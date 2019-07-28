@@ -22,6 +22,7 @@
 #include "Init.h"
 #include <algorithm>
 using namespace std;
+using namespace Thunderegg;
 static void getXYZ(shared_ptr<PatchInfo<3>> pinfo, int xi, int yi, int zi, double &x, double &y,
                    double &z)
 {

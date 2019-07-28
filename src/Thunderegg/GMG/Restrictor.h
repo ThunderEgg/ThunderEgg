@@ -19,10 +19,12 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGRestrictor_H
-#define GMGRestrictor_H
+#ifndef THUNDEREGG_GMG_RESTRICTOR_H
+#define THUNDEREGG_GMG_RESTRICTOR_H
+
 #include <Thunderegg/Vector.h>
-namespace GMG
+
+namespace Thunderegg::GMG
 {
 /**
  * @brief Base class for multi-grid restriction operators.
@@ -39,5 +41,5 @@ template <size_t D> class Restrictor
 	virtual void restrict(std::shared_ptr<Vector<D>>       coarse,
 	                      std::shared_ptr<const Vector<D>> fine) const = 0;
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

@@ -22,6 +22,8 @@
 #ifndef Serializable_H
 #define Serializable_H
 #include <memory>
+namespace Thunderegg
+{
 /**
  * @brief Interface for serializing objects
  */
@@ -44,4 +46,5 @@ class Serializable
 	 */
 	virtual int deserialize(char *buffer) = 0;
 };
+} // namespace Thunderegg
 #endif

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively 
+ *  Thunderegg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
  *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
@@ -24,6 +24,8 @@
 #include <functional>
 #include <petscmat.h>
 #include <valarray>
+namespace Thunderegg
+{
 struct Block;
 class SchurMatrixHelper
 {
@@ -38,11 +40,12 @@ class SchurMatrixHelper
 	SchurMatrixHelper(std::shared_ptr<SchurHelper<3>> sh)
 	{
 		this->sh = sh;
-        n=sh->getLengths()[0];
+		n        = sh->getLengths()[0];
 	}
-	PW_explicit<Mat> formCRSMatrix();
-	PBMatrix *       formPBMatrix();
-	void             getPBDiagInv(PC p);
-	PW_explicit<Mat> getPBMatrix();
-	PW_explicit<Mat> getPBDiagInv();
+	PW_explicit<Mat>        formCRSMatrix();
+	Experimental::PBMatrix *formPBMatrix();
+	void                    getPBDiagInv(PC p);
+	PW_explicit<Mat>        getPBMatrix();
+	PW_explicit<Mat>        getPBDiagInv();
 };
+} // namespace Thunderegg

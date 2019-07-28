@@ -22,6 +22,7 @@
 #include "ClawWriter.h"
 #include <fstream>
 using namespace std;
+using namespace Thunderegg;
 ClawWriter::ClawWriter(std::shared_ptr<Domain<2>> domain)
 {
 	this->domain = domain;

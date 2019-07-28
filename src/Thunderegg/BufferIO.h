@@ -21,10 +21,14 @@
 
 #ifndef THUNDEREGG_BUFFERIO_H
 #define THUNDEREGG_BUFFERIO_H
-#include "Serializable.h"
+
+#include <Thunderegg/Serializable.h>
 #include <cstddef>
 #include <iostream>
 #include <type_traits>
+
+namespace Thunderegg
+{
 template <typename T> constexpr bool isSerializable()
 {
 	return std::is_base_of<Serializable, T>::value;
@@ -146,4 +150,5 @@ class BufferReader
 		return *this;
 	}
 };
+} // namespace Thunderegg
 #endif

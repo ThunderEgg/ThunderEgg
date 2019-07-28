@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively 
+ *  Thunderegg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
  *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
@@ -19,15 +19,19 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef OCTREE_H
-#define OCTREE_H
-#include "OctNode.h"
+#ifndef THUNDEREGG_EXPERIMENTAL_OCTREE_H
+#define THUNDEREGG_EXPERIMENTAL_OCTREE_H
+
+#include <Thunderegg/Experimental/OctNode.h>
 #include <deque>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
 #include <string>
+
+namespace Thunderegg::Experimental
+{
 /**
  * @brief Represents an oct-tree.
  */
@@ -211,4 +215,5 @@ template <size_t D> inline void Tree<D>::refineNode(Node<D> &n)
 		nodes[child.id] = child;
 	}
 }
+} // namespace Thunderegg::Experimental
 #endif

@@ -19,18 +19,17 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGLEVEL_H
-#define GMGLEVEL_H
+#ifndef THUNDEREGG_GMG_LEVEL_H
+#define THUNDEREGG_GMG_LEVEL_H
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/GMG/Interpolator.h>
 #include <Thunderegg/GMG/Restrictor.h>
 #include <Thunderegg/GMG/Smoother.h>
-#include <Thunderegg/Operators/Operator.h>
+#include <Thunderegg/Operator.h>
 #include <Thunderegg/Vector.h>
 #include <memory>
-namespace GMG
+namespace Thunderegg::GMG
 {
-
 /**
  * @brief Represents a level in geometric multi-grid.
  */
@@ -203,5 +202,5 @@ template <size_t D> class Level
 		return coarser == nullptr;
 	}
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

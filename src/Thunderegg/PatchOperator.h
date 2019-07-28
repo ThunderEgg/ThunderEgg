@@ -19,10 +19,12 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef PATCHOPERATOR_H
-#define PATCHOPERATOR_H
+#ifndef THUNDEREGG_PATCHOPERATOR_H
+#define THUNDEREGG_PATCHOPERATOR_H
 #include <Thunderegg/SchurInfo.h>
 #include <Thunderegg/Vector.h>
+namespace Thunderegg
+{
 template <size_t D> class PatchOperator
 {
 	public:
@@ -35,4 +37,5 @@ template <size_t D> class PatchOperator
 	= 0;
 	virtual void apply(const SchurInfo<D> &d, const LocalData<D> u, LocalData<D> f) = 0;
 };
+} // namespace Thunderegg
 #endif

@@ -19,70 +19,111 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef IFACETYPE_H
-#define IFACETYPE_H
+#ifndef THUNDEREGG_IFACETYPE_H
+#define THUNDEREGG_IFACETYPE_H
 #include <Thunderegg/Side.h>
-/*
-enum class IfaceType {
-    normal,
-    coarse_to_coarse,
-    fine_to_coarse_0,
-    fine_to_coarse_1,
-    fine_to_coarse_2,
-    fine_to_coarse_3,
-    fine_to_fine_0,
-    fine_to_fine_1,
-    fine_to_fine_2,
-    fine_to_fine_3,
-    coarse_to_fine_0,
-    coarse_to_fine_1,
-    coarse_to_fine_2,
-    coarse_to_fine_3
-};
-inline IfaceType operator+(const IfaceType &a, const int &b)
+namespace Thunderegg
 {
-    return static_cast<IfaceType>(static_cast<int>(a) + b);
-}
-*/
+/**
+ * @brief An enum-style class that represents interface types
+ *
+ * @tparam D the number of cartesian dimensions on a patch
+ */
 template <size_t D> class IfaceType
 {
 	private:
 	/**
 	 * @brief the value of the enum
 	 */
-	char           val     = -1;
+	char val = -1;
+	/**
+	 * @brief Orthant that the interface lies on
+	 */
 	Orthant<D - 1> orthant = -1;
 
 	public:
 	// enum definitions
-	static constexpr char normal           = 0b000;
+	/**
+	 * @brief An interface on a side of a patch with a neighbor at the same refinement level.
+	 */
+	static constexpr char normal = 0b000;
+	/**
+	 * @brief An interface on a side of a patch with neighbors at a finer refinement level.
+	 *
+	 * This interface lines up with the cells on the coarser patch.
+	 */
 	static constexpr char coarse_to_coarse = 0b001;
-	static constexpr char fine_to_coarse   = 0b010;
-	static constexpr char fine_to_fine     = 0b011;
-	static constexpr char coarse_to_fine   = 0b100;
-	IfaceType()                            = default;
+	/**
+	 * @brief An interface on a side of a patch with a neighbor at a coarser refinement level.
+	 *
+	 * This interface lines up with the cells on the coarser patch.
+	 */
+	static constexpr char fine_to_coarse = 0b010;
+	/**
+	 * @brief An interface on a side of a patch with a neighbor at a coarser refinement level.
+	 *
+	 * This interface lines up with the cells on the finer patch.
+	 * The orthant value should be set to the orthant on the coarser patch's side that the finer
+	 * patch lies on.
+	 */
+	static constexpr char fine_to_fine = 0b011;
+	/**
+	 * @brief An interface on a side of a patch with neighbors at a finer refinement level.
+	 *
+	 * This interface lines up with the cells on the finer patch.
+	 * The orthant value should be set to the orthant on the coarser patch's side that the finer
+	 * patch lies on.
+	 */
+	static constexpr char coarse_to_fine = 0b100;
+	/**
+	 * @brief Construct a new Iface Type object with the value set to -1
+	 */
+	IfaceType() = default;
+	/**
+	 * @brief Construct a new Iface Type object with the specified value
+	 *
+	 * @param val the value
+	 */
 	IfaceType(const char val)
 	{
 		this->val = val;
 	}
+	/**
+	 * @brief Construct a new Iface Type object with the specified value and orthant.
+	 *
+	 * @param val the value
+	 * @param orthant orthant on the coarser patch's side that the finer
+	 * patch lies on.
+	 */
 	IfaceType(const char val, const Orthant<D - 1> orthant)
 	{
 		this->val     = val;
 		this->orthant = orthant;
 	}
-	void set(int blah) {}
+	/**
+	 * @brief Return the integer value of this ifacetype
+	 */
 	char toInt()
 	{
 		return val;
 	}
+	/**
+	 * @brief Get the Orthant that the finer patch lies on
+	 */
 	Orthant<D - 1> getOrthant()
 	{
 		return orthant;
 	}
+	/**
+	 * @brief Set the Orthant that the finer patch lies on
+	 */
 	void setOrthant(const Orthant<D - 1> orthant)
 	{
 		this->orthant = orthant;
 	}
+	/**
+	 * @brief Compare iface type values
+	 */
 	bool operator<(const IfaceType &b) const
 	{
 		int orth   = orthant.toInt();
@@ -90,5 +131,5 @@ template <size_t D> class IfaceType
 		return std::tie(val, orth) < std::tie(b.val, b_orth);
 	}
 };
-
+} // namespace Thunderegg
 #endif

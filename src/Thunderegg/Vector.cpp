@@ -20,7 +20,7 @@
  ***************************************************************************/
 
 #include "Vector.h"
-
+using namespace Thunderegg;
 template class LocalData<1>;
 template class LocalData<2>;
 template class LocalData<3>;

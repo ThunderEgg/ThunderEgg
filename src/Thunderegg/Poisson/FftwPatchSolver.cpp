@@ -19,34 +19,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_MATRIXHELPER_H
-#define THUNDEREGG_MATRIXHELPER_H
-#include <Thunderegg/Domain.h>
-#include <petscmat.h>
-/**
- * @brief Create a matrix for the 3D second-order Laplacian operator
- */
-class MatrixHelper
-{
-	private:
-	/**
-	 * @brief the domain
-	 */
-	std::shared_ptr<Domain<3>> domain;
+#include "FftwPatchSolver.h"
 
-	public:
-	/**
-	 * @brief Create a MatrixHelper for a given 3D domain.
-	 *
-	 * @param domain the Domain
-	 */
-	MatrixHelper(std::shared_ptr<Domain<3>> domain);
+using namespace Thunderegg::Poisson;
 
-	/**
-	 * @brief Form the matrix for the domain
-	 *
-	 * @return the formed matrix
-	 */
-	PW_explicit<Mat> formCRSMatrix(double lambda = 0);
-};
-#endif
+template class FftwPatchSolver<2>;
+template class FftwPatchSolver<3>;

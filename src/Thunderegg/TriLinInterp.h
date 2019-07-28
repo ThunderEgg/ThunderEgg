@@ -22,6 +22,8 @@
 #ifndef TRILININTERP_H
 #define TRILININTERP_H
 #include <Thunderegg/IfaceInterp.h>
+namespace Thunderegg
+{
 class TriLinInterp : public IfaceInterp<3>
 {
 	public:
@@ -32,4 +34,5 @@ class TriLinInterp : public IfaceInterp<3>
 	void interpolate(SchurInfo<3> &d, Side<3> s, int local_index, IfaceType<3> itype,
 	                 std::shared_ptr<const Vector<3>> u, std::shared_ptr<Vector<2>> interp);
 };
+} // namespace Thunderegg
 #endif

@@ -20,5 +20,5 @@
  ***************************************************************************/
 
 #include <Thunderegg/PatchInfo.h>
-template class PatchInfo<2>;
-template class PatchInfo<3>;
+template class Thunderegg::PatchInfo<2>;
+template class Thunderegg::PatchInfo<3>;

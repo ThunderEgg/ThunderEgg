@@ -21,8 +21,9 @@
 
 #include "SchurMatrixHelper.h"
 using namespace std;
+using namespace Thunderegg;
 enum class Rotation : char { x_cw, x_ccw, y_cw, y_ccw, z_cw, z_ccw };
-struct Block {
+struct Thunderegg::Block {
 	static const Side<3>          side_table[6][6];
 	static const char             rots_table[6][6];
 	static const vector<Rotation> main_rot_plan[6];
@@ -264,7 +265,7 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 		pinfo->spacings.fill(1.0 / n);
 		pinfo->neumann                    = curr_type.neumann;
 		sd.getIfaceInfoPtr(Side<3>::west) = new NormalIfaceInfo<3>();
-		solver->addDomain(sd);
+		solver->addPatch(sd);
 		std::vector<SchurInfo<3>> single_domain;
 		single_domain.push_back(sd);
 
@@ -440,6 +441,7 @@ PW_explicit<Mat> SchurMatrixHelper::formCRSMatrix()
 	MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
 	return A;
 }
+using Thunderegg::Experimental::PBMatrix;
 PBMatrix *SchurMatrixHelper::formPBMatrix()
 {
 	int local_size  = sh->getIfaces().size() * n * n;

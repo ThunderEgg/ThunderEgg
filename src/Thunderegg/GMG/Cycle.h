@@ -19,12 +19,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGCycle_H
-#define GMGCycle_H
+#ifndef THUNDEREGG_GMG_CYCLE_H
+#define THUNDEREGG_GMG_CYCLE_H
+
 #include <Thunderegg/GMG/Level.h>
 #include <Thunderegg/Vector.h>
 #include <list>
-namespace GMG
+
+namespace Thunderegg::GMG
 {
 /**
  * @brief Base class for cycles. Includes functions for preparing vectors for finer and coarser
@@ -125,5 +127,5 @@ template <size_t D> class Cycle : public Operator<D>
 		u_vectors.pop_front();
 	}
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

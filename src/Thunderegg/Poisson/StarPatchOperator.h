@@ -19,10 +19,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef STARPATCHOP_H
-#define STARPATCHOP_H
+#ifndef THUNDEREGG_POISSON_STARPATCHOPERATOR_H
+#define THUNDEREGG_POISSON_STARPATCHOPERATOR_H
+
 #include <Thunderegg/PatchOperator.h>
-template <size_t D> class StarPatchOp : public PatchOperator<D>
+
+namespace Thunderegg::Poisson
+{
+template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	public:
 	void applyWithInterface(SchurInfo<D> &sinfo, const LocalData<D> u,
@@ -318,6 +322,7 @@ template <size_t D> class StarPatchOp : public PatchOperator<D>
 		}
 	}
 };
-extern template class StarPatchOp<2>;
-extern template class StarPatchOp<3>;
+extern template class StarPatchOperator<2>;
+extern template class StarPatchOperator<3>;
+}; // namespace Thunderegg::Poisson
 #endif

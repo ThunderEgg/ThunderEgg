@@ -25,11 +25,12 @@
 class ClawWriter
 {
 	private:
-	std::shared_ptr<Domain<2>> domain;
-	void writePatch(PatchInfo<2> &d, std::ostream &os, double *u_view, double *resid_view);
+	std::shared_ptr<Thunderegg::Domain<2>> domain;
+	void writePatch(Thunderegg::PatchInfo<2> &d, std::ostream &os, double *u_view,
+	                double *resid_view);
 
 	public:
-	ClawWriter(std::shared_ptr<Domain<2>> domain);
+	ClawWriter(std::shared_ptr<Thunderegg::Domain<2>> domain);
 	void write(Vec u, Vec resid);
 };
 #endif

@@ -22,6 +22,7 @@
 #include "PolyChebPrec.h"
 #include <iostream>
 using namespace std;
+using namespace Thunderegg;
 PolyChebPrec::PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<SchurHelper<3>> sh)
 {
 	this->sh     = sh;

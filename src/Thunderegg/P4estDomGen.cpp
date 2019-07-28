@@ -24,6 +24,7 @@
 #include <p4est_iterate.h>
 
 using namespace std;
+using namespace Thunderegg;
 
 std::shared_ptr<Domain<2>> P4estDomGen::getFinestDomain()
 {

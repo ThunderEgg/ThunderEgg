@@ -25,6 +25,8 @@
 #include <iostream>
 #include <numeric>
 #include <vector>
+namespace Thunderegg
+{
 enum class Axis { x, y, z };
 /**
  * @brief An enum-style class that represents the sides of a cube.
@@ -468,4 +470,5 @@ inline std::ostream &operator<<(std::ostream &os, const Orthant<3> &o)
 	}
 	return os;
 }
+} // namespace Thunderegg
 #endif

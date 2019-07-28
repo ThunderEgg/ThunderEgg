@@ -19,10 +19,12 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGInterpolator_H
-#define GMGInterpolator_H
+#ifndef THUNDEREGG_GMG_INTERPOLATOR_H
+#define THUNDEREGG_GMG_INTERPOLATOR_H
+
 #include <Thunderegg/Vector.h>
-namespace GMG
+
+namespace Thunderegg::GMG
 {
 /**
  * @brief base class for interpolation operators from finer levels to coarser levels.
@@ -39,5 +41,5 @@ template <size_t D> class Interpolator
 	virtual void interpolate(std::shared_ptr<const Vector<D>> coarse,
 	                         std::shared_ptr<Vector<D>>       fine) const = 0;
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

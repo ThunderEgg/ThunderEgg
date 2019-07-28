@@ -21,14 +21,23 @@
 
 #ifndef BICGSTABSOLVER_H
 #define BICGSTABSOLVER_H
+
 #include <Thunderegg/BiCGStab.h>
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/PatchOperator.h>
-#include <Thunderegg/PatchSolvers/PatchSolver.h>
+#include <Thunderegg/PatchSolver.h>
 #include <Thunderegg/ValVector.h>
 #include <bitset>
 #include <fftw3.h>
 #include <map>
+
+namespace Thunderegg
+{
+/**
+ * @brief Solves the patches using a BiCGStab iterative solver on each patch
+ *
+ * @tparam D
+ */
 template <size_t D> class BiCGStabSolver : public PatchSolver<D>
 {
 	private:
@@ -94,6 +103,13 @@ template <size_t D> class BiCGStabSolver : public PatchSolver<D>
 	double                            tol;
 
 	public:
+	/**
+	 * @brief Construct a new BiCGStabSolver object
+	 *
+	 * @param op the operator to use
+	 * @param tol the tolerance
+	 * @param max_it the maximum iterations
+	 */
 	BiCGStabSolver(std::shared_ptr<PatchOperator<D>> op, double tol = 1e-12, int max_it = 1000)
 	{
 		this->op     = op;
@@ -102,14 +118,14 @@ template <size_t D> class BiCGStabSolver : public PatchSolver<D>
 	}
 	void solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
 	           std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma);
-	void domainSolve(std::vector<SchurInfo<D>> &domains, std::shared_ptr<const Vector<D>> f,
+	void domainSolve(std::vector<SchurInfo<D>> &patches, std::shared_ptr<const Vector<D>> f,
 	                 std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma)
 	{
-		for (SchurInfo<D> &sinfo : domains) {
+		for (SchurInfo<D> &sinfo : patches) {
 			solve(sinfo, f, u, gamma);
 		}
 	}
-	void addDomain(SchurInfo<D> &sinfo) {}
+	void addPatch(SchurInfo<D> &sinfo) {}
 };
 template <size_t D>
 void BiCGStabSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
@@ -130,4 +146,5 @@ void BiCGStabSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<
 
 	BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
 }
+} // namespace Thunderegg
 #endif

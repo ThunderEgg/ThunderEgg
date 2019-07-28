@@ -24,6 +24,7 @@
 #include <numeric>
 #include <tuple>
 using namespace std;
+using namespace Thunderegg;
 enum axis_enum { X_AXIS, Y_AXIS };
 enum bc_enum { DIRICHLET, NEUMANN, REFINED };
 
@@ -140,7 +141,7 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 		pinfo->ns.fill(n);
 		pinfo->neumann                    = curr_type.neumann;
 		sd.getIfaceInfoPtr(Side<2>::west) = new NormalIfaceInfo<2>();
-		solver->addDomain(sd);
+		solver->addPatch(sd);
 		std::vector<SchurInfo<2>> single_domain;
 		single_domain.push_back(sd);
 

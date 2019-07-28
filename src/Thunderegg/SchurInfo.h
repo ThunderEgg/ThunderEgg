@@ -24,6 +24,8 @@
 #include <Thunderegg/Iface.h>
 #include <Thunderegg/PatchInfo.h>
 #include <deque>
+namespace Thunderegg
+{
 /**
  * @brief The IfaceInfo class represents the information for an interface on a given side of the
  * patch.
@@ -558,4 +560,5 @@ template <size_t D> struct SchurInfo {
 };
 extern template struct SchurInfo<2>;
 extern template struct SchurInfo<3>;
+} // namespace Thunderegg
 #endif

@@ -22,10 +22,11 @@
 #ifndef THUNDEREGG_POLYCHEBPREC_H
 #define THUNDEREGG_POLYCHEBPREC_H
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/MatrixHelper.h>
-#include <Thunderegg/Operators/Operator.h>
+#include <Thunderegg/Operator.h>
 #include <Thunderegg/SchurHelper.h>
 #include <petscpc.h>
+namespace Thunderegg
+{
 /**
  * @brief Approximate inverse of Schur-compliment system using Chebyschev polynomials
  */
@@ -42,8 +43,15 @@ class PolyChebPrec : public Operator<2>
 	   3.809106471898141e-02, 2.416923786484517e-02, 1.533567161022980e-02, 1.628851184599676e-02};
 
 	public:
+	/**
+	 * @brief Construct a new PolyChebPrec object
+	 *
+	 * @param domain the Domain
+	 * @param sh the SchurHelper
+	 */
 	PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<SchurHelper<3>> sh);
 
 	void apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const;
 };
+} // namespace Thunderegg
 #endif

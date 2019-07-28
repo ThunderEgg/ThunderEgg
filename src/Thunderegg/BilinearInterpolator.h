@@ -21,9 +21,13 @@
 
 #ifndef THUNDEREGG_BILINEARINTERPOLATOR_H
 #define THUNDEREGG_BILINEARINTERPOLATOR_H
+
 #include <Thunderegg/IfaceInterp.h>
+
+namespace Thunderegg
+{
 /**
- * @brief a bilinear interpolator
+ * @brief a bilinear interpolator for interface values
  */
 class BilinearInterpolator : public IfaceInterp<2>
 {
@@ -35,4 +39,5 @@ class BilinearInterpolator : public IfaceInterp<2>
 	void interpolate(SchurInfo<2> &d, Side<2> s, int local_index, IfaceType<2> itype,
 	                 std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector<1>> interp);
 };
+} // namespace Thunderegg
 #endif

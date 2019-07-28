@@ -19,7 +19,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "StarPatchOp.h"
+#include "DftPatchSolver.h"
 
-template class StarPatchOp<2>;
-template class StarPatchOp<3>;
+using namespace Thunderegg::Poisson;
+
+template class DftPatchSolver<2>;
+template class DftPatchSolver<3>;

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively 
+ *  Thunderegg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
  *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
@@ -29,6 +29,7 @@ void dgetrf_(int *M, int *N, double *A, int *lda, int *IPIV, int *INFO);
 void dgetri_(int *N, double *A, int *lda, int *IPIV, double *WORK, int *lwork, int *INFO);
 }
 using namespace std;
+using namespace Thunderegg::Experimental;
 PBMatrix::PBMatrix(int n, int local_size, int global_size)
 {
 	this->n           = n;
@@ -36,8 +37,8 @@ PBMatrix::PBMatrix(int n, int local_size, int global_size)
 	this->global_size = global_size;
 }
 void PBMatrix::insertBlock(int i, int j, std::shared_ptr<std::valarray<double>> coeffs,
-                           std::function<int(int, int, int)>                    col_trans,
-                           std::function<int(int, int, int)>                    row_trans)
+                           std::function<int(int, int, int)> col_trans,
+                           std::function<int(int, int, int)> row_trans)
 {
 	PBlock b = {i, j, coeffs, col_trans, row_trans};
 	blocks.insert(b);
@@ -116,8 +117,8 @@ void inverse(double *A, int N)
 }
 struct PBlockMin {
 	std::shared_ptr<std::valarray<double>> coeffs;
-	std::function<int(int, int, int)> col_trans;
-	std::function<int(int, int, int)> row_trans;
+	std::function<int(int, int, int)>      col_trans;
+	std::function<int(int, int, int)>      row_trans;
 	PBlockMin(const PBMatrix::PBlock &b)
 	{
 		coeffs    = b.coeffs;
@@ -135,12 +136,10 @@ struct PBlockMin {
 };
 PBMatrix *PBMatrix::getDiagInv()
 {
-	PBMatrix *APB = new PBMatrix(n, local_size, global_size);
+	PBMatrix *               APB = new PBMatrix(n, local_size, global_size);
 	map<int, set<PBlockMin>> diags;
 	for (const PBlock &b : blocks) {
-		if (b.i == b.j) {
-			diags[b.i].insert(b);
-		}
+		if (b.i == b.j) { diags[b.i].insert(b); }
 	}
 	map<set<PBlockMin>, shared_ptr<valarray<double>>> invs;
 	for (auto &p : diags) {
@@ -182,13 +181,13 @@ PBMatrix *PBMatrix::getDiagInv()
 }
 BlockJacobiSmoother PBMatrix::getBlockJacobiSmoother()
 {
-	PBMatrix *APB = new PBMatrix(n, local_size, global_size);
-	PBMatrix *R = new PBMatrix(n, local_size, global_size);
+	PBMatrix *               APB = new PBMatrix(n, local_size, global_size);
+	PBMatrix *               R   = new PBMatrix(n, local_size, global_size);
 	map<int, set<PBlockMin>> diags;
 	for (const PBlock &b : blocks) {
 		if (b.i == b.j) {
 			diags[b.i].insert(b);
-		}else{
+		} else {
 			R->blocks.insert(b);
 		}
 	}

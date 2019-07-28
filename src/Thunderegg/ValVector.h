@@ -23,6 +23,8 @@
 #define VALVECTOR_H
 #include <Thunderegg/Vector.h>
 #include <valarray>
+namespace Thunderegg
+{
 template <size_t D> class ValVector : public Vector<D>
 
 {
@@ -63,4 +65,5 @@ template <size_t D> class ValVector : public Vector<D>
 		return LocalData<D>(data, strides, lengths, nullptr);
 	}
 };
+} // namespace Thunderegg
 #endif

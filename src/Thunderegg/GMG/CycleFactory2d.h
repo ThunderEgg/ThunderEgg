@@ -19,15 +19,15 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGCYCLEFACTORY2D_H
-#define GMGCYCLEFACTORY2D_H
+#ifndef THUNDEREGG_GMG_CYCLEFACTORY2D_H
+#define THUNDEREGG_GMG_CYCLEFACTORY2D_H
 #include <Thunderegg/DomainGenerator.h>
 #include <Thunderegg/GMG/Cycle.h>
 #include <Thunderegg/GMG/CycleOpts.h>
 #include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/PatchOperator.h>
-#include <Thunderegg/PatchSolvers/PatchSolver.h>
-namespace GMG
+#include <Thunderegg/PatchSolver.h>
+namespace Thunderegg::GMG
 {
 class CycleFactory2d
 {
@@ -38,5 +38,5 @@ class CycleFactory2d
 	                                          std::shared_ptr<PatchOperator<2>>   op,
 	                                          std::shared_ptr<IfaceInterp<2>>     interpolator);
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

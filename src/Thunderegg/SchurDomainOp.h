@@ -19,21 +19,42 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef Operator_H
-#define Operator_H
-#include <Thunderegg/Vector.h>
-/**
- * @brief Base class for operators
- */
-template <size_t D> class Operator
+#ifndef THUNDEREGG_SCHURDOMAINOP_H
+#define THUNDEREGG_SCHURDOMAINOP_H
+
+#include <Thunderegg/Operator.h>
+#include <Thunderegg/SchurHelper.h>
+
+namespace Thunderegg
 {
+template <size_t D> class SchurDomainOp : public Operator<D>
+{
+	private:
+	/**
+	 * @brief PETSc Matrix object
+	 */
+	std::shared_ptr<SchurHelper<D>> helper;
+
 	public:
 	/**
-	 * @brief Virtual function that base classes have to implement.
+	 * @brief Crate new WrapOp
+	 *
+	 * @param matrix the PETSc matrix
+	 */
+	SchurDomainOp(std::shared_ptr<SchurHelper<D>> helper)
+	{
+		this->helper = helper;
+	}
+	/**
+	 * @brief Perform matrix/vector multiply.
 	 *
 	 * @param x the input vector.
 	 * @param b the output vector.
 	 */
-	virtual void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const = 0;
+	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
+	{
+		helper->apply(x, b);
+	}
 };
+} // namespace Thunderegg
 #endif

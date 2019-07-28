@@ -19,10 +19,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef BICGSTAB_H
-#define BICGSTAB_H
-#include <Thunderegg/Operators/Operator.h>
+#ifndef THUNDEREGG_BICGSTAB_H
+#define THUNDEREGG_BICGSTAB_H
+#include <Thunderegg/Operator.h>
 #include <Thunderegg/Vector.h>
+
+namespace Thunderegg
+{
 /**
  * @brief Thunderegg implementation of BiCGStab iterative solver.
  *
@@ -32,9 +35,9 @@ template <size_t D> class BiCGStab
 {
 	public:
 	/**
-	 * @brief Perform an iterative solver
+	 * @brief Perform an iterative solve
 	 *
-	 * @param vg a VectorGenerator that allow for the creation of temporary work vectors
+	 * @param vg a VectorGenerator that allows for the creation of temporary work vectors
 	 * @param A the matrix
 	 * @param x the initial LHS guess.
 	 * @param b the RHS vector.
@@ -105,4 +108,5 @@ template <size_t D> class BiCGStab
 		return num_its;
 	}
 };
+} // namespace Thunderegg
 #endif

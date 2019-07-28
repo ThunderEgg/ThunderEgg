@@ -19,18 +19,21 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef PATCHSOLVER_H
-#define PATCHSOLVER_H
-#include <Thunderegg/SchurInfo.h>
-#include <Thunderegg/Vector.h>
-template <size_t D> class PatchSolver
+#ifndef THUNDEREGG_POISSON_SEVENPTPATCHOPERATOR_H
+#define THUNDEREGG_POISSON_SEVENPTPATCHOPERATOR_H
+
+#include <Thunderegg/PatchOperator.h>
+
+namespace Thunderegg::Poisson
+{
+class SevenPtPatchOperator : public PatchOperator<3>
 {
 	public:
-	virtual ~PatchSolver() {}
-	virtual void addDomain(SchurInfo<D> &d) = 0;
-	virtual void domainSolve(std::vector<SchurInfo<D>> &domains, std::shared_ptr<const Vector<D>> f,
-	                         std::shared_ptr<Vector<D>>           u,
-	                         std::shared_ptr<const Vector<D - 1>> gamma)
-	= 0;
+	void applyWithInterface(SchurInfo<3> &d, const LocalData<3> u,
+	                        std::shared_ptr<const Vector<2>> gamma, LocalData<3> f) override;
+	void addInterfaceToRHS(SchurInfo<3> &sinfo, std::shared_ptr<const Vector<2>> gamma,
+	                       LocalData<3> f) override;
+	void apply(const SchurInfo<3> &sinfo, const LocalData<3> u, LocalData<3> f) override;
 };
+} // namespace Thunderegg::Poisson
 #endif

@@ -26,12 +26,14 @@
 #include <Thunderegg/GMG/InterLevelComm.h>
 #include <Thunderegg/GMG/VCycle.h>
 #include <Thunderegg/GMG/WCycle.h>
-#include <Thunderegg/MatrixHelper.h>
-#include <Thunderegg/Operators/PetscMatOp.h>
-#include <Thunderegg/Operators/SchurDomainOp.h>
+#include <Thunderegg/PetscMatOp.h>
+#include <Thunderegg/Poisson/MatrixHelper.h>
+#include <Thunderegg/SchurDomainOp.h>
 #include <fstream>
 #include <limits>
-using namespace GMG;
+using namespace Thunderegg::GMG;
+using namespace Thunderegg::Poisson;
+using namespace Thunderegg;
 using namespace std;
 static std::shared_ptr<Operator<3>> getNewOperator(std::string                     op_type,
                                                    std::shared_ptr<Domain<3>>      domain,

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively 
+ *  Thunderegg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
  *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
@@ -22,10 +22,23 @@
 #ifndef QUADINTERPOLATOR_H
 #define QUADINTERPOLATOR_H
 #include <Thunderegg/IfaceInterp.h>
+namespace Thunderegg
+{
+/**
+ * @brief Quadradic interpolation for interfaces
+ */
 class QuadInterpolator : public IfaceInterp<2>
 {
 	public:
-	void interpolate(PatchInfo<2> &d, const Vec u, Vec interp);
-	void interpolate(PatchInfo<2> &d, Side<2> s, InterpCase icase, const Vec u, Vec interp);
+	/**
+	 * @brief
+	 *
+	 * @param pinfo
+	 * @param u the rhs vector
+	 * @param interp
+	 */
+	void interpolate(PatchInfo<2> &pinfo, const Vec u, Vec interp);
+	void interpolate(PatchInfo<2> &pinfo, Side<2> s, InterpCase icase, const Vec u, Vec interp);
 };
+} // namespace Thunderegg
 #endif

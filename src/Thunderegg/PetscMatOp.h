@@ -19,39 +19,40 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef SchurDomainOp_H
-#define SchurDomainOp_H
-#include <Thunderegg/Operators/Operator.h>
+#ifndef THUNDEREGG_PETSCMATOP_H
+#define THUNDEREGG_PETSCMATOP_H
+
+#include <Thunderegg/Operator.h>
 #include <Thunderegg/SchurHelper.h>
 
-template <size_t D> class SchurDomainOp : public Operator<D>
+namespace Thunderegg
+{
+/**
+ * @brief Base class for operators
+ */
+template <size_t D> class PetscMatOp : public Operator<D>
 {
 	private:
-	/**
-	 * @brief PETSc Matrix object
-	 */
-	std::shared_ptr<SchurHelper<D>> helper;
+	PW<Mat> A;
 
 	public:
-	/**
-	 * @brief Crate new WrapOp
-	 *
-	 * @param matrix the PETSc matrix
-	 */
-	SchurDomainOp(std::shared_ptr<SchurHelper<D>> helper)
+	PetscMatOp(PW<Mat> A)
 	{
-		this->helper = helper;
+		this->A = A;
 	}
 	/**
-	 * @brief Perform matrix/vector multiply.
+	 * @brief Apply Petsc matrix
 	 *
 	 * @param x the input vector.
 	 * @param b the output vector.
 	 */
 	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 	{
-		helper->apply(x, b);
+		const PetscVector<D> *x_vec = dynamic_cast<const PetscVector<D> *>(x.get());
+		PetscVector<D> *      b_vec = dynamic_cast<PetscVector<D> *>(b.get());
+		if (x_vec == nullptr || b_vec == nullptr) { throw 3; }
+		MatMult(A, x_vec->vec, b_vec->vec);
 	}
 };
-
+} // namespace Thunderegg
 #endif

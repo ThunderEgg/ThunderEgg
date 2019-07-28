@@ -20,5 +20,5 @@
  ***************************************************************************/
 
 #include "SchurInfo.h"
-template struct SchurInfo<2>;
-template struct SchurInfo<3>;
+template struct Thunderegg::SchurInfo<2>;
+template struct Thunderegg::SchurInfo<3>;

@@ -19,18 +19,20 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_THUNDEREGGDOMGEN_H
-#define THUNDEREGG_THUNDEREGGDOMGEN_H
+#ifndef THUNDEREGG_EXPERIMENTAL_DOMGEN_H
+#define THUNDEREGG_EXPERIMENTAL_DOMGEN_H
 #include <Thunderegg/DomainGenerator.h>
-#include <Thunderegg/OctTree.h>
+#include <Thunderegg/Experimental/OctTree.h>
 #include <list>
 #include <zoltan.h>
+namespace Thunderegg::Experimental
+{
 /**
  * @brief Creates domains from a Thunderegg Tree
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class ThundereggDomGen : public DomainGenerator<D>
+template <size_t D> class DomGen : public DomainGenerator<D>
 {
 	private:
 	/**
@@ -83,20 +85,19 @@ template <size_t D> class ThundereggDomGen : public DomainGenerator<D>
 
 	public:
 	/**
-	 * @brief Construct a new ThundereggDomGen object
+	 * @brief Construct a new DomGen object
 	 *
 	 * @param t the tree to use
 	 * @param ns the number of cells in each direction
 	 * @param neumann whether to use neumann boundary conditions
 	 */
-	ThundereggDomGen(Tree<D> t, std::array<int, D> ns, bool neumann = false);
-	~ThundereggDomGen() = default;
+	DomGen(Tree<D> t, std::array<int, D> ns, bool neumann = false);
+	~DomGen() = default;
 	std::shared_ptr<Domain<D>> getFinestDomain();
 	bool                       hasCoarserDomain();
 	std::shared_ptr<Domain<D>> getCoarserDomain();
 };
-template <size_t D>
-ThundereggDomGen<D>::ThundereggDomGen(Tree<D> t, std::array<int, D> ns, bool neumann)
+template <size_t D> DomGen<D>::DomGen(Tree<D> t, std::array<int, D> ns, bool neumann)
 {
 	this->t       = t;
 	this->ns      = ns;
@@ -107,11 +108,11 @@ ThundereggDomGen<D>::ThundereggDomGen(Tree<D> t, std::array<int, D> ns, bool neu
 	// generate finest DC
 	extractLevel();
 }
-template <size_t D> std::shared_ptr<Domain<D>> ThundereggDomGen<D>::getFinestDomain()
+template <size_t D> std::shared_ptr<Domain<D>> DomGen<D>::getFinestDomain()
 {
 	return domain_list.front();
 }
-template <size_t D> std::shared_ptr<Domain<D>> ThundereggDomGen<D>::getCoarserDomain()
+template <size_t D> std::shared_ptr<Domain<D>> DomGen<D>::getCoarserDomain()
 {
 	if (curr_level > 0) {
 		extractLevel();
@@ -120,11 +121,11 @@ template <size_t D> std::shared_ptr<Domain<D>> ThundereggDomGen<D>::getCoarserDo
 		return nullptr;
 	}
 }
-template <size_t D> bool ThundereggDomGen<D>::hasCoarserDomain()
+template <size_t D> bool DomGen<D>::hasCoarserDomain()
 {
 	return curr_level > 0;
 }
-template <size_t D> inline void ThundereggDomGen<D>::extractLevel()
+template <size_t D> inline void DomGen<D>::extractLevel()
 {
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -220,7 +221,7 @@ template <size_t D> inline void ThundereggDomGen<D>::extractLevel()
 	}
 	curr_level--;
 }
-template <size_t D> inline void ThundereggDomGen<D>::balanceLevel(PInfoMap &level)
+template <size_t D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
 {
 	struct Zoltan_Struct *zz = Zoltan_Create(MPI_COMM_WORLD);
 
@@ -409,7 +410,7 @@ template <size_t D> inline void ThundereggDomGen<D>::balanceLevel(PInfoMap &leve
 	}
 }
 template <size_t D>
-inline void ThundereggDomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_level)
+inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_level)
 {
 	struct Zoltan_Struct *zz = Zoltan_Create(MPI_COMM_WORLD);
 
@@ -646,6 +647,7 @@ inline void ThundereggDomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap
 		p.second->setPtrs(level);
 	}
 }
-extern template class ThundereggDomGen<2>;
-extern template class ThundereggDomGen<3>;
+extern template class DomGen<2>;
+extern template class DomGen<3>;
+} // namespace Thunderegg::Experimental
 #endif

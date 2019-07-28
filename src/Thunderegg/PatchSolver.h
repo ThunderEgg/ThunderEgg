@@ -19,32 +19,46 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef DOMAINWRAPOP_H
-#define DOMAINWRAPOP_H
-#include <Thunderegg/Operators/Operator.h>
-#include <Thunderegg/SchurHelper.h>
-/**
- * @brief Base class for operators
- */
-template <size_t D> class DomainWrapOp : public Operator<D>
-{
-	private:
-	std::shared_ptr<SchurHelper<D>> sh;
+#ifndef PATCHSOLVER_H
+#define PATCHSOLVER_H
 
+#include <Thunderegg/SchurInfo.h>
+#include <Thunderegg/Vector.h>
+
+namespace Thunderegg
+{
+/**
+ * @brief Solves the problem on the patches using a specified interface value
+ *
+ * @tparam D the number of cartesian dimensions
+ */
+template <size_t D> class PatchSolver
+{
 	public:
-    DomainWrapOp(std::shared_ptr<SchurHelper<D>> sh)
-	{
-		this->sh = sh;
-	}
 	/**
-	 * @brief Apply Schur matrix
-	 *
-	 * @param x the input vector.
-	 * @param b the output vector.
+	 * @brief Destroy the Patch Solver object
 	 */
-	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
-	{
-		sh->apply(x, b);
-	}
+	virtual ~PatchSolver() {}
+	/**
+	 * @brief add a patch to the solver
+	 *
+	 * The solver do any necessary setup for the patch
+	 *
+	 * @param sinfo the patch
+	 */
+	virtual void addPatch(SchurInfo<D> &sinfo) = 0;
+	/**
+	 * @brief Solve all the patches in the domain
+	 *
+	 * @param patches the patches
+	 * @param f the rhs vector
+	 * @param u the lhs vector
+	 * @param gamma the interface values to use
+	 */
+	virtual void domainSolve(std::vector<SchurInfo<D>> &patches, std::shared_ptr<const Vector<D>> f,
+	                         std::shared_ptr<Vector<D>>           u,
+	                         std::shared_ptr<const Vector<D - 1>> gamma)
+	= 0;
 };
+} // namespace Thunderegg
 #endif

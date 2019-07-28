@@ -24,7 +24,7 @@
 
 #ifndef THUNDEREGG_PATCHINFO_H
 #define THUNDEREGG_PATCHINFO_H
-#include <Thunderegg/BufferWriter.h>
+#include <Thunderegg/BufferIO.h>
 #include <Thunderegg/Serializable.h>
 #include <Thunderegg/Side.h>
 #include <Thunderegg/TypeDefs.h>
@@ -34,6 +34,8 @@
 #include <map>
 #include <memory>
 
+namespace Thunderegg
+{
 /**
  * @brief The type of neighbor
  */
@@ -252,7 +254,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	/**
 	 * @brief Set the neumann boundary conditions
 	 *
-	 * @param inf the function for determining boudnary conditions
+	 * @param inf the function for determining boundary conditions
 	 */
 	void setNeumann(IsNeumannFunc<D> inf);
 	/**
@@ -795,4 +797,5 @@ template <size_t D> inline void PatchInfo<D>::updateRank(int rank)
 }
 extern template class PatchInfo<2>;
 extern template class PatchInfo<3>;
+} // namespace Thunderegg
 #endif

@@ -24,23 +24,23 @@
 #include "Writers/ClawWriter.h"
 #include <Thunderegg/BiCGStab.h>
 #include <Thunderegg/Domain.h>
+#include <Thunderegg/DomainWrapOp.h>
+#include <Thunderegg/Experimental/DomGen.h>
+#include <Thunderegg/Experimental/OctTree.h>
 #include <Thunderegg/GMG/CycleFactory3d.h>
 #include <Thunderegg/GMG/CycleOpts.h>
-#include <Thunderegg/MatrixHelper.h>
-#include <Thunderegg/OctTree.h>
-#include <Thunderegg/Operators/DomainWrapOp.h>
-#include <Thunderegg/Operators/PetscMatOp.h>
-#include <Thunderegg/Operators/SchurWrapOp.h>
-#include <Thunderegg/PatchSolvers/DftPatchSolver.h>
-#include <Thunderegg/PatchSolvers/FftwPatchSolver.h>
+#include <Thunderegg/PetscMatOp.h>
 #include <Thunderegg/PetscShellCreator.h>
+#include <Thunderegg/Poisson/DftPatchSolver.h>
+#include <Thunderegg/Poisson/FftwPatchSolver.h>
+#include <Thunderegg/Poisson/MatrixHelper.h>
+#include <Thunderegg/Poisson/SevenPtPatchOperator.h>
+#include <Thunderegg/Poisson/StarPatchOperator.h>
 #include <Thunderegg/PolyChebPrec.h>
 #include <Thunderegg/SchurHelper.h>
 #include <Thunderegg/SchurMatrixHelper.h>
+#include <Thunderegg/SchurWrapOp.h>
 #include <Thunderegg/SchwarzPrec.h>
-#include <Thunderegg/SevenPtPatchOperator.h>
-#include <Thunderegg/StarPatchOp.h>
-#include <Thunderegg/ThundereggDomGen.h>
 #include <Thunderegg/Timer.h>
 #include <Thunderegg/TriLinInterp.h>
 #ifdef ENABLE_AMGX
@@ -70,6 +70,9 @@
 // =========== //
 
 using namespace std;
+using namespace Thunderegg;
+using namespace Thunderegg::Experimental;
+using namespace Thunderegg::Poisson;
 
 int main(int argc, char *argv[])
 {
@@ -289,16 +292,16 @@ int main(int argc, char *argv[])
 	shared_ptr<PatchSolver<3>> p_solver;
 
 	// patch operator
-	shared_ptr<PatchOperator<3>> p_operator(new StarPatchOp<3>());
+	shared_ptr<PatchOperator<3>> p_operator(new StarPatchOperator<3>());
 
 	// interface interpolator
 	shared_ptr<IfaceInterp<3>> p_interp(new TriLinInterp());
 
-	Tools::Timer timer;
+	Timer timer;
 	for (int loop = 0; loop < loop_count; loop++) {
 		timer.start("Domain Initialization");
 
-		shared_ptr<DomainGenerator<3>> dcg(new ThundereggDomGen<3>(t, ns, neumann));
+		shared_ptr<DomainGenerator<3>> dcg(new DomGen<3>(t, ns, neumann));
 
 		dc = dcg->getFinestDomain();
 

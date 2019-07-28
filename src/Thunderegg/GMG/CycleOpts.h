@@ -19,10 +19,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGCYCLEOPTS_H
-#define GMGCYCLEOPTS_H
+#ifndef THUNDEREGG_GMG_CYCLEOPTS_H
+#define THUNDEREGG_GMG_CYCLEOPTS_H
 #include <string>
-namespace GMG
+namespace Thunderegg::GMG
 {
 /* case insensitive string
 struct ci_char_traits : public char_traits<char> {
@@ -78,5 +78,5 @@ struct CycleOpts {
 	 */
 	std::string cycle_type = "V";
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

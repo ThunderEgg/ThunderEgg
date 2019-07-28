@@ -19,13 +19,15 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGTriLinIntp_H
-#define GMGTriLinIntp_H
+#ifndef THUNDEREGG_GMG_TRILININTP_H
+#define THUNDEREGG_GMG_TRILININTP_H
+
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/GMG/InterLevelComm.h>
 #include <Thunderegg/GMG/Interpolator.h>
 #include <memory>
-namespace GMG
+
+namespace Thunderegg::GMG
 {
 /**
  * @brief Simple class that directly places values from coarse vector to fine vector. (This is
@@ -66,5 +68,5 @@ class TriLinIntp : public Interpolator<3>
 	void interpolate(std::shared_ptr<const Vector<3>> coarse,
 	                 std::shared_ptr<Vector<3>>       fine) const;
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

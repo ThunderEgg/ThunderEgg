@@ -19,7 +19,39 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "DftPatchSolver.h"
+#ifndef THUNDEREGG_POISSON_MATRIXHELPER_H
+#define THUNDEREGG_POISSON_MATRIXHELPER_H
 
-template class DftPatchSolver<2>;
-template class DftPatchSolver<3>;
+#include <Thunderegg/Domain.h>
+#include <petscmat.h>
+
+namespace Thunderegg::Poisson
+{
+/**
+ * @brief Create a matrix for the 3D second-order Laplacian operator
+ */
+class MatrixHelper
+{
+	private:
+	/**
+	 * @brief the domain
+	 */
+	std::shared_ptr<Domain<3>> domain;
+
+	public:
+	/**
+	 * @brief Create a MatrixHelper for a given 3D domain.
+	 *
+	 * @param domain the Domain
+	 */
+	MatrixHelper(std::shared_ptr<Domain<3>> domain);
+
+	/**
+	 * @brief Form the matrix for the domain
+	 *
+	 * @return the formed matrix
+	 */
+	PW_explicit<Mat> formCRSMatrix(double lambda = 0);
+};
+} // namespace Thunderegg::Poisson
+#endif

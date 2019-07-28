@@ -25,6 +25,8 @@
 #include <functional>
 #include <list>
 #include <p4est_extended.h>
+namespace Thunderegg
+{
 /**
  * @brief Generates Domain objects form a given p4est object
  */
@@ -110,4 +112,5 @@ class P4estDomGen : public DomainGenerator<2>
 	bool                       hasCoarserDomain();
 	std::shared_ptr<Domain<2>> getCoarserDomain();
 };
+} // namespace Thunderegg
 #endif

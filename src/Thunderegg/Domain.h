@@ -21,7 +21,6 @@
 
 #ifndef THUNDEREGG_DOMAIN_H
 #define THUNDEREGG_DOMAIN_H
-#include <Thunderegg/InterpCase.h>
 #include <Thunderegg/PW.h>
 #include <Thunderegg/PatchInfo.h>
 #include <Thunderegg/PetscVector.h>
@@ -34,6 +33,9 @@
 #include <set>
 #include <string>
 #include <vector>
+
+namespace Thunderegg
+{
 /**
  * @brief Represents the domain of the problem.
  *
@@ -118,8 +120,8 @@ template <size_t D> class Domain
 	 * @param local_id_set true if local indexes are set by user
 	 * @param global_id_set true if global indexes are set by user
 	 */
-	Domain(std::array<int,D> ns, std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_map, bool local_id_set = false,
-	       bool global_id_set = false)
+	Domain(std::array<int, D> ns, std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_map,
+	       bool local_id_set = false, bool global_id_set = false)
 	{
 		this->ns = ns;
 
@@ -429,4 +431,5 @@ template <size_t D> class DomainVG : public VectorGenerator<D>
 };
 extern template class Domain<2>;
 extern template class Domain<3>;
+} // namespace Thunderegg
 #endif

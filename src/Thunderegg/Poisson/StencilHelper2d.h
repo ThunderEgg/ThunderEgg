@@ -23,6 +23,8 @@
 #define STENCILHELPER_H
 #include <Thunderegg/PatchInfo.h>
 #include <valarray>
+namespace Thunderegg::Poisson
+{
 class StencilHelper
 {
 	public:
@@ -491,4 +493,5 @@ StencilHelper *getStencilHelper(PatchInfo<2> &d, Side<2> s)
 	}
 	return retval;
 }
+} // namespace Thunderegg::Poisson
 #endif

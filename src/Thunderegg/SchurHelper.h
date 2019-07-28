@@ -25,7 +25,7 @@
 #include <Thunderegg/Iface.h>
 #include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/PatchOperator.h>
-#include <Thunderegg/PatchSolvers/PatchSolver.h>
+#include <Thunderegg/PatchSolver.h>
 #include <Thunderegg/PetscVector.h>
 #include <Thunderegg/SchurInfo.h>
 #include <deque>
@@ -33,6 +33,8 @@
 #include <petscmat.h>
 #include <petscpc.h>
 #include <valarray>
+namespace Thunderegg
+{
 /**
  * @brief This class represents a collection of sinfo_vector that a single processor owns.
  *
@@ -210,7 +212,7 @@ inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>>        domain,
 	std::set<int>                             incoming_procs;
 	for (SchurInfo<D> &sd : sinfo_vector) {
 		sd.enumerateIfaces(ifaces, off_proc_ifaces, incoming_procs);
-		solver->addDomain(sd);
+		solver->addPatch(sd);
 	}
 	{
 		using namespace std;
@@ -527,4 +529,5 @@ template <size_t D> class SchurHelperVG : public VectorGenerator<D>
 };
 extern template class SchurHelper<2>;
 extern template class SchurHelper<3>;
+} // namespace Thunderegg
 #endif

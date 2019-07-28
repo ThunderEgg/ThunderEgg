@@ -19,11 +19,11 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGVCycle_H
-#define GMGVCycle_H
+#ifndef THUNDEREGG_GMG_VCYCLE_H
+#define THUNDEREGG_GMG_VCYCLE_H
 #include <Thunderegg/GMG/Cycle.h>
 #include <Thunderegg/GMG/CycleOpts.h>
-namespace GMG
+namespace Thunderegg::GMG
 {
 /**
  * @brief Implementation of a V-cycle
@@ -74,5 +74,5 @@ template <size_t D> class VCycle : public Cycle<D>
 		num_coarse_sweeps = opts.coarse_sweeps;
 	}
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

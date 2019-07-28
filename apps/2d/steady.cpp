@@ -22,25 +22,24 @@
 #include "Init.h"
 #include "Writers/ClawWriter.h"
 #include <Thunderegg/BiCGStab.h>
+#include <Thunderegg/BiCGStabSolver.h>
 #include <Thunderegg/BilinearInterpolator.h>
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/FivePtPatchOperator.h>
+#include <Thunderegg/DomainWrapOp.h>
+#include <Thunderegg/Experimental/DomGen.h>
 #include <Thunderegg/GMG/CycleFactory2d.h>
-#include <Thunderegg/MatrixHelper2d.h>
-#include <Thunderegg/Operators/DomainWrapOp.h>
-#include <Thunderegg/Operators/PetscMatOp.h>
-#include <Thunderegg/Operators/SchurWrapOp.h>
-#include <Thunderegg/PatchSolvers/BiCGStabSolver.h>
-#include <Thunderegg/PatchSolvers/DftPatchSolver.h>
-#include <Thunderegg/PatchSolvers/FftwPatchSolver.h>
+#include <Thunderegg/PetscMatOp.h>
 #include <Thunderegg/PetscShellCreator.h>
+#include <Thunderegg/Poisson/DftPatchSolver.h>
+#include <Thunderegg/Poisson/FftwPatchSolver.h>
+#include <Thunderegg/Poisson/FivePtPatchOperator.h>
+#include <Thunderegg/Poisson/MatrixHelper2d.h>
+#include <Thunderegg/Poisson/StarPatchOperator.h>
 #include <Thunderegg/PolyChebPrec.h>
-#include <Thunderegg/QuadInterpolator.h>
 #include <Thunderegg/SchurHelper.h>
 #include <Thunderegg/SchurMatrixHelper2d.h>
+#include <Thunderegg/SchurWrapOp.h>
 #include <Thunderegg/SchwarzPrec.h>
-#include <Thunderegg/StarPatchOp.h>
-#include <Thunderegg/ThundereggDomGen.h>
 #include <Thunderegg/Timer.h>
 #ifdef HAVE_VTK
 #include "Writers/VtkWriter2d.h"
@@ -66,6 +65,9 @@
 // =========== //
 
 using namespace std;
+using namespace Thunderegg;
+using namespace Thunderegg::Experimental;
+using namespace Thunderegg::Poisson;
 
 int main(int argc, char *argv[])
 {
@@ -238,7 +240,7 @@ int main(int argc, char *argv[])
 	if (false) {
 #endif
 	} else {
-		dcg.reset(new ThundereggDomGen<2>(t, ns, neumann));
+		dcg.reset(new DomGen<2>(t, ns, neumann));
 	}
 
 	domain = dcg->getFinestDomain();
@@ -319,7 +321,7 @@ int main(int argc, char *argv[])
 	}
 
 	// patch operator
-	shared_ptr<PatchOperator<2>> p_operator(new StarPatchOp<2>());
+	shared_ptr<PatchOperator<2>> p_operator(new StarPatchOperator<2>());
 
 	// set the patch solver
 	shared_ptr<PatchSolver<2>> p_solver;
@@ -334,7 +336,7 @@ int main(int argc, char *argv[])
 	// interface interpolator
 	shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator());
 
-	Tools::Timer timer;
+	Timer timer;
 	for (int loop = 0; loop < loop_count; loop++) {
 		timer.start("Domain Initialization");
 

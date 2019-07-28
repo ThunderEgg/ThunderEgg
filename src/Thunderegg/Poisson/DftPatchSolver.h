@@ -19,17 +19,20 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef DFTPATCHSOLVER_H
-#define DFTPATCHSOLVER_H
+#ifndef THUNDEREGG_POISSON_DFTPATCHSOLVER_H
+#define THUNDEREGG_POISSON_DFTPATCHSOLVER_H
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/PatchSolvers/PatchSolver.h>
+#include <Thunderegg/PatchSolver.h>
 #include <Thunderegg/ValVector.h>
 #include <bitset>
 #include <map>
 #include <valarray>
+
 extern "C" void dgemv_(char &, int &, int &, double &, double *, int &, double *, int &, double &,
                        double *, int &);
 
+namespace Thunderegg::Poisson
+{
 enum class DftType { DCT_II, DCT_III, DCT_IV, DST_II, DST_III, DST_IV };
 #ifndef DOMAINK
 #define DOMAINK
@@ -85,7 +88,7 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 			solve(sinfo, f, u, gamma);
 		}
 	}
-	void addDomain(SchurInfo<D> &sinfo);
+	void addPatch(SchurInfo<D> &sinfo);
 };
 
 template <size_t D> inline DftPatchSolver<D>::DftPatchSolver(Domain<D> &domain, double lambda)
@@ -95,7 +98,7 @@ template <size_t D> inline DftPatchSolver<D>::DftPatchSolver(Domain<D> &domain, 
 	patch_stride = domain.getNumCellsInPatch();
 	this->lambda = lambda;
 }
-template <size_t D> inline void DftPatchSolver<D>::addDomain(SchurInfo<D> &sinfo)
+template <size_t D> inline void DftPatchSolver<D>::addPatch(SchurInfo<D> &sinfo)
 {
 	using namespace std;
 	if (!initialized) {
@@ -347,4 +350,5 @@ DftPatchSolver<D>::execute_plan(std::array<std::shared_ptr<std::valarray<double>
 }
 extern template class DftPatchSolver<2>;
 extern template class DftPatchSolver<3>;
+} // namespace Thunderegg::Poisson
 #endif

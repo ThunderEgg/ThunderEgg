@@ -21,8 +21,10 @@
 
 #ifndef SCHWARZPREC_H
 #define SCHWARZPREC_H
-#include <Thunderegg/Operators/Operator.h>
+#include <Thunderegg/Operator.h>
 #include <Thunderegg/SchurHelper.h>
+namespace Thunderegg
+{
 /**
  * @brief Additive Schwarz Preconditioner
  */
@@ -55,4 +57,5 @@ template <size_t D> class SchwarzPrec : public Operator<D>
 		sh->solveWithSolution(x, b);
 	}
 };
+} // namespace Thunderegg
 #endif

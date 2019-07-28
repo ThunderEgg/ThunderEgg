@@ -22,12 +22,14 @@
 #ifndef FFTWPATCHSOLVER_H
 #define FFTWPATCHSOLVER_H
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/PatchSolvers/PatchSolver.h>
+#include <Thunderegg/PatchSolver.h>
+#include <Thunderegg/Poisson/StarPatchOperator.h>
 #include <Thunderegg/ValVector.h>
-#include <Thunderegg/StarPatchOp.h>
 #include <bitset>
 #include <fftw3.h>
 #include <map>
+namespace Thunderegg::Poisson
+{
 #ifndef DOMAINK
 #define DOMAINK
 template <size_t D> struct DomainK {
@@ -74,7 +76,7 @@ template <size_t D> class FftwPatchSolver : public PatchSolver<D>
 			solve(sinfo, f, u, gamma);
 		}
 	}
-	void addDomain(SchurInfo<D> &sinfo);
+	void addPatch(SchurInfo<D> &sinfo);
 };
 template <size_t D> FftwPatchSolver<D>::FftwPatchSolver(Domain<D> &domain, double lambda)
 {
@@ -90,7 +92,7 @@ template <size_t D> FftwPatchSolver<D>::~FftwPatchSolver()
 		fftw_destroy_plan(p.second);
 	}
 }
-template <size_t D> void FftwPatchSolver<D>::addDomain(SchurInfo<D> &sinfo)
+template <size_t D> void FftwPatchSolver<D>::addPatch(SchurInfo<D> &sinfo)
 {
 	using namespace std;
 	if (!initialized) {
@@ -187,8 +189,8 @@ void FftwPatchSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector
 	nested_loop<D>(start, end,
 	               [&](std::array<int, D> coord) { f_copy_view[coord] = f_view[coord]; });
 
-	StarPatchOp<D> op;
-	op.addInterfaceToRHS(sinfo,gamma,f_copy.getLocalData(0));
+	StarPatchOperator<D> op;
+	op.addInterfaceToRHS(sinfo, gamma, f_copy.getLocalData(0));
 
 	fftw_execute(plan1[sinfo]);
 
@@ -206,4 +208,5 @@ void FftwPatchSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector
 }
 extern template class FftwPatchSolver<2>;
 extern template class FftwPatchSolver<3>;
+} // namespace Thunderegg::Poisson
 #endif

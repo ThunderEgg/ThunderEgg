@@ -19,16 +19,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef SEVENPTPATCHOPERATOR_H
-#define SEVENPTPATCHOPERATOR_H
-#include <Thunderegg/PatchOperator.h>
-class SevenPtPatchOperator : public PatchOperator<3>
-{
-	public:
-	void applyWithInterface(SchurInfo<3> &d, const LocalData<3> u,
-	                        std::shared_ptr<const Vector<2>> gamma, LocalData<3> f) override;
-	void addInterfaceToRHS(SchurInfo<3> &sinfo, std::shared_ptr<const Vector<2>> gamma,
-	                       LocalData<3> f) override;
-	void apply(const SchurInfo<3> &sinfo, const LocalData<3> u, LocalData<3> f) override;
-};
-#endif
+#include <Thunderegg/Poisson/StarPatchOperator.h>
+
+template class Thunderegg::Poisson::StarPatchOperator<2>;
+template class Thunderegg::Poisson::StarPatchOperator<3>;

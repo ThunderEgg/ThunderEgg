@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_EXP_PBMATRIX_H
-#define THUNDEREGG_EXP_PBMATRIX_H
+#ifndef THUNDEREGG_EXPERIMENTAL_PBMATRIX_H
+#define THUNDEREGG_EXPERIMENTAL_PBMATRIX_H
 #include <Thunderegg/PW.h>
 #include <functional>
 #include <map>
@@ -29,6 +29,9 @@
 #include <petscpc.h>
 #include <set>
 #include <valarray>
+
+namespace Thunderegg::Experimental
+{
 struct BlockJacobiSmoother;
 class PBMatrix
 {
@@ -116,4 +119,5 @@ struct BlockJacobiSmoother {
 		D->apply(tmp, x);
 	}
 };
+} // namespace Thunderegg::Experimental
 #endif

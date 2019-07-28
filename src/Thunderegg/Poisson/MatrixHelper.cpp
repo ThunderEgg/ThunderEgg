@@ -23,6 +23,8 @@
 #include "StencilHelper.h"
 #include <iostream>
 using namespace std;
+using namespace Thunderegg::Poisson;
+using namespace Thunderegg;
 MatrixHelper::MatrixHelper(std::shared_ptr<Domain<3>> domain)
 {
 	this->domain = domain;

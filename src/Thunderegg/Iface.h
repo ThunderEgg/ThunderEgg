@@ -21,26 +21,65 @@
 
 #ifndef IFACE_H
 #define IFACE_H
-#include "BufferWriter.h"
-#include "IfaceType.h"
-#include "Side.h"
+#include <Thunderegg/BufferIO.h>
+#include <Thunderegg/IfaceType.h>
+#include <Thunderegg/Side.h>
 #include <bitset>
 #include <map>
 #include <set>
 #include <vector>
+namespace Thunderegg
+{
+/**
+ * @brief  Contains information for an a specific interface of a patch. (Does not include
+ * neighboring information.)
+ *
+ * @tparam D The number of cartesian dimensions in a patch.
+ */
 template <size_t D> struct Iface {
-	IfaceType<D>                        type;
-	Side<D>                             s;
+	/**
+	 * @brief The type of interface.
+	 */
+	IfaceType<D> type;
+	/**
+	 * @brief The side of the patch that the interface is on.
+	 */
+	Side<D> s;
+	/**
+	 * @brief The id of each interface on each side of the patch.
+	 */
 	std::array<int, Side<D>::num_sides> ids;
+	/**
+	 * @brief The local index of the interfaces on each side of the patch.
+	 */
 	std::array<int, Side<D>::num_sides> local_id;
+	/**
+	 * @brief The global index of the interfaces on each side of the patch.
+	 */
 	std::array<int, Side<D>::num_sides> global_id;
-	std::bitset<Side<D>::num_sides>     neumann;
+	/**
+	 * @brief The boundary conditions on the patch.
+	 */
+	std::bitset<Side<D>::num_sides> neumann;
+	/**
+	 * @brief Construct a new Iface object
+	 *
+	 * Everything is set to -1
+	 */
 	Iface()
 	{
 		ids.fill(-1);
 		local_id.fill(-1);
 		global_id.fill(-1);
 	}
+	/**
+	 * @brief Construct a new Iface object
+	 *
+	 * @param ids the ids of the interfaces on each side of the patch
+	 * @param type the type of iface
+	 * @param s the side of the patch that the iface is on
+	 * @param neumann the boundary conditions of the patch
+	 */
 	Iface(std::array<int, Side<D>::num_sides> ids, IfaceType<D> type, Side<D> s,
 	      std::bitset<Side<D>::num_sides> neumann)
 	{
@@ -52,12 +91,37 @@ template <size_t D> struct Iface {
 		this->neumann = neumann;
 	}
 };
+/**
+ * @brief This is a set of Iface objects for an interface.
+ *
+ * This will contain information from each patch that the interface is on.
+ *
+ * @tparam D the number of cartesian dimensions on a patch.
+ */
 template <size_t D> struct IfaceSet : public Serializable {
-	int                   id        = -1;
-	int                   id_local  = -1;
-	int                   id_global = -1;
+	/**
+	 * @brief The id of the interface
+	 */
+	int id = -1;
+	/**
+	 * @brief The local index of the interface
+	 */
+	int id_local = -1;
+	/**
+	 * @brief The global index of the interface
+	 */
+	int id_global = -1;
+	/**
+	 * @brief the set of Iface objects
+	 */
 	std::vector<Iface<D>> ifaces;
-	std::set<int>         getNbrs() const
+	/**
+	 * @brief Get a set of neighboring interfaces. (The interfaces that are on patches connected to
+	 * this interface)
+	 *
+	 * @return std::set<int>
+	 */
+	std::set<int> getNbrs() const
 	{
 		std::set<int> retval;
 		for (const Iface<D> &iface : ifaces) {
@@ -67,10 +131,16 @@ template <size_t D> struct IfaceSet : public Serializable {
 		}
 		return retval;
 	}
+	/**
+	 * @brief Add an Iface to this set.
+	 */
 	void insert(Iface<D> i)
 	{
 		ifaces.push_back(i);
 	}
+	/**
+	 * @brief Add an Ifaces in an IfaceSet to this set.
+	 */
 	void insert(IfaceSet<D> ifs)
 	{
 		id = ifs.id;
@@ -78,6 +148,11 @@ template <size_t D> struct IfaceSet : public Serializable {
 			ifaces.push_back(i);
 		}
 	}
+	/**
+	 * @brief Set the local indexes in the Iface objects
+	 *
+	 * @param rev_map map from id to local_index
+	 */
 	void setLocalIndexes(const std::map<int, int> &rev_map)
 	{
 		id_local = rev_map.at(id);
@@ -87,6 +162,11 @@ template <size_t D> struct IfaceSet : public Serializable {
 			}
 		}
 	}
+	/**
+	 * @brief Set the global indexes in the NbrInfo objects
+	 *
+	 * @param rev_map map form local_index to global_index
+	 */
 	void setGlobalIndexes(const std::map<int, int> &rev_map)
 	{
 		id_global = rev_map.at(id_local);
@@ -123,4 +203,5 @@ template <size_t D> struct IfaceSet : public Serializable {
 		return reader.getPos();
 	}
 };
+} // namespace Thunderegg
 #endif

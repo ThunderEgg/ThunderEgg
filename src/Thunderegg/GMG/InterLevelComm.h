@@ -19,11 +19,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef InterLevelComm_H
-#define InterLevelComm_H
+#ifndef THUNDEREGG_INTERLEVELCOMM_H
+#define THUNDEREGG_INTERLEVELCOMM_H
+
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/PetscVector.h>
-namespace GMG
+
+namespace Thunderegg::GMG
 {
 /**
  * @brief Structure that wraps some extra meta-data around a Domain object.
@@ -187,5 +189,5 @@ inline void InterLevelComm<D>::scatterReverse(std::shared_ptr<const Vector<D>> d
 	VecScatterBegin(p_scatter, p_dist->vec, p_global->vec, ADD_VALUES, SCATTER_REVERSE);
 	VecScatterEnd(p_scatter, p_dist->vec, p_global->vec, ADD_VALUES, SCATTER_REVERSE);
 }
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

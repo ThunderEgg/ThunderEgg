@@ -21,5 +21,5 @@
 
 #include "SchurHelper.h"
 
-template class SchurHelper<2>;
-template class SchurHelper<3>;
+template class Thunderegg::SchurHelper<2>;
+template class Thunderegg::SchurHelper<3>;

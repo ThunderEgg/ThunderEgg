@@ -19,10 +19,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGWCycle_H
-#define GMGWCycle_H
+#ifndef THUNDEREGG_GMG_WCYCLE_H
+#define THUNDEREGG_GMG_WCYCLE_H
 #include <Thunderegg/GMG/Cycle.h>
-namespace GMG
+namespace Thunderegg::GMG
 {
 /**
  * @brief Implementation of a W-cycle
@@ -81,5 +81,5 @@ template <size_t D> class WCycle : public Cycle<D>
 		num_mid_sweeps    = opts.mid_sweeps;
 	}
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

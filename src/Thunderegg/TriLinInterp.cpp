@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include "TriLinInterp.h"
+using namespace Thunderegg;
 void TriLinInterp::interpolate(const std::vector<SchurInfo<3>> &patches,
                                std::shared_ptr<const Vector<3>> u,
                                std::shared_ptr<Vector<2>>       interp)

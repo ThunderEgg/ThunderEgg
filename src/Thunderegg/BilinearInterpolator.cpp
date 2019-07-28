@@ -21,6 +21,7 @@
 
 #include "BilinearInterpolator.h"
 using namespace std;
+using namespace Thunderegg;
 void BilinearInterpolator::interpolate(const std::vector<SchurInfo<2>> &patches,
                                        std::shared_ptr<const Vector<2>> u,
                                        std::shared_ptr<Vector<1>>       interp)

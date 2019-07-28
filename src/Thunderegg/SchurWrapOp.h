@@ -19,7 +19,41 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "FftwPatchSolver.h"
+#ifndef THUNDEREGG_SCHURWRAPOP_H
+#define THUNDEREGG_SCHURWRAPOP_H
 
-template class FftwPatchSolver<2>;
-template class FftwPatchSolver<3>;
+#include <Thunderegg/Operator.h>
+#include <Thunderegg/SchurHelper.h>
+
+namespace Thunderegg
+{
+/**
+ * @brief Base class for operators
+ */
+template <size_t D> class SchurWrapOp : public Operator<D - 1>
+{
+	private:
+	std::shared_ptr<Domain<D>>      domain;
+	std::shared_ptr<SchurHelper<D>> sh;
+
+	public:
+	SchurWrapOp(std::shared_ptr<Domain<D>> domain, std::shared_ptr<SchurHelper<D>> sh)
+	{
+		this->domain = domain;
+		this->sh     = sh;
+	}
+	/**
+	 * @brief Apply Schur matrix
+	 *
+	 * @param x the input vector.
+	 * @param b the output vector.
+	 */
+	void apply(std::shared_ptr<const Vector<D - 1>> x, std::shared_ptr<Vector<D - 1>> b) const
+	{
+		auto f = domain->getNewDomainVec();
+		auto u = domain->getNewDomainVec();
+		sh->solveAndInterpolateWithInterface(f, u, x, b);
+	}
+};
+} // namespace Thunderegg
+#endif

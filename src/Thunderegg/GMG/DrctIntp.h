@@ -19,13 +19,15 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGDrctIntp_H
-#define GMGDrctIntp_H
+#ifndef THUNDEREGG_GMG_DRCTINTP_H
+#define THUNDEREGG_GMG_DRCTINTP_H
+
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/GMG/InterLevelComm.h>
 #include <Thunderegg/GMG/Interpolator.h>
 #include <memory>
-namespace GMG
+
+namespace Thunderegg::GMG
 {
 /**
  * @brief Simple class that directly places values from coarse cell into the corresponding fine
@@ -111,5 +113,5 @@ inline void DrctIntp<D>::interpolate(std::shared_ptr<const Vector<D>> coarse,
 		}
 	}
 }
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

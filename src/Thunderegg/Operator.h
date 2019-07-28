@@ -19,36 +19,26 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef SCHURWRAPOP_H
-#define SCHURWRAPOP_H
-#include <Thunderegg/Operators/Operator.h>
-#include <Thunderegg/SchurHelper.h>
+#ifndef THUNDEREGG_OPERATOR_H
+#define THUNDEREGG_OPERATOR_H
+
+#include <Thunderegg/Vector.h>
+
+namespace Thunderegg
+{
 /**
  * @brief Base class for operators
  */
-template <size_t D> class SchurWrapOp : public Operator<D - 1>
+template <size_t D> class Operator
 {
-	private:
-	std::shared_ptr<Domain<D>>      domain;
-	std::shared_ptr<SchurHelper<D>> sh;
-
 	public:
-	SchurWrapOp(std::shared_ptr<Domain<D>> domain, std::shared_ptr<SchurHelper<D>> sh)
-	{
-		this->domain = domain;
-		this->sh     = sh;
-	}
 	/**
-	 * @brief Apply Schur matrix
+	 * @brief Virtual function that base classes have to implement.
 	 *
 	 * @param x the input vector.
 	 * @param b the output vector.
 	 */
-	void apply(std::shared_ptr<const Vector<D - 1>> x, std::shared_ptr<Vector<D - 1>> b) const
-	{
-		auto f = domain->getNewDomainVec();
-		auto u = domain->getNewDomainVec();
-		sh->solveAndInterpolateWithInterface(f, u, x, b);
-	}
+	virtual void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const = 0;
 };
+} // namespace Thunderegg
 #endif

@@ -19,11 +19,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef PETSCPCSHELLOP_H
-#define PETSCPCSHELLOP_H
-#include <Thunderegg/Operators/Operator.h>
+#ifndef THUNDEREGG_PETSCSHELLCREATOR_H
+#define THUNDEREGG_PETSCSHELLCREATOR_H
+#include <Thunderegg/Operator.h>
+namespace Thunderegg
+{
 /**
- * @brief Base class for operators
+ * @brief Class that contains methods for wrapping Thunderegg operators for use in petsc
  */
 class PetscShellCreator
 {
@@ -121,6 +123,14 @@ class PetscShellCreator
 	};
 
 	public:
+	/**
+	 * @brief Wrap a Thunderegg operator for use as a preconditioner in petsc
+	 *
+	 * @tparam D the number of cartesian dimensions on a patch
+	 * @param pc the PC object from petsc
+	 * @param op the operator that we are wrapping
+	 * @param domain the domain of the problem
+	 */
 	template <size_t D>
 	static void getPCShell(PC pc, std::shared_ptr<Operator<D>> op,
 	                       std::shared_ptr<Domain<D>> domain)
@@ -131,6 +141,16 @@ class PetscShellCreator
 		PCShellSetApply(pc, PetscPCShellOpDomain<D>::apply);
 		PCShellSetDestroy(pc, PetscPCShellOpDomain<D>::destroy);
 	}
+	/**
+	 * @brief Wrap a Thunderegg operator for use as a preconditioner in petsc
+	 *
+	 * This is for wrapping preconditioners of the Schur matrix.
+	 *
+	 * @tparam D the number of cartesian dimensions on a patch
+	 * @param pc the PC object from petsc
+	 * @param op the operator that we are wrapping
+	 * @param sh the SchurHelper of the problem
+	 */
 	template <size_t D>
 	static void getPCShell(PC pc, std::shared_ptr<Operator<D>> op,
 	                       std::shared_ptr<SchurHelper<D + 1>> sh)
@@ -141,6 +161,14 @@ class PetscShellCreator
 		PCShellSetApply(pc, PetscPCShellOpSchur<D>::apply);
 		PCShellSetDestroy(pc, PetscPCShellOpSchur<D>::destroy);
 	}
+	/**
+	 * @brief Wrap a Thunderegg operator for use in petsc solver
+	 *
+	 * @tparam D the number of cartesian dimensions in a patch
+	 * @param op the operator that we are wrapping
+	 * @param domain the domain of the problem
+	 * @return PW_explicit<Mat> Return a new Mat object
+	 */
 	template <size_t D>
 	static PW_explicit<Mat> getMatShell(std::shared_ptr<Operator<D>> op,
 	                                    std::shared_ptr<Domain<D>>   domain)
@@ -155,6 +183,16 @@ class PetscShellCreator
 		                     (void (*)(void)) PetscPCShellOpDomain<D>::destroyMat);
 		return A;
 	}
+	/**
+	 * @brief Wrap a Thunderegg operator for use in petsc solver
+	 *
+	 * This is for use in schur matrix operators
+	 *
+	 * @tparam D the number of cartesian dimensions in a patch
+	 * @param op the operator that we are wrapping
+	 * @param sh the SchurHelper of the problem
+	 * @return PW_explicit<Mat> Return a new Mat object
+	 */
 	template <size_t D>
 	static PW_explicit<Mat> getMatShell(std::shared_ptr<Operator<D>>    op,
 	                                    std::shared_ptr<SchurHelper<D>> sh)
@@ -169,4 +207,5 @@ class PetscShellCreator
 		return A;
 	}
 };
+} // namespace Thunderegg
 #endif

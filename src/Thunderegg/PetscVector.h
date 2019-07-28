@@ -19,11 +19,16 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef PETSCVECTOR_H
-#define PETSCVECTOR_H
+#ifndef THUNDEREGG_PETSCVECTOR_H
+#define THUNDEREGG_PETSCVECTOR_H
 #include <Thunderegg/Vector.h>
 #include <petscvec.h>
 
+namespace Thunderegg
+{
+/**
+ * @brief Manages access to petsc raw pointer data
+ */
 class PetscLDM : public LocalDataManager
 {
 	private:
@@ -56,6 +61,11 @@ class PetscLDM : public LocalDataManager
 		return vec_view;
 	}
 };
+/**
+ * @brief Wrap a petsc vector for use in Thunderegg
+ *
+ * @tparam D the number of cartesian dimensions on a patch.
+ */
 template <size_t D> class PetscVector : public Vector<D>
 
 {
@@ -66,6 +76,9 @@ template <size_t D> class PetscVector : public Vector<D>
 	std::array<int, D> lengths;
 
 	public:
+	/**
+	 * @brief The petsc vector object
+	 */
 	Vec vec;
 	PetscVector(Vec vec, const std::array<int, D> &lengths, bool own = true)
 	{
@@ -80,20 +93,35 @@ template <size_t D> class PetscVector : public Vector<D>
 		VecGetLocalSize(vec, &this->num_local_patches);
 		this->num_local_patches /= patch_stride;
 	}
+	/**
+	 * @brief Destroy the Petsc Vector object
+	 */
 	~PetscVector()
 	{
 		if (own) { VecDestroy(&vec); }
 	}
-	LocalData<D> getLocalData(int local_patch_id)
+	/**
+	 * @brief Get the LocalData object for the given local patch index
+	 *
+	 * @param patch_local_index the local index of the patch
+	 * @return LocalData<D> the local data object
+	 */
+	LocalData<D> getLocalData(int patch_local_index)
 	{
 		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, true));
-		double *                  data = ldm->getVecView() + patch_stride * local_patch_id;
+		double *                  data = ldm->getVecView() + patch_stride * patch_local_index;
 		return LocalData<D>(data, strides, lengths, ldm);
 	}
-	const LocalData<D> getLocalData(int local_patch_id) const
+	/**
+	 * @brief Get the LocalData object for the given local patch index
+	 *
+	 * @param patch_local_index the local index of the patch
+	 * @return LocalData<D> the local data object
+	 */
+	const LocalData<D> getLocalData(int patch_local_index) const
 	{
 		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, false));
-		double *                  data = ldm->getVecView() + patch_stride * local_patch_id;
+		double *                  data = ldm->getVecView() + patch_stride * patch_local_index;
 		return LocalData<D>(data, strides, lengths, std::move(ldm));
 	}
 	/*
@@ -129,4 +157,5 @@ template <size_t D> class PetscVector : public Vector<D>
 	}
 	*/
 };
+} // namespace Thunderegg
 #endif

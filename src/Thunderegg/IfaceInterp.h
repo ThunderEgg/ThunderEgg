@@ -24,6 +24,8 @@
 #include <Thunderegg/Iface.h>
 #include <Thunderegg/SchurInfo.h>
 #include <Thunderegg/Vector.h>
+namespace Thunderegg
+{
 /**
  * @brief An abstract class that interpolates to the interfaces in the Schur compliment system.
  *
@@ -37,7 +39,7 @@ template <size_t D> class IfaceInterp
 	/**
 	 * @brief Given a set of patches, interpolate to their interfaces.
 	 *
-	 * @param patches the set of patches
+	 * @param patches the set of SchurInfo objects
 	 * @param u the domain vector
 	 * @param interp the interface vector
 	 */
@@ -71,4 +73,5 @@ template <size_t D> class IfaceInterp
 	                         std::shared_ptr<Vector<D - 1>>   interp)
 	= 0;
 };
+} // namespace Thunderegg
 #endif

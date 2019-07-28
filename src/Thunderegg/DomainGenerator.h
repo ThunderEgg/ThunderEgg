@@ -22,6 +22,8 @@
 #ifndef THUNDEREGG_DOMAINGENERATOR_H
 #define THUNDEREGG_DOMAINGENERATOR_H
 #include <Thunderegg/Domain.h>
+namespace Thunderegg
+{
 /**
  * @brief Generates Domain objects.
  *
@@ -50,4 +52,5 @@ template <size_t D> class DomainGenerator
 	 */
 	virtual std::shared_ptr<Domain<D>> getCoarserDomain() = 0;
 };
+} // namespace Thunderegg
 #endif

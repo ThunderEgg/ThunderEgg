@@ -29,6 +29,8 @@
 #include <array>
 #include <functional>
 
+namespace Thunderegg
+{
 /**
  * @brief This function is used to set the boundary condition types of the solver.
  *
@@ -43,5 +45,5 @@
 template <size_t D>
 using IsNeumannFunc = std::function<bool(Side<D> s, const std::array<double, D> &lower,
                                          const std::array<double, D> &upper)>;
-
+} // namespace Thunderegg
 #endif

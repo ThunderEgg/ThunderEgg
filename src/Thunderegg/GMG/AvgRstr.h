@@ -19,13 +19,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGAVGRSTR_H
-#define GMGAVGRSTR_H
+#ifndef THUNDEREGG_GMG_AVGRSTR_H
+#define THUNDEREGG_GMG_AVGRSTR_H
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/GMG/InterLevelComm.h>
 #include <Thunderegg/GMG/Restrictor.h>
 #include <memory>
-namespace GMG
+namespace Thunderegg::GMG
 {
 /**
  * @brief Restrictor that averages the corresponding fine cells into each coarse cell.
@@ -111,5 +111,5 @@ inline void AvgRstr<D>::restrict(std::shared_ptr<Vector<D>>       coarse,
 	coarse->set(0);
 	ilc->scatterReverse(coarse_local, coarse);
 }
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

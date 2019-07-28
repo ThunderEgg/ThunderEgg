@@ -19,7 +19,37 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "ThundereggDomGen.h"
+#ifndef THUNDEREGG_DOMAINWRAPOP_H
+#define THUNDEREGG_DOMAINWRAPOP_H
 
-template class ThundereggDomGen<2>;
-template class ThundereggDomGen<3>;
+#include <Thunderegg/Operator.h>
+#include <Thunderegg/SchurHelper.h>
+
+namespace Thunderegg
+{
+/**
+ * @brief Base class for operators
+ */
+template <size_t D> class DomainWrapOp : public Operator<D>
+{
+	private:
+	std::shared_ptr<SchurHelper<D>> sh;
+
+	public:
+	DomainWrapOp(std::shared_ptr<SchurHelper<D>> sh)
+	{
+		this->sh = sh;
+	}
+	/**
+	 * @brief Apply Schur matrix
+	 *
+	 * @param x the input vector.
+	 * @param b the output vector.
+	 */
+	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
+	{
+		sh->apply(x, b);
+	}
+};
+} // namespace Thunderegg
+#endif

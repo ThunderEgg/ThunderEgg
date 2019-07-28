@@ -19,10 +19,12 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef GMGFFTBlockJacobiSmoother_H
-#define GMGFFTBlockJacobiSmoother_H
+#ifndef THUNDEREGG_GMG_BLOCKJACOBISMOOTHER_H
+#define THUNDEREGG_GMG_BLOCKJACOBISMOOTHER_H
+
 #include <Thunderegg/SchurHelper.h>
-namespace GMG
+
+namespace Thunderegg::GMG
 {
 /**
  * @brief A block Jacobi smoother that uses FFTW solves on each patch. Implemented using the
@@ -57,5 +59,5 @@ template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
 		sh->solveWithSolution(f, u);
 	}
 };
-} // namespace GMG
+} // namespace Thunderegg::GMG
 #endif

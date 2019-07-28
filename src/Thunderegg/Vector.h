@@ -19,14 +19,19 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef THUNDEREGG_VECTOR_H
+#define THUNDEREGG_VECTOR_H
 #include <Thunderegg/Side.h>
 #include <algorithm>
 #include <cmath>
 #include <memory>
 #include <mpi.h>
 #include <numeric>
+namespace Thunderegg
+{
+/**
+ * @brief This object does any necessary cleanup when deleted
+ */
 class LocalDataManager
 {
 	public:
@@ -61,6 +66,11 @@ inline void nested_loop(std::array<int, D> start, std::array<int, D> end, T lamb
 	std::array<int, D> coord = start;
 	NestedLoop<D, D - 1, T>::nested_loop_loop(coord, start, end, lambda);
 }
+/**
+ * @brief Array for acessing data of a patch. It supports variable striding
+ *
+ * @tparam D number of cartesian dimensions
+ */
 template <size_t D> class LocalData
 {
 	private:
@@ -75,6 +85,14 @@ template <size_t D> class LocalData
 
 	public:
 	LocalData() = default;
+	/**
+	 * @brief Construct a new LocalData object
+	 *
+	 * @param data pointer to the first element in the patch
+	 * @param strides the strides in each direction
+	 * @param lengths the lengths in each direction
+	 * @param ldm the local data manager for the data
+	 */
 	LocalData(double *data, const std::array<int, D> &strides, const std::array<int, D> &lengths,
 	          std::shared_ptr<LocalDataManager> ldm = nullptr)
 	{
@@ -88,22 +106,42 @@ template <size_t D> class LocalData
 			end[i]--;
 		}
 	}
-    inline double *getPtr(const std::array<int, D> &coord)
+	/**
+	 * @brief Get the pointer the data at the specified coordinate
+	 *
+	 * @param coord the coordianate
+	 * @return double* the pointer
+	 */
+	inline double *getPtr(const std::array<int, D> &coord)
 	{
 		int idx = 0;
 		for (size_t i = 0; i < D; i++) {
 			idx += strides[i] * coord[i];
 		}
-		return data+idx;;
+		return data + idx;
+		;
 	}
+	/**
+	 * @brief Get the pointer the data at the specified coordinate
+	 *
+	 * @param coord the coordianate
+	 * @return double* the pointer
+	 */
 	inline const double *getPtr(const std::array<int, D> &coord) const
 	{
 		int idx = 0;
 		for (size_t i = 0; i < D; i++) {
 			idx += strides[i] * coord[i];
 		}
-		return data+idx;;
+		return data + idx;
+		;
 	}
+	/**
+	 * @brief Get a reference to the element at the specified coordinate
+	 *
+	 * @param coord the coordinate
+	 * @return double& the element
+	 */
 	inline double &operator[](const std::array<int, D> &coord)
 	{
 		int idx = 0;
@@ -112,6 +150,12 @@ template <size_t D> class LocalData
 		}
 		return data[idx];
 	}
+	/**
+	 * @brief Get a reference to the element at the specified coordinate
+	 *
+	 * @param coord the coordinate
+	 * @return double& the element
+	 */
 	inline const double &operator[](const std::array<int, D> &coord) const
 	{
 		int idx = 0;
@@ -120,30 +164,59 @@ template <size_t D> class LocalData
 		}
 		return data[idx];
 	}
+	/**
+	 * @brief Get a slice with dimensions D-1 on the specified side of the patch
+	 *
+	 * @param s the side
+	 * @param offset how far from the side the slice is
+	 * @return LocalData<D - 1>
+	 */
 	LocalData<D - 1> getSliceOnSide(Side<D> s, int offset = 0)
 	{
 		return getSliceOnSidePriv(s, offset);
 	}
+	/**
+	 * @brief Get a slice with dimensions D-1 on the specified side of the patch
+	 *
+	 * @param s the side
+	 * @param offset how far from the side the slice is
+	 * @return LocalData<D - 1>
+	 */
 	const LocalData<D - 1> getSliceOnSide(Side<D> s, int offset = 0) const
 	{
 		return getSliceOnSidePriv(s, offset);
 	}
+	/**
+	 * @brief Get the Lengths of the patch in each direction
+	 */
 	const std::array<int, D> &getLengths() const
 	{
 		return lengths;
 	}
+	/**
+	 * @brief Get the strides of the patch in each direction
+	 */
 	const std::array<int, D> &getStrides() const
 	{
 		return strides;
 	}
+	/**
+	 * @brief Get the coordinate of the first element
+	 */
 	const std::array<int, D> &getStart() const
 	{
 		return start;
 	}
+	/**
+	 * @brief Get the coordinate of the last element
+	 */
 	const std::array<int, D> &getEnd() const
 	{
 		return end;
 	}
+	/**
+	 * @brief Get the pointer to the first element
+	 */
 	double *getPtr() const
 	{
 		return data;
@@ -176,17 +249,48 @@ inline LocalData<D - 1> LocalData<D>::getSliceOnSidePriv(Side<D> s, int offset) 
 	}
 }
 
+/**
+ * @brief Vector class for use in thunderegg
+ *
+ * @tparam D the number of cartesian dimensions
+ */
 template <size_t D> class Vector
 {
 	protected:
-	int      num_local_patches;
+	/**
+	 * @brief The number of local patches in the vector
+	 */
+	int num_local_patches;
+	/**
+	 * @brief the mpi comm
+	 */
 	MPI_Comm comm = MPI_COMM_WORLD;
 
 	public:
+	/**
+	 * @brief Destroy the Vector object
+	 */
 	virtual ~Vector(){};
-	virtual LocalData<D>       getLocalData(int local_patch_id)       = 0;
-	virtual const LocalData<D> getLocalData(int local_patch_id) const = 0;
+	/**
+	 * @brief Get the LocalData object for the specified path
+	 *
+	 * @param patch_local_index the local index of the patch
+	 * @return LocalData<D> the LocalData object
+	 */
+	virtual LocalData<D> getLocalData(int patch_local_index) = 0;
+	/**
+	 * @brief Get the LocalData object for the specified path
+	 *
+	 * @param patch_local_index the local index of the patch
+	 * @return LocalData<D> the LocalData object
+	 */
+	virtual const LocalData<D> getLocalData(int patch_local_index) const = 0;
 
+	/**
+	 * @brief set all value in the vector
+	 *
+	 * @param alpha the value ot be set
+	 */
 	virtual void set(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
@@ -195,6 +299,11 @@ template <size_t D> class Vector
 			               [&](std::array<int, D> coord) { ld[coord] = alpha; });
 		}
 	}
+	/**
+	 * @brief scale all elements in the vector
+	 *
+	 * @param alpha the value to scale by
+	 */
 	virtual void scale(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
@@ -203,6 +312,11 @@ template <size_t D> class Vector
 			               [&](std::array<int, D> coord) { ld[coord] *= alpha; });
 		}
 	}
+	/**
+	 * @brief shift all the values in the vector
+	 *
+	 * @param delta the value to shift by
+	 */
 	virtual void shift(double delta)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
@@ -211,6 +325,11 @@ template <size_t D> class Vector
 			               [&](std::array<int, D> coord) { ld[coord] += delta; });
 		}
 	}
+	/**
+	 * @brief copy the values of the other vector
+	 *
+	 * @param b the other vector
+	 */
 	virtual void copy(std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
@@ -220,6 +339,11 @@ template <size_t D> class Vector
 			               [&](std::array<int, D> coord) { ld[coord] = ld_b[coord]; });
 		}
 	}
+	/**
+	 * @brief add the other vector to this vector
+	 *
+	 * @param b the other vector
+	 */
 	virtual void add(std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
@@ -229,6 +353,9 @@ template <size_t D> class Vector
 			               [&](std::array<int, D> coord) { ld[coord] += ld_b[coord]; });
 		}
 	}
+	/**
+	 * @brief `this = this + alpha * b`
+	 */
 	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
@@ -238,6 +365,9 @@ template <size_t D> class Vector
 			               [&](std::array<int, D> coord) { ld[coord] += ld_b[coord] * alpha; });
 		}
 	}
+	/**
+	 * @brief `this = this + alpha * a + beta * b`
+	 */
 	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> a, double beta,
 	                       std::shared_ptr<const Vector<D>> b)
 	{
@@ -250,6 +380,9 @@ template <size_t D> class Vector
 			});
 		}
 	}
+	/**
+	 * @brief `this = alpha * this + b`
+	 */
 	virtual void scaleThenAdd(double alpha, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
@@ -260,6 +393,9 @@ template <size_t D> class Vector
 			});
 		}
 	}
+	/**
+	 * @brief `this = alpha * this + beta * b`
+	 */
 	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
@@ -270,6 +406,9 @@ template <size_t D> class Vector
 			});
 		}
 	}
+	/**
+	 * @brief `this = alpha * this + beta * b + gamma * c`
+	 */
 	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b,
 	                                double gamma, std::shared_ptr<const Vector<D>> c)
 	{
@@ -282,6 +421,9 @@ template <size_t D> class Vector
 			});
 		}
 	}
+	/**
+	 * @brief get the l2norm
+	 */
 	virtual double twoNorm() const
 	{
 		double sum = 0;
@@ -294,6 +436,9 @@ template <size_t D> class Vector
 		MPI_Allreduce(&sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, comm);
 		return sqrt(global_sum);
 	}
+	/**
+	 * @brief get the infnorm
+	 */
 	virtual double infNorm() const
 	{
 		double max = 0;
@@ -306,6 +451,9 @@ template <size_t D> class Vector
 		MPI_Allreduce(&max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm);
 		return global_max;
 	}
+	/**
+	 * @brief get the infnorm
+	 */
 	virtual double dot(std::shared_ptr<const Vector<D>> b) const
 	{
 		double retval = 0;
@@ -331,4 +479,5 @@ extern template class LocalData<3>;
 extern template class Vector<1>;
 extern template class Vector<2>;
 extern template class Vector<3>;
+} // namespace Thunderegg
 #endif

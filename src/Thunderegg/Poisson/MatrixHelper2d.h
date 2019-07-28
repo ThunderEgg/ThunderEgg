@@ -19,35 +19,36 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef PETSCMATOP_H
-#define PETSCMATOP_H
-#include <Thunderegg/Operators/Operator.h>
-#include <Thunderegg/SchurHelper.h>
+#ifndef THUNDEREGG_POISSON_MATRIXHELPER2D_H
+#define THUNDEREGG_POISSON_MATRIXHELPER2D_H
+
+#include <Thunderegg/Domain.h>
+#include <petscmat.h>
+
+namespace Thunderegg::Poisson
+{
 /**
- * @brief Base class for operators
+ * @brief Create a matrix for the 2D second-order Laplacian operator
  */
-template <size_t D> class PetscMatOp : public Operator<D>
+class MatrixHelper2d
 {
 	private:
-	PW<Mat> A;
+	std::shared_ptr<Domain<2>> domain;
 
 	public:
-	PetscMatOp(PW<Mat> A)
-	{
-		this->A = A;
-	}
 	/**
-	 * @brief Apply Petsc matrix
+	 * @brief Create a MatrixHelper for a given domain
 	 *
-	 * @param x the input vector.
-	 * @param b the output vector.
+	 * @param domain the domain
 	 */
-	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
-	{
-		const PetscVector<D> *x_vec = dynamic_cast<const PetscVector<D> *>(x.get());
-		PetscVector<D> *      b_vec = dynamic_cast<PetscVector<D> *>(b.get());
-		if (x_vec == nullptr || b_vec == nullptr) { throw 3; }
-		MatMult(A, x_vec->vec, b_vec->vec);
-	}
+	MatrixHelper2d(std::shared_ptr<Domain<2>> domain);
+
+	/**
+	 * @brief Form the matrix
+	 *
+	 * @return the formed matrix
+	 */
+	PW_explicit<Mat> formCRSMatrix(double lambda = 0);
 };
+} // namespace Thunderegg::Poisson
 #endif

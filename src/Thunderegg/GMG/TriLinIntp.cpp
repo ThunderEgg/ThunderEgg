@@ -23,7 +23,8 @@
 #include <algorithm>
 #include <functional>
 using namespace std;
-using namespace GMG;
+using namespace Thunderegg::GMG;
+using namespace Thunderegg;
 /*
  * @brief Get an array of all pairs of sides that touch i.e. form a corner.
  *

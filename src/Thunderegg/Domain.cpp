@@ -21,5 +21,5 @@
 
 #include "Domain.h"
 
-template class Domain<2>;
-template class Domain<3>;
+template class Thunderegg::Domain<2>;
+template class Thunderegg::Domain<3>;
