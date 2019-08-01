@@ -45,6 +45,11 @@ class PetscLDM : public LocalDataManager
 		if (is_read_only) {
 			VecGetArrayRead(vec, const_cast<const double **>(&vec_view));
 		} else {
+			int state;
+			VecLockGet(vec, &state);
+			if (state != 0) {
+				throw std::runtime_error("Vector is in state " + std::to_string(state));
+			}
 			VecGetArray(vec, &vec_view);
 		}
 	}
@@ -108,7 +113,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	 */
 	LocalData<D> getLocalData(int patch_local_index)
 	{
-		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, true));
+		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, false));
 		double *                  data = ldm->getVecView() + patch_stride * patch_local_index;
 		return LocalData<D>(data, strides, lengths, ldm);
 	}
@@ -120,7 +125,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	 */
 	const LocalData<D> getLocalData(int patch_local_index) const
 	{
-		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, false));
+		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, true));
 		double *                  data = ldm->getVecView() + patch_stride * patch_local_index;
 		return LocalData<D>(data, strides, lengths, std::move(ldm));
 	}

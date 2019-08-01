@@ -32,6 +32,9 @@ list(APPEND Thunderegg_SRCS Thunderegg/Poisson/MatrixHelper2d.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/Poisson/DftPatchSolver.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/Poisson/FftwPatchSolver.cpp)
 
+list(APPEND Thunderegg_SRCS Thunderegg/VarPoisson/StarPatchOperator.cpp)
+
+list(APPEND Thunderegg_SRCS Thunderegg/Poisson/MatrixHelper.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory2d.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory3d.cpp)
 

@@ -19,36 +19,42 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
+#include "CLI11.hpp"
 #include "Init.h"
 #include "Writers/ClawWriter.h"
 #include <Thunderegg/BiCGStab.h>
-#include <Thunderegg/BiCGStabSolver.h>
-#include <Thunderegg/BilinearInterpolator.h>
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/DomainWrapOp.h>
 #include <Thunderegg/Experimental/DomGen.h>
-#include <Thunderegg/GMG/CycleFactory2d.h>
+#include <Thunderegg/Experimental/OctTree.h>
+#include <Thunderegg/GMG/CycleFactory3d.h>
+#include <Thunderegg/GMG/CycleOpts.h>
 #include <Thunderegg/PetscMatOp.h>
 #include <Thunderegg/PetscShellCreator.h>
 #include <Thunderegg/Poisson/DftPatchSolver.h>
 #include <Thunderegg/Poisson/FftwPatchSolver.h>
-#include <Thunderegg/Poisson/FivePtPatchOperator.h>
-#include <Thunderegg/Poisson/MatrixHelper2d.h>
+#include <Thunderegg/Poisson/MatrixHelper.h>
+#include <Thunderegg/Poisson/SevenPtPatchOperator.h>
 #include <Thunderegg/Poisson/StarPatchOperator.h>
 #include <Thunderegg/PolyChebPrec.h>
 #include <Thunderegg/SchurHelper.h>
-#include <Thunderegg/SchurMatrixHelper2d.h>
+#include <Thunderegg/SchurMatrixHelper.h>
 #include <Thunderegg/SchurWrapOp.h>
 #include <Thunderegg/SchwarzPrec.h>
 #include <Thunderegg/Timer.h>
+#include <Thunderegg/TriLinInterp.h>
+#ifdef ENABLE_AMGX
+#include "AmgxWrapper.h"
+#endif
+#ifdef ENABLE_MUELU
+#include <MueLuWrapper.h>
+#endif
+#ifdef ENABLE_MUELU_CUDA
+#include <MueLuCudaWrapper.h>
+#endif
 #ifdef HAVE_VTK
-#include "Writers/VtkWriter2d.h"
+#include "Writers/VtkWriter.h"
 #endif
-#ifdef HAVE_P4EST
-#include "TreeToP4est.h"
-#include <Thunderegg/P4estDomGen.h>
-#endif
-#include "CLI11.hpp"
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -58,7 +64,6 @@
 #include <petscviewer.h>
 #include <string>
 #include <unistd.h>
-//#include "IfaceMatrixHelper.h"
 
 // =========== //
 // main driver //
@@ -86,11 +91,11 @@ int main(int argc, char *argv[])
 	app.add_option("-l", loop_count, "Number of times to run program");
 
 	string matrix_type = "wrap";
-	app.add_set_ignore_case("--matrix_type", matrix_type, {"wrap", "crs"},
+	app.add_set_ignore_case("--matrix_type", matrix_type, {"wrap", "crs", "pbm"},
 	                        "Which type of matrix operator to use");
 
 	int div = 0;
-	app.add_option("--divide", div, "Number of levels to add to quadtree");
+	app.add_option("--divide", div, "Number of levels to add to octtree");
 
 	bool no_zero_rhs_avg = false;
 	app.add_flag("--nozerof", no_zero_rhs_avg,
@@ -111,24 +116,18 @@ int main(int argc, char *argv[])
 	->check(CLI::ExistingFile);
 
 	string problem = "trig";
-	app.add_set_ignore_case("--problem", problem, {"trig", "gauss", "zero", "circle"},
+	app.add_set_ignore_case("--problem", problem, {"trig", "gauss", "zero"},
 	                        "Which problem to solve");
 
 	string solver_type = "thunderegg";
 	app.add_set_ignore_case("--solver", solver_type, {"petsc", "thunderegg"},
 	                        "Which Solver to use");
-
 	string preconditioner = "";
-	app.add_set_ignore_case("--prec", preconditioner, {"GMG"}, "Which Preconditoner to use");
+	app.add_set_ignore_case("--prec", preconditioner, {"GMG", "Schwarz", "BlockJacobi", "cheb"},
+	                        "Which Preconditoner to use");
 
 	string patch_solver = "fftw";
-	app.add_set_ignore_case("--patch_solver", patch_solver, {"fftw", "bcgs", "dft"},
-	                        "Which patch solver to use");
-
-	int ps_max_it = 1000;
-	app.add_option("--patch_solver_max_it", ps_max_it, "max iterations for bcgs patch solver");
-	double ps_tol = 1e-12;
-	app.add_option("--patch_solver_tol", ps_tol, "tolerance for bcgs patch solver");
+	app.add_option("--patch_solver", patch_solver, "Which patch solver to use");
 
 	bool setrow = false;
 	app.add_flag("--setrow", setrow, "Set row in matrix");
@@ -183,11 +182,6 @@ int main(int argc, char *argv[])
 	string gamma_filename = "";
 	app.add_option("--out_gamma", gamma_filename, "Filename of gamma output");
 
-#ifdef HAVE_P4EST
-	bool use_p4est = false;
-	app.add_flag("--p4est", use_p4est, "use p4est");
-#endif
-
 	string config_out_filename = "";
 	auto   out_config_opt
 	= app.add_option("--output_config", config_out_filename, "Save CLI options to config file");
@@ -210,174 +204,134 @@ int main(int argc, char *argv[])
 	MPI_Comm_rank(MPI_COMM_WORLD, &my_global_rank);
 
 	// Set the number of discretization points in the x and y direction.
-	std::array<int, 2> ns;
+	std::array<int, 3> ns;
 	ns.fill(n);
 
 	///////////////
 	// Create Mesh
 	///////////////
-	shared_ptr<Domain<2>> domain;
-	Tree<2>               t;
-	t = Tree<2>(mesh_filename);
+	shared_ptr<Domain<3>> dc;
+	Tree<3>               t;
+	t = Tree<3>(mesh_filename);
 	for (int i = 0; i < div; i++) {
 		t.refineLeaves();
 	}
 
-	shared_ptr<DomainGenerator<2>> dcg;
-#ifdef HAVE_P4EST
-	if (use_p4est) {
-		TreeToP4est ttp(t);
-
-		auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
-			x = unit_x;
-			y = unit_y;
-		};
-		auto inf
-		= [=](Side<2> s, const array<double, 2> &, const array<double, 2> &) { return neumann; };
-
-		dcg.reset(new P4estDomGen(ttp.p4est, ns, inf, bmf));
-#else
-	if (false) {
-#endif
-	} else {
-		dcg.reset(new DomGen<2>(t, ns, neumann));
-	}
-
-	domain = dcg->getFinestDomain();
-
 	// the functions that we are using
-	function<double(double, double)> ffun;
-	function<double(double, double)> gfun;
-	function<double(double, double)> nfun;
-	function<double(double, double)> nfuny;
+	function<double(double, double, double)> ffun;
+	function<double(double, double, double)> gfun;
+	function<double(double, double, double)> nfunx;
+	function<double(double, double, double)> nfuny;
+	function<double(double, double, double)> nfunz;
 
-	if (problem == "gauss") {
-		double x0    = .5;
-		double y0    = .5;
-		double alpha = 1000;
-		ffun         = [&](double x, double y) {
-            double r2 = pow((x - x0), 2) + pow((y - y0), 2);
-            return exp(-alpha / 2.0 * r2) * (pow(alpha, 2) * r2 - 2 * alpha);
+	if (problem == "zero") {
+		ffun  = [](double x, double y, double z) { return 0; };
+		gfun  = [](double x, double y, double z) { return 0; };
+		nfunx = [](double x, double y, double z) { return 0; };
+		nfuny = [](double x, double y, double z) { return 0; };
+		nfunz = [](double x, double y, double z) { return 0; };
+	} else if (problem == "gauss") {
+		gfun = [](double x, double y, double z) {
+			return exp(cos(10 * M_PI * x)) - exp(cos(11 * M_PI * y)) + exp(cos(12 * M_PI * z));
 		};
-		gfun = [&](double x, double y) {
-			double r2 = pow((x - x0), 2) + pow((y - y0), 2);
-			return exp(-alpha / 2.0 * r2);
+		ffun = [](double x, double y, double z) {
+			return -M_PI * M_PI
+			       * (100 * exp(cos(10 * M_PI * x)) * cos(10 * M_PI * x)
+			          - 100 * exp(cos(10 * M_PI * x)) * pow(sin(10 * M_PI * x), 2)
+			          - 121 * exp(cos(11 * M_PI * y)) * cos(11 * M_PI * y)
+			          + 121 * exp(cos(11 * M_PI * y)) * pow(sin(11 * M_PI * y), 2)
+			          + 144 * exp(cos(12 * M_PI * z)) * cos(12 * M_PI * z)
+			          - 144 * exp(cos(12 * M_PI * z)) * pow(sin(12 * M_PI * z), 2));
 		};
-		nfun  = [](double x, double y) { return 0; };
-		nfuny = [](double x, double y) { return 0; };
-	} else if (problem == "zero") {
-		ffun  = [](double x, double y) { return 0; };
-		gfun  = [](double x, double y) { return 0; };
-		nfun  = [](double x, double y) { return 0; };
-		nfuny = [](double x, double y) { return 0; };
-	} else if (problem == "circle") {
-		ffun = [](double x, double y) {
-			double xdist, ydist, dist;
-			// distance form center circle
-			xdist = x - 0.5;
-			ydist = y - 0.5;
-			dist  = sqrt(xdist * xdist + ydist * ydist);
-			if (dist < 0.2) { return 1; }
-			for (int i = 0; i < 4; i++) {
-				// larger circles
-				double theta = i * M_PI / 2.0;
-				xdist        = x - (0.3 * cos(theta) + 0.5);
-				ydist        = y - (0.3 * sin(theta) + 0.5);
-				dist         = sqrt(xdist * xdist + ydist * ydist);
-				if (dist < 0.1) { return 1; }
-				// smaller circles
-				theta = M_PI / 4.0 + i * M_PI / 2.0;
-				xdist = x - (0.275 * cos(theta) + 0.5);
-				ydist = y - (0.275 * sin(theta) + 0.5);
-				dist  = sqrt(xdist * xdist + ydist * ydist);
-				if (dist < 0.075) { return 1; }
-			}
-			return 0;
-		};
-		gfun  = [](double x, double y) { return 0; };
-		nfun  = [](double x, double y) { return 0; };
-		nfuny = [](double x, double y) { return 0; };
-	} else if (problem == "trig gauss") {
-		gfun = [](double x, double y) { return exp(cos(10 * M_PI * x)) - exp(cos(11 * M_PI * y)); };
-		ffun = [](double x, double y) {
-			return 100 * M_PI * M_PI * (pow(sin(10 * M_PI * x), 2) - cos(10 * M_PI * x))
-			       * exp(cos(10 * M_PI * x))
-			       + 121 * M_PI * M_PI * (cos(11 * M_PI * y) - pow(sin(11 * M_PI * y), 2))
-			         * exp(cos(11 * M_PI * y));
-		};
-		nfun = [](double x, double y) {
+		nfunx = [](double x, double y, double z) {
 			return -10 * M_PI * sin(10 * M_PI * x) * exp(cos(10 * M_PI * x));
 		};
-
-		nfuny = [](double x, double y) {
+		nfuny = [](double x, double y, double z) {
 			return 11 * M_PI * sin(11 * M_PI * y) * exp(cos(11 * M_PI * y));
 		};
+		nfunz = [](double x, double y, double z) {
+			return -12 * M_PI * sin(12 * M_PI * z) * exp(cos(12 * M_PI * z));
+		};
 	} else {
-		ffun
-		= [](double x, double y) { return -5 * M_PI * M_PI * sinl(M_PI * y) * cosl(2 * M_PI * x); };
-		gfun  = [](double x, double y) { return sinl(M_PI * y) * cosl(2 * M_PI * x); };
-		nfun  = [](double x, double y) { return -2 * M_PI * sinl(M_PI * y) * sinl(2 * M_PI * x); };
-		nfuny = [](double x, double y) { return M_PI * cosl(M_PI * y) * cosl(2 * M_PI * x); };
+		ffun = [](double x, double y, double z) {
+			x += .3;
+			y += .3;
+			z += .3;
+			return -77.0 / 36 * M_PI * M_PI * sin(M_PI * x) * cos(2.0 / 3 * M_PI * y)
+			       * sin(5.0 / 6 * M_PI * z);
+		};
+		gfun = [](double x, double y, double z) {
+			x += .3;
+			y += .3;
+			z += .3;
+			return sin(M_PI * x) * cos(2.0 / 3 * M_PI * y) * sin(5.0 / 6 * M_PI * z);
+		};
+		nfunx = [](double x, double y, double z) {
+			x += .3;
+			y += .3;
+			z += .3;
+			return M_PI * cos(M_PI * x) * cos(2.0 / 3 * M_PI * y) * sin(5.0 / 6 * M_PI * z);
+		};
+		nfuny = [](double x, double y, double z) {
+			x += .3;
+			y += .3;
+			z += .3;
+			return -2.0 / 3 * M_PI * sin(M_PI * x) * sin(2.0 / 3 * M_PI * y)
+			       * sin(5.0 / 6 * M_PI * z);
+		};
+		nfunz = [](double x, double y, double z) {
+			x += .3;
+			y += .3;
+			z += .3;
+			return 5.0 / 6 * M_PI * sin(M_PI * x) * cos(2.0 / 3 * M_PI * y)
+			       * cos(5.0 / 6 * M_PI * z);
+		};
 	}
-
-	// patch operator
-	shared_ptr<PatchOperator<2>> p_operator(new StarPatchOperator<2>());
 
 	// set the patch solver
-	shared_ptr<PatchSolver<2>> p_solver;
-	if (patch_solver == "bcgs") {
-		p_solver.reset(new BiCGStabSolver<2>(p_operator, ps_tol, ps_max_it));
-	} else if (patch_solver == "dft") {
-		p_solver.reset(new DftPatchSolver<2>(*domain));
-	} else {
-		p_solver.reset(new FftwPatchSolver<2>(*domain));
-	}
+	shared_ptr<PatchSolver<3>> p_solver;
+
+	// patch operator
+	shared_ptr<PatchOperator<3>> p_operator(new StarPatchOperator<3>());
 
 	// interface interpolator
-	shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator());
+	shared_ptr<IfaceInterp<3>> p_interp(new TriLinInterp());
 
 	Timer timer;
 	for (int loop = 0; loop < loop_count; loop++) {
 		timer.start("Domain Initialization");
 
-		shared_ptr<SchurHelper<2>> sch(new SchurHelper<2>(domain, p_solver, p_operator, p_interp));
-		/*
-		if (f_outim) {
-		    IfaceMatrixHelper imh(dc);
-		    PW<Mat>           IA = imh.formCRSMatrix();
-		    PetscViewer       viewer;
-		    PetscViewerBinaryOpen(PETSC_COMM_WORLD, args::get(f_outim).c_str(), FILE_MODE_WRITE,
-		                          &viewer);
-		    MatView(IA, viewer);
-		    PetscViewerDestroy(&viewer);
-		}
-		*/
+		shared_ptr<DomainGenerator<3>> dcg(new DomGen<3>(t, ns, neumann));
 
-		shared_ptr<PetscVector<2>> u     = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> exact = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> f     = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> au    = domain->getNewDomainVec();
+		dc = dcg->getFinestDomain();
+
+		if (patch_solver == "dft") {
+			p_solver.reset(new DftPatchSolver<3>(*dc));
+		} else {
+			p_solver.reset(new FftwPatchSolver<3>(*dc));
+		}
+		shared_ptr<SchurHelper<3>> sch(new SchurHelper<3>(dc, p_solver, p_operator, p_interp));
+
+		// Initialize Vectors
+		shared_ptr<PetscVector<3>> u     = dc->getNewDomainVec();
+		shared_ptr<PetscVector<3>> exact = dc->getNewDomainVec();
+		shared_ptr<PetscVector<3>> f     = dc->getNewDomainVec();
+		shared_ptr<PetscVector<3>> au    = dc->getNewDomainVec();
 
 		if (neumann) {
-			Init::initNeumann2d(*domain, f->vec, exact->vec, ffun, gfun, nfun, nfuny);
+			Init::initNeumann(*dc, f->vec, exact->vec, ffun, gfun, nfunx, nfuny, nfunz);
 		} else {
-			Init::initDirichlet2d(*domain, f->vec, exact->vec, ffun, gfun);
+			Init::initDirichlet(*dc, f->vec, exact->vec, ffun, gfun);
 		}
 
 		timer.stop("Domain Initialization");
 
-		// Create the gamma and diff vectors
-		shared_ptr<PetscVector<1>> gamma = sch->getNewSchurVec();
-		shared_ptr<PetscVector<1>> diff  = sch->getNewSchurVec();
-		shared_ptr<PetscVector<1>> b     = sch->getNewSchurVec();
-
-		// Create linear problem for the Belos solver
-		PW<KSP> solver;
-		KSPCreate(MPI_COMM_WORLD, &solver);
-		KSPSetFromOptions(solver);
+		shared_ptr<PetscVector<2>> gamma = sch->getNewSchurVec();
+		shared_ptr<PetscVector<2>> diff  = sch->getNewSchurVec();
+		shared_ptr<PetscVector<2>> b     = sch->getNewSchurVec();
 
 		if (neumann && !no_zero_rhs_avg) {
-			double fdiff = domain->integrate(f) / domain->volume();
+			double fdiff = dc->integrate(f) / dc->volume();
 			if (my_global_rank == 0) cout << "Fdiff: " << fdiff << endl;
 			f->shift(-fdiff);
 		}
@@ -397,9 +351,9 @@ int main(int argc, char *argv[])
 				VecView(b->vec, viewer);
 				PetscViewerDestroy(&viewer);
 			}
-			std::shared_ptr<Operator<1>> A;
+			std::shared_ptr<Operator<2>> A;
 			PW<Mat>                      A_petsc;
-			std::shared_ptr<Operator<1>> M;
+			std::shared_ptr<Operator<2>> M;
 			PW<PC>                       M_petsc;
 
 			///////////////////
@@ -409,11 +363,11 @@ int main(int argc, char *argv[])
 
 			timer.start("Matrix Formation");
 			if (matrix_type == "wrap") {
-				A.reset(new SchurWrapOp<2>(domain, sch));
+				A.reset(new SchurWrapOp<3>(dc, sch));
 			} else if (matrix_type == "crs") {
-				SchurMatrixHelper2d smh(sch);
+				SchurMatrixHelper smh(sch);
 				A_petsc = smh.formCRSMatrix();
-				A.reset(new PetscMatOp<1>(A_petsc));
+				A.reset(new PetscMatOp<2>(A_petsc));
 				if (setrow) {
 					int row = 0;
 					MatZeroRows(A_petsc, 1, &row, 1.0, nullptr, nullptr);
@@ -426,6 +380,10 @@ int main(int argc, char *argv[])
 					MatView(A_petsc, viewer);
 					PetscViewerDestroy(&viewer);
 				}
+			} else if (matrix_type == "pbm") {
+				SchurMatrixHelper smh(sch);
+				A_petsc = smh.getPBMatrix();
+				A.reset(new PetscMatOp<2>(A_petsc));
 			}
 			timer.stop("Matrix Formation");
 			// preconditoners
@@ -434,6 +392,8 @@ int main(int argc, char *argv[])
 				throw 3;
 			} else if (preconditioner == "GMG") {
 				throw 3;
+			} else if (preconditioner == "cheb") {
+				M.reset(new PolyChebPrec(dc, sch));
 			}
 			timer.stop("Preconditioner Setup");
 
@@ -467,9 +427,9 @@ int main(int argc, char *argv[])
 				KSPGetIterationNumber(solver, &its);
 				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
 			} else {
-				std::shared_ptr<VectorGenerator<1>> vg(new SchurHelperVG<1>(sch));
+				std::shared_ptr<VectorGenerator<2>> vg(new SchurHelperVG<2>(sch));
 
-				int its = BiCGStab<1>::solve(vg, A, gamma, b, M);
+				int its = BiCGStab<2>::solve(vg, A, gamma, b, M);
 				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
 			}
 			timer.stop("Linear Solve");
@@ -483,9 +443,9 @@ int main(int argc, char *argv[])
 
 			sch->applyWithInterface(u, gamma, au);
 		} else {
-			std::shared_ptr<Operator<2>> A;
+			std::shared_ptr<Operator<3>> A;
 			PW<Mat>                      A_petsc;
-			std::shared_ptr<Operator<2>> M;
+			std::shared_ptr<Operator<3>> M;
 			///////////////////
 			// setup start
 			///////////////////
@@ -493,12 +453,12 @@ int main(int argc, char *argv[])
 
 			timer.start("Matrix Formation");
 			if (matrix_type == "wrap") {
-				A.reset(new DomainWrapOp<2>(sch));
-				A_petsc = PetscShellCreator::getMatShell(A, domain);
+				A.reset(new DomainWrapOp<3>(sch));
+				A_petsc = PetscShellCreator::getMatShell(A, dc);
 			} else if (matrix_type == "crs") {
-				MatrixHelper2d mh(domain);
+				MatrixHelper mh(dc);
 				A_petsc = mh.formCRSMatrix();
-				A.reset(new PetscMatOp<2>(A_petsc));
+				A.reset(new PetscMatOp<3>(A_petsc));
 				if (setrow) {
 					int row = 0;
 					MatZeroRows(A_petsc, 1, &row, 1.0, nullptr, nullptr);
@@ -518,11 +478,11 @@ int main(int argc, char *argv[])
 			// preconditoners
 			timer.start("Preconditioner Setup");
 			if (preconditioner == "Scwharz") {
-				M.reset(new SchwarzPrec<2>(sch));
+				M.reset(new SchwarzPrec<3>(sch));
 			} else if (preconditioner == "GMG") {
 				timer.start("GMG Setup");
 
-				M = GMG::CycleFactory2d::getCycle(copts, dcg, p_solver, p_operator, p_interp);
+				M = GMG::CycleFactory3d::getCycle(copts, dcg, p_solver, p_operator, p_interp);
 
 				timer.stop("GMG Setup");
 			} else if (preconditioner == "cheb") {
@@ -541,7 +501,7 @@ int main(int argc, char *argv[])
 				if (M != nullptr) {
 					PC M_petsc;
 					KSPGetPC(solver, &M_petsc);
-					PetscShellCreator::getPCShell(M_petsc, M, domain);
+					PetscShellCreator::getPCShell(M_petsc, M, dc);
 				}
 				KSPSetUp(solver);
 				KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
@@ -560,9 +520,9 @@ int main(int argc, char *argv[])
 				KSPGetIterationNumber(solver, &its);
 				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
 			} else {
-				std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
+				std::shared_ptr<VectorGenerator<3>> vg(new DomainVG<3>(dc));
 
-				int its = BiCGStab<2>::solve(vg, A, u, f, M);
+				int its = BiCGStab<3>::solve(vg, A, u, f, M);
 				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
 			}
 			timer.stop("Linear Solve");
@@ -570,72 +530,67 @@ int main(int argc, char *argv[])
 			A->apply(u, au);
 		}
 
-		// residual
-		shared_ptr<PetscVector<2>> resid = domain->getNewDomainVec();
-		VecAXPBYPCZ(resid->vec, -1.0, 1.0, 0.0, au->vec, f->vec);
+		shared_ptr<PetscVector<3>> resid = dc->getNewDomainVec();
+		resid->addScaled(-1, au, 1, f);
+
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
-		shared_ptr<PetscVector<2>> error = domain->getNewDomainVec();
-		VecAXPBYPCZ(error->vec, -1.0, 1.0, 0.0, exact->vec, u->vec);
+		shared_ptr<PetscVector<3>> error = dc->getNewDomainVec();
+		error->addScaled(-1, exact, 1, u);
 		if (neumann) {
-			double uavg = domain->integrate(u) / domain->volume();
-			double eavg = domain->integrate(exact) / domain->volume();
+			double uavg = dc->integrate(u) / dc->volume();
+			double eavg = dc->integrate(exact) / dc->volume();
 
 			if (my_global_rank == 0) {
 				cout << "Average of computed solution: " << uavg << endl;
 				cout << "Average of exact solution: " << eavg << endl;
 			}
 
-			VecShift(error->vec, eavg - uavg);
+			error->shift(eavg - uavg);
 		}
-		double error_norm = error->twoNorm();
-		double exact_norm = exact->twoNorm();
+		double error_norm     = error->twoNorm();
+		double error_norm_inf = error->infNorm();
+		double exact_norm     = exact->twoNorm();
 
-		double ausum = domain->integrate(au);
-		double fsum  = domain->integrate(f);
+		double ausum = dc->integrate(au);
+		double fsum  = dc->integrate(f);
 		if (my_global_rank == 0) {
 			std::cout << std::scientific;
 			std::cout.precision(13);
-			std::cout << "Error: " << error_norm / exact_norm << endl;
+			std::cout << "Error (2-norm):   " << error_norm / exact_norm << endl;
+			std::cout << "Error (inf-norm): " << error_norm_inf << endl;
 			std::cout << "Residual: " << residual / fnorm << endl;
 			std::cout << u8"ΣAu-Σf: " << ausum - fsum << endl;
 			cout.unsetf(std::ios_base::floatfield);
-			int total_cells = domain->getNumGlobalCells();
+			int total_cells = dc->getNumGlobalCells();
 			cout << "Total cells: " << total_cells << endl;
+			cout << "Cores: " << num_procs << endl;
 		}
 
 		// output
-		if (claw_filename != "") {
-			ClawWriter writer(domain);
-			writer.write(u->vec, resid->vec);
+		if (gamma_filename != "") {
+			PetscViewer viewer;
+			PetscViewerASCIIOpen(PETSC_COMM_WORLD, gamma_filename.c_str(), &viewer);
+			VecView(gamma->vec, viewer);
 		}
 #ifdef HAVE_VTK
 		if (vtk_filename != "") {
-			VtkWriter2d writer(*domain, vtk_filename);
+			VtkWriter writer(dc, vtk_filename);
 			writer.add(u->vec, "Solution");
 			writer.add(error->vec, "Error");
+			writer.add(exact->vec, "Exact");
 			writer.add(resid->vec, "Residual");
 			writer.add(f->vec, "RHS");
-			writer.add(exact->vec, "Exact");
 			writer.write();
 		}
 #endif
 		cout.unsetf(std::ios_base::floatfield);
-#ifdef ENABLE_MUELU
-		if (meulusolver != nullptr) { delete meulusolver; }
-#endif
-#ifdef ENABLE_MUELU_CUDA
-		if (meulucudasolver != nullptr) { delete meulucudasolver; }
-#endif
 	}
 
 #ifdef ENABLE_AMGX
 	if (amgxsolver != nullptr) { delete amgxsolver; }
-#endif
-#ifdef ENABLE_MUELU_CUDA
-	if (f_meulucuda) { MueLuCudaWrapper::finalize(); }
 #endif
 	if (my_global_rank == 0) { cout << timer; }
 	PetscFinalize();

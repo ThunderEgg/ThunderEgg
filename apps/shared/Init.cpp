@@ -51,6 +51,7 @@ static void getXYZ(shared_ptr<PatchInfo<3>> pinfo, int xi, int yi, int zi, doubl
 		z = pinfo->starts[2] + h_z / 2.0 + pinfo->spacings[2] * zi;
 	}
 }
+
 inline int index(shared_ptr<PatchInfo<3>> pinfo, int xi, int yi, int zi)
 {
 	return xi + yi * pinfo->ns[0] + zi * pinfo->ns[0] * pinfo->ns[1];

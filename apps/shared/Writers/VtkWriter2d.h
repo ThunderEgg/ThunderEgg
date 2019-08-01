@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively 
+ *  Thunderegg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
  *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
@@ -21,7 +21,7 @@
 
 #ifndef VTKWRITER2D_H
 #define VTKWRITER2D_H
-#include "Domain.h"
+#include <Thunderegg/Domain.h>
 #include <map>
 #include <set>
 #include <string>
@@ -37,7 +37,7 @@
 class VtkWriter2d
 {
 	private:
-	DomainCollection<2>                               dc;
+	std::shared_ptr<Thunderegg::Domain<2>>            dc;
 	std::string                                       file_name;
 	static vtkSmartPointer<vtkMultiProcessController> controller;
 	std::map<int, vtkSmartPointer<vtkImageData>>      images;
@@ -47,7 +47,7 @@ class VtkWriter2d
 	vtkSmartPointer<vtkMultiPieceDataSet>             data;
 
 	public:
-	VtkWriter2d(DomainCollection<2> &dc, std::string file_name);
+	VtkWriter2d(std::shared_ptr<Thunderegg::Domain<2>> dc, std::string file_name);
 	void add(Vec u, std::string name);
 	void write();
 };

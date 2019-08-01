@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively 
+ *  Thunderegg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
  *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
@@ -21,7 +21,7 @@
 
 #ifndef VTKWRITER_H
 #define VTKWRITER_H
-#include "Domain.h"
+#include <Thunderegg/Domain.h>
 #include <map>
 #include <set>
 #include <string>
@@ -37,17 +37,17 @@
 class VtkWriter
 {
 	private:
-	DomainCollection<3>                                  dc;
+	std::shared_ptr<Thunderegg::Domain<3>>            dc;
 	std::string                                       file_name;
 	static vtkSmartPointer<vtkMultiProcessController> controller;
-	std::map<int, vtkSmartPointer<vtkImageData>> images;
-	std::set<vtkSmartPointer<vtkDoubleArray>>    arrays;
-	vtkSmartPointer<vtkXMLPMultiBlockDataWriter> writer;
-	vtkSmartPointer<vtkMultiBlockDataSet>        block;
-	vtkSmartPointer<vtkMultiPieceDataSet>        data;
+	std::map<int, vtkSmartPointer<vtkImageData>>      images;
+	std::set<vtkSmartPointer<vtkDoubleArray>>         arrays;
+	vtkSmartPointer<vtkXMLPMultiBlockDataWriter>      writer;
+	vtkSmartPointer<vtkMultiBlockDataSet>             block;
+	vtkSmartPointer<vtkMultiPieceDataSet>             data;
 
 	public:
-	VtkWriter(DomainCollection<3> &dc, std::string file_name);
+	VtkWriter(std::shared_ptr<Thunderegg::Domain<3>> dc, std::string file_name);
 	void add(Vec u, std::string name);
 	void write();
 };

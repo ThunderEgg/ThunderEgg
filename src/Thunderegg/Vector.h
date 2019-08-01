@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_VECTOR_H
 #define THUNDEREGG_VECTOR_H
+#include <Thunderegg/Loops.h>
 #include <Thunderegg/Side.h>
 #include <algorithm>
 #include <cmath>
@@ -37,35 +38,7 @@ class LocalDataManager
 	public:
 	virtual ~LocalDataManager(){};
 };
-template <size_t D, size_t Dir, typename T> class NestedLoop
-{
-	public:
-	static void inline nested_loop_loop(std::array<int, D> &coord, std::array<int, D> &start,
-	                                    std::array<int, D> &end, T lambda)
-	{
-		for (coord[Dir] = start[Dir]; coord[Dir] <= end[Dir]; coord[Dir]++) {
-			NestedLoop<D, Dir - 1, T>::nested_loop_loop(coord, start, end, lambda);
-		}
-	}
-};
 
-template <size_t D, typename T> class NestedLoop<D, 0, T>
-{
-	public:
-	static void inline nested_loop_loop(std::array<int, D> &coord, std::array<int, D> &start,
-	                                    std::array<int, D> &end, T lambda)
-	{
-		for (coord[0] = start[0]; coord[0] <= end[0]; coord[0]++) {
-			lambda(coord);
-		}
-	}
-};
-template <size_t D, typename T>
-inline void nested_loop(std::array<int, D> start, std::array<int, D> end, T lambda)
-{
-	std::array<int, D> coord = start;
-	NestedLoop<D, D - 1, T>::nested_loop_loop(coord, start, end, lambda);
-}
 /**
  * @brief Array for acessing data of a patch. It supports variable striding
  *
@@ -271,6 +244,13 @@ template <size_t D> class Vector
 	 * @brief Destroy the Vector object
 	 */
 	virtual ~Vector(){};
+	/**
+	 * @brief Get the number of local patches
+	 */
+	int getNumLocalPatches()
+	{
+		return num_local_patches;
+	}
 	/**
 	 * @brief Get the LocalData object for the specified path
 	 *

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively 
+ *  Thunderegg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
  *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
@@ -21,8 +21,9 @@
 
 #include "VtkWriter.h"
 using namespace std;
+using namespace Thunderegg;
 vtkSmartPointer<vtkMultiProcessController> VtkWriter::controller;
-VtkWriter::VtkWriter(DomainCollection<3> &dc, string file_name)
+VtkWriter::VtkWriter(shared_ptr<Domain<3>> dc, string file_name)
 {
 	if (controller == nullptr) {
 		controller = vtkSmartPointer<vtkMPIController>::New();
@@ -37,7 +38,7 @@ VtkWriter::VtkWriter(DomainCollection<3> &dc, string file_name)
 	writer->SetController(controller);
 	block = vtkSmartPointer<vtkMultiBlockDataSet>::New();
 	data  = vtkSmartPointer<vtkMultiPieceDataSet>::New();
-	data->SetNumberOfPieces(dc.num_global_domains);
+	data->SetNumberOfPieces(dc->getNumGlobalCells());
 	block->SetNumberOfBlocks(1);
 	block->SetBlock(0, data);
 
@@ -55,13 +56,12 @@ void VtkWriter::add(Vec u, string name)
 	double *u_view;
 	VecGetArray(u, &u_view);
 
-	for (auto &p : dc.domains) {
-		Domain<3> &d     = *p.second;
-		int        n     = d.n;
-		double     h_x   = d.lengths[0] / n;
-		double     h_y   = d.lengths[1] / n;
-		double     h_z   = d.lengths[2] / n;
-		int        start = d.id_local * n * n * n;
+	for (auto &pinfo : dc->getPatchInfoVector()) {
+		PatchInfo<3> &d     = *pinfo;
+		double        h_x   = d.spacings[0];
+		double        h_y   = d.spacings[1];
+		double        h_z   = d.spacings[2];
+		int           start = d.local_index * d.ns[0] * d.ns[1] * d.ns[2];
 
 		// create image object
 		vtkSmartPointer<vtkImageData> image = images[d.id];
@@ -70,20 +70,21 @@ void VtkWriter::add(Vec u, string name)
 			images[d.id] = image;
 			image->SetOrigin(d.starts[0], d.starts[1], d.starts[2]);
 			image->SetSpacing(h_x, h_y, h_z);
-			image->SetExtent(d.starts[0], d.starts[0] + d.lengths[0], d.starts[1],
-			                 d.starts[1] + d.lengths[1], d.starts[2], d.starts[2] + d.lengths[2]);
+			image->SetExtent(d.starts[0], d.starts[0] + d.spacings[0] * d.ns[0], d.starts[1],
+			                 d.starts[1] + d.ns[1] * d.spacings[1], d.starts[2],
+			                 d.starts[2] + d.spacings[2] * d.ns[2]);
 			image->PrepareForNewData();
-			image->SetDimensions(n + 1, n + 1, n + 1);
+			image->SetDimensions(d.ns[0] + 1, d.ns[1] + 1, d.ns[2] + 1);
 			// add image to dataset
-			data->SetPiece(d.id_global, image);
+			data->SetPiece(d.global_index, image);
 		}
 
 		// create solution vector
 		vtkSmartPointer<vtkDoubleArray> solution = vtkSmartPointer<vtkDoubleArray>::New();
 		solution->SetNumberOfComponents(1);
-		solution->SetNumberOfValues(n * n * n);
+		solution->SetNumberOfValues(dc->getNumCellsInPatch());
 		solution->SetName(name.c_str());
-		for (int i = 0; i < n * n * n; i++) {
+		for (int i = 0; i < dc->getNumCellsInPatch(); i++) {
 			solution->SetValue(i, u_view[start + i]);
 		}
 		image->GetCellData()->AddArray(solution);
