@@ -157,7 +157,7 @@ inline InterLevelComm<D>::InterLevelComm(std::shared_ptr<Domain<D>> coarse_domai
 
 	PW<Vec> u_local;
 	VecCreateSeq(PETSC_COMM_SELF, local_vec_size, &u_local);
-	std::shared_ptr<PetscVector<D>> u = coarse_domain->getNewDomainVec();
+	std::shared_ptr<PetscVector<D>> u = PetscVector<D>::GetNewVector(coarse_domain);
 	VecScatterCreate(u->vec, dist_is, u_local, nullptr, &p_scatter);
 }
 

@@ -50,8 +50,8 @@ template <size_t D> class SchurWrapOp : public Operator<D - 1>
 	 */
 	void apply(std::shared_ptr<const Vector<D - 1>> x, std::shared_ptr<Vector<D - 1>> b) const
 	{
-		auto f = domain->getNewDomainVec();
-		auto u = domain->getNewDomainVec();
+		auto f = PetscVector<D>::GetNewVector(domain);
+		auto u = PetscVector<D>::GetNewVector(domain);
 		sh->solveAndInterpolateWithInterface(f, u, x, b);
 	}
 };

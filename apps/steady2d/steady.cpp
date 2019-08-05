@@ -353,10 +353,10 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		shared_ptr<PetscVector<2>> u     = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> exact = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> f     = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> au    = domain->getNewDomainVec();
+		shared_ptr<PetscVector<2>> u     = PetscVector<2>::GetNewVector(domain);
+		shared_ptr<PetscVector<2>> exact = PetscVector<2>::GetNewVector(domain);
+		shared_ptr<PetscVector<2>> f     = PetscVector<2>::GetNewVector(domain);
+		shared_ptr<PetscVector<2>> au    = PetscVector<2>::GetNewVector(domain);
 
 		if (neumann) {
 			Init::initNeumann2d(*domain, f->vec, exact->vec, ffun, gfun, nfun, nfuny);
@@ -571,13 +571,13 @@ int main(int argc, char *argv[])
 		}
 
 		// residual
-		shared_ptr<PetscVector<2>> resid = domain->getNewDomainVec();
+		shared_ptr<PetscVector<2>> resid = PetscVector<2>::GetNewVector(domain);
 		VecAXPBYPCZ(resid->vec, -1.0, 1.0, 0.0, au->vec, f->vec);
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
-		shared_ptr<PetscVector<2>> error = domain->getNewDomainVec();
+		shared_ptr<PetscVector<2>> error = PetscVector<2>::GetNewVector(domain);
 		VecAXPBYPCZ(error->vec, -1.0, 1.0, 0.0, exact->vec, u->vec);
 		if (neumann) {
 			double uavg = domain->integrate(u) / domain->volume();

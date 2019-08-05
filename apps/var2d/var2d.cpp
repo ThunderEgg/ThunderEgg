@@ -254,11 +254,11 @@ int main(int argc, char *argv[])
 			double x = coord[0];
 			double y = coord[1];
 			return exp(x * y)
-			       * (pow(x, 5) * (y - 1) * y * y - pow(x, 4) * y * (y * y - 7 * y + 4)
-			          + x * x * x * (pow(y, 5) - pow(y, 4) - 6 * y * y + 12 * y - 3)
-			          - x * x * (pow(y, 5) - 7 * pow(y, 4) + 6 * y * y * y + 8 * y - 5)
-			          - 2 * x * (2 * pow(y, 4) - 6 * y * y * y + 4 * y * y + 1)
-			          + y * (-3 * y * y + 5 * y - 2));
+			       * (pow(x, 5) * (-1 + y) * pow(y, 2) + y * (-2 + (5 - 3 * y) * y)
+			          - pow(x, 4) * y * (4 + (-7 + y) * y)
+			          - 2 * x * (1 + 2 * (-2 + y) * (-1 + y) * pow(y, 2))
+			          - pow(x, 2) * (-5 + 8 * y + (-6 + y) * (-1 + y) * pow(y, 3))
+			          + pow(x, 3) * (-3 + y * (12 - 6 * y - pow(y, 3) + pow(y, 4))));
 		};
 		gfun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
@@ -268,21 +268,20 @@ int main(int argc, char *argv[])
 		hfun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[1];
-			// return 1 + x * y;
-			return 1;
+			return 1 + x * y;
 		};
 	} else {
 		ffun = [](const std::array<double, 2> &coord) {
-			double x = coord[0];
+			double x = coord[0] + 0.25;
 			double y = coord[1];
 			return -5 * M_PI * M_PI * sinl(M_PI * y) * cosl(2 * M_PI * x);
 		};
 		gfun = [](const std::array<double, 2> &coord) {
-			double x = coord[0];
+			double x = coord[0] + 0.25;
 			double y = coord[1];
 			return sinl(M_PI * y) * cosl(2 * M_PI * x);
 		};
-		hfun = [](const std::array<double, 2> &coord) { return coord[0]; };
+		hfun = [](const std::array<double, 2> &coord) { return 1; };
 	}
 
 	Timer timer;
@@ -301,15 +300,17 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		shared_ptr<PetscVector<2>> u     = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> exact = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> f     = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> au    = domain->getNewDomainVec();
-		shared_ptr<PetscVector<2>> h     = domain->getNewDomainVec();
+		shared_ptr<PetscVector<2>> u     = PetscVector<2>::GetNewVector(domain);
+		shared_ptr<PetscVector<2>> exact = PetscVector<2>::GetNewVector(domain);
+		shared_ptr<PetscVector<2>> f     = PetscVector<2>::GetNewVector(domain);
+		shared_ptr<PetscVector<2>> au    = PetscVector<2>::GetNewVector(domain);
+		shared_ptr<PetscVector<2>> h     = PetscVector<2>::GetNewVector(domain);
+		shared_ptr<PetscVector<1>> h_bc  = PetscVector<2>::GetNewBCVector(domain);
 
 		DomainTools<2>::setValues(domain, f, ffun);
 		DomainTools<2>::setValues(domain, exact, gfun);
 		DomainTools<2>::setValues(domain, h, hfun);
+		DomainTools<2>::setBCValues(domain, h_bc, hfun);
 		if (neumann) {
 			// Init::initNeumann2d(*domain, f->vec, exact->vec, ffun, gfun, nfunx, nfuny);
 		} else {
@@ -319,7 +320,7 @@ int main(int argc, char *argv[])
 		timer.stop("Domain Initialization");
 
 		// patch operator
-		shared_ptr<PatchOperator<2>> p_operator(new StarPatchOperator<2>(h));
+		shared_ptr<PatchOperator<2>> p_operator(new StarPatchOperator<2>(h, h_bc, nullptr));
 
 		// set the patch solver
 		shared_ptr<PatchSolver<2>> p_solver;
@@ -511,7 +512,7 @@ int main(int argc, char *argv[])
 			} else {
 				std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
 
-				int its = BiCGStab<2>::solve(vg, A, u, f, M);
+				int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000000);
 				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
 			}
 			timer.stop("Linear Solve");
@@ -520,13 +521,13 @@ int main(int argc, char *argv[])
 		}
 
 		// residual
-		shared_ptr<PetscVector<2>> resid = domain->getNewDomainVec();
+		shared_ptr<PetscVector<2>> resid = PetscVector<2>::GetNewVector(domain);
 		VecAXPBYPCZ(resid->vec, -1.0, 1.0, 0.0, au->vec, f->vec);
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
-		shared_ptr<PetscVector<2>> error = domain->getNewDomainVec();
+		shared_ptr<PetscVector<2>> error = PetscVector<2>::GetNewVector(domain);
 		VecAXPBYPCZ(error->vec, -1.0, 1.0, 0.0, exact->vec, u->vec);
 		if (neumann) {
 			double uavg = domain->integrate(u) / domain->volume();
@@ -548,6 +549,7 @@ int main(int argc, char *argv[])
 			std::cout << std::scientific;
 			std::cout.precision(13);
 			std::cout << "Error: " << error_norm / exact_norm << endl;
+			std::cout << "Error-inf: " << error->infNorm() << endl;
 			std::cout << "Residual: " << residual / fnorm << endl;
 			std::cout << u8"ΣAu-Σf: " << ausum - fsum << endl;
 			cout.unsetf(std::ios_base::floatfield);

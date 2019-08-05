@@ -46,7 +46,7 @@ PW_explicit<Mat> MatrixHelper::formCRSMatrix(double lambda)
 		double h_x   = pinfo->spacings[0];
 		double h_y   = pinfo->spacings[1];
 		double h_z   = pinfo->spacings[2];
-		int    start = nx * ny * nz * pinfo->local_index;
+		int    start = nx * ny * nz * pinfo->global_index;
 
 		// center coeffs
 		double coeff = -2.0 / (h_x * h_x) - 2.0 / (h_y * h_y) - 2.0 / (h_z * h_z);

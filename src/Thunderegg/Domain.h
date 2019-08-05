@@ -23,7 +23,7 @@
 #define THUNDEREGG_DOMAIN_H
 #include <Thunderegg/PW.h>
 #include <Thunderegg/PatchInfo.h>
-#include <Thunderegg/PetscVector.h>
+#include <Thunderegg/Vector.h>
 #include <cmath>
 #include <deque>
 #include <map>
@@ -46,6 +46,9 @@ namespace Thunderegg
  */
 template <size_t D> class Domain
 {
+	public:
+	std::vector<int> patch_id_bc_map_vec;
+
 	private:
 	/**
 	 * @brief The number of cells in each direction
@@ -69,6 +72,10 @@ template <size_t D> class Domain
 	 */
 	int global_num_patches = 1;
 	/**
+	 * @brief local number of boundary conditions in vector
+	 */
+	int local_num_bc = 4;
+	/**
 	 * @brief Vector of patch ids. Index corresponds to the patch's local index.
 	 */
 	std::vector<int> patch_id_map_vec;
@@ -76,6 +83,32 @@ template <size_t D> class Domain
 	 * @brief Vector of patch global_indexes. Index corresponds to the patch's global index.
 	 */
 	std::vector<int> patch_global_index_map_vec;
+	/**
+	 * @brief vector of neighboring ranks with incoming data in order of how they appear in the
+	 * vector
+	 */
+	std::vector<int> in_off_proc_rank_vec;
+	/**
+	 * @brief size of incoming data from neighbors
+	 */
+	std::vector<int> in_off_proc_rank_size_vec;
+	/**
+	 * @brief map of id to local index in incoming vector
+	 */
+	std::vector<int> in_off_proc_map_vec;
+	/**
+	 * @brief vector of neighboring ranks with outgoing data in order of how they appear in the
+	 * vector
+	 */
+	std::vector<int> out_off_proc_rank_vec;
+	/**
+	 * @brief size of outgoing data from neighbors
+	 */
+	std::vector<int> out_off_proc_rank_size_vec;
+	/**
+	 * @brief map of id to local index in outgoing vector
+	 */
+	std::vector<int> out_off_proc_map_vec;
 	/**
 	 * @brief Vector of ghost patch global_indexes. Index corresponds to the patch's local index in
 	 * the ghost vector.
@@ -100,6 +133,15 @@ template <size_t D> class Domain
 	void indexDomainsGlobal(bool global_id_set = false);
 
 	/**
+	 * @brief Give the boundary conditions local indexes.
+	 */
+	void indexBCLocal();
+	/**
+	 * @brief Give the boundary conditions global indexes
+	 */
+	void indexBCGlobal();
+
+	/**
 	 * @brief Give patches new global and local indexes
 	 *
 	 * @param local_id_set true if local indexes are set by user
@@ -109,6 +151,8 @@ template <size_t D> class Domain
 	{
 		indexDomainsLocal(local_id_set);
 		if (!global_id_set) { indexDomainsGlobal(); }
+		indexBCLocal();
+		indexBCGlobal();
 	}
 
 	public:
@@ -190,12 +234,6 @@ template <size_t D> class Domain
 			p.second->setNeumann(inf);
 		}
 	}
-	std::shared_ptr<PetscVector<D>> getNewDomainVec() const
-	{
-		Vec u;
-		VecCreateMPI(MPI_COMM_WORLD, pinfo_id_map.size() * num_cells_in_patch, PETSC_DETERMINE, &u);
-		return std::shared_ptr<PetscVector<D>>(new PetscVector<D>(u, ns));
-	}
 	/**
 	 * @brief Get the number of global patches
 	 */
@@ -223,6 +261,13 @@ template <size_t D> class Domain
 	int getNumLocalCells() const
 	{
 		return pinfo_id_map.size() * num_cells_in_patch;
+	}
+	/**
+	 * @brief Get get the number of local boundary condition cells
+	 */
+	int getNumLocalBCCells() const
+	{
+		return local_num_bc * num_cells_in_patch / ns[0];
 	}
 	/**
 	 * @brief Get the number of cells in a patch
@@ -282,12 +327,14 @@ template <size_t D> class Domain
 
 template <size_t D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 {
-	std::vector<int>   map_vec;
-	std::vector<int>   off_proc_map_vec;
-	std::map<int, int> rev_map;
-	int                curr_i = local_id_set ? pinfo_id_map.size() : 0;
+	std::vector<int>               map_vec;
+	std::vector<int>               in_off_proc_map_vec;
+	std::vector<int>               out_off_proc_map_vec;
+	std::set<std::tuple<int, int>> in_offs;
+	std::set<std::tuple<int, int>> out_offs;
+	std::map<int, int>             rev_map;
+	int                            curr_i = local_id_set ? pinfo_id_map.size() : 0;
 	if (local_id_set) {
-		std::set<int> offs;
 		if (!pinfo_id_map.empty()) {
 			std::set<int> todo;
 			map_vec.resize(pinfo_id_map.size());
@@ -307,17 +354,19 @@ template <size_t D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 					queue.pop_front();
 					PatchInfo<D> &d = *pinfo_id_map[i];
 					rev_map[i]      = d.local_index;
-					for (int i : d.getNbrIds()) {
-						if (!enqueued.count(i)) {
-							enqueued.insert(i);
-							if (pinfo_id_map.count(i)) {
-								queue.push_back(i);
-							} else {
-								if (!offs.count(i)) {
-									offs.insert(i);
-									off_proc_map_vec.push_back(i);
-								}
+					auto ranks      = d.getNbrRanks();
+					auto ids        = d.getNbrIds();
+					for (size_t idx = 0; idx < ranks.size(); idx++) {
+						int nbr_id = ids[idx];
+						int rank   = ranks[idx];
+						if (pinfo_id_map.count(nbr_id)) {
+							if (!enqueued.count(nbr_id)) {
+								enqueued.insert(nbr_id);
+								queue.push_back(nbr_id);
 							}
+						} else {
+							in_offs.insert(std::make_tuple(rank, nbr_id));
+							out_offs.insert(std::make_tuple(rank, i));
 						}
 					}
 				}
@@ -344,17 +393,19 @@ template <size_t D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 					rev_map[i]      = curr_i;
 					d.local_index   = curr_i;
 					curr_i++;
-					for (int i : d.getNbrIds()) {
-						if (!enqueued.count(i)) {
-							enqueued.insert(i);
-							if (pinfo_id_map.count(i)) {
-								queue.push_back(i);
-							} else {
-								if (!offs.count(i)) {
-									offs.insert(i);
-									off_proc_map_vec.push_back(i);
-								}
+					auto ranks = d.getNbrRanks();
+					auto ids   = d.getNbrIds();
+					for (size_t idx = 0; idx < ranks.size(); idx++) {
+						int nbr_id = ids[idx];
+						int rank   = ranks[idx];
+						if (pinfo_id_map.count(nbr_id)) {
+							if (!enqueued.count(nbr_id)) {
+								enqueued.insert(nbr_id);
+								queue.push_back(nbr_id);
 							}
+						} else {
+							in_offs.insert(std::make_tuple(rank, nbr_id));
+							out_offs.insert(std::make_tuple(rank, i));
 						}
 					}
 				}
@@ -362,10 +413,31 @@ template <size_t D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 		}
 	}
 	// map off proc
-	for (int i : off_proc_map_vec) {
-		rev_map[i] = curr_i;
+	for (auto pair : in_offs) {
+		int rank = std::get<0>(pair);
+		int id   = std::get<1>(pair);
+		if (in_off_proc_rank_vec.size() == 0 || rank != in_off_proc_rank_vec.back()) {
+			in_off_proc_rank_vec.push_back(rank);
+			in_off_proc_rank_size_vec.push_back(1);
+		} else {
+			in_off_proc_rank_size_vec.back()++;
+		}
+		in_off_proc_map_vec.push_back(id);
+		rev_map[id] = curr_i;
 		curr_i++;
 	}
+	for (auto pair : out_offs) {
+		int rank = std::get<0>(pair);
+		int id   = std::get<1>(pair);
+		if (out_off_proc_rank_vec.size() == 0 || rank != out_off_proc_rank_vec.back()) {
+			out_off_proc_rank_vec.push_back(rank);
+			out_off_proc_rank_size_vec.push_back(1);
+		} else {
+			out_off_proc_rank_size_vec.back()++;
+		}
+		out_off_proc_map_vec.push_back(id);
+	}
+	// set local indexes
 	pinfo_vector.resize(pinfo_id_map.size());
 	for (auto &p : pinfo_id_map) {
 		p.second->setLocalNeighborIndexes(rev_map);
@@ -374,7 +446,9 @@ template <size_t D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 	// domain_rev_map          = rev_map;
 	patch_global_index_map_vec          = map_vec;
 	patch_id_map_vec                    = map_vec;
-	patch_global_index_map_vec_off_proc = off_proc_map_vec;
+	this->in_off_proc_map_vec           = in_off_proc_map_vec;
+	this->out_off_proc_map_vec          = out_off_proc_map_vec;
+	patch_global_index_map_vec_off_proc = in_off_proc_map_vec;
 }
 template <size_t D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 {
@@ -414,21 +488,35 @@ template <size_t D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 		patch_global_index_map_vec_off_proc[i] = inds[patch_global_index_map_vec.size() + i];
 	}
 }
-template <size_t D> class DomainVG : public VectorGenerator<D>
+template <size_t D> void Domain<D>::indexBCLocal()
 {
-	private:
-	std::shared_ptr<Domain<D>> dc;
+	int curr_i = 0;
+	for (auto pinfo : pinfo_vector) {
+		for (Side<D> s : Side<D>::getValues()) {
+			if (!pinfo->hasNbr(s)) {
+				pinfo->setBCLocalIndex(s, curr_i);
+				patch_id_bc_map_vec.push_back(pinfo->id);
+				curr_i++;
+			}
+		}
+	}
+	local_num_bc = curr_i;
+}
+template <size_t D> void Domain<D>::indexBCGlobal()
+{
+	int curr_i;
+	MPI_Scan(&local_num_bc, &curr_i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+	curr_i -= local_num_bc;
+	for (auto pinfo : pinfo_vector) {
+		for (Side<D> s : Side<D>::getValues()) {
+			if (!pinfo->hasNbr(s)) {
+				pinfo->setBCGlobalIndex(s, curr_i);
+				curr_i++;
+			}
+		}
+	}
+}
 
-	public:
-	DomainVG(std::shared_ptr<Domain<D>> dc)
-	{
-		this->dc = dc;
-	}
-	std::shared_ptr<Vector<D>> getNewVector()
-	{
-		return dc->getNewDomainVec();
-	}
-};
 extern template class Domain<2>;
 extern template class Domain<3>;
 } // namespace Thunderegg

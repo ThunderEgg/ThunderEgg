@@ -313,10 +313,10 @@ int main(int argc, char *argv[])
 		shared_ptr<SchurHelper<3>> sch(new SchurHelper<3>(dc, p_solver, p_operator, p_interp));
 
 		// Initialize Vectors
-		shared_ptr<PetscVector<3>> u     = dc->getNewDomainVec();
-		shared_ptr<PetscVector<3>> exact = dc->getNewDomainVec();
-		shared_ptr<PetscVector<3>> f     = dc->getNewDomainVec();
-		shared_ptr<PetscVector<3>> au    = dc->getNewDomainVec();
+		shared_ptr<PetscVector<3>> u     = PetscVector<3>::GetNewVector(dc);
+		shared_ptr<PetscVector<3>> exact = PetscVector<3>::GetNewVector(dc);
+		shared_ptr<PetscVector<3>> f     = PetscVector<3>::GetNewVector(dc);
+		shared_ptr<PetscVector<3>> au    = PetscVector<3>::GetNewVector(dc);
 
 		if (neumann) {
 			Init::initNeumann(*dc, f->vec, exact->vec, ffun, gfun, nfunx, nfuny, nfunz);
@@ -530,14 +530,14 @@ int main(int argc, char *argv[])
 			A->apply(u, au);
 		}
 
-		shared_ptr<PetscVector<3>> resid = dc->getNewDomainVec();
+		shared_ptr<PetscVector<3>> resid = PetscVector<3>::GetNewVector(dc);
 		resid->addScaled(-1, au, 1, f);
 
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
-		shared_ptr<PetscVector<3>> error = dc->getNewDomainVec();
+		shared_ptr<PetscVector<3>> error = PetscVector<3>::GetNewVector(dc);
 		error->addScaled(-1, exact, 1, u);
 		if (neumann) {
 			double uavg = dc->integrate(u) / dc->volume();

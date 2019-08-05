@@ -63,7 +63,6 @@ template <size_t D> class BiCGStab
 		std::shared_ptr<Vector<D>> rhat    = vg->getNewVector();
 		rhat->copy(resid);
 		std::shared_ptr<Vector<D>> p = vg->getNewVector();
-		std::cerr << "rdotr" << resid->dot(rhat) << std::endl;
 		p->copy(resid);
 		std::shared_ptr<Vector<D>> ap = vg->getNewVector();
 		std::shared_ptr<Vector<D>> as = vg->getNewVector();

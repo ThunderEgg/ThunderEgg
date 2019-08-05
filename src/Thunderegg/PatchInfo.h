@@ -122,6 +122,14 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 * If there is no neighbor, it should be set to nullptr.
 	 */
 	std::array<std::shared_ptr<NbrInfo<D>>, Side<D>::num_sides> nbr_info;
+	/**
+	 * @brief local index in the boundary conditions vector
+	 */
+	std::array<int, Side<D>::num_sides> bc_local_index;
+	/**
+	 * @brief global index in the boundary conditions vector
+	 */
+	std::array<int, Side<D>::num_sides> bc_global_index;
 
 	/**
 	 * @brief Construct a new Patch Info object
@@ -133,6 +141,8 @@ template <size_t D> struct PatchInfo : public Serializable {
 		nbr_info.fill(nullptr);
 		ns.fill(0);
 		spacings.fill(0);
+		bc_local_index.fill(-1);
+		bc_global_index.fill(-1);
 	}
 	/**
 	 * @brief Destroy the Patch Info object
@@ -262,6 +272,10 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	std::deque<int> getNbrIds();
 	/**
+	 * @brief return a vector of neighbor ranks
+	 */
+	std::deque<int> getNbrRanks();
+	/**
 	 * @brief set the ptrs to PatchInfo objects in the NbrInfo objects.
 	 *
 	 * @param patches map of id to patches on this processor
@@ -274,8 +288,48 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 * @param rank the mpi rank
 	 */
 	void updateRank(int rank);
-	int  serialize(char *buffer) const;
-	int  deserialize(char *buffer);
+	/**
+	 * @brief set the local index in the boundary condition vector
+	 *
+	 * @param s the side that the boundary is on
+	 * @param local_index the index
+	 */
+	void setBCLocalIndex(Side<D> s, int local_index)
+	{
+		bc_local_index[s.toInt()] = local_index;
+	}
+	/**
+	 * @brief get the local index in the boundnary condition vector
+	 *
+	 * @param s the side that the boundary is on
+	 * @return int the index
+	 */
+	int getBCLocalIndex(Side<D> s)
+	{
+		return bc_local_index[s.toInt()];
+	}
+	/**
+	 * @brief set the global index in the boundary condition vector
+	 *
+	 * @param s the side that the boundary is on
+	 * @param local_index the index
+	 */
+	void setBCGlobalIndex(Side<D> s, int global_index)
+	{
+		bc_global_index[s.toInt()] = global_index;
+	}
+	/**
+	 * @brief get the global index in the boundnary condition vector
+	 *
+	 * @param s the side that the boundary is on
+	 * @return int the index
+	 */
+	int getBCGlobalIndex(Side<D> s)
+	{
+		return bc_global_index[s.toInt()];
+	}
+	int serialize(char *buffer) const;
+	int deserialize(char *buffer);
 };
 /**
  * @brief Represents information about a patch's neighbor.
@@ -299,6 +353,10 @@ template <size_t D> class NbrInfo : virtual public Serializable
 	 * @brief Add to a deque of neighbor ids
 	 */
 	virtual void getNbrIds(std::deque<int> &nbr_ids) = 0;
+	/**
+	 * @brief Add to a deque of neighbor ranks
+	 */
+	virtual void getNbrRanks(std::deque<int> &nbr_ranks) = 0;
 	/**
 	 * @brief Set the local indexes in the NbrInfo objects
 	 *
@@ -378,6 +436,10 @@ template <size_t D> class NormalNbrInfo : public NbrInfo<D>
 	void getNbrIds(std::deque<int> &nbr_ids)
 	{
 		nbr_ids.push_back(id);
+	}
+	void getNbrRanks(std::deque<int> &nbr_ranks)
+	{
+		nbr_ranks.push_back(rank);
 	}
 	void setGlobalIndexes(std::map<int, int> &rev_map)
 	{
@@ -480,6 +542,10 @@ template <size_t D> class CoarseNbrInfo : public NbrInfo<D>
 	{
 		nbr_ids.push_back(id);
 	};
+	void getNbrRanks(std::deque<int> &nbr_ranks)
+	{
+		nbr_ranks.push_back(rank);
+	}
 	void setGlobalIndexes(std::map<int, int> &rev_map)
 	{
 		global_index = rev_map.at(local_index);
@@ -584,6 +650,12 @@ template <size_t D> class FineNbrInfo : public NbrInfo<D>
 			nbr_ids.push_back(ids[i]);
 		}
 	};
+	void getNbrRanks(std::deque<int> &nbr_ranks)
+	{
+		for (size_t i = 0; i < ranks.size(); i++) {
+			nbr_ranks.push_back(ranks[0]);
+		}
+	}
 	void setGlobalIndexes(std::map<int, int> &rev_map)
 	{
 		for (size_t i = 0; i < global_indexes.size(); i++) {
@@ -702,6 +774,14 @@ template <size_t D> inline std::deque<int> PatchInfo<D>::getNbrIds()
 	std::deque<int> retval;
 	for (Side<D> s : Side<D>::getValues()) {
 		if (hasNbr(s)) { nbr_info[s.toInt()]->getNbrIds(retval); }
+	}
+	return retval;
+}
+template <size_t D> inline std::deque<int> PatchInfo<D>::getNbrRanks()
+{
+	std::deque<int> retval;
+	for (Side<D> s : Side<D>::getValues()) {
+		if (hasNbr(s)) { nbr_info[s.toInt()]->getNbrRanks(retval); }
 	}
 	return retval;
 }

@@ -42,6 +42,37 @@ template <size_t D> struct DomainTools {
 			}
 		});
 	}
+	static void getRealCoordBound(std::shared_ptr<PatchInfo<D>> pinfo,
+	                              const std::array<int, D - 1> &coord, Side<D> s,
+	                              std::array<double, D> &real_coord)
+	{
+		for (size_t dir = 0; dir < s.axis(); dir++) {
+			if (coord[dir] == -1) {
+				real_coord[dir] = pinfo->starts[dir];
+			} else if (coord[dir] == pinfo->ns[dir]) {
+				real_coord[dir] = pinfo->starts[dir] + pinfo->spacings[dir] * pinfo->ns[dir];
+			} else {
+				real_coord[dir] = pinfo->starts[dir] + pinfo->spacings[dir] / 2.0
+				                  + pinfo->spacings[dir] * coord[dir];
+			}
+		}
+		if (s.isLowerOnAxis()) {
+			real_coord[s.axis()] = pinfo->starts[s.axis()];
+		} else {
+			real_coord[s.axis()]
+			= pinfo->starts[s.axis()] + pinfo->spacings[s.axis()] * pinfo->ns[s.axis()];
+		}
+		for (size_t dir = s.axis() + 1; dir < D; dir++) {
+			if (coord[dir - 1] == -1) {
+				real_coord[dir] = pinfo->starts[dir];
+			} else if (coord[dir - 1] == pinfo->ns[dir]) {
+				real_coord[dir] = pinfo->starts[dir] + pinfo->spacings[dir] * pinfo->ns[dir];
+			} else {
+				real_coord[dir] = pinfo->starts[dir] + pinfo->spacings[dir] / 2.0
+				                  + pinfo->spacings[dir] * coord[dir - 1];
+			}
+		}
+	}
 	static void setValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
 	                      std::function<double(const std::array<double, D> &)> func)
 	{
@@ -53,6 +84,24 @@ template <size_t D> struct DomainTools {
 				getRealCoord(pinfo, coord, real_coord);
 				ld[coord] = func(real_coord);
 			});
+		}
+	}
+	static void setBCValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D - 1>> vec,
+	                        std::function<double(const std::array<double, D> &)> func)
+	{
+		std::array<double, D> real_coord;
+		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
+			auto pinfo = domain->getPatchInfoMap()[domain->patch_id_bc_map_vec[i]];
+			for (Side<D> s : Side<D>::getValues()) {
+				if (!pinfo->hasNbr(s)) {
+					LocalData<D - 1> ld = vec->getLocalData(pinfo->getBCLocalIndex(s));
+					nested_loop<D - 1>(ld.getStart(), ld.getEnd(),
+					                   [&](const std::array<int, D - 1> &coord) {
+						                   getRealCoordBound(pinfo, coord, s, real_coord);
+						                   ld[coord] = func(real_coord);
+					                   });
+				}
+			}
 		}
 	}
 };

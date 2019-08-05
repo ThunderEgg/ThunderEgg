@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_PETSCVECTOR_H
 #define THUNDEREGG_PETSCVECTOR_H
+#include <Thunderegg/Domain.h>
 #include <Thunderegg/Vector.h>
 #include <petscvec.h>
 
@@ -79,12 +80,9 @@ template <size_t D> class PetscVector : public Vector<D>
 	bool               own;
 	std::array<int, D> strides;
 	std::array<int, D> lengths;
+	// std::shared_ptr<void> user_data;
 
 	public:
-	/**
-	 * @brief The petsc vector object
-	 */
-	Vec vec;
 	PetscVector(Vec vec, const std::array<int, D> &lengths, bool own = true)
 	{
 		this->own     = own;
@@ -98,6 +96,37 @@ template <size_t D> class PetscVector : public Vector<D>
 		VecGetLocalSize(vec, &this->num_local_patches);
 		this->num_local_patches /= patch_stride;
 	}
+
+	/**
+	 * @brief The petsc vector object
+	 */
+	Vec vec;
+
+	static std::shared_ptr<PetscVector<D>> GetNewVector(std::shared_ptr<Domain<D>> domain)
+	{
+		Vec u;
+		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCells(), PETSC_DETERMINE, &u);
+		return std::shared_ptr<PetscVector<D>>(new PetscVector<D>(u, domain->getNs()));
+	}
+	static std::shared_ptr<PetscVector<D - 1>> GetNewBCVector(std::shared_ptr<Domain<D>> domain)
+	{
+		Vec u;
+		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalBCCells(), PETSC_DETERMINE, &u);
+		std::array<int, D - 1> ns;
+		for (size_t i = 0; i < ns.size(); i++) {
+			ns[i] = domain->getNs()[i];
+		}
+		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, ns));
+	}
+	/*
+	static std::shared_ptr<PetscVector<D>> GetNewSchurVector(std::shared_ptr<SchurHelper<D + 1>> sh)
+	{
+	    Vec u;
+	    VecCreateMPI(MPI_COMM_WORLD, sh->getSchurVecLocalSize(), PETSC_DETERMINE, &u);
+	    return std::shared_ptr<PetscVector<D>>(new PetscVector<D>(u, sh->getLengths()));
+	}
+	*/
+
 	/**
 	 * @brief Destroy the Petsc Vector object
 	 */
@@ -161,6 +190,21 @@ template <size_t D> class PetscVector : public Vector<D>
 	    }
 	}
 	*/
+};
+template <size_t D> class DomainVG : public VectorGenerator<D>
+{
+	private:
+	std::shared_ptr<Domain<D>> dc;
+
+	public:
+	DomainVG(std::shared_ptr<Domain<D>> dc)
+	{
+		this->dc = dc;
+	}
+	std::shared_ptr<Vector<D>> getNewVector()
+	{
+		return PetscVector<D>::GetNewVector(dc);
+	}
 };
 } // namespace Thunderegg
 #endif

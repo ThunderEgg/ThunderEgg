@@ -31,7 +31,7 @@ find_path (p4est_DIR include/p4est.h HINTS p4est_DIR ENV p4est_DIR CPATH)
   message("-- found p4est dependant libraries: ${p4est_extra_libs}")
 
   foreach(lib ${p4est_extra_libs})
-    find_library(extra_lib ${lib} ${p4est_extra_lib_dirs})
+    find_library(extra_lib ${lib} PATHS ${p4est_extra_lib_dirs})
     list(APPEND p4est_LIBRARIES ${extra_lib})
     unset(extra_lib CACHE)
   endforeach(lib)
