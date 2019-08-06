@@ -37,6 +37,15 @@ template <size_t D> class IfaceInterp
 	virtual ~IfaceInterp() {}
 
 	/**
+	 * @brief Interpolate the vector to the interfaces
+	 *
+	 * @param u the input vector
+	 * @param interp the interface vector to be interpolated to
+	 */
+	virtual void interpolate(std::shared_ptr<const Vector<D>> u,
+	                         std::shared_ptr<Vector<D - 1>>   interp)
+	= 0;
+	/**
 	 * @brief Given a set of patches, interpolate to their interfaces.
 	 *
 	 * @param patches the set of SchurInfo objects

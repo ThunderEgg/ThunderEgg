@@ -23,6 +23,7 @@
 #define VTKWRITER_H
 #include <Thunderegg/Domain.h>
 #include <map>
+#include <petscvec.h>
 #include <set>
 #include <string>
 #include <vtkCellData.h>

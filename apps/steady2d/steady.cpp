@@ -334,7 +334,7 @@ int main(int argc, char *argv[])
 	}
 
 	// interface interpolator
-	shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator());
+	shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator(nullptr));
 
 	Timer timer;
 	for (int loop = 0; loop < loop_count; loop++) {

@@ -233,6 +233,7 @@ template <size_t D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
 	Zoltan_Set_Param(zz, "OBJ_WEIGHT_DIM", "0");      /* we omit object weights */
 	Zoltan_Set_Param(zz, "AUTO_MIGRATE", "FALSE");    /* we omit object weights */
 	Zoltan_Set_Param(zz, "DEBUG_LEVEL", "0");         /* we omit object weights */
+	Zoltan_Set_Param(zz, "RETURN_LISTS", "PARTS");    /* we omit object weights */
 
 	// Query functions
 	// Number of Vertices

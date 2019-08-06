@@ -23,6 +23,7 @@
 #define THUNDEREGG_BILINEARINTERPOLATOR_H
 
 #include <Thunderegg/IfaceInterp.h>
+#include <Thunderegg/SchurHelper.h>
 
 namespace Thunderegg
 {
@@ -31,7 +32,16 @@ namespace Thunderegg
  */
 class BilinearInterpolator : public IfaceInterp<2>
 {
+	private:
+	std::shared_ptr<SchurHelper<2>> sh;
+
 	public:
+	BilinearInterpolator(std::shared_ptr<SchurHelper<2>> sh)
+	{
+		this->sh = sh;
+	}
+	void interpolate(std::shared_ptr<const Vector<2>> u,
+	                 std::shared_ptr<Vector<1>>       interp) override;
 	void interpolate(const std::vector<SchurInfo<2>> &patches, std::shared_ptr<const Vector<2>> u,
 	                 std::shared_ptr<Vector<1>> interp);
 	void interpolate(SchurInfo<2> &d, std::shared_ptr<const Vector<2>> u,

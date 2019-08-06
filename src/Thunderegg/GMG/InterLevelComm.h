@@ -24,6 +24,7 @@
 
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/PetscVector.h>
+#include <petscao.h>
 
 namespace Thunderegg::GMG
 {

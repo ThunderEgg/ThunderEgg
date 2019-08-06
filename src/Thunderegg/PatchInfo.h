@@ -653,7 +653,7 @@ template <size_t D> class FineNbrInfo : public NbrInfo<D>
 	void getNbrRanks(std::deque<int> &nbr_ranks)
 	{
 		for (size_t i = 0; i < ranks.size(); i++) {
-			nbr_ranks.push_back(ranks[0]);
+			nbr_ranks.push_back(ranks[i]);
 		}
 	}
 	void setGlobalIndexes(std::map<int, int> &rev_map)

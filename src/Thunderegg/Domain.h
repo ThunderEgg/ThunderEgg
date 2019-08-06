@@ -28,8 +28,6 @@
 #include <deque>
 #include <map>
 #include <memory>
-#include <petscao.h>
-#include <petscvec.h>
 #include <set>
 #include <string>
 #include <vector>
@@ -457,35 +455,54 @@ template <size_t D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 	int start_i;
 	MPI_Scan(&local_size, &start_i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 	start_i -= local_size;
-	std::vector<int> new_global(local_size);
-	iota(new_global.begin(), new_global.end(), start_i);
+	patch_global_index_map_vec.resize(local_size);
+	iota(patch_global_index_map_vec.begin(), patch_global_index_map_vec.end(), start_i);
 
-	// create map for gids
-	PW<AO> ao;
-	AOCreateMapping(MPI_COMM_WORLD, local_size, &patch_global_index_map_vec[0], &new_global[0],
-	                &ao);
-
-	// get global indices that we want to recieve for dest vector
-	std::vector<int> inds = patch_global_index_map_vec;
-	for (int i : patch_global_index_map_vec_off_proc) {
-		inds.push_back(i);
+	// prepare outgoing vector of data
+	std::vector<int> out_data = out_off_proc_map_vec;
+	for (size_t i = 0; i < out_data.size(); i++) {
+		out_data[i] = patch_global_index_map_vec[pinfo_id_map[out_data[i]]->local_index];
 	}
+	// send outgoing messages
+	int curr_pos = 0;
+	using namespace std;
+	// send info
+	vector<MPI_Request> requests;
+	requests.reserve(out_off_proc_rank_vec.size() + in_off_proc_rank_vec.size());
+	for (size_t i = 0; i < out_off_proc_rank_vec.size(); i++) {
+		int         dest = out_off_proc_rank_vec[i];
+		int         size = out_off_proc_rank_size_vec[i];
+		MPI_Request request;
+		MPI_Isend(&out_data[curr_pos], size, MPI_INT, dest, 0, MPI_COMM_WORLD, &request);
+		requests.push_back(request);
+		curr_pos += size;
+	}
+	curr_pos = 0;
+	// recv info
+	for (size_t i = 0; i < in_off_proc_rank_vec.size(); i++) {
+		int         source = in_off_proc_rank_vec[i];
+		int         size   = in_off_proc_rank_size_vec[i];
+		MPI_Request request;
+		MPI_Irecv(&patch_global_index_map_vec_off_proc[curr_pos], size, MPI_INT, source, 0,
+		          MPI_COMM_WORLD, &request);
+		requests.push_back(request);
+		curr_pos += size;
+	}
+	// wait for all
+	MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
 
-	// get new global indices
-	AOApplicationToPetsc(ao, inds.size(), &inds[0]);
+	curr_pos = 0;
 	std::map<int, int> rev_map;
-	for (size_t i = 0; i < inds.size(); i++) {
-		rev_map[i] = inds[i];
+	for (int i : patch_global_index_map_vec) {
+		rev_map[curr_pos] = i;
+		curr_pos++;
 	}
-
+	for (int i : patch_global_index_map_vec_off_proc) {
+		rev_map[curr_pos] = i;
+		curr_pos++;
+	}
 	for (auto &p : pinfo_id_map) {
 		p.second->setGlobalNeighborIndexes(rev_map);
-	}
-	for (size_t i = 0; i < patch_global_index_map_vec.size(); i++) {
-		patch_global_index_map_vec[i] = inds[i];
-	}
-	for (size_t i = 0; i < patch_global_index_map_vec_off_proc.size(); i++) {
-		patch_global_index_map_vec_off_proc[i] = inds[patch_global_index_map_vec.size() + i];
 	}
 }
 template <size_t D> void Domain<D>::indexBCLocal()

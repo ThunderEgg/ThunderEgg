@@ -327,9 +327,10 @@ int main(int argc, char *argv[])
 		p_solver.reset(new BiCGStabSolver<2>(p_operator, ps_tol, ps_max_it));
 
 		// interface interpolator
-		shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator());
-
+		shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator(nullptr));
 		shared_ptr<SchurHelper<2>> sch(new SchurHelper<2>(domain, p_solver, p_operator, p_interp));
+		p_interp.reset(new BilinearInterpolator(sch));
+
 		// Create the gamma and diff vectors
 		shared_ptr<PetscVector<1>> gamma = sch->getNewSchurVec();
 		shared_ptr<PetscVector<1>> diff  = sch->getNewSchurVec();

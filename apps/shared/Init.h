@@ -21,6 +21,7 @@
 
 #include <Thunderegg/Domain.h>
 #include <functional>
+#include <petscvec.h>
 class Init
 {
 	public:

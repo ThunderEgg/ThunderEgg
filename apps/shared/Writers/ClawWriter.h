@@ -22,6 +22,7 @@
 #ifndef CLAWWRITER_H
 #define CLAWWRITER_H
 #include <Thunderegg/Domain.h>
+#include <petscvec.h>
 class ClawWriter
 {
 	private:

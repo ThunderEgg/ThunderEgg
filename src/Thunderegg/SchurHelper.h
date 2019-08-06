@@ -30,8 +30,10 @@
 #include <Thunderegg/SchurInfo.h>
 #include <deque>
 #include <memory>
+#include <petscao.h>
 #include <petscmat.h>
 #include <petscpc.h>
+#include <petscvec.h>
 #include <valarray>
 namespace Thunderegg
 {
@@ -191,6 +193,10 @@ template <size_t D> class SchurHelper
 	const std::array<int, D - 1> getLengths() const
 	{
 		return lengths;
+	}
+	const std::vector<SchurInfo<D>> getSchurInfoVector()
+	{
+		return sinfo_vector;
 	}
 };
 template <size_t D>
