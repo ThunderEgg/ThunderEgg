@@ -86,13 +86,15 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 	for (auto p : sh->getIfaces()) {
 		const IfaceSet<2> &ifs = p.second;
 		int                i   = ifs.id_global;
-		for (const Iface<2> &iface : ifs.ifaces) {
-			Side<2> aux = iface.s;
+		for (size_t idx = 0; idx < ifs.sinfos.size(); i++) {
+			Side<2>       aux   = ifs.sides[idx];
+			SchurInfo<2> &sinfo = *ifs.sinfos[idx];
+			IfaceType<2>  type  = ifs.types[idx];
 			for (int s = 0; s < 4; s++) {
-				int j = iface.global_id[s];
-				if (j != -1) {
+				if (sinfo.iface_info[s] != nullptr) {
+					int     j    = sinfo.iface_info[s]->global_index;
 					Side<2> main = static_cast<Side<2>>(s);
-					blocks.insert(Block(main, j, aux, i, iface.neumann, iface.type));
+					blocks.insert(Block(main, j, aux, i, sinfo.pinfo->neumann, type));
 				}
 			}
 		}
@@ -136,11 +138,13 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 		auto interpolator = sh->getIfaceInterp();
 		// create domain representing curr_type
 		std::shared_ptr<PatchInfo<2>> pinfo(new PatchInfo<2>());
-		SchurInfo<2>                  sd;
+		pinfo->nbr_info[0].reset(new NormalNbrInfo<2>());
+		SchurInfo<2> sd;
 		sd.pinfo = pinfo;
 		pinfo->ns.fill(n);
-		pinfo->neumann                    = curr_type.neumann;
-		sd.getIfaceInfoPtr(Side<2>::west) = new NormalIfaceInfo<2>();
+		pinfo->spacings.fill(1.0 / n);
+		pinfo->neumann = curr_type.neumann;
+		sd.getIfaceInfoPtr(Side<2>::west).reset(new NormalIfaceInfo<2>());
 		solver->addPatch(sd);
 		std::vector<SchurInfo<2>> single_domain;
 		single_domain.push_back(sd);
@@ -192,12 +196,6 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 	}
 	VecRestoreArray(interp, &interp_view);
 	VecRestoreArray(gamma, &gamma_view);
-	VecDestroy(&u);
-	VecDestroy(&f);
-	VecDestroy(&r);
-	VecDestroy(&e);
-	VecDestroy(&gamma);
-	VecDestroy(&interp);
 }
 PW_explicit<Mat> SchurMatrixHelper2d::formCRSMatrix()
 {

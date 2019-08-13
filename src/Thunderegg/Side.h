@@ -81,6 +81,14 @@ template <size_t D> class Side
 	{
 		return val;
 	}
+	operator int() const
+	{
+		return val;
+	}
+	operator size_t() const
+	{
+		return val;
+	}
 	/**
 	 * @brief Get an array of all side values, in increasing order.
 	 *
@@ -100,6 +108,20 @@ template <size_t D> class Side
 	{
 		// is least-significant bit set?
 		return !(val & 0x1);
+	}
+	/**
+	 * @brief Return whether or not the side of the cube is higher on the axis that is orthogonal to
+	 * it.
+	 *
+	 * For example: The x-axis is orthogonal to both the west and east sides. Since west is lower on
+	 * the axis, west will return false and east will return true.
+	 *
+	 * @return Whether or not it is higher on the axis.
+	 */
+	inline bool isHigherOnAxis() const
+	{
+		// is least-significant bit set?
+		return (val & 0x1);
 	}
 	/**
 	 * @brief Return the axis that the side lies on.
@@ -148,6 +170,28 @@ template <size_t D> class Side
 	bool operator==(const int &other) const
 	{
 		return val == other;
+	}
+	/**
+	 * @brief Not Equals operator.
+	 *
+	 * @param other The other side.
+	 *
+	 * @return Whether or not the value of this side equals the value other side.
+	 */
+	bool operator!=(const Side &other) const
+	{
+		return val != other.val;
+	}
+	/**
+	 * @brief Not Equals operator.
+	 *
+	 * @param other The other value.
+	 *
+	 * @return Whether or not the value of this side equals the value of the integer.
+	 */
+	bool operator!=(const int &other) const
+	{
+		return val != other;
 	}
 };
 template <size_t D> inline std::array<Side<D>, Side<D>::num_sides> Side<D>::getValues()

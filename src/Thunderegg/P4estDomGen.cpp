@@ -124,7 +124,8 @@ static void create_domains(p4est_iter_volume_info_t *info, void *user_data)
 	if (ptr == nullptr) { ptr.reset(new PatchInfo<2>); }
 	PatchInfo<2> &pinfo = *ptr;
 
-	pinfo.id = global_id;
+	pinfo.rank = info->p4est->mpirank;
+	pinfo.id   = global_id;
 	pinfo.local_index
 	= info->quadid + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset;
 

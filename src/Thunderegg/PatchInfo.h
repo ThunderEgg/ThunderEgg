@@ -98,6 +98,10 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	int parent_id = -1;
 	/**
+	 * @brief MPI rank of this patch
+	 */
+	int rank = -1;
+	/**
 	 * @brief The orthant of the parent that this parent resides on.
 	 */
 	Orthant<D> orth_on_parent;
@@ -793,6 +797,7 @@ template <size_t D> inline int PatchInfo<D>::serialize(char *buffer) const
 	writer << ns;
 	writer << refine_level;
 	writer << parent_id;
+	writer << rank;
 	writer << orth_on_parent;
 	writer << neumann;
 	writer << starts;
@@ -831,6 +836,7 @@ template <size_t D> inline int PatchInfo<D>::deserialize(char *buffer)
 	reader >> ns;
 	reader >> refine_level;
 	reader >> parent_id;
+	reader >> rank;
 	reader >> orth_on_parent;
 	reader >> neumann;
 	reader >> starts;
@@ -870,7 +876,7 @@ inline void PatchInfo<D>::setPtrs(std::map<int, std::shared_ptr<PatchInfo>> &dom
 }
 template <size_t D> inline void PatchInfo<D>::updateRank(int rank)
 {
-	rank = rank;
+	this->rank = rank;
 	for (Side<D> s : Side<D>::getValues()) {
 		if (hasNbr(s)) { nbr_info[s.toInt()]->updateRankOnNeighbors(rank, s); }
 	}

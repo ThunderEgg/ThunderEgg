@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_IFACEINTERP_H
 #define THUNDEREGG_IFACEINTERP_H
-#include <Thunderegg/Iface.h>
+#include <Thunderegg/IfaceType.h>
 #include <Thunderegg/SchurInfo.h>
 #include <Thunderegg/Vector.h>
 namespace Thunderegg

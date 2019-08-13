@@ -52,7 +52,7 @@ template <size_t D> class SchurWrapOp : public Operator<D - 1>
 	{
 		auto f = PetscVector<D>::GetNewVector(domain);
 		auto u = PetscVector<D>::GetNewVector(domain);
-		sh->solveAndInterpolateWithInterface(f, u, x, b);
+		sh->solveWithInterface(f, u, x, b);
 	}
 };
 } // namespace Thunderegg

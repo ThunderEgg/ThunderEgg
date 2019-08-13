@@ -464,27 +464,28 @@ template <size_t D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 		out_data[i] = patch_global_index_map_vec[pinfo_id_map[out_data[i]]->local_index];
 	}
 	// send outgoing messages
-	int curr_pos = 0;
 	using namespace std;
-	// send info
 	vector<MPI_Request> requests;
-	requests.reserve(out_off_proc_rank_vec.size() + in_off_proc_rank_vec.size());
-	for (size_t i = 0; i < out_off_proc_rank_vec.size(); i++) {
-		int         dest = out_off_proc_rank_vec[i];
-		int         size = out_off_proc_rank_size_vec[i];
-		MPI_Request request;
-		MPI_Isend(&out_data[curr_pos], size, MPI_INT, dest, 0, MPI_COMM_WORLD, &request);
-		requests.push_back(request);
-		curr_pos += size;
-	}
-	curr_pos = 0;
+
 	// recv info
+	int curr_pos = 0;
 	for (size_t i = 0; i < in_off_proc_rank_vec.size(); i++) {
 		int         source = in_off_proc_rank_vec[i];
 		int         size   = in_off_proc_rank_size_vec[i];
 		MPI_Request request;
 		MPI_Irecv(&patch_global_index_map_vec_off_proc[curr_pos], size, MPI_INT, source, 0,
 		          MPI_COMM_WORLD, &request);
+		requests.push_back(request);
+		curr_pos += size;
+	}
+	// send info
+	curr_pos = 0;
+	requests.reserve(out_off_proc_rank_vec.size() + in_off_proc_rank_vec.size());
+	for (size_t i = 0; i < out_off_proc_rank_vec.size(); i++) {
+		int         dest = out_off_proc_rank_vec[i];
+		int         size = out_off_proc_rank_size_vec[i];
+		MPI_Request request;
+		MPI_Isend(&out_data[curr_pos], size, MPI_INT, dest, 0, MPI_COMM_WORLD, &request);
 		requests.push_back(request);
 		curr_pos += size;
 	}

@@ -611,6 +611,14 @@ int main(int argc, char *argv[])
 			ClawWriter writer(domain);
 			writer.write(u->vec, resid->vec);
 		}
+
+		if (gamma_filename != "") {
+			PetscViewer viewer;
+			PetscViewerBinaryOpen(PETSC_COMM_WORLD, gamma_filename.c_str(), FILE_MODE_WRITE,
+			                      &viewer);
+			VecView(gamma->vec, viewer);
+			PetscViewerDestroy(&viewer);
+		}
 #ifdef HAVE_VTK
 		if (vtk_filename != "") {
 			VtkWriter2d writer(domain, vtk_filename);

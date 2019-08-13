@@ -211,13 +211,15 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 	for (auto &p : sh->getIfaces()) {
 		const IfaceSet<3> &ifs = p.second;
 		int                i   = ifs.id_global;
-		for (const Iface<3> &iface : ifs.ifaces) {
-			Side<3> aux = iface.s;
+		for (size_t idx = 0; idx < ifs.sinfos.size(); i++) {
+			Side<3>       aux   = ifs.sides[idx];
+			SchurInfo<3> &sinfo = *ifs.sinfos[idx];
+			IfaceType<3>  type  = ifs.types[idx];
 			for (int s = 0; s < 6; s++) {
-				int j = iface.global_id[s];
-				if (j != -1) {
+				if (sinfo.iface_info[s] != nullptr) {
+					int     j    = sinfo.iface_info[s]->global_index;
 					Side<3> main = static_cast<Side<3>>(s);
-					blocks.insert(Block(main, j, aux, i, iface.neumann, iface.type));
+					blocks.insert(Block(main, j, aux, i, sinfo.pinfo->neumann, type));
 				}
 			}
 		}
@@ -263,8 +265,8 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 		sd.pinfo = pinfo;
 		pinfo->ns.fill(n);
 		pinfo->spacings.fill(1.0 / n);
-		pinfo->neumann                    = curr_type.neumann;
-		sd.getIfaceInfoPtr(Side<3>::west) = new NormalIfaceInfo<3>();
+		pinfo->neumann = curr_type.neumann;
+		sd.getIfaceInfoPtr(Side<3>::west).reset(new NormalIfaceInfo<3>());
 		solver->addPatch(sd);
 		std::vector<SchurInfo<3>> single_domain;
 		single_domain.push_back(sd);

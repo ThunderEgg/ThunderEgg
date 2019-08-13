@@ -22,8 +22,8 @@
 #ifndef THUNDEREGG_SCHURHELPER_H
 #define THUNDEREGG_SCHURHELPER_H
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/Iface.h>
 #include <Thunderegg/IfaceInterp.h>
+#include <Thunderegg/IfaceSet.h>
 #include <Thunderegg/PatchOperator.h>
 #include <Thunderegg/PatchSolver.h>
 #include <Thunderegg/PetscVector.h>
@@ -68,15 +68,22 @@ template <size_t D> class SchurHelper
 	 * @brief Vector of SchurInfo pointers where index in the vector corresponds to the patch's
 	 * local index
 	 */
-	std::vector<SchurInfo<D>>  sinfo_vector;
-	std::map<int, IfaceSet<D>> ifaces;
+	std::vector<std::shared_ptr<SchurInfo<D>>>   sinfo_vector;
+	std::map<int, std::shared_ptr<SchurInfo<D>>> id_sinfo_map;
+	std::map<int, IfaceSet<D>>                   ifaces;
 
-	std::vector<int> iface_dist_map_vec;
-	std::vector<int> iface_map_vec;
-	std::vector<int> iface_off_proc_map_vec;
-	void             indexIfacesLocal();
-	void             indexDomainIfacesLocal();
-	void             indexIfacesGlobal();
+	std::vector<int>                       id_map_vec;
+	std::vector<int>                       global_map_vec;
+	int                                    ghost_start;
+	int                                    matrix_extra_ghost_start;
+	int                                    rank;
+	std::vector<std::tuple<int, int, int>> matrix_out_id_local_rank_vec;
+	std::vector<std::tuple<int, int, int>> matrix_in_id_local_rank_vec;
+	std::vector<std::tuple<int, int, int>> patch_out_id_local_rank_vec;
+	std::vector<std::tuple<int, int, int>> patch_in_id_local_rank_vec;
+	void                                   indexIfacesLocal();
+	void                                   indexDomainIfacesLocal();
+	void                                   indexIfacesGlobal();
 
 	int                    num_global_ifaces = 0;
 	int                    iface_stride;
@@ -155,19 +162,19 @@ template <size_t D> class SchurHelper
 	std::shared_ptr<PetscVector<D - 1>> getNewSchurVec()
 	{
 		Vec u;
-		VecCreateMPI(MPI_COMM_WORLD, iface_map_vec.size() * iface_stride, PETSC_DETERMINE, &u);
+		VecCreateMPI(MPI_COMM_WORLD, ghost_start * iface_stride, PETSC_DETERMINE, &u);
 		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, lengths));
 	}
 	std::shared_ptr<PetscVector<D - 1>> getNewSchurDistVec()
 	{
 		Vec u;
-		VecCreateSeq(PETSC_COMM_SELF, iface_dist_map_vec.size() * iface_stride, &u);
+		VecCreateSeq(PETSC_COMM_SELF, matrix_extra_ghost_start * iface_stride, &u);
 		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, lengths));
 	}
 
 	int getSchurVecLocalSize() const
 	{
-		return iface_map_vec.size() * iface_stride;
+		return ghost_start * iface_stride;
 	}
 	int getSchurVecGlobalSize() const
 	{
@@ -194,7 +201,7 @@ template <size_t D> class SchurHelper
 	{
 		return lengths;
 	}
-	const std::vector<SchurInfo<D>> getSchurInfoVector()
+	const std::vector<std::shared_ptr<SchurInfo<D>>> getSchurInfoVector()
 	{
 		return sinfo_vector;
 	}
@@ -205,6 +212,7 @@ inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>>        domain,
                                    std::shared_ptr<PatchOperator<D>> op,
                                    std::shared_ptr<IfaceInterp<D>>   interpolator)
 {
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	iface_stride = 1;
 	for (size_t i = 0; i < D - 1; i++) {
 		iface_stride *= domain->getNs()[i];
@@ -212,65 +220,10 @@ inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>>        domain,
 	}
 	sinfo_vector.reserve(domain->getNumLocalPatches());
 	for (auto &pinfo : domain->getPatchInfoVector()) {
-		sinfo_vector.push_back(pinfo);
+		sinfo_vector.emplace_back(new SchurInfo<D>(pinfo));
+		id_sinfo_map[pinfo->id] = sinfo_vector.back();
 	}
-	std::map<int, std::map<int, IfaceSet<D>>> off_proc_ifaces;
-	std::set<int>                             incoming_procs;
-	for (SchurInfo<D> &sd : sinfo_vector) {
-		sd.enumerateIfaces(ifaces, off_proc_ifaces, incoming_procs);
-		solver->addPatch(sd);
-	}
-	{
-		using namespace std;
-		// send info
-		deque<char *>       buffers;
-		vector<MPI_Request> send_requests;
-		for (auto &p : off_proc_ifaces) {
-			int dest = p.first;
-			int size = 0;
-			for (auto q : p.second) {
-				IfaceSet<D> &iface = q.second;
-				size += iface.serialize(nullptr);
-			}
-			char *buffer = new char[size];
-			buffers.push_back(buffer);
-			int pos = 0;
-			for (auto q : p.second) {
-				IfaceSet<D> &iface = q.second;
-				pos += iface.serialize(buffer + pos);
-			}
-			MPI_Request request;
-			MPI_Isend(buffer, size, MPI_BYTE, dest, 0, MPI_COMM_WORLD, &request);
-			send_requests.push_back(request);
-		}
-		MPI_Barrier(MPI_COMM_WORLD);
-		// recv info
-		for (int src : incoming_procs) {
-			MPI_Status status;
-			MPI_Probe(src, 0, MPI_COMM_WORLD, &status);
-			int size;
-			MPI_Get_count(&status, MPI_BYTE, &size);
-			char *buffer = new char[size];
-
-			MPI_Recv(buffer, size, MPI_BYTE, src, 0, MPI_COMM_WORLD, &status);
-
-			BufferReader reader(buffer);
-			while (reader.getPos() < size) {
-				IfaceSet<D> ifs;
-				reader >> ifs;
-				ifaces[ifs.id].insert(ifs);
-			}
-
-			delete[] buffer;
-		}
-		// wait for all
-		MPI_Waitall(send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
-		// delete send buffers
-		for (char *buffer : buffers) {
-			delete[] buffer;
-		}
-		MPI_Barrier(MPI_COMM_WORLD);
-	}
+	ifaces = IfaceSet<D>::EnumerateIfaces(sinfo_vector.begin(), sinfo_vector.end());
 	indexDomainIfacesLocal();
 	indexIfacesLocal();
 	this->solver       = solver;
@@ -278,12 +231,7 @@ inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>>        domain,
 	this->interpolator = interpolator;
 	local_gamma        = getNewSchurDistVec();
 	gamma              = getNewSchurVec();
-	PW<IS> dist_is;
-	ISCreateBlock(MPI_COMM_SELF, iface_stride, iface_dist_map_vec.size(), &iface_dist_map_vec[0],
-	              PETSC_COPY_VALUES, &dist_is);
-	VecScatterCreate(gamma->vec, dist_is, local_gamma->vec, nullptr, &scatter);
-
-	int num_ifaces = ifaces.size();
+	int num_ifaces     = ifaces.size();
 	MPI_Allreduce(&num_ifaces, &num_global_ifaces, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 }
 template <size_t D>
@@ -294,11 +242,11 @@ inline void SchurHelper<D>::solveWithInterface(std::shared_ptr<const Vector<D>> 
 {
 	scatterInterface(local_gamma, gamma);
 
-	solver->domainSolve(sinfo_vector, f, u, local_gamma);
+	// solver->domainSolve(sinfo_vector, f, u, local_gamma);
 
 	local_gamma->set(0);
-	for (SchurInfo<D> &sd : sinfo_vector) {
-		interpolator->interpolate(sd, u, local_gamma);
+	for (auto &sinfo : sinfo_vector) {
+		interpolator->interpolate(*sinfo, u, local_gamma);
 	}
 
 	diff->set(0);
@@ -313,11 +261,11 @@ std::shared_ptr<const Vector<D - 1>> gamma, std::shared_ptr<Vector<D - 1>> inter
 	scatterInterface(local_gamma, gamma);
 
 	// solve over sinfo_vector on this proc
-	solver->domainSolve(sinfo_vector, f, u, local_gamma);
+	// solver->domainSolve(sinfo_vector, f, u, local_gamma);
 
 	local_gamma->set(0);
-	for (SchurInfo<D> &sd : sinfo_vector) {
-		interpolator->interpolate(sd, u, local_gamma);
+	for (auto &sinfo : sinfo_vector) {
+		interpolator->interpolate(*sinfo, u, local_gamma);
 	}
 
 	interp->set(0);
@@ -328,14 +276,14 @@ inline void SchurHelper<D>::solveWithSolution(std::shared_ptr<const Vector<D>> f
                                               std::shared_ptr<Vector<D>>       u)
 {
 	local_gamma->set(0);
-	for (SchurInfo<D> &sd : sinfo_vector) {
-		interpolator->interpolate(sd, u, local_gamma);
+	for (auto &sinfo : sinfo_vector) {
+		interpolator->interpolate(*sinfo, u, local_gamma);
 	}
 
 	updateInterfaceDist(local_gamma);
 
 	// solve over sinfo_vector on this proc
-	solver->domainSolve(sinfo_vector, f, u, local_gamma);
+	// solver->domainSolve(sinfo_vector, f, u, local_gamma);
 }
 template <size_t D>
 inline void SchurHelper<D>::interpolateToInterface(std::shared_ptr<const Vector<D>> f,
@@ -344,8 +292,8 @@ inline void SchurHelper<D>::interpolateToInterface(std::shared_ptr<const Vector<
 {
 	// initilize our local variables
 	local_gamma->set(0);
-	for (SchurInfo<D> &sd : sinfo_vector) {
-		interpolator->interpolate(sd, u, local_gamma);
+	for (auto &sinfo : sinfo_vector) {
+		interpolator->interpolate(*sinfo, u, local_gamma);
 	}
 	gamma->set(0);
 	scatterInterfaceReverse(local_gamma, gamma);
@@ -359,9 +307,9 @@ inline void SchurHelper<D>::applyWithInterface(std::shared_ptr<const Vector<D>> 
 
 	f->set(0);
 
-	for (SchurInfo<D> &sd : sinfo_vector) {
-		int local_index = sd.pinfo->local_index;
-		op->applyWithInterface(sd, u->getLocalData(local_index), local_gamma,
+	for (auto &sinfo : sinfo_vector) {
+		int local_index = sinfo->pinfo->local_index;
+		op->applyWithInterface(*sinfo, u->getLocalData(local_index), local_gamma,
 		                       f->getLocalData(local_index));
 	}
 }
@@ -369,93 +317,255 @@ template <size_t D>
 inline void SchurHelper<D>::apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f)
 {
 	local_gamma->set(0);
-	for (SchurInfo<D> &sd : sinfo_vector) {
-		interpolator->interpolate(sd, u, local_gamma);
+	for (auto &sinfo : sinfo_vector) {
+		interpolator->interpolate(*sinfo, u, local_gamma);
 	}
 
 	updateInterfaceDist(local_gamma);
 
 	f->set(0);
-	for (SchurInfo<D> &sd : sinfo_vector) {
-		int local_index = sd.pinfo->local_index;
-		op->applyWithInterface(sd, u->getLocalData(local_index), local_gamma,
+	for (auto &sinfo : sinfo_vector) {
+		int local_index = sinfo->pinfo->local_index;
+		op->applyWithInterface(*sinfo, u->getLocalData(local_index), local_gamma,
 		                       f->getLocalData(local_index));
 	}
 }
-template <size_t D> inline void SchurHelper<D>::indexDomainIfacesLocal()
-{
-	using namespace std;
-	vector<int>   map_vec;
-	map<int, int> rev_map;
-	if (!sinfo_vector.empty()) {
-		int curr_i = 0;
-		for (SchurInfo<D> &sd : sinfo_vector) {
-			for (int id : sd.getIds()) {
-				if (rev_map.count(id) == 0) {
-					rev_map[id] = curr_i;
-					map_vec.push_back(id);
-					curr_i++;
-				}
-			}
-		}
-		for (SchurInfo<D> &sd : sinfo_vector) {
-			sd.setLocalIndexes(rev_map);
-		}
-	}
-	iface_dist_map_vec = map_vec;
-}
+template <size_t D> inline void SchurHelper<D>::indexDomainIfacesLocal() {}
 template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 {
 	using namespace std;
-	int           curr_i = 0;
-	vector<int>   map_vec;
-	vector<int>   off_proc_map_vec;
-	vector<int>   off_proc_map_vec_send;
-	map<int, int> rev_map;
+	int curr_i = 0;
+	id_map_vec.reserve(ifaces.size());
+	id_map_vec.resize(0);
+	map<int, int>       rev_map;
+	set<int>            enqueued;
+	set<pair<int, int>> out_matrix_offs;
+	set<pair<int, int>> in_matrix_offs;
+	// set local indexes in schur compliment matrix
 	if (!ifaces.empty()) {
 		set<int> todo;
 		for (auto &p : ifaces) {
 			todo.insert(p.first);
 		}
-		set<int> enqueued;
 		while (!todo.empty()) {
 			deque<int> queue;
 			queue.push_back(*todo.begin());
 			enqueued.insert(*todo.begin());
 			while (!queue.empty()) {
-				int i = queue.front();
-				todo.erase(i);
+				int id = queue.front();
+				todo.erase(id);
 				queue.pop_front();
-				map_vec.push_back(i);
-				IfaceSet<D> &ifs = ifaces.at(i);
-				rev_map[i]       = curr_i;
+
+				// set local index for interface
+				id_map_vec.push_back(id);
+				IfaceSet<D> &ifs = ifaces.at(id);
+				rev_map[id]      = curr_i;
+
 				curr_i++;
-				for (int nbr : ifs.getNbrs()) {
-					if (!enqueued.count(nbr)) {
-						enqueued.insert(nbr);
-						if (ifaces.count(nbr)) {
-							queue.push_back(nbr);
-						} else {
-							off_proc_map_vec.push_back(nbr);
+				for (size_t idx = 0; idx < ifs.sinfos.size(); idx++) {
+					Side<D> iface_side = ifs.sides[idx];
+					auto    sinfo      = ifs.sinfos[idx];
+					if (sinfo->getIfaceInfoPtr(iface_side)->id == id) {
+						// outgoing affects all ifaces
+						for (Side<D> s : Side<D>::getValues()) {
+							if (sinfo->pinfo->hasNbr(s)) {
+								switch (sinfo->pinfo->getNbrType(s)) {
+									case NbrType::Normal: {
+										const NormalIfaceInfo<D> &info
+										= sinfo->getNormalIfaceInfo(s);
+										if (info.rank != rank) {
+											in_matrix_offs.emplace(info.rank, info.id);
+											out_matrix_offs.emplace(info.rank, id);
+										}
+									} break;
+									case NbrType::Fine: {
+										const FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
+										if (info.rank != rank) {
+											in_matrix_offs.emplace(info.rank, info.id);
+											out_matrix_offs.emplace(info.rank, id);
+										}
+										for (int i = 0; i < Orthant<D - 1>::num_orthants; i++) {
+											if (info.fine_ranks[i] != rank) {
+												out_matrix_offs.emplace(info.fine_ranks[i], id);
+											}
+										}
+									} break;
+									case NbrType::Coarse: {
+										const CoarseIfaceInfo<D> &info
+										= sinfo->getCoarseIfaceInfo(s);
+										if (info.rank != rank) {
+											in_matrix_offs.emplace(info.rank, info.id);
+											out_matrix_offs.emplace(info.rank, id);
+										}
+										if (info.coarse_rank != rank) {
+											out_matrix_offs.emplace(info.coarse_rank, id);
+										}
+									} break;
+								}
+							}
 						}
+					} else {
+						// outgoing affects only ifaces on iface_side
+						// iface side has to handled specially
+						switch (sinfo->pinfo->getNbrType(iface_side)) {
+							case NbrType::Normal: {
+								const NormalIfaceInfo<D> &info
+								= sinfo->getNormalIfaceInfo(iface_side);
+								if (info.rank != rank) {
+									in_matrix_offs.emplace(info.rank, info.id);
+									out_matrix_offs.emplace(info.rank, id);
+								}
+							} break;
+							case NbrType::Fine: {
+								const FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(iface_side);
+								if (info.rank != rank) {
+									in_matrix_offs.emplace(info.rank, info.id);
+									out_matrix_offs.emplace(info.rank, id);
+								}
+								for (int i = 0; i < Orthant<D - 1>::num_orthants; i++) {
+									if (info.fine_ranks[i] != rank) {
+										out_matrix_offs.emplace(info.fine_ranks[i], id);
+									}
+								}
+							} break;
+							case NbrType::Coarse: {
+								const CoarseIfaceInfo<D> &info
+								= sinfo->getCoarseIfaceInfo(iface_side);
+								if (info.rank != rank) {
+									in_matrix_offs.emplace(info.rank, info.id);
+									out_matrix_offs.emplace(info.rank, id);
+								}
+								if (info.coarse_rank != rank) {
+									out_matrix_offs.emplace(info.coarse_rank, id);
+								}
+							} break;
+						}
+						// handle the rest of the cases
+						for (Side<D> s : Side<D>::getValues()) {
+							if (s != iface_side && sinfo->pinfo->hasNbr(s)) {
+								switch (sinfo->pinfo->getNbrType(s)) {
+									case NbrType::Normal: {
+										const NormalIfaceInfo<D> &info
+										= sinfo->getNormalIfaceInfo(s);
+										if (info.rank != rank) {
+											in_matrix_offs.emplace(info.rank, info.id);
+										}
+									} break;
+									case NbrType::Fine: {
+										const FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
+										if (info.rank != rank) {
+											in_matrix_offs.emplace(info.rank, info.id);
+										}
+									} break;
+									case NbrType::Coarse: {
+										const CoarseIfaceInfo<D> &info
+										= sinfo->getCoarseIfaceInfo(s);
+										if (info.rank != rank) {
+											in_matrix_offs.emplace(info.rank, info.id);
+										}
+									} break;
+								}
+							}
+						}
+					}
+				}
+				for (int nbr_id : ifs.getNbrs()) {
+					if (ifaces.count(nbr_id) && !enqueued.count(nbr_id)) {
+						enqueued.insert(nbr_id);
+						queue.push_back(nbr_id);
 					}
 				}
 			}
 		}
 	}
-
-	// map off proc
-	for (int i : off_proc_map_vec) {
-		rev_map[i] = curr_i;
-		curr_i++;
+	set<pair<int, int>> out_patch_offs;
+	set<pair<int, int>> in_patch_offs;
+	ghost_start = curr_i;
+	for (shared_ptr<SchurInfo<D>> &sinfo : sinfo_vector) {
+		for (Side<D> s : Side<D>::getValues()) {
+			if (sinfo->pinfo->hasNbr(s)) {
+				int id = sinfo->getIfaceInfoPtr(s)->id;
+				if (!rev_map.count(id)) {
+					id_map_vec.push_back(id);
+					rev_map[id] = curr_i;
+					curr_i++;
+				}
+				switch (sinfo->pinfo->getNbrType(s)) {
+					case NbrType::Normal: {
+						NormalIfaceInfo<D> &info = sinfo->getNormalIfaceInfo(s);
+						if (info.nbr_info->ptr == nullptr) {
+							in_patch_offs.insert(make_pair(info.nbr_info->rank, id));
+							out_patch_offs.insert(make_pair(info.nbr_info->rank, id));
+						}
+					} break;
+					case NbrType::Coarse: {
+						CoarseIfaceInfo<D> &info = sinfo->getCoarseIfaceInfo(s);
+						if (info.nbr_info->ptr == nullptr) {
+							in_patch_offs.insert(make_pair(info.nbr_info->rank, id));
+							out_patch_offs.insert(make_pair(info.nbr_info->rank, info.coarse_id));
+							if (!rev_map.count(info.coarse_id)) {
+								id_map_vec.push_back(info.coarse_id);
+								rev_map[info.coarse_id] = curr_i;
+								curr_i++;
+							}
+						}
+					} break;
+					case NbrType::Fine: {
+						FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
+						for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
+							if (info.nbr_info->ptrs[o.toInt()] == nullptr) {
+								in_patch_offs.insert(
+								make_pair(info.nbr_info->ranks[o.toInt()], id));
+								out_patch_offs.insert(make_pair(info.nbr_info->ranks[o.toInt()],
+								                                info.fine_ids[o.toInt()]));
+								if (!rev_map.count(info.fine_ids[o.toInt()])) {
+									id_map_vec.push_back(info.fine_ids[o.toInt()]);
+									rev_map[info.fine_ids[o.toInt()]] = curr_i;
+									curr_i++;
+								}
+							}
+						}
+					} break;
+				}
+			}
+		}
 	}
+	matrix_extra_ghost_start = curr_i;
+	// get off proc data
+	for (auto pair : out_patch_offs) {
+		int rank = pair.first;
+		int id   = pair.second;
+		patch_out_id_local_rank_vec.emplace_back(id, rev_map[id], rank);
+	}
+	for (auto pair : in_patch_offs) {
+		int rank = pair.first;
+		int id   = pair.second;
+		patch_in_id_local_rank_vec.emplace_back(id, rev_map[id], rank);
+	}
+	for (auto pair : out_matrix_offs) {
+		int rank = pair.first;
+		int id   = pair.second;
+		matrix_out_id_local_rank_vec.emplace_back(id, rev_map[id], rank);
+	}
+	for (auto pair : in_matrix_offs) {
+		int rank = pair.first;
+		int id   = pair.second;
+		if (!rev_map.count(id)) {
+			id_map_vec.push_back(id);
+			rev_map[id] = curr_i;
+			curr_i++;
+		}
+		matrix_in_id_local_rank_vec.emplace_back(id, rev_map[id], rank);
+	}
+	// TODO rest of matrix
 	for (auto &p : ifaces) {
 		p.second.setLocalIndexes(rev_map);
 	}
-	iface_map_vec          = map_vec;
-	iface_off_proc_map_vec = off_proc_map_vec;
+	for (auto &sinfo : sinfo_vector) {
+		sinfo->setLocalIndexes(rev_map);
+	}
 	indexIfacesGlobal();
-}
+} // namespace Thunderegg
 template <size_t D> inline void SchurHelper<D>::indexIfacesGlobal()
 {
 	using namespace std;
@@ -464,59 +574,34 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesGlobal()
 	int start_i;
 	MPI_Scan(&local_size, &start_i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 	start_i -= local_size;
-	vector<int> new_global(local_size);
-	iota(new_global.begin(), new_global.end(), start_i);
+	vector<int> new_global(id_map_vec.size());
+	iota(new_global.begin(), new_global.begin() + ghost_start, start_i);
 
-	// create map for gids
-	PW<AO> ao;
-	AOCreateMapping(MPI_COMM_WORLD, local_size, &iface_map_vec[0], &new_global[0], &ao);
+	// send outgoing messages
+	vector<MPI_Request> requests;
+	requests.reserve(matrix_in_id_local_rank_vec.size() + matrix_out_id_local_rank_vec.size());
 
-	// get indices for schur matrix
-	{
-		// get global indices that we want to recieve for dest vector
-		vector<int> inds = iface_map_vec;
-		for (int i : iface_off_proc_map_vec) {
-			inds.push_back(i);
-		}
-
-		// get new global indices
-		AOApplicationToPetsc(ao, inds.size(), &inds[0]);
-		map<int, int> rev_map;
-		for (size_t i = 0; i < inds.size(); i++) {
-			rev_map[i] = inds[i];
-		}
-
-		// set new global indices in iface objects
-		for (auto &p : ifaces) {
-			p.second.setGlobalIndexes(rev_map);
-		}
-		for (size_t i = 0; i < iface_map_vec.size(); i++) {
-			iface_map_vec[i] = inds[i];
-		}
-		for (size_t i = 0; i < iface_off_proc_map_vec.size(); i++) {
-			iface_off_proc_map_vec[i] = inds[iface_map_vec.size() + i];
-		}
+	// recv info
+	for (const auto &tuple : matrix_in_id_local_rank_vec) {
+		int         id          = std::get<0>(tuple);
+		int         local_index = std::get<1>(tuple);
+		int         source      = std::get<2>(tuple);
+		MPI_Request request;
+		MPI_Irecv(&new_global[local_index], 1, MPI_INT, source, id, MPI_COMM_WORLD, &request);
+		requests.push_back(request);
 	}
-	// get indices for local ifaces
-	{
-		// get global indices that we want to recieve for dest vector
-		vector<int> inds = iface_dist_map_vec;
-
-		// get new global indices
-		AOApplicationToPetsc(ao, inds.size(), &inds[0]);
-		map<int, int> rev_map;
-		for (size_t i = 0; i < inds.size(); i++) {
-			rev_map[i] = inds[i];
-		}
-
-		// set new global indices in domain objects
-		for (SchurInfo<D> &sd : sinfo_vector) {
-			sd.setGlobalIndexes(rev_map);
-		}
-		for (size_t i = 0; i < iface_dist_map_vec.size(); i++) {
-			iface_dist_map_vec[i] = inds[i];
-		}
+	// send info
+	for (const auto &tuple : matrix_out_id_local_rank_vec) {
+		int         id          = std::get<0>(tuple);
+		int         local_index = std::get<1>(tuple);
+		int         dest        = std::get<2>(tuple);
+		MPI_Request request;
+		MPI_Isend(&new_global[local_index], 1, MPI_INT, dest, id, MPI_COMM_WORLD, &request);
+		requests.push_back(request);
 	}
+	// wait for all
+	MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
+	global_map_vec = new_global;
 }
 template <size_t D> class SchurHelperVG : public VectorGenerator<D>
 {

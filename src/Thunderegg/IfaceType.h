@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_IFACETYPE_H
 #define THUNDEREGG_IFACETYPE_H
 #include <Thunderegg/Side.h>
+#include <tuple>
 namespace Thunderegg
 {
 /**
