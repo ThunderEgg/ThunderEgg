@@ -25,7 +25,9 @@
 #include <Thunderegg/Side.h>
 #include <array>
 
-namespace Thunderegg::Experimental
+namespace Thunderegg
+{
+namespace Experimental
 {
 /**
  * @brief Represents a node in an OctTree
@@ -133,5 +135,6 @@ template <size_t D> struct Node {
 		return nbr_id[s.toInt()];
 	}
 };
-} // namespace Thunderegg::Experimental
+} // namespace Experimental
+} // namespace Thunderegg
 #endif

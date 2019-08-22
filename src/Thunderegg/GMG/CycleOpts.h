@@ -22,7 +22,9 @@
 #ifndef THUNDEREGG_GMG_CYCLEOPTS_H
 #define THUNDEREGG_GMG_CYCLEOPTS_H
 #include <string>
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 /* case insensitive string
 struct ci_char_traits : public char_traits<char> {
@@ -78,5 +80,6 @@ struct CycleOpts {
 	 */
 	std::string cycle_type = "V";
 };
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

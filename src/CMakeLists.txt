@@ -37,6 +37,7 @@ list(APPEND Thunderegg_SRCS Thunderegg/VarPoisson/StarPatchOperator.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/Poisson/MatrixHelper.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory2d.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory3d.cpp)
+list(APPEND Thunderegg_SRCS Thunderegg/GMG/InterLevelComm.h)
 
 list(APPEND Thunderegg_SRCS Thunderegg/Experimental/DomGen.cpp)
 
@@ -48,6 +49,7 @@ endif()
 list(APPEND Thunderegg_SRCS Thunderegg/Experimental/PBMatrix.cpp)
 
 add_library(Thunderegg ${Thunderegg_SRCS} ${Thunderegg_HDRS})
+target_compile_features(Thunderegg PUBLIC cxx_std_11)
 
 # set include directories
 target_include_directories(Thunderegg PUBLIC 

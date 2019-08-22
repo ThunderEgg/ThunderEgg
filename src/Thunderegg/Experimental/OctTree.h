@@ -30,7 +30,9 @@
 #include <set>
 #include <string>
 
-namespace Thunderegg::Experimental
+namespace Thunderegg
+{
+namespace Experimental
 {
 /**
  * @brief Represents an oct-tree.
@@ -215,5 +217,6 @@ template <size_t D> inline void Tree<D>::refineNode(Node<D> &n)
 		nodes[child.id] = child;
 	}
 }
-} // namespace Thunderegg::Experimental
+} // namespace Experimental
+} // namespace Thunderegg
 #endif

@@ -107,12 +107,12 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 	VecCreateSeq(PETSC_COMM_SELF, n * n, &e);
 	VecCreateSeq(PETSC_COMM_SELF, n, &gamma);
 	VecCreateSeq(PETSC_COMM_SELF, n, &interp);
-	std::shared_ptr<Vector<2>> u_vec(new PetscVector<2>(u, {n, n}));
-	std::shared_ptr<Vector<2>> f_vec(new PetscVector<2>(f, {n, n}));
-	std::shared_ptr<Vector<2>> r_vec(new PetscVector<2>(r, {n, n}));
-	std::shared_ptr<Vector<2>> e_vec(new PetscVector<2>(e, {n, n}));
-	std::shared_ptr<Vector<1>> interp_vec(new PetscVector<1>(interp, {n}));
-	std::shared_ptr<Vector<1>> gamma_vec(new PetscVector<1>(gamma, {n}));
+	std::shared_ptr<Vector<2>> u_vec(new PetscVector<2>(u, -1, {n, n}));
+	std::shared_ptr<Vector<2>> f_vec(new PetscVector<2>(f, -1, {n, n}));
+	std::shared_ptr<Vector<2>> r_vec(new PetscVector<2>(r, -1, {n, n}));
+	std::shared_ptr<Vector<2>> e_vec(new PetscVector<2>(e, -1, {n, n}));
+	std::shared_ptr<Vector<1>> interp_vec(new PetscVector<1>(interp, -1, {n}));
+	std::shared_ptr<Vector<1>> gamma_vec(new PetscVector<1>(gamma, -1, {n}));
 	double *                   interp_view, *gamma_view;
 	VecGetArray(interp, &interp_view);
 	VecGetArray(gamma, &gamma_view);
@@ -139,14 +139,14 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 		// create domain representing curr_type
 		std::shared_ptr<PatchInfo<2>> pinfo(new PatchInfo<2>());
 		pinfo->nbr_info[0].reset(new NormalNbrInfo<2>());
-		SchurInfo<2> sd;
-		sd.pinfo = pinfo;
+		std::shared_ptr<SchurInfo<2>> sd(new SchurInfo<2>());
+		sd->pinfo = pinfo;
 		pinfo->ns.fill(n);
 		pinfo->spacings.fill(1.0 / n);
 		pinfo->neumann = curr_type.neumann;
-		sd.getIfaceInfoPtr(Side<2>::west).reset(new NormalIfaceInfo<2>());
-		solver->addPatch(sd);
-		std::vector<SchurInfo<2>> single_domain;
+		sd->getIfaceInfoPtr(Side<2>::west).reset(new NormalIfaceInfo<2>());
+		solver->addPatch(*sd);
+		std::vector<std::shared_ptr<SchurInfo<2>>> single_domain;
 		single_domain.push_back(sd);
 
 		map<BlockKey, shared_ptr<valarray<double>>> coeffs;
@@ -168,7 +168,7 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 				Side<2>      s    = p.first.s;
 				IfaceType<2> type = p.first.type;
 				VecScale(interp, 0);
-				interpolator->interpolate(sd, s, 0, type, u_vec, interp_vec);
+				interpolator->interpolate(*sd, s, 0, type, u_vec, interp_vec);
 				valarray<double> &block = *p.second;
 				for (int i = 0; i < n; i++) {
 					block[i * n + j] = -interp_view[i];

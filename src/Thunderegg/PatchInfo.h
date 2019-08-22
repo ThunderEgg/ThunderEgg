@@ -96,7 +96,11 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 *
 	 * Set to -1 if there is no parent.
 	 */
-	int parent_id = -1;
+	int                                       parent_id   = -1;
+	int                                       parent_rank = -1;
+	std::array<int, Orthant<D>::num_orthants> child_ids;
+	std::array<int, Orthant<D>::num_orthants> child_ranks;
+
 	/**
 	 * @brief MPI rank of this patch
 	 */
@@ -147,11 +151,13 @@ template <size_t D> struct PatchInfo : public Serializable {
 		spacings.fill(0);
 		bc_local_index.fill(-1);
 		bc_global_index.fill(-1);
+		child_ids.fill(-1);
+		child_ranks.fill(-1);
 	}
-	/**
+	/**dddd
 	 * @brief Destroy the Patch Info object
 	 */
-	~PatchInfo() = default;
+	//~PatchInfo() = default;
 	/**
 	 * @brief Compare the ids of the patches
 	 *
@@ -797,6 +803,9 @@ template <size_t D> inline int PatchInfo<D>::serialize(char *buffer) const
 	writer << ns;
 	writer << refine_level;
 	writer << parent_id;
+	writer << parent_rank;
+	writer << child_ids;
+	writer << child_ranks;
 	writer << rank;
 	writer << orth_on_parent;
 	writer << neumann;
@@ -836,6 +845,9 @@ template <size_t D> inline int PatchInfo<D>::deserialize(char *buffer)
 	reader >> ns;
 	reader >> refine_level;
 	reader >> parent_id;
+	reader >> parent_rank;
+	reader >> child_ids;
+	reader >> child_ranks;
 	reader >> rank;
 	reader >> orth_on_parent;
 	reader >> neumann;

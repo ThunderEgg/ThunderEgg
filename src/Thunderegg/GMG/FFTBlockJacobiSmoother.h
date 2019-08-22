@@ -24,7 +24,9 @@
 
 #include <Thunderegg/SchurHelper.h>
 
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 /**
  * @brief A block Jacobi smoother that uses FFTW solves on each patch. Implemented using the
@@ -59,5 +61,6 @@ template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
 		sh->solveWithSolution(f, u);
 	}
 };
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

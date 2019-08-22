@@ -55,7 +55,7 @@ template <size_t D> class PatchSolver
 	 * @param u the lhs vector
 	 * @param gamma the interface values to use
 	 */
-	virtual void domainSolve(std::vector<SchurInfo<D>> &patches, std::shared_ptr<const Vector<D>> f,
+	virtual void domainSolve(std::vector<std::shared_ptr<SchurInfo<D>>> &patches, std::shared_ptr<const Vector<D>> f,
 	                         std::shared_ptr<Vector<D>>           u,
 	                         std::shared_ptr<const Vector<D - 1>> gamma)
 	= 0;

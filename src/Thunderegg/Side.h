@@ -206,6 +206,13 @@ template <size_t D> inline Side<D> Side<D>::opposite() const
 	retval.val ^= 0x1;
 	return retval;
 }
+template <size_t D> constexpr int Side<D>::west;
+template <size_t D> constexpr int Side<D>::east;
+template <size_t D> constexpr int Side<D>::south;
+template <size_t D> constexpr int Side<D>::north;
+template <size_t D> constexpr int Side<D>::bottom;
+template <size_t D> constexpr int Side<D>::top;
+template <size_t D> constexpr int Side<D>::num_sides;
 /**
  * @brief An enum-style class that represents the octants of a cube.
  *
@@ -412,6 +419,15 @@ template <size_t D> inline std::array<Orthant<D>, Orthant<D>::num_orthants> Orth
 	std::iota(retval.begin(), retval.end(), 0);
 	return retval;
 }
+template <size_t D> constexpr int Orthant<D>::bsw;
+template <size_t D> constexpr int Orthant<D>::bse;
+template <size_t D> constexpr int Orthant<D>::bnw;
+template <size_t D> constexpr int Orthant<D>::bne;
+template <size_t D> constexpr int Orthant<D>::tsw;
+template <size_t D> constexpr int Orthant<D>::tse;
+template <size_t D> constexpr int Orthant<D>::tnw;
+template <size_t D> constexpr int Orthant<D>::tne;
+template <size_t D> constexpr int Orthant<D>::num_orthants;
 /**
  * @brief ostream operator that prints a string representation of side enum.
  *

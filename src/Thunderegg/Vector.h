@@ -57,7 +57,7 @@ template <size_t D> class LocalData
 	LocalData<D - 1> getSliceOnSidePriv(Side<D> s, int offset) const;
 
 	public:
-	LocalData() = default;
+	LocalData() {}
 	/**
 	 * @brief Construct a new LocalData object
 	 *
@@ -265,6 +265,7 @@ template <size_t D> class Vector
 	 * @return LocalData<D> the LocalData object
 	 */
 	virtual const LocalData<D> getLocalData(int patch_local_index) const = 0;
+	virtual void               setNumGhostPatches(int num_ghost_patches) = 0;
 
 	/**
 	 * @brief set all value in the vector

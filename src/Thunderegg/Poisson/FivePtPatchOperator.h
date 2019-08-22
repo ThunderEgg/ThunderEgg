@@ -22,7 +22,9 @@
 #ifndef FIVEPTPATCHOPERATOR_H
 #define FIVEPTPATCHOPERATOR_H
 #include <Thunderegg/PatchOperator.h>
-namespace Thunderegg::Poisson
+namespace Thunderegg
+{
+namespace Poisson
 {
 class FivePtPatchOperator : public PatchOperator<2>
 {
@@ -262,5 +264,6 @@ class FivePtPatchOperator : public PatchOperator<2>
 		}
 	}
 };
-} // namespace Thunderegg::Poisson
+} // namespace Poisson
+} // namespace Thunderegg
 #endif

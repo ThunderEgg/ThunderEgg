@@ -24,7 +24,9 @@
 
 #include <Thunderegg/PatchOperator.h>
 
-namespace Thunderegg::Poisson
+namespace Thunderegg
+{
+namespace Poisson
 {
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
@@ -324,5 +326,6 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 };
 extern template class StarPatchOperator<2>;
 extern template class StarPatchOperator<3>;
-}; // namespace Thunderegg::Poisson
+} // namespace Poisson
+} // namespace Thunderegg
 #endif

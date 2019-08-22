@@ -26,7 +26,9 @@
 #include <Thunderegg/PetscVector.h>
 #include <petscao.h>
 
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 /**
  * @brief Structure that wraps some extra meta-data around a Domain object.
@@ -166,7 +168,7 @@ template <size_t D> inline std::shared_ptr<Vector<D>> InterLevelComm<D>::getNewC
 {
 	Vec u;
 	VecCreateSeq(PETSC_COMM_SELF, local_vec_size, &u);
-	return std::shared_ptr<Vector<D>>(new PetscVector<D>(u, ns));
+	return std::shared_ptr<Vector<D>>(new PetscVector<D>(u, -1, ns));
 }
 template <size_t D>
 inline void InterLevelComm<D>::scatter(std::shared_ptr<Vector<D>>       dist,
@@ -190,5 +192,6 @@ inline void InterLevelComm<D>::scatterReverse(std::shared_ptr<const Vector<D>> d
 	VecScatterBegin(p_scatter, p_dist->vec, p_global->vec, ADD_VALUES, SCATTER_REVERSE);
 	VecScatterEnd(p_scatter, p_dist->vec, p_global->vec, ADD_VALUES, SCATTER_REVERSE);
 }
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

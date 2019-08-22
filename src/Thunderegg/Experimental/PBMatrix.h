@@ -30,7 +30,9 @@
 #include <set>
 #include <valarray>
 
-namespace Thunderegg::Experimental
+namespace Thunderegg
+{
+namespace Experimental
 {
 struct BlockJacobiSmoother;
 class PBMatrix
@@ -119,5 +121,6 @@ struct BlockJacobiSmoother {
 		D->apply(tmp, x);
 	}
 };
-} // namespace Thunderegg::Experimental
+} // namespace Experimental
+} // namespace Thunderegg
 #endif

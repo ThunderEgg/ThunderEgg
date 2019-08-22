@@ -24,7 +24,9 @@
 
 #include <Thunderegg/Vector.h>
 
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 /**
  * @brief Base class for multi-grid restriction operators.
@@ -41,5 +43,6 @@ template <size_t D> class Restrictor
 	virtual void restrict(std::shared_ptr<Vector<D>>       coarse,
 	                      std::shared_ptr<const Vector<D>> fine) const = 0;
 };
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

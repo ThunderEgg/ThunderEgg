@@ -26,7 +26,9 @@
 #include <Thunderegg/Vector.h>
 #include <list>
 
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 /**
  * @brief Base class for cycles. Includes functions for preparing vectors for finer and coarser
@@ -127,5 +129,6 @@ template <size_t D> class Cycle : public Operator<D>
 		u_vectors.pop_front();
 	}
 };
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

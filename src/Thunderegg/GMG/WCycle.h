@@ -22,7 +22,9 @@
 #ifndef THUNDEREGG_GMG_WCYCLE_H
 #define THUNDEREGG_GMG_WCYCLE_H
 #include <Thunderegg/GMG/Cycle.h>
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 /**
  * @brief Implementation of a W-cycle
@@ -81,5 +83,6 @@ template <size_t D> class WCycle : public Cycle<D>
 		num_mid_sweeps    = opts.mid_sweeps;
 	}
 };
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

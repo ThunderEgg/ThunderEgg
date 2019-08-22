@@ -28,7 +28,9 @@
 #include <bitset>
 #include <fftw3.h>
 #include <map>
-namespace Thunderegg::Poisson
+namespace Thunderegg
+{
+namespace Poisson
 {
 #ifndef DOMAINK
 #define DOMAINK
@@ -69,11 +71,12 @@ template <size_t D> class FftwPatchSolver : public PatchSolver<D>
 	~FftwPatchSolver();
 	void solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
 	           std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma);
-	void domainSolve(std::vector<SchurInfo<D>> &domains, std::shared_ptr<const Vector<D>> f,
-	                 std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma)
+	void domainSolve(std::vector<std::shared_ptr<SchurInfo<D>>> &domains,
+	                 std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
+	                 std::shared_ptr<const Vector<D - 1>> gamma) override
 	{
-		for (SchurInfo<D> &sinfo : domains) {
-			solve(sinfo, f, u, gamma);
+		for (auto &sinfo : domains) {
+			solve(*sinfo, f, u, gamma);
 		}
 	}
 	void addPatch(SchurInfo<D> &sinfo);
@@ -208,5 +211,6 @@ void FftwPatchSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector
 }
 extern template class FftwPatchSolver<2>;
 extern template class FftwPatchSolver<3>;
-} // namespace Thunderegg::Poisson
+} // namespace Poisson
+} // namespace Thunderegg
 #endif

@@ -35,6 +35,7 @@ template <size_t D> class ValVector : public Vector<D>
 
 	public:
 	std::valarray<double> vec;
+	std::valarray<double> ghost_data;
 	ValVector() = default;
 	ValVector(const std::array<int, D> &lengths, int num_patches = 1)
 	{
@@ -63,6 +64,10 @@ template <size_t D> class ValVector : public Vector<D>
 	{
 		double *data = const_cast<double *>(&vec[patch_stride * local_patch_id]);
 		return LocalData<D>(data, strides, lengths, nullptr);
+	}
+	void setNumGhostPatches(int num_ghost_patches)
+	{
+		ghost_data.resize(patch_stride * num_ghost_patches);
 	}
 };
 } // namespace Thunderegg

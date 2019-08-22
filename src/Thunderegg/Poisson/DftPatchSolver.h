@@ -31,7 +31,9 @@
 extern "C" void dgemv_(char &, int &, int &, double &, double *, int &, double *, int &, double &,
                        double *, int &);
 
-namespace Thunderegg::Poisson
+namespace Thunderegg
+{
+namespace Poisson
 {
 enum class DftType { DCT_II, DCT_III, DCT_IV, DST_II, DST_III, DST_IV };
 #ifndef DOMAINK
@@ -81,11 +83,12 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 	DftPatchSolver(Domain<D> &domain, double lambda = 0);
 	void solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
 	           std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma);
-	void domainSolve(std::vector<SchurInfo<D>> &domains, std::shared_ptr<const Vector<D>> f,
-	                 std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma)
+	void domainSolve(std::vector<std::shared_ptr<SchurInfo<D>>> &domains,
+	                 std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
+	                 std::shared_ptr<const Vector<D - 1>> gamma) override
 	{
-		for (SchurInfo<D> &sinfo : domains) {
-			solve(sinfo, f, u, gamma);
+		for (auto &sinfo : domains) {
+			solve(*sinfo, f, u, gamma);
 		}
 	}
 	void addPatch(SchurInfo<D> &sinfo);
@@ -145,8 +148,8 @@ template <size_t D> inline void DftPatchSolver<D>::addPatch(SchurInfo<D> &sinfo)
 			valarray<size_t> sizes(D - 1);
 			sizes = n;
 			valarray<size_t> strides(D - 1);
-			for (size_t sinfo = 1; sinfo < D; sinfo++) {
-				strides[sinfo - 1] = pow(n, (i + sinfo) % D);
+			for (size_t axis = 1; axis < D; axis++) {
+				strides[axis - 1] = pow(n, (i + axis) % D);
 			}
 			double h = sinfo.pinfo->spacings[0];
 
@@ -350,5 +353,6 @@ DftPatchSolver<D>::execute_plan(std::array<std::shared_ptr<std::valarray<double>
 }
 extern template class DftPatchSolver<2>;
 extern template class DftPatchSolver<3>;
-} // namespace Thunderegg::Poisson
+} // namespace Poisson
+} // namespace Thunderegg
 #endif

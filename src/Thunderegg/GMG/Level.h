@@ -28,7 +28,9 @@
 #include <Thunderegg/Operator.h>
 #include <Thunderegg/Vector.h>
 #include <memory>
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 /**
  * @brief Represents a level in geometric multi-grid.
@@ -202,5 +204,6 @@ template <size_t D> class Level
 		return coarser == nullptr;
 	}
 };
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

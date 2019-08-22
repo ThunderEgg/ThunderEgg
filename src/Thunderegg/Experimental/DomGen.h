@@ -25,7 +25,9 @@
 #include <Thunderegg/Experimental/OctTree.h>
 #include <list>
 #include <zoltan.h>
-namespace Thunderegg::Experimental
+namespace Thunderegg
+{
+namespace Experimental
 {
 /**
  * @brief Creates domains from a Thunderegg Tree
@@ -55,6 +57,10 @@ template <size_t D> class DomGen : public DomainGenerator<D>
 	 * @brief the tree
 	 */
 	Tree<D> t;
+	/**
+	 * @brief map of id to rank
+	 */
+	std::map<int, int> id_rank_map;
 	/**
 	 * @brief the number of cells in each direction.
 	 */
@@ -92,7 +98,6 @@ template <size_t D> class DomGen : public DomainGenerator<D>
 	 * @param neumann whether to use neumann boundary conditions
 	 */
 	DomGen(Tree<D> t, std::array<int, D> ns, bool neumann = false);
-	~DomGen() = default;
 	std::shared_ptr<Domain<D>> getFinestDomain();
 	bool                       hasCoarserDomain();
 	std::shared_ptr<Domain<D>> getCoarserDomain();
@@ -151,7 +156,9 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 			pinfo.starts       = n.starts;
 			pinfo.refine_level = n.level;
 			if (n.level < curr_level) {
+				// will still exist at next coarsening
 				pinfo.parent_id = n.id;
+				if (curr_level != num_levels) { pinfo.child_ids[0] = n.id; }
 			} else {
 				pinfo.parent_id = n.parent;
 				if (pinfo.parent_id != -1) {
@@ -160,6 +167,19 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 						orth_on_parent++;
 					}
 					pinfo.orth_on_parent = orth_on_parent;
+				}
+				if (!n.hasChildren() && curr_level != num_levels) {
+					pinfo.child_ids[0] = n.id;
+				} else if (n.hasChildren()) {
+					pinfo.child_ids = n.child_id;
+				}
+			}
+			// set child ranks
+			if (pinfo.child_ids[0] != -1) {
+				for (size_t i = 0; i < pinfo.child_ids.size(); i++) {
+					if (pinfo.child_ids[i] != -1) {
+						pinfo.child_ranks[i] = id_rank_map.at(pinfo.child_ids[i]);
+					}
 				}
 			}
 
@@ -211,7 +231,62 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 	if (curr_level == num_levels) {
 		balanceLevel(new_level);
 	} else {
-		balanceLevelWithLower(new_level, domain_list.back()->getPatchInfoMap());
+		auto &old_level = domain_list.back()->getPatchInfoMap();
+		balanceLevelWithLower(new_level, old_level);
+		// update parent ranks
+		std::map<int, int> id_rank_map;
+		// get outgoing information
+		std::map<int, std::set<int>> out_info;
+		for (auto pair : new_level) {
+			id_rank_map[pair.first] = rank;
+			auto &pinfo             = pair.second;
+			for (int i = 0; i < Orthant<D>::num_orthants; i++) {
+				if (pinfo->child_ranks[i] != -1 && pinfo->child_ranks[i] != rank) {
+					out_info[pinfo->child_ranks[i]].insert(pinfo->id);
+				}
+			}
+		}
+		// get incoming information
+		std::set<int> incoming_ids;
+		for (auto &pair : old_level) {
+			if (!new_level.count(pair.second->parent_id)) {
+				incoming_ids.insert(pair.second->parent_id);
+			}
+		}
+		// send info
+		std::deque<std::vector<int>> buffers;
+		std::vector<MPI_Request>     send_requests;
+		for (auto &pair : out_info) {
+			int              dest = pair.first;
+			std::vector<int> buffer(pair.second.begin(), pair.second.end());
+			buffers.push_back(buffer);
+			MPI_Request request;
+			MPI_Isend(buffer.data(), buffer.size(), MPI_INT, dest, 0, MPI_COMM_WORLD, &request);
+			send_requests.push_back(request);
+		}
+		// recv info
+		while (incoming_ids.size()) {
+			MPI_Status status;
+			MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+			int size;
+			MPI_Get_count(&status, MPI_INT, &size);
+			int *buffer = new int[size];
+
+			MPI_Recv(buffer, size, MPI_INT, status.MPI_SOURCE, 0, MPI_COMM_WORLD, &status);
+
+			for (int i = 0; i < size; i++) {
+				id_rank_map[buffer[i]] = status.MPI_SOURCE;
+				incoming_ids.erase(buffer[i]);
+			}
+
+			delete[] buffer;
+		}
+		// wait for all
+		MPI_Waitall(send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
+		// update rank info
+		for (auto &pair : old_level) {
+			pair.second->parent_rank = id_rank_map.at(pair.second->parent_id);
+		}
 	}
 	domain_list.push_back(std::shared_ptr<Domain<D>>(new Domain<D>(ns, new_level)));
 	if (neumann) {
@@ -372,9 +447,11 @@ template <size_t D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
 	                             &exportToPart);
 
 	// update ranks of neighbors before migrating
+	id_rank_map.clear();
 	for (int i = 0; i < numExport; i++) {
-		int curr_id   = exportGlobalIds[i];
-		int dest_rank = exportProcs[i];
+		int curr_id          = exportGlobalIds[i];
+		int dest_rank        = exportProcs[i];
+		id_rank_map[curr_id] = dest_rank;
 		level[curr_id]->updateRank(dest_rank);
 	}
 
@@ -424,6 +501,7 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 	Zoltan_Set_Param(zz, "EDGE_WEIGHT_DIM", "0");     /* we omit object weights */
 	Zoltan_Set_Param(zz, "AUTO_MIGRATE", "FALSE");    /* we omit object weights */
 	Zoltan_Set_Param(zz, "DEBUG_LEVEL", "0");         /* we omit object weights */
+	Zoltan_Set_Param(zz, "RETURN_LISTS", "PARTS");    /* we omit object weights */
 
 	// Query functions
 	// Number of Vertices
@@ -454,7 +532,7 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 			                       pos++;
 		                       }
 		                       for (auto p : *levels->lower) {
-			                       global_ids[pos] = p.first;
+			                       global_ids[pos] = p.first + levels->upper->size();
 			                       obj_wgts[pos]   = 0;
 			                       pos++;
 		                       }
@@ -501,7 +579,7 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 	// process fine level
 	for (auto &p : lower_level) {
 		PatchInfo<D> &pinfo = *p.second;
-		graph.vertices.push_back(pinfo.id);
+		graph.vertices.push_back(pinfo.id + level.size());
 		graph.ptrs.push_back(graph.edges.size());
 		graph.edges.push_back(-pinfo.parent_id - 1);
 	}
@@ -555,7 +633,7 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 		                             MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		                             int pos = 0;
 		                             for (auto p : *levels->lower) {
-			                             fixed_gids[pos]  = p.first;
+			                             fixed_gids[pos]  = p.first + levels->upper->size();
 			                             fixed_parts[pos] = rank;
 			                             pos++;
 		                             }
@@ -609,11 +687,16 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 	                             &numExport, &exportGlobalIds, &exportLocalIds, &exportProcs,
 	                             &exportToPart);
 
+	id_rank_map.clear();
 	// update ranks of neighbors before migrating
 	for (int i = 0; i < numExport; i++) {
-		int curr_id   = exportGlobalIds[i];
-		int dest_rank = exportProcs[i];
-		levels.upper->at(curr_id)->updateRank(dest_rank);
+		int  curr_id   = exportGlobalIds[i];
+		int  dest_rank = exportProcs[i];
+		auto iter      = levels.upper->find(curr_id);
+		if (iter != levels.upper->end()) {
+			id_rank_map[curr_id] = dest_rank;
+			iter->second->updateRank(dest_rank);
+		}
 	}
 
 	rc = Zoltan_Migrate(zz, numImport, importGlobalIds, importLocalIds, importProcs, importToPart,
@@ -650,5 +733,6 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 }
 extern template class DomGen<2>;
 extern template class DomGen<3>;
-} // namespace Thunderegg::Experimental
+} // namespace Experimental
+} // namespace Thunderegg
 #endif

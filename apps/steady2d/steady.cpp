@@ -73,6 +73,18 @@ int main(int argc, char *argv[])
 {
 	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
+
+	int my_global_rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &my_global_rank);
+	/*
+	if(my_global_rank==0){
+		std::cout<<"Continue?"<<std::endl;
+		string blah;
+		std::cin>>blah;
+	}
+	MPI_Barrier(MPI_COMM_WORLD);
+	*/
+
 	// parse input
 	CLI::App app{"Thunderegg 3d poisson solver example"};
 
@@ -206,8 +218,6 @@ int main(int argc, char *argv[])
 	int num_procs;
 	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
 
-	int my_global_rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &my_global_rank);
 
 	// Set the number of discretization points in the x and y direction.
 	std::array<int, 2> ns;

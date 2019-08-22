@@ -38,19 +38,18 @@
 namespace Thunderegg
 {
 /**
- * @brief This class represents a collection of sinfo_vector that a single processor owns.
+ * @brief Represents the Schur compliment domain of the problem.
  *
- * The purposes of this class:
- *   - Provide a member function for solving with a given interface vector.
+ * This class mainly manages a set of interface that makes up the Schur compliment system. It is
+ * responsible for setting up the indexing of the interfaces, which is used in the rest of the
+ * Thunderegg library.
+ *
+ * @tparam D the number of Cartesian dimensions
  */
 template <size_t D> class SchurHelper
 {
 	private:
 	std::shared_ptr<Domain<D>> domain;
-
-	std::shared_ptr<PetscVector<D - 1>> local_gamma;
-	std::shared_ptr<PetscVector<D - 1>> gamma;
-	PW<VecScatter>                      scatter;
 
 	/**
 	 * @brief Interpolates to interface values
@@ -131,45 +130,84 @@ template <size_t D> class SchurHelper
 	                        std::shared_ptr<Vector<D>>           f);
 	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f);
 
-	void scatterInterface(std::shared_ptr<Vector<D - 1>>       gamma_dist,
-	                      std::shared_ptr<const Vector<D - 1>> gamma)
+	void updateInterfaceDist(std::shared_ptr<Vector<D - 1>> gamma)
 	{
-		// TODO make this general;
-		PetscVector<D - 1> *      p_dist   = dynamic_cast<PetscVector<D - 1> *>(gamma_dist.get());
-		const PetscVector<D - 1> *p_global = dynamic_cast<const PetscVector<D - 1> *>(gamma.get());
-		if (p_dist == nullptr || p_global == nullptr) { throw 3; }
-		VecScatterBegin(scatter, p_global->vec, p_dist->vec, INSERT_VALUES, SCATTER_FORWARD);
-		VecScatterEnd(scatter, p_global->vec, p_dist->vec, INSERT_VALUES, SCATTER_FORWARD);
-	}
+		// send outgoing messages
+		std::vector<MPI_Request> requests;
+		requests.reserve(patch_in_id_local_rank_vec.size() + patch_out_id_local_rank_vec.size());
 
-	void scatterInterfaceReverse(std::shared_ptr<const Vector<D - 1>> gamma_dist,
-	                             std::shared_ptr<Vector<D - 1>>       gamma)
-	{
-		// TODO make this general;
-		const PetscVector<D - 1> *p_dist
-		= dynamic_cast<const PetscVector<D - 1> *>(gamma_dist.get());
-		PetscVector<D - 1> *p_global = dynamic_cast<PetscVector<D - 1> *>(gamma.get());
-		if (p_dist == nullptr || p_global == nullptr) { throw 3; }
-		VecScatterBegin(scatter, p_dist->vec, p_global->vec, ADD_VALUES, SCATTER_REVERSE);
-		VecScatterEnd(scatter, p_dist->vec, p_global->vec, ADD_VALUES, SCATTER_REVERSE);
+		// send info
+		for (const auto &tuple : patch_out_id_local_rank_vec) {
+			int         id          = std::get<0>(tuple);
+			int         local_index = std::get<1>(tuple);
+			int         dest        = std::get<2>(tuple);
+			MPI_Request request;
+			MPI_Isend(gamma->getLocalData(local_index).getPtr(), iface_stride, MPI_DOUBLE, dest, id,
+			          MPI_COMM_WORLD, &request);
+			requests.push_back(request);
+		}
+		// recv info
+		for (const auto &tuple : patch_in_id_local_rank_vec) {
+			int id          = std::get<0>(tuple);
+			int local_index = std::get<1>(tuple);
+			int source      = std::get<2>(tuple);
+
+			double buffer[iface_stride];
+			MPI_Recv(buffer, iface_stride, MPI_DOUBLE, source, id, MPI_COMM_WORLD,
+			         MPI_STATUS_IGNORE);
+			double *data = gamma->getLocalData(local_index).getPtr();
+			for (int i = 0; i < iface_stride; i++) {
+				data[i] += buffer[i];
+			}
+		}
+
+		// wait for all
+		MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
 	}
-	void updateInterfaceDist(std::shared_ptr<Vector<D - 1>> gamma_dist)
+	void scatterInterfaceDist(std::shared_ptr<const Vector<D - 1>> gamma)
 	{
-		gamma->set(0);
-		scatterInterfaceReverse(gamma_dist, gamma);
-		scatterInterface(gamma_dist, gamma);
+		// send outgoing messages
+		std::vector<MPI_Request> requests;
+		requests.reserve(patch_in_id_local_rank_vec.size() + patch_out_id_local_rank_vec.size());
+
+		// send info
+		for (const auto &tuple : patch_out_id_local_rank_vec) {
+			int id          = std::get<0>(tuple);
+			int local_index = std::get<1>(tuple);
+			int dest        = std::get<2>(tuple);
+			if (local_index < ghost_start) {
+				MPI_Request request;
+				MPI_Isend(gamma->getLocalData(local_index).getPtr(), iface_stride, MPI_DOUBLE, dest,
+				          id, MPI_COMM_WORLD, &request);
+				requests.push_back(request);
+			}
+		}
+		// recv info
+		for (const auto &tuple : patch_in_id_local_rank_vec) {
+			int id          = std::get<0>(tuple);
+			int local_index = std::get<1>(tuple);
+			int source      = std::get<2>(tuple);
+
+			if (local_index >= ghost_start) {
+				MPI_Recv(gamma->getLocalData(local_index).getPtr(), iface_stride, MPI_DOUBLE,
+				         source, id, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			}
+		}
+
+		// wait for all
+		MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
 	}
 	std::shared_ptr<PetscVector<D - 1>> getNewSchurVec()
 	{
 		Vec u;
-		VecCreateMPI(MPI_COMM_WORLD, ghost_start * iface_stride, PETSC_DETERMINE, &u);
-		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, lengths));
+		VecCreateSeq(MPI_COMM_SELF, matrix_extra_ghost_start * iface_stride, &u);
+		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, ghost_start, lengths));
 	}
 	std::shared_ptr<PetscVector<D - 1>> getNewSchurDistVec()
 	{
 		Vec u;
 		VecCreateSeq(PETSC_COMM_SELF, matrix_extra_ghost_start * iface_stride, &u);
-		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, lengths));
+		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, ghost_start, lengths));
 	}
 
 	int getSchurVecLocalSize() const
@@ -222,6 +260,7 @@ inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>>        domain,
 	for (auto &pinfo : domain->getPatchInfoVector()) {
 		sinfo_vector.emplace_back(new SchurInfo<D>(pinfo));
 		id_sinfo_map[pinfo->id] = sinfo_vector.back();
+		solver->addPatch(*sinfo_vector.back());
 	}
 	ifaces = IfaceSet<D>::EnumerateIfaces(sinfo_vector.begin(), sinfo_vector.end());
 	indexDomainIfacesLocal();
@@ -229,8 +268,6 @@ inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>>        domain,
 	this->solver       = solver;
 	this->op           = op;
 	this->interpolator = interpolator;
-	local_gamma        = getNewSchurDistVec();
-	gamma              = getNewSchurVec();
 	int num_ifaces     = ifaces.size();
 	MPI_Allreduce(&num_ifaces, &num_global_ifaces, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 }
@@ -240,17 +277,15 @@ inline void SchurHelper<D>::solveWithInterface(std::shared_ptr<const Vector<D>> 
                                                std::shared_ptr<const Vector<D - 1>> gamma,
                                                std::shared_ptr<Vector<D - 1>>       diff)
 {
-	scatterInterface(local_gamma, gamma);
+	scatterInterfaceDist(gamma);
 
-	// solver->domainSolve(sinfo_vector, f, u, local_gamma);
-
-	local_gamma->set(0);
-	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, local_gamma);
-	}
+	solver->domainSolve(sinfo_vector, f, u, gamma);
 
 	diff->set(0);
-	scatterInterfaceReverse(local_gamma, diff);
+	for (auto &sinfo : sinfo_vector) {
+		interpolator->interpolate(*sinfo, u, diff);
+	}
+	updateInterfaceDist(diff);
 	diff->addScaled(-1, gamma);
 }
 template <size_t D>
@@ -258,75 +293,72 @@ inline void SchurHelper<D>::solveAndInterpolateWithInterface(
 std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
 std::shared_ptr<const Vector<D - 1>> gamma, std::shared_ptr<Vector<D - 1>> interp)
 {
-	scatterInterface(local_gamma, gamma);
+	scatterInterfaceDist(gamma);
 
 	// solve over sinfo_vector on this proc
-	// solver->domainSolve(sinfo_vector, f, u, local_gamma);
-
-	local_gamma->set(0);
-	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, local_gamma);
-	}
+	solver->domainSolve(sinfo_vector, f, u, gamma);
 
 	interp->set(0);
-	scatterInterfaceReverse(local_gamma, interp);
+	for (auto &sinfo : sinfo_vector) {
+		interpolator->interpolate(*sinfo, u, interp);
+	}
+
+	updateInterfaceDist(interp);
 }
 template <size_t D>
 inline void SchurHelper<D>::solveWithSolution(std::shared_ptr<const Vector<D>> f,
                                               std::shared_ptr<Vector<D>>       u)
 {
-	local_gamma->set(0);
+	auto gamma = getNewSchurVec();
 	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, local_gamma);
+		interpolator->interpolate(*sinfo, u, gamma);
 	}
 
-	updateInterfaceDist(local_gamma);
+	updateInterfaceDist(gamma);
 
 	// solve over sinfo_vector on this proc
-	// solver->domainSolve(sinfo_vector, f, u, local_gamma);
+	solver->domainSolve(sinfo_vector, f, u, gamma);
 }
 template <size_t D>
 inline void SchurHelper<D>::interpolateToInterface(std::shared_ptr<const Vector<D>> f,
                                                    std::shared_ptr<Vector<D>>       u,
                                                    std::shared_ptr<Vector<D - 1>>   gamma)
 {
-	// initilize our local variables
-	local_gamma->set(0);
-	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, local_gamma);
-	}
 	gamma->set(0);
-	scatterInterfaceReverse(local_gamma, gamma);
+	for (auto &sinfo : sinfo_vector) {
+		interpolator->interpolate(*sinfo, u, gamma);
+	}
+	updateInterfaceDist(gamma);
 }
 template <size_t D>
 inline void SchurHelper<D>::applyWithInterface(std::shared_ptr<const Vector<D>>     u,
                                                std::shared_ptr<const Vector<D - 1>> gamma,
                                                std::shared_ptr<Vector<D>>           f)
 {
-	scatterInterface(local_gamma, gamma);
+	scatterInterfaceDist(gamma);
 
 	f->set(0);
 
 	for (auto &sinfo : sinfo_vector) {
 		int local_index = sinfo->pinfo->local_index;
-		op->applyWithInterface(*sinfo, u->getLocalData(local_index), local_gamma,
+		op->applyWithInterface(*sinfo, u->getLocalData(local_index), gamma,
 		                       f->getLocalData(local_index));
 	}
 }
 template <size_t D>
 inline void SchurHelper<D>::apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f)
 {
-	local_gamma->set(0);
+	auto gamma = getNewSchurVec();
 	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, local_gamma);
+		interpolator->interpolate(*sinfo, u, gamma);
 	}
 
-	updateInterfaceDist(local_gamma);
+	updateInterfaceDist(gamma);
 
 	f->set(0);
 	for (auto &sinfo : sinfo_vector) {
 		int local_index = sinfo->pinfo->local_index;
-		op->applyWithInterface(*sinfo, u->getLocalData(local_index), local_gamma,
+		op->applyWithInterface(*sinfo, u->getLocalData(local_index), gamma,
 		                       f->getLocalData(local_index));
 	}
 }

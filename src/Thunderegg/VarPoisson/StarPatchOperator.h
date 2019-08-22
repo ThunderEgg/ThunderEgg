@@ -26,7 +26,9 @@
 #include <Thunderegg/PatchOperator.h>
 #include <Thunderegg/SchurHelper.h>
 
-namespace Thunderegg::VarPoisson
+namespace Thunderegg
+{
+namespace VarPoisson
 {
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
@@ -328,5 +330,6 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 };
 extern template class StarPatchOperator<2>;
 extern template class StarPatchOperator<3>;
-}; // namespace Thunderegg::VarPoisson
+} // namespace VarPoisson
+} // namespace Thunderegg
 #endif

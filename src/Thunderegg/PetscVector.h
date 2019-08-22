@@ -83,7 +83,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	// std::shared_ptr<void> user_data;
 
 	public:
-	PetscVector(Vec vec, const std::array<int, D> &lengths, bool own = true)
+	PetscVector(Vec vec, int num_local_patches, const std::array<int, D> &lengths, bool own = true)
 	{
 		this->own     = own;
 		this->lengths = lengths;
@@ -93,20 +93,26 @@ template <size_t D> class PetscVector : public Vector<D>
 			strides[i] = lengths[i - 1] * strides[i - 1];
 		}
 		patch_stride = strides[D - 1] * lengths[D - 1];
-		VecGetLocalSize(vec, &this->num_local_patches);
-		this->num_local_patches /= patch_stride;
+		if (num_local_patches == -1) {
+			VecGetLocalSize(vec, &this->num_local_patches);
+			this->num_local_patches /= patch_stride;
+		} else {
+			this->num_local_patches = num_local_patches;
+		}
 	}
 
 	/**
 	 * @brief The petsc vector object
 	 */
-	Vec vec;
+	Vec                 vec;
+	std::vector<double> ghost_data;
 
 	static std::shared_ptr<PetscVector<D>> GetNewVector(std::shared_ptr<Domain<D>> domain)
 	{
 		Vec u;
 		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCells(), PETSC_DETERMINE, &u);
-		return std::shared_ptr<PetscVector<D>>(new PetscVector<D>(u, domain->getNs()));
+		return std::shared_ptr<PetscVector<D>>(
+		new PetscVector<D>(u, domain->getNumLocalPatches(), domain->getNs()));
 	}
 	static std::shared_ptr<PetscVector<D - 1>> GetNewBCVector(std::shared_ptr<Domain<D>> domain)
 	{
@@ -116,7 +122,7 @@ template <size_t D> class PetscVector : public Vector<D>
 		for (size_t i = 0; i < ns.size(); i++) {
 			ns[i] = domain->getNs()[i];
 		}
-		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, ns));
+		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, -1, ns));
 	}
 	/*
 	static std::shared_ptr<PetscVector<D>> GetNewSchurVector(std::shared_ptr<SchurHelper<D + 1>> sh)
@@ -157,6 +163,10 @@ template <size_t D> class PetscVector : public Vector<D>
 		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, true));
 		double *                  data = ldm->getVecView() + patch_stride * patch_local_index;
 		return LocalData<D>(data, strides, lengths, std::move(ldm));
+	}
+	void setNumGhostPatches(int num_ghost_patches)
+	{
+		ghost_data.resize(patch_stride * num_ghost_patches);
 	}
 	/*
 	void set(double alpha)

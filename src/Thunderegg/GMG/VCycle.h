@@ -23,7 +23,9 @@
 #define THUNDEREGG_GMG_VCYCLE_H
 #include <Thunderegg/GMG/Cycle.h>
 #include <Thunderegg/GMG/CycleOpts.h>
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 /**
  * @brief Implementation of a V-cycle
@@ -74,5 +76,6 @@ template <size_t D> class VCycle : public Cycle<D>
 		num_coarse_sweeps = opts.coarse_sweeps;
 	}
 };
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

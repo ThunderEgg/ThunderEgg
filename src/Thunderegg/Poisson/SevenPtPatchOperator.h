@@ -24,7 +24,9 @@
 
 #include <Thunderegg/PatchOperator.h>
 
-namespace Thunderegg::Poisson
+namespace Thunderegg
+{
+namespace Poisson
 {
 class SevenPtPatchOperator : public PatchOperator<3>
 {
@@ -35,5 +37,6 @@ class SevenPtPatchOperator : public PatchOperator<3>
 	                       LocalData<3> f) override;
 	void apply(const SchurInfo<3> &sinfo, const LocalData<3> u, LocalData<3> f) override;
 };
-} // namespace Thunderegg::Poisson
+} // namespace Poisson
+} // namespace Thunderegg
 #endif

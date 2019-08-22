@@ -27,7 +27,9 @@
 #include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/PatchOperator.h>
 #include <Thunderegg/PatchSolver.h>
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 class CycleFactory2d
 {
@@ -38,5 +40,6 @@ class CycleFactory2d
 	                                          std::shared_ptr<PatchOperator<2>>   op,
 	                                          std::shared_ptr<IfaceInterp<2>>     interpolator);
 };
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

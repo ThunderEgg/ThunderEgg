@@ -23,7 +23,9 @@
 #define STENCILHELPER_H
 #include <Thunderegg/PatchInfo.h>
 #include <valarray>
-namespace Thunderegg::Poisson
+namespace Thunderegg
+{
+namespace Poisson
 {
 class StencilHelper
 {
@@ -493,5 +495,6 @@ StencilHelper *getStencilHelper(PatchInfo<2> &d, Side<2> s)
 	}
 	return retval;
 }
-} // namespace Thunderegg::Poisson
+} // namespace Poisson
+} // namespace Thunderegg
 #endif

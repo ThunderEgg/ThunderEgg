@@ -27,7 +27,9 @@
 #include <Thunderegg/GMG/Interpolator.h>
 #include <memory>
 
-namespace Thunderegg::GMG
+namespace Thunderegg
+{
+namespace GMG
 {
 /**
  * @brief Simple class that directly places values from coarse cell into the corresponding fine
@@ -113,5 +115,6 @@ inline void DrctIntp<D>::interpolate(std::shared_ptr<const Vector<D>> coarse,
 		}
 	}
 }
-} // namespace Thunderegg::GMG
+} // namespace GMG
+} // namespace Thunderegg
 #endif

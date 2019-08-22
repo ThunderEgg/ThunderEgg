@@ -75,6 +75,7 @@ template <size_t D> class BiCGStabSolver : public PatchSolver<D>
 		{
 			return ld;
 		}
+		void setNumGhostPatches(int) {}
 	};
 	class SinglePatchOp : public Operator<D>
 	{
@@ -118,11 +119,12 @@ template <size_t D> class BiCGStabSolver : public PatchSolver<D>
 	}
 	void solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
 	           std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma);
-	void domainSolve(std::vector<SchurInfo<D>> &patches, std::shared_ptr<const Vector<D>> f,
-	                 std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma)
+	void domainSolve(std::vector<std::shared_ptr<SchurInfo<D>>> &patches,
+	                 std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
+	                 std::shared_ptr<const Vector<D - 1>> gamma) override
 	{
-		for (SchurInfo<D> &sinfo : patches) {
-			solve(sinfo, f, u, gamma);
+		for (auto &sinfo : patches) {
+			solve(*sinfo, f, u, gamma);
 		}
 	}
 	void addPatch(SchurInfo<D> &sinfo) {}

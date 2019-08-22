@@ -6,6 +6,7 @@ endif()
 
 add_library(UTILS ${UTILS_SRCS})
 
+
 target_include_directories(UTILS PUBLIC ".")
 
 target_link_libraries(UTILS Thunderegg)
