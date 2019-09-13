@@ -21,7 +21,9 @@
 
 #ifndef SCHWARZPREC_H
 #define SCHWARZPREC_H
+#include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/Operator.h>
+#include <Thunderegg/PatchSolver.h>
 #include <Thunderegg/SchurHelper.h>
 namespace Thunderegg
 {
@@ -35,6 +37,8 @@ template <size_t D> class SchwarzPrec : public Operator<D>
 	 * @brief the SchurHelper
 	 */
 	std::shared_ptr<SchurHelper<D>> sh;
+	std::shared_ptr<PatchSolver<D>> solver;
+	std::shared_ptr<IfaceInterp<D>> interp;
 
 	public:
 	/**
@@ -42,9 +46,12 @@ template <size_t D> class SchwarzPrec : public Operator<D>
 	 *
 	 * @param sh the SchurHelper
 	 */
-	SchwarzPrec(std::shared_ptr<SchurHelper<D>> sh)
+	SchwarzPrec(std::shared_ptr<SchurHelper<D>> sh, std::shared_ptr<PatchSolver<D>> solver,
+	            std::shared_ptr<IfaceInterp<D>> interp)
 	{
-		this->sh = sh;
+		this->sh     = sh;
+		this->solver = solver;
+		this->interp = interp;
 	}
 	/**
 	 * @brief Apply schwarz preconditioner
@@ -54,7 +61,9 @@ template <size_t D> class SchwarzPrec : public Operator<D>
 	 */
 	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 	{
-		sh->solveWithSolution(x, b);
+		auto gamma = sh->getNewSchurDistVec();
+		interp->interpolateToInterface(x, gamma);
+		solver->solve(x, b, gamma);
 	}
 };
 } // namespace Thunderegg

@@ -40,14 +40,17 @@ class BilinearInterpolator : public IfaceInterp<2>
 	{
 		this->sh = sh;
 	}
-	void interpolate(std::shared_ptr<const Vector<2>> u,
-	                 std::shared_ptr<Vector<1>>       interp) override;
-	void interpolate(const std::vector<SchurInfo<2>> &patches, std::shared_ptr<const Vector<2>> u,
-	                 std::shared_ptr<Vector<1>> interp);
+	void interpolateToInterface(std::shared_ptr<const Vector<2>> u,
+	                            std::shared_ptr<Vector<1>>       interp) override;
+	void interpolate(const std::vector<std::shared_ptr<SchurInfo<2>>> &patches,
+	                 std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector<1>> interp);
 	void interpolate(SchurInfo<2> &d, std::shared_ptr<const Vector<2>> u,
 	                 std::shared_ptr<Vector<1>> interp);
 	void interpolate(SchurInfo<2> &d, Side<2> s, int local_index, IfaceType<2> itype,
 	                 std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector<1>> interp);
+    std::shared_ptr<IfaceInterp<2>> getNewIfaceInterp(GMG::CycleFactoryCtx<2> ctx) override{
+		return std::shared_ptr<IfaceInterp<2>>(new BilinearInterpolator(ctx.sh));
+	}
 };
 } // namespace Thunderegg
 #endif

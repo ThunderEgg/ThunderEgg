@@ -21,6 +21,7 @@
 
 #include "CycleFactory3d.h"
 #include <Thunderegg/GMG/AvgRstr.h>
+#include <Thunderegg/GMG/CycleFactoryCtx.h>
 #include <Thunderegg/GMG/DrctIntp.h>
 #include <Thunderegg/GMG/FFTBlockJacobiSmoother.h>
 #include <Thunderegg/GMG/InterLevelComm.h>
@@ -35,24 +36,28 @@ using namespace Thunderegg::GMG;
 using namespace Thunderegg::Poisson;
 using namespace Thunderegg;
 using namespace std;
-static std::shared_ptr<Operator<3>> getNewOperator(std::string                     op_type,
-                                                   std::shared_ptr<Domain<3>>      domain,
-                                                   std::shared_ptr<SchurHelper<3>> sh)
+static std::shared_ptr<Operator<3>> getNewOperator(std::string                       op_type,
+                                                   std::shared_ptr<Domain<3>>        domain,
+                                                   std::shared_ptr<SchurHelper<3>>   sh,
+                                                   std::shared_ptr<IfaceInterp<3>>   interp,
+                                                   std::shared_ptr<PatchOperator<3>> pop)
 {
 	std::shared_ptr<Operator<3>> op;
 	if (op_type == "crs_matrix") {
 		MatrixHelper mh(domain);
 		op.reset(new PetscMatOp<3>(mh.formCRSMatrix()));
 	} else if (op_type == "matrix_free") {
-		op.reset(new SchurDomainOp<3>(sh));
+		op.reset(new SchurDomainOp<3>(sh, interp, pop));
 	}
 	return op;
 }
 static std::shared_ptr<Smoother<3>> getNewSmoother(std::string                     smoother_type,
                                                    std::shared_ptr<Domain<3>>      domain,
-                                                   std::shared_ptr<SchurHelper<3>> sh)
+                                                   std::shared_ptr<SchurHelper<3>> sh,
+                                                   std::shared_ptr<IfaceInterp<3>> interp,
+                                                   std::shared_ptr<PatchSolver<3>> solver)
 {
-	return std::shared_ptr<Smoother<3>>(new FFTBlockJacobiSmoother<3>(sh));
+	return std::shared_ptr<Smoother<3>>(new FFTBlockJacobiSmoother<3>(sh, solver, interp));
 }
 static std::shared_ptr<Interpolator<3>> getNewInterpolator(std::string interpolator_type,
                                                            std::shared_ptr<Domain<3>> domain,
@@ -89,11 +94,11 @@ std::shared_ptr<Cycle<3>> CycleFactory3d::getCycle(const CycleOpts &            
 	shared_ptr<Domain<3>> finer_domain;
 	{
 		shared_ptr<Domain<3>>          domain = dcg->getFinestDomain();
-		shared_ptr<SchurHelper<3>>     sh(new SchurHelper<3>(domain, solver, op, interp));
+		shared_ptr<SchurHelper<3>>     sh(new SchurHelper<3>(domain));
 		shared_ptr<VectorGenerator<3>> vg(new DomainVG<3>(domain));
 		finest_level.reset(new Level<3>(vg));
-		finest_level->setOperator(getNewOperator(op_type, domain, sh));
-		finest_level->setSmoother(getNewSmoother(smoother_type, domain, sh));
+		finest_level->setOperator(getNewOperator(op_type, domain, sh, interp, op));
+		finest_level->setSmoother(getNewSmoother(smoother_type, domain, sh, interp, solver));
 
 		finer_domain = domain;
 	}
@@ -104,11 +109,9 @@ std::shared_ptr<Cycle<3>> CycleFactory3d::getCycle(const CycleOpts &            
 		// create new level
 		shared_ptr<Domain<3>> domain = dcg->getCoarserDomain();
 		if ((domain->getNumGlobalPatches() + 0.0) / size < opts.patches_per_proc) { break; }
-		shared_ptr<SchurHelper<3>>     sh(new SchurHelper<3>(domain, solver, op, interp));
+		shared_ptr<SchurHelper<3>>     sh(new SchurHelper<3>(domain));
 		shared_ptr<VectorGenerator<3>> vg(new DomainVG<3>(domain));
 		shared_ptr<Level<3>>           coarser_level(new Level<3>(vg));
-		coarser_level->setOperator(getNewOperator(op_type, domain, sh));
-		coarser_level->setSmoother(getNewSmoother(smoother_type, domain, sh));
 
 		// link levels
 		coarser_level->setFiner(finer_level);
@@ -119,6 +122,11 @@ std::shared_ptr<Cycle<3>> CycleFactory3d::getCycle(const CycleOpts &            
 		finer_level->setRestrictor(getNewRestrictor(restrictor_type, domain, finer_domain, ilc));
 		coarser_level->setInterpolator(
 		getNewInterpolator(interpolator_type, domain, finer_domain, ilc));
+
+		CycleFactoryCtx<3> ctx = {domain, sh, coarser_level};
+		op                     = op->getNewPatchOperator(ctx);
+		coarser_level->setOperator(getNewOperator(op_type, domain, sh, interp, op));
+		coarser_level->setSmoother(getNewSmoother(smoother_type, domain, sh, interp, solver));
 
 		curr_level++;
 		finer_level  = coarser_level;

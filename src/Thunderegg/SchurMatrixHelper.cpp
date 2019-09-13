@@ -257,8 +257,6 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 			blocks.erase(i);
 		}
 
-		auto solver       = sh->getSolver();
-		auto interpolator = sh->getIfaceInterp();
 		// create domain representing curr_type
 		std::shared_ptr<PatchInfo<3>> pinfo(new PatchInfo<3>());
 		std::shared_ptr<SchurInfo<3>> sd(new SchurInfo<3>);
@@ -282,7 +280,7 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 
 		for (int j = 0; j < n * n; j++) {
 			gamma_view[j] = 1;
-			solver->domainSolve(single_domain, f_vec, u_vec, gamma_vec);
+			// solver->domainSolve(single_domain, f_vec, u_vec, gamma_vec);
 			gamma_view[j] = 0;
 
 			// fill the blocks
@@ -291,7 +289,7 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 				Side<3>      s    = bk.s;
 				IfaceType<3> type = bk.type;
 				VecScale(interp, 0);
-				interpolator->interpolate(*sd, s, 0, type, u_vec, interp_vec);
+				// interpolator->interpolate(*sd, s, 0, type, u_vec, interp_vec);
 				valarray<double> &block = *p.second;
 				for (int i = 0; i < n * n; i++) {
 					block[i * n * n + j] = -interp_view[i];

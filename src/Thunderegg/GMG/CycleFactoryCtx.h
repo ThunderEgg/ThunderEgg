@@ -19,50 +19,23 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHURDOMAINOP_H
-#define THUNDEREGG_SCHURDOMAINOP_H
-
-#include <Thunderegg/Operator.h>
-#include <Thunderegg/PatchOperator.h>
+#ifndef THUNDEREGG_GMG_CYCLEFACTORYCTX_H
+#define THUNDEREGG_GMG_CYCLEFACTORYCTX_H
+#include <Thunderegg/Domain.h>
+#include <Thunderegg/GMG/Level.h>
 #include <Thunderegg/SchurHelper.h>
-
 namespace Thunderegg
 {
-template <size_t D> class SchurDomainOp : public Operator<D>
+template<size_t D>
+class PatchOperator;
+namespace GMG
 {
-	private:
-	/**
-	 * @brief PETSc Matrix object
-	 */
-	std::shared_ptr<SchurHelper<D>>   helper;
-	std::shared_ptr<IfaceInterp<D>>   interp;
-	std::shared_ptr<PatchOperator<D>> op;
-
-	public:
-	/**
-	 * @brief Crate new WrapOp
-	 *
-	 * @param matrix the PETSc matrix
-	 */
-	SchurDomainOp(std::shared_ptr<SchurHelper<D>> helper, std::shared_ptr<IfaceInterp<D>> interp,
-	              std::shared_ptr<PatchOperator<D>> op)
-	{
-		this->helper = helper;
-		this->interp = interp;
-		this->op     = op;
-	}
-	/**
-	 * @brief Perform matrix/vector multiply.
-	 *
-	 * @param x the input vector.
-	 * @param b the output vector.
-	 */
-	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
-	{
-		auto gamma = helper->getNewSchurDistVec();
-		interp->interpolateToInterface(x, gamma);
-		op->apply(x, gamma, b);
-	}
+template <size_t D> struct CycleFactoryCtx {
+	std::shared_ptr<Domain<D>>      domain;
+	std::shared_ptr<SchurHelper<D>> sh;
+	std::shared_ptr<Level<D>>       level;
+	std::shared_ptr<PatchOperator<D>>       op;
 };
+} // namespace GMG
 } // namespace Thunderegg
 #endif

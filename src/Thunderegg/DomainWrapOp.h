@@ -33,12 +33,17 @@ namespace Thunderegg
 template <size_t D> class DomainWrapOp : public Operator<D>
 {
 	private:
-	std::shared_ptr<SchurHelper<D>> sh;
+	std::shared_ptr<SchurHelper<D>>   sh;
+	std::shared_ptr<PatchOperator<D>> op;
+	std::shared_ptr<IfaceInterp<D>>   interp;
 
 	public:
-	DomainWrapOp(std::shared_ptr<SchurHelper<D>> sh)
+	DomainWrapOp(std::shared_ptr<SchurHelper<D>> sh, std::shared_ptr<IfaceInterp<D>> interp,
+	             std::shared_ptr<PatchOperator<D>> op)
 	{
-		this->sh = sh;
+		this->sh     = sh;
+		this->interp = interp;
+		this->op     = op;
 	}
 	/**
 	 * @brief Apply Schur matrix
@@ -48,7 +53,9 @@ template <size_t D> class DomainWrapOp : public Operator<D>
 	 */
 	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 	{
-		sh->apply(x, b);
+		auto gamma = sh->getNewSchurDistVec();
+		interp->interpolateToInterface(x, gamma);
+		op->apply(x, gamma, b);
 	}
 };
 } // namespace Thunderegg

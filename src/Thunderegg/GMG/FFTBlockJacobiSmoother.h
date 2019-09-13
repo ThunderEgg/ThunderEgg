@@ -39,6 +39,8 @@ template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
 	 * @brief point to the SchurHelper object.
 	 */
 	std::shared_ptr<SchurHelper<D>> sh;
+	std::shared_ptr<PatchSolver<D>> solver;
+	std::shared_ptr<IfaceInterp<D>> interp;
 
 	public:
 	/**
@@ -46,9 +48,13 @@ template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
 	 *
 	 * @param sh pointer to the SchurHelper object
 	 */
-	FFTBlockJacobiSmoother(std::shared_ptr<SchurHelper<D>> sh)
+	FFTBlockJacobiSmoother(std::shared_ptr<SchurHelper<D>> sh,
+	                       std::shared_ptr<PatchSolver<D>> solver,
+	                       std::shared_ptr<IfaceInterp<D>> interp)
 	{
-		this->sh = sh;
+		this->sh     = sh;
+		this->solver = solver;
+		this->interp = interp;
 	}
 	/**
 	 * @brief Run an iteration of smoothing.
@@ -58,7 +64,9 @@ template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
 	 */
 	void smooth(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const
 	{
-		sh->solveWithSolution(f, u);
+		auto gamma = sh->getNewSchurDistVec();
+		interp->interpolateToInterface(u, gamma);
+		solver->solve(f, u, gamma);
 	}
 };
 } // namespace GMG

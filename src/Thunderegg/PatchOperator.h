@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_PATCHOPERATOR_H
 #define THUNDEREGG_PATCHOPERATOR_H
-#include <Thunderegg/SchurInfo.h>
+#include <Thunderegg/GMG/CycleFactoryCtx.h>
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
 {
@@ -29,6 +29,11 @@ template <size_t D> class PatchOperator
 {
 	public:
 	virtual ~PatchOperator() {}
+
+	virtual void apply(std::shared_ptr<const Vector<D>>     u,
+	                   std::shared_ptr<const Vector<D - 1>> gamma, std::shared_ptr<Vector<D>> f)
+	= 0;
+	virtual std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) = 0;
 	virtual void applyWithInterface(SchurInfo<D> &d, const LocalData<D> u,
 	                                std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f)
 	= 0;

@@ -22,10 +22,7 @@
 #ifndef THUNDEREGG_SCHURHELPER_H
 #define THUNDEREGG_SCHURHELPER_H
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/IfaceSet.h>
-#include <Thunderegg/PatchOperator.h>
-#include <Thunderegg/PatchSolver.h>
 #include <Thunderegg/PetscVector.h>
 #include <Thunderegg/SchurInfo.h>
 #include <deque>
@@ -51,18 +48,6 @@ template <size_t D> class SchurHelper
 	private:
 	std::shared_ptr<Domain<D>> domain;
 
-	/**
-	 * @brief Interpolates to interface values
-	 */
-	std::shared_ptr<IfaceInterp<D>> interpolator;
-	/**
-	 * @brief The patch operator
-	 */
-	std::shared_ptr<PatchOperator<D>> op;
-	/**
-	 * @brief The patch solver
-	 */
-	std::shared_ptr<PatchSolver<D>> solver;
 	/**
 	 * @brief Vector of SchurInfo pointers where index in the vector corresponds to the patch's
 	 * local index
@@ -96,39 +81,7 @@ template <size_t D> class SchurHelper
 	 * @param domain the DomainCollection
 	 * @param comm the teuchos communicator
 	 */
-	SchurHelper(std::shared_ptr<Domain<D>> domain, std::shared_ptr<PatchSolver<D>> solver,
-	            std::shared_ptr<PatchOperator<D>> op, std::shared_ptr<IfaceInterp<D>> interpolator);
-
-	/**
-	 * @brief Solve with a given set of interface values
-	 *
-	 * @param f the rhs vector
-	 * @param u the vector to put solution in
-	 * @param gamma the interface values to use
-	 * @param diff the resulting difference
-	 */
-	void solveWithInterface(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
-	                        std::shared_ptr<const Vector<D - 1>> gamma,
-	                        std::shared_ptr<Vector<D - 1>>       diff);
-	void solveAndInterpolateWithInterface(std::shared_ptr<const Vector<D>>     f,
-	                                      std::shared_ptr<Vector<D>>           u,
-	                                      std::shared_ptr<const Vector<D - 1>> gamma,
-	                                      std::shared_ptr<Vector<D - 1>>       interp);
-	void solveWithSolution(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u);
-	void interpolateToInterface(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
-	                            std::shared_ptr<Vector<D - 1>> gamma);
-
-	/**
-	 * @brief Apply patch operator with a given set of interface values
-	 *
-	 * @param u the solution vector to use
-	 * @param gamma the interface values to use
-	 * @param f the resulting rhs vector
-	 */
-	void applyWithInterface(std::shared_ptr<const Vector<D>>     u,
-	                        std::shared_ptr<const Vector<D - 1>> gamma,
-	                        std::shared_ptr<Vector<D>>           f);
-	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f);
+	SchurHelper(std::shared_ptr<Domain<D>> domain);
 
 	void updateInterfaceDist(std::shared_ptr<Vector<D - 1>> gamma)
 	{
@@ -219,18 +172,6 @@ template <size_t D> class SchurHelper
 		return num_global_ifaces * iface_stride;
 	}
 	// getters
-	std::shared_ptr<IfaceInterp<D>> getIfaceInterp()
-	{
-		return interpolator;
-	}
-	std::shared_ptr<PatchOperator<D>> getOp()
-	{
-		return op;
-	}
-	std::shared_ptr<PatchSolver<D>> getSolver()
-	{
-		return solver;
-	}
 	const std::map<int, IfaceSet<D>> getIfaces() const
 	{
 		return ifaces;
@@ -243,12 +184,12 @@ template <size_t D> class SchurHelper
 	{
 		return sinfo_vector;
 	}
+	std::shared_ptr<Domain<D>> getDomain()
+	{
+		return domain;
+	}
 };
-template <size_t D>
-inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>>        domain,
-                                   std::shared_ptr<PatchSolver<D>>   solver,
-                                   std::shared_ptr<PatchOperator<D>> op,
-                                   std::shared_ptr<IfaceInterp<D>>   interpolator)
+template <size_t D> inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>> domain)
 {
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	iface_stride = 1;
@@ -260,107 +201,12 @@ inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>>        domain,
 	for (auto &pinfo : domain->getPatchInfoVector()) {
 		sinfo_vector.emplace_back(new SchurInfo<D>(pinfo));
 		id_sinfo_map[pinfo->id] = sinfo_vector.back();
-		solver->addPatch(*sinfo_vector.back());
 	}
 	ifaces = IfaceSet<D>::EnumerateIfaces(sinfo_vector.begin(), sinfo_vector.end());
 	indexDomainIfacesLocal();
 	indexIfacesLocal();
-	this->solver       = solver;
-	this->op           = op;
-	this->interpolator = interpolator;
-	int num_ifaces     = ifaces.size();
+	int num_ifaces = ifaces.size();
 	MPI_Allreduce(&num_ifaces, &num_global_ifaces, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-}
-template <size_t D>
-inline void SchurHelper<D>::solveWithInterface(std::shared_ptr<const Vector<D>>     f,
-                                               std::shared_ptr<Vector<D>>           u,
-                                               std::shared_ptr<const Vector<D - 1>> gamma,
-                                               std::shared_ptr<Vector<D - 1>>       diff)
-{
-	scatterInterfaceDist(gamma);
-
-	solver->domainSolve(sinfo_vector, f, u, gamma);
-
-	diff->set(0);
-	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, diff);
-	}
-	updateInterfaceDist(diff);
-	diff->addScaled(-1, gamma);
-}
-template <size_t D>
-inline void SchurHelper<D>::solveAndInterpolateWithInterface(
-std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
-std::shared_ptr<const Vector<D - 1>> gamma, std::shared_ptr<Vector<D - 1>> interp)
-{
-	scatterInterfaceDist(gamma);
-
-	// solve over sinfo_vector on this proc
-	solver->domainSolve(sinfo_vector, f, u, gamma);
-
-	interp->set(0);
-	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, interp);
-	}
-
-	updateInterfaceDist(interp);
-}
-template <size_t D>
-inline void SchurHelper<D>::solveWithSolution(std::shared_ptr<const Vector<D>> f,
-                                              std::shared_ptr<Vector<D>>       u)
-{
-	auto gamma = getNewSchurVec();
-	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, gamma);
-	}
-
-	updateInterfaceDist(gamma);
-
-	// solve over sinfo_vector on this proc
-	solver->domainSolve(sinfo_vector, f, u, gamma);
-}
-template <size_t D>
-inline void SchurHelper<D>::interpolateToInterface(std::shared_ptr<const Vector<D>> f,
-                                                   std::shared_ptr<Vector<D>>       u,
-                                                   std::shared_ptr<Vector<D - 1>>   gamma)
-{
-	gamma->set(0);
-	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, gamma);
-	}
-	updateInterfaceDist(gamma);
-}
-template <size_t D>
-inline void SchurHelper<D>::applyWithInterface(std::shared_ptr<const Vector<D>>     u,
-                                               std::shared_ptr<const Vector<D - 1>> gamma,
-                                               std::shared_ptr<Vector<D>>           f)
-{
-	scatterInterfaceDist(gamma);
-
-	f->set(0);
-
-	for (auto &sinfo : sinfo_vector) {
-		int local_index = sinfo->pinfo->local_index;
-		op->applyWithInterface(*sinfo, u->getLocalData(local_index), gamma,
-		                       f->getLocalData(local_index));
-	}
-}
-template <size_t D>
-inline void SchurHelper<D>::apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f)
-{
-	auto gamma = getNewSchurVec();
-	for (auto &sinfo : sinfo_vector) {
-		interpolator->interpolate(*sinfo, u, gamma);
-	}
-
-	updateInterfaceDist(gamma);
-
-	f->set(0);
-	for (auto &sinfo : sinfo_vector) {
-		int local_index = sinfo->pinfo->local_index;
-		op->applyWithInterface(*sinfo, u->getLocalData(local_index), gamma,
-		                       f->getLocalData(local_index));
-	}
 }
 template <size_t D> inline void SchurHelper<D>::indexDomainIfacesLocal() {}
 template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()

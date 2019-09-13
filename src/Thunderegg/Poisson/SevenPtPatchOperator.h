@@ -31,11 +31,16 @@ namespace Poisson
 class SevenPtPatchOperator : public PatchOperator<3>
 {
 	public:
+	void apply(std::shared_ptr<const Vector<3>> u, std::shared_ptr<const Vector<2>> gamma,
+	           std::shared_ptr<Vector<3>> f) override;
 	void applyWithInterface(SchurInfo<3> &d, const LocalData<3> u,
-	                        std::shared_ptr<const Vector<2>> gamma, LocalData<3> f) override;
+	                        std::shared_ptr<const Vector<2>> gamma, LocalData<3> f);
 	void addInterfaceToRHS(SchurInfo<3> &sinfo, std::shared_ptr<const Vector<2>> gamma,
-	                       LocalData<3> f) override;
-	void apply(const SchurInfo<3> &sinfo, const LocalData<3> u, LocalData<3> f) override;
+	                       LocalData<3> f);
+	void apply(const SchurInfo<3> &sinfo, const LocalData<3> u, LocalData<3> f);
+	std::shared_ptr<PatchOperator<3>> getNewPatchOperator(GMG::CycleFactoryCtx<3> ctx){
+		return std::shared_ptr<PatchOperator<3>>(new SevenPtPatchOperator());
+	}
 };
 } // namespace Poisson
 } // namespace Thunderegg

@@ -21,8 +21,8 @@
 
 #ifndef THUNDEREGG_POISSON_DFTPATCHSOLVER_H
 #define THUNDEREGG_POISSON_DFTPATCHSOLVER_H
-#include <Thunderegg/Domain.h>
 #include <Thunderegg/PatchSolver.h>
+#include <Thunderegg/SchurHelper.h>
 #include <Thunderegg/ValVector.h>
 #include <bitset>
 #include <map>
@@ -58,6 +58,7 @@ template <size_t D> struct DomainK {
 template <size_t D> class DftPatchSolver : public PatchSolver<D>
 {
 	private:
+	std::shared_ptr<SchurHelper<D>>                                             sh;
 	std::array<int, D>                                                          ns;
 	int                                                                         n;
 	int                                                                         patch_stride;
@@ -80,25 +81,29 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 	                  LocalData<D> out, const bool inverse);
 
 	public:
-	DftPatchSolver(Domain<D> &domain, double lambda = 0);
+	DftPatchSolver(std::shared_ptr<SchurHelper<D>> sh, double lambda = 0);
 	void solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
 	           std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma);
-	void domainSolve(std::vector<std::shared_ptr<SchurInfo<D>>> &domains,
-	                 std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
-	                 std::shared_ptr<const Vector<D - 1>> gamma) override
+	void solve(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
+	           std::shared_ptr<const Vector<D - 1>> gamma) override
 	{
-		for (auto &sinfo : domains) {
+		for (auto &sinfo : sh->getSchurInfoVector()) {
 			solve(*sinfo, f, u, gamma);
 		}
 	}
 	void addPatch(SchurInfo<D> &sinfo);
+	std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx){
+		return std::shared_ptr<PatchSolver<D>>(new DftPatchSolver(ctx.sh));
+	}
 };
 
-template <size_t D> inline DftPatchSolver<D>::DftPatchSolver(Domain<D> &domain, double lambda)
+template <size_t D>
+inline DftPatchSolver<D>::DftPatchSolver(std::shared_ptr<SchurHelper<D>> sh, double lambda)
 {
-	ns           = domain.getNs();
+	this->sh     = sh;
+	ns           = sh->getDomain()->getNs();
 	n            = ns[0];
-	patch_stride = domain.getNumCellsInPatch();
+	patch_stride = sh->getDomain()->getNumCellsInPatch();
 	this->lambda = lambda;
 }
 template <size_t D> inline void DftPatchSolver<D>::addPatch(SchurInfo<D> &sinfo)

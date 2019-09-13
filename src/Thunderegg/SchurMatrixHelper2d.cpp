@@ -134,8 +134,6 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 			blocks.erase(i);
 		}
 
-		auto solver       = sh->getSolver();
-		auto interpolator = sh->getIfaceInterp();
 		// create domain representing curr_type
 		std::shared_ptr<PatchInfo<2>> pinfo(new PatchInfo<2>());
 		pinfo->nbr_info[0].reset(new NormalNbrInfo<2>());
@@ -145,7 +143,7 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 		pinfo->spacings.fill(1.0 / n);
 		pinfo->neumann = curr_type.neumann;
 		sd->getIfaceInfoPtr(Side<2>::west).reset(new NormalIfaceInfo<2>());
-		solver->addPatch(*sd);
+		// solver->addPatch(*sd);
 		std::vector<std::shared_ptr<SchurInfo<2>>> single_domain;
 		single_domain.push_back(sd);
 
@@ -160,7 +158,7 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 
 		for (int j = 0; j < n; j++) {
 			gamma_view[j] = 1;
-			solver->domainSolve(single_domain, f_vec, u_vec, gamma_vec);
+			// solver->domainSolve(single_domain, f_vec, u_vec, gamma_vec);
 			gamma_view[j] = 0;
 
 			// fill the blocks
@@ -168,7 +166,7 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 				Side<2>      s    = p.first.s;
 				IfaceType<2> type = p.first.type;
 				VecScale(interp, 0);
-				interpolator->interpolate(*sd, s, 0, type, u_vec, interp_vec);
+				// interpolator->interpolate(*sd, s, 0, type, u_vec, interp_vec);
 				valarray<double> &block = *p.second;
 				for (int i = 0; i < n; i++) {
 					block[i * n + j] = -interp_view[i];

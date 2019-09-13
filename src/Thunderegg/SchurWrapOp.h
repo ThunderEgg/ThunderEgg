@@ -22,7 +22,9 @@
 #ifndef THUNDEREGG_SCHURWRAPOP_H
 #define THUNDEREGG_SCHURWRAPOP_H
 
+#include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/Operator.h>
+#include <Thunderegg/PatchSolver.h>
 #include <Thunderegg/SchurHelper.h>
 
 namespace Thunderegg
@@ -35,12 +37,17 @@ template <size_t D> class SchurWrapOp : public Operator<D - 1>
 	private:
 	std::shared_ptr<Domain<D>>      domain;
 	std::shared_ptr<SchurHelper<D>> sh;
+	std::shared_ptr<PatchSolver<D>> solver;
+	std::shared_ptr<IfaceInterp<D>> interp;
 
 	public:
-	SchurWrapOp(std::shared_ptr<Domain<D>> domain, std::shared_ptr<SchurHelper<D>> sh)
+	SchurWrapOp(std::shared_ptr<Domain<D>> domain, std::shared_ptr<SchurHelper<D>> sh,
+	            std::shared_ptr<PatchSolver<D>> solver, std::shared_ptr<IfaceInterp<D>> interp)
 	{
 		this->domain = domain;
 		this->sh     = sh;
+		this->solver = solver;
+		this->interp = interp;
 	}
 	/**
 	 * @brief Apply Schur matrix
@@ -52,7 +59,9 @@ template <size_t D> class SchurWrapOp : public Operator<D - 1>
 	{
 		auto f = PetscVector<D>::GetNewVector(domain);
 		auto u = PetscVector<D>::GetNewVector(domain);
-		sh->solveWithInterface(f, u, x, b);
+		solver->solve(f, u, x);
+		interp->interpolateToInterface(u, b);
+		b->addScaled(-1, x);
 	}
 };
 } // namespace Thunderegg

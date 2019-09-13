@@ -22,7 +22,7 @@
 #ifndef THUNDEREGG_IFACEINTERP_H
 #define THUNDEREGG_IFACEINTERP_H
 #include <Thunderegg/IfaceType.h>
-#include <Thunderegg/SchurInfo.h>
+#include <Thunderegg/GMG/CycleFactoryCtx.h>
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
 {
@@ -42,45 +42,10 @@ template <size_t D> class IfaceInterp
 	 * @param u the input vector
 	 * @param interp the interface vector to be interpolated to
 	 */
-	virtual void interpolate(std::shared_ptr<const Vector<D>> u,
-	                         std::shared_ptr<Vector<D - 1>>   interp)
+	virtual void interpolateToInterface(std::shared_ptr<const Vector<D>> u,
+	                                    std::shared_ptr<Vector<D - 1>>   interp)
 	= 0;
-	/**
-	 * @brief Given a set of patches, interpolate to their interfaces.
-	 *
-	 * @param patches the set of SchurInfo objects
-	 * @param u the domain vector
-	 * @param interp the interface vector
-	 */
-	virtual void interpolate(const std::vector<SchurInfo<D>> &patches,
-	                         std::shared_ptr<const Vector<D>> u,
-	                         std::shared_ptr<Vector<D - 1>>   interp)
-	= 0;
-	/**
-	 * \deprecated
-	 * @brief Given a domain vector, interpolate to the interface vector.
-	 *
-	 * @param d the domain
-	 * @param u the domain vector
-	 * @param interp the interface vector
-	 */
-	virtual void interpolate(SchurInfo<D> &d, std::shared_ptr<const Vector<D>> u,
-	                         std::shared_ptr<Vector<D - 1>> interp)
-	= 0;
-	/**
-	 * \deprecated
-	 * @brief Given a domain vector, interpolate to the interface vector.
-	 * @param d
-	 * @param s
-	 * @param local_index
-	 * @param itype
-	 * @param u
-	 * @param interp
-	 */
-	virtual void interpolate(SchurInfo<D> &d, Side<D> s, int local_index, IfaceType<D> itype,
-	                         std::shared_ptr<const Vector<D>> u,
-	                         std::shared_ptr<Vector<D - 1>>   interp)
-	= 0;
+	virtual std::shared_ptr<IfaceInterp<D>> getNewIfaceInterp(GMG::CycleFactoryCtx<D> ctx) = 0;
 };
 } // namespace Thunderegg
 #endif

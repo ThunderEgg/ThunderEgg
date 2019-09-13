@@ -22,26 +22,27 @@
 #include "BilinearInterpolator.h"
 using namespace std;
 using namespace Thunderegg;
-void BilinearInterpolator::interpolate(std::shared_ptr<const Vector<2>> u,
-                                       std::shared_ptr<Vector<1>>       interp)
+void BilinearInterpolator::interpolateToInterface(std::shared_ptr<const Vector<2>> u,
+                                                  std::shared_ptr<Vector<1>>       interp)
 {
-	// interpolate(sh->getSchurInfoVector(), u, interp);
+	interpolate(sh->getSchurInfoVector(), u, interp);
+	sh->updateInterfaceDist(interp);
 }
-void BilinearInterpolator::interpolate(const std::vector<SchurInfo<2>> &patches,
-                                       std::shared_ptr<const Vector<2>> u,
-                                       std::shared_ptr<Vector<1>>       interp)
+void BilinearInterpolator::interpolate(const std::vector<std::shared_ptr<SchurInfo<2>>> &patches,
+                                       std::shared_ptr<const Vector<2>>                  u,
+                                       std::shared_ptr<Vector<1>>                        interp)
 {
-	for (SchurInfo<2> p : patches) {
+	for (auto p : patches) {
 		for (Side<2> s : Side<2>::getValues()) {
-			if (p.pinfo->hasNbr(s)) {
+			if (p->pinfo->hasNbr(s)) {
 				std::deque<int>          idx;
 				std::deque<IfaceType<2>> types;
 
-				p.getIfaceInfoPtr(s)->getLocalIndexes(idx);
-				p.getIfaceInfoPtr(s)->getIfaceTypes(types);
+				p->getIfaceInfoPtr(s)->getLocalIndexes(idx);
+				p->getIfaceInfoPtr(s)->getIfaceTypes(types);
 
 				for (size_t i = 0; i < idx.size(); i++) {
-					interpolate(p, s, idx[i], types[i], u, interp);
+					interpolate(*p, s, idx[i], types[i], u, interp);
 				}
 			}
 		}

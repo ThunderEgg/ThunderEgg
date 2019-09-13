@@ -23,6 +23,7 @@
 #define PATCHSOLVER_H
 
 #include <Thunderegg/SchurInfo.h>
+#include <Thunderegg/GMG/CycleFactoryCtx.h>
 #include <Thunderegg/Vector.h>
 
 namespace Thunderegg
@@ -55,10 +56,10 @@ template <size_t D> class PatchSolver
 	 * @param u the lhs vector
 	 * @param gamma the interface values to use
 	 */
-	virtual void domainSolve(std::vector<std::shared_ptr<SchurInfo<D>>> &patches, std::shared_ptr<const Vector<D>> f,
-	                         std::shared_ptr<Vector<D>>           u,
-	                         std::shared_ptr<const Vector<D - 1>> gamma)
+	virtual void solve(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
+	                   std::shared_ptr<const Vector<D - 1>> gamma)
 	= 0;
+	virtual std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)=0;
 };
 } // namespace Thunderegg
 #endif

@@ -73,14 +73,13 @@ int main(int argc, char *argv[])
 {
 	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
-
 	int my_global_rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &my_global_rank);
 	/*
 	if(my_global_rank==0){
-		std::cout<<"Continue?"<<std::endl;
-		string blah;
-		std::cin>>blah;
+	    std::cout<<"Continue?"<<std::endl;
+	    string blah;
+	    std::cin>>blah;
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
 	*/
@@ -218,7 +217,6 @@ int main(int argc, char *argv[])
 	int num_procs;
 	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
 
-
 	// Set the number of discretization points in the x and y direction.
 	std::array<int, 2> ns;
 	ns.fill(n);
@@ -330,27 +328,27 @@ int main(int argc, char *argv[])
 		nfuny = [](double x, double y) { return M_PI * cosl(M_PI * y) * cosl(2 * M_PI * x); };
 	}
 
+	shared_ptr<SchurHelper<2>> sch(new SchurHelper<2>(domain));
 	// patch operator
-	shared_ptr<PatchOperator<2>> p_operator(new StarPatchOperator<2>());
+	shared_ptr<PatchOperator<2>> p_operator(new StarPatchOperator<2>(sch));
 
 	// set the patch solver
 	shared_ptr<PatchSolver<2>> p_solver;
 	if (patch_solver == "bcgs") {
-		p_solver.reset(new BiCGStabSolver<2>(p_operator, ps_tol, ps_max_it));
+		p_solver.reset(new BiCGStabSolver<2>(sch, p_operator, ps_tol, ps_max_it));
 	} else if (patch_solver == "dft") {
-		p_solver.reset(new DftPatchSolver<2>(*domain));
+		p_solver.reset(new DftPatchSolver<2>(sch));
 	} else {
-		p_solver.reset(new FftwPatchSolver<2>(*domain));
+		p_solver.reset(new FftwPatchSolver<2>(sch));
 	}
 
 	// interface interpolator
-	shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator(nullptr));
+	shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator(sch));
 
 	Timer timer;
 	for (int loop = 0; loop < loop_count; loop++) {
 		timer.start("Domain Initialization");
 
-		shared_ptr<SchurHelper<2>> sch(new SchurHelper<2>(domain, p_solver, p_operator, p_interp));
 		/*
 		if (f_outim) {
 		    IfaceMatrixHelper imh(dc);
@@ -397,7 +395,9 @@ int main(int argc, char *argv[])
 
 			// Get the b vector
 			gamma->set(0);
-			sch->solveWithInterface(f, u, gamma, b);
+			p_solver->solve(f, u, gamma);
+			p_interp->interpolateToInterface(u, b);
+			b->addScaled(-1, gamma);
 			b->scale(-1);
 
 			if (rhs_filename != "") {
@@ -419,7 +419,7 @@ int main(int argc, char *argv[])
 
 			timer.start("Matrix Formation");
 			if (matrix_type == "wrap") {
-				A.reset(new SchurWrapOp<2>(domain, sch));
+				A.reset(new SchurWrapOp<2>(domain, sch, p_solver, p_interp));
 			} else if (matrix_type == "crs") {
 				SchurMatrixHelper2d smh(sch);
 				A_petsc = smh.formCRSMatrix();
@@ -487,11 +487,11 @@ int main(int argc, char *argv[])
 			// Do one last solve
 			timer.start("Patch Solve");
 
-			sch->solveWithInterface(f, u, gamma, diff);
+			p_solver->solve(f, u, gamma);
 
 			timer.stop("Patch Solve");
 
-			sch->applyWithInterface(u, gamma, au);
+			p_operator->apply(u, gamma, au);
 		} else {
 			std::shared_ptr<Operator<2>> A;
 			PW<Mat>                      A_petsc;
@@ -503,7 +503,7 @@ int main(int argc, char *argv[])
 
 			timer.start("Matrix Formation");
 			if (matrix_type == "wrap") {
-				A.reset(new DomainWrapOp<2>(sch));
+				A.reset(new DomainWrapOp<2>(sch, p_interp, p_operator));
 				A_petsc = PetscShellCreator::getMatShell(A, domain);
 			} else if (matrix_type == "crs") {
 				MatrixHelper2d mh(domain);
@@ -528,7 +528,7 @@ int main(int argc, char *argv[])
 			// preconditoners
 			timer.start("Preconditioner Setup");
 			if (preconditioner == "Scwharz") {
-				M.reset(new SchwarzPrec<2>(sch));
+				M.reset(new SchwarzPrec<2>(sch, p_solver, p_interp));
 			} else if (preconditioner == "GMG") {
 				timer.start("GMG Setup");
 

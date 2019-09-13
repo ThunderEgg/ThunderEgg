@@ -26,6 +26,7 @@
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/PatchOperator.h>
 #include <Thunderegg/PatchSolver.h>
+#include <Thunderegg/SchurHelper.h>
 #include <Thunderegg/ValVector.h>
 #include <bitset>
 #include <fftw3.h>
@@ -100,6 +101,7 @@ template <size_t D> class BiCGStabSolver : public PatchSolver<D>
 	double                            lambda;
 	std::array<int, D + 1>            npow;
 	std::shared_ptr<PatchOperator<D>> op;
+	std::shared_ptr<SchurHelper<D>>   sh;
 	int                               max_it;
 	double                            tol;
 
@@ -111,23 +113,27 @@ template <size_t D> class BiCGStabSolver : public PatchSolver<D>
 	 * @param tol the tolerance
 	 * @param max_it the maximum iterations
 	 */
-	BiCGStabSolver(std::shared_ptr<PatchOperator<D>> op, double tol = 1e-12, int max_it = 1000)
+	BiCGStabSolver(std::shared_ptr<SchurHelper<D>> sh, std::shared_ptr<PatchOperator<D>> op,
+	               double tol = 1e-12, int max_it = 1000)
 	{
+		this->sh     = sh;
 		this->op     = op;
 		this->tol    = tol;
 		this->max_it = max_it;
 	}
 	void solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
 	           std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma);
-	void domainSolve(std::vector<std::shared_ptr<SchurInfo<D>>> &patches,
-	                 std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
-	                 std::shared_ptr<const Vector<D - 1>> gamma) override
+	void solve(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
+	           std::shared_ptr<const Vector<D - 1>> gamma) override
 	{
-		for (auto &sinfo : patches) {
+		for (auto &sinfo : sh->getSchurInfoVector()) {
 			solve(*sinfo, f, u, gamma);
 		}
 	}
 	void addPatch(SchurInfo<D> &sinfo) {}
+	std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)override{
+		return std::shared_ptr<PatchSolver<D>>(new BiCGStabSolver(ctx.sh,ctx.op,tol,max_it));
+	}
 };
 template <size_t D>
 void BiCGStabSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,

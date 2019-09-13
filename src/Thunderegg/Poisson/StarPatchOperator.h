@@ -23,6 +23,7 @@
 #define THUNDEREGG_POISSON_STARPATCHOPERATOR_H
 
 #include <Thunderegg/PatchOperator.h>
+#include <Thunderegg/SchurHelper.h>
 
 namespace Thunderegg
 {
@@ -30,7 +31,27 @@ namespace Poisson
 {
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
+	private:
+	std::shared_ptr<SchurHelper<D>> sh;
+
 	public:
+	StarPatchOperator(std::shared_ptr<SchurHelper<D>> sh)
+	{
+		this->sh = sh;
+	}
+	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma,
+	           std::shared_ptr<Vector<D>> f) override
+	{
+		for (auto sinfo : sh->getSchurInfoVector()) {
+			applyWithInterface(*sinfo, u->getLocalData(sinfo->pinfo->local_index), gamma,
+			                   f->getLocalData(sinfo->pinfo->local_index));
+		}
+	}
+	std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
+	{
+		return std::shared_ptr<StarPatchOperator<D>>(new StarPatchOperator<D>(ctx.sh));
+	}
+
 	void applyWithInterface(SchurInfo<D> &sinfo, const LocalData<D> u,
 	                        std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f) override
 	{

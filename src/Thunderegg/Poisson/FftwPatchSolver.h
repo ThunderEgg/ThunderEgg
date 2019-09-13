@@ -21,9 +21,9 @@
 
 #ifndef FFTWPATCHSOLVER_H
 #define FFTWPATCHSOLVER_H
-#include <Thunderegg/Domain.h>
 #include <Thunderegg/PatchSolver.h>
 #include <Thunderegg/Poisson/StarPatchOperator.h>
+#include <Thunderegg/SchurHelper.h>
 #include <Thunderegg/ValVector.h>
 #include <bitset>
 #include <fftw3.h>
@@ -65,26 +65,34 @@ template <size_t D> class FftwPatchSolver : public PatchSolver<D>
 	ValVector<D>                                sol;
 	std::array<int, D + 1>                      npow;
 	std::map<DomainK<D>, std::valarray<double>> denoms;
+	std::shared_ptr<SchurHelper<D>>             sh;
 
 	public:
-	FftwPatchSolver(Domain<D> &domain, double lambda = 0);
+	FftwPatchSolver(std::shared_ptr<SchurHelper<D>> sh, double lambda = 0);
 	~FftwPatchSolver();
 	void solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
 	           std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma);
-	void domainSolve(std::vector<std::shared_ptr<SchurInfo<D>>> &domains,
-	                 std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
-	                 std::shared_ptr<const Vector<D - 1>> gamma) override
+	void solve(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
+	           std::shared_ptr<const Vector<D - 1>> gamma) override
 	{
-		for (auto &sinfo : domains) {
+		for (auto &sinfo : sh->getSchurInfoVector()) {
 			solve(*sinfo, f, u, gamma);
 		}
 	}
 	void addPatch(SchurInfo<D> &sinfo);
+	std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx){
+		return std::shared_ptr<PatchSolver<D>>(new FftwPatchSolver(ctx.sh));
+	}
 };
-template <size_t D> FftwPatchSolver<D>::FftwPatchSolver(Domain<D> &domain, double lambda)
+template <size_t D>
+FftwPatchSolver<D>::FftwPatchSolver(std::shared_ptr<SchurHelper<D>> sh, double lambda)
 {
-	n            = domain.getNs()[0];
+	this->sh     = sh;
+	n            = sh->getLengths()[0];
 	this->lambda = lambda;
+	for (auto &sinfo : sh->getSchurInfoVector()) {
+		addPatch(*sinfo);
+	}
 }
 template <size_t D> FftwPatchSolver<D>::~FftwPatchSolver()
 {
@@ -192,7 +200,7 @@ void FftwPatchSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector
 	nested_loop<D>(start, end,
 	               [&](std::array<int, D> coord) { f_copy_view[coord] = f_view[coord]; });
 
-	StarPatchOperator<D> op;
+	StarPatchOperator<D> op(sh);
 	op.addInterfaceToRHS(sinfo, gamma, f_copy.getLocalData(0));
 
 	fftw_execute(plan1[sinfo]);
