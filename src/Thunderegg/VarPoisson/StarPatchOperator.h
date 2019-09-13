@@ -25,6 +25,7 @@
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/PatchOperator.h>
 #include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/IfaceInterp.h>
 
 namespace Thunderegg
 {
@@ -36,13 +37,20 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	std::shared_ptr<const Vector<D>>     coeffs;
 	std::shared_ptr<const Vector<D - 1>> bc_coeffs;
 	std::shared_ptr<const Vector<D - 1>> gamma_coeffs;
+	std::shared_ptr<SchurHelper<D>> sh;
+	std::shared_ptr<IfaceInterp<D>> interp;
 
 	public:
 	StarPatchOperator(std::shared_ptr<const Vector<D>> h, std::shared_ptr<const Vector<D - 1>> h_bc,
-	                  std::shared_ptr<SchurHelper<D>> sh)
+	                  std::shared_ptr<SchurHelper<D>> sh,std::shared_ptr<IfaceInterp<D>> interp)
 	{
 		coeffs    = h;
 		bc_coeffs = h_bc;
+		this->sh = sh;
+		this->interp = interp;
+		auto new_gamma_coeffs = sh->getNewSchurDistVec();
+		interp->interpolateToInterface(coeffs,new_gamma_coeffs);
+		gamma_coeffs=new_gamma_coeffs;
 	}
 	void applyWithInterface(SchurInfo<D> &sinfo, const LocalData<D> u,
 	                        std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f) override
@@ -123,9 +131,15 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
 				const LocalData<D - 1> bnd
 				= gamma->getLocalData(sinfo.getIfaceLocalIndex(upper_side));
+				const LocalData<D - 1> c_lower   = c.getSliceOnSide(upper_side, 1);
+				const LocalData<D - 1> c_mid     = c.getSliceOnSide(upper_side);
+				const LocalData<D - 1> c_bnd
+				= gamma_coeffs->getLocalData(sinfo.getIfaceLocalIndex(upper_side));
 
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] += (lower[coord] - 3 * mid[coord] + 2 * bnd[coord]) / h2[axis];
+					f_slice[coord] += ((c_lower[coord] + c_mid[coord]) * (lower[coord] - mid[coord])
+					                   - 4 * c_bnd[coord] * (mid[coord] - bnd[coord]))
+					                  / (2 * h2[axis]);
 				});
 			} else if (sinfo.pinfo->isNeumann(upper_side)) {
 				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
@@ -156,19 +170,20 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	void addInterfaceToRHS(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D - 1>> gamma,
 	                       LocalData<D> f) override
 	{
-		throw 3;
 		for (Side<D> s : Side<D>::getValues()) {
 			if (sinfo.pinfo->hasNbr(s)) {
 				const LocalData<D - 1> gamma_view
 				= gamma->getLocalData(sinfo.getIfaceLocalIndex(s));
 
 				LocalData<D - 1> slice = f.getSliceOnSide(s);
+				const LocalData<D - 1> c_bnd
+				= gamma_coeffs->getLocalData(sinfo.getIfaceLocalIndex(s));
 
 				double h2 = pow(sinfo.pinfo->spacings[s.axis()], 2);
 
 				nested_loop<D - 1>(gamma_view.getStart(), gamma_view.getEnd(),
 				                   [&](std::array<int, D - 1> coord) {
-					                   slice[coord] -= 2.0 / h2 * gamma_view[coord];
+					                   slice[coord] -= 2.0 / h2 * gamma_view[coord]*c_bnd[coord];
 				                   });
 			}
 		}
@@ -326,6 +341,22 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		    }
 		}
 		*/
+	}
+	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma,
+	           std::shared_ptr<Vector<D>> f) override
+	{
+		f->set(0);
+		for (auto sinfo : sh->getSchurInfoVector()) {
+			applyWithInterface(*sinfo, u->getLocalData(sinfo->pinfo->local_index), gamma,
+			                   f->getLocalData(sinfo->pinfo->local_index));
+		}
+	}
+	std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx)override{
+		auto new_coeffs = PetscVector<D>::GetNewVector(ctx.domain);
+		auto new_bc_coeffs = PetscVector<D>::GetNewBCVector(ctx.domain);
+		ctx.level->getRestrictor().restrict(new_coeffs,coeffs);
+		new_bc_coeffs->set(1);
+		return std::make_shared<StarPatchOperator<D>>(new_coeffs, new_bc_coeffs, ctx.sh,interp);
 	}
 };
 extern template class StarPatchOperator<2>;
