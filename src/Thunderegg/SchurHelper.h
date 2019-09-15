@@ -191,6 +191,7 @@ template <size_t D> class SchurHelper
 };
 template <size_t D> inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>> domain)
 {
+	this->domain = domain;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	iface_stride = 1;
 	for (size_t i = 0; i < D - 1; i++) {

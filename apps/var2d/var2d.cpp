@@ -335,7 +335,7 @@ int main(int argc, char *argv[])
 
 		// patch operator
 		shared_ptr<StarPatchOperator<2>> p_operator(
-		new StarPatchOperator<2>(h, h_bc, sch, p_interp));
+		new StarPatchOperator<2>(h, hfun, sch, p_interp));
 		StarPatchOperator<2>::addDrichletBCToRHS(domain, f, gfun, hfun);
 
 		// set the patch solver

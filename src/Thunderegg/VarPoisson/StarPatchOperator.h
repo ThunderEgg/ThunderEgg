@@ -34,23 +34,28 @@ namespace VarPoisson
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	private:
-	std::shared_ptr<const Vector<D>>     coeffs;
-	std::shared_ptr<const Vector<D - 1>> bc_coeffs;
-	std::shared_ptr<const Vector<D - 1>> gamma_coeffs;
-	std::shared_ptr<SchurHelper<D>>      sh;
-	std::shared_ptr<IfaceInterp<D>>      interp;
+	std::shared_ptr<const Vector<D>>                     coeffs;
+	std::shared_ptr<const Vector<D - 1>>                 bc_coeffs;
+	std::shared_ptr<const Vector<D - 1>>                 gamma_coeffs;
+	std::function<double(const std::array<double, D> &)> beta_func;
+	std::shared_ptr<SchurHelper<D>>                      sh;
+	std::shared_ptr<IfaceInterp<D>>                      interp;
 
 	public:
-	StarPatchOperator(std::shared_ptr<const Vector<D>> h, std::shared_ptr<const Vector<D - 1>> h_bc,
+	StarPatchOperator(std::shared_ptr<const Vector<D>>                     h,
+	                  std::function<double(const std::array<double, D> &)> beta_func,
 	                  std::shared_ptr<SchurHelper<D>> sh, std::shared_ptr<IfaceInterp<D>> interp)
 	{
 		coeffs                = h;
-		bc_coeffs             = h_bc;
 		this->sh              = sh;
 		this->interp          = interp;
+		this->beta_func       = beta_func;
 		auto new_gamma_coeffs = sh->getNewSchurDistVec();
 		interp->interpolateToInterface(coeffs, new_gamma_coeffs);
-		gamma_coeffs = new_gamma_coeffs;
+		gamma_coeffs       = new_gamma_coeffs;
+		auto new_bc_coeffs = PetscVector<D>::GetNewBCVector(sh->getDomain());
+		DomainTools<D>::setBCValues(sh->getDomain(), new_bc_coeffs, beta_func);
+		bc_coeffs = new_bc_coeffs;
 	}
 	void applyWithInterface(SchurInfo<D> &sinfo, const LocalData<D> u,
 	                        std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f) override
@@ -437,17 +442,9 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	}
 	std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
 	{
-		auto new_coeffs    = PetscVector<D>::GetNewVector(ctx.domain);
-		auto new_bc_coeffs = PetscVector<D>::GetNewBCVector(ctx.domain);
+		auto new_coeffs = PetscVector<D>::GetNewVector(ctx.domain);
 		ctx.finer_level->getRestrictor().restrict(new_coeffs, coeffs);
-		auto hfun = [](const std::array<double, D> &coord) {
-			double x = coord[0];
-			double y = coord[1];
-			return 1 + x * y;
-		};
-		DomainTools<D>::setBCValues(ctx.domain, new_bc_coeffs, hfun);
-		return std::make_shared<StarPatchOperator<D>>(new_coeffs, new_bc_coeffs, ctx.sh,
-		                                              ctx.interp);
+		return std::make_shared<StarPatchOperator<D>>(new_coeffs, beta_func, ctx.sh, ctx.interp);
 	}
 }; // namespace VarPoisson
 extern template class StarPatchOperator<2>;
