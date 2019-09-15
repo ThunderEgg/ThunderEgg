@@ -70,8 +70,9 @@ template <size_t D> class BiCGStab
 		std::shared_ptr<Vector<D>> s   = vg->getNewVector();
 		double                     rho = rhat->dot(resid);
 
-		int num_its = 0;
-		while (resid->twoNorm() / r0_norm > tolerance && num_its < max_it) {
+		int    num_its  = 0;
+		double residual = resid->twoNorm() / r0_norm;
+		while (residual > tolerance && num_its < max_it) {
 			if (Mr != nullptr) {
 				Mr->apply(p, mp);
 				A->apply(mp, ap);
@@ -103,7 +104,8 @@ template <size_t D> class BiCGStab
 			p->scaleThenAdd(beta, resid);
 
 			num_its++;
-			rho = rho_new;
+			rho      = rho_new;
+			residual = resid->twoNorm() / r0_norm;
 		}
 		return num_its;
 	}

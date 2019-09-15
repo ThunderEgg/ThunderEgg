@@ -8,9 +8,9 @@ include(GNUInstallDirs)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-set (CMAKE_CXX_FLAGS "-Wall -std=c++11 -O3")
-set (CMAKE_CXX_FLAGS_DEBUG  "-Wall -std=c++11 -g3 -O0 -DDD_DEBUG")
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_FLAGS "-Wall -std=c++14 -O3")
+set (CMAKE_CXX_FLAGS_DEBUG  "-Wall -std=c++14 -g3 -O0 -DDD_DEBUG")
+set (CMAKE_CXX_STANDARD 14)
 
 
 find_program(CCACHE_FOUND ccache)
@@ -23,6 +23,4 @@ endif(CCACHE_FOUND)
 add_subdirectory(tpl)
 add_subdirectory(src)
 add_subdirectory(apps)
-if(CMAKE_BUILD_TYPE EQUAL Debug)
 add_subdirectory(test)
-endif(CMAKE_BUILD_TYPE EQUAL Debug)

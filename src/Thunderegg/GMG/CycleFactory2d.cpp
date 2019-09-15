@@ -122,10 +122,11 @@ std::shared_ptr<Cycle<2>> CycleFactory2d::getCycle(const CycleOpts &            
 		coarser_level->setInterpolator(
 		getNewInterpolator(interpolator_type, domain, finer_domain, ilc));
 
-		CycleFactoryCtx<2> ctx = {domain, sh, coarser_level};
+		CycleFactoryCtx<2> ctx = {domain, sh, coarser_level,finer_level};
+		interp                 = interp->getNewIfaceInterp(ctx);
+		ctx.interp=interp;
 		op                     = op->getNewPatchOperator(ctx);
 		ctx.op=op;
-		interp                 = interp->getNewIfaceInterp(ctx);
 		solver                 = solver->getNewPatchSolver(ctx);
 		coarser_level->setOperator(getNewOperator(op_type, domain, sh, interp, op));
 		coarser_level->setSmoother(getNewSmoother(smoother_type, domain, sh, interp, solver));

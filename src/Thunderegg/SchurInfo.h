@@ -518,7 +518,7 @@ template <size_t D> struct SchurInfo : public Serializable {
 			if (pinfo->hasNbr(s)) { getIfaceInfoPtr(s)->setGlobalIndexes(rev_map); }
 		}
 	}
-	int getIfaceLocalIndex(Side<D> s)
+	int getIfaceLocalIndex(Side<D> s) const
 	{
 		return iface_info[s.toInt()]->local_index;
 	}

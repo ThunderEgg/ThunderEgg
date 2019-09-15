@@ -92,7 +92,6 @@ template <size_t D> class LocalData
 			idx += strides[i] * coord[i];
 		}
 		return data + idx;
-		;
 	}
 	/**
 	 * @brief Get the pointer the data at the specified coordinate
@@ -107,7 +106,6 @@ template <size_t D> class LocalData
 			idx += strides[i] * coord[i];
 		}
 		return data + idx;
-		;
 	}
 	/**
 	 * @brief Get a reference to the element at the specified coordinate

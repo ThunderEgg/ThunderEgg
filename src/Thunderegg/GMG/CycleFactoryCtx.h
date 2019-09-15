@@ -28,13 +28,17 @@ namespace Thunderegg
 {
 template<size_t D>
 class PatchOperator;
+template<size_t D>
+class IfaceInterp;
 namespace GMG
 {
 template <size_t D> struct CycleFactoryCtx {
 	std::shared_ptr<Domain<D>>      domain;
 	std::shared_ptr<SchurHelper<D>> sh;
-	std::shared_ptr<Level<D>>       level;
+	std::shared_ptr<Level<D>>       coarser_level;
+	std::shared_ptr<Level<D>>       finer_level;
 	std::shared_ptr<PatchOperator<D>>       op;
+	std::shared_ptr<IfaceInterp<D>>       interp;
 };
 } // namespace GMG
 } // namespace Thunderegg

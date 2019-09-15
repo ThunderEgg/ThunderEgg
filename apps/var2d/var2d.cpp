@@ -116,7 +116,8 @@ int main(int argc, char *argv[])
 	                        "Which Solver to use");
 
 	string preconditioner = "";
-	app.add_set_ignore_case("--prec", preconditioner, {"GMG"}, "Which Preconditoner to use");
+	app.add_set_ignore_case("--prec", preconditioner, {"GMG", "Schwarz"},
+	                        "Which Preconditoner to use");
 
 	string patch_solver = "fftw";
 	app.add_set_ignore_case("--patch_solver", patch_solver, {"fftw", "bcgs", "dft"},
@@ -272,16 +273,25 @@ int main(int argc, char *argv[])
 		};
 	} else {
 		ffun = [](const std::array<double, 2> &coord) {
-			double x = coord[0] + 0.25;
+			double x = coord[0];
 			double y = coord[1];
 			return -5 * M_PI * M_PI * sinl(M_PI * y) * cosl(2 * M_PI * x);
 		};
 		gfun = [](const std::array<double, 2> &coord) {
-			double x = coord[0] + 0.25;
+			double x = coord[0];
 			double y = coord[1];
 			return sinl(M_PI * y) * cosl(2 * M_PI * x);
 		};
 		hfun = [](const std::array<double, 2> &coord) { return 1; };
+		/*
+		ffun = [](const std::array<double, 2> &coord) {
+		    return 0;
+		};
+		gfun = [](const std::array<double, 2> &coord) {
+		    return 1;
+		};
+		hfun = [](const std::array<double, 2> &coord) { return 1; };
+		*/
 	}
 
 	Timer timer;
@@ -324,12 +334,13 @@ int main(int argc, char *argv[])
 		shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator(sch));
 
 		// patch operator
-		shared_ptr<PatchOperator<2>> p_operator(new StarPatchOperator<2>(h, h_bc, sch,p_interp));
+		shared_ptr<StarPatchOperator<2>> p_operator(
+		new StarPatchOperator<2>(h, h_bc, sch, p_interp));
+		StarPatchOperator<2>::addDrichletBCToRHS(domain, f, gfun, hfun);
 
 		// set the patch solver
 		shared_ptr<PatchSolver<2>> p_solver;
-		p_solver.reset(new BiCGStabSolver<2>(sch,p_operator, ps_tol, ps_max_it));
-
+		p_solver.reset(new BiCGStabSolver<2>(sch, p_operator, ps_tol, ps_max_it));
 
 		// Create the gamma and diff vectors
 		shared_ptr<PetscVector<1>> gamma = sch->getNewSchurVec();
@@ -376,7 +387,7 @@ int main(int argc, char *argv[])
 
 			timer.start("Matrix Formation");
 			if (matrix_type == "wrap") {
-				A.reset(new SchurWrapOp<2>(domain, sch,p_solver,p_interp));
+				A.reset(new SchurWrapOp<2>(domain, sch, p_solver, p_interp));
 			} else if (matrix_type == "crs") {
 				SchurMatrixHelper2d smh(sch);
 				A_petsc = smh.formCRSMatrix();
@@ -460,7 +471,7 @@ int main(int argc, char *argv[])
 
 			timer.start("Matrix Formation");
 			if (matrix_type == "wrap") {
-				A.reset(new DomainWrapOp<2>(sch,p_interp,p_operator));
+				A.reset(new DomainWrapOp<2>(sch, p_interp, p_operator));
 				A_petsc = PetscShellCreator::getMatShell(A, domain);
 			} else if (matrix_type == "crs") {
 				throw 3;
@@ -470,8 +481,8 @@ int main(int argc, char *argv[])
 			timer.stop("Matrix Formation");
 			// preconditoners
 			timer.start("Preconditioner Setup");
-			if (preconditioner == "Scwharz") {
-				M.reset(new SchwarzPrec<2>(sch,p_solver,p_interp));
+			if (preconditioner == "Schwarz") {
+				M.reset(new SchwarzPrec<2>(sch, p_solver, p_interp));
 			} else if (preconditioner == "GMG") {
 				timer.start("GMG Setup");
 
@@ -516,7 +527,7 @@ int main(int argc, char *argv[])
 				std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
 
 				u->set(0);
-				int its = BiCGStab<2>::solve(vg, A, u, f, nullptr, 1000);
+				int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000000);
 				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
 			}
 			timer.stop("Linear Solve");

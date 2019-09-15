@@ -48,34 +48,31 @@ template <int start, int stop, typename T> inline void loop(T lambda)
 {
 	Loop<start, stop, T>::loop_loop(lambda);
 }
-template <size_t D, size_t Dir, typename T> class NestedLoop
+template <size_t D, size_t Dir, typename T, typename A> class NestedLoop
 {
 	public:
-	static void inline nested_loop_loop(std::array<int, D> &coord, std::array<int, D> &start,
-	                                    std::array<int, D> &end, T lambda)
+	static void inline nested_loop_loop(A coord, A start, A end, T lambda)
 	{
 		for (coord[Dir] = start[Dir]; coord[Dir] <= end[Dir]; coord[Dir]++) {
-			NestedLoop<D, Dir - 1, T>::nested_loop_loop(coord, start, end, lambda);
+			NestedLoop<D, Dir - 1, T, A>::nested_loop_loop(coord, start, end, lambda);
 		}
 	}
 };
 
-template <size_t D, typename T> class NestedLoop<D, 0, T>
+template <size_t D, typename T, typename A> class NestedLoop<D, 0, T, A>
 {
 	public:
-	static void inline nested_loop_loop(std::array<int, D> &coord, std::array<int, D> &start,
-	                                    std::array<int, D> &end, T lambda)
+	static void inline nested_loop_loop(A coord, A start, A end, T lambda)
 	{
 		for (coord[0] = start[0]; coord[0] <= end[0]; coord[0]++) {
 			lambda(coord);
 		}
 	}
 };
-template <size_t D, typename T>
-inline void nested_loop(std::array<int, D> start, std::array<int, D> end, T lambda)
+template <size_t D, typename T, typename A> inline void nested_loop(A start, A end, T lambda)
 {
-	std::array<int, D> coord = start;
-	NestedLoop<D, D - 1, T>::nested_loop_loop(coord, start, end, lambda);
+	A coord = start;
+	NestedLoop<D, D - 1, T, A>::nested_loop_loop(coord, start, end, lambda);
 }
 } // namespace Thunderegg
 #endif
