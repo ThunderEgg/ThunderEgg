@@ -1,6 +1,7 @@
-#include <Thunderegg/PatchInfo.h>
 #include "catch.hpp"
+#include <Thunderegg/PatchInfo.h>
 using namespace std;
+using namespace Thunderegg;
 TEST_CASE("NormalNbrInfo getNbrType works", "[PatchInfo]")
 {
 	NbrInfo<3> *info = new NormalNbrInfo<3>();
@@ -66,10 +67,10 @@ TEST_CASE("FineNbrInfo Serialization/Deserialization", "[PatchInfo]")
 }
 TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 {
-	PatchInfo<3> *d_ptr                = new PatchInfo<3>;
-	PatchInfo<3> &d                    = *d_ptr;
-	d.id                            = 0;
-	d.nbr_info[Side<3>::north].reset( new NormalNbrInfo<3>(1));
+	PatchInfo<3> *d_ptr = new PatchInfo<3>;
+	PatchInfo<3> &d     = *d_ptr;
+	d.id                = 0;
+	d.nbr_info[Side<3>::north].reset(new NormalNbrInfo<3>(1));
 	d.nbr_info[Side<3>::east].reset(new CoarseNbrInfo<3>(2, 3));
 	d.nbr_info[Side<3>::south].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
 

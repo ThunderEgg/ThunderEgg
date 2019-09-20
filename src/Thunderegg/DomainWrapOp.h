@@ -22,7 +22,9 @@
 #ifndef THUNDEREGG_DOMAINWRAPOP_H
 #define THUNDEREGG_DOMAINWRAPOP_H
 
+#include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/Operator.h>
+#include <Thunderegg/PatchOperator.h>
 #include <Thunderegg/SchurHelper.h>
 
 namespace Thunderegg

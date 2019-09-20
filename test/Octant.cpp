@@ -1,6 +1,7 @@
-#include <Thunderegg/Side.h>
 #include "catch.hpp"
+#include <Thunderegg/Side.h>
 using namespace std;
+using namespace Thunderegg;
 TEST_CASE("Orthant<3> Default constructor works", "[Octant]")
 {
 	Orthant<3> o;

@@ -1,8 +1,8 @@
-add_executable(test SchurInfo.cpp Domain.cpp GMG.cpp test.cpp Side.cpp Octant.cpp OctTree.cpp
+add_executable(unit_tests SchurInfo.cpp PatchInfo.cpp GMG.cpp test.cpp Side.cpp Octant.cpp OctTree.cpp
     DomainCollection.cpp Utils.cpp)
-target_link_libraries(test
+target_link_libraries(unit_tests
     Thunderegg
     )
 if(VTK_FOUND)
-    target_link_libraries(test VtkWriter)
+    target_link_libraries(unit_tests VtkWriter)
 endif(VTK_FOUND)

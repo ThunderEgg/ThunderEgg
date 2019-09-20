@@ -21,25 +21,26 @@
 
 #include "TriLinInterp.h"
 using namespace Thunderegg;
-void TriLinInterp::interpolate(const std::vector<SchurInfo<3>> &patches,
-                               std::shared_ptr<const Vector<3>> u,
-                               std::shared_ptr<Vector<2>>       interp)
+void TriLinInterp::interpolateToInterface(std::shared_ptr<const Vector<3>> u,
+                                          std::shared_ptr<Vector<2>>       interp)
 {
-	for (SchurInfo<3> p : patches) {
+	for (std::shared_ptr<SchurInfo<3>> sinfo : sh->getSchurInfoVector()) {
 		for (Side<3> s : Side<3>::getValues()) {
-			if (p.pinfo->hasNbr(s)) {
+			if (sinfo->pinfo->hasNbr(s)) {
 				std::deque<int>          idx;
 				std::deque<IfaceType<3>> types;
 
-				p.getIfaceInfoPtr(s)->getLocalIndexes(idx);
-				p.getIfaceInfoPtr(s)->getIfaceTypes(types);
+				sinfo->getIfaceInfoPtr(s)->getLocalIndexes(idx);
+				sinfo->getIfaceInfoPtr(s)->getIfaceTypes(types);
 
 				for (size_t i = 0; i < idx.size(); i++) {
-					interpolate(p, s, idx[i], types[i], u, interp);
+					interpolate(*sinfo, s, idx[i], types[i], u, interp);
 				}
 			}
 		}
 	}
+
+	sh->updateInterfaceDist(interp);
 }
 void TriLinInterp::interpolate(SchurInfo<3> &sinfo, std::shared_ptr<const Vector<3>> u,
                                std::shared_ptr<Vector<2>> interp)

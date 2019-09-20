@@ -1,7 +1,9 @@
-#include <Thunderegg/OctTree.h>
 #include "catch.hpp"
+#include <Thunderegg/Experimental/OctTree.h>
 #include <set>
 using namespace std;
+using namespace Thunderegg::Experimental;
+using namespace Thunderegg;
 TEST_CASE("Tree<3> default constructor works", "[Side]")
 {
 	Tree<3> tree;

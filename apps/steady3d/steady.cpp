@@ -288,29 +288,29 @@ int main(int argc, char *argv[])
 		};
 	}
 
+	shared_ptr<DomainGenerator<3>> dcg(new DomGen<3>(t, ns, neumann));
+
+	dc = dcg->getFinestDomain();
+	shared_ptr<SchurHelper<3>> sch(new SchurHelper<3>(dc));
+
 	// set the patch solver
 	shared_ptr<PatchSolver<3>> p_solver;
 
 	// patch operator
-	shared_ptr<PatchOperator<3>> p_operator(new StarPatchOperator<3>());
+	shared_ptr<PatchOperator<3>> p_operator(new StarPatchOperator<3>(sch));
 
 	// interface interpolator
-	shared_ptr<IfaceInterp<3>> p_interp(new TriLinInterp());
+	shared_ptr<IfaceInterp<3>> p_interp(new TriLinInterp(sch));
+
+	if (patch_solver == "dft") {
+		p_solver.reset(new DftPatchSolver<3>(sch));
+	} else {
+		p_solver.reset(new FftwPatchSolver<3>(sch));
+	}
 
 	Timer timer;
 	for (int loop = 0; loop < loop_count; loop++) {
 		timer.start("Domain Initialization");
-
-		shared_ptr<DomainGenerator<3>> dcg(new DomGen<3>(t, ns, neumann));
-
-		dc = dcg->getFinestDomain();
-
-		if (patch_solver == "dft") {
-			p_solver.reset(new DftPatchSolver<3>(*dc));
-		} else {
-			p_solver.reset(new FftwPatchSolver<3>(*dc));
-		}
-		shared_ptr<SchurHelper<3>> sch(new SchurHelper<3>(dc, p_solver, p_operator, p_interp));
 
 		// Initialize Vectors
 		shared_ptr<PetscVector<3>> u     = PetscVector<3>::GetNewVector(dc);
@@ -341,7 +341,9 @@ int main(int argc, char *argv[])
 
 			// Get the b vector
 			gamma->set(0);
-			sch->solveWithInterface(f, u, gamma, b);
+			p_solver->solve(f, u, gamma);
+			p_interp->interpolateToInterface(u, b);
+			b->addScaled(-1, gamma);
 			b->scale(-1);
 
 			if (rhs_filename != "") {
@@ -363,9 +365,9 @@ int main(int argc, char *argv[])
 
 			timer.start("Matrix Formation");
 			if (matrix_type == "wrap") {
-				A.reset(new SchurWrapOp<3>(dc, sch));
+				A.reset(new SchurWrapOp<3>(dc, sch, p_solver, p_interp));
 			} else if (matrix_type == "crs") {
-				SchurMatrixHelper smh(sch);
+				SchurMatrixHelper smh(sch, p_solver, p_interp);
 				A_petsc = smh.formCRSMatrix();
 				A.reset(new PetscMatOp<2>(A_petsc));
 				if (setrow) {
@@ -381,7 +383,7 @@ int main(int argc, char *argv[])
 					PetscViewerDestroy(&viewer);
 				}
 			} else if (matrix_type == "pbm") {
-				SchurMatrixHelper smh(sch);
+				SchurMatrixHelper smh(sch, p_solver, p_interp);
 				A_petsc = smh.getPBMatrix();
 				A.reset(new PetscMatOp<2>(A_petsc));
 			}
@@ -393,7 +395,7 @@ int main(int argc, char *argv[])
 			} else if (preconditioner == "GMG") {
 				throw 3;
 			} else if (preconditioner == "cheb") {
-				M.reset(new PolyChebPrec(dc, sch));
+				M.reset(new PolyChebPrec(dc, sch, p_interp, p_solver));
 			}
 			timer.stop("Preconditioner Setup");
 
@@ -437,11 +439,11 @@ int main(int argc, char *argv[])
 			// Do one last solve
 			timer.start("Patch Solve");
 
-			sch->solveWithInterface(f, u, gamma, diff);
+			p_solver->solve(f, u, gamma);
 
 			timer.stop("Patch Solve");
 
-			sch->applyWithInterface(u, gamma, au);
+			p_operator->apply(u, gamma, au);
 		} else {
 			std::shared_ptr<Operator<3>> A;
 			PW<Mat>                      A_petsc;
@@ -453,7 +455,7 @@ int main(int argc, char *argv[])
 
 			timer.start("Matrix Formation");
 			if (matrix_type == "wrap") {
-				A.reset(new DomainWrapOp<3>(sch));
+				A.reset(new DomainWrapOp<3>(sch, p_interp, p_operator));
 				A_petsc = PetscShellCreator::getMatShell(A, dc);
 			} else if (matrix_type == "crs") {
 				MatrixHelper mh(dc);
@@ -478,7 +480,7 @@ int main(int argc, char *argv[])
 			// preconditoners
 			timer.start("Preconditioner Setup");
 			if (preconditioner == "Scwharz") {
-				M.reset(new SchwarzPrec<3>(sch));
+				M.reset(new SchwarzPrec<3>(sch, p_solver, p_interp));
 			} else if (preconditioner == "GMG") {
 				timer.start("GMG Setup");
 
