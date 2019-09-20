@@ -2,15 +2,16 @@ language: cpp
 compiler: gcc
 
 os: linux
-apt:
-  packages:
-    - libfftw3-dev
-    - libopenmpi-dev
-    - openmpi-bin
-    - libpetsc3.7-dev
-    - libtrilinos-zoltan-dev
-    - libblas-dev
-    - liblapack-dev
+addons:
+  apt:
+    packages:
+      - libfftw3-dev
+      - libopenmpi-dev
+      - openmpi-bin
+      - libpetsc3.7-dev
+      - libtrilinos-zoltan-dev
+      - libblas-dev
+      - liblapack-dev
 script:
   - cmake .
   - make
