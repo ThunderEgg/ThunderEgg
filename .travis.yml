@@ -11,5 +11,5 @@ apt:
     - libblas-dev
     - liblapack-dev
 script:
-  - cmake
+  - cmake .
   - make
