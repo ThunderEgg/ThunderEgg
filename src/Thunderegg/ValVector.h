@@ -32,38 +32,40 @@ template <size_t D> class ValVector : public Vector<D>
 	int                patch_stride;
 	std::array<int, D> lengths;
 	std::array<int, D> strides;
+	int                num_ghost_cells;
+	int                first_offset;
 
 	public:
 	std::valarray<double> vec;
 	std::valarray<double> ghost_data;
 	ValVector() = default;
-	ValVector(const std::array<int, D> &lengths, int num_patches = 1)
+	ValVector(const std::array<int, D> &lengths, int num_ghost_cells, int num_patches)
 	{
 		this->num_local_patches = num_patches;
+		this->num_ghost_cells   = num_ghost_cells;
 		int size                = 1;
 		this->lengths           = lengths;
+		first_offset            = 0;
 		for (size_t i = 0; i < D; i++) {
+			this->lengths[i] += 2 * num_ghost_cells;
 			strides[i] = size;
 			size *= lengths[i];
+			first_offset += strides[i] * num_ghost_cells;
 		}
-		if (num_patches == 1) {
-			patch_stride = 0;
-		} else {
-			patch_stride = size;
-		}
+		patch_stride = size;
 		size *= num_patches;
 		vec.resize(size);
 	}
 	~ValVector() = default;
 	LocalData<D> getLocalData(int local_patch_id)
 	{
-		double *data = &vec[patch_stride * local_patch_id];
-		return LocalData<D>(data, strides, lengths, nullptr);
+		double *data = &vec[patch_stride * local_patch_id + first_offset];
+		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 	const LocalData<D> getLocalData(int local_patch_id) const
 	{
-		double *data = const_cast<double *>(&vec[patch_stride * local_patch_id]);
-		return LocalData<D>(data, strides, lengths, nullptr);
+		double *data = const_cast<double *>(&vec[patch_stride * local_patch_id + first_offset]);
+		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 	void setNumGhostPatches(int num_ghost_patches)
 	{

@@ -38,6 +38,10 @@ template <size_t D> class DomGen : public DomainGenerator<D>
 {
 	private:
 	/**
+	 * @brief number of ghost cells on each side of the patch
+	 */
+	int num_ghost_cells;
+	/**
 	 * @brief Whether Neumann boundary conditions are being used
 	 */
 	bool neumann;
@@ -95,20 +99,23 @@ template <size_t D> class DomGen : public DomainGenerator<D>
 	 *
 	 * @param t the tree to use
 	 * @param ns the number of cells in each direction
+	 * @param num_ghost_cells the number of ghost cells on each side of the patch.
 	 * @param neumann whether to use neumann boundary conditions
 	 */
-	DomGen(Tree<D> t, std::array<int, D> ns, bool neumann = false);
+	DomGen(Tree<D> t, std::array<int, D> ns, int num_ghost_cells, bool neumann = false);
 	std::shared_ptr<Domain<D>> getFinestDomain();
 	bool                       hasCoarserDomain();
 	std::shared_ptr<Domain<D>> getCoarserDomain();
 };
-template <size_t D> DomGen<D>::DomGen(Tree<D> t, std::array<int, D> ns, bool neumann)
+template <size_t D>
+DomGen<D>::DomGen(Tree<D> t, std::array<int, D> ns, int num_ghost_cells, bool neumann)
 {
-	this->t       = t;
-	this->ns      = ns;
-	this->neumann = neumann;
-	num_levels    = t.num_levels;
-	curr_level    = num_levels;
+	this->t               = t;
+	this->ns              = ns;
+	this->neumann         = neumann;
+	this->num_ghost_cells = num_ghost_cells;
+	num_levels            = t.num_levels;
+	curr_level            = num_levels;
 
 	// generate finest DC
 	extractLevel();
@@ -145,7 +152,8 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 		while (!q.empty()) {
 			std::shared_ptr<PatchInfo<D>> d_ptr(new PatchInfo<D>());
 			PatchInfo<D> &                pinfo = *d_ptr;
-			Node<D>                       n     = t.nodes.at(q.front());
+			pinfo.num_ghost_cells               = num_ghost_cells;
+			Node<D> n                           = t.nodes.at(q.front());
 			q.pop_front();
 
 			pinfo.ns = ns;
@@ -288,7 +296,7 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 			pair.second->parent_rank = id_rank_map.at(pair.second->parent_id);
 		}
 	}
-	domain_list.push_back(std::shared_ptr<Domain<D>>(new Domain<D>(ns, new_level)));
+	domain_list.push_back(std::shared_ptr<Domain<D>>(new Domain<D>(new_level)));
 	if (neumann) {
 		IsNeumannFunc<D> inf = [](Side<D>, const std::array<double, D> &,
 		                          const std::array<double, D> &) { return true; };

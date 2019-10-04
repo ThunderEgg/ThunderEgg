@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
 		auto inf
 		= [=](Side<2> s, const array<double, 2> &, const array<double, 2> &) { return neumann; };
 
-		dcg.reset(new P4estDomGen(ttp.p4est, ns, inf, bmf));
+		dcg.reset(new P4estDomGen(ttp.p4est, ns, 1, inf, bmf));
 #else
 	if (false) {
 #endif
@@ -254,17 +254,23 @@ int main(int argc, char *argv[])
 		ffun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[1];
+			return x + y;
+			/*
 			return exp(x * y)
 			       * (pow(x, 5) * (-1 + y) * pow(y, 2) + y * (-2 + (5 - 3 * y) * y)
 			          - pow(x, 4) * y * (4 + (-7 + y) * y)
 			          - 2 * x * (1 + 2 * (-2 + y) * (-1 + y) * pow(y, 2))
 			          - pow(x, 2) * (-5 + 8 * y + (-6 + y) * (-1 + y) * pow(y, 3))
 			          + pow(x, 3) * (-3 + y * (12 - 6 * y - pow(y, 3) + pow(y, 4))));
+			          */
 		};
 		gfun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[1];
+			return x + y;
+			/*
 			return (1 - x) * x * (1 - y) * y * exp(x * y);
+			*/
 		};
 		hfun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];

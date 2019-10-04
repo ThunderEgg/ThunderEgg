@@ -100,6 +100,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	int                                       parent_rank = -1;
 	std::array<int, Orthant<D>::num_orthants> child_ids;
 	std::array<int, Orthant<D>::num_orthants> child_ranks;
+	int                                       num_ghost_cells = 0;
 
 	/**
 	 * @brief MPI rank of this patch

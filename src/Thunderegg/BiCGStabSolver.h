@@ -46,15 +46,17 @@ template <size_t D> class BiCGStabSolver : public PatchSolver<D>
 	{
 		private:
 		std::array<int, D> lengths;
+		int                num_ghost_cells;
 
 		public:
 		SingleVG(const SchurInfo<D> &sinfo)
 		{
-			lengths = sinfo.pinfo->ns;
+			lengths         = sinfo.pinfo->ns;
+			num_ghost_cells = sinfo.pinfo->num_ghost_cells;
 		}
 		std::shared_ptr<Vector<D>> getNewVector()
 		{
-			return std::shared_ptr<Vector<D>>(new ValVector<D>(lengths));
+			return std::shared_ptr<Vector<D>>(new ValVector<D>(lengths, 1, num_ghost_cells));
 		}
 	};
 	class SinglePatchVec : public Vector<D>
@@ -130,9 +132,10 @@ template <size_t D> class BiCGStabSolver : public PatchSolver<D>
 			solve(*sinfo, f, u, gamma);
 		}
 	}
-	void addPatch(SchurInfo<D> &sinfo) {}
-	std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)override{
-		return std::shared_ptr<PatchSolver<D>>(new BiCGStabSolver(ctx.sh,ctx.op,tol,max_it));
+	void                            addPatch(SchurInfo<D> &sinfo) {}
+	std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx) override
+	{
+		return std::shared_ptr<PatchSolver<D>>(new BiCGStabSolver(ctx.sh, ctx.op, tol, max_it));
 	}
 };
 template <size_t D>

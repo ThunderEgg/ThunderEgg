@@ -52,7 +52,10 @@ template <size_t D> class LocalData
 	std::array<int, D>                lengths;
 	std::array<int, D>                start;
 	std::array<int, D>                end;
+	std::array<int, D>                ghost_start;
+	std::array<int, D>                ghost_end;
 	std::shared_ptr<LocalDataManager> ldm;
+	int                               num_ghost_cells;
 
 	LocalData<D - 1> getSliceOnSidePriv(Side<D> s, int offset) const;
 
@@ -61,22 +64,30 @@ template <size_t D> class LocalData
 	/**
 	 * @brief Construct a new LocalData object
 	 *
-	 * @param data pointer to the first element in the patch
+	 * @param data pointer to the first element in the patch (non-ghost cell element)
 	 * @param strides the strides in each direction
 	 * @param lengths the lengths in each direction
+	 * @param num_ghost_cells the number of ghost cells on each side of the patch
 	 * @param ldm the local data manager for the data
 	 */
 	LocalData(double *data, const std::array<int, D> &strides, const std::array<int, D> &lengths,
-	          std::shared_ptr<LocalDataManager> ldm = nullptr)
+	          int num_ghost_cells, std::shared_ptr<LocalDataManager> ldm = nullptr)
 	{
-		this->data    = data;
-		this->strides = strides;
-		this->lengths = lengths;
-		this->ldm     = ldm;
+		this->data            = data;
+		this->strides         = strides;
+		this->lengths         = lengths;
+		this->ldm             = ldm;
+		this->num_ghost_cells = num_ghost_cells;
 		start.fill(0);
 		end = lengths;
 		for (size_t i = 0; i < D; i++) {
 			end[i]--;
+		}
+		ghost_start = start;
+		ghost_end   = end;
+		for (size_t i = 0; i < D; i++) {
+			ghost_start[i] -= num_ghost_cells;
+			ghost_end[i] += num_ghost_cells;
 		}
 	}
 	/**
@@ -186,6 +197,13 @@ template <size_t D> class LocalData
 		return end;
 	}
 	/**
+	 * @brief Get the number of ghost cells on each side of the patch
+	 */
+	int getNumGhostCells() const
+	{
+		return num_ghost_cells;
+	}
+	/**
 	 * @brief Get the pointer to the first element
 	 */
 	double *getPtr() const
@@ -213,10 +231,10 @@ inline LocalData<D - 1> LocalData<D>::getSliceOnSidePriv(Side<D> s, int offset) 
 	}
 	if (s.isLowerOnAxis()) {
 		double *new_data = data + offset * strides[axis];
-		return LocalData<D - 1>(new_data, new_strides, new_lengths, ldm);
+		return LocalData<D - 1>(new_data, new_strides, new_lengths, 0, ldm);
 	} else {
 		double *new_data = data + (lengths[axis] - 1 - offset) * strides[axis];
-		return LocalData<D - 1>(new_data, new_strides, new_lengths, ldm);
+		return LocalData<D - 1>(new_data, new_strides, new_lengths, 0, ldm);
 	}
 }
 

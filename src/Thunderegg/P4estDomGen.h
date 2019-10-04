@@ -61,6 +61,10 @@ class P4estDomGen : public DomainGenerator<2>
 	std::list<std::shared_ptr<Domain<2>>> domain_list;
 
 	/**
+	 * @brief the number of ghost cells on each side of the patch
+	 */
+	int num_ghost_cells;
+	/**
 	 * @brief The current level that has been generated.
 	 *
 	 * Will start with num_levels-1
@@ -102,11 +106,12 @@ class P4estDomGen : public DomainGenerator<2>
 	 *
 	 * @param p4est the p4est object
 	 * @param ns the number of cells in each direction
+	 * @param num_ghost_cells the number of ghost cells on each side of the patch
 	 * @param inf the function used to set neumann boundary conditions
 	 * @param bmf the function used to map the blocks to the domain
 	 */
-	P4estDomGen(p4est_t *p4est, const std::array<int, 2> &ns, IsNeumannFunc<2> inf,
-	            BlockMapFunc bmf);
+	P4estDomGen(p4est_t *p4est, const std::array<int, 2> &ns, int num_ghost_cells,
+	            IsNeumannFunc<2> inf, BlockMapFunc bmf);
 	~P4estDomGen();
 	std::shared_ptr<Domain<2>> getFinestDomain();
 	bool                       hasCoarserDomain();

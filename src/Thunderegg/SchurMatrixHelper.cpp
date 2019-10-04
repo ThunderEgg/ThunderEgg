@@ -231,12 +231,12 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 	VecCreateSeq(PETSC_COMM_SELF, n * n * n, &e);
 	VecCreateSeq(PETSC_COMM_SELF, n * n, &gamma);
 	VecCreateSeq(PETSC_COMM_SELF, n * n, &interp);
-	std::shared_ptr<Vector<3>> u_vec(new PetscVector<3>(u, -1, {n, n, n}));
-	std::shared_ptr<Vector<3>> f_vec(new PetscVector<3>(f, -1, {n, n, n}));
-	std::shared_ptr<Vector<3>> r_vec(new PetscVector<3>(r, -1, {n, n, n}));
-	std::shared_ptr<Vector<3>> e_vec(new PetscVector<3>(e, -1, {n, n, n}));
-	std::shared_ptr<Vector<2>> interp_vec(new PetscVector<2>(interp, -1, {n, n}));
-	std::shared_ptr<Vector<2>> gamma_vec(new PetscVector<2>(gamma, -1, {n, n}));
+	std::shared_ptr<Vector<3>> u_vec(new PetscVector<3>(u, -1, {n, n, n}, 0));
+	std::shared_ptr<Vector<3>> f_vec(new PetscVector<3>(f, -1, {n, n, n}, 0));
+	std::shared_ptr<Vector<3>> r_vec(new PetscVector<3>(r, -1, {n, n, n}, 0));
+	std::shared_ptr<Vector<3>> e_vec(new PetscVector<3>(e, -1, {n, n, n}, 0));
+	std::shared_ptr<Vector<2>> interp_vec(new PetscVector<2>(interp, -1, {n, n}, 0));
+	std::shared_ptr<Vector<2>> gamma_vec(new PetscVector<2>(gamma, -1, {n, n}, 0));
 	double *                   interp_view, *gamma_view;
 	VecGetArray(interp, &interp_view);
 	VecGetArray(gamma, &gamma_view);

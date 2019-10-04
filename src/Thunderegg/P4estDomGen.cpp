@@ -70,12 +70,13 @@ static void set_ids(p4est_iter_volume_info_t *info, void *user_data)
 /**
  * Constructor
  */
-P4estDomGen::P4estDomGen(p4est_t *p4est, const std::array<int, 2> &ns, IsNeumannFunc<2> inf,
-                         BlockMapFunc bmf)
+P4estDomGen::P4estDomGen(p4est_t *p4est, const std::array<int, 2> &ns, int num_ghost_cells,
+                         IsNeumannFunc<2> inf, BlockMapFunc bmf)
 {
-	this->ns  = ns;
-	this->bmf = bmf;
-	this->inf = inf;
+	this->num_ghost_cells = num_ghost_cells;
+	this->ns              = ns;
+	this->bmf             = bmf;
+	this->inf             = inf;
 
 	double x_start;
 	double y_start;
@@ -125,6 +126,7 @@ struct create_domains_ctx {
 	P4estDomGen::BlockMapFunc                     bmf;
 	double                                        x_scale;
 	double                                        y_scale;
+	int                                           num_ghost_cells;
 };
 /**
  * @brief iterator to create domain objects
@@ -150,7 +152,8 @@ static void create_domains(p4est_iter_volume_info_t *info, void *user_data)
 	= info->quadid + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset;
 
 	// patch dimensions
-	pinfo.ns = ctx.ns;
+	pinfo.ns              = ctx.ns;
+	pinfo.num_ghost_cells = ctx.num_ghost_cells;
 
 	// cell spacings
 	double length     = (double) P4EST_QUADRANT_LEN(info->quad->level) / P4EST_ROOT_LEN;
@@ -323,7 +326,7 @@ void P4estDomGen::extractLevel()
 	p4est_ghost_exchange_data(my_p4est, ghost, ghost_data);
 
 	std::map<int, std::shared_ptr<PatchInfo<2>>> new_level;
-	create_domains_ctx ctx = {ghost_data, ns, &new_level, bmf, x_scale, y_scale};
+	create_domains_ctx ctx = {ghost_data, ns, &new_level, bmf, x_scale, y_scale, num_ghost_cells};
 	// create domain objects and set neighbor information
 	p4est_iterate_ext(my_p4est, ghost, &ctx, create_domains, link_domains, nullptr, 0);
 
@@ -390,7 +393,7 @@ void P4estDomGen::extractLevel()
 		}
 	}
 	// create Domain object
-	domain_list.push_back(shared_ptr<Domain<2>>(new Domain<2>(ns, new_level, true)));
+	domain_list.push_back(shared_ptr<Domain<2>>(new Domain<2>(new_level, true)));
 	domain_list.back()->setNeumann(inf);
 
 	curr_level--;

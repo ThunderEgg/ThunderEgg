@@ -168,7 +168,7 @@ template <size_t D> inline std::shared_ptr<Vector<D>> InterLevelComm<D>::getNewC
 {
 	Vec u;
 	VecCreateSeq(PETSC_COMM_SELF, local_vec_size, &u);
-	return std::shared_ptr<Vector<D>>(new PetscVector<D>(u, -1, ns));
+	return std::shared_ptr<Vector<D>>(new PetscVector<D>(u, -1, ns, 0));
 }
 template <size_t D>
 inline void InterLevelComm<D>::scatter(std::shared_ptr<Vector<D>>       dist,

@@ -154,13 +154,15 @@ template <size_t D> class SchurHelper
 	{
 		Vec u;
 		VecCreateSeq(MPI_COMM_SELF, matrix_extra_ghost_start * iface_stride, &u);
-		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, ghost_start, lengths));
+		return std::shared_ptr<PetscVector<D - 1>>(
+		new PetscVector<D - 1>(u, ghost_start, lengths, 0));
 	}
 	std::shared_ptr<PetscVector<D - 1>> getNewSchurDistVec()
 	{
 		Vec u;
 		VecCreateSeq(PETSC_COMM_SELF, matrix_extra_ghost_start * iface_stride, &u);
-		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, ghost_start, lengths));
+		return std::shared_ptr<PetscVector<D - 1>>(
+		new PetscVector<D - 1>(u, ghost_start, lengths, 0));
 	}
 
 	int getSchurVecLocalSize() const

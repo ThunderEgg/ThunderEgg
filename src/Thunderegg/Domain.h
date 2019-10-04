@@ -53,6 +53,10 @@ template <size_t D> class Domain
 	 */
 	std::array<int, D> ns;
 	/**
+	 * @brief number of ghost cells on each side of the patch
+	 */
+	int num_ghost_cells;
+	/**
 	 * @brief The number of cells in a patch
 	 */
 	int num_cells_in_patch;
@@ -157,15 +161,15 @@ template <size_t D> class Domain
 	/**
 	 * @brief Construct a new Domain object with a given PatchInfo map.
 	 *
-	 * @param ns number of cells in each direction
 	 * @param pinfo_map map that goes from patch id to the PatchInfo pointer
 	 * @param local_id_set true if local indexes are set by user
 	 * @param global_id_set true if global indexes are set by user
 	 */
-	Domain(std::array<int, D> ns, std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_map,
-	       bool local_id_set = false, bool global_id_set = false)
+	Domain(std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_map, bool local_id_set = false,
+	       bool global_id_set = false)
 	{
-		this->ns = ns;
+		num_ghost_cells = pinfo_map.begin()->second->num_ghost_cells;
+		ns              = pinfo_map.begin()->second->ns;
 
 		num_cells_in_patch = 1;
 		for (size_t i = 0; i < D; i++) {
@@ -273,6 +277,13 @@ template <size_t D> class Domain
 	int getNumCellsInPatch() const
 	{
 		return num_cells_in_patch;
+	}
+	/**
+	 * @brief get the number of ghost cell on each side of a patch
+	 */
+	int getNumGhostCells() const
+	{
+		return num_ghost_cells;
 	}
 	/**
 	 * @brief Get the volume of the domain.

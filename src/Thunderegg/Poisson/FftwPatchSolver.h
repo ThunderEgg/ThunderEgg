@@ -79,8 +79,9 @@ template <size_t D> class FftwPatchSolver : public PatchSolver<D>
 			solve(*sinfo, f, u, gamma);
 		}
 	}
-	void addPatch(SchurInfo<D> &sinfo);
-	std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx){
+	void                            addPatch(SchurInfo<D> &sinfo);
+	std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)
+	{
 		return std::shared_ptr<PatchSolver<D>>(new FftwPatchSolver(ctx.sh));
 	}
 };
@@ -113,9 +114,9 @@ template <size_t D> void FftwPatchSolver<D>::addPatch(SchurInfo<D> &sinfo)
 		}
 		std::array<int, D> lengths;
 		lengths.fill(n);
-		f_copy = ValVector<D>(lengths);
-		tmp    = ValVector<D>(lengths);
-		sol    = ValVector<D>(lengths);
+		f_copy = ValVector<D>(lengths, 0, 1);
+		tmp    = ValVector<D>(lengths, 0, 1);
+		sol    = ValVector<D>(lengths, 0, 1);
 	}
 
 	int           ns[D];

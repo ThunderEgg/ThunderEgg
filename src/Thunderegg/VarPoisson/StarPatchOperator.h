@@ -40,6 +40,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	std::function<double(const std::array<double, D> &)> beta_func;
 	std::shared_ptr<SchurHelper<D>>                      sh;
 	std::shared_ptr<IfaceInterp<D>>                      interp;
+	static constexpr int                                 num_ghost_cells = 1;
 
 	public:
 	StarPatchOperator(std::shared_ptr<const Vector<D>>                     h,

@@ -77,20 +77,24 @@ template <size_t D> class PetscVector : public Vector<D>
 {
 	private:
 	int                patch_stride;
+	int                num_ghost_cells;
 	bool               own;
 	std::array<int, D> strides;
 	std::array<int, D> lengths;
 	// std::shared_ptr<void> user_data;
 
 	public:
-	PetscVector(Vec vec, int num_local_patches, const std::array<int, D> &lengths, bool own = true)
+	PetscVector(Vec vec, int num_local_patches, const std::array<int, D> &lengths,
+	            int num_ghost_cells, bool own = true)
 	{
-		this->own     = own;
-		this->lengths = lengths;
-		this->vec     = vec;
-		strides[0]    = 1;
+		this->own             = own;
+		this->lengths         = lengths;
+		this->vec             = vec;
+		this->num_ghost_cells = num_ghost_cells;
+
+		strides[0] = 1;
 		for (size_t i = 1; i < D; i++) {
-			strides[i] = lengths[i - 1] * strides[i - 1];
+			strides[i] = (this->lengths[i - 1] + 2 * num_ghost_cells) * strides[i - 1];
 		}
 		patch_stride = strides[D - 1] * lengths[D - 1];
 		if (num_local_patches == -1) {
@@ -111,8 +115,8 @@ template <size_t D> class PetscVector : public Vector<D>
 	{
 		Vec u;
 		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCells(), PETSC_DETERMINE, &u);
-		return std::shared_ptr<PetscVector<D>>(
-		new PetscVector<D>(u, domain->getNumLocalPatches(), domain->getNs()));
+		return std::shared_ptr<PetscVector<D>>(new PetscVector<D>(
+		u, domain->getNumLocalPatches(), domain->getNs(), domain->getNumGhostCells()));
 	}
 	static std::shared_ptr<PetscVector<D - 1>> GetNewBCVector(std::shared_ptr<Domain<D>> domain)
 	{
@@ -122,7 +126,7 @@ template <size_t D> class PetscVector : public Vector<D>
 		for (size_t i = 0; i < ns.size(); i++) {
 			ns[i] = domain->getNs()[i];
 		}
-		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, -1, ns));
+		return std::shared_ptr<PetscVector<D - 1>>(new PetscVector<D - 1>(u, -1, ns, 0));
 	}
 	/*
 	static std::shared_ptr<PetscVector<D>> GetNewSchurVector(std::shared_ptr<SchurHelper<D + 1>> sh)
@@ -150,7 +154,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	{
 		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, false));
 		double *                  data = ldm->getVecView() + patch_stride * patch_local_index;
-		return LocalData<D>(data, strides, lengths, ldm);
+		return LocalData<D>(data, strides, lengths, num_ghost_cells, ldm);
 	}
 	/**
 	 * @brief Get the LocalData object for the given local patch index
@@ -162,7 +166,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	{
 		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, true));
 		double *                  data = ldm->getVecView() + patch_stride * patch_local_index;
-		return LocalData<D>(data, strides, lengths, std::move(ldm));
+		return LocalData<D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
 	}
 	void setNumGhostPatches(int num_ghost_patches)
 	{

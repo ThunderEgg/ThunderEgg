@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
 		auto inf
 		= [=](Side<2> s, const array<double, 2> &, const array<double, 2> &) { return neumann; };
 
-		dcg.reset(new P4estDomGen(ttp.p4est, ns, inf, bmf));
+		dcg.reset(new P4estDomGen(ttp.p4est, ns, 1, inf, bmf));
 #else
 	if (false) {
 #endif
