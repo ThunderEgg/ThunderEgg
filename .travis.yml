@@ -16,3 +16,4 @@ addons:
 script:
   - cmake .
   - make
+  - test/unit_tests
