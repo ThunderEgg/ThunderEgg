@@ -3,14 +3,14 @@
 
 find_path (p4est_DIR include/p4est.h HINTS p4est_DIR ENV p4est_DIR CPATH)
 
-if(p4est_DIR EQUAL "p4est_DIR-NOTFOUND" )
-  SET(p4est_FOUND NO)
-else()
   SET(p4est_INCLUDES ${p4est_DIR})
   find_path (p4est_INCLUDE_DIR p4est.h HINTS "${p4est_DIR}/include" PATH_SUFFIXES include NO_DEFAULT_PATH)
   list(APPEND p4est_INCLUDES ${p4est_INCLUDE_DIR})
   find_library(p4est_LIBRARIES p4est PATHS "${p4est_DIR}/lib" ${p4est_DIR})
 
+if(NOT (p4est_INCLUDE_DIR AND p4est_LIBRARIES))
+  SET(p4est_FOUND NO)
+else()
   #get linker flags from config header
   file(READ ${p4est_INCLUDE_DIR}/p4est_config.h p4est_config_h)
   string(REGEX MATCH "#define P4EST_LIBS [^\n]*" p4est_extra_lib_string ${p4est_config_h})
