@@ -3,6 +3,9 @@
 
 find_path (p4est_DIR include/p4est.h HINTS p4est_DIR ENV p4est_DIR CPATH)
 
+if(p4est_DIR EQUAL "p4est_DIR-NOTFOUND" )
+  SET(p4est_FOUND NO)
+else()
   SET(p4est_INCLUDES ${p4est_DIR})
   find_path (p4est_INCLUDE_DIR p4est.h HINTS "${p4est_DIR}/include" PATH_SUFFIXES include NO_DEFAULT_PATH)
   list(APPEND p4est_INCLUDES ${p4est_INCLUDE_DIR})
@@ -45,6 +48,7 @@ IF(EXISTS ${p4est_DIR}/include/p4est.h)
 ELSE(EXISTS ${p4est_DIR}/include/p4est.h)
   SET(p4est_FOUND NO)
 ENDIF(EXISTS ${p4est_DIR}/include/p4est.h)
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(p4est DEFAULT_MSG p4est_LIBRARIES p4est_INCLUDES)
