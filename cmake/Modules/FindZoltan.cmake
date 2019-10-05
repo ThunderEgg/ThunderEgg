@@ -6,7 +6,7 @@ find_path (Zoltan_DIR include/zoltan.h HINTS ENV Zoltan_DIR)
 #find libs
 find_library(
   Zoltan_LIB
-  NAMES "zoltan"
+  NAMES "zoltan" "trilinos_zoltan"
   PATHS ${Zoltan_DIR}
   PATH_SUFFIXES "lib" "lib64"
 )
