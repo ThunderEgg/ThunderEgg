@@ -16,7 +16,7 @@ find_path(
   Zoltan_INCLUDES
   NAMES "zoltan.h"
   PATHS ${Zoltan_DIR}
-  PATH_SUFFIXES "include"
+  PATH_SUFFIXES "include" "trilinos"
 )
 
 
