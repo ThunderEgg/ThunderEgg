@@ -106,3 +106,41 @@ TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 	REQUIRE(!out.hasNbr(Side<3>::bottom));
 	REQUIRE(!out.hasNbr(Side<3>::top));
 }
+TEST_CASE("PatchInfo Default Values", "[PatchInfo]")
+{
+	PatchInfo<3> pinfo;
+	CHECK(pinfo.id == 0);
+	CHECK(pinfo.local_index == 0);
+	CHECK(pinfo.global_index == 0);
+	CHECK(pinfo.refine_level == -1);
+	CHECK(pinfo.parent_id == -1);
+	CHECK(pinfo.parent_rank == -1);
+	for (int child_id : pinfo.child_ids) {
+		CHECK(child_id == -1);
+	}
+	for (int child_rank : pinfo.child_ids) {
+		CHECK(child_rank == -1);
+	}
+	CHECK(pinfo.num_ghost_cells == 0);
+	CHECK(pinfo.rank == -1);
+	CHECK(pinfo.orth_on_parent == Orthant<3>::null);
+	CHECK(pinfo.neumann.to_ulong() == 0);
+	for (int n : pinfo.ns) {
+		CHECK(n == 1);
+	}
+	for (double start : pinfo.starts) {
+		CHECK(start == 0);
+	}
+	for (double spacing : pinfo.spacings) {
+		CHECK(spacing == 1);
+	}
+	for (auto nbr_info : pinfo.nbr_info) {
+		CHECK(nbr_info == nullptr);
+	}
+	for (int idx : pinfo.bc_local_index) {
+		CHECK(idx == -1);
+	}
+	for (int idx : pinfo.bc_global_index) {
+		CHECK(idx == -1);
+	}
+}

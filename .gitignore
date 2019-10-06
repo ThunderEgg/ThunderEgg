@@ -126,3 +126,4 @@ apps/var2d/*
 !apps/var2d/meshes
 .gitignore
 misc/*
+test/unit_tests
