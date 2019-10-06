@@ -22,9 +22,9 @@
 #ifndef THUNDEREGG_SCHURHELPER_H
 #define THUNDEREGG_SCHURHELPER_H
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/IfaceSet.h>
 #include <Thunderegg/PetscVector.h>
-#include <Thunderegg/SchurInfo.h>
+#include <Thunderegg/Schur/IfaceSet.h>
+#include <Thunderegg/Schur/SchurInfo.h>
 #include <deque>
 #include <memory>
 #include <petscao.h>
@@ -33,6 +33,8 @@
 #include <petscvec.h>
 #include <valarray>
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief Represents the Schur compliment domain of the problem.
@@ -501,5 +503,6 @@ template <size_t D> class SchurHelperVG : public VectorGenerator<D>
 };
 extern template class SchurHelper<2>;
 extern template class SchurHelper<3>;
+} // namespace Schur
 } // namespace Thunderegg
 #endif

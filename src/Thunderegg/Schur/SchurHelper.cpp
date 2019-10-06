@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "SchurHelper.h"
+#include <Thunderegg/Schur/SchurHelper.h>
 
-template class Thunderegg::SchurHelper<2>;
-template class Thunderegg::SchurHelper<3>;
+template class Thunderegg::Schur::SchurHelper<2>;
+template class Thunderegg::Schur::SchurHelper<3>;

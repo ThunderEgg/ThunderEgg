@@ -13,16 +13,12 @@ if(p4est_FOUND)
 endif()
 
 #determine sources first
-list(APPEND Thunderegg_SRCS Thunderegg/SchurMatrixHelper.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/SchurMatrixHelper2d.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/TriLinInterp.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/BilinearInterpolator.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/PolyChebPrec.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/SchurHelper.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/Domain.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/PatchInfo.cpp)
 list(APPEND Thunderegg_HDRS Thunderegg/PatchInfo.h)
-list(APPEND Thunderegg_SRCS Thunderegg/SchurInfo.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/Vector.cpp)
 
 list(APPEND Thunderegg_SRCS Thunderegg/Poisson/SevenPtPatchOperator.cpp)
@@ -41,6 +37,10 @@ list(APPEND Thunderegg_SRCS Thunderegg/GMG/InterLevelComm.h)
 
 list(APPEND Thunderegg_SRCS Thunderegg/Experimental/DomGen.cpp)
 
+list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurMatrixHelper.cpp)
+list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurMatrixHelper2d.cpp)
+list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurInfo.cpp)
+list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurHelper.cpp)
 
 if(p4est_FOUND)
     list(APPEND Thunderegg_SRCS Thunderegg/P4estDomGen.cpp)
