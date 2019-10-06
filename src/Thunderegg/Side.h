@@ -231,6 +231,10 @@ template <size_t D> class Orthant
 
 	public:
 	/**
+	 * @brief null value
+	 */
+	static constexpr int null = -1;
+	/**
 	 * @brief Bottom-South-West octant of cube.
 	 */
 	static constexpr int bsw = 0b000;
@@ -419,6 +423,7 @@ template <size_t D> inline std::array<Orthant<D>, Orthant<D>::num_orthants> Orth
 	std::iota(retval.begin(), retval.end(), 0);
 	return retval;
 }
+template <size_t D> constexpr int Orthant<D>::null;
 template <size_t D> constexpr int Orthant<D>::bsw;
 template <size_t D> constexpr int Orthant<D>::bse;
 template <size_t D> constexpr int Orthant<D>::bnw;

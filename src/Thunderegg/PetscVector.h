@@ -81,6 +81,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	bool               own;
 	std::array<int, D> strides;
 	std::array<int, D> lengths;
+	int                first_offset;
 	// std::shared_ptr<void> user_data;
 
 	public:
@@ -92,9 +93,11 @@ template <size_t D> class PetscVector : public Vector<D>
 		this->vec             = vec;
 		this->num_ghost_cells = num_ghost_cells;
 
-		strides[0] = 1;
+		strides[0]   = 1;
+		first_offset = num_ghost_cells;
 		for (size_t i = 1; i < D; i++) {
 			strides[i] = (this->lengths[i - 1] + 2 * num_ghost_cells) * strides[i - 1];
+			first_offset += strides[i] * num_ghost_cells;
 		}
 		patch_stride = strides[D - 1] * lengths[D - 1];
 		if (num_local_patches == -1) {
@@ -114,7 +117,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	static std::shared_ptr<PetscVector<D>> GetNewVector(std::shared_ptr<Domain<D>> domain)
 	{
 		Vec u;
-		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCells(), PETSC_DETERMINE, &u);
+		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCellsWithGhost(), PETSC_DETERMINE, &u);
 		return std::shared_ptr<PetscVector<D>>(new PetscVector<D>(
 		u, domain->getNumLocalPatches(), domain->getNs(), domain->getNumGhostCells()));
 	}
@@ -153,7 +156,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	LocalData<D> getLocalData(int patch_local_index)
 	{
 		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, false));
-		double *                  data = ldm->getVecView() + patch_stride * patch_local_index;
+		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset;
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, ldm);
 	}
 	/**
@@ -165,7 +168,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	const LocalData<D> getLocalData(int patch_local_index) const
 	{
 		std::shared_ptr<PetscLDM> ldm(new PetscLDM(vec, true));
-		double *                  data = ldm->getVecView() + patch_stride * patch_local_index;
+		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset;
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
 	}
 	void setNumGhostPatches(int num_ghost_patches)

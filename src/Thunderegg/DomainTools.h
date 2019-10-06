@@ -42,6 +42,15 @@ template <size_t D> struct DomainTools {
 			}
 		});
 	}
+	static void getRealCoordGhost(std::shared_ptr<PatchInfo<D>> pinfo,
+	                              const std::array<int, D> &    coord,
+	                              std::array<double, D> &       real_coord)
+	{
+		loop<0, D - 1>([&](int dir) {
+			real_coord[dir]
+			= pinfo->starts[dir] + pinfo->spacings[dir] / 2.0 + pinfo->spacings[dir] * coord[dir];
+		});
+	}
 	static void getRealCoordBound(std::shared_ptr<PatchInfo<D>> pinfo,
 	                              const std::array<int, D - 1> &coord, Side<D> s,
 	                              std::array<double, D> &real_coord)
@@ -84,6 +93,21 @@ template <size_t D> struct DomainTools {
 				getRealCoord(pinfo, coord, real_coord);
 				ld[coord] = func(real_coord);
 			});
+		}
+	}
+	static void setValuesWithGhost(std::shared_ptr<Domain<D>>                           domain,
+	                               std::shared_ptr<Vector<D>>                           vec,
+	                               std::function<double(const std::array<double, D> &)> func)
+	{
+		std::array<double, D> real_coord;
+		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
+			LocalData<D> ld    = vec->getLocalData(i);
+			auto         pinfo = domain->getPatchInfoVector()[i];
+			nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(),
+			               [&](const std::array<int, D> &coord) {
+				               getRealCoord(pinfo, coord, real_coord);
+				               ld[coord] = func(real_coord);
+			               });
 		}
 	}
 	static void setBCValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D - 1>> vec,

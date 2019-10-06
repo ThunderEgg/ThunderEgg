@@ -35,7 +35,6 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	private:
 	std::shared_ptr<const Vector<D>>                     coeffs;
-	std::shared_ptr<const Vector<D - 1>>                 bc_coeffs;
 	std::shared_ptr<const Vector<D - 1>>                 gamma_coeffs;
 	std::function<double(const std::array<double, D> &)> beta_func;
 	std::shared_ptr<SchurHelper<D>>                      sh;
@@ -53,10 +52,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		this->beta_func       = beta_func;
 		auto new_gamma_coeffs = sh->getNewSchurDistVec();
 		interp->interpolateToInterface(coeffs, new_gamma_coeffs);
-		gamma_coeffs       = new_gamma_coeffs;
-		auto new_bc_coeffs = PetscVector<D>::GetNewBCVector(sh->getDomain());
-		DomainTools<D>::setBCValues(sh->getDomain(), new_bc_coeffs, beta_func);
-		bc_coeffs = new_bc_coeffs;
+		gamma_coeffs = new_gamma_coeffs;
 	}
 	void applyWithInterface(SchurInfo<D> &sinfo, const LocalData<D> u,
 	                        std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f) override
@@ -94,18 +90,18 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 					f_slice[coord] += (-mid[coord] + upper[coord]) / h2[axis];
 				});
 			} else {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
+				LocalData<D - 1> f_slice = f.getSliceOnSide(lower_side);
+				// const LocalData<D - 1> lower   = u.getSliceOnSide(lower_side, -1);
 				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
 				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> c_bnd
-				= bc_coeffs->getLocalData(sinfo.pinfo->getBCLocalIndex(lower_side));
+				const LocalData<D - 1> c_lower = c.getSliceOnSide(lower_side, -1);
 				const LocalData<D - 1> c_mid   = c.getSliceOnSide(lower_side);
 				const LocalData<D - 1> c_upper = c.getSliceOnSide(lower_side, 1);
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord]
-					+= ((c_upper[coord] + c_mid[coord]) * upper[coord]
-					    - (4 * c_bnd[coord] + c_upper[coord] + c_mid[coord]) * mid[coord])
-					   / (2 * h2[axis]);
+					double lower = -mid[coord];
+					f_slice[coord] += ((c_upper[coord] + c_mid[coord]) * (upper[coord] - mid[coord])
+					                   - (c_lower[coord] + c_mid[coord]) * (mid[coord] - lower))
+					                  / (2 * h2[axis]);
 				});
 			}
 			// middle
@@ -159,15 +155,16 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
 				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
 				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
+				const LocalData<D - 1> upper   = u.getSliceOnSide(upper_side, -1);
 				const LocalData<D - 1> c_lower = c.getSliceOnSide(upper_side, 1);
 				const LocalData<D - 1> c_mid   = c.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_bnd
-				= bc_coeffs->getLocalData(sinfo.pinfo->getBCLocalIndex(upper_side));
+				const LocalData<D - 1> c_upper = c.getSliceOnSide(upper_side, -1);
 
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
+					double upper = -mid[coord];
 					f_slice[coord]
-					+= ((c_lower[coord] + c_mid[coord]) * lower[coord]
-					    - (4 * c_bnd[coord] + c_lower[coord] + c_mid[coord]) * mid[coord])
+					+= ((c_upper[coord] + c_mid[coord]) * (upper - mid[coord])
+					    - (c_lower[coord] + c_mid[coord]) * (mid[coord] - lower[coord]))
 					   / (2 * h2[axis]);
 				});
 			}
@@ -232,15 +229,13 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
 				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
 				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> c_bnd
-				= bc_coeffs->getLocalData(sinfo.pinfo->getBCLocalIndex(lower_side));
+				const LocalData<D - 1> c_lower = c.getSliceOnSide(lower_side, -1);
 				const LocalData<D - 1> c_mid   = c.getSliceOnSide(lower_side);
 				const LocalData<D - 1> c_upper = c.getSliceOnSide(lower_side, 1);
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord]
-					= ((c_upper[coord] + c_mid[coord]) * upper[coord]
-					   - (4 * c_bnd[coord] + c_upper[coord] + c_mid[coord]) * mid[coord])
-					  / (2 * h2[axis]);
+					f_slice[coord] += ((c_upper[coord] + c_mid[coord]) * (upper[coord] - mid[coord])
+					                   - (c_lower[coord] + c_mid[coord]) * (mid[coord]))
+					                  / (2 * h2[axis]);
 				});
 			}
 			// middle
@@ -295,14 +290,13 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
 				const LocalData<D - 1> c_lower = c.getSliceOnSide(upper_side, 1);
 				const LocalData<D - 1> c_mid   = c.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_bnd
-				= bc_coeffs->getLocalData(sinfo.pinfo->getBCLocalIndex(upper_side));
+				const LocalData<D - 1> c_upper = c.getSliceOnSide(upper_side, -1);
 
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
 					f_slice[coord]
-					= ((c_lower[coord] + c_mid[coord]) * lower[coord]
-					   - (4 * c_bnd[coord] + c_lower[coord] + c_mid[coord]) * mid[coord])
-					  / (2 * h2[axis]);
+					+= ((c_upper[coord] + c_mid[coord]) * (0 - mid[coord])
+					    - (c_lower[coord] + c_mid[coord]) * (mid[coord] - lower[coord]))
+					   / (2 * h2[axis]);
 				});
 			}
 		}
@@ -336,15 +330,13 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
 				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
 				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> c_bnd
-				= bc_coeffs->getLocalData(sinfo.pinfo->getBCLocalIndex(lower_side));
+				const LocalData<D - 1> c_lower = c.getSliceOnSide(lower_side, -1);
 				const LocalData<D - 1> c_mid   = c.getSliceOnSide(lower_side);
 				const LocalData<D - 1> c_upper = c.getSliceOnSide(lower_side, 1);
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord]
-					+= ((c_upper[coord] + c_mid[coord]) * upper[coord]
-					    - (4 * c_bnd[coord] + c_upper[coord] + c_mid[coord]) * mid[coord])
-					   / (2 * h2[axis]);
+					f_slice[coord] += ((c_upper[coord] + c_mid[coord]) * (upper[coord] - mid[coord])
+					                   - (c_lower[coord] + c_mid[coord]) * (mid[coord]))
+					                  / (2 * h2[axis]);
 				});
 			}
 			// middle
@@ -399,13 +391,12 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
 				const LocalData<D - 1> c_lower = c.getSliceOnSide(upper_side, 1);
 				const LocalData<D - 1> c_mid   = c.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_bnd
-				= bc_coeffs->getLocalData(sinfo.pinfo->getBCLocalIndex(upper_side));
+				const LocalData<D - 1> c_upper = c.getSliceOnSide(upper_side, -1);
 
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
 					f_slice[coord]
-					+= ((c_lower[coord] + c_mid[coord]) * lower[coord]
-					    - (4 * c_bnd[coord] + c_lower[coord] + c_mid[coord]) * mid[coord])
+					+= ((c_upper[coord] + c_mid[coord]) * (0 - mid[coord])
+					    - (c_lower[coord] + c_mid[coord]) * (mid[coord] - lower[coord]))
 					   / (2 * h2[axis]);
 				});
 			}
@@ -426,7 +417,14 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 					ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 						std::array<double, D> real_coord;
 						DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
-						ld[coord] -= 2 * gfunc(real_coord) * hfunc(real_coord) / h2;
+						std::array<double, D> other_real_coord = real_coord;
+						if (s.isLowerOnAxis()) {
+							other_real_coord[s.axis()] -= pinfo->spacings[s.axis()];
+						} else {
+							other_real_coord[s.axis()] += pinfo->spacings[s.axis()];
+						}
+						ld[coord] += gfunc(real_coord)
+						             * (hfunc(real_coord) + hfunc(other_real_coord)) / (2 * h2);
 					});
 				}
 			}

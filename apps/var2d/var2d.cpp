@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
 
 		DomainTools<2>::setValues(domain, f, ffun);
 		DomainTools<2>::setValues(domain, exact, gfun);
-		DomainTools<2>::setValues(domain, h, hfun);
+		DomainTools<2>::setValuesWithGhost(domain, h, hfun);
 		DomainTools<2>::setBCValues(domain, h_bc, hfun);
 		if (neumann) {
 			// Init::initNeumann2d(*domain, f->vec, exact->vec, ffun, gfun, nfunx, nfuny);

@@ -90,24 +90,41 @@ template <size_t D> struct PatchInfo : public Serializable {
 	/**
 	 * @brief The refinement level
 	 */
-	int refine_level = 1;
+	int refine_level = -1;
 	/**
 	 * @brief The id of the parent patch.
 	 *
 	 * Set to -1 if there is no parent.
 	 */
-	int                                       parent_id   = -1;
-	int                                       parent_rank = -1;
+	int parent_id = -1;
+	/**
+	 * @brief the rank that the parent patch resides on
+	 */
+	int parent_rank = -1;
+	/**
+	 * @brief The id's of the children.
+	 *
+	 * Set to -1 if there are no children
+	 */
 	std::array<int, Orthant<D>::num_orthants> child_ids;
+	/**
+	 * @brief The ranks of the children
+	 *
+	 * Set to -1 if there are no children
+	 */
 	std::array<int, Orthant<D>::num_orthants> child_ranks;
-	int                                       num_ghost_cells = 0;
-
+	/**
+	 * @brief Number of ghost cells on each side of the patch.
+	 */
+	int num_ghost_cells = 0;
 	/**
 	 * @brief MPI rank of this patch
 	 */
 	int rank = -1;
 	/**
 	 * @brief The orthant of the parent that this parent resides on.
+	 *
+	 * If the parent is the same size, it should be set to Orthant::null
 	 */
 	Orthant<D> orth_on_parent;
 	/**
@@ -148,17 +165,13 @@ template <size_t D> struct PatchInfo : public Serializable {
 	{
 		starts.fill(0);
 		nbr_info.fill(nullptr);
-		ns.fill(0);
-		spacings.fill(0);
+		ns.fill(1);
+		spacings.fill(1);
 		bc_local_index.fill(-1);
 		bc_global_index.fill(-1);
 		child_ids.fill(-1);
 		child_ranks.fill(-1);
 	}
-	/**dddd
-	 * @brief Destroy the Patch Info object
-	 */
-	//~PatchInfo() = default;
 	/**
 	 * @brief Compare the ids of the patches
 	 *

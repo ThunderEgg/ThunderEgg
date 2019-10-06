@@ -61,6 +61,10 @@ template <size_t D> class Domain
 	 */
 	int num_cells_in_patch;
 	/**
+	 * @brief The number of cells(including ghost cells) in a patch
+	 */
+	int num_cells_in_patch_with_ghost;
+	/**
 	 * @brief Map that goes form patch's id to the PatchInfo pointer
 	 */
 	std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_id_map;
@@ -171,9 +175,11 @@ template <size_t D> class Domain
 		num_ghost_cells = pinfo_map.begin()->second->num_ghost_cells;
 		ns              = pinfo_map.begin()->second->ns;
 
-		num_cells_in_patch = 1;
+		num_cells_in_patch            = 1;
+		num_cells_in_patch_with_ghost = 1;
 		for (size_t i = 0; i < D; i++) {
 			num_cells_in_patch *= ns[i];
+			num_cells_in_patch_with_ghost *= (ns[i] + 2 * num_ghost_cells);
 		}
 
 		pinfo_id_map = pinfo_map;
@@ -263,6 +269,13 @@ template <size_t D> class Domain
 	int getNumLocalCells() const
 	{
 		return pinfo_id_map.size() * num_cells_in_patch;
+	}
+	/**
+	 * @brief Get get the number of local cells (including ghost cells)
+	 */
+	int getNumLocalCellsWithGhost() const
+	{
+		return pinfo_id_map.size() * num_cells_in_patch_with_ghost;
 	}
 	/**
 	 * @brief Get get the number of local boundary condition cells

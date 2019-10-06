@@ -197,6 +197,20 @@ template <size_t D> class LocalData
 		return end;
 	}
 	/**
+	 * @brief Get the coordinate of the first ghost cell element
+	 */
+	const std::array<int, D> &getGhostStart() const
+	{
+		return ghost_start;
+	}
+	/**
+	 * @brief Get the coordinate of the last ghost cell element
+	 */
+	const std::array<int, D> &getGhostEnd() const
+	{
+		return ghost_end;
+	}
+	/**
 	 * @brief Get the number of ghost cells on each side of the patch
 	 */
 	int getNumGhostCells() const
