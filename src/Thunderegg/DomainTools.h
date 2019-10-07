@@ -105,7 +105,7 @@ template <size_t D> struct DomainTools {
 			auto         pinfo = domain->getPatchInfoVector()[i];
 			nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(),
 			               [&](const std::array<int, D> &coord) {
-				               getRealCoord(pinfo, coord, real_coord);
+				               getRealCoordGhost(pinfo, coord, real_coord);
 				               ld[coord] = func(real_coord);
 			               });
 		}
