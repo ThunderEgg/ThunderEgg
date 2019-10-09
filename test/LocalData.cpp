@@ -2,7 +2,7 @@
 #include <Thunderegg/Vector.h>
 using namespace std;
 using namespace Thunderegg;
-TEST_CASE("LocalData constructor", "[LocalData]")
+TEST_CASE("LocalData constructor", "[DomainTools]")
 {
 	auto nx        = GENERATE(1, 2, 10, 13);
 	auto ny        = GENERATE(1, 2, 10, 13);

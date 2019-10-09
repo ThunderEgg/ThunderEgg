@@ -27,7 +27,18 @@
 
 namespace Thunderegg
 {
+/**
+ * @brief Various tools for filling in values in a domain
+ *
+ * @tparam D the number of cartesian dimensions
+ */
 template <size_t D> struct DomainTools {
+	/**
+	 * @brief Given a path info object, get the coordinate from a given index into the patch.
+	 *
+	 * If one of the values is -1 or ns[axis] it will give the coordinate of the cooresponding
+	 * interface
+	 */
 	static void getRealCoord(std::shared_ptr<PatchInfo<D>> pinfo, const std::array<int, D> &coord,
 	                         std::array<double, D> &real_coord)
 	{
@@ -42,6 +53,9 @@ template <size_t D> struct DomainTools {
 			}
 		});
 	}
+	/**
+	 * @brief Given a path info object, get the coordinate from a given index into the patch.
+	 */
 	static void getRealCoordGhost(std::shared_ptr<PatchInfo<D>> pinfo,
 	                              const std::array<int, D> &    coord,
 	                              std::array<double, D> &       real_coord)
@@ -51,6 +65,10 @@ template <size_t D> struct DomainTools {
 			= pinfo->starts[dir] + pinfo->spacings[dir] / 2.0 + pinfo->spacings[dir] * coord[dir];
 		});
 	}
+	/**
+	 * @brief Given a path info object and a side of the patch, get the coordinate from a given
+	 * index into the interface of the patch.
+	 */
 	static void getRealCoordBound(std::shared_ptr<PatchInfo<D>> pinfo,
 	                              const std::array<int, D - 1> &coord, Side<D> s,
 	                              std::array<double, D> &real_coord)
@@ -82,6 +100,9 @@ template <size_t D> struct DomainTools {
 			}
 		}
 	}
+	/**
+	 * @brief Set the values for a vector with the given function.
+	 */
 	static void setValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
 	                      std::function<double(const std::array<double, D> &)> func)
 	{
@@ -95,6 +116,9 @@ template <size_t D> struct DomainTools {
 			});
 		}
 	}
+	/**
+	 * @brief Set the values (including ghost values) for a vector with the given function.
+	 */
 	static void setValuesWithGhost(std::shared_ptr<Domain<D>>                           domain,
 	                               std::shared_ptr<Vector<D>>                           vec,
 	                               std::function<double(const std::array<double, D> &)> func)
@@ -110,6 +134,9 @@ template <size_t D> struct DomainTools {
 			               });
 		}
 	}
+	/**
+	 * @brief Set the value of a boundary vector using a given function.
+	 */
 	static void setBCValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D - 1>> vec,
 	                        std::function<double(const std::array<double, D> &)> func)
 	{

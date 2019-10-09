@@ -47,9 +47,8 @@ template <size_t D> class ValVector : public Vector<D>
 		this->lengths           = lengths;
 		first_offset            = 0;
 		for (size_t i = 0; i < D; i++) {
-			this->lengths[i] += 2 * num_ghost_cells;
 			strides[i] = size;
-			size *= this->lengths[i];
+			size *= (this->lengths[i] + 2 * num_ghost_cells);
 			first_offset += strides[i] * num_ghost_cells;
 		}
 		patch_stride = size;
