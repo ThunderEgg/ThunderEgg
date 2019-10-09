@@ -19,23 +19,25 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_POISSON_STARPATCHOPERATOR_H
-#define THUNDEREGG_POISSON_STARPATCHOPERATOR_H
+#ifndef THUNDEREGG_POISSON_SCHUR_STARPATCHOPERATOR_H
+#define THUNDEREGG_POISSON_SCHUR_STARPATCHOPERATOR_H
 
-#include <Thunderegg/PatchOperator.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/PatchOperator.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 
 namespace Thunderegg
 {
 namespace Poisson
 {
-template <size_t D> class StarPatchOperator : public PatchOperator<D>
+namespace Schur
+{
+template <size_t D> class StarPatchOperator : public Thunderegg::Schur::PatchOperator<D>
 {
 	private:
-	std::shared_ptr<SchurHelper<D>> sh;
+	std::shared_ptr<Thunderegg::Schur::SchurHelper<D>> sh;
 
 	public:
-	StarPatchOperator(std::shared_ptr<SchurHelper<D>> sh)
+	StarPatchOperator(std::shared_ptr<Thunderegg::Schur::SchurHelper<D>> sh)
 	{
 		this->sh = sh;
 	}
@@ -47,12 +49,13 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			                   f->getLocalData(sinfo->pinfo->local_index));
 		}
 	}
-	std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
+	std::shared_ptr<Thunderegg::Schur::PatchOperator<D>>
+	getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
 	{
 		return std::shared_ptr<StarPatchOperator<D>>(new StarPatchOperator<D>(ctx.sh));
 	}
 
-	void applyWithInterface(SchurInfo<D> &sinfo, const LocalData<D> u,
+	void applyWithInterface(Thunderegg::Schur::SchurInfo<D> &sinfo, const LocalData<D> u,
 	                        std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f) override
 	{
 		std::array<double, D> h2 = sinfo.pinfo->spacings;
@@ -209,8 +212,8 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			}
 		}
 	}
-	void addInterfaceToRHS(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D - 1>> gamma,
-	                       LocalData<D> f) override
+	void addInterfaceToRHS(Thunderegg::Schur::SchurInfo<D> &    sinfo,
+	                       std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f) override
 	{
 		for (Side<D> s : Side<D>::getValues()) {
 			if (sinfo.pinfo->hasNbr(s)) {
@@ -228,7 +231,8 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			}
 		}
 	}
-	void apply(const SchurInfo<D> &sinfo, const LocalData<D> u, LocalData<D> f) override
+	void apply(const Thunderegg::Schur::SchurInfo<D> &sinfo, const LocalData<D> u,
+	           LocalData<D> f) override
 	{
 		std::array<double, D> h2 = sinfo.pinfo->spacings;
 		for (size_t i = 0; i < D; i++) {
@@ -347,6 +351,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 };
 extern template class StarPatchOperator<2>;
 extern template class StarPatchOperator<3>;
+} // namespace Schur
 } // namespace Poisson
 } // namespace Thunderegg
 #endif

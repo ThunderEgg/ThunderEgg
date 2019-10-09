@@ -83,11 +83,12 @@ class PetscShellCreator
 	template <size_t D> class PetscPCShellOpSchur
 	{
 		private:
-		std::shared_ptr<Operator<D>>        op;
-		std::shared_ptr<SchurHelper<D + 1>> sh;
+		std::shared_ptr<Operator<D>>               op;
+		std::shared_ptr<Schur::SchurHelper<D + 1>> sh;
 
 		public:
-		PetscPCShellOpSchur(std::shared_ptr<Operator<D>> op, std::shared_ptr<SchurHelper<D + 1>> sh)
+		PetscPCShellOpSchur(std::shared_ptr<Operator<D>>               op,
+		                    std::shared_ptr<Schur::SchurHelper<D + 1>> sh)
 		{
 			this->op = op;
 			this->sh = sh;
@@ -161,7 +162,7 @@ class PetscShellCreator
 	 */
 	template <size_t D>
 	static void getPCShell(PC pc, std::shared_ptr<Operator<D>> op,
-	                       std::shared_ptr<SchurHelper<D + 1>> sh)
+	                       std::shared_ptr<Schur::SchurHelper<D + 1>> sh)
 	{
 		PetscPCShellOpSchur<D> *wrap = new PetscPCShellOpSchur<D>(op, sh);
 		PCSetType(pc, PCSHELL);
@@ -202,8 +203,8 @@ class PetscShellCreator
 	 * @return PW_explicit<Mat> Return a new Mat object
 	 */
 	template <size_t D>
-	static PW_explicit<Mat> getMatShell(std::shared_ptr<Operator<D>>    op,
-	                                    std::shared_ptr<SchurHelper<D>> sh)
+	static PW_explicit<Mat> getMatShell(std::shared_ptr<Operator<D>>           op,
+	                                    std::shared_ptr<Schur::SchurHelper<D>> sh)
 	{
 		PetscPCShellOpSchur<D> *wrap = new PetscPCShellOpSchur<D>(op, sh);
 		int                     M    = sh->getSchurVecGlobalSize();

@@ -19,14 +19,16 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHURMATRIXHELPER2D_H
-#define THUNDEREGG_SCHURMATRIXHELPER2D_H
-#include <Thunderegg/SchurHelper.h>
+#ifndef THUNDEREGG_SHUR_SCHURMATRIXHELPER2D_H
+#define THUNDEREGG_SHUR_SCHURMATRIXHELPER2D_H
+#include <Thunderegg/Schur/SchurHelper.h>
 #include <functional>
 #include <memory>
 #include <petscmat.h>
 #include <valarray>
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief This class represents a collection of domains that a single processor owns.
@@ -60,5 +62,6 @@ class SchurMatrixHelper2d
 	 */
 	PW_explicit<Mat> formCRSMatrix();
 };
+} // namespace Schur
 } // namespace Thunderegg
 #endif

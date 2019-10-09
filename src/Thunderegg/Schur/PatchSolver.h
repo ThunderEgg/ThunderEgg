@@ -19,14 +19,16 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef PATCHSOLVER_H
-#define PATCHSOLVER_H
+#ifndef THUNDEREGG_SCHUR_PATCHSOLVER_H
+#define THUNDEREGG_SCHUR_PATCHSOLVER_H
 
-#include <Thunderegg/SchurInfo.h>
 #include <Thunderegg/GMG/CycleFactoryCtx.h>
+#include <Thunderegg/Schur/SchurInfo.h>
 #include <Thunderegg/Vector.h>
 
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief Solves the problem on the patches using a specified interface value
@@ -59,7 +61,8 @@ template <size_t D> class PatchSolver
 	virtual void solve(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
 	                   std::shared_ptr<const Vector<D - 1>> gamma)
 	= 0;
-	virtual std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)=0;
+	virtual std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx) = 0;
 };
+} // namespace Schur
 } // namespace Thunderegg
 #endif

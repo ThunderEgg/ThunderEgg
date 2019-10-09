@@ -22,8 +22,6 @@
 #include "Init.h"
 #include "Writers/ClawWriter.h"
 #include <Thunderegg/BiCGStab.h>
-#include <Thunderegg/BiCGStabSolver.h>
-#include <Thunderegg/BilinearInterpolator.h>
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/DomainWrapOp.h>
@@ -31,10 +29,11 @@
 #include <Thunderegg/GMG/CycleFactory2d.h>
 #include <Thunderegg/PetscMatOp.h>
 #include <Thunderegg/PetscShellCreator.h>
-#include <Thunderegg/PolyChebPrec.h>
-#include <Thunderegg/SchurHelper.h>
-#include <Thunderegg/SchurMatrixHelper2d.h>
-#include <Thunderegg/SchurWrapOp.h>
+#include <Thunderegg/Schur/BiCGStabSolver.h>
+#include <Thunderegg/Schur/BilinearInterpolator.h>
+#include <Thunderegg/Schur/SchurHelper.h>
+#include <Thunderegg/Schur/SchurMatrixHelper2d.h>
+#include <Thunderegg/Schur/SchurWrapOp.h>
 #include <Thunderegg/SchwarzPrec.h>
 #include <Thunderegg/Timer.h>
 #include <Thunderegg/VarPoisson/StarPatchOperator.h>
@@ -63,6 +62,7 @@
 
 using namespace std;
 using namespace Thunderegg;
+using namespace Thunderegg::Schur;
 using namespace Thunderegg::Experimental;
 using namespace Thunderegg::VarPoisson;
 

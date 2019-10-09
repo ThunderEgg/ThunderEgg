@@ -19,12 +19,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_IFACEINTERP_H
-#define THUNDEREGG_IFACEINTERP_H
-#include <Thunderegg/IfaceType.h>
+#ifndef THUNDEREGG_SCHUR_IFACEINTERP_H
+#define THUNDEREGG_SCHUR_IFACEINTERP_H
 #include <Thunderegg/GMG/CycleFactoryCtx.h>
+#include <Thunderegg/Schur/IfaceType.h>
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief An abstract class that interpolates to the interfaces in the Schur compliment system.
@@ -47,5 +49,6 @@ template <size_t D> class IfaceInterp
 	= 0;
 	virtual std::shared_ptr<IfaceInterp<D>> getNewIfaceInterp(GMG::CycleFactoryCtx<D> ctx) = 0;
 };
+} // namespace Schur
 } // namespace Thunderegg
 #endif

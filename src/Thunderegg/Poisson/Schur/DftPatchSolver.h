@@ -19,10 +19,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_POISSON_DFTPATCHSOLVER_H
-#define THUNDEREGG_POISSON_DFTPATCHSOLVER_H
-#include <Thunderegg/PatchSolver.h>
-#include <Thunderegg/SchurHelper.h>
+#ifndef THUNDEREGG_POISSON_SCHUR_DFTPATCHSOLVER_H
+#define THUNDEREGG_POISSON_SCHUR_DFTPATCHSOLVER_H
+#include <Thunderegg/Schur/PatchSolver.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 #include <Thunderegg/ValVector.h>
 #include <bitset>
 #include <map>
@@ -35,6 +35,8 @@ namespace Thunderegg
 {
 namespace Poisson
 {
+namespace Schur
+{
 enum class DftType { DCT_II, DCT_III, DCT_IV, DST_II, DST_III, DST_IV };
 #ifndef DOMAINK
 #define DOMAINK
@@ -43,7 +45,7 @@ template <size_t D> struct DomainK {
 	double        h_x     = 0;
 
 	DomainK() {}
-	DomainK(const SchurInfo<D> &sinfo)
+	DomainK(const Thunderegg::Schur::SchurInfo<D> &sinfo)
 	{
 		this->neumann = sinfo.pinfo->neumann.to_ulong();
 		this->h_x     = sinfo.pinfo->spacings[0];
@@ -55,10 +57,10 @@ template <size_t D> struct DomainK {
 };
 #endif
 
-template <size_t D> class DftPatchSolver : public PatchSolver<D>
+template <size_t D> class DftPatchSolver : public Thunderegg::Schur::PatchSolver<D>
 {
 	private:
-	std::shared_ptr<SchurHelper<D>>                                             sh;
+	std::shared_ptr<Thunderegg::Schur::SchurHelper<D>>                          sh;
 	std::array<int, D>                                                          ns;
 	int                                                                         n;
 	int                                                                         patch_stride;
@@ -81,8 +83,8 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 	                  LocalData<D> out, const bool inverse);
 
 	public:
-	DftPatchSolver(std::shared_ptr<SchurHelper<D>> sh, double lambda = 0);
-	void solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
+	DftPatchSolver(std::shared_ptr<Thunderegg::Schur::SchurHelper<D>> sh, double lambda = 0);
+	void solve(Thunderegg::Schur::SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
 	           std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma);
 	void solve(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
 	           std::shared_ptr<const Vector<D - 1>> gamma) override
@@ -91,15 +93,17 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 			solve(*sinfo, f, u, gamma);
 		}
 	}
-	void                            addPatch(SchurInfo<D> &sinfo);
-	std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)
+	void addPatch(Thunderegg::Schur::SchurInfo<D> &sinfo);
+	std::shared_ptr<Thunderegg::Schur::PatchSolver<D>>
+	getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)
 	{
-		return std::shared_ptr<PatchSolver<D>>(new DftPatchSolver(ctx.sh));
+		return std::shared_ptr<Thunderegg::Schur::PatchSolver<D>>(new DftPatchSolver(ctx.sh));
 	}
 };
 
 template <size_t D>
-inline DftPatchSolver<D>::DftPatchSolver(std::shared_ptr<SchurHelper<D>> sh, double lambda)
+inline DftPatchSolver<D>::DftPatchSolver(std::shared_ptr<Thunderegg::Schur::SchurHelper<D>> sh,
+                                         double                                             lambda)
 {
 	this->sh     = sh;
 	ns           = sh->getDomain()->getNs();
@@ -107,7 +111,7 @@ inline DftPatchSolver<D>::DftPatchSolver(std::shared_ptr<SchurHelper<D>> sh, dou
 	patch_stride = sh->getDomain()->getNumCellsInPatch();
 	this->lambda = lambda;
 }
-template <size_t D> inline void DftPatchSolver<D>::addPatch(SchurInfo<D> &sinfo)
+template <size_t D> inline void DftPatchSolver<D>::addPatch(Thunderegg::Schur::SchurInfo<D> &sinfo)
 {
 	using namespace std;
 	if (!initialized) {
@@ -182,9 +186,9 @@ template <size_t D> inline void DftPatchSolver<D>::addPatch(SchurInfo<D> &sinfo)
 }
 
 template <size_t D>
-inline void DftPatchSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
-                                     std::shared_ptr<Vector<D>>           u,
-                                     std::shared_ptr<const Vector<D - 1>> gamma)
+inline void
+DftPatchSolver<D>::solve(Thunderegg::Schur::SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
+                         std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma)
 {
 	using namespace std;
 	const LocalData<D> f_view      = f->getLocalData(sinfo.pinfo->local_index);
@@ -359,6 +363,7 @@ DftPatchSolver<D>::execute_plan(std::array<std::shared_ptr<std::valarray<double>
 }
 extern template class DftPatchSolver<2>;
 extern template class DftPatchSolver<3>;
+} // namespace Schur
 } // namespace Poisson
 } // namespace Thunderegg
 #endif

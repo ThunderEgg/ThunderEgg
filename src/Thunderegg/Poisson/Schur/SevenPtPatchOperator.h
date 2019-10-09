@@ -19,29 +19,34 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_POISSON_SEVENPTPATCHOPERATOR_H
-#define THUNDEREGG_POISSON_SEVENPTPATCHOPERATOR_H
+#ifndef THUNDEREGG_POISSON_SCHUR_SEVENPTPATCHOPERATOR_H
+#define THUNDEREGG_POISSON_SCHUR_SEVENPTPATCHOPERATOR_H
 
-#include <Thunderegg/PatchOperator.h>
+#include <Thunderegg/Schur/PatchOperator.h>
 
 namespace Thunderegg
 {
 namespace Poisson
 {
-class SevenPtPatchOperator : public PatchOperator<3>
+namespace Schur
+{
+class SevenPtPatchOperator : public Thunderegg::Schur::PatchOperator<3>
 {
 	public:
 	void apply(std::shared_ptr<const Vector<3>> u, std::shared_ptr<const Vector<2>> gamma,
 	           std::shared_ptr<Vector<3>> f) override;
-	void applyWithInterface(SchurInfo<3> &d, const LocalData<3> u,
+	void applyWithInterface(Thunderegg::Schur::SchurInfo<3> &d, const LocalData<3> u,
 	                        std::shared_ptr<const Vector<2>> gamma, LocalData<3> f);
-	void addInterfaceToRHS(SchurInfo<3> &sinfo, std::shared_ptr<const Vector<2>> gamma,
-	                       LocalData<3> f);
-	void apply(const SchurInfo<3> &sinfo, const LocalData<3> u, LocalData<3> f);
-	std::shared_ptr<PatchOperator<3>> getNewPatchOperator(GMG::CycleFactoryCtx<3> ctx){
+	void addInterfaceToRHS(Thunderegg::Schur::SchurInfo<3> &sinfo,
+	                       std::shared_ptr<const Vector<2>> gamma, LocalData<3> f);
+	void apply(const Thunderegg::Schur::SchurInfo<3> &sinfo, const LocalData<3> u, LocalData<3> f);
+	std::shared_ptr<Thunderegg::Schur::PatchOperator<3>>
+	getNewPatchOperator(GMG::CycleFactoryCtx<3> ctx)
+	{
 		return std::shared_ptr<PatchOperator<3>>(new SevenPtPatchOperator());
 	}
 };
+} // namespace Schur
 } // namespace Poisson
 } // namespace Thunderegg
 #endif

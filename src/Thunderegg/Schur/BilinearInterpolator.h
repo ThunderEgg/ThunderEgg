@@ -19,13 +19,15 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_BILINEARINTERPOLATOR_H
-#define THUNDEREGG_BILINEARINTERPOLATOR_H
+#ifndef THUNDEREGG_SCHUR_BILINEARINTERPOLATOR_H
+#define THUNDEREGG_SCHUR_BILINEARINTERPOLATOR_H
 
-#include <Thunderegg/IfaceInterp.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/IfaceInterp.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief a bilinear interpolator for interface values
@@ -48,9 +50,11 @@ class BilinearInterpolator : public IfaceInterp<2>
 	                 std::shared_ptr<Vector<1>> interp);
 	void interpolate(SchurInfo<2> &d, Side<2> s, int local_index, IfaceType<2> itype,
 	                 std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector<1>> interp);
-    std::shared_ptr<IfaceInterp<2>> getNewIfaceInterp(GMG::CycleFactoryCtx<2> ctx) override{
+	std::shared_ptr<IfaceInterp<2>> getNewIfaceInterp(GMG::CycleFactoryCtx<2> ctx) override
+	{
 		return std::shared_ptr<IfaceInterp<2>>(new BilinearInterpolator(ctx.sh));
 	}
 };
+} // namespace Schur
 } // namespace Thunderegg
 #endif

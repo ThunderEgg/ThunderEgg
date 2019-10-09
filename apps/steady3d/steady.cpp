@@ -31,18 +31,18 @@
 #include <Thunderegg/GMG/CycleOpts.h>
 #include <Thunderegg/PetscMatOp.h>
 #include <Thunderegg/PetscShellCreator.h>
-#include <Thunderegg/Poisson/DftPatchSolver.h>
-#include <Thunderegg/Poisson/FftwPatchSolver.h>
 #include <Thunderegg/Poisson/MatrixHelper.h>
-#include <Thunderegg/Poisson/SevenPtPatchOperator.h>
-#include <Thunderegg/Poisson/StarPatchOperator.h>
-#include <Thunderegg/PolyChebPrec.h>
-#include <Thunderegg/SchurHelper.h>
-#include <Thunderegg/SchurMatrixHelper.h>
-#include <Thunderegg/SchurWrapOp.h>
+#include <Thunderegg/Poisson/Schur/DftPatchSolver.h>
+#include <Thunderegg/Poisson/Schur/FftwPatchSolver.h>
+#include <Thunderegg/Poisson/Schur/SevenPtPatchOperator.h>
+#include <Thunderegg/Poisson/Schur/StarPatchOperator.h>
+#include <Thunderegg/Schur/PolyChebPrec.h>
+#include <Thunderegg/Schur/SchurHelper.h>
+#include <Thunderegg/Schur/SchurMatrixHelper.h>
+#include <Thunderegg/Schur/SchurWrapOp.h>
+#include <Thunderegg/Schur/TriLinInterp.h>
 #include <Thunderegg/SchwarzPrec.h>
 #include <Thunderegg/Timer.h>
-#include <Thunderegg/TriLinInterp.h>
 #ifdef ENABLE_AMGX
 #include "AmgxWrapper.h"
 #endif
@@ -71,8 +71,10 @@
 
 using namespace std;
 using namespace Thunderegg;
+using namespace Thunderegg::Schur;
 using namespace Thunderegg::Experimental;
 using namespace Thunderegg::Poisson;
+using namespace Thunderegg::Poisson::Schur;
 
 int main(int argc, char *argv[])
 {

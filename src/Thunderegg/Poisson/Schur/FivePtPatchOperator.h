@@ -19,17 +19,19 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef FIVEPTPATCHOPERATOR_H
-#define FIVEPTPATCHOPERATOR_H
-#include <Thunderegg/PatchOperator.h>
+#ifndef THUNDEREGG_POISSON_SCHUR_FIVEPTPATCHOPERATOR_H
+#define THUNDEREGG_POISSON_SCHUR_FIVEPTPATCHOPERATOR_H
+#include <Thunderegg/Schur/PatchOperator.h>
 namespace Thunderegg
 {
 namespace Poisson
 {
-class FivePtPatchOperator : public PatchOperator<2>
+namespace Schur
+{
+class FivePtPatchOperator : public Thunderegg::Schur::PatchOperator<2>
 {
 	public:
-	void applyWithInterface(SchurInfo<2> &sinfo, const LocalData<2> u,
+	void applyWithInterface(Thunderegg::Schur::SchurInfo<2> &sinfo, const LocalData<2> u,
 	                        std::shared_ptr<const Vector<1>> gamma, LocalData<2> f) override
 	{
 		int nx = sinfo.pinfo->ns[0];
@@ -156,8 +158,8 @@ class FivePtPatchOperator : public PatchOperator<2>
 			}
 		}
 	}
-	void addInterfaceToRHS(SchurInfo<2> &sinfo, std::shared_ptr<const Vector<1>> gamma,
-	                       LocalData<2> f) override
+	void addInterfaceToRHS(Thunderegg::Schur::SchurInfo<2> &sinfo,
+	                       std::shared_ptr<const Vector<1>> gamma, LocalData<2> f) override
 	{
 		for (Side<2> s : Side<2>::getValues()) {
 			if (sinfo.pinfo->hasNbr(s)) {
@@ -173,7 +175,8 @@ class FivePtPatchOperator : public PatchOperator<2>
 			}
 		}
 	}
-	void apply(const SchurInfo<2> &sinfo, const LocalData<2> u, LocalData<2> f) override
+	void apply(const Thunderegg::Schur::SchurInfo<2> &sinfo, const LocalData<2> u,
+	           LocalData<2> f) override
 	{
 		int nx = sinfo.pinfo->ns[0];
 		int ny = sinfo.pinfo->ns[1];
@@ -264,6 +267,7 @@ class FivePtPatchOperator : public PatchOperator<2>
 		}
 	}
 };
+} // namespace Schur
 } // namespace Poisson
 } // namespace Thunderegg
 #endif

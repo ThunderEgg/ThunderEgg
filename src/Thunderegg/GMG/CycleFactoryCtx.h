@@ -23,22 +23,23 @@
 #define THUNDEREGG_GMG_CYCLEFACTORYCTX_H
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/GMG/Level.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 namespace Thunderegg
 {
-template<size_t D>
-class PatchOperator;
-template<size_t D>
-class IfaceInterp;
+namespace Schur
+{
+template <size_t D> class PatchOperator;
+template <size_t D> class IfaceInterp;
+} // namespace Schur
 namespace GMG
 {
 template <size_t D> struct CycleFactoryCtx {
-	std::shared_ptr<Domain<D>>      domain;
-	std::shared_ptr<SchurHelper<D>> sh;
-	std::shared_ptr<Level<D>>       coarser_level;
-	std::shared_ptr<Level<D>>       finer_level;
-	std::shared_ptr<PatchOperator<D>>       op;
-	std::shared_ptr<IfaceInterp<D>>       interp;
+	std::shared_ptr<Domain<D>>               domain;
+	std::shared_ptr<Schur::SchurHelper<D>>   sh;
+	std::shared_ptr<Level<D>>                coarser_level;
+	std::shared_ptr<Level<D>>                finer_level;
+	std::shared_ptr<Schur::PatchOperator<D>> op;
+	std::shared_ptr<Schur::IfaceInterp<D>>   interp;
 };
 } // namespace GMG
 } // namespace Thunderegg

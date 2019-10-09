@@ -19,14 +19,18 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
+#ifndef THUNDEREGG_SCHUR_SCHURMATRIXHELPER
+#define THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #include <Thunderegg/Experimental/PBMatrix.h>
-#include <Thunderegg/IfaceInterp.h>
-#include <Thunderegg/PatchSolver.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/IfaceInterp.h>
+#include <Thunderegg/Schur/PatchSolver.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 #include <functional>
 #include <petscmat.h>
 #include <valarray>
 namespace Thunderegg
+{
+namespace Schur
 {
 struct Block;
 class SchurMatrixHelper
@@ -55,4 +59,6 @@ class SchurMatrixHelper
 	PW_explicit<Mat>        getPBMatrix();
 	PW_explicit<Mat>        getPBDiagInv();
 };
+} // namespace Schur
 } // namespace Thunderegg
+#endif

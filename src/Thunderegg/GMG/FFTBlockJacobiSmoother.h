@@ -22,7 +22,7 @@
 #ifndef THUNDEREGG_GMG_BLOCKJACOBISMOOTHER_H
 #define THUNDEREGG_GMG_BLOCKJACOBISMOOTHER_H
 
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 
 namespace Thunderegg
 {
@@ -38,9 +38,9 @@ template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
 	/**
 	 * @brief point to the SchurHelper object.
 	 */
-	std::shared_ptr<SchurHelper<D>> sh;
-	std::shared_ptr<PatchSolver<D>> solver;
-	std::shared_ptr<IfaceInterp<D>> interp;
+	std::shared_ptr<Schur::SchurHelper<D>> sh;
+	std::shared_ptr<Schur::PatchSolver<D>> solver;
+	std::shared_ptr<Schur::IfaceInterp<D>> interp;
 
 	public:
 	/**
@@ -48,9 +48,9 @@ template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
 	 *
 	 * @param sh pointer to the SchurHelper object
 	 */
-	FFTBlockJacobiSmoother(std::shared_ptr<SchurHelper<D>> sh,
-	                       std::shared_ptr<PatchSolver<D>> solver,
-	                       std::shared_ptr<IfaceInterp<D>> interp)
+	FFTBlockJacobiSmoother(std::shared_ptr<Schur::SchurHelper<D>> sh,
+	                       std::shared_ptr<Schur::PatchSolver<D>> solver,
+	                       std::shared_ptr<Schur::IfaceInterp<D>> interp)
 	{
 		this->sh     = sh;
 		this->solver = solver;

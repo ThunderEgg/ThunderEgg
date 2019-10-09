@@ -36,11 +36,11 @@ using namespace Thunderegg::GMG;
 using namespace Thunderegg::Poisson;
 using namespace Thunderegg;
 using namespace std;
-static std::shared_ptr<Operator<3>> getNewOperator(std::string                       op_type,
-                                                   std::shared_ptr<Domain<3>>        domain,
-                                                   std::shared_ptr<SchurHelper<3>>   sh,
-                                                   std::shared_ptr<IfaceInterp<3>>   interp,
-                                                   std::shared_ptr<PatchOperator<3>> pop)
+static std::shared_ptr<Operator<3>> getNewOperator(std::string                              op_type,
+                                                   std::shared_ptr<Domain<3>>               domain,
+                                                   std::shared_ptr<Schur::SchurHelper<3>>   sh,
+                                                   std::shared_ptr<Schur::IfaceInterp<3>>   interp,
+                                                   std::shared_ptr<Schur::PatchOperator<3>> pop)
 {
 	std::shared_ptr<Operator<3>> op;
 	if (op_type == "crs_matrix") {
@@ -51,11 +51,11 @@ static std::shared_ptr<Operator<3>> getNewOperator(std::string                  
 	}
 	return op;
 }
-static std::shared_ptr<Smoother<3>> getNewSmoother(std::string                     smoother_type,
-                                                   std::shared_ptr<Domain<3>>      domain,
-                                                   std::shared_ptr<SchurHelper<3>> sh,
-                                                   std::shared_ptr<IfaceInterp<3>> interp,
-                                                   std::shared_ptr<PatchSolver<3>> solver)
+static std::shared_ptr<Smoother<3>> getNewSmoother(std::string                smoother_type,
+                                                   std::shared_ptr<Domain<3>> domain,
+                                                   std::shared_ptr<Schur::SchurHelper<3>> sh,
+                                                   std::shared_ptr<Schur::IfaceInterp<3>> interp,
+                                                   std::shared_ptr<Schur::PatchSolver<3>> solver)
 {
 	return std::shared_ptr<Smoother<3>>(new FFTBlockJacobiSmoother<3>(sh, solver, interp));
 }
@@ -73,11 +73,11 @@ static std::shared_ptr<Restrictor<3>> getNewRestrictor(std::string              
 {
 	return std::shared_ptr<Restrictor<3>>(new AvgRstr<3>(domain, finer_domain, ilc));
 }
-std::shared_ptr<Cycle<3>> CycleFactory3d::getCycle(const CycleOpts &                   opts,
-                                                   std::shared_ptr<DomainGenerator<3>> dcg,
-                                                   std::shared_ptr<PatchSolver<3>>     solver,
-                                                   std::shared_ptr<PatchOperator<3>>   op,
-                                                   std::shared_ptr<IfaceInterp<3>>     interp)
+std::shared_ptr<Cycle<3>> CycleFactory3d::getCycle(const CycleOpts &                        opts,
+                                                   std::shared_ptr<DomainGenerator<3>>      dcg,
+                                                   std::shared_ptr<Schur::PatchSolver<3>>   solver,
+                                                   std::shared_ptr<Schur::PatchOperator<3>> op,
+                                                   std::shared_ptr<Schur::IfaceInterp<3>>   interp)
 {
 	int size;
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -93,9 +93,9 @@ std::shared_ptr<Cycle<3>> CycleFactory3d::getCycle(const CycleOpts &            
 	shared_ptr<Level<3>>  finest_level;
 	shared_ptr<Domain<3>> finer_domain;
 	{
-		shared_ptr<Domain<3>>          domain = dcg->getFinestDomain();
-		shared_ptr<SchurHelper<3>>     sh(new SchurHelper<3>(domain));
-		shared_ptr<VectorGenerator<3>> vg(new DomainVG<3>(domain));
+		shared_ptr<Domain<3>>             domain = dcg->getFinestDomain();
+		shared_ptr<Schur::SchurHelper<3>> sh(new Schur::SchurHelper<3>(domain));
+		shared_ptr<VectorGenerator<3>>    vg(new DomainVG<3>(domain));
 		finest_level.reset(new Level<3>(vg));
 		finest_level->setOperator(getNewOperator(op_type, domain, sh, interp, op));
 		finest_level->setSmoother(getNewSmoother(smoother_type, domain, sh, interp, solver));
@@ -109,9 +109,9 @@ std::shared_ptr<Cycle<3>> CycleFactory3d::getCycle(const CycleOpts &            
 		// create new level
 		shared_ptr<Domain<3>> domain = dcg->getCoarserDomain();
 		if ((domain->getNumGlobalPatches() + 0.0) / size < opts.patches_per_proc) { break; }
-		shared_ptr<SchurHelper<3>>     sh(new SchurHelper<3>(domain));
-		shared_ptr<VectorGenerator<3>> vg(new DomainVG<3>(domain));
-		shared_ptr<Level<3>>           coarser_level(new Level<3>(vg));
+		shared_ptr<Schur::SchurHelper<3>> sh(new Schur::SchurHelper<3>(domain));
+		shared_ptr<VectorGenerator<3>>    vg(new DomainVG<3>(domain));
+		shared_ptr<Level<3>>              coarser_level(new Level<3>(vg));
 
 		// link levels
 		coarser_level->setFiner(finer_level);

@@ -25,6 +25,7 @@
 #include <tuple>
 using namespace std;
 using namespace Thunderegg;
+using namespace Thunderegg::Schur;
 enum axis_enum { X_AXIS, Y_AXIS };
 enum bc_enum { DIRICHLET, NEUMANN, REFINED };
 

@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHURHELPER_H
-#define THUNDEREGG_SCHURHELPER_H
+#ifndef THUNDEREGG_SCHUR_SCHURHELPER_H
+#define THUNDEREGG_SCHUR_SCHURHELPER_H
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/PetscVector.h>
 #include <Thunderegg/Schur/IfaceSet.h>

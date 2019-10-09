@@ -21,10 +21,10 @@
 
 #ifndef SCHWARZPREC_H
 #define SCHWARZPREC_H
-#include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/Operator.h>
-#include <Thunderegg/PatchSolver.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/IfaceInterp.h>
+#include <Thunderegg/Schur/PatchSolver.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 namespace Thunderegg
 {
 /**
@@ -36,9 +36,9 @@ template <size_t D> class SchwarzPrec : public Operator<D>
 	/**
 	 * @brief the SchurHelper
 	 */
-	std::shared_ptr<SchurHelper<D>> sh;
-	std::shared_ptr<PatchSolver<D>> solver;
-	std::shared_ptr<IfaceInterp<D>> interp;
+	std::shared_ptr<Schur::SchurHelper<D>> sh;
+	std::shared_ptr<Schur::PatchSolver<D>> solver;
+	std::shared_ptr<Schur::IfaceInterp<D>> interp;
 
 	public:
 	/**
@@ -46,8 +46,9 @@ template <size_t D> class SchwarzPrec : public Operator<D>
 	 *
 	 * @param sh the SchurHelper
 	 */
-	SchwarzPrec(std::shared_ptr<SchurHelper<D>> sh, std::shared_ptr<PatchSolver<D>> solver,
-	            std::shared_ptr<IfaceInterp<D>> interp)
+	SchwarzPrec(std::shared_ptr<Schur::SchurHelper<D>> sh,
+	            std::shared_ptr<Schur::PatchSolver<D>> solver,
+	            std::shared_ptr<Schur::IfaceInterp<D>> interp)
 	{
 		this->sh     = sh;
 		this->solver = solver;

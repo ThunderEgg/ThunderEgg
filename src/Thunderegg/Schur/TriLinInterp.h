@@ -19,10 +19,12 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef TRILININTERP_H
-#define TRILININTERP_H
-#include <Thunderegg/IfaceInterp.h>
+#ifndef THUNDEREGG_SCHUR_TRILININTERP_H
+#define THUNDEREGG_SCHUR_TRILININTERP_H
+#include <Thunderegg/Schur/IfaceInterp.h>
 namespace Thunderegg
+{
+namespace Schur
 {
 class TriLinInterp : public IfaceInterp<3>
 {
@@ -45,5 +47,6 @@ class TriLinInterp : public IfaceInterp<3>
 		return std::shared_ptr<IfaceInterp<3>>(new TriLinInterp(ctx.sh));
 	}
 };
+} // namespace Schur
 } // namespace Thunderegg
 #endif

@@ -22,10 +22,10 @@
 #ifndef THUNDEREGG_DOMAINWRAPOP_H
 #define THUNDEREGG_DOMAINWRAPOP_H
 
-#include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/Operator.h>
-#include <Thunderegg/PatchOperator.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/IfaceInterp.h>
+#include <Thunderegg/Schur/PatchOperator.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 
 namespace Thunderegg
 {
@@ -35,13 +35,14 @@ namespace Thunderegg
 template <size_t D> class DomainWrapOp : public Operator<D>
 {
 	private:
-	std::shared_ptr<SchurHelper<D>>   sh;
-	std::shared_ptr<PatchOperator<D>> op;
-	std::shared_ptr<IfaceInterp<D>>   interp;
+	std::shared_ptr<Schur::SchurHelper<D>>   sh;
+	std::shared_ptr<Schur::PatchOperator<D>> op;
+	std::shared_ptr<Schur::IfaceInterp<D>>   interp;
 
 	public:
-	DomainWrapOp(std::shared_ptr<SchurHelper<D>> sh, std::shared_ptr<IfaceInterp<D>> interp,
-	             std::shared_ptr<PatchOperator<D>> op)
+	DomainWrapOp(std::shared_ptr<Schur::SchurHelper<D>>   sh,
+	             std::shared_ptr<Schur::IfaceInterp<D>>   interp,
+	             std::shared_ptr<Schur::PatchOperator<D>> op)
 	{
 		this->sh     = sh;
 		this->interp = interp;

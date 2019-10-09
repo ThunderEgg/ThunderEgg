@@ -25,6 +25,8 @@
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
 {
+namespace Schur
+{
 template <size_t D> class PatchOperator
 {
 	public:
@@ -42,5 +44,6 @@ template <size_t D> class PatchOperator
 	= 0;
 	virtual void apply(const SchurInfo<D> &d, const LocalData<D> u, LocalData<D> f) = 0;
 };
+} // namespace Schur
 } // namespace Thunderegg
 #endif

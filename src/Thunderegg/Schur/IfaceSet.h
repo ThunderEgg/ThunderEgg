@@ -19,17 +19,19 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef IFACE_H
-#define IFACE_H
+#ifndef THUNDEREGG_SCHUR_IFACESET_H
+#define THUNDEREGG_SCHUR_IFACESET_H
 #include <Thunderegg/BufferIO.h>
-#include <Thunderegg/IfaceType.h>
-#include <Thunderegg/SchurInfo.h>
+#include <Thunderegg/Schur/IfaceType.h>
+#include <Thunderegg/Schur/SchurInfo.h>
 #include <bitset>
 #include <map>
 #include <mpi.h>
 #include <set>
 #include <vector>
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief This is a set of SchurInfo objects for an interface.
@@ -302,5 +304,6 @@ std::map<int, IfaceSet<D>> IfaceSet<D>::EnumerateIfaces(Iter begin, Iter end)
 	}
 	return ifaces;
 }
+} // namespace Schur
 } // namespace Thunderegg
 #endif

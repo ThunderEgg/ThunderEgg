@@ -19,20 +19,22 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef BICGSTABSOLVER_H
-#define BICGSTABSOLVER_H
+#ifndef THUNDEREGG_SCHUR_BICGSTABSOLVER_H
+#define THUNDEREGG_SCHUR_BICGSTABSOLVER_H
 
 #include <Thunderegg/BiCGStab.h>
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/PatchOperator.h>
-#include <Thunderegg/PatchSolver.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/PatchOperator.h>
+#include <Thunderegg/Schur/PatchSolver.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 #include <Thunderegg/ValVector.h>
 #include <bitset>
 #include <fftw3.h>
 #include <map>
 
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief Solves the patches using a BiCGStab iterative solver on each patch
@@ -157,5 +159,6 @@ void BiCGStabSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<
 
 	BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
 }
+} // namespace Schur
 } // namespace Thunderegg
 #endif

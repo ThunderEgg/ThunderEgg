@@ -24,9 +24,9 @@
 #include <Thunderegg/DomainGenerator.h>
 #include <Thunderegg/GMG/Cycle.h>
 #include <Thunderegg/GMG/CycleOpts.h>
-#include <Thunderegg/IfaceInterp.h>
-#include <Thunderegg/PatchOperator.h>
-#include <Thunderegg/PatchSolver.h>
+#include <Thunderegg/Schur/IfaceInterp.h>
+#include <Thunderegg/Schur/PatchOperator.h>
+#include <Thunderegg/Schur/PatchSolver.h>
 namespace Thunderegg
 {
 namespace GMG
@@ -34,11 +34,11 @@ namespace GMG
 class CycleFactory3d
 {
 	public:
-	static std::shared_ptr<Cycle<3>> getCycle(const CycleOpts &                   opts,
-	                                          std::shared_ptr<DomainGenerator<3>> dcg,
-	                                          std::shared_ptr<PatchSolver<3>>     solver,
-	                                          std::shared_ptr<PatchOperator<3>>   op,
-	                                          std::shared_ptr<IfaceInterp<3>>     interpolator);
+	static std::shared_ptr<Cycle<3>> getCycle(const CycleOpts &                        opts,
+	                                          std::shared_ptr<DomainGenerator<3>>      dcg,
+	                                          std::shared_ptr<Schur::PatchSolver<3>>   solver,
+	                                          std::shared_ptr<Schur::PatchOperator<3>> op,
+	                                          std::shared_ptr<Schur::IfaceInterp<3>> interpolator);
 };
 } // namespace GMG
 } // namespace Thunderegg

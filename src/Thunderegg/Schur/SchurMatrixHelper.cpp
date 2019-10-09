@@ -22,8 +22,9 @@
 #include "SchurMatrixHelper.h"
 using namespace std;
 using namespace Thunderegg;
+using namespace Thunderegg::Schur;
 enum class Rotation : char { x_cw, x_ccw, y_cw, y_ccw, z_cw, z_ccw };
-struct Thunderegg::Block {
+struct Thunderegg::Schur::Block {
 	static const Side<3>          side_table[6][6];
 	static const char             rots_table[6][6];
 	static const vector<Rotation> main_rot_plan[6];

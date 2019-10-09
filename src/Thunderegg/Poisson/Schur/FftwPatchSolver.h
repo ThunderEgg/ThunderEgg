@@ -19,11 +19,11 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef FFTWPATCHSOLVER_H
-#define FFTWPATCHSOLVER_H
-#include <Thunderegg/PatchSolver.h>
-#include <Thunderegg/Poisson/StarPatchOperator.h>
-#include <Thunderegg/SchurHelper.h>
+#ifndef THUNDEREGG_POISSON_SCHUR_FFTWPATCHSOLVER_H
+#define THUNDEREGG_POISSON_SCHUR_FFTWPATCHSOLVER_H
+#include <Thunderegg/Poisson/Schur/StarPatchOperator.h>
+#include <Thunderegg/Schur/PatchSolver.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 #include <Thunderegg/ValVector.h>
 #include <bitset>
 #include <fftw3.h>
@@ -32,6 +32,8 @@ namespace Thunderegg
 {
 namespace Poisson
 {
+namespace Schur
+{
 #ifndef DOMAINK
 #define DOMAINK
 template <size_t D> struct DomainK {
@@ -39,7 +41,7 @@ template <size_t D> struct DomainK {
 	double        h_x     = 0;
 
 	DomainK() {}
-	DomainK(const SchurInfo<D> &sinfo)
+	DomainK(const Thunderegg::Schur::SchurInfo<D> &sinfo)
 	{
 		this->neumann = sinfo.pinfo->neumann.to_ulong();
 		this->h_x     = sinfo.pinfo->spacings[0];
@@ -51,26 +53,26 @@ template <size_t D> struct DomainK {
 };
 #endif
 
-template <size_t D> class FftwPatchSolver : public PatchSolver<D>
+template <size_t D> class FftwPatchSolver : public Thunderegg::Schur::PatchSolver<D>
 {
 	private:
-	int                                         n;
-	bool                                        initialized = false;
-	static bool                                 compareDomains();
-	double                                      lambda;
-	std::map<DomainK<D>, fftw_plan>             plan1;
-	std::map<DomainK<D>, fftw_plan>             plan2;
-	ValVector<D>                                f_copy;
-	ValVector<D>                                tmp;
-	ValVector<D>                                sol;
-	std::array<int, D + 1>                      npow;
-	std::map<DomainK<D>, std::valarray<double>> denoms;
-	std::shared_ptr<SchurHelper<D>>             sh;
+	int                                                n;
+	bool                                               initialized = false;
+	static bool                                        compareDomains();
+	double                                             lambda;
+	std::map<DomainK<D>, fftw_plan>                    plan1;
+	std::map<DomainK<D>, fftw_plan>                    plan2;
+	ValVector<D>                                       f_copy;
+	ValVector<D>                                       tmp;
+	ValVector<D>                                       sol;
+	std::array<int, D + 1>                             npow;
+	std::map<DomainK<D>, std::valarray<double>>        denoms;
+	std::shared_ptr<Thunderegg::Schur::SchurHelper<D>> sh;
 
 	public:
-	FftwPatchSolver(std::shared_ptr<SchurHelper<D>> sh, double lambda = 0);
+	FftwPatchSolver(std::shared_ptr<Thunderegg::Schur::SchurHelper<D>> sh, double lambda = 0);
 	~FftwPatchSolver();
-	void solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
+	void solve(Thunderegg::Schur::SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
 	           std::shared_ptr<Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma);
 	void solve(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
 	           std::shared_ptr<const Vector<D - 1>> gamma) override
@@ -79,14 +81,16 @@ template <size_t D> class FftwPatchSolver : public PatchSolver<D>
 			solve(*sinfo, f, u, gamma);
 		}
 	}
-	void                            addPatch(SchurInfo<D> &sinfo);
-	std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)
+	void addPatch(Thunderegg::Schur::SchurInfo<D> &sinfo);
+	std::shared_ptr<Thunderegg::Schur::PatchSolver<D>>
+	getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)
 	{
-		return std::shared_ptr<PatchSolver<D>>(new FftwPatchSolver(ctx.sh));
+		return std::shared_ptr<Thunderegg::Schur::PatchSolver<D>>(new FftwPatchSolver(ctx.sh));
 	}
 };
 template <size_t D>
-FftwPatchSolver<D>::FftwPatchSolver(std::shared_ptr<SchurHelper<D>> sh, double lambda)
+FftwPatchSolver<D>::FftwPatchSolver(std::shared_ptr<Thunderegg::Schur::SchurHelper<D>> sh,
+                                    double                                             lambda)
 {
 	this->sh     = sh;
 	n            = sh->getLengths()[0];
@@ -104,7 +108,7 @@ template <size_t D> FftwPatchSolver<D>::~FftwPatchSolver()
 		fftw_destroy_plan(p.second);
 	}
 }
-template <size_t D> void FftwPatchSolver<D>::addPatch(SchurInfo<D> &sinfo)
+template <size_t D> void FftwPatchSolver<D>::addPatch(Thunderegg::Schur::SchurInfo<D> &sinfo)
 {
 	using namespace std;
 	if (!initialized) {
@@ -185,8 +189,8 @@ template <size_t D> void FftwPatchSolver<D>::addPatch(SchurInfo<D> &sinfo)
 	}
 }
 template <size_t D>
-void FftwPatchSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D>> f,
-                               std::shared_ptr<Vector<D>>           u,
+void FftwPatchSolver<D>::solve(Thunderegg::Schur::SchurInfo<D> &sinfo,
+                               std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
                                std::shared_ptr<const Vector<D - 1>> gamma)
 {
 	using namespace std;
@@ -220,6 +224,7 @@ void FftwPatchSolver<D>::solve(SchurInfo<D> &sinfo, std::shared_ptr<const Vector
 }
 extern template class FftwPatchSolver<2>;
 extern template class FftwPatchSolver<3>;
+} // namespace Schur
 } // namespace Poisson
 } // namespace Thunderegg
 #endif

@@ -23,7 +23,6 @@
 #define THUNDEREGG_PETSCMATOP_H
 
 #include <Thunderegg/Operator.h>
-#include <Thunderegg/SchurHelper.h>
 
 namespace Thunderegg
 {

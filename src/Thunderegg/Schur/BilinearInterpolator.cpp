@@ -22,6 +22,7 @@
 #include "BilinearInterpolator.h"
 using namespace std;
 using namespace Thunderegg;
+using namespace Thunderegg::Schur;
 void BilinearInterpolator::interpolateToInterface(std::shared_ptr<const Vector<2>> u,
                                                   std::shared_ptr<Vector<1>>       interp)
 {

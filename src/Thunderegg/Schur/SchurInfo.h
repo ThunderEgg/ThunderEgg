@@ -19,13 +19,15 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHURINFO_H
-#define THUNDEREGG_SCHURINFO_H
-#include <Thunderegg/IfaceType.h>
+#ifndef THUNDEREGG_SCHUR_SCHURINFO_H
+#define THUNDEREGG_SCHUR_SCHURINFO_H
 #include <Thunderegg/PatchInfo.h>
+#include <Thunderegg/Schur/IfaceType.h>
 #include <deque>
 #include <set>
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief The IfaceInfo class represents the information for an interface on a given side of the
@@ -554,5 +556,6 @@ template <size_t D> struct SchurInfo : public Serializable {
 };
 extern template struct SchurInfo<2>;
 extern template struct SchurInfo<3>;
+} // namespace Schur
 } // namespace Thunderegg
 #endif

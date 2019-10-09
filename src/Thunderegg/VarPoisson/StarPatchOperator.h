@@ -23,28 +23,29 @@
 #define THUNDEREGG_VARPOISSON_STARPATCHOPERATOR_H
 
 #include <Thunderegg/DomainTools.h>
-#include <Thunderegg/IfaceInterp.h>
-#include <Thunderegg/PatchOperator.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/IfaceInterp.h>
+#include <Thunderegg/Schur/PatchOperator.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 
 namespace Thunderegg
 {
 namespace VarPoisson
 {
-template <size_t D> class StarPatchOperator : public PatchOperator<D>
+template <size_t D> class StarPatchOperator : public Schur::PatchOperator<D>
 {
 	private:
 	std::shared_ptr<const Vector<D>>                     coeffs;
 	std::shared_ptr<const Vector<D - 1>>                 gamma_coeffs;
 	std::function<double(const std::array<double, D> &)> beta_func;
-	std::shared_ptr<SchurHelper<D>>                      sh;
-	std::shared_ptr<IfaceInterp<D>>                      interp;
+	std::shared_ptr<Schur::SchurHelper<D>>               sh;
+	std::shared_ptr<Schur::IfaceInterp<D>>               interp;
 	static constexpr int                                 num_ghost_cells = 1;
 
 	public:
 	StarPatchOperator(std::shared_ptr<const Vector<D>>                     h,
 	                  std::function<double(const std::array<double, D> &)> beta_func,
-	                  std::shared_ptr<SchurHelper<D>> sh, std::shared_ptr<IfaceInterp<D>> interp)
+	                  std::shared_ptr<Schur::SchurHelper<D>>               sh,
+	                  std::shared_ptr<Schur::IfaceInterp<D>>               interp)
 	{
 		coeffs                = h;
 		this->sh              = sh;
@@ -54,7 +55,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		interp->interpolateToInterface(coeffs, new_gamma_coeffs);
 		gamma_coeffs = new_gamma_coeffs;
 	}
-	void applyWithInterface(SchurInfo<D> &sinfo, const LocalData<D> u,
+	void applyWithInterface(Schur::SchurInfo<D> &sinfo, const LocalData<D> u,
 	                        std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f) override
 	{
 		const LocalData<D>    c  = coeffs->getLocalData(sinfo.pinfo->local_index);
@@ -170,7 +171,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			}
 		});
 	}
-	void addInterfaceToRHS(SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D - 1>> gamma,
+	void addInterfaceToRHS(Schur::SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D - 1>> gamma,
 	                       LocalData<D> f) override
 	{
 		for (Side<D> s : Side<D>::getValues()) {
@@ -191,7 +192,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			}
 		}
 	}
-	void apply(const SchurInfo<D> &sinfo, const LocalData<D> u, LocalData<D> f) override
+	void apply(const Schur::SchurInfo<D> &sinfo, const LocalData<D> u, LocalData<D> f) override
 	{
 		const LocalData<D>    c  = coeffs->getLocalData(sinfo.pinfo->local_index);
 		std::array<double, D> h2 = sinfo.pinfo->spacings;
@@ -439,7 +440,8 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			                   f->getLocalData(sinfo->pinfo->local_index));
 		}
 	}
-	std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
+	std::shared_ptr<Schur::PatchOperator<D>>
+	getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
 	{
 		auto new_coeffs = PetscVector<D>::GetNewVector(ctx.domain);
 		ctx.finer_level->getRestrictor().restrict(new_coeffs, coeffs);

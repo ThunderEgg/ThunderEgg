@@ -22,23 +22,23 @@
 #include "Init.h"
 #include "Writers/ClawWriter.h"
 #include <Thunderegg/BiCGStab.h>
-#include <Thunderegg/BiCGStabSolver.h>
-#include <Thunderegg/BilinearInterpolator.h>
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/DomainWrapOp.h>
 #include <Thunderegg/Experimental/DomGen.h>
 #include <Thunderegg/GMG/CycleFactory2d.h>
 #include <Thunderegg/PetscMatOp.h>
 #include <Thunderegg/PetscShellCreator.h>
-#include <Thunderegg/Poisson/DftPatchSolver.h>
-#include <Thunderegg/Poisson/FftwPatchSolver.h>
-#include <Thunderegg/Poisson/FivePtPatchOperator.h>
 #include <Thunderegg/Poisson/MatrixHelper2d.h>
-#include <Thunderegg/Poisson/StarPatchOperator.h>
-#include <Thunderegg/PolyChebPrec.h>
-#include <Thunderegg/SchurHelper.h>
-#include <Thunderegg/SchurMatrixHelper2d.h>
-#include <Thunderegg/SchurWrapOp.h>
+#include <Thunderegg/Poisson/Schur/DftPatchSolver.h>
+#include <Thunderegg/Poisson/Schur/FftwPatchSolver.h>
+#include <Thunderegg/Poisson/Schur/FivePtPatchOperator.h>
+#include <Thunderegg/Poisson/Schur/StarPatchOperator.h>
+#include <Thunderegg/Schur/BiCGStabSolver.h>
+#include <Thunderegg/Schur/BilinearInterpolator.h>
+#include <Thunderegg/Schur/PolyChebPrec.h>
+#include <Thunderegg/Schur/SchurHelper.h>
+#include <Thunderegg/Schur/SchurMatrixHelper2d.h>
+#include <Thunderegg/Schur/SchurWrapOp.h>
 #include <Thunderegg/SchwarzPrec.h>
 #include <Thunderegg/Timer.h>
 #ifdef HAVE_VTK
@@ -67,7 +67,9 @@
 using namespace std;
 using namespace Thunderegg;
 using namespace Thunderegg::Experimental;
+using namespace Thunderegg::Poisson::Schur;
 using namespace Thunderegg::Poisson;
+using namespace Thunderegg::Schur;
 
 int main(int argc, char *argv[])
 {

@@ -19,7 +19,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <Thunderegg/Poisson/StarPatchOperator.h>
+#include "FftwPatchSolver.h"
 
-template class Thunderegg::Poisson::StarPatchOperator<2>;
-template class Thunderegg::Poisson::StarPatchOperator<3>;
+using namespace Thunderegg::Poisson::Schur;
+
+template class FftwPatchSolver<2>;
+template class FftwPatchSolver<3>;

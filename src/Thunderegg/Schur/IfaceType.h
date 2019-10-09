@@ -19,11 +19,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_IFACETYPE_H
-#define THUNDEREGG_IFACETYPE_H
+#ifndef THUNDEREGG_SCHUR_IFACETYPE_H
+#define THUNDEREGG_SCHUR_IFACETYPE_H
 #include <Thunderegg/Side.h>
 #include <tuple>
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief An enum-style class that represents interface types
@@ -132,5 +134,6 @@ template <size_t D> class IfaceType
 		return std::tie(val, orth) < std::tie(b.val, b_orth);
 	}
 };
+} // namespace Schur
 } // namespace Thunderegg
 #endif

@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include <Thunderegg/IfaceSet.h>
-#include <Thunderegg/SchurInfo.h>
+#include <Thunderegg/Schur/IfaceSet.h>
+#include <Thunderegg/Schur/SchurInfo.h>
 
 using namespace std;
 using namespace Thunderegg;

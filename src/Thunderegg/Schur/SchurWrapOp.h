@@ -19,15 +19,17 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHURWRAPOP_H
-#define THUNDEREGG_SCHURWRAPOP_H
+#ifndef THUNDEREGG_SCHUR_SCHURWRAPOP_H
+#define THUNDEREGG_SCHUR_SCHURWRAPOP_H
 
-#include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/Operator.h>
-#include <Thunderegg/PatchSolver.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/IfaceInterp.h>
+#include <Thunderegg/Schur/PatchSolver.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief Base class for operators
@@ -64,5 +66,6 @@ template <size_t D> class SchurWrapOp : public Operator<D - 1>
 		b->addScaled(-1, x);
 	}
 };
+} // namespace Schur
 } // namespace Thunderegg
 #endif

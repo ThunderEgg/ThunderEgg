@@ -21,6 +21,7 @@
 
 #include "TriLinInterp.h"
 using namespace Thunderegg;
+using namespace Thunderegg::Schur;
 void TriLinInterp::interpolateToInterface(std::shared_ptr<const Vector<3>> u,
                                           std::shared_ptr<Vector<2>>       interp)
 {

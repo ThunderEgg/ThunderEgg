@@ -19,15 +19,17 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_POLYCHEBPREC_H
-#define THUNDEREGG_POLYCHEBPREC_H
+#ifndef THUNDEREGG_SCHUR_POLYCHEBPREC_H
+#define THUNDEREGG_SCHUR_POLYCHEBPREC_H
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/IfaceInterp.h>
 #include <Thunderegg/Operator.h>
-#include <Thunderegg/PatchSolver.h>
-#include <Thunderegg/SchurHelper.h>
+#include <Thunderegg/Schur/IfaceInterp.h>
+#include <Thunderegg/Schur/PatchSolver.h>
+#include <Thunderegg/Schur/SchurHelper.h>
 #include <petscpc.h>
 namespace Thunderegg
+{
+namespace Schur
 {
 /**
  * @brief Approximate inverse of Schur-compliment system using Chebyschev polynomials
@@ -35,12 +37,12 @@ namespace Thunderegg
 class PolyChebPrec : public Operator<2>
 {
 	private:
-	std::shared_ptr<SchurHelper<3>> sh;
-	std::shared_ptr<Domain<3>>      domain;
-	std::shared_ptr<IfaceInterp<3>> interp;
-	std::shared_ptr<PatchSolver<3>> solver;
-	double                          interval = 0.95;
-	std::vector<double>             coeffs
+	std::shared_ptr<Schur::SchurHelper<3>> sh;
+	std::shared_ptr<Domain<3>>             domain;
+	std::shared_ptr<Schur::IfaceInterp<3>> interp;
+	std::shared_ptr<Schur::PatchSolver<3>> solver;
+	double                                 interval = 0.95;
+	std::vector<double>                    coeffs
 	= {4.472135954953655e+00, 5.675247900481234e+00, 3.601012922685066e+00, 2.284885928634731e+00,
 	   1.449787551186771e+00, 9.199076055378766e-01, 5.836924189936992e-01, 3.703598469934007e-01,
 	   2.349977690621489e-01, 1.491089055767314e-01, 9.461139059090561e-02, 6.003206306517687e-02,
@@ -58,5 +60,6 @@ class PolyChebPrec : public Operator<2>
 
 	void apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const;
 };
+} // namespace Schur
 } // namespace Thunderegg
 #endif

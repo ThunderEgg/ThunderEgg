@@ -1,5 +1,6 @@
 #include "SevenPtPatchOperator.h"
-using namespace Thunderegg::Poisson;
+using namespace Thunderegg::Poisson::Schur;
+using Thunderegg::Schur::SchurInfo;
 void SevenPtPatchOperator::applyWithInterface(SchurInfo<3> &sinfo, const LocalData<3> u,
                                               std::shared_ptr<const Vector<2>> gamma,
                                               LocalData<3>                     f)

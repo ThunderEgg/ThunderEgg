@@ -23,6 +23,7 @@
 #include <iostream>
 using namespace std;
 using namespace Thunderegg;
+using namespace Thunderegg::Schur;
 PolyChebPrec::PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<SchurHelper<3>> sh,
                            std::shared_ptr<IfaceInterp<3>> interp,
                            std::shared_ptr<PatchSolver<3>> solver)
