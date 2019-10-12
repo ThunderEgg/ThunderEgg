@@ -19,31 +19,21 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHUR_PATCHOPERATOR_H
-#define THUNDEREGG_SCHUR_PATCHOPERATOR_H
+#ifndef THUNDEREGG_PATCHOPERATOR_H
+#define THUNDEREGG_PATCHOPERATOR_H
 #include <Thunderegg/GMG/CycleFactoryCtx.h>
+#include <Thunderegg/Operator.h>
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
 {
-namespace Schur
-{
-template <size_t D> class PatchOperator
+template <size_t D> class PatchOperator : public Operator<D>
 {
 	public:
 	virtual ~PatchOperator() {}
 
-	virtual void apply(std::shared_ptr<const Vector<D>>     u,
-	                   std::shared_ptr<const Vector<D - 1>> gamma, std::shared_ptr<Vector<D>> f)
-	= 0;
+	virtual void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
+	                              LocalData<D> f) const                                        = 0;
 	virtual std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) = 0;
-	virtual void applyWithInterface(SchurInfo<D> &d, const LocalData<D> u,
-	                                std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f)
-	= 0;
-	virtual void addInterfaceToRHS(SchurInfo<D> &d, std::shared_ptr<const Vector<D - 1>> gamma,
-	                               LocalData<D> f)
-	= 0;
-	virtual void apply(const SchurInfo<D> &d, const LocalData<D> u, LocalData<D> f) = 0;
 };
-} // namespace Schur
 } // namespace Thunderegg
 #endif

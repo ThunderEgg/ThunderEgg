@@ -9,6 +9,7 @@ add_executable(unit_tests
     Domain.cpp 
     LocalData.cpp 
     DomainTools.cpp 
+    SimpleGhostFiller.cpp 
     Utils.cpp)
 
 target_link_libraries(unit_tests

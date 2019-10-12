@@ -69,6 +69,14 @@ template <size_t D, typename T, typename A> class NestedLoop<D, 0, T, A>
 		}
 	}
 };
+template <typename T, typename A> class NestedLoop<0, -1, T, A>
+{
+	public:
+	static void inline nested_loop_loop(A coord, A start, A end, T lambda)
+	{
+		lambda(coord);
+	}
+};
 template <size_t D, typename T, typename A> inline void nested_loop(A start, A end, T lambda)
 {
 	A coord = start;

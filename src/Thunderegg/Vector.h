@@ -169,6 +169,17 @@ template <size_t D> class LocalData
 		return getSliceOnSidePriv(s, offset);
 	}
 	/**
+	 * @brief Get a slice of ghost cells with dimensions D-1 on the specified side of the patch
+	 *
+	 * @param s the side
+	 * @param offset which layer of ghost cells to acess
+	 * @return LocalData<D - 1>
+	 */
+	LocalData<D - 1> getGhostSliceOnSide(Side<D> s, int offset) const
+	{
+		return getSliceOnSidePriv(s, -offset);
+	}
+	/**
 	 * @brief Get the Lengths of the patch in each direction
 	 */
 	const std::array<int, D> &getLengths() const

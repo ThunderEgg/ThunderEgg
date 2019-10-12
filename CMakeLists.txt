@@ -9,7 +9,8 @@ include(GNUInstallDirs)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set (CMAKE_CXX_FLAGS "-Wall -O3")
-set (CMAKE_CXX_FLAGS_DEBUG  "-Wall -g -O3 -DDD_DEBUG")
+set (CMAKE_CXX_FLAGS_DEBUG  "-Wall -g -O0 -DDD_DEBUG")
+set (CMAKE_CXX_FLAGS_RELWITHDEBINFO  "-Wall -g -O3 -DDD_DEBUG")
 set (CMAKE_CXX_STANDARD 11)
 
 

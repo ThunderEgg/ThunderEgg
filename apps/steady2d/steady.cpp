@@ -634,11 +634,11 @@ int main(int argc, char *argv[])
 #ifdef HAVE_VTK
 		if (vtk_filename != "") {
 			VtkWriter2d writer(domain, vtk_filename);
-			writer.add(u->vec, "Solution");
-			writer.add(error->vec, "Error");
-			writer.add(resid->vec, "Residual");
-			writer.add(f->vec, "RHS");
-			writer.add(exact->vec, "Exact");
+			writer.add(u, "Solution");
+			writer.add(error, "Error");
+			writer.add(resid, "Residual");
+			writer.add(f, "RHS");
+			writer.add(exact, "Exact");
 			writer.write();
 		}
 #endif

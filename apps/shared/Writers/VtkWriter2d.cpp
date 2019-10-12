@@ -49,18 +49,14 @@ VtkWriter2d::VtkWriter2d(shared_ptr<Domain<2>> dc, string file_name)
 	writer->SetInputData(block);
 	if (rank == 0) { writer->SetWriteMetaFile(1); }
 }
-void VtkWriter2d::add(Vec u, string name)
+void VtkWriter2d::add(std::shared_ptr<const Vector<2>> u, string name)
 {
 	// create MultiPieceDataSet and fill with patch information
-
-	double *u_view;
-	VecGetArray(u, &u_view);
-
 	for (auto &d_ptr : dc->getPatchInfoVector()) {
-		PatchInfo<2> &d     = *d_ptr;
-		double        h_x   = d.spacings[0];
-		double        h_y   = d.spacings[1];
-		int           start = d.local_index * d.ns[0] * d.ns[1];
+		PatchInfo<2> &     d   = *d_ptr;
+		double             h_x = d.spacings[0];
+		double             h_y = d.spacings[1];
+		const LocalData<2> ld  = u->getLocalData(d.local_index);
 
 		// create image object
 		vtkSmartPointer<vtkImageData> image = images[d.id];
@@ -82,13 +78,13 @@ void VtkWriter2d::add(Vec u, string name)
 		solution->SetNumberOfComponents(1);
 		solution->SetNumberOfValues(d.ns[0] * d.ns[1]);
 		solution->SetName(name.c_str());
-		for (int i = 0; i < d.ns[0] * d.ns[1]; i++) {
-			solution->SetValue(i, u_view[start + i]);
-		}
+		int i = 0;
+		nested_loop<2>(ld.getStart(), ld.getEnd(), [&](const std::array<int, 2> coord) {
+			solution->SetValue(i, ld[coord]);
+			i++;
+		});
 		image->GetCellData()->AddArray(solution);
 	}
-
-	VecRestoreArray(u, &u_view);
 }
 void VtkWriter2d::write()
 {

@@ -19,31 +19,27 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHUR_PATCHOPERATOR_H
-#define THUNDEREGG_SCHUR_PATCHOPERATOR_H
-#include <Thunderegg/GMG/CycleFactoryCtx.h>
+#ifndef THUNDEREGG_GHOSTEFILLER_H
+#define THUNDEREGG_GHOSTEFILLER_H
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
 {
-namespace Schur
-{
-template <size_t D> class PatchOperator
+/**
+ * @brief Fills ghost cells on patches
+ *
+ * @tparam D the number of Cartesian dimensions in the patches.
+ */
+template <size_t D> class GhostFiller
 {
 	public:
-	virtual ~PatchOperator() {}
+	virtual ~GhostFiller() {}
 
-	virtual void apply(std::shared_ptr<const Vector<D>>     u,
-	                   std::shared_ptr<const Vector<D - 1>> gamma, std::shared_ptr<Vector<D>> f)
-	= 0;
-	virtual std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) = 0;
-	virtual void applyWithInterface(SchurInfo<D> &d, const LocalData<D> u,
-	                                std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f)
-	= 0;
-	virtual void addInterfaceToRHS(SchurInfo<D> &d, std::shared_ptr<const Vector<D - 1>> gamma,
-	                               LocalData<D> f)
-	= 0;
-	virtual void apply(const SchurInfo<D> &d, const LocalData<D> u, LocalData<D> f) = 0;
+	/**
+	 * @brief Fill ghost cells on a vector
+	 *
+	 * @param u  the vector
+	 */
+	virtual void fillGhost(std::shared_ptr<const Vector<D>> u) const = 0;
 };
-} // namespace Schur
 } // namespace Thunderegg
 #endif

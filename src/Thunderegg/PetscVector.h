@@ -99,7 +99,7 @@ template <size_t D> class PetscVector : public Vector<D>
 			strides[i] = (this->lengths[i - 1] + 2 * num_ghost_cells) * strides[i - 1];
 			first_offset += strides[i] * num_ghost_cells;
 		}
-		patch_stride = strides[D - 1] * lengths[D - 1];
+		patch_stride = strides[D - 1] * (lengths[D - 1] + 2 * num_ghost_cells);
 		if (num_local_patches == -1) {
 			VecGetLocalSize(vec, &this->num_local_patches);
 			this->num_local_patches /= patch_stride;

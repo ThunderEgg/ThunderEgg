@@ -22,6 +22,7 @@
 #ifndef VTKWRITER2D_H
 #define VTKWRITER2D_H
 #include <Thunderegg/Domain.h>
+#include <Thunderegg/Vector.h>
 #include <map>
 #include <petscvec.h>
 #include <set>
@@ -49,7 +50,7 @@ class VtkWriter2d
 
 	public:
 	VtkWriter2d(std::shared_ptr<Thunderegg::Domain<2>> dc, std::string file_name);
-	void add(Vec u, std::string name);
+	void add(std::shared_ptr<const Thunderegg::Vector<2>> u, std::string name);
 	void write();
 };
 #endif

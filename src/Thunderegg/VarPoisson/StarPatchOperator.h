@@ -23,384 +23,75 @@
 #define THUNDEREGG_VARPOISSON_STARPATCHOPERATOR_H
 
 #include <Thunderegg/DomainTools.h>
-#include <Thunderegg/Schur/IfaceInterp.h>
-#include <Thunderegg/Schur/PatchOperator.h>
-#include <Thunderegg/Schur/SchurHelper.h>
+#include <Thunderegg/GhostFiller.h>
+#include <Thunderegg/PatchOperator.h>
 
 namespace Thunderegg
 {
 namespace VarPoisson
 {
-template <size_t D> class StarPatchOperator : public Schur::PatchOperator<D>
+template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	private:
-	std::shared_ptr<const Vector<D>>                     coeffs;
-	std::shared_ptr<const Vector<D - 1>>                 gamma_coeffs;
-	std::function<double(const std::array<double, D> &)> beta_func;
-	std::shared_ptr<Schur::SchurHelper<D>>               sh;
-	std::shared_ptr<Schur::IfaceInterp<D>>               interp;
-	static constexpr int                                 num_ghost_cells = 1;
+	std::shared_ptr<const Vector<D>>     coeffs;
+	std::shared_ptr<const Vector<D - 1>> gamma_coeffs;
+	std::shared_ptr<Domain<D>>           domain;
+	std::shared_ptr<GhostFiller<D>>      ghost_filler;
+
+	constexpr int addValue(int axis)
+	{
+		return (axis == 0) ? 0 : 1;
+	}
 
 	public:
-	StarPatchOperator(std::shared_ptr<const Vector<D>>                     h,
-	                  std::function<double(const std::array<double, D> &)> beta_func,
-	                  std::shared_ptr<Schur::SchurHelper<D>>               sh,
-	                  std::shared_ptr<Schur::IfaceInterp<D>>               interp)
+	StarPatchOperator(std::shared_ptr<const Vector<D>> coeffs, std::shared_ptr<Domain<D>> domain,
+	                  std::shared_ptr<GhostFiller<D>> ghost_filler)
 	{
-		coeffs                = h;
-		this->sh              = sh;
-		this->interp          = interp;
-		this->beta_func       = beta_func;
-		auto new_gamma_coeffs = sh->getNewSchurDistVec();
-		interp->interpolateToInterface(coeffs, new_gamma_coeffs);
-		gamma_coeffs = new_gamma_coeffs;
+		if (domain->getNumGhostCells() < 1) { throw 88; }
+		this->coeffs       = coeffs;
+		this->domain       = domain;
+		this->ghost_filler = ghost_filler;
 	}
-	void applyWithInterface(Schur::SchurInfo<D> &sinfo, const LocalData<D> u,
-	                        std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f) override
+	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
+	                      LocalData<D> f) const override
 	{
-		const LocalData<D>    c  = coeffs->getLocalData(sinfo.pinfo->local_index);
-		std::array<double, D> h2 = sinfo.pinfo->spacings;
+		const LocalData<D>    c  = coeffs->getLocalData(pinfo->local_index);
+		std::array<double, D> h2 = pinfo->spacings;
 		for (size_t i = 0; i < D; i++) {
 			h2[i] *= h2[i];
 		}
 		loop<0, D - 1>([&](int axis) {
 			Side<D> lower_side = axis * 2;
 			Side<D> upper_side = axis * 2 + 1;
-			if (sinfo.pinfo->hasNbr(lower_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
-				const LocalData<D - 1> bnd
-				= gamma->getLocalData(sinfo.getIfaceLocalIndex(lower_side));
+			if (!pinfo->hasNbr(lower_side)) {
+				LocalData<D - 1>       lower = u.getGhostSliceOnSide(lower_side, 1);
 				const LocalData<D - 1> mid   = u.getSliceOnSide(lower_side);
-				const LocalData<D - 1> upper = u.getSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> c_bnd
-				= gamma_coeffs->getLocalData(sinfo.getIfaceLocalIndex(lower_side));
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(lower_side);
-				const LocalData<D - 1> c_upper = c.getSliceOnSide(lower_side, 1);
-
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] += ((c_upper[coord] + c_mid[coord]) * (upper[coord] - mid[coord])
-					                   - 4 * c_bnd[coord] * (mid[coord] - bnd[coord]))
-					                  / (2 * h2[axis]);
-				});
-			} else if (sinfo.pinfo->isNeumann(lower_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
-				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] += (-mid[coord] + upper[coord]) / h2[axis];
-				});
-			} else {
-				LocalData<D - 1> f_slice = f.getSliceOnSide(lower_side);
-				// const LocalData<D - 1> lower   = u.getSliceOnSide(lower_side, -1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
-				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> c_lower = c.getSliceOnSide(lower_side, -1);
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(lower_side);
-				const LocalData<D - 1> c_upper = c.getSliceOnSide(lower_side, 1);
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					double lower = -mid[coord];
-					f_slice[coord] += ((c_upper[coord] + c_mid[coord]) * (upper[coord] - mid[coord])
-					                   - (c_lower[coord] + c_mid[coord]) * (mid[coord] - lower))
-					                  / (2 * h2[axis]);
+					lower[coord] = -mid[coord];
 				});
 			}
-			// middle
-			{
-				std::array<int, D> start = f.getStart();
-				std::array<int, D> end   = f.getEnd();
-				start[axis] += 1;
-				end[axis] -= 1;
-				int stride   = u.getStrides()[axis];
-				int c_stride = c.getStrides()[axis];
-				nested_loop<D>(start, end, [&](std::array<int, D> coord) {
-					const double *ptr     = u.getPtr(coord);
-					const double *c_ptr   = c.getPtr(coord);
-					double        lower   = *(ptr - stride);
-					double        mid     = *ptr;
-					double        upper   = *(ptr + stride);
-					double        c_lower = *(c_ptr - c_stride);
-					double        c_mid   = *c_ptr;
-					double        c_upper = *(c_ptr + c_stride);
-					f[coord]
-					+= ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower))
-					   / (2 * h2[axis]);
+			if (!pinfo->hasNbr(upper_side)) {
+				LocalData<D - 1>       upper = u.getGhostSliceOnSide(upper_side, 1);
+				const LocalData<D - 1> mid   = u.getSliceOnSide(upper_side);
+				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
+					upper[coord] = -mid[coord];
 				});
 			}
-			// east
-			if (sinfo.pinfo->hasNbr(upper_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
-				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
-				const LocalData<D - 1> bnd
-				= gamma->getLocalData(sinfo.getIfaceLocalIndex(upper_side));
-				const LocalData<D - 1> c_lower = c.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_bnd
-				= gamma_coeffs->getLocalData(sinfo.getIfaceLocalIndex(upper_side));
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] += ((c_lower[coord] + c_mid[coord]) * (lower[coord] - mid[coord])
-					                   - 4 * c_bnd[coord] * (mid[coord] - bnd[coord]))
-					                  / (2 * h2[axis]);
-				});
-			} else if (sinfo.pinfo->isNeumann(upper_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
-				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] += (lower[coord] - mid[coord]) / h2[axis];
-				});
-			} else {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
-				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
-				const LocalData<D - 1> upper   = u.getSliceOnSide(upper_side, -1);
-				const LocalData<D - 1> c_lower = c.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_upper = c.getSliceOnSide(upper_side, -1);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					double upper = -mid[coord];
-					f_slice[coord]
-					+= ((c_upper[coord] + c_mid[coord]) * (upper - mid[coord])
-					    - (c_lower[coord] + c_mid[coord]) * (mid[coord] - lower[coord]))
-					   / (2 * h2[axis]);
-				});
-			}
-		});
-	}
-	void addInterfaceToRHS(Schur::SchurInfo<D> &sinfo, std::shared_ptr<const Vector<D - 1>> gamma,
-	                       LocalData<D> f) override
-	{
-		for (Side<D> s : Side<D>::getValues()) {
-			if (sinfo.pinfo->hasNbr(s)) {
-				const LocalData<D - 1> gamma_view
-				= gamma->getLocalData(sinfo.getIfaceLocalIndex(s));
-
-				LocalData<D - 1>       slice = f.getSliceOnSide(s);
-				const LocalData<D - 1> c_bnd
-				= gamma_coeffs->getLocalData(sinfo.getIfaceLocalIndex(s));
-
-				double h2 = pow(sinfo.pinfo->spacings[s.axis()], 2);
-
-				nested_loop<D - 1>(gamma_view.getStart(), gamma_view.getEnd(),
-				                   [&](std::array<int, D - 1> coord) {
-					                   slice[coord] -= 2 * gamma_view[coord] * c_bnd[coord] / h2;
-				                   });
-			}
-		}
-	}
-	void apply(const Schur::SchurInfo<D> &sinfo, const LocalData<D> u, LocalData<D> f) override
-	{
-		const LocalData<D>    c  = coeffs->getLocalData(sinfo.pinfo->local_index);
-		std::array<double, D> h2 = sinfo.pinfo->spacings;
-		for (size_t i = 0; i < D; i++) {
-			h2[i] *= h2[i];
-		}
-		{
-			int     axis       = 0;
-			Side<D> lower_side = axis * 2;
-			Side<D> upper_side = axis * 2 + 1;
-			if (sinfo.pinfo->hasNbr(lower_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
-				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> c_bnd
-				= gamma_coeffs->getLocalData(sinfo.getIfaceLocalIndex(lower_side));
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(lower_side);
-				const LocalData<D - 1> c_upper = c.getSliceOnSide(lower_side, 1);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord]
-					= ((c_upper[coord] + c_mid[coord]) * upper[coord]
-					   - (4 * c_bnd[coord] + c_upper[coord] + c_mid[coord]) * mid[coord])
-					  / (2 * h2[axis]);
-				});
-			} else if (sinfo.pinfo->isNeumann(lower_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
-				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] = (-mid[coord] + upper[coord]) / h2[axis];
-				});
-			} else {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
-				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> c_lower = c.getSliceOnSide(lower_side, -1);
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(lower_side);
-				const LocalData<D - 1> c_upper = c.getSliceOnSide(lower_side, 1);
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] += ((c_upper[coord] + c_mid[coord]) * (upper[coord] - mid[coord])
-					                   - (c_lower[coord] + c_mid[coord]) * (mid[coord]))
-					                  / (2 * h2[axis]);
-				});
-			}
-			// middle
-			{
-				std::array<int, D> start = f.getStart();
-				std::array<int, D> end   = f.getEnd();
-				start[axis] += 1;
-				end[axis] -= 1;
-				int stride   = u.getStrides()[axis];
-				int c_stride = c.getStrides()[axis];
-				nested_loop<D>(start, end, [&](std::array<int, D> coord) {
-					const double *ptr     = u.getPtr(coord);
-					const double *c_ptr   = c.getPtr(coord);
-					double        lower   = *(ptr - stride);
-					double        mid     = *ptr;
-					double        upper   = *(ptr + stride);
-					double        c_lower = *(c_ptr - c_stride);
-					double        c_mid   = *c_ptr;
-					double        c_upper = *(c_ptr + c_stride);
-					f[coord]
-					= ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower))
-					  / (2 * h2[axis]);
-				});
-			}
-			// east
-			if (sinfo.pinfo->hasNbr(upper_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
-				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_lower = c.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_bnd
-				= gamma_coeffs->getLocalData(sinfo.getIfaceLocalIndex(upper_side));
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord]
-					= ((c_lower[coord] + c_mid[coord]) * lower[coord]
-					   - (4 * c_bnd[coord] + c_lower[coord] + c_mid[coord]) * mid[coord])
-					  / (2 * h2[axis]);
-				});
-			} else if (sinfo.pinfo->isNeumann(upper_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
-				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] = (lower[coord] - mid[coord]) / h2[axis];
-				});
-			} else {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
-				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_lower = c.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_upper = c.getSliceOnSide(upper_side, -1);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord]
-					+= ((c_upper[coord] + c_mid[coord]) * (0 - mid[coord])
-					    - (c_lower[coord] + c_mid[coord]) * (mid[coord] - lower[coord]))
-					   / (2 * h2[axis]);
-				});
-			}
-		}
-		loop<1, D - 1>([&](int axis) {
-			Side<D> lower_side = axis * 2;
-			Side<D> upper_side = axis * 2 + 1;
-			if (sinfo.pinfo->hasNbr(lower_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
-				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> c_bnd
-				= gamma_coeffs->getLocalData(sinfo.getIfaceLocalIndex(lower_side));
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(lower_side);
-				const LocalData<D - 1> c_upper = c.getSliceOnSide(lower_side, 1);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord]
-					+= ((c_upper[coord] + c_mid[coord]) * upper[coord]
-					    - (4 * c_bnd[coord] + c_upper[coord] + c_mid[coord]) * mid[coord])
-					   / (2 * h2[axis]);
-				});
-			} else if (sinfo.pinfo->isNeumann(lower_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
-				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] += (-mid[coord] + upper[coord]) / h2[axis];
-				});
-			} else {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
-				const LocalData<D - 1> upper   = u.getSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> c_lower = c.getSliceOnSide(lower_side, -1);
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(lower_side);
-				const LocalData<D - 1> c_upper = c.getSliceOnSide(lower_side, 1);
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] += ((c_upper[coord] + c_mid[coord]) * (upper[coord] - mid[coord])
-					                   - (c_lower[coord] + c_mid[coord]) * (mid[coord]))
-					                  / (2 * h2[axis]);
-				});
-			}
-			// middle
-			{
-				std::array<int, D> start = f.getStart();
-				std::array<int, D> end   = f.getEnd();
-				start[axis] += 1;
-				end[axis] -= 1;
-				int stride   = u.getStrides()[axis];
-				int c_stride = c.getStrides()[axis];
-				nested_loop<D>(start, end, [&](std::array<int, D> coord) {
-					const double *ptr     = u.getPtr(coord);
-					const double *c_ptr   = c.getPtr(coord);
-					double        lower   = *(ptr - stride);
-					double        mid     = *ptr;
-					double        upper   = *(ptr + stride);
-					double        c_lower = *(c_ptr - c_stride);
-					double        c_mid   = *c_ptr;
-					double        c_upper = *(c_ptr + c_stride);
-					f[coord]
-					+= ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower))
-					   / (2 * h2[axis]);
-				});
-			}
-			// east
-			if (sinfo.pinfo->hasNbr(upper_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
-				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_lower = c.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_bnd
-				= gamma_coeffs->getLocalData(sinfo.getIfaceLocalIndex(upper_side));
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord]
-					+= ((c_lower[coord] + c_mid[coord]) * lower[coord]
-					    - (4 * c_bnd[coord] + c_lower[coord] + c_mid[coord]) * mid[coord])
-					   / (2 * h2[axis]);
-				});
-			} else if (sinfo.pinfo->isNeumann(upper_side)) {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
-				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord] += (lower[coord] - mid[coord]) / h2[axis];
-				});
-			} else {
-				LocalData<D - 1>       f_slice = f.getSliceOnSide(upper_side);
-				const LocalData<D - 1> lower   = u.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid     = u.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_lower = c.getSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> c_mid   = c.getSliceOnSide(upper_side);
-				const LocalData<D - 1> c_upper = c.getSliceOnSide(upper_side, -1);
-
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					f_slice[coord]
-					+= ((c_upper[coord] + c_mid[coord]) * (0 - mid[coord])
-					    - (c_lower[coord] + c_mid[coord]) * (mid[coord] - lower[coord]))
-					   / (2 * h2[axis]);
-				});
-			}
+			int stride   = u.getStrides()[axis];
+			int c_stride = c.getStrides()[axis];
+			nested_loop<D>(u.getStart(), u.getEnd(), [&](std::array<int, D> coord) {
+				const double *ptr     = u.getPtr(coord);
+				const double *c_ptr   = c.getPtr(coord);
+				double        lower   = *(ptr - stride);
+				double        mid     = *ptr;
+				double        upper   = *(ptr + stride);
+				double        c_lower = *(c_ptr - c_stride);
+				double        c_mid   = *c_ptr;
+				double        c_upper = *(c_ptr + c_stride);
+				f[coord]              = addValue(axis) * f[coord]
+				           + ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower))
+				             / (2 * h2[axis]);
+			});
 		});
 	}
 	static void addDrichletBCToRHS(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> f,
@@ -431,21 +122,19 @@ template <size_t D> class StarPatchOperator : public Schur::PatchOperator<D>
 			}
 		}
 	}
-	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<const Vector<D - 1>> gamma,
-	           std::shared_ptr<Vector<D>> f) override
+	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f) const override
 	{
-		f->set(0);
-		for (auto sinfo : sh->getSchurInfoVector()) {
-			applyWithInterface(*sinfo, u->getLocalData(sinfo->pinfo->local_index), gamma,
-			                   f->getLocalData(sinfo->pinfo->local_index));
+		ghost_filler->fillGhost(u);
+		for (auto pinfo : domain->getPatchInfoVector()) {
+			applySinglePatch(pinfo, u->getLocalData(pinfo->local_index),
+			                 f->getLocalData(pinfo->local_index));
 		}
 	}
-	std::shared_ptr<Schur::PatchOperator<D>>
-	getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
+	std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
 	{
 		auto new_coeffs = PetscVector<D>::GetNewVector(ctx.domain);
 		ctx.finer_level->getRestrictor().restrict(new_coeffs, coeffs);
-		return std::make_shared<StarPatchOperator<D>>(new_coeffs, beta_func, ctx.sh, ctx.interp);
+		return std::make_shared<StarPatchOperator<D>>(new_coeffs, domain, ghost_filler);
 	}
 }; // namespace VarPoisson
 extern template class StarPatchOperator<2>;

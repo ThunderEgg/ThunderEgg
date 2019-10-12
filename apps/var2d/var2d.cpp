@@ -35,6 +35,7 @@
 #include <Thunderegg/Schur/SchurMatrixHelper2d.h>
 #include <Thunderegg/Schur/SchurWrapOp.h>
 #include <Thunderegg/SchwarzPrec.h>
+#include <Thunderegg/SimpleGhostFiller.h>
 #include <Thunderegg/Timer.h>
 #include <Thunderegg/VarPoisson/StarPatchOperator.h>
 #ifdef HAVE_VTK
@@ -238,7 +239,7 @@ int main(int argc, char *argv[])
 	if (false) {
 #endif
 	} else {
-		dcg.reset(new DomGen<2>(t, ns, neumann));
+		dcg.reset(new DomGen<2>(t, ns, 1, neumann));
 	}
 
 	domain = dcg->getFinestDomain();
@@ -254,23 +255,17 @@ int main(int argc, char *argv[])
 		ffun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[1];
-			return x + y;
-			/*
 			return exp(x * y)
 			       * (pow(x, 5) * (-1 + y) * pow(y, 2) + y * (-2 + (5 - 3 * y) * y)
 			          - pow(x, 4) * y * (4 + (-7 + y) * y)
 			          - 2 * x * (1 + 2 * (-2 + y) * (-1 + y) * pow(y, 2))
 			          - pow(x, 2) * (-5 + 8 * y + (-6 + y) * (-1 + y) * pow(y, 3))
 			          + pow(x, 3) * (-3 + y * (12 - 6 * y - pow(y, 3) + pow(y, 4))));
-			          */
 		};
 		gfun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[1];
-			return x + y;
-			/*
 			return (1 - x) * x * (1 - y) * y * exp(x * y);
-			*/
 		};
 		hfun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
@@ -340,23 +335,15 @@ int main(int argc, char *argv[])
 		shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator(sch));
 
 		// patch operator
-		shared_ptr<StarPatchOperator<2>> p_operator(
-		new StarPatchOperator<2>(h, hfun, sch, p_interp));
+		shared_ptr<SimpleGhostFiller<2>> gf(new SimpleGhostFiller<2>(domain));
+		shared_ptr<StarPatchOperator<2>> p_operator(new StarPatchOperator<2>(h, domain, gf));
 		StarPatchOperator<2>::addDrichletBCToRHS(domain, f, gfun, hfun);
 
 		// set the patch solver
+		/*
 		shared_ptr<PatchSolver<2>> p_solver;
 		p_solver.reset(new BiCGStabSolver<2>(sch, p_operator, ps_tol, ps_max_it));
-
-		// Create the gamma and diff vectors
-		shared_ptr<PetscVector<1>> gamma = sch->getNewSchurVec();
-		shared_ptr<PetscVector<1>> diff  = sch->getNewSchurVec();
-		shared_ptr<PetscVector<1>> b     = sch->getNewSchurVec();
-
-		// Create linear problem for the Belos solver
-		PW<KSP> solver;
-		KSPCreate(MPI_COMM_WORLD, &solver);
-		KSPSetFromOptions(solver);
+		*/
 
 		if (neumann && !no_zero_rhs_avg) {
 			double fdiff = domain->integrate(f) / domain->volume();
@@ -364,182 +351,70 @@ int main(int argc, char *argv[])
 			f->shift(-fdiff);
 		}
 
-		if (solve_schur) {
-			// initialize vectors for Schur compliment system
+		std::shared_ptr<Operator<2>> A = p_operator;
+		PW<Mat>                      A_petsc;
+		std::shared_ptr<Operator<2>> M;
+		///////////////////
+		// setup start
+		///////////////////
+		timer.start("Linear System Setup");
 
-			// Get the b vector
-			gamma->set(0);
-			p_solver->solve(f, u, gamma);
-			p_interp->interpolateToInterface(u, b);
-			b->addScaled(-1, gamma);
-			b->scale(-1);
+		timer.start("Matrix Formation");
+		timer.stop("Matrix Formation");
+		// preconditoners
+		timer.start("Preconditioner Setup");
+		if (preconditioner == "Schwarz") {
+			//	M.reset(new SchwarzPrec<2>(sch, p_solver, p_interp));
+		} else if (preconditioner == "GMG") {
+			timer.start("GMG Setup");
 
-			if (rhs_filename != "") {
-				PetscViewer viewer;
-				PetscViewerBinaryOpen(PETSC_COMM_WORLD, rhs_filename.c_str(), FILE_MODE_WRITE,
-				                      &viewer);
-				VecView(b->vec, viewer);
-				PetscViewerDestroy(&viewer);
-			}
-			std::shared_ptr<Operator<1>> A;
-			PW<Mat>                      A_petsc;
-			std::shared_ptr<Operator<1>> M;
-			PW<PC>                       M_petsc;
+			// M = GMG::CycleFactory2d::getCycle(copts, dcg, p_solver, p_operator, p_interp);
 
-			///////////////////
-			// setup start
-			///////////////////
-			timer.start("Linear System Setup");
-
-			timer.start("Matrix Formation");
-			if (matrix_type == "wrap") {
-				A.reset(new SchurWrapOp<2>(domain, sch, p_solver, p_interp));
-			} else if (matrix_type == "crs") {
-				SchurMatrixHelper2d smh(sch);
-				A_petsc = smh.formCRSMatrix();
-				A.reset(new PetscMatOp<1>(A_petsc));
-				if (setrow) {
-					int row = 0;
-					MatZeroRows(A_petsc, 1, &row, 1.0, nullptr, nullptr);
-				}
-
-				if (matrix_filename != "") {
-					PetscViewer viewer;
-					PetscViewerBinaryOpen(PETSC_COMM_WORLD, matrix_filename.c_str(),
-					                      FILE_MODE_WRITE, &viewer);
-					MatView(A_petsc, viewer);
-					PetscViewerDestroy(&viewer);
-				}
-			}
-			timer.stop("Matrix Formation");
-			// preconditoners
-			timer.start("Preconditioner Setup");
-			if (preconditioner == "Scwharz") {
-				throw 3;
-			} else if (preconditioner == "GMG") {
-				throw 3;
-			}
-			timer.stop("Preconditioner Setup");
-
-			PW<KSP> solver;
-			// setup petsc if needed
-			if (solver_type == "petsc") {
-				timer.start("Petsc Setup");
-
-				KSPCreate(MPI_COMM_WORLD, &solver);
-				KSPSetFromOptions(solver);
-				KSPSetOperators(solver, A_petsc, A_petsc);
-				if (M != nullptr) {
-					PC M_petsc;
-					KSPGetPC(solver, &M_petsc);
-					PetscShellCreator::getPCShell(M_petsc, M, sch);
-				}
-				KSPSetUp(solver);
-				KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
-
-				timer.stop("Petsc Setup");
-			}
-			///////////////////
-			// setup end
-			///////////////////
-			timer.stop("Linear System Setup");
-
-			timer.start("Linear Solve");
-			if (solver_type == "petsc") {
-				KSPSolve(solver, b->vec, gamma->vec);
-				int its;
-				KSPGetIterationNumber(solver, &its);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
-			} else {
-				std::shared_ptr<VectorGenerator<1>> vg(new SchurHelperVG<1>(sch));
-
-				int its = BiCGStab<1>::solve(vg, A, gamma, b, M);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
-			}
-			timer.stop("Linear Solve");
-
-			// Do one last solve
-			timer.start("Patch Solve");
-
-			p_solver->solve(f, u, gamma);
-
-			timer.stop("Patch Solve");
-
-			p_operator->apply(u, gamma, au);
-		} else {
-			std::shared_ptr<Operator<2>> A;
-			PW<Mat>                      A_petsc;
-			std::shared_ptr<Operator<2>> M;
-			///////////////////
-			// setup start
-			///////////////////
-			timer.start("Linear System Setup");
-
-			timer.start("Matrix Formation");
-			if (matrix_type == "wrap") {
-				A.reset(new DomainWrapOp<2>(sch, p_interp, p_operator));
-				A_petsc = PetscShellCreator::getMatShell(A, domain);
-			} else if (matrix_type == "crs") {
-				throw 3;
-			} else if (matrix_type == "pbm") {
-				throw 3;
-			}
-			timer.stop("Matrix Formation");
-			// preconditoners
-			timer.start("Preconditioner Setup");
-			if (preconditioner == "Schwarz") {
-				M.reset(new SchwarzPrec<2>(sch, p_solver, p_interp));
-			} else if (preconditioner == "GMG") {
-				timer.start("GMG Setup");
-
-				M = GMG::CycleFactory2d::getCycle(copts, dcg, p_solver, p_operator, p_interp);
-
-				timer.stop("GMG Setup");
-			} else if (preconditioner == "cheb") {
-				throw 3;
-			}
-			timer.stop("Preconditioner Setup");
-
-			PW<KSP> solver;
-			// setup petsc if needed
-			if (solver_type == "petsc") {
-				timer.start("Petsc Setup");
-
-				KSPCreate(MPI_COMM_WORLD, &solver);
-				KSPSetFromOptions(solver);
-				KSPSetOperators(solver, A_petsc, A_petsc);
-				if (M != nullptr) {
-					PC M_petsc;
-					KSPGetPC(solver, &M_petsc);
-					PetscShellCreator::getPCShell(M_petsc, M, domain);
-				}
-				KSPSetUp(solver);
-				KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
-
-				timer.stop("Petsc Setup");
-			}
-			///////////////////
-			// setup end
-			///////////////////
-			timer.stop("Linear System Setup");
-
-			timer.start("Linear Solve");
-			if (solver_type == "petsc") {
-				KSPSolve(solver, f->vec, u->vec);
-				int its;
-				KSPGetIterationNumber(solver, &its);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
-			} else {
-				std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
-
-				u->set(0);
-				int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000000);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
-			}
-			timer.stop("Linear Solve");
-
-			A->apply(u, au);
+			timer.stop("GMG Setup");
+		} else if (preconditioner == "cheb") {
+			throw 3;
 		}
+		timer.stop("Preconditioner Setup");
+
+		PW<KSP> solver;
+		// setup petsc if needed
+		if (solver_type == "petsc") {
+			timer.start("Petsc Setup");
+
+			KSPCreate(MPI_COMM_WORLD, &solver);
+			KSPSetFromOptions(solver);
+			KSPSetOperators(solver, A_petsc, A_petsc);
+			if (M != nullptr) {
+				PC M_petsc;
+				KSPGetPC(solver, &M_petsc);
+				PetscShellCreator::getPCShell(M_petsc, M, domain);
+			}
+			KSPSetUp(solver);
+			KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
+
+			timer.stop("Petsc Setup");
+		}
+		///////////////////
+		// setup end
+		///////////////////
+		timer.stop("Linear System Setup");
+
+		timer.start("Linear Solve");
+		if (solver_type == "petsc") {
+			KSPSolve(solver, f->vec, u->vec);
+			int its;
+			KSPGetIterationNumber(solver, &its);
+			if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+		} else {
+			std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
+
+			u->set(0);
+			int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000000);
+			if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+		}
+		timer.stop("Linear Solve");
+
+		A->apply(u, au);
 
 		// residual
 		shared_ptr<PetscVector<2>> resid = PetscVector<2>::GetNewVector(domain);
@@ -586,12 +461,12 @@ int main(int argc, char *argv[])
 #ifdef HAVE_VTK
 		if (vtk_filename != "") {
 			VtkWriter2d writer(domain, vtk_filename);
-			writer.add(u->vec, "Solution");
-			writer.add(error->vec, "Error");
-			writer.add(resid->vec, "Residual");
-			writer.add(h->vec, "Coeff");
-			writer.add(f->vec, "RHS");
-			writer.add(exact->vec, "Exact");
+			writer.add(u, "Solution");
+			writer.add(error, "Error");
+			writer.add(resid, "Residual");
+			writer.add(h, "Coeff");
+			writer.add(f, "RHS");
+			writer.add(exact, "Exact");
 			writer.write();
 		}
 #endif
