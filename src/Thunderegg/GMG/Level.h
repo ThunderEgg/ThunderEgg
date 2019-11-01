@@ -39,25 +39,29 @@ template <size_t D> class Level
 {
 	private:
 	/**
+	 * @brief The domain for this level
+	 */
+	std::shared_ptr<const Domain<D>> domain;
+	/**
 	 * @brief the VectorGenerator for this level.
 	 */
 	std::shared_ptr<VectorGenerator<D>> vg;
 	/**
 	 * @brief The operator (matrix) for this level.
 	 */
-	std::shared_ptr<Operator<D>> op;
+	std::shared_ptr<const Operator<D>> op;
 	/**
 	 * @brief The restrictor from this level to the coarser level.
 	 */
-	std::shared_ptr<Restrictor<D>> restrictor;
+	std::shared_ptr<const Restrictor<D>> restrictor;
 	/**
 	 * @brief The interpolator from this level to the finer level.
 	 */
-	std::shared_ptr<Interpolator<D>> interpolator;
+	std::shared_ptr<const Interpolator<D>> interpolator;
 	/**
 	 * @brief The smoother for this level.
 	 */
-	std::shared_ptr<Smoother<D>> smoother;
+	std::shared_ptr<const Smoother<D>> smoother;
 	/**
 	 * @brief Pointer to coarser level
 	 */
@@ -73,16 +77,24 @@ template <size_t D> class Level
 	 *
 	 * @param dc pointer to the DomainCollection for this level
 	 */
-	Level(std::shared_ptr<VectorGenerator<D>> vg)
+	Level(std::shared_ptr<const Domain<D>> domain, std::shared_ptr<VectorGenerator<D>> vg)
 	{
-		this->vg = vg;
+		this->domain = domain;
+		this->vg     = vg;
+	}
+	/**
+	 * @brief Get the Domain object
+	 */
+	std::shared_ptr<const Domain<D>> getDomain() const
+	{
+		return domain;
 	}
 	/**
 	 * @brief Set the restriction operator for restricting from this level to the coarser level.
 	 *
 	 * @param restrictor the restriction operator.
 	 */
-	void setRestrictor(std::shared_ptr<Restrictor<D>> restrictor)
+	void setRestrictor(std::shared_ptr<const Restrictor<D>> restrictor)
 	{
 		this->restrictor = restrictor;
 	}
@@ -100,7 +112,7 @@ template <size_t D> class Level
 	 *
 	 * @param interpolator the interpolation operator.
 	 */
-	void setInterpolator(std::shared_ptr<Interpolator<D>> interpolator)
+	void setInterpolator(std::shared_ptr<const Interpolator<D>> interpolator)
 	{
 		this->interpolator = interpolator;
 	}
@@ -118,7 +130,7 @@ template <size_t D> class Level
 	 *
 	 * @param op the operator
 	 */
-	void setOperator(std::shared_ptr<Operator<D>> op)
+	void setOperator(std::shared_ptr<const Operator<D>> op)
 	{
 		this->op = op;
 	}
@@ -136,7 +148,7 @@ template <size_t D> class Level
 	 *
 	 * @param smoother the smoother
 	 */
-	void setSmoother(std::shared_ptr<Smoother<D>> smoother)
+	void setSmoother(std::shared_ptr<const Smoother<D>> smoother)
 	{
 		this->smoother = smoother;
 	}
@@ -172,9 +184,9 @@ template <size_t D> class Level
 	 *
 	 * @return reference to the coarser level.
 	 */
-	const Level &getCoarser() const
+	std::shared_ptr<const Level> getCoarser() const
 	{
-		return *coarser;
+		return coarser;
 	}
 	/**
 	 * @brief Set the pointer to the finer level.
@@ -184,6 +196,20 @@ template <size_t D> class Level
 	void setFiner(std::shared_ptr<Level> finer)
 	{
 		this->finer = finer;
+	}
+	/**
+	 * @brief Get the finer level
+	 */
+	std::shared_ptr<Level> getFiner()
+	{
+		return finer;
+	}
+	/**
+	 * @brief Get the finer level
+	 */
+	std::shared_ptr<const Level> getFiner() const
+	{
+		return std::shared_ptr<const Level>(finer);
 	}
 	/**
 	 * @brief Check if this level is the finest level.

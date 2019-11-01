@@ -114,7 +114,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	Vec                 vec;
 	std::vector<double> ghost_data;
 
-	static std::shared_ptr<PetscVector<D>> GetNewVector(std::shared_ptr<Domain<D>> domain)
+	static std::shared_ptr<PetscVector<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain)
 	{
 		Vec u;
 		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCellsWithGhost(), PETSC_DETERMINE, &u);

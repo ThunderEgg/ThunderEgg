@@ -56,12 +56,12 @@ template <size_t D> class WCycle : public Cycle<D>
 				this->smooth(level, u_vectors, f_vectors);
 			}
 			this->prepCoarser(level, u_vectors, f_vectors);
-			this->visit(level.getCoarser(), u_vectors, f_vectors);
+			this->visit(*level.getCoarser(), u_vectors, f_vectors);
 			for (int i = 0; i < num_mid_sweeps; i++) {
 				this->smooth(level, u_vectors, f_vectors);
 			}
 			this->prepCoarser(level, u_vectors, f_vectors);
-			this->visit(level.getCoarser(), u_vectors, f_vectors);
+			this->visit(*level.getCoarser(), u_vectors, f_vectors);
 			for (int i = 0; i < num_post_sweeps; i++) {
 				this->smooth(level, u_vectors, f_vectors);
 			}

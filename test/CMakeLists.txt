@@ -10,8 +10,11 @@ add_executable(unit_tests
     LocalData.cpp 
     DomainTools.cpp 
     SimpleGhostFiller.cpp 
-    Utils.cpp)
-
+    Utils.cpp
+    GMG/CycleFactory.cpp 
+    )
+    target_include_directories(unit_tests PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(unit_tests
     Thunderegg
     )

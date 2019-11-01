@@ -41,11 +41,11 @@ template <size_t D> class DrctIntp : public Interpolator<D>
 	/**
 	 * @brief The coarser set of domains
 	 */
-	std::shared_ptr<Domain<D>> coarse_domain;
+	std::shared_ptr<const Domain<D>> coarse_domain;
 	/**
 	 * @brief The finer set of domains
 	 */
-	std::shared_ptr<Domain<D>> fine_domain;
+	std::shared_ptr<const Domain<D>> fine_domain;
 	/**
 	 * @brief The comm package between the levels.
 	 */
@@ -59,8 +59,13 @@ template <size_t D> class DrctIntp : public Interpolator<D>
 	 * @param fine_domain the finer set of domains.
 	 * @param ilc the comm package between the levels.
 	 */
-	DrctIntp(std::shared_ptr<Domain<D>> coarse_domain, std::shared_ptr<Domain<D>> fine_domain,
-	         std::shared_ptr<InterLevelComm<D>> ilc);
+	DrctIntp(std::shared_ptr<const Domain<D>> coarse_domain,
+	         std::shared_ptr<const Domain<D>> fine_domain, std::shared_ptr<InterLevelComm<D>> ilc)
+	{
+		this->coarse_domain = coarse_domain;
+		this->fine_domain   = fine_domain;
+		this->ilc           = ilc;
+	}
 	/**
 	 * @brief Interpolate from the finer level to the coarser level.
 	 *
@@ -69,17 +74,20 @@ template <size_t D> class DrctIntp : public Interpolator<D>
 	 */
 	void interpolate(std::shared_ptr<const Vector<D>> coarse,
 	                 std::shared_ptr<Vector<D>>       fine) const;
-};
-template <size_t D>
-inline DrctIntp<D>::DrctIntp(std::shared_ptr<Domain<D>>         coarse_domain,
-                             std::shared_ptr<Domain<D>>         fine_domain,
-                             std::shared_ptr<InterLevelComm<D>> ilc)
-{
-	this->coarse_domain = coarse_domain;
-	this->fine_domain   = fine_domain;
-	this->ilc           = ilc;
-}
 
+	class Generator
+	{
+		public:
+		Generator() {}
+		std::shared_ptr<const DrctIntp<D>> operator()(std::shared_ptr<const Level<D>> level)
+		{
+			auto ilc = std::make_shared<InterLevelComm<D>>(level->getDomain(),
+			                                               level->getFiner()->getDomain());
+			return std::make_shared<DrctIntp<D>>(level->getDomain(), level->getFiner()->getDomain(),
+			                                     ilc);
+		}
+	};
+};
 template <size_t D>
 inline void DrctIntp<D>::interpolate(std::shared_ptr<const Vector<D>> coarse,
                                      std::shared_ptr<Vector<D>>       fine) const
@@ -89,9 +97,9 @@ inline void DrctIntp<D>::interpolate(std::shared_ptr<const Vector<D>> coarse,
 	ilc->scatter(coarse_local, coarse);
 
 	for (auto data : ilc->getFineDomains()) {
-		PatchInfo<D> &pinfo             = *data.pinfo;
-		LocalData<D>  coarse_local_data = coarse_local->getLocalData(data.local_index);
-		LocalData<D>  fine_data         = fine->getLocalData(pinfo.local_index);
+		const PatchInfo<D> &pinfo             = *data.pinfo;
+		LocalData<D>        coarse_local_data = coarse_local->getLocalData(data.local_index);
+		LocalData<D>        fine_data         = fine->getLocalData(pinfo.local_index);
 
 		if (pinfo.hasCoarseParent()) {
 			Orthant<D>         orth = pinfo.orth_on_parent;

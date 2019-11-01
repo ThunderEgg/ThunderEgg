@@ -37,7 +37,7 @@ template <size_t D> struct ILCFineToCoarseMetadata {
 	/**
 	 * @brief The PatchInfo object that this meta-data corresponds to.
 	 */
-	std::shared_ptr<PatchInfo<D>> pinfo;
+	std::shared_ptr<const PatchInfo<D>> pinfo;
 	/**
 	 * @brief the local block-index of the parent domain in the scattered coarse vector.
 	 */
@@ -86,8 +86,8 @@ template <size_t D> class InterLevelComm
 	 * @param coarse_domain the coarser DomainCollection.
 	 * @param fine_domain the finer DomainCollection.
 	 */
-	InterLevelComm(std::shared_ptr<Domain<D>> coarse_domain,
-	               std::shared_ptr<Domain<D>> fine_domain);
+	InterLevelComm(std::shared_ptr<const Domain<D>> coarse_domain,
+	               std::shared_ptr<const Domain<D>> fine_domain);
 
 	/**
 	 * @brief Allocate a new vector for which coarse values values will be scattered into.
@@ -117,8 +117,8 @@ template <size_t D> class InterLevelComm
 	}
 };
 template <size_t D>
-inline InterLevelComm<D>::InterLevelComm(std::shared_ptr<Domain<D>> coarse_domain,
-                                         std::shared_ptr<Domain<D>> fine_domain)
+inline InterLevelComm<D>::InterLevelComm(std::shared_ptr<const Domain<D>> coarse_domain,
+                                         std::shared_ptr<const Domain<D>> fine_domain)
 {
 	using namespace std;
 	int patch_stride = coarse_domain->getNumCellsInPatch();

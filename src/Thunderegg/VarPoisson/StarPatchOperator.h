@@ -23,8 +23,10 @@
 #define THUNDEREGG_VARPOISSON_STARPATCHOPERATOR_H
 
 #include <Thunderegg/DomainTools.h>
+#include <Thunderegg/GMG/Level.h>
 #include <Thunderegg/GhostFiller.h>
 #include <Thunderegg/PatchOperator.h>
+#include <Thunderegg/PetscVector.h>
 
 namespace Thunderegg
 {
@@ -32,11 +34,11 @@ namespace VarPoisson
 {
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
-	private:
-	std::shared_ptr<const Vector<D>>     coeffs;
-	std::shared_ptr<const Vector<D - 1>> gamma_coeffs;
-	std::shared_ptr<Domain<D>>           domain;
-	std::shared_ptr<GhostFiller<D>>      ghost_filler;
+	protected:
+	std::shared_ptr<const Vector<D>>      coeffs;
+	std::shared_ptr<const Vector<D - 1>>  gamma_coeffs;
+	std::shared_ptr<const GhostFiller<D>> ghost_filler;
+	std::shared_ptr<const Domain<D>>      domain;
 
 	constexpr int addValue(int axis)
 	{
@@ -44,8 +46,9 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	}
 
 	public:
-	StarPatchOperator(std::shared_ptr<const Vector<D>> coeffs, std::shared_ptr<Domain<D>> domain,
-	                  std::shared_ptr<GhostFiller<D>> ghost_filler)
+	StarPatchOperator(std::shared_ptr<const Vector<D>>      coeffs,
+	                  std::shared_ptr<const Domain<D>>      domain,
+	                  std::shared_ptr<const GhostFiller<D>> ghost_filler)
 	{
 		if (domain->getNumGhostCells() < 1) { throw 88; }
 		this->coeffs       = coeffs;
@@ -94,6 +97,24 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			});
 		});
 	}
+	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
+	                   LocalData<D> f) const
+	{
+		const LocalData<D> c = coeffs->getLocalData(pinfo->local_index);
+		for (Side<D> s : Side<D>::getValues()) {
+			if (pinfo->hasNbr(s)) {
+				double                 h2      = pow(pinfo->spacings[s.axis()], 2);
+				LocalData<D - 1>       f_inner = f.getSliceOnSide(s);
+				const LocalData<D - 1> u_ghost = f.getSliceOnSide(s, -1);
+				const LocalData<D - 1> c_ghost = f.getSliceOnSide(s, -1);
+				const LocalData<D - 1> c_inner = f.getSliceOnSide(s);
+				nested_loop<D - 1>(
+				f_inner.getStart(), f_inner.getEnd(), [&](const std::array<int, D - 1> &coord) {
+					f_inner[coord] -= u_ghost[coord] * (c_inner[coord] + c_ghost[coord]) / (2 * h2);
+				});
+			}
+		}
+	}
 	static void addDrichletBCToRHS(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> f,
 	                               std::function<double(const std::array<double, D> &)> gfunc,
 	                               std::function<double(const std::array<double, D> &)> hfunc)
@@ -130,15 +151,51 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			                 f->getLocalData(pinfo->local_index));
 		}
 	}
+	/*
 	std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
 	{
-		auto new_coeffs = PetscVector<D>::GetNewVector(ctx.domain);
-		ctx.finer_level->getRestrictor().restrict(new_coeffs, coeffs);
-		return std::make_shared<StarPatchOperator<D>>(new_coeffs, domain, ghost_filler);
+	    auto new_coeffs = PetscVector<D>::GetNewVector(ctx.domain);
+	    ctx.finer_level->getRestrictor().restrict(new_coeffs, coeffs);
+	    return std::make_shared<StarPatchOperator<D>>(new_coeffs, domain, ghost_filler);
 	}
-}; // namespace VarPoisson
+	*/
+	class Generator
+	{
+		private:
+		std::function<std::shared_ptr<const GhostFiller<D>>(
+		std::shared_ptr<const GMG::Level<D>> level)>
+		filler_gen;
+		std::map<std::shared_ptr<const Domain<D>>, std::shared_ptr<const StarPatchOperator<D>>>
+		generated_operators;
+
+		public:
+		Generator(std::shared_ptr<const StarPatchOperator<D>> finest_op,
+		          std::function<
+		          std::shared_ptr<const GhostFiller<D>>(std::shared_ptr<const GMG::Level<D>> level)>
+		          filler_gen)
+		{
+			generated_operators[finest_op->domain] = finest_op;
+			this->filler_gen                       = filler_gen;
+		}
+		std::shared_ptr<const StarPatchOperator<D>>
+		operator()(std::shared_ptr<const GMG::Level<D>> level)
+		{
+			auto coarser_op = generated_operators[level->getDomain()];
+			if (coarser_op != nullptr) { return coarser_op; }
+
+			std::shared_ptr<const Domain<D>> finer_domain = level->getFiner()->getDomain();
+			auto                             finer_op     = generated_operators[finer_domain];
+			auto new_coeffs = PetscVector<D>::GetNewVector(level->getDomain());
+			level->getFiner()->getRestrictor().restrict(new_coeffs, finer_op->coeffs);
+			coarser_op.reset(
+			new StarPatchOperator<D>(new_coeffs, level->getDomain(), filler_gen(level)));
+			return coarser_op;
+		}
+	};
+};
 extern template class StarPatchOperator<2>;
 extern template class StarPatchOperator<3>;
+
 } // namespace VarPoisson
 } // namespace Thunderegg
 #endif

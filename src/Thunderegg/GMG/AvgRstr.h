@@ -23,6 +23,7 @@
 #define THUNDEREGG_GMG_AVGRSTR_H
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/GMG/InterLevelComm.h>
+#include <Thunderegg/GMG/Level.h>
 #include <Thunderegg/GMG/Restrictor.h>
 #include <memory>
 namespace Thunderegg
@@ -38,11 +39,11 @@ template <size_t D> class AvgRstr : public Restrictor<D>
 	/**
 	 * @brief The coarse DomainCollection that is being restricted to.
 	 */
-	std::shared_ptr<Domain<D>> coarse_domain;
+	std::shared_ptr<const Domain<D>> coarse_domain;
 	/**
 	 * @brief The fine DomainCollection that is being restricted from.
 	 */
-	std::shared_ptr<Domain<D>> fine_domain;
+	std::shared_ptr<const Domain<D>> fine_domain;
 	/**
 	 * @brief The communication package for restricting between levels.
 	 */
@@ -56,63 +57,68 @@ template <size_t D> class AvgRstr : public Restrictor<D>
 	 * @param fine_domain the DomainCollection that is being restricted from.
 	 * @param ilc the communcation package for these two levels.
 	 */
-	AvgRstr(std::shared_ptr<Domain<D>> coarse_domain, std::shared_ptr<Domain<D>> fine_domain,
-	        std::shared_ptr<InterLevelComm<D>> ilc);
+	AvgRstr(std::shared_ptr<const Domain<D>> coarse_domain,
+	        std::shared_ptr<const Domain<D>> fine_domain, std::shared_ptr<InterLevelComm<D>> ilc)
+	{
+		this->coarse_domain = coarse_domain;
+		this->fine_domain   = fine_domain;
+		this->ilc           = ilc;
+	}
 	/**
 	 * @brief restriction function
 	 *
 	 * @param coarse the output vector that is restricted to.
 	 * @param fine the input vector that is restricted.
 	 */
-	void restrict(std::shared_ptr<Vector<D>> coarse, std::shared_ptr<const Vector<D>> fine) const;
-};
+	void restrict(std::shared_ptr<Vector<D>> coarse, std::shared_ptr<const Vector<D>> fine) const
+	{
+		std::shared_ptr<Vector<D>> coarse_local = ilc->getNewCoarseDistVec();
 
-template <size_t D>
-inline AvgRstr<D>::AvgRstr(std::shared_ptr<Domain<D>>         coarse_domain,
-                           std::shared_ptr<Domain<D>>         fine_domain,
-                           std::shared_ptr<InterLevelComm<D>> ilc)
-{
-	this->coarse_domain = coarse_domain;
-	this->fine_domain   = fine_domain;
-	this->ilc           = ilc;
-}
-template <size_t D>
-inline void AvgRstr<D>::restrict(std::shared_ptr<Vector<D>>       coarse,
-                                 std::shared_ptr<const Vector<D>> fine) const
-{
-	std::shared_ptr<Vector<D>> coarse_local = ilc->getNewCoarseDistVec();
+		for (ILCFineToCoarseMetadata<D> data : ilc->getFineDomains()) {
+			const PatchInfo<D> &pinfo             = *data.pinfo;
+			LocalData<D>        coarse_local_data = coarse_local->getLocalData(data.local_index);
+			LocalData<D>        fine_data         = fine->getLocalData(pinfo.local_index);
 
-	for (ILCFineToCoarseMetadata<D> data : ilc->getFineDomains()) {
-		PatchInfo<D> &pinfo             = *data.pinfo;
-		LocalData<D>  coarse_local_data = coarse_local->getLocalData(data.local_index);
-		LocalData<D>  fine_data         = fine->getLocalData(pinfo.local_index);
+			if (pinfo.hasCoarseParent()) {
+				Orthant<D>         orth = pinfo.orth_on_parent;
+				std::array<int, D> starts;
+				for (size_t i = 0; i < D; i++) {
+					starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
+				}
 
-		if (pinfo.hasCoarseParent()) {
-			Orthant<D>         orth = pinfo.orth_on_parent;
-			std::array<int, D> starts;
-			for (size_t i = 0; i < D; i++) {
-				starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
+				nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
+				               [&](const std::array<int, D> &coord) {
+					               std::array<int, D> coarse_coord;
+					               for (size_t x = 0; x < D; x++) {
+						               coarse_coord[x] = (coord[x] + starts[x]) / 2;
+					               }
+					               coarse_local_data[coarse_coord] += fine_data[coord] / (1 << D);
+				               });
+			} else {
+				nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
+				               [&](const std::array<int, D> &coord) {
+					               coarse_local_data[coord] += fine_data[coord];
+				               });
 			}
-
-			nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
-			               [&](const std::array<int, D> &coord) {
-				               std::array<int, D> coarse_coord;
-				               for (size_t x = 0; x < D; x++) {
-					               coarse_coord[x] = (coord[x] + starts[x]) / 2;
-				               }
-				               coarse_local_data[coarse_coord] += fine_data[coord] / (1 << D);
-			               });
-		} else {
-			nested_loop<D>(
-			fine_data.getStart(), fine_data.getEnd(),
-			[&](const std::array<int, D> &coord) { coarse_local_data[coord] += fine_data[coord]; });
 		}
-	}
 
-	// scatter
-	coarse->set(0);
-	ilc->scatterReverse(coarse_local, coarse);
-}
+		// scatter
+		coarse->set(0);
+		ilc->scatterReverse(coarse_local, coarse);
+	}
+	class Generator
+	{
+		public:
+		Generator() {}
+		std::shared_ptr<const AvgRstr<D>> operator()(std::shared_ptr<const Level<D>> level)
+		{
+			auto ilc = std::make_shared<InterLevelComm<D>>(level->getCoarser()->getDomain(),
+			                                               level->getDomain());
+			return std::make_shared<AvgRstr<D>>(level->getCoarser()->getDomain(),
+			                                    level->getDomain(), ilc);
+		}
+	};
+};
 } // namespace GMG
 } // namespace Thunderegg
 #endif

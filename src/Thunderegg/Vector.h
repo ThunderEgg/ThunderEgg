@@ -175,7 +175,7 @@ template <size_t D> class LocalData
 	 * @param offset which layer of ghost cells to acess
 	 * @return LocalData<D - 1>
 	 */
-	LocalData<D - 1> getGhostSliceOnSide(Side<D> s, int offset) const
+	const LocalData<D - 1> getGhostSliceOnSide(Side<D> s, int offset) const
 	{
 		return getSliceOnSidePriv(s, -offset);
 	}
@@ -318,6 +318,19 @@ template <size_t D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			LocalData<D> ld = getLocalData(i);
 			nested_loop<D>(ld.getStart(), ld.getEnd(),
+			               [&](std::array<int, D> coord) { ld[coord] = alpha; });
+		}
+	}
+	/**
+	 * @brief set all values in the vector (including ghost cells)
+	 *
+	 * @param alpha the value ot be set
+	 */
+	virtual void setWithGhost(double alpha)
+	{
+		for (int i = 0; i < num_local_patches; i++) {
+			LocalData<D> ld = getLocalData(i);
+			nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(),
 			               [&](std::array<int, D> coord) { ld[coord] = alpha; });
 		}
 	}

@@ -21,7 +21,6 @@
 
 #ifndef THUNDEREGG_PATCHOPERATOR_H
 #define THUNDEREGG_PATCHOPERATOR_H
-#include <Thunderegg/GMG/CycleFactoryCtx.h>
 #include <Thunderegg/Operator.h>
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
@@ -32,8 +31,9 @@ template <size_t D> class PatchOperator : public Operator<D>
 	virtual ~PatchOperator() {}
 
 	virtual void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
-	                              LocalData<D> f) const                                        = 0;
-	virtual std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) = 0;
+	                              LocalData<D> f) const = 0;
+	virtual void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
+	                           LocalData<D> f) const    = 0;
 };
 } // namespace Thunderegg
 #endif

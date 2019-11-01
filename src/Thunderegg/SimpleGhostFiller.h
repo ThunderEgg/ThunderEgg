@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_SIMPLEGHOSTFILLER_H
 #define THUNDEREGG_SIMPLEGHOSTFILLER_H
+#include <Thunderegg/GMG/Level.h>
 #include <Thunderegg/GhostFiller.h>
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
@@ -32,10 +33,11 @@ namespace Thunderegg
  */
 template <size_t D> class SimpleGhostFiller : public GhostFiller<D>
 {
-	std::shared_ptr<Domain<D>> domain;
+	protected:
+	std::shared_ptr<const Domain<D>> domain;
 
 	public:
-	SimpleGhostFiller(std::shared_ptr<Domain<D>> domain)
+	SimpleGhostFiller(std::shared_ptr<const Domain<D>> domain)
 	{
 		this->domain = domain;
 	}
@@ -63,6 +65,26 @@ template <size_t D> class SimpleGhostFiller : public GhostFiller<D>
 			}
 		}
 	}
+	class Generator
+	{
+		private:
+		std::map<std::shared_ptr<const Domain<D>>, std::shared_ptr<const SimpleGhostFiller<D>>>
+		generated_fillers;
+
+		public:
+		Generator(std::shared_ptr<const SimpleGhostFiller<D>> filler)
+		{
+			generated_fillers[filler->domain] = filler;
+		}
+		std::shared_ptr<const SimpleGhostFiller<D>>
+		operator()(std::shared_ptr<const GMG::Level<D>> level)
+		{
+			auto filler = generated_fillers[level->getDomain()];
+			if (filler != nullptr) { return filler; }
+			filler.reset(new SimpleGhostFiller<D>(level->getDomain()));
+			return filler;
+		}
+	};
 };
 } // namespace Thunderegg
 #endif

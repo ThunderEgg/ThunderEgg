@@ -202,6 +202,15 @@ template <size_t D> class Domain
 		return pinfo_vector;
 	}
 	/**
+	 * @brief Get a vector of PatchInfo pointers where index in the vector corresponds to the
+	 * patch's local index
+	 */
+	std::vector<std::shared_ptr<const PatchInfo<D>>> getPatchInfoVector() const
+	{
+		return std::vector<std::shared_ptr<const PatchInfo<D>>>(pinfo_vector.cbegin(),
+		                                                        pinfo_vector.cend());
+	}
+	/**
 	 * @brief Get map that goes form patch's id to the PatchInfo pointer
 	 */
 	std::map<int, std::shared_ptr<PatchInfo<D>>> &getPatchInfoMap()

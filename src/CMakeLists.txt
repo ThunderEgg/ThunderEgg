@@ -28,8 +28,8 @@ list(APPEND Thunderegg_SRCS Thunderegg/Poisson/Schur/StarPatchOperator.cpp)
 
 list(APPEND Thunderegg_SRCS Thunderegg/VarPoisson/StarPatchOperator.cpp)
 
-list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory2d.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory3d.cpp)
+#list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory2d.cpp)
+#list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory3d.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/GMG/InterLevelComm.h)
 
 list(APPEND Thunderegg_SRCS Thunderegg/Experimental/DomGen.cpp)

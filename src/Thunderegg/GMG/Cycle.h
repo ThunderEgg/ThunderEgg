@@ -64,8 +64,8 @@ template <size_t D> class Cycle : public Operator<D>
 		level.getOperator().apply(u_vectors.front(), r);
 		r->scaleThenAdd(-1, f_vectors.front());
 		// create vectors for coarser levels
-		std::shared_ptr<Vector<D>> new_u = level.getCoarser().getVectorGenerator()->getNewVector();
-		std::shared_ptr<Vector<D>> new_f = level.getCoarser().getVectorGenerator()->getNewVector();
+		std::shared_ptr<Vector<D>> new_u = level.getCoarser()->getVectorGenerator()->getNewVector();
+		std::shared_ptr<Vector<D>> new_f = level.getCoarser()->getVectorGenerator()->getNewVector();
 		level.getRestrictor().restrict(new_f, r);
 		u_vectors.push_front(new_u);
 		f_vectors.push_front(new_f);

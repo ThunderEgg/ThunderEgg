@@ -22,18 +22,16 @@
 #include "Init.h"
 #include "Writers/ClawWriter.h"
 #include <Thunderegg/BiCGStab.h>
+#include <Thunderegg/BiCGStabPatchSolver.h>
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/DomainWrapOp.h>
 #include <Thunderegg/Experimental/DomGen.h>
-#include <Thunderegg/GMG/CycleFactory2d.h>
+#include <Thunderegg/GMG/AvgRstr.h>
+#include <Thunderegg/GMG/CycleFactory.h>
+#include <Thunderegg/GMG/DrctIntp.h>
 #include <Thunderegg/PetscMatOp.h>
 #include <Thunderegg/PetscShellCreator.h>
-#include <Thunderegg/Schur/BiCGStabSolver.h>
-#include <Thunderegg/Schur/BilinearInterpolator.h>
-#include <Thunderegg/Schur/SchurHelper.h>
-#include <Thunderegg/Schur/SchurMatrixHelper2d.h>
-#include <Thunderegg/Schur/SchurWrapOp.h>
 #include <Thunderegg/SchwarzPrec.h>
 #include <Thunderegg/SimpleGhostFiller.h>
 #include <Thunderegg/Timer.h>
@@ -63,7 +61,6 @@
 
 using namespace std;
 using namespace Thunderegg;
-using namespace Thunderegg::Schur;
 using namespace Thunderegg::Experimental;
 using namespace Thunderegg::VarPoisson;
 
@@ -311,7 +308,6 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		shared_ptr<SchurHelper<2>> sch(new SchurHelper<2>(domain));
 		shared_ptr<PetscVector<2>> u     = PetscVector<2>::GetNewVector(domain);
 		shared_ptr<PetscVector<2>> exact = PetscVector<2>::GetNewVector(domain);
 		shared_ptr<PetscVector<2>> f     = PetscVector<2>::GetNewVector(domain);
@@ -331,19 +327,14 @@ int main(int argc, char *argv[])
 
 		timer.stop("Domain Initialization");
 
-		// interface interpolator
-		shared_ptr<IfaceInterp<2>> p_interp(new BilinearInterpolator(sch));
-
 		// patch operator
 		shared_ptr<SimpleGhostFiller<2>> gf(new SimpleGhostFiller<2>(domain));
 		shared_ptr<StarPatchOperator<2>> p_operator(new StarPatchOperator<2>(h, domain, gf));
 		StarPatchOperator<2>::addDrichletBCToRHS(domain, f, gfun, hfun);
 
 		// set the patch solver
-		/*
-		shared_ptr<PatchSolver<2>> p_solver;
-		p_solver.reset(new BiCGStabSolver<2>(sch, p_operator, ps_tol, ps_max_it));
-		*/
+		auto p_solver
+		= make_shared<BiCGStabPatchSolver<2>>(domain, gf, p_operator, ps_tol, ps_max_it);
 
 		if (neumann && !no_zero_rhs_avg) {
 			double fdiff = domain->integrate(f) / domain->volume();
@@ -368,7 +359,13 @@ int main(int argc, char *argv[])
 		} else if (preconditioner == "GMG") {
 			timer.start("GMG Setup");
 
-			// M = GMG::CycleFactory2d::getCycle(copts, dcg, p_solver, p_operator, p_interp);
+			SimpleGhostFiller<2>::Generator   filler_gen(gf);
+			StarPatchOperator<2>::Generator   op_gen(p_operator, filler_gen);
+			BiCGStabPatchSolver<2>::Generator smooth_gen(p_solver, filler_gen, op_gen);
+			GMG::AvgRstr<2>::Generator        restrictor_gen;
+			GMG::DrctIntp<2>::Generator       interpolator_gen;
+			M = GMG::CycleFactory<2>::getCycle(copts, dcg, restrictor_gen, interpolator_gen,
+			                                   smooth_gen, op_gen);
 
 			timer.stop("GMG Setup");
 		} else if (preconditioner == "cheb") {
