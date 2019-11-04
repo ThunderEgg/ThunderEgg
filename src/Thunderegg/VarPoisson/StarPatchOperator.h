@@ -115,6 +115,14 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			}
 		}
 	}
+	/**
+	 * @brief Helper fucntion for adding Dirichlet boundary conditions to right hand side.
+	 *
+	 * @param domain The domain associated with the vector
+	 * @param f the right hand side vector
+	 * @param gfunc the exact solution
+	 * @param hfunc the coefficients
+	 */
 	static void addDrichletBCToRHS(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> f,
 	                               std::function<double(const std::array<double, D> &)> gfunc,
 	                               std::function<double(const std::array<double, D> &)> hfunc)
@@ -151,24 +159,34 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			                 f->getLocalData(pinfo->local_index));
 		}
 	}
-	/*
-	std::shared_ptr<PatchOperator<D>> getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
-	{
-	    auto new_coeffs = PetscVector<D>::GetNewVector(ctx.domain);
-	    ctx.finer_level->getRestrictor().restrict(new_coeffs, coeffs);
-	    return std::make_shared<StarPatchOperator<D>>(new_coeffs, domain, ghost_filler);
-	}
-	*/
+	/**
+	 * @brief Generator for GMG levels.
+	 *
+	 * Will use same interpolation scheme for coefficions as the
+	 * interpolator in GMG.
+	 */
 	class Generator
 	{
 		private:
+		/**
+		 * @brief generator for ghost fillers
+		 */
 		std::function<std::shared_ptr<const GhostFiller<D>>(
 		std::shared_ptr<const GMG::Level<D>> level)>
 		filler_gen;
+		/**
+		 * @brief Generated operators are stored here.
+		 */
 		std::map<std::shared_ptr<const Domain<D>>, std::shared_ptr<const StarPatchOperator<D>>>
 		generated_operators;
 
 		public:
+		/**
+		 * @brief Construct a new StarPatchOperator generator
+		 *
+		 * @param finest_op the finest star pach operator
+		 * @param filler_gen returns a GhostFiller for a given level
+		 */
 		Generator(std::shared_ptr<const StarPatchOperator<D>> finest_op,
 		          std::function<
 		          std::shared_ptr<const GhostFiller<D>>(std::shared_ptr<const GMG::Level<D>> level)>
@@ -177,6 +195,12 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			generated_operators[finest_op->domain] = finest_op;
 			this->filler_gen                       = filler_gen;
 		}
+		/**
+		 * @brief Return a StarPatchOperator for a given level
+		 *
+		 * @param level the level in GMG
+		 * @return std::shared_ptr<const StarPatchOperator<D>> the operator
+		 */
 		std::shared_ptr<const StarPatchOperator<D>>
 		operator()(std::shared_ptr<const GMG::Level<D>> level)
 		{

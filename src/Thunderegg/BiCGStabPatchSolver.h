@@ -152,6 +152,13 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		int    max_it;
 
 		public:
+		/**
+		 * @brief Construct a new Generator object
+		 *
+		 * @param solver the solver for the finest level
+		 * @param filler_gen GhostFiller generator
+		 * @param op_gen Operator generator
+		 */
 		Generator(std::shared_ptr<const BiCGStabPatchSolver<D>> solver,
 		          std::function<
 		          std::shared_ptr<const GhostFiller<D>>(std::shared_ptr<const GMG::Level<D>> level)>
@@ -166,6 +173,12 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 			this->op_gen                      = op_gen;
 			generated_solvers[solver->domain] = solver;
 		}
+		/**
+		 * @brief get a new BiCGStabPatchSolver for given gmg level
+		 *
+		 * @param level the level
+		 * @return std::shared_ptr<const BiCGStabPatchSolver<D>>
+		 */
 		std::shared_ptr<const BiCGStabPatchSolver<D>>
 		operator()(std::shared_ptr<const GMG::Level<D>> level)
 		{

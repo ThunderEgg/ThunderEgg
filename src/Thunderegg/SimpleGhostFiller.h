@@ -65,17 +65,34 @@ template <size_t D> class SimpleGhostFiller : public GhostFiller<D>
 			}
 		}
 	}
+	/**
+	 * @brief Generates ghost fillers for a given GMG level
+	 */
 	class Generator
 	{
 		private:
+		/**
+		 * @brief Generated ghost fillers
+		 */
 		std::map<std::shared_ptr<const Domain<D>>, std::shared_ptr<const SimpleGhostFiller<D>>>
 		generated_fillers;
 
 		public:
+		/**
+		 * @brief Construct a new Generator object
+		 *
+		 * @param filler the finest ghost filler
+		 */
 		Generator(std::shared_ptr<const SimpleGhostFiller<D>> filler)
 		{
 			generated_fillers[filler->domain] = filler;
 		}
+		/**
+		 * @brief Get a new ghost filler for a given level
+		 *
+		 * @param level  the level
+		 * @return std::shared_ptr<const SimpleGhostFiller<D>>
+		 */
 		std::shared_ptr<const SimpleGhostFiller<D>>
 		operator()(std::shared_ptr<const GMG::Level<D>> level)
 		{
