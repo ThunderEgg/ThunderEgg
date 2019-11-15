@@ -48,7 +48,7 @@ template <int start, int stop, typename T> inline void loop(T lambda)
 {
 	Loop<start, stop, T>::loop_loop(lambda);
 }
-template <size_t D, size_t Dir, typename T, typename A> class NestedLoop
+template <int D, int Dir, typename T, typename A> class NestedLoop
 {
 	public:
 	static void inline nested_loop_loop(A coord, A start, A end, T lambda)
@@ -59,7 +59,7 @@ template <size_t D, size_t Dir, typename T, typename A> class NestedLoop
 	}
 };
 
-template <size_t D, typename T, typename A> class NestedLoop<D, 0, T, A>
+template <int D, typename T, typename A> class NestedLoop<D, 0, T, A>
 {
 	public:
 	static void inline nested_loop_loop(A coord, A start, A end, T lambda)
@@ -77,7 +77,7 @@ template <typename T, typename A> class NestedLoop<0, -1, T, A>
 		lambda(coord);
 	}
 };
-template <size_t D, typename T, typename A> inline void nested_loop(A start, A end, T lambda)
+template <int D, typename T, typename A> inline void nested_loop(A start, A end, T lambda)
 {
 	A coord = start;
 	NestedLoop<D, D - 1, T, A>::nested_loop_loop(coord, start, end, lambda);
