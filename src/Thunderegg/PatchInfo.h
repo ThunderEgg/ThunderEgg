@@ -53,6 +53,24 @@ enum class NbrType {
 	 */
 	Fine
 };
+/**
+ * @brief ostream operator that prints a string representation of NbrType enum.
+ */
+inline std::ostream &operator<<(std::ostream &os, const NbrType &type)
+{
+	switch (type) {
+		case NbrType::Coarse:
+			os << "NbrType::Coarse";
+			break;
+		case NbrType::Fine:
+			os << "NbrType::Fine";
+			break;
+		case NbrType::Normal:
+			os << "NbrType::Normal";
+			break;
+	}
+	return os;
+}
 
 template <size_t D> struct NbrInfo;
 template <size_t D> struct NormalNbrInfo;
@@ -306,8 +324,8 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	void setPtrs(std::map<int, std::shared_ptr<PatchInfo>> &patches);
 	/**
-	 * @brief change the rank of this object and update the neighbors. (if they are on the same
-	 * processor)
+	 * @brief change the rank of this object and update the neighbors. (if they are on
+	 * the same processor)
 	 *
 	 * @param rank the mpi rank
 	 */
@@ -402,7 +420,8 @@ template <size_t D> class NbrInfo : virtual public Serializable
 	/**
 	 * @brief Update the ranks on the neighbor objects.
 	 *
-	 * TODO make this work across processors. This only updates the objects on the same processor
+	 * TODO make this work across processors. This only updates the objects on the same
+	 * processor
 	 *
 	 * @param new_rank The new rank of this patch
 	 * @param s the side of tha patch that the neighbor is on.
@@ -550,8 +569,8 @@ template <size_t D> class CoarseNbrInfo : public NbrInfo<D>
 	 * @brief Construct a new CoarseNbrInfo object
 	 *
 	 * @param id the id of the neighbor
-	 * @param orth_on_coarse The orthant that this patch in relation to the coarser patch's
-	 * interface.
+	 * @param orth_on_coarse The orthant that this patch in relation to the coarser
+	 * patch's interface.
 	 */
 	CoarseNbrInfo(int id, Orthant<D - 1> orth_on_coarse)
 	{

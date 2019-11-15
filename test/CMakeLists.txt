@@ -10,6 +10,7 @@ add_executable(unit_tests
     LocalData.cpp 
     DomainTools.cpp 
     SimpleGhostFiller.cpp 
+    BiLinearGhostFiller.cpp 
     Utils.cpp
     GMG/CycleFactory.cpp 
     )
