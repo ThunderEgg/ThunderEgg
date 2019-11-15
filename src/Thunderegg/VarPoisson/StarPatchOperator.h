@@ -204,7 +204,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		std::shared_ptr<const StarPatchOperator<D>>
 		operator()(std::shared_ptr<const GMG::Level<D>> level)
 		{
-			auto coarser_op = generated_operators[level->getDomain()];
+			auto &coarser_op = generated_operators[level->getDomain()];
 			if (coarser_op != nullptr) { return coarser_op; }
 
 			std::shared_ptr<const Domain<D>> finer_domain = level->getFiner()->getDomain();

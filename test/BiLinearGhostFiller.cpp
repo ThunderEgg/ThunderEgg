@@ -297,3 +297,57 @@ TEST_CASE("exchange refined 2D BiLinearGhostFiller", "[BiLinearGhostFiller]")
 		}
 	}
 }
+TEST_CASE("exchange refined 2D BiLinearGhostFiller ghost already set", "[BiLinearGhostFiller]")
+{
+	auto nx        = GENERATE(2, 10);
+	auto ny        = GENERATE(2, 10);
+	int  num_ghost = 1;
+
+	Experimental::Tree<2>   t("middle_refine.bin");
+	Experimental::DomGen<2> dg(t, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>>   d = dg.getFinestDomain();
+
+	shared_ptr<ValVector<2>> vec(new ValVector<2>({nx, ny}, num_ghost, d->getNumGlobalPatches()));
+	shared_ptr<ValVector<2>> expected(
+	new ValVector<2>({nx, ny}, num_ghost, d->getNumGlobalPatches()));
+
+	auto f = [&](const std::array<double, 2> coord) -> double {
+		double x = coord[0];
+		double y = coord[0];
+		return 1 + ((x * 0.3) + y);
+	};
+
+	DomainTools<2>::setValuesWithGhost(d, vec, f);
+	DomainTools<2>::setValuesWithGhost(d, expected, f);
+
+	BiLinearGhostFiller blgf(d);
+	blgf.fillGhost(vec);
+
+	for (auto pinfo : d->getPatchInfoVector()) {
+		INFO("Patch: " << pinfo->id);
+		INFO("x:     " << pinfo->starts[0]);
+		INFO("y:     " << pinfo->starts[1]);
+		INFO("nx:    " << pinfo->ns[0]);
+		INFO("ny:    " << pinfo->ns[1]);
+		LocalData<2> vec_ld      = vec->getLocalData(pinfo->local_index);
+		LocalData<2> expected_ld = expected->getLocalData(pinfo->local_index);
+		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+			///
+			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+		});
+		for (Side<2> s : Side<2>::getValues()) {
+			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			if (pinfo->hasNbr(s)) {
+				INFO("side:      " << s);
+				INFO("nbr-type:  " << pinfo->getNbrType(s));
+				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				               [&](const array<int, 1> &coord) {
+					               ///
+					               INFO("coord:  " << coord[0]);
+					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				               });
+			}
+		}
+	}
+}

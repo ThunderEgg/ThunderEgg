@@ -48,6 +48,16 @@ class BiLinearGhostFiller : public GhostFiller<2>
 	void fillGhost(std::shared_ptr<const Vector<2>> u) const
 	{
 		for (auto pinfo : domain->getPatchInfoVector()) {
+			const LocalData<2> this_patch = u->getLocalData(pinfo->local_index);
+			for (Side<2> s : Side<2>::getValues()) {
+				if (pinfo->hasNbr(s)) {
+					auto this_ghost = this_patch.getGhostSliceOnSide(s, 1);
+					nested_loop<1>(this_ghost.getStart(), this_ghost.getEnd(),
+					               [&](const std::array<int, 1> &coord) { this_ghost[coord] = 0; });
+				}
+			}
+		}
+		for (auto pinfo : domain->getPatchInfoVector()) {
 			for (Side<2> s : Side<2>::getValues()) {
 				if (pinfo->hasNbr(s)) {
 					switch (pinfo->getNbrType(s)) {

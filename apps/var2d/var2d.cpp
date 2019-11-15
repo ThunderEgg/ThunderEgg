@@ -23,6 +23,7 @@
 #include "Writers/ClawWriter.h"
 #include <Thunderegg/BiCGStab.h>
 #include <Thunderegg/BiCGStabPatchSolver.h>
+#include <Thunderegg/BiLinearGhostFiller.h>
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/DomainWrapOp.h>
@@ -33,7 +34,6 @@
 #include <Thunderegg/PetscMatOp.h>
 #include <Thunderegg/PetscShellCreator.h>
 #include <Thunderegg/SchwarzPrec.h>
-#include <Thunderegg/SimpleGhostFiller.h>
 #include <Thunderegg/Timer.h>
 #include <Thunderegg/VarPoisson/StarPatchOperator.h>
 #ifdef HAVE_VTK
@@ -328,7 +328,7 @@ int main(int argc, char *argv[])
 		timer.stop("Domain Initialization");
 
 		// patch operator
-		shared_ptr<SimpleGhostFiller<2>> gf(new SimpleGhostFiller<2>(domain));
+		shared_ptr<BiLinearGhostFiller>  gf(new BiLinearGhostFiller(domain));
 		shared_ptr<StarPatchOperator<2>> p_operator(new StarPatchOperator<2>(h, domain, gf));
 		StarPatchOperator<2>::addDrichletBCToRHS(domain, f, gfun, hfun);
 
@@ -359,7 +359,7 @@ int main(int argc, char *argv[])
 		} else if (preconditioner == "GMG") {
 			timer.start("GMG Setup");
 
-			SimpleGhostFiller<2>::Generator   filler_gen(gf);
+			BiLinearGhostFiller::Generator    filler_gen(gf);
 			StarPatchOperator<2>::Generator   op_gen(p_operator, filler_gen);
 			BiCGStabPatchSolver<2>::Generator smooth_gen(p_solver, filler_gen, op_gen);
 			GMG::AvgRstr<2>::Generator        restrictor_gen;
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 			std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
 
 			u->set(0);
-			int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000000);
+			int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000);
 			if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
 		}
 		timer.stop("Linear Solve");
