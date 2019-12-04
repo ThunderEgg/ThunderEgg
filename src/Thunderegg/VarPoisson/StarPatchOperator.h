@@ -54,6 +54,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		this->coeffs       = coeffs;
 		this->domain       = domain;
 		this->ghost_filler = ghost_filler;
+		this->ghost_filler->fillGhost(this->coeffs);
 	}
 	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
 	                      LocalData<D> f) const override

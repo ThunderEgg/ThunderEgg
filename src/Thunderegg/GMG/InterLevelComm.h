@@ -121,8 +121,9 @@ inline InterLevelComm<D>::InterLevelComm(std::shared_ptr<const Domain<D>> coarse
                                          std::shared_ptr<const Domain<D>> fine_domain)
 {
 	using namespace std;
-	int patch_stride = coarse_domain->getNumCellsInPatch();
-	ns               = coarse_domain->getNs();
+	int patch_stride
+	= coarse_domain->getNumLocalCellsWithGhost() / coarse_domain->getNumLocalPatches();
+	ns = coarse_domain->getNs();
 	set<int> parent_ids;
 	for (auto &pinfo : fine_domain->getPatchInfoVector()) {
 		parent_ids.insert(pinfo->parent_id);
@@ -168,7 +169,7 @@ template <size_t D> inline std::shared_ptr<Vector<D>> InterLevelComm<D>::getNewC
 {
 	Vec u;
 	VecCreateSeq(PETSC_COMM_SELF, local_vec_size, &u);
-	return std::shared_ptr<Vector<D>>(new PetscVector<D>(u, -1, ns, 0));
+	return std::shared_ptr<Vector<D>>(new PetscVector<D>(u, -1, ns, 1));
 }
 template <size_t D>
 inline void InterLevelComm<D>::scatter(std::shared_ptr<Vector<D>>       dist,

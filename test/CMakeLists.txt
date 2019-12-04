@@ -13,6 +13,7 @@ add_executable(unit_tests
     BiLinearGhostFiller.cpp 
     Utils.cpp
     GMG/CycleFactory.cpp 
+    GMG/LinearRestrictor.cpp 
     )
     target_include_directories(unit_tests PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR})

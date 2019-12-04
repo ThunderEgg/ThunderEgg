@@ -28,9 +28,9 @@
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/DomainWrapOp.h>
 #include <Thunderegg/Experimental/DomGen.h>
-#include <Thunderegg/GMG/AvgRstr.h>
 #include <Thunderegg/GMG/CycleFactory.h>
 #include <Thunderegg/GMG/DrctIntp.h>
+#include <Thunderegg/GMG/LinearRestrictor.h>
 #include <Thunderegg/PetscMatOp.h>
 #include <Thunderegg/PetscShellCreator.h>
 #include <Thunderegg/SchwarzPrec.h>
@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 	function<double(double, double)>                nfuny;
 	function<double(const std::array<double, 2> &)> hfun;
 
-	if (true) {
+	if (false) {
 		ffun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[1];
@@ -359,11 +359,11 @@ int main(int argc, char *argv[])
 		} else if (preconditioner == "GMG") {
 			timer.start("GMG Setup");
 
-			BiLinearGhostFiller::Generator    filler_gen(gf);
-			StarPatchOperator<2>::Generator   op_gen(p_operator, filler_gen);
-			BiCGStabPatchSolver<2>::Generator smooth_gen(p_solver, filler_gen, op_gen);
-			GMG::AvgRstr<2>::Generator        restrictor_gen;
-			GMG::DrctIntp<2>::Generator       interpolator_gen;
+			BiLinearGhostFiller::Generator      filler_gen(gf);
+			StarPatchOperator<2>::Generator     op_gen(p_operator, filler_gen);
+			BiCGStabPatchSolver<2>::Generator   smooth_gen(p_solver, filler_gen, op_gen);
+			GMG::LinearRestrictor<2>::Generator restrictor_gen;
+			GMG::DrctIntp<2>::Generator         interpolator_gen;
 			M = GMG::CycleFactory<2>::getCycle(copts, dcg, restrictor_gen, interpolator_gen,
 			                                   smooth_gen, op_gen);
 
@@ -451,10 +451,12 @@ int main(int argc, char *argv[])
 		}
 
 		// output
+		/*
 		if (claw_filename != "") {
-			ClawWriter writer(domain);
-			writer.write(u->vec, resid->vec);
+		    ClawWriter writer(domain);
+		    writer.write(u->vec, resid->vec);
 		}
+		*/
 #ifdef HAVE_VTK
 		if (vtk_filename != "") {
 			VtkWriter2d writer(domain, vtk_filename);

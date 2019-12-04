@@ -18,7 +18,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
-		double y = coord[0];
+		double y = coord[1];
 		return 1 + ((x + 0.3) * y);
 	};
 
@@ -259,7 +259,7 @@ TEST_CASE("exchange refined 2D BiLinearGhostFiller", "[BiLinearGhostFiller]")
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
-		double y = coord[0];
+		double y = coord[1];
 		return 1 + ((x * 0.3) + y);
 	};
 
