@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
 	function<double(double, double)>                nfuny;
 	function<double(const std::array<double, 2> &)> hfun;
 
-	if (false) {
+	if (true) {
 		ffun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[1];
@@ -451,12 +451,13 @@ int main(int argc, char *argv[])
 		}
 
 		// output
-		/*
 		if (claw_filename != "") {
-		    ClawWriter writer(domain);
-		    writer.write(u->vec, resid->vec);
+			ClawWriter writer(domain);
+			writer.addVector(u);
+			writer.addVector(f);
+			writer.addVector(error);
+			writer.write();
 		}
-		*/
 #ifdef HAVE_VTK
 		if (vtk_filename != "") {
 			VtkWriter2d writer(domain, vtk_filename);

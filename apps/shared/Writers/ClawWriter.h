@@ -22,16 +22,18 @@
 #ifndef CLAWWRITER_H
 #define CLAWWRITER_H
 #include <Thunderegg/Domain.h>
-#include <petscvec.h>
+#include <Thunderegg/Vector.h>
+#include <list>
 class ClawWriter
 {
 	private:
-	std::shared_ptr<Thunderegg::Domain<2>> domain;
-	void writePatch(Thunderegg::PatchInfo<2> &d, std::ostream &os, double *u_view,
-	                double *resid_view);
+	std::shared_ptr<Thunderegg::Domain<2>>            domain;
+	std::list<std::shared_ptr<Thunderegg::Vector<2>>> vectors;
+	void writePatch(Thunderegg::PatchInfo<2> &d, std::ostream &os);
 
 	public:
 	ClawWriter(std::shared_ptr<Thunderegg::Domain<2>> domain);
-	void write(Vec u, Vec resid);
+	void addVector(std::shared_ptr<Thunderegg::Vector<2>> vec);
+	void write();
 };
 #endif

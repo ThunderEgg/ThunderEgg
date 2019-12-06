@@ -27,50 +27,56 @@ ClawWriter::ClawWriter(std::shared_ptr<Domain<2>> domain)
 {
 	this->domain = domain;
 }
-void ClawWriter::write(Vec u, Vec resid)
+void ClawWriter::addVector(std::shared_ptr<Vector<2>> vec)
+{
+	vectors.push_back(vec);
+}
+void ClawWriter::write()
 {
 	ofstream     t_file("fort.t0000");
 	const string tab = "\t";
 	t_file << 0.0 << tab << "time" << endl;
-	t_file << 2 << tab << "meqn" << endl;
+	t_file << vectors.size() << tab << "meqn" << endl;
 	t_file << domain->getNumLocalPatches() << tab << "ngrids" << endl;
 	t_file << 2 << tab << "num_aux" << endl;
 	t_file << 2 << tab << "num_dim" << endl;
 	t_file.close();
 	ofstream q_file("fort.q0000");
 
-	double *u_view, *resid_view;
-	VecGetArray(u, &u_view);
-	VecGetArray(resid, &resid_view);
 	q_file.precision(10);
 	q_file << scientific;
 	for (auto &pinfo : domain->getPatchInfoVector()) {
-		writePatch(*pinfo, q_file, u_view, resid_view);
+		writePatch(*pinfo, q_file);
 	}
-	VecRestoreArray(u, &u_view);
-	VecRestoreArray(resid, &resid_view);
 	q_file.close();
 }
-void ClawWriter::writePatch(PatchInfo<2> &d, std::ostream &os, double *u_view, double *resid_view)
+void ClawWriter::writePatch(PatchInfo<2> &pinfo, std::ostream &os)
 {
 	const string tab = "\t";
-	os << d.id << tab << "grid_number" << endl;
-	os << d.refine_level << tab << "AMR_level" << endl;
+	os << pinfo.id << tab << "grid_number" << endl;
+	os << pinfo.refine_level << tab << "AMR_level" << endl;
 	os << 0 << tab << "block_number" << endl;
 	os << 0 << tab << "mpi_rank" << endl;
-	os << d.ns[0] << tab << "mx" << endl;
-	os << d.ns[1] << tab << "my" << endl;
-	os << d.starts[0] << tab << "xlow" << endl;
-	os << d.starts[1] << tab << "ylow" << endl;
-	os << d.spacings[0] << tab << "dx" << endl;
-	os << d.spacings[1] << tab << "dy" << endl;
+	os << pinfo.ns[0] << tab << "mx" << endl;
+	os << pinfo.ns[1] << tab << "my" << endl;
+	os << pinfo.starts[0] << tab << "xlow" << endl;
+	os << pinfo.starts[1] << tab << "ylow" << endl;
+	os << pinfo.spacings[0] << tab << "dx" << endl;
+	os << pinfo.spacings[1] << tab << "dy" << endl;
 	os << endl;
-	int start = d.id * d.ns[0] * d.ns[1];
-	for (int i = 0; i < d.ns[0]; i++) {
-		for (int j = 0; j < d.ns[1]; j++) {
-			int loc = j + i * d.ns[1];
-			os << u_view[start + loc] << tab
-			   << resid_view[start + loc] * d.spacings[0] * d.spacings[1] << endl;
+	list<LocalData<2>> lds;
+	for (auto vec : vectors) {
+		lds.push_back(vec->getLocalData(pinfo.local_index));
+	}
+	for (int y = 0; y < pinfo.ns[1]; y++) {
+		for (int x = 0; x < pinfo.ns[0]; x++) {
+			auto lds_iter       = lds.begin();
+			auto one_before_end = --lds.end();
+			while (lds_iter != one_before_end) {
+				os << (*lds_iter)[{x, y}] << tab;
+				lds_iter++;
+			}
+			os << (*lds_iter)[{x, y}] << endl;
 		}
 		os << endl;
 	}
