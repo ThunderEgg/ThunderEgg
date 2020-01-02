@@ -223,6 +223,10 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		 * @brief The maximum number of iterations
 		 */
 		int max_it;
+		/**
+		 * @brief timer from finest solver
+		 */
+		std::shared_ptr<Timer> timer;
 
 		public:
 		/**
@@ -240,6 +244,7 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		          std::shared_ptr<const GMG::Level<D>> level)>
 		          op_gen)
 		{
+			this->timer                       = solver->getTimer();
 			this->tol                         = solver->tol;
 			this->max_it                      = solver->max_it;
 			this->filler_gen                  = filler_gen;
@@ -261,6 +266,7 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 			}
 			solver.reset(new BiCGStabPatchSolver<D>(level->getDomain(), filler_gen(level),
 			                                        op_gen(level), tol, max_it));
+			solver->setTimer(timer);
 			return solver;
 		}
 	};

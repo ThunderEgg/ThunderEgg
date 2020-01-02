@@ -131,6 +131,7 @@ class Timer
 			if (times.size() == 1) {
 				os << "   time (sec): " << times[0] << std::endl << std::endl;
 			} else {
+				os << "  total calls: " << times.size() << std::endl;
 				double average = 0;
 				for (double t : times) {
 					average += t;

@@ -62,9 +62,18 @@ template <size_t D> class PatchSolver : public virtual Operator<D>, public virtu
 	 *
 	 * @param timer the timer
 	 */
-	void setTimer(std::shared_ptr<Timer> timer)
+	void setTimer(std::shared_ptr<Timer> timer) const
 	{
 		this->timer = timer;
+	}
+	/**
+	 * @brief Get the Timer object
+	 *
+	 * @return std::shared_ptr<Timer> the timer
+	 */
+	std::shared_ptr<Timer> getTimer() const
+	{
+		return timer;
 	}
 	/**
 	 * @brief Perform a single solve over a patch
