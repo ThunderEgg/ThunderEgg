@@ -335,6 +335,7 @@ int main(int argc, char *argv[])
 		// set the patch solver
 		auto p_solver
 		= make_shared<BiCGStabPatchSolver<2>>(domain, gf, p_operator, ps_tol, ps_max_it);
+		p_solver->setTimer(timer);
 
 		if (neumann && !no_zero_rhs_avg) {
 			double fdiff = domain->integrate(f) / domain->volume();

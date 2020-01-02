@@ -26,6 +26,7 @@
 #include <Thunderegg/GMG/Smoother.h>
 #include <Thunderegg/GhostFiller.h>
 #include <Thunderegg/Operator.h>
+#include <Thunderegg/Timer.h>
 #include <Thunderegg/Vector.h>
 
 namespace Thunderegg
@@ -38,14 +39,40 @@ namespace Thunderegg
 template <size_t D> class PatchSolver : public virtual Operator<D>, public virtual GMG::Smoother<D>
 {
 	protected:
-	std::shared_ptr<const Domain<D>>      domain;
+	/**
+	 * @brief the domain that is being solved over
+	 */
+	std::shared_ptr<const Domain<D>> domain;
+	/**
+	 * @brief The ghost filler, needed for smoothing
+	 */
 	std::shared_ptr<const GhostFiller<D>> ghost_filler;
+	/**
+	 * @brief The timer
+	 */
+	mutable std::shared_ptr<Timer> timer;
 
 	public:
 	/**
 	 * @brief Destroy the Patch Solver object
 	 */
 	virtual ~PatchSolver() {}
+	/**
+	 * @brief Set the Timer object
+	 *
+	 * @param timer the timer
+	 */
+	void setTimer(std::shared_ptr<Timer> timer)
+	{
+		this->timer = timer;
+	}
+	/**
+	 * @brief Perform a single solve over a patch
+	 *
+	 * @param pinfo the PatchInfo for the patch
+	 * @param u the left hand side
+	 * @param f the right hand side
+	 */
 	virtual void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
 	                              const LocalData<D> f) const = 0;
 	/**
@@ -58,9 +85,21 @@ template <size_t D> class PatchSolver : public virtual Operator<D>, public virtu
 	                   std::shared_ptr<Vector<D>>       u) const override
 	{
 		u->setWithGhost(0);
+		if (timer) {
+			timer->start("Total Patch Solve");
+		}
 		for (std::shared_ptr<const PatchInfo<D>> pinfo : domain->getPatchInfoVector()) {
+			if (timer) {
+				timer->start("Single Patch Solve");
+			}
 			solveSinglePatch(pinfo, u->getLocalData(pinfo->local_index),
 			                 f->getLocalData(pinfo->local_index));
+			if (timer) {
+				timer->stop("Single Patch Solve");
+			}
+		}
+		if (timer) {
+			timer->stop("Total Patch Solve");
 		}
 	}
 	/**
@@ -72,10 +111,22 @@ template <size_t D> class PatchSolver : public virtual Operator<D>, public virtu
 	virtual void smooth(std::shared_ptr<const Vector<D>> f,
 	                    std::shared_ptr<Vector<D>>       u) const override
 	{
+		if (timer) {
+			timer->start("Total Patch Solve");
+		}
 		ghost_filler->fillGhost(u);
 		for (std::shared_ptr<const PatchInfo<D>> pinfo : domain->getPatchInfoVector()) {
+			if (timer) {
+				timer->start("Single Patch Solve");
+			}
 			solveSinglePatch(pinfo, u->getLocalData(pinfo->local_index),
 			                 f->getLocalData(pinfo->local_index));
+			if (timer) {
+				timer->stop("Single Patch Solve");
+			}
+		}
+		if (timer) {
+			timer->stop("Total Patch Solve");
 		}
 	}
 };

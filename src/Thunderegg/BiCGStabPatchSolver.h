@@ -36,34 +36,64 @@ namespace Thunderegg
 /**
  * @brief Solves the patches using a BiCGStab iterative solver on each patch
  *
- * @tparam D
+ * @tparam D the number of cartesian dimensions
  */
 template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 {
 	private:
+	/**
+	 * @brief Generates a vector that is only the size of a patch
+	 */
 	class SingleVG : public VectorGenerator<D>
 	{
 		private:
+		/**
+		 * @brief number of cells along each axis
+		 */
 		std::array<int, D> lengths;
-		int                num_ghost_cells;
+		/**
+		 * @brief number of ghost cells
+		 */
+		int num_ghost_cells;
 
 		public:
+		/**
+		 * @brief Construct a new SingleVG object for a given patch
+		 *
+		 * @param pinfo the PatchInfo object for the patch
+		 */
 		SingleVG(std::shared_ptr<const PatchInfo<D>> pinfo)
 		{
 			lengths         = pinfo->ns;
 			num_ghost_cells = pinfo->num_ghost_cells;
 		}
+		/**
+		 * @brief Get a newly allocated vector
+		 *
+		 * @return std::shared_ptr<Vector<D>> the vector
+		 */
 		std::shared_ptr<Vector<D>> getNewVector()
 		{
 			return std::shared_ptr<Vector<D>>(new ValVector<D>(lengths, 1, num_ghost_cells));
 		}
 	};
+	/**
+	 * @brief Wrapper that provides a vector interface for the LocalData of a patch
+	 */
 	class SinglePatchVec : public Vector<D>
 	{
 		private:
+		/**
+		 * @brief The LocalData for the patch
+		 */
 		LocalData<D> ld;
 
 		public:
+		/**
+		 * @brief Construct a new SinglePatchVec object
+		 *
+		 * @param ld the localdata for the patch
+		 */
 		SinglePatchVec(const LocalData<D> &ld)
 		{
 			this->num_local_patches = 1;
@@ -79,13 +109,29 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		}
 		void setNumGhostPatches(int) {}
 	};
+	/**
+	 * @brief This wraps a PatchOperator object so that it only applies the operator on a specified
+	 * patch
+	 */
 	class SinglePatchOp : public Operator<D>
 	{
 		private:
+		/**
+		 * @brief the PatchOperator that is being wrapped
+		 */
 		std::shared_ptr<const PatchOperator<D>> op;
-		std::shared_ptr<const PatchInfo<D>>     pinfo;
+		/**
+		 * @brief the PatchInfo object for the patch
+		 */
+		std::shared_ptr<const PatchInfo<D>> pinfo;
 
 		public:
+		/**
+		 * @brief Construct a new SinglePatchOp object
+		 *
+		 * @param pinfo the patch that we want to operate on
+		 * @param op the operator
+		 */
 		SinglePatchOp(std::shared_ptr<const PatchInfo<D>>     pinfo,
 		              std::shared_ptr<const PatchOperator<D>> op)
 		{
@@ -97,10 +143,19 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 			op->applySinglePatch(pinfo, x->getLocalData(0), b->getLocalData(0));
 		}
 	};
+
+	/**
+	 * @brief The operator for the solve
+	 */
 	std::shared_ptr<const PatchOperator<D>> op;
 
-	protected:
-	int    max_it;
+	/**
+	 * @brief maximum number of iterators for each solve
+	 */
+	int max_it;
+	/**
+	 * @brief tolerance for each solve
+	 */
 	double tol;
 
 	public:
@@ -137,19 +192,37 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 
 		BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
 	}
+	/**
+	 * @brief Generator for created a new solver for each new level in GMG
+	 */
 	class Generator
 	{
 		private:
+		/**
+		 * @brief A set of ghost fillers that have been generated
+		 */
 		std::function<std::shared_ptr<const GhostFiller<D>>(
 		std::shared_ptr<const GMG::Level<D>> level)>
 		filler_gen;
+		/**
+		 * @brief A set of PatchOperators that have been generated
+		 */
 		std::function<std::shared_ptr<const PatchOperator<D>>(
 		std::shared_ptr<const GMG::Level<D>> level)>
 		op_gen;
+		/**
+		 * @brief A set of PatchSolvers that have been generated
+		 */
 		std::map<std::shared_ptr<const Domain<D>>, std::shared_ptr<const BiCGStabPatchSolver<D>>>
-		       generated_solvers;
+		generated_solvers;
+		/**
+		 * @brief The tolerance
+		 */
 		double tol;
-		int    max_it;
+		/**
+		 * @brief The maximum number of iterations
+		 */
+		int max_it;
 
 		public:
 		/**
@@ -183,7 +256,9 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		operator()(std::shared_ptr<const GMG::Level<D>> level)
 		{
 			auto solver = generated_solvers[level->getDomain()];
-			if (solver != nullptr) { return solver; }
+			if (solver != nullptr) {
+				return solver;
+			}
 			solver.reset(new BiCGStabPatchSolver<D>(level->getDomain(), filler_gen(level),
 			                                        op_gen(level), tol, max_it));
 			return solver;
