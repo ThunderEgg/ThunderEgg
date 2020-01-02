@@ -40,17 +40,21 @@ class Timer
 	public:
 	void start(string name)
 	{
-		if (verbose) { cout << "Starting " << name << endl; }
-		MPI_Barrier(MPI_COMM_WORLD);
+		if (verbose) {
+			cout << "Starting " << name << endl;
+		}
 		starts[name] = steady_clock::now();
 	}
 	void stop(string name)
 	{
-		MPI_Barrier(MPI_COMM_WORLD);
 		duration<double> time = steady_clock::now() - starts[name];
 		times[name].push_back(time.count());
-		if (std::find(order.begin(), order.end(), name) == order.end()) { order.push_back(name); }
-		if (verbose) { cout << "Stopped " << name << endl; }
+		if (std::find(order.begin(), order.end(), name) == order.end()) {
+			order.push_back(name);
+		}
+		if (verbose) {
+			cout << "Stopped " << name << endl;
+		}
 	}
 	friend ostream &operator<<(ostream &os, const Timer &timer)
 	{

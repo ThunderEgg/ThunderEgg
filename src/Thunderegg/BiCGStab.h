@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_BICGSTAB_H
 #define THUNDEREGG_BICGSTAB_H
 #include <Thunderegg/Operator.h>
+#include <Thunderegg/Timer.h>
 #include <Thunderegg/Vector.h>
 
 namespace Thunderegg
@@ -48,7 +49,7 @@ template <size_t D> class BiCGStab
 	static int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
 	                 std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
 	                 std::shared_ptr<const Operator<D>> Mr = nullptr, int max_it = 1000,
-	                 double tolerance = 1e-12)
+	                 double tolerance = 1e-12, std::shared_ptr<Thunderegg::Timer> timer = nullptr)
 	{
 		std::shared_ptr<Vector<D>> resid = vg->getNewVector();
 		std::shared_ptr<Vector<D>> ms;
@@ -73,6 +74,10 @@ template <size_t D> class BiCGStab
 		int    num_its  = 0;
 		double residual = resid->twoNorm() / r0_norm;
 		while (residual > tolerance && num_its < max_it) {
+			if (timer) {
+				timer->start("Iteration");
+			}
+
 			if (Mr != nullptr) {
 				Mr->apply(p, mp);
 				A->apply(mp, ap);
@@ -106,6 +111,10 @@ template <size_t D> class BiCGStab
 			num_its++;
 			rho      = rho_new;
 			residual = resid->twoNorm() / r0_norm;
+
+			if (timer) {
+				timer->stop("Iteration");
+			}
 		}
 		return num_its;
 	}

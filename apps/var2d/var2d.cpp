@@ -292,9 +292,9 @@ int main(int argc, char *argv[])
 		*/
 	}
 
-	Timer timer;
+	std::shared_ptr<Timer> timer = make_shared<Timer>();
 	for (int loop = 0; loop < loop_count; loop++) {
-		timer.start("Domain Initialization");
+		timer->start("Domain Initialization");
 
 		/*
 		if (f_outim) {
@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
 			// DomainTools<2>::addDirichlet(domain, f, gfun);
 		}
 
-		timer.stop("Domain Initialization");
+		timer->stop("Domain Initialization");
 
 		// patch operator
 		shared_ptr<BiLinearGhostFiller>  gf(new BiLinearGhostFiller(domain));
@@ -338,7 +338,8 @@ int main(int argc, char *argv[])
 
 		if (neumann && !no_zero_rhs_avg) {
 			double fdiff = domain->integrate(f) / domain->volume();
-			if (my_global_rank == 0) cout << "Fdiff: " << fdiff << endl;
+			if (my_global_rank == 0)
+				cout << "Fdiff: " << fdiff << endl;
 			f->shift(-fdiff);
 		}
 
@@ -348,16 +349,16 @@ int main(int argc, char *argv[])
 		///////////////////
 		// setup start
 		///////////////////
-		timer.start("Linear System Setup");
+		timer->start("Linear System Setup");
 
-		timer.start("Matrix Formation");
-		timer.stop("Matrix Formation");
+		timer->start("Matrix Formation");
+		timer->stop("Matrix Formation");
 		// preconditoners
-		timer.start("Preconditioner Setup");
+		timer->start("Preconditioner Setup");
 		if (preconditioner == "Schwarz") {
 			//	M.reset(new SchwarzPrec<2>(sch, p_solver, p_interp));
 		} else if (preconditioner == "GMG") {
-			timer.start("GMG Setup");
+			timer->start("GMG Setup");
 
 			BiLinearGhostFiller::Generator      filler_gen(gf);
 			StarPatchOperator<2>::Generator     op_gen(p_operator, filler_gen);
@@ -367,16 +368,16 @@ int main(int argc, char *argv[])
 			M = GMG::CycleFactory<2>::getCycle(copts, dcg, restrictor_gen, interpolator_gen,
 			                                   smooth_gen, op_gen);
 
-			timer.stop("GMG Setup");
+			timer->stop("GMG Setup");
 		} else if (preconditioner == "cheb") {
 			throw 3;
 		}
-		timer.stop("Preconditioner Setup");
+		timer->stop("Preconditioner Setup");
 
 		PW<KSP> solver;
 		// setup petsc if needed
 		if (solver_type == "petsc") {
-			timer.start("Petsc Setup");
+			timer->start("Petsc Setup");
 
 			KSPCreate(MPI_COMM_WORLD, &solver);
 			KSPSetFromOptions(solver);
@@ -389,27 +390,31 @@ int main(int argc, char *argv[])
 			KSPSetUp(solver);
 			KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
 
-			timer.stop("Petsc Setup");
+			timer->stop("Petsc Setup");
 		}
 		///////////////////
 		// setup end
 		///////////////////
-		timer.stop("Linear System Setup");
+		timer->stop("Linear System Setup");
 
-		timer.start("Linear Solve");
+		timer->start("Linear Solve");
 		if (solver_type == "petsc") {
 			KSPSolve(solver, f->vec, u->vec);
 			int its;
 			KSPGetIterationNumber(solver, &its);
-			if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+			if (my_global_rank == 0) {
+				cout << "Iterations: " << its << endl;
+			}
 		} else {
 			std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
 
 			u->set(0);
-			int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000);
-			if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+			int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000, 1e-12, timer);
+			if (my_global_rank == 0) {
+				cout << "Iterations: " << its << endl;
+			}
 		}
-		timer.stop("Linear Solve");
+		timer->stop("Linear Solve");
 
 		A->apply(u, au);
 
@@ -470,22 +475,11 @@ int main(int argc, char *argv[])
 			writer.write();
 		}
 #endif
-		cout.unsetf(std::ios_base::floatfield);
-#ifdef ENABLE_MUELU
-		if (meulusolver != nullptr) { delete meulusolver; }
-#endif
-#ifdef ENABLE_MUELU_CUDA
-		if (meulucudasolver != nullptr) { delete meulucudasolver; }
-#endif
 	}
-
-#ifdef ENABLE_AMGX
-	if (amgxsolver != nullptr) { delete amgxsolver; }
-#endif
-#ifdef ENABLE_MUELU_CUDA
-	if (f_meulucuda) { MueLuCudaWrapper::finalize(); }
-#endif
-	if (my_global_rank == 0) { cout << timer; }
+	cout.unsetf(std::ios_base::floatfield);
+	if (my_global_rank == 0) {
+		cout << *timer;
+	}
 	PetscFinalize();
 	return 0;
 }
