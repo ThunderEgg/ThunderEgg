@@ -138,7 +138,7 @@ AllowShortCaseLabelsOnASingleLine : false
 
 # If true, if (a) return; can be put on
 # a single line.
-AllowShortIfStatementsOnASingleLine : true
+AllowShortIfStatementsOnASingleLine : false
 
 # If true, while (true) continue; can be
 # put on a single line.
