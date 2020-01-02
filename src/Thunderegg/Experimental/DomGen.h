@@ -166,7 +166,9 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 			if (n.level < curr_level) {
 				// will still exist at next coarsening
 				pinfo.parent_id = n.id;
-				if (curr_level != num_levels) { pinfo.child_ids[0] = n.id; }
+				if (curr_level != num_levels) {
+					pinfo.child_ids[0] = n.id;
+				}
 			} else {
 				pinfo.parent_id = n.parent;
 				if (pinfo.parent_id != -1) {
@@ -467,9 +469,7 @@ template <size_t D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
 	                    numExport, exportGlobalIds, exportLocalIds, exportProcs, exportToPart);
 
 	if (rc != ZOLTAN_OK) {
-		std::cerr << "zoltan error\n";
-		Zoltan_Destroy(&zz);
-		exit(0);
+		throw "zoltan error";
 	}
 	Zoltan_Destroy(&zz);
 #if DD_DEBUG
@@ -711,9 +711,7 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 	                    numExport, exportGlobalIds, exportLocalIds, exportProcs, exportToPart);
 
 	if (rc != ZOLTAN_OK) {
-		std::cerr << "zoltan error\n";
-		Zoltan_Destroy(&zz);
-		exit(0);
+		throw "zoltan error";
 	}
 	Zoltan_Destroy(&zz);
 #if DD_DEBUG

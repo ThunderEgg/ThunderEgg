@@ -5,16 +5,28 @@ os: linux
 dist: bionic
 addons:
   apt:
+    sources:
+      - sourceline: 'ppa:scottaiton/thunderegg-deps'
     packages:
+      - cmake
       - libfftw3-dev
       - libopenmpi-dev
       - openmpi-bin
-      - libpetsc3.7-dev
-      - libtrilinos-zoltan-dev
+      - petsc-dev
       - libblas-dev
       - liblapack-dev
+      - libtrilinos-zoltan-dev
+before_install:
+  - pip install --user cpp-coveralls
+  - export CXXFLAGS="-std=c++11"
 script:
+  - export CXXFLAGS="-g -O0 -Wall -W -Wshadow -Wunused-variable -Wunused-parameter -Wunused-function -Wunused -Wno-system-headers -Wno-deprecated -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage"
+  - export CFLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
+  - export LDFLAGS="-lgcov"
   - cmake .
   - make
   - cd test
   - ./unit_tests
+  - cd ../
+after_success:
+  - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'
