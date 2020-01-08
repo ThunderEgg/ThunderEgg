@@ -81,12 +81,14 @@ template <size_t D> class LinearRestrictor : public Restrictor<D>
 			LocalData<D>        fine_data         = fine->getLocalData(pinfo.local_index);
 
 			if (pinfo.hasCoarseParent()) {
-				Orthant<D>         orth = pinfo.orth_on_parent;
+				Orthant<D> orth = pinfo.orth_on_parent;
+				// get starting index in coarser patch
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
 					starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
 				}
 
+				// interpolate interior values
 				nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
 				               [&](const std::array<int, D> &coord) {
 					               std::array<int, D> coarse_coord;
@@ -115,6 +117,7 @@ template <size_t D> class LinearRestrictor : public Restrictor<D>
 					               });
 				}
 			} else {
+				// just copy the values
 				nested_loop<D>(fine_data.getGhostStart(), fine_data.getGhostEnd(),
 				               [&](const std::array<int, D> &coord) {
 					               coarse_local_data[coord] += fine_data[coord];
@@ -126,10 +129,18 @@ template <size_t D> class LinearRestrictor : public Restrictor<D>
 		coarse->set(0);
 		ilc->scatterReverse(coarse_local, coarse);
 	}
+	/**
+	 * @brief Generates LinearRestrictors for GMG levels
+	 */
 	class Generator
 	{
 		public:
-		Generator() {}
+		/**
+		 * @brief Generate a LinearRestrictor from the finer level to the coarser level
+		 *
+		 * @param level the finer level
+		 * @return std::shared_ptr<const LinearRestrictor<D>> the restrictor
+		 */
 		std::shared_ptr<const LinearRestrictor<D>> operator()(std::shared_ptr<const Level<D>> level)
 		{
 			auto ilc = std::make_shared<InterLevelComm<D>>(level->getCoarser()->getDomain(),
@@ -141,4 +152,7 @@ template <size_t D> class LinearRestrictor : public Restrictor<D>
 };
 } // namespace GMG
 } // namespace Thunderegg
+// explicit instantiation
+extern template class Thunderegg::GMG::LinearRestrictor<2>;
+extern template class Thunderegg::GMG::LinearRestrictor<3>;
 #endif
