@@ -21,10 +21,7 @@
 
 #ifndef THUNDEREGG_GMG_LINEARRESTRICTOR_H
 #define THUNDEREGG_GMG_LINEARRESTRICTOR_H
-#include <Thunderegg/Domain.h>
-#include <Thunderegg/GMG/InterLevelComm.h>
-#include <Thunderegg/GMG/Level.h>
-#include <Thunderegg/GMG/Restrictor.h>
+#include <Thunderegg/GMG/MPIRestrictor.h>
 #include <memory>
 namespace Thunderegg
 {
@@ -33,55 +30,21 @@ namespace GMG
 /**
  * @brief Restrictor that averages the corresponding fine cells into each coarse cell.
  */
-template <size_t D> class LinearRestrictor : public Restrictor<D>
+template <size_t D> class LinearRestrictor : public MPIRestrictor<D>
 {
 	private:
-	/**
-	 * @brief The coarse DomainCollection that is being restricted to.
-	 */
-	std::shared_ptr<const Domain<D>> coarse_domain;
-	/**
-	 * @brief The fine DomainCollection that is being restricted from.
-	 */
-	std::shared_ptr<const Domain<D>> fine_domain;
-	/**
-	 * @brief The communication package for restricting between levels.
-	 */
-	std::shared_ptr<InterLevelComm<D>> ilc;
-
-	public:
-	/**
-	 * @brief Create new LinearRestrictor object.
-	 *
-	 * @param coarse_domain the DomainColleciton that is being restricted to.
-	 * @param fine_domain the DomainCollection that is being restricted from.
-	 * @param ilc the communcation package for these two levels.
-	 */
-	LinearRestrictor(std::shared_ptr<const Domain<D>>   coarse_domain,
-	                 std::shared_ptr<const Domain<D>>   fine_domain,
-	                 std::shared_ptr<InterLevelComm<D>> ilc)
+	void
+	restrictPatches(const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
+	                std::shared_ptr<const Vector<D>> finer_vector,
+	                std::shared_ptr<Vector<D>>       coarser_vector) const override
 	{
-		this->coarse_domain = coarse_domain;
-		this->fine_domain   = fine_domain;
-		this->ilc           = ilc;
-	}
-	/**
-	 * @brief restriction function
-	 *
-	 * @param coarse the output vector that is restricted to.
-	 * @param fine the input vector that is restricted.
-	 */
-	void restrict(std::shared_ptr<Vector<D>> coarse, std::shared_ptr<const Vector<D>> fine) const
-	{
-		std::shared_ptr<Vector<D>> coarse_local = ilc->getNewCoarseDistVec();
+		for (const auto &pair : patches) {
+			std::shared_ptr<const PatchInfo<D>> pinfo = pair.second;
+			LocalData<D> coarse_local_data            = coarser_vector->getLocalData(pair.first);
+			LocalData<D> fine_data = finer_vector->getLocalData(pinfo->local_index);
 
-		for (ILCFineToCoarseMetadata<D> data : ilc->getFineDomains()) {
-			const PatchInfo<D> &pinfo             = *data.pinfo;
-			LocalData<D>        coarse_local_data = coarse_local->getLocalData(data.local_index);
-			LocalData<D>        fine_data         = fine->getLocalData(pinfo.local_index);
-
-			if (pinfo.hasCoarseParent()) {
-				Orthant<D> orth = pinfo.orth_on_parent;
+			if (pinfo->hasCoarseParent()) {
+				Orthant<D> orth = pinfo->orth_on_parent;
 				// get starting index in coarser patch
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
@@ -124,11 +87,15 @@ template <size_t D> class LinearRestrictor : public Restrictor<D>
 				               });
 			}
 		}
-
-		// scatter
-		coarse->set(0);
-		ilc->scatterReverse(coarse_local, coarse);
 	}
+
+	public:
+	/**
+	 * @brief Create new LinearRestrictor object.
+	 *
+	 * @param ilc the communcation package for the two levels.
+	 */
+	LinearRestrictor(std::shared_ptr<InterLevelComm<D>> ilc_in) : MPIRestrictor<D>(ilc_in) {}
 	/**
 	 * @brief Generates LinearRestrictors for GMG levels
 	 */
@@ -145,8 +112,7 @@ template <size_t D> class LinearRestrictor : public Restrictor<D>
 		{
 			auto ilc = std::make_shared<InterLevelComm<D>>(level->getCoarser()->getDomain(),
 			                                               level->getDomain());
-			return std::make_shared<LinearRestrictor<D>>(level->getCoarser()->getDomain(),
-			                                             level->getDomain(), ilc);
+			return std::make_shared<LinearRestrictor<D>>(ilc);
 		}
 	};
 };

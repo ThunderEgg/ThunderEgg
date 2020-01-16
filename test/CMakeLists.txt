@@ -14,6 +14,7 @@ add_executable(unit_tests
     Utils.cpp
     GMG/CycleFactory.cpp 
     GMG/LinearRestrictor.cpp 
+    utils/DomainReader.cpp
     Timer.cpp
     )
     target_include_directories(unit_tests PUBLIC 

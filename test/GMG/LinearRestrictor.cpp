@@ -19,29 +19,29 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
+#include "../utils/DomainReader.h"
 #include "catch.hpp"
 #include <Thunderegg/BiLinearGhostFiller.h>
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/Experimental/DomGen.h>
 #include <Thunderegg/Experimental/OctTree.h>
 #include <Thunderegg/GMG/LinearRestrictor.h>
-#include <Thunderegg/ValVector.h>
+#include <Thunderegg/PetscVector.h>
 using namespace std;
 using namespace Thunderegg;
 TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 {
-	auto nx        = GENERATE(2, 10);
-	auto ny        = GENERATE(2, 10);
-	int  num_ghost = 1;
+	auto            nx        = GENERATE(2, 10);
+	auto            ny        = GENERATE(2, 10);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader("mesh_inputs/uiform_single_patch_coarser_level.json", {nx, ny},
+	                              num_ghost);
+	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
+	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	Experimental::Tree<2>   t("middle_refine.bin");
-	Experimental::DomGen<2> dg(t, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>   d        = dg.getFinestDomain();
-	shared_ptr<Domain<2>>   d_coarse = dg.getCoarserDomain();
-
-	auto fine_vec = PetscVector<2>::GetNewVector(d);
-	auto vec      = PetscVector<2>::GetNewVector(d_coarse);
-	auto expected = PetscVector<2>::GetNewVector(d_coarse);
+	auto fine_vec        = PetscVector<2>::GetNewVector(d_fine);
+	auto coarse_vec      = PetscVector<2>::GetNewVector(d_coarse);
+	auto coarse_expected = PetscVector<2>::GetNewVector(d_coarse);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -49,13 +49,13 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValuesWithGhost(d, fine_vec, f);
-	DomainTools<2>::setValuesWithGhost(d_coarse, expected, f);
+	DomainTools<2>::setValuesWithGhost(d_fine, fine_vec, f);
+	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_expected, f);
 
-	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d);
+	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_coarse, d, ilc);
 
-	restrictor->restrict(vec, fine_vec);
+	restrictor->restrict(coarse_vec, fine_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo->id);
@@ -63,70 +63,8 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(pinfo->local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
-		});
-		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
-				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
-			}
-		}
-	}
-}
-TEST_CASE("Test LinearRestrictor::Generator", "[GMG::LinearRestrictor]")
-{
-	auto nx        = 10;
-	auto ny        = 10;
-	int  num_ghost = 1;
-
-	Experimental::Tree<2>   t("middle_refine.bin");
-	Experimental::DomGen<2> dg(t, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>   finer_domain   = dg.getFinestDomain();
-	shared_ptr<Domain<2>>   coarser_domain = dg.getCoarserDomain();
-
-	auto generator = GMG::LinearRestrictor<2>::Generator();
-
-	auto finer_level   = make_shared<GMG::Level<2>>(finer_domain, nullptr);
-	auto coarser_level = make_shared<GMG::Level<2>>(coarser_domain, nullptr);
-	// link domains
-	finer_level->setCoarser(coarser_level);
-	coarser_level->setFiner(finer_level);
-	// get restrictor
-	auto restrictor = generator(finer_level);
-
-	auto fine_vec = PetscVector<2>::GetNewVector(finer_domain);
-	auto vec      = PetscVector<2>::GetNewVector(coarser_domain);
-	auto expected = PetscVector<2>::GetNewVector(coarser_domain);
-
-	auto f = [&](const std::array<double, 2> coord) -> double {
-		double x = coord[0];
-		double y = coord[1];
-		return 1 + ((x * 0.3) + y);
-	};
-
-	DomainTools<2>::setValuesWithGhost(finer_domain, fine_vec, f);
-	DomainTools<2>::setValuesWithGhost(coarser_domain, expected, f);
-
-	restrictor->restrict(vec, fine_vec);
-
-	for (auto pinfo : coarser_domain->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = coarse_vec->getLocalData(pinfo->local_index);
+		LocalData<2> expected_ld = coarse_expected->getLocalData(pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});

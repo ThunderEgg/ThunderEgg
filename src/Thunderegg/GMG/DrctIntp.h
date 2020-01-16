@@ -93,35 +93,37 @@ inline void DrctIntp<D>::interpolate(std::shared_ptr<const Vector<D>> coarse,
                                      std::shared_ptr<Vector<D>>       fine) const
 {
 	// scatter
+	/*
 	std::shared_ptr<Vector<D>> coarse_local = ilc->getNewCoarseDistVec();
 	ilc->scatter(coarse_local, coarse);
 
 	for (auto data : ilc->getFineDomains()) {
-		const PatchInfo<D> &pinfo             = *data.pinfo;
-		LocalData<D>        coarse_local_data = coarse_local->getLocalData(data.local_index);
-		LocalData<D>        fine_data         = fine->getLocalData(pinfo.local_index);
+	    const PatchInfo<D> &pinfo             = *data.pinfo;
+	    LocalData<D>        coarse_local_data = coarse_local->getLocalData(data.local_index);
+	    LocalData<D>        fine_data         = fine->getLocalData(pinfo.local_index);
 
-		if (pinfo.hasCoarseParent()) {
-			Orthant<D>         orth = pinfo.orth_on_parent;
-			std::array<int, D> starts;
-			for (size_t i = 0; i < D; i++) {
-				starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
-			}
+	    if (pinfo.hasCoarseParent()) {
+	        Orthant<D>         orth = pinfo.orth_on_parent;
+	        std::array<int, D> starts;
+	        for (size_t i = 0; i < D; i++) {
+	            starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
+	        }
 
-			nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
-			               [&](const std::array<int, D> &coord) {
-				               std::array<int, D> coarse_coord;
-				               for (size_t x = 0; x < D; x++) {
-					               coarse_coord[x] = (coord[x] + starts[x]) / 2;
-				               }
-				               fine_data[coord] += coarse_local_data[coarse_coord];
-			               });
-		} else {
-			nested_loop<D>(
-			fine_data.getStart(), fine_data.getEnd(),
-			[&](const std::array<int, D> &coord) { fine_data[coord] += coarse_local_data[coord]; });
-		}
+	        nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
+	                       [&](const std::array<int, D> &coord) {
+	                           std::array<int, D> coarse_coord;
+	                           for (size_t x = 0; x < D; x++) {
+	                               coarse_coord[x] = (coord[x] + starts[x]) / 2;
+	                           }
+	                           fine_data[coord] += coarse_local_data[coarse_coord];
+	                       });
+	    } else {
+	        nested_loop<D>(
+	        fine_data.getStart(), fine_data.getEnd(),
+	        [&](const std::array<int, D> &coord) { fine_data[coord] += coarse_local_data[coord]; });
+	    }
 	}
+	*/
 }
 } // namespace GMG
 } // namespace Thunderegg

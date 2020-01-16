@@ -126,7 +126,7 @@ template <size_t D> class Side
 	/**
 	 * @brief Return the axis that the side lies on.
 	 */
-	inline bool axis() const
+	inline int axis() const
 	{
 		return val / 2;
 	}
@@ -316,7 +316,9 @@ template <size_t D> class Orthant
 		std::array<Side<D>, D> retval;
 		for (size_t i = 0; i < D; i++) {
 			int side = 2 * i;
-			if (!((1 << i) & val)) { side |= 1; }
+			if (!((1 << i) & val)) {
+				side |= 1;
+			}
 			retval[i] = side;
 		}
 		return retval;
@@ -331,7 +333,9 @@ template <size_t D> class Orthant
 		std::array<Side<D>, D> retval;
 		for (size_t i = 0; i < D; i++) {
 			int side = 2 * i;
-			if ((1 << i) & val) { side |= 1; }
+			if ((1 << i) & val) {
+				side |= 1;
+			}
 			retval[i] = side;
 		}
 		return retval;

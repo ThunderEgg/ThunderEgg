@@ -32,6 +32,7 @@ list(APPEND Thunderegg_SRCS Thunderegg/VarPoisson/StarPatchOperator.cpp)
 #list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory3d.cpp)
 list(APPEND Thunderegg_SRCS Thunderegg/GMG/InterLevelComm.h)
 list(APPEND Thunderegg_SRCS Thunderegg/GMG/LinearRestrictor.cpp)
+list(APPEND Thunderegg_SRCS Thunderegg/GMG/MPIRestrictor.cpp)
 
 list(APPEND Thunderegg_SRCS Thunderegg/Experimental/DomGen.cpp)
 
