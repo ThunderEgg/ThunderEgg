@@ -48,6 +48,8 @@ template <size_t D> class InterLevelComm
 	std::vector<int>                                                 ghost_vector_rank_vector;
 	std::vector<std::pair<int, std::vector<int>>>                    vector_rank_local_indexes;
 	std::vector<std::pair<int, std::vector<int>>>                    ghost_rank_local_indexes;
+	bool                                                             communicating = false;
+	bool                                                             sending       = false;
 
 	public:
 	/**
@@ -154,18 +156,56 @@ template <size_t D> class InterLevelComm
 	void sendGhostPatchesStart(std::shared_ptr<Vector<D>>       vector,
 	                           std::shared_ptr<const Vector<D>> ghost_vector)
 	{
+		if (communicating) {
+			if (sending) {
+				throw InterLevelCommException(
+				"InterLevelComm has a sendGhostPatches posted that is unfinished");
+			} else {
+				throw InterLevelCommException(
+				"InterLevelComm has a getGhostPatches posted that is unfinished");
+			}
+		}
+		communicating = true;
+		sending       = true;
 	}
 	void sendGhostPatchesFinish(std::shared_ptr<Vector<D>>       vector,
 	                            std::shared_ptr<const Vector<D>> ghost_vector)
 	{
+		if (!communicating) {
+			throw InterLevelCommException(
+			"InterLevelComm cannot finish sendGhostPatches since communication was not started");
+		} else if (!sending) {
+			throw InterLevelCommException(
+			"InterLevelComm sendGhostPatchesFinish is being called after getGhostPatchesStart was called");
+		}
+		communicating = false;
 	}
 	void getGhostPatchesStart(std::shared_ptr<const Vector<D>> vector,
 	                          std::shared_ptr<Vector<D>>       ghost_vector)
 	{
+		if (communicating) {
+			if (sending) {
+				throw InterLevelCommException(
+				"InterLevelComm has a sendGhostPatches posted that is unfinished");
+			} else {
+				throw InterLevelCommException(
+				"InterLevelComm has a getGhostPatches posted that is unfinished");
+			}
+		}
+		communicating = true;
+		sending       = false;
 	}
 	void getGhostPatchesFinish(std::shared_ptr<const Vector<D>> vector,
 	                           std::shared_ptr<Vector<D>>       ghost_vector)
 	{
+		if (!communicating) {
+			throw InterLevelCommException(
+			"InterLevelComm cannot finish sendGhostPatches since communication was not started");
+		} else if (sending) {
+			throw InterLevelCommException(
+			"InterLevelComm getGhostPatchesFinish is being called after sendGhostPatchesStart was called");
+		}
+		communicating = false;
 	}
 }; // namespace GMG
 } // namespace GMG

@@ -26,6 +26,7 @@ endif(VTK_FOUND)
 
 include(CTest)
 include(ParseAndAddCatchTests)
+set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
 function(add_mpi_test ARG1)
   set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
   set(AdditionalCatchParameters WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
