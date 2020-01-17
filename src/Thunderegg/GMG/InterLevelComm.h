@@ -29,6 +29,12 @@ namespace Thunderegg
 namespace GMG
 {
 /**
+ * @brief Exception that the InterLevelComm class trows
+ */
+struct InterLevelCommException : std::runtime_error {
+	InterLevelCommException(std::string message) : std::runtime_error(message){};
+};
+/**
  * @brief Creates a mapping from fine to coarse levels.
  */
 template <size_t D> class InterLevelComm

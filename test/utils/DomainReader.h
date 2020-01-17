@@ -51,6 +51,7 @@ template <size_t D> class DomainReader
 		for (size_t d = 0; d < 2; d++) {
 			pinfo->spacings[d] /= ns[d];
 		}
+
 		pinfo->ns              = ns;
 		nlohmann::json &nbrs_j = patch_j.at("nbrs");
 		for (nlohmann::json &nbr_j : nbrs_j) {
@@ -68,13 +69,13 @@ template <size_t D> class DomainReader
 			std::string         side_str = nbr_j["side"];
 			Thunderegg::Side<2> side;
 			if (side_str == "west") {
-				side == Thunderegg::Side<2>::west;
+				side = Thunderegg::Side<2>::west;
 			} else if (side_str == "east") {
-				side == Thunderegg::Side<2>::east;
+				side = Thunderegg::Side<2>::east;
 			} else if (side_str == "south") {
-				side == Thunderegg::Side<2>::south;
+				side = Thunderegg::Side<2>::south;
 			} else if (side_str == "north") {
-				side == Thunderegg::Side<2>::north;
+				side = Thunderegg::Side<2>::north;
 			} else {
 				throw "parsing error";
 			}
@@ -95,20 +96,28 @@ template <size_t D> class DomainReader
 	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in)
 	: ns(ns_in), num_ghost(num_ghost_in)
 	{
+		int rank;
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
 		nlohmann::json j;
 		std::ifstream  input_stream(file_name);
+		if (!input_stream.good()) {
+			throw "could not open file";
+		}
 		input_stream >> j;
 		input_stream.close();
 		std::map<int, std::shared_ptr<Thunderegg::PatchInfo<2>>> finer_map;
 		for (nlohmann::json &patch_j : j.at("finer")) {
-			auto patch           = parsePatch(patch_j);
-			finer_map[patch->id] = patch;
+			auto patch = parsePatch(patch_j);
+			if (patch->rank == rank)
+				finer_map[patch->id] = patch;
 		}
 		finer_domain = std::make_shared<Thunderegg::Domain<2>>(finer_map);
 		std::map<int, std::shared_ptr<Thunderegg::PatchInfo<2>>> coarser_map;
 		for (nlohmann::json &patch_j : j.at("coarser")) {
-			auto patch             = parsePatch(patch_j);
-			coarser_map[patch->id] = patch;
+			auto patch = parsePatch(patch_j);
+			if (patch->rank == rank)
+				coarser_map[patch->id] = patch;
 		}
 		coarser_domain = std::make_shared<Thunderegg::Domain<2>>(coarser_map);
 	}
