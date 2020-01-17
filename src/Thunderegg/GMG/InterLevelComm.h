@@ -51,6 +51,9 @@ template <size_t D> class InterLevelComm
 	bool                                                             communicating = false;
 	bool                                                             sending       = false;
 
+	std::shared_ptr<const Vector<D>> current_vector;
+	std::shared_ptr<const Vector<D>> current_ghost_vector;
+
 	public:
 	/**
 	 * @brief Create a new InterLevelComm object.
@@ -165,6 +168,12 @@ template <size_t D> class InterLevelComm
 				"InterLevelComm has a getGhostPatches posted that is unfinished");
 			}
 		}
+
+		// keep track of what vectors we are using
+		current_ghost_vector = ghost_vector;
+		current_vector       = vector;
+
+		// set state
 		communicating = true;
 		sending       = true;
 	}
@@ -178,7 +187,19 @@ template <size_t D> class InterLevelComm
 			throw InterLevelCommException(
 			"InterLevelComm sendGhostPatchesFinish is being called after getGhostPatchesStart was called");
 		}
-		communicating = false;
+		if (vector != current_vector) {
+			throw InterLevelCommException(
+			"InterLevelComm sendGhostPatchesFinish is being called with a different vector than when sendGhostPatchesStart was called");
+		}
+		if (ghost_vector != current_ghost_vector) {
+			throw InterLevelCommException(
+			"InterLevelComm senGhostPatchesFinish is being called with a different ghost vector than when sendGhostPatchesStart was called");
+		}
+
+		// set state
+		communicating        = false;
+		current_ghost_vector = nullptr;
+		current_vector       = nullptr;
 	}
 	void getGhostPatchesStart(std::shared_ptr<const Vector<D>> vector,
 	                          std::shared_ptr<Vector<D>>       ghost_vector)
@@ -192,6 +213,12 @@ template <size_t D> class InterLevelComm
 				"InterLevelComm has a getGhostPatches posted that is unfinished");
 			}
 		}
+
+		// keep track of what vectors we are using
+		current_ghost_vector = ghost_vector;
+		current_vector       = vector;
+
+		// set state
 		communicating = true;
 		sending       = false;
 	}
@@ -205,7 +232,19 @@ template <size_t D> class InterLevelComm
 			throw InterLevelCommException(
 			"InterLevelComm getGhostPatchesFinish is being called after sendGhostPatchesStart was called");
 		}
-		communicating = false;
+		if (vector != current_vector) {
+			throw InterLevelCommException(
+			"InterLevelComm getGhostPatchesFinish is being called with a different vector than when getGhostPatchesStart was called");
+		}
+		if (ghost_vector != current_ghost_vector) {
+			throw InterLevelCommException(
+			"InterLevelComm getGhostPatchesFinish is being called with a different ghost vector than when getGhostPatchesStart was called");
+		}
+
+		// set state
+		communicating        = false;
+		current_ghost_vector = nullptr;
+		current_vector       = nullptr;
 	}
 }; // namespace GMG
 } // namespace GMG
