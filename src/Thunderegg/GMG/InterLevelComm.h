@@ -23,6 +23,7 @@
 #define THUNDEREGG_GMG_INTERLEVELCOMM_H
 
 #include <Thunderegg/Domain.h>
+#include <Thunderegg/ValVector.h>
 
 namespace Thunderegg
 {
@@ -40,6 +41,14 @@ struct InterLevelCommException : std::runtime_error {
 template <size_t D> class InterLevelComm
 {
 	private:
+	std::array<int, D>                                               ns;
+	int                                                              num_ghost_cells;
+	std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> patches_with_local_parent;
+	std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> patches_with_ghost_parent;
+	std::vector<int>                                                 ghost_vector_rank_vector;
+	std::vector<std::pair<int, std::vector<int>>>                    vector_rank_local_indexes;
+	std::vector<std::pair<int, std::vector<int>>>                    ghost_rank_local_indexes;
+
 	public:
 	/**
 	 * @brief Create a new InterLevelComm object.
@@ -49,7 +58,70 @@ template <size_t D> class InterLevelComm
 	 */
 	InterLevelComm(std::shared_ptr<const Domain<D>> coarser_domain,
 	               std::shared_ptr<const Domain<D>> finer_domain)
+	: ns(finer_domain->getNs()), num_ghost_cells(finer_domain->getNumGhostCells())
 	{
+		// sort into patches with local parents and patches with ghost parents
+		std::deque<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> local_parents;
+		std::deque<std::shared_ptr<const PatchInfo<D>>>                 ghost_parents;
+		std::set<int>                                                   ghost_parents_ids;
+
+		int rank;
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		// TODO this has to be changed when domain class is updated
+		auto cd_map = coarser_domain->getPatchInfoMap();
+		for (auto patch : finer_domain->getPatchInfoVector()) {
+			if (patch->parent_rank == rank) {
+				local_parents.emplace_back(cd_map.at(patch->parent_id)->local_index, patch);
+			} else {
+				ghost_parents.push_back(patch);
+				ghost_parents_ids.insert(patch->parent_id);
+			}
+		}
+
+		// fill in local vector
+		patches_with_local_parent
+		= std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>>(local_parents.begin(),
+		                                                                   local_parents.end());
+
+		// fill in ghost vector
+		// first, assign local indexes in ghost vector for ghost patches
+		std::map<int, int> id_ghost_vector_local_index_map;
+		int                index = 0;
+		for (int id : ghost_parents_ids) {
+			id_ghost_vector_local_index_map[id] = index;
+			index++;
+		}
+
+		patches_with_ghost_parent.reserve(ghost_parents.size());
+		ghost_vector_rank_vector.resize(ghost_parents_ids.size());
+		for (auto patch : ghost_parents) {
+			int ghost_local_index = id_ghost_vector_local_index_map[patch->parent_id];
+
+			patches_with_ghost_parent.emplace_back(ghost_local_index, patch);
+
+			ghost_vector_rank_vector[ghost_local_index] = patch->parent_rank;
+		}
+
+		// find local coarse patches that are ghost paches on other ranks
+		std::map<int, std::set<std::pair<int, int>>> ranks_and_local_patches;
+		for (auto pinfo : coarser_domain->getPatchInfoVector()) {
+			for (int child_rank : pinfo->child_ranks) {
+				if (child_rank != -1 && child_rank != rank)
+					ranks_and_local_patches[child_rank].emplace(pinfo->id, pinfo->local_index);
+			}
+		}
+
+		// the map sould have sorted patches by id, the other processors will expect things in this
+		// order
+		vector_rank_local_indexes.reserve(ranks_and_local_patches.size());
+		for (auto pair : ranks_and_local_patches) {
+			std::vector<int> local_indexes;
+			local_indexes.reserve(pair.second.size());
+			for (auto id_local_index_pair : pair.second) {
+				local_indexes.push_back(id_local_index_pair.second);
+			}
+			vector_rank_local_indexes.emplace_back(pair.first, local_indexes);
+		}
 	}
 
 	/**
@@ -57,15 +129,20 @@ template <size_t D> class InterLevelComm
 	 *
 	 * @return the newly allocated vector.
 	 */
-	std::shared_ptr<Vector<D>> getNewGhostVector() const {}
+	std::shared_ptr<Vector<D>> getNewGhostVector() const
+	{
+		return std::make_shared<ValVector<D>>(ns, num_ghost_cells, ghost_vector_rank_vector.size());
+	}
 
 	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &
 	getPatchesWithLocalParent() const
 	{
+		return patches_with_local_parent;
 	}
 	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &
 	getPatchesWithGhostParent() const
 	{
+		return patches_with_ghost_parent;
 	}
 
 	/**

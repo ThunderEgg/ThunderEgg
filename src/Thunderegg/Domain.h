@@ -156,7 +156,9 @@ template <size_t D> class Domain
 	void reIndex(bool local_id_set, bool global_id_set)
 	{
 		indexDomainsLocal(local_id_set);
-		if (!global_id_set) { indexDomainsGlobal(); }
+		if (!global_id_set) {
+			indexDomainsGlobal();
+		}
 		indexBCLocal();
 		indexBCGlobal();
 	}
@@ -216,6 +218,14 @@ template <size_t D> class Domain
 	std::map<int, std::shared_ptr<PatchInfo<D>>> &getPatchInfoMap()
 	{
 		return pinfo_id_map;
+	}
+	/**
+	 * @brief Get map that goes form patch's id to the PatchInfo pointer
+	 */
+	std::map<int, std::shared_ptr<const PatchInfo<D>>> getPatchInfoMap() const
+	{
+		return std::map<int, std::shared_ptr<const PatchInfo<D>>>(pinfo_id_map.cbegin(),
+		                                                          pinfo_id_map.cend());
 	}
 	/**
 	 * @brief Get a vector of patch ids. Index in vector corresponds to the patch's local index.
@@ -354,7 +364,7 @@ template <size_t D> class Domain
 		MPI_Allreduce(&sum, &retval, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		return retval;
 	}
-};
+}; // namespace Thunderegg
 
 template <size_t D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 {
