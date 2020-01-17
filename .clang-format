@@ -167,6 +167,7 @@ BinPackParameters : true
 
 # If true, binary operators will be placed after line breaks.
 BreakBeforeBinaryOperators : true
+BreakStringLiterals : false
 
 # The brace breaking style to use.  (--inanc we could try other options)
 # Available Options:

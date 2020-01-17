@@ -25,8 +25,8 @@
 #include <Thunderegg/PetscVector.h>
 using namespace Thunderegg;
 using namespace std;
-const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi2.json";
-TEST_CASE("2-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterLevelComm]")
+const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi3.json";
+TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2);
 	auto                  ny        = GENERATE(2);
@@ -51,8 +51,8 @@ TEST_CASE("2-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterL
 		CHECK(parents_to_children.count(0));
 		CHECK(parents_to_children[0].count(1));
 		CHECK(parents_to_children[0].count(2));
-	} else {
-		CHECK(ilc->getPatchesWithGhostParent().size() == 2);
+	} else if (rank == 1) {
+		CHECK(ilc->getPatchesWithGhostParent().size() == 1);
 		CHECK(ilc->getPatchesWithLocalParent().size() == 0);
 
 		map<int, set<int>> parents_to_children;
@@ -61,10 +61,19 @@ TEST_CASE("2-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterL
 		}
 		CHECK(parents_to_children.count(0) == 1);
 		CHECK(parents_to_children[0].count(3) == 1);
+	} else {
+		CHECK(ilc->getPatchesWithGhostParent().size() == 1);
+		CHECK(ilc->getPatchesWithLocalParent().size() == 0);
+
+		map<int, set<int>> parents_to_children;
+		for (auto pair : ilc->getPatchesWithGhostParent()) {
+			parents_to_children[pair.first].insert(pair.second->id);
+		}
+		CHECK(parents_to_children.count(0) == 1);
 		CHECK(parents_to_children[0].count(4) == 1);
 	}
 }
-TEST_CASE("2-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("3-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
@@ -84,7 +93,7 @@ TEST_CASE("2-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm
 		CHECK(ghost_vec->getNumLocalPatches() == 1);
 	}
 }
-TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
@@ -114,15 +123,15 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
-		// the coarse vec should be filled with 3
+		// the coarse vec should be filled with 5
 		auto local_data = coarse_vec->getLocalData(0);
 		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) { CHECK(local_data[coord] == 3); });
+		               [&](const std::array<int, 2> &coord) { CHECK(local_data[coord] == 6); });
 	} else {
 	}
 }
 TEST_CASE(
-"2-processor sendGhostPatches throws exception when start isn't called before finish on uniform quad",
+"3-processor sendGhostPatches throws exception when start isn't called before finish on uniform quad",
 "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -141,7 +150,7 @@ TEST_CASE(
 	                GMG::InterLevelCommException);
 }
 TEST_CASE(
-"2-processor sendGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
+"3-processor sendGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -162,7 +171,7 @@ TEST_CASE(
 	                GMG::InterLevelCommException);
 }
 TEST_CASE(
-"2-processor sendGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
+"3-processor sendGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -183,7 +192,7 @@ TEST_CASE(
 	                GMG::InterLevelCommException);
 }
 TEST_CASE(
-"2-processor sendGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
+"3-processor sendGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -205,7 +214,7 @@ TEST_CASE(
 	                GMG::InterLevelCommException);
 }
 TEST_CASE(
-"2-processor sendGhostPatches throws exception when start is called twice on uniform quad",
+"3-processor sendGhostPatches throws exception when start is called twice on uniform quad",
 "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -224,7 +233,7 @@ TEST_CASE(
 	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, ghost_vec),
 	                GMG::InterLevelCommException);
 }
-TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
@@ -262,7 +271,7 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	}
 }
 TEST_CASE(
-"2-processor getGhostPatches throws exception when start isn't called before finish on uniform quad",
+"3-processor getGhostPatches throws exception when start isn't called before finish on uniform quad",
 "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -281,7 +290,7 @@ TEST_CASE(
 	                GMG::InterLevelCommException);
 }
 TEST_CASE(
-"2-processor getGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
+"3-processor getGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -302,7 +311,7 @@ TEST_CASE(
 	                GMG::InterLevelCommException);
 }
 TEST_CASE(
-"2-processor getGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
+"3-processor getGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -323,7 +332,7 @@ TEST_CASE(
 	                GMG::InterLevelCommException);
 }
 TEST_CASE(
-"2-processor getGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
+"3-processor getGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -344,7 +353,7 @@ TEST_CASE(
 	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec_2, ghost_vec_2),
 	                GMG::InterLevelCommException);
 }
-TEST_CASE("2-processor getGhostPatches throws exception when start is called twice on uniform quad",
+TEST_CASE("3-processor getGhostPatches throws exception when start is called twice on uniform quad",
           "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2, 10);
