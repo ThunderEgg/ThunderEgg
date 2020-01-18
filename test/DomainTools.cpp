@@ -314,7 +314,7 @@ TEST_CASE("DomainTools::setValues 1D f(x)=x", "[DomainTools]")
 	pinfo_map[0]->spacings        = {spacingx};
 	pinfo_map[0]->starts          = {startx};
 	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map));
+	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
 	shared_ptr<ValVector<1>> vec(new ValVector<1>(pinfo_map[0]->ns, num_ghost, 1));
 
@@ -347,7 +347,7 @@ TEST_CASE("DomainTools::setValues 1D f(x)=x^2", "[DomainTools]")
 	pinfo_map[0]->spacings        = {spacingx};
 	pinfo_map[0]->starts          = {startx};
 	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map));
+	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
 	shared_ptr<ValVector<1>> vec(new ValVector<1>(pinfo_map[0]->ns, num_ghost, 1));
 
@@ -383,7 +383,7 @@ TEST_CASE("DomainTools::setValues 2D f(x,y)=x+y", "[DomainTools]")
 	pinfo_map[0]->spacings        = {spacingx, spacingy};
 	pinfo_map[0]->starts          = {startx, starty};
 	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map));
+	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
 	shared_ptr<ValVector<2>> vec(new ValVector<2>(pinfo_map[0]->ns, num_ghost, 1));
 
@@ -419,7 +419,7 @@ TEST_CASE("DomainTools::setValues 2D f(x,y)=x*y", "[DomainTools]")
 	pinfo_map[0]->spacings        = {spacingx, spacingy};
 	pinfo_map[0]->starts          = {startx, starty};
 	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map));
+	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
 	shared_ptr<ValVector<2>> vec(new ValVector<2>(pinfo_map[0]->ns, num_ghost, 1));
 
@@ -452,7 +452,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f(x)=x", "[DomainTools]")
 	pinfo_map[0]->spacings        = {spacingx};
 	pinfo_map[0]->starts          = {startx};
 	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map));
+	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
 	shared_ptr<ValVector<1>> vec(new ValVector<1>(pinfo_map[0]->ns, num_ghost, 1));
 
@@ -481,7 +481,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f(x)=x^2", "[DomainTools]")
 	pinfo_map[0]->spacings        = {spacingx};
 	pinfo_map[0]->starts          = {startx};
 	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map));
+	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
 	shared_ptr<ValVector<1>> vec(new ValVector<1>(pinfo_map[0]->ns, num_ghost, 1));
 
@@ -513,7 +513,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f(x,y)=x+y", "[DomainTools]")
 	pinfo_map[0]->spacings        = {spacingx, spacingy};
 	pinfo_map[0]->starts          = {startx, starty};
 	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map));
+	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
 	shared_ptr<ValVector<2>> vec(new ValVector<2>(pinfo_map[0]->ns, num_ghost, 1));
 
@@ -545,7 +545,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f(x,y)=x*y", "[DomainTools]")
 	pinfo_map[0]->spacings        = {spacingx, spacingy};
 	pinfo_map[0]->starts          = {startx, starty};
 	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map));
+	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
 	shared_ptr<ValVector<2>> vec(new ValVector<2>(pinfo_map[0]->ns, num_ghost, 1));
 

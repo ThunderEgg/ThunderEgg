@@ -35,7 +35,7 @@ TEST_CASE("exchange uniform 1D east-west", "[SimpleGhostFiller]")
 	pinfo_map[1]->starts          = {startx + lengthx};
 	pinfo_map[1]->num_ghost_cells = num_ghost;
 	pinfo_map[1]->nbr_info[0].reset(new NormalNbrInfo<1>(0));
-	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map));
+	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
 	shared_ptr<ValVector<1>> vec(new ValVector<1>(pinfo_map[0]->ns, num_ghost, 2));
 
@@ -125,7 +125,7 @@ TEST_CASE("exchange uniform 2D quad", "[SimpleGhostFiller]")
 	pinfo_map[4]->nbr_info[Side<2>::west].reset(new NormalNbrInfo<2>(3));
 	pinfo_map[4]->nbr_info[Side<2>::south].reset(new NormalNbrInfo<2>(2));
 
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map));
+	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
 	shared_ptr<ValVector<2>> vec(new ValVector<2>(pinfo_map[1]->ns, num_ghost, 4));
 

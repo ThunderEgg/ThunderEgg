@@ -56,7 +56,9 @@ static void get_num_levels(p4est_iter_volume_info_t *info, void *user_data)
 {
 	int &max_level  = *(int *) user_data;
 	int  quad_level = info->quad->level;
-	if (quad_level > max_level) { max_level = quad_level; }
+	if (quad_level > max_level) {
+		max_level = quad_level;
+	}
 }
 /**
  * @brief p4est iterator to set gids
@@ -139,14 +141,18 @@ static void create_domains(p4est_iter_volume_info_t *info, void *user_data)
 	// create domain object
 	my_data *                 data = (my_data *) info->quad->p.user_data;
 	shared_ptr<PatchInfo<2>> &ptr  = dmap[data->id];
-	if (ptr == nullptr) { ptr.reset(new PatchInfo<2>); }
+	if (ptr == nullptr) {
+		ptr.reset(new PatchInfo<2>);
+	}
 	PatchInfo<2> &pinfo = *ptr;
 
 	pinfo.rank      = info->p4est->mpirank;
 	pinfo.id        = data->id;
 	pinfo.child_ids = data->child_ids;
 	for (int i = 0; i < 4; i++) {
-		if (pinfo.child_ids[i] != -1) { pinfo.child_ranks[i] = data->child_rank; }
+		if (pinfo.child_ids[i] != -1) {
+			pinfo.child_ranks[i] = data->child_rank;
+		}
 	}
 	pinfo.local_index
 	= info->quadid + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset;
@@ -313,7 +319,9 @@ void P4estDomGen::extractLevel()
 		p4est_coarsen_ext(my_p4est, false, true, coarsen, init_data, coarsen_replace);
 		for (auto p : domain_list.back()->getPatchInfoMap()) {
 			PatchInfo<2> &pinfo = *p.second;
-			if (!pinfo.hasCoarseParent()) { pinfo.parent_id = pinfo.id; }
+			if (!pinfo.hasCoarseParent()) {
+				pinfo.parent_id = pinfo.id;
+			}
 		}
 		p4est_partition_ext(my_p4est, true, nullptr);
 	}
@@ -393,7 +401,8 @@ void P4estDomGen::extractLevel()
 		}
 	}
 	// create Domain object
-	domain_list.push_back(shared_ptr<Domain<2>>(new Domain<2>(new_level, true)));
+	domain_list.push_back(
+	shared_ptr<Domain<2>>(new Domain<2>(new_level, ns, num_ghost_cells, true)));
 	domain_list.back()->setNeumann(inf);
 
 	curr_level--;

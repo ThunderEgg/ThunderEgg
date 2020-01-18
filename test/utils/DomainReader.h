@@ -112,14 +112,14 @@ template <size_t D> class DomainReader
 			if (patch->rank == rank)
 				finer_map[patch->id] = patch;
 		}
-		finer_domain = std::make_shared<Thunderegg::Domain<2>>(finer_map);
+		finer_domain = std::make_shared<Thunderegg::Domain<2>>(finer_map, ns, num_ghost);
 		std::map<int, std::shared_ptr<Thunderegg::PatchInfo<2>>> coarser_map;
 		for (nlohmann::json &patch_j : j.at("coarser")) {
 			auto patch = parsePatch(patch_j);
 			if (patch->rank == rank)
 				coarser_map[patch->id] = patch;
 		}
-		coarser_domain = std::make_shared<Thunderegg::Domain<2>>(coarser_map);
+		coarser_domain = std::make_shared<Thunderegg::Domain<2>>(coarser_map, ns, num_ghost);
 	}
 	std::shared_ptr<Thunderegg::Domain<2>> getCoarserDomain()
 	{

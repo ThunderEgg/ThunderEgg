@@ -65,7 +65,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	pinfo_map[4]->nbr_info[Side<2>::west].reset(new NormalNbrInfo<2>(3));
 	pinfo_map[4]->nbr_info[Side<2>::south].reset(new NormalNbrInfo<2>(2));
 
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map));
+	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
 	shared_ptr<ValVector<2>> vec(new ValVector<2>(pinfo_map[1]->ns, num_ghost, 4));
 

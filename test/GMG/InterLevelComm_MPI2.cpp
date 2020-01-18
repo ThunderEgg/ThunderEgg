@@ -101,7 +101,12 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank; };
+	// info
+	INFO("nx: " << nx);
+	INFO("ny: " << ny);
+	INFO("rank: " << rank);
+
+	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
 
 	// fill vectors with rank+1
 	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_vec, f);
@@ -117,7 +122,11 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 		// the coarse vec should be filled with 3
 		auto local_data = coarse_vec->getLocalData(0);
 		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) { CHECK(local_data[coord] == 3); });
+		               [&](const std::array<int, 2> &coord) {
+			               INFO("xi: " << coord[0]);
+			               INFO("yi: " << coord[1]);
+			               CHECK(local_data[coord] == 3);
+		               });
 	} else {
 	}
 }
@@ -125,8 +134,8 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when start isn't called before finish on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
+	auto                  nx        = GENERATE(2);
+	auto                  ny        = GENERATE(2);
 	int                   num_ghost = 1;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
@@ -144,8 +153,8 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
+	auto                  nx        = GENERATE(2);
+	auto                  ny        = GENERATE(2);
 	int                   num_ghost = 1;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
@@ -280,7 +289,7 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank; };
+	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
 
 	// fill vectors with rank+1
 	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_vec, f);
@@ -531,8 +540,9 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank; };
+	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
 	for (int i = 0; i < 2; i++) {
+		INFO("Call" << i);
 		auto coarse_vec = PetscVector<2>::GetNewVector(d_coarse);
 
 		auto ghost_vec = ilc->getNewGhostVector();
@@ -569,7 +579,7 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank; };
+	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
 
 	for (int i = 0; i < 2; i++) {
 		auto coarse_vec = PetscVector<2>::GetNewVector(d_coarse);
@@ -609,7 +619,7 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank; };
+	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
 
 	auto coarse_vec = PetscVector<2>::GetNewVector(d_coarse);
 	auto ghost_vec  = ilc->getNewGhostVector();
@@ -664,7 +674,7 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank; };
+	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
 
 	auto coarse_vec = PetscVector<2>::GetNewVector(d_coarse);
 	auto ghost_vec  = ilc->getNewGhostVector();

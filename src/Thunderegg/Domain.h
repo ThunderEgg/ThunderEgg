@@ -171,12 +171,10 @@ template <size_t D> class Domain
 	 * @param local_id_set true if local indexes are set by user
 	 * @param global_id_set true if global indexes are set by user
 	 */
-	Domain(std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_map, bool local_id_set = false,
-	       bool global_id_set = false)
+	Domain(std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_map, std::array<int, D> ns_in,
+	       int num_ghost_cells_in, bool local_id_set = false, bool global_id_set = false)
+	: ns(ns_in), num_ghost_cells(num_ghost_cells_in)
 	{
-		num_ghost_cells = pinfo_map.begin()->second->num_ghost_cells;
-		ns              = pinfo_map.begin()->second->ns;
-
 		num_cells_in_patch            = 1;
 		num_cells_in_patch_with_ghost = 1;
 		for (size_t i = 0; i < D; i++) {

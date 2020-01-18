@@ -15,7 +15,7 @@ TEST_CASE("Domain constructors work", "[Domain]")
 	pinfo_map[0]->ns.fill(n);
 	pinfo_map[0]->spacings.fill(spacing);
 	pinfo_map[0]->num_ghost_cells = num_ghost;
-	Domain<2> d(pinfo_map);
+	Domain<2> d(pinfo_map, {n, n}, num_ghost);
 
 	// check getters
 	for (int ni : d.getNs()) {

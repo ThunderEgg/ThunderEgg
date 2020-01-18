@@ -110,7 +110,7 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank; };
+	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
 
 	// fill vectors with rank+1
 	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_vec, f);
@@ -250,7 +250,7 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank; };
+	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
 
 	// fill vectors with rank+1
 	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_vec, f);
