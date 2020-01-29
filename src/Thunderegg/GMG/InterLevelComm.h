@@ -326,6 +326,44 @@ template <size_t D> class InterLevelComm
 		current_ghost_vector = ghost_vector;
 		current_vector       = vector;
 
+		// post receives
+		recv_buffers.reserve(ghost_rank_local_indexes.size());
+		recv_requests.reserve(ghost_rank_local_indexes.size());
+		for (auto rank_indexes_pair : ghost_rank_local_indexes) {
+			// allocate buffer
+			recv_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
+
+			// post the recieve
+			int rank = rank_indexes_pair.first;
+			recv_requests.emplace_back();
+			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0,
+			          MPI_COMM_WORLD, &recv_requests.back());
+		}
+		send_buffers.reserve(vector_rank_local_indexes.size());
+		send_requests.reserve(vector_rank_local_indexes.size());
+		// post sends
+		for (auto rank_indexes_pair : vector_rank_local_indexes) {
+			// allocate buffer
+			send_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
+
+			// fill buffer with values
+			int buffer_idx = 0;
+			for (int local_index : rank_indexes_pair.second) {
+				auto local_data = vector->getLocalData(local_index);
+				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+				               [&](const std::array<int, D> &coord) {
+					               send_buffers.back()[buffer_idx] = local_data[coord];
+					               buffer_idx++;
+				               });
+			}
+
+			// post the send
+			int rank = rank_indexes_pair.first;
+			send_requests.emplace_back();
+			MPI_Isend(send_buffers.back().data(), send_buffers.back().size(), MPI_DOUBLE, rank, 0,
+			          MPI_COMM_WORLD, &send_requests.back());
+		}
+
 		// set state
 		communicating = true;
 		sending       = false;
@@ -348,6 +386,37 @@ template <size_t D> class InterLevelComm
 			throw InterLevelCommException(
 			"InterLevelComm getGhostPatchesFinish is being called with a different ghost vector than when getGhostPatchesStart was called");
 		}
+
+		// finish recvs
+		for (int i = 0; i < ghost_rank_local_indexes.size(); i++) {
+			int finished_idx;
+			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx,
+			            MPI_STATUS_IGNORE);
+
+			// get local indexes for the buffer that was recieved
+			std::vector<int> &local_indexes = ghost_rank_local_indexes.at(finished_idx).second;
+
+			// add the values in the buffer to the vector
+			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
+			int                  buffer_idx = 0;
+			for (int local_index : local_indexes) {
+				auto local_data = ghost_vector->getLocalData(local_index);
+				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+				               [&](const std::array<int, D> &coord) {
+					               local_data[coord] = buffer[buffer_idx];
+					               buffer_idx++;
+				               });
+			}
+		}
+
+		// wait for sends for finish
+		MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUS_IGNORE);
+
+		// clear buffers
+		recv_requests.clear();
+		recv_buffers.clear();
+		send_requests.clear();
+		send_buffers.clear();
 
 		// set state
 		communicating        = false;
