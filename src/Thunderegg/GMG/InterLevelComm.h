@@ -36,27 +36,63 @@ struct InterLevelCommException : std::runtime_error {
 	InterLevelCommException(std::string message) : std::runtime_error(message){};
 };
 /**
- * @brief Creates a mapping from fine to coarse levels.
+ * @brief A communicator between a finer domain and a coarser domain.
+ *
+ * This class will determine the following things:
+ *
+ * Which patches in the finer domain have a parent patch in the coarser domain on the same rank?
+ * 	- getPatchesWithLocalParent() will return a vector of these patches and the local indexes of
+ *    their parent patches.
+ *
+ * Which patches in the finer domain have a parent patch in the coarser domain on a different rank?
+ * 	- getPatchesWithGhostParent() will return a vector of these patches and the local indexes in the
+ * 	  ghost vector.
+ * 	- getNewGhostVector() will allocate a new vector for these ghost values.
+ *
  */
 template <size_t D> class InterLevelComm
 {
 	private:
-	std::array<int, D>                                               ns;
-	int                                                              num_ghost_cells;
-	int                                                              num_ghost_patches;
-	int                                                              patch_size;
+	/**
+	 * @brief Dimensions of a patch
+	 */
+	std::array<int, D> ns;
+	/**
+	 * @brief Number of ghost cells
+	 */
+	int num_ghost_cells;
+	/**
+	 * @brief Number of ghost patches
+	 */
+	int num_ghost_patches;
+	/**
+	 * @brief Number of values in a patch. (including ghost values)
+	 */
+	int patch_size;
+	/**
+	 * @brief Patches with a local parent
+	 *
+	 * First value: local index of coarser patch
+	 * Second value: the PatchInfo object
+	 */
 	std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> patches_with_local_parent;
+	/**
+	 * @brief Patches with a ghost parent
+	 *
+	 * First value: local index in the ghost vector of coarser patch
+	 * Second value: the PatchInfo object
+	 */
 	std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> patches_with_ghost_parent;
 	/**
 	 * @brief A vector of pairs where the first value is the rank, and the second vector is the
 	 * local_indexes of patches in the order that the other processor is expecting them.
 	 */
-	std::vector<std::pair<int, std::vector<int>>> vector_rank_local_indexes;
+	std::vector<std::pair<int, std::vector<int>>> rank_and_local_indexes_for_vector;
 	/**
 	 * @brief A vector of pairs where the first value is the rank, and the second vector is the
 	 * local_indexes of ghost patches in the order that the other processor is expecting them.
 	 */
-	std::vector<std::pair<int, std::vector<int>>> ghost_rank_local_indexes;
+	std::vector<std::pair<int, std::vector<int>>> rank_and_local_indexes_for_ghost_vector;
 	bool                                          communicating = false;
 	bool                                          sending       = false;
 
@@ -120,7 +156,7 @@ template <size_t D> class InterLevelComm
 			}
 		}
 
-		vector_rank_local_indexes.reserve(ranks_and_local_patches.size());
+		rank_and_local_indexes_for_vector.reserve(ranks_and_local_patches.size());
 		for (auto pair : ranks_and_local_patches) {
 			std::vector<int> local_indexes;
 			// the map sould have sorted patches by id, the other processors will expect things in
@@ -129,7 +165,7 @@ template <size_t D> class InterLevelComm
 			for (auto id_local_index_pair : pair.second) {
 				local_indexes.push_back(id_local_index_pair.second);
 			}
-			vector_rank_local_indexes.emplace_back(pair.first, local_indexes);
+			rank_and_local_indexes_for_vector.emplace_back(pair.first, local_indexes);
 		}
 
 		// fill in ghost vector
@@ -155,7 +191,7 @@ template <size_t D> class InterLevelComm
 			patches_with_ghost_parent.emplace_back(ghost_local_index, patch);
 		}
 
-		ghost_rank_local_indexes.reserve(ranks_and_local_patches.size());
+		rank_and_local_indexes_for_ghost_vector.reserve(ranks_and_local_patches.size());
 		for (auto pair : ranks_and_ghost_patches) {
 			// the map sould have sorted patches by id, the other processors will expect things in
 			// this order
@@ -164,7 +200,19 @@ template <size_t D> class InterLevelComm
 			for (auto id_local_index_pair : pair.second) {
 				local_indexes.push_back(id_local_index_pair.second);
 			}
-			ghost_rank_local_indexes.emplace_back(pair.first, local_indexes);
+			rank_and_local_indexes_for_ghost_vector.emplace_back(pair.first, local_indexes);
+		}
+	}
+	/**
+	 * @brief Destroy the InterLevelComm object
+	 */
+	~InterLevelComm()
+	{
+		if (!(send_requests.empty() && recv_requests.empty())) {
+			// destructor is being called with unfinished communication
+			// finish communication (this will free mpi allocated stuff)
+			MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUS_IGNORE);
+			MPI_Waitall(recv_requests.size(), recv_requests.data(), MPI_STATUS_IGNORE);
 		}
 	}
 
@@ -178,11 +226,30 @@ template <size_t D> class InterLevelComm
 		return std::make_shared<ValVector<D>>(ns, num_ghost_cells, num_ghost_patches);
 	}
 
+	/**
+	 * @brief Get the vector of finer patches that have a local parent
+	 *
+	 * The vector will consist of pair values:
+	 * 		- First value: the local index of the parent patch
+	 * 		- First value: the finer patch associated with that index
+	 *
+	 * @return const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>>& the vector
+	 */
 	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &
 	getPatchesWithLocalParent() const
 	{
 		return patches_with_local_parent;
 	}
+
+	/**
+	 * @brief Get the vector of finer patches that have a ghost parent
+	 *
+	 * The vector will consist of pair values:
+	 * 		- First value: the local index in the ghost vector of the parent patch
+	 * 		- First value: the finer patch associated with that index
+	 *
+	 * @return const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>>& the vector
+	 */
 	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &
 	getPatchesWithGhostParent() const
 	{
@@ -190,10 +257,16 @@ template <size_t D> class InterLevelComm
 	}
 
 	/**
-	 * @brief Get a PETSc VecScatter object that will scatter values from the coarse vector to
-	 * the processes that need them for interpolation / restriction.
+	 * @brief Start the communication for sending ghost values.
 	 *
-	 * @return the VecScatter object
+	 * This will send the values in the ghost vector and will add them to the values in the vector.
+	 * This is essentially a reverse scatter.
+	 *
+	 * This function is seperated into a Start and Finish function, this allows for other
+	 * computations to happen while the communication is happening.
+	 *
+	 * @param vector the vector
+	 * @param ghost_vector the associated ghost vector
 	 */
 	void sendGhostPatchesStart(std::shared_ptr<Vector<D>>       vector,
 	                           std::shared_ptr<const Vector<D>> ghost_vector)
@@ -213,22 +286,22 @@ template <size_t D> class InterLevelComm
 		current_vector       = vector;
 
 		// post receives
-		recv_buffers.reserve(vector_rank_local_indexes.size());
-		recv_requests.reserve(vector_rank_local_indexes.size());
-		for (auto rank_indexes_pair : vector_rank_local_indexes) {
+		recv_buffers.reserve(rank_and_local_indexes_for_vector.size());
+		recv_requests.reserve(rank_and_local_indexes_for_vector.size());
+		for (auto rank_indexes_pair : rank_and_local_indexes_for_vector) {
 			// allocate buffer
 			recv_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
 
-			// post the recieve
+			// post the receive
 			int rank = rank_indexes_pair.first;
 			recv_requests.emplace_back();
 			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0,
 			          MPI_COMM_WORLD, &recv_requests.back());
 		}
-		send_buffers.reserve(ghost_rank_local_indexes.size());
-		send_requests.reserve(ghost_rank_local_indexes.size());
+		send_buffers.reserve(rank_and_local_indexes_for_ghost_vector.size());
+		send_requests.reserve(rank_and_local_indexes_for_ghost_vector.size());
 		// post sends
-		for (auto rank_indexes_pair : ghost_rank_local_indexes) {
+		for (auto rank_indexes_pair : rank_and_local_indexes_for_ghost_vector) {
 			// allocate buffer
 			send_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
 
@@ -254,6 +327,18 @@ template <size_t D> class InterLevelComm
 		communicating = true;
 		sending       = true;
 	}
+	/**
+	 * @brief Finish the communication for sending ghost values.
+	 *
+	 * This will send the values in the ghost vector and will add them to the values in the vector.
+	 * This is essentially a reverse scatter.
+	 *
+	 * This function is seperated into a Start and Finish function, this allows for other
+	 * computations to happen while the communication is happening.
+	 *
+	 * @param vector the vector
+	 * @param ghost_vector the associated ghost vector
+	 */
 	void sendGhostPatchesFinish(std::shared_ptr<Vector<D>>       vector,
 	                            std::shared_ptr<const Vector<D>> ghost_vector)
 	{
@@ -274,13 +359,14 @@ template <size_t D> class InterLevelComm
 		}
 
 		// finish recvs
-		for (int i = 0; i < vector_rank_local_indexes.size(); i++) {
+		for (int i = 0; i < rank_and_local_indexes_for_vector.size(); i++) {
 			int finished_idx;
 			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx,
 			            MPI_STATUS_IGNORE);
 
-			// get local indexes for the buffer that was recieved
-			std::vector<int> &local_indexes = vector_rank_local_indexes.at(finished_idx).second;
+			// get local indexes for the buffer that was received
+			std::vector<int> &local_indexes
+			= rank_and_local_indexes_for_vector.at(finished_idx).second;
 
 			// add the values in the buffer to the vector
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
@@ -309,6 +395,18 @@ template <size_t D> class InterLevelComm
 		current_ghost_vector = nullptr;
 		current_vector       = nullptr;
 	}
+	/**
+	 * @brief Start the communication for getting ghost values.
+	 *
+	 * This will send the values in the vector to the ghost vector, and will overwrite the values in
+	 * the ghost vector. This is essentially a forward scatter.
+	 *
+	 * This function is seperated into a Start and Finish function, this allows for other
+	 * computations to happen while the communication is happening.
+	 *
+	 * @param vector the vector
+	 * @param ghost_vector the associated ghost vector
+	 */
 	void getGhostPatchesStart(std::shared_ptr<const Vector<D>> vector,
 	                          std::shared_ptr<Vector<D>>       ghost_vector)
 	{
@@ -327,9 +425,9 @@ template <size_t D> class InterLevelComm
 		current_vector       = vector;
 
 		// post receives
-		recv_buffers.reserve(ghost_rank_local_indexes.size());
-		recv_requests.reserve(ghost_rank_local_indexes.size());
-		for (auto rank_indexes_pair : ghost_rank_local_indexes) {
+		recv_buffers.reserve(rank_and_local_indexes_for_ghost_vector.size());
+		recv_requests.reserve(rank_and_local_indexes_for_ghost_vector.size());
+		for (auto rank_indexes_pair : rank_and_local_indexes_for_ghost_vector) {
 			// allocate buffer
 			recv_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
 
@@ -339,10 +437,10 @@ template <size_t D> class InterLevelComm
 			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0,
 			          MPI_COMM_WORLD, &recv_requests.back());
 		}
-		send_buffers.reserve(vector_rank_local_indexes.size());
-		send_requests.reserve(vector_rank_local_indexes.size());
+		send_buffers.reserve(rank_and_local_indexes_for_vector.size());
+		send_requests.reserve(rank_and_local_indexes_for_vector.size());
 		// post sends
-		for (auto rank_indexes_pair : vector_rank_local_indexes) {
+		for (auto rank_indexes_pair : rank_and_local_indexes_for_vector) {
 			// allocate buffer
 			send_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
 
@@ -368,6 +466,18 @@ template <size_t D> class InterLevelComm
 		communicating = true;
 		sending       = false;
 	}
+	/**
+	 * @brief Finish the communication for getting ghost values.
+	 *
+	 * This will send the values in the vector to the ghost vector, and will overwrite the values in
+	 * the ghost vector. This is essentially a forward scatter.
+	 *
+	 * This function is seperated into a Start and Finish function, this allows for other
+	 * computations to happen while the communication is happening.
+	 *
+	 * @param vector the vector
+	 * @param ghost_vector the associated ghost vector
+	 */
 	void getGhostPatchesFinish(std::shared_ptr<const Vector<D>> vector,
 	                           std::shared_ptr<Vector<D>>       ghost_vector)
 	{
@@ -388,13 +498,14 @@ template <size_t D> class InterLevelComm
 		}
 
 		// finish recvs
-		for (int i = 0; i < ghost_rank_local_indexes.size(); i++) {
+		for (int i = 0; i < rank_and_local_indexes_for_ghost_vector.size(); i++) {
 			int finished_idx;
 			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx,
 			            MPI_STATUS_IGNORE);
 
 			// get local indexes for the buffer that was recieved
-			std::vector<int> &local_indexes = ghost_rank_local_indexes.at(finished_idx).second;
+			std::vector<int> &local_indexes
+			= rank_and_local_indexes_for_ghost_vector.at(finished_idx).second;
 
 			// add the values in the buffer to the vector
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);

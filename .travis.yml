@@ -28,5 +28,6 @@ script:
   - cd test
   - ./unit_tests
   - cd ../
+  - make test
 after_success:
   - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'

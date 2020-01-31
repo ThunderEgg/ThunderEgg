@@ -29,13 +29,13 @@
 #include <Thunderegg/PetscVector.h>
 using namespace std;
 using namespace Thunderegg;
+const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi2.json";
 TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 {
-	auto            nx        = GENERATE(2, 10);
-	auto            ny        = GENERATE(2, 10);
-	int             num_ghost = 1;
-	DomainReader<2> domain_reader("mesh_inputs/uniform_single_patch_coarse_level.json", {nx, ny},
-	                              num_ghost);
+	auto                  nx        = GENERATE(2, 10);
+	auto                  ny        = GENERATE(2, 10);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
