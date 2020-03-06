@@ -1,9 +1,8 @@
 project(Thunderegg_Lib)
 
-find_package(PETSc REQUIRED)
-find_package(FFTW REQUIRED)
-find_package(Zoltan REQUIRED)
-find_package(CUDA)
+find_package(PETSc)
+find_package(FFTW)
+find_package(Zoltan)
 find_package(p4est)
 find_package(BLAS)
 find_package(LAPACK)
@@ -12,49 +11,88 @@ if(p4est_FOUND)
 endif()
 
 # determine sources first
+list(APPEND Thunderegg_HDRS Thunderegg/BiCGStab.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/BiCGStabPatchSolver.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/BiLinearGhostFiller.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/BufferIO.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/Domain.h)
 list(APPEND Thunderegg_SRCS Thunderegg/Domain.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/PatchInfo.cpp)
-list(APPEND Thunderegg_HDRS Thunderegg/PatchInfo.h)
-list(APPEND Thunderegg_SRCS Thunderegg/Vector.cpp)
 
-list(APPEND Thunderegg_SRCS Thunderegg/Poisson/MatrixHelper.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Poisson/MatrixHelper2d.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Poisson/MatrixHelper.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Poisson/Schur/DftPatchSolver.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Poisson/Schur/FftwPatchSolver.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Poisson/Schur/SevenPtPatchOperator.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Poisson/Schur/StarPatchOperator.cpp)
+list(APPEND Thunderegg_HDRS Thunderegg/DomainGenerator.h)
 
-list(APPEND Thunderegg_SRCS Thunderegg/VarPoisson/StarPatchOperator.cpp)
+list(APPEND Thunderegg_HDRS Thunderegg/DomainTools.h)
 
-# list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory2d.cpp) list(APPEND
-# Thunderegg_SRCS Thunderegg/GMG/CycleFactory3d.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/GMG/InterLevelComm.h)
-list(APPEND Thunderegg_SRCS Thunderegg/GMG/LinearRestrictor.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/GMG/MPIRestrictor.cpp)
+list(APPEND Thunderegg_HDRS Thunderegg/DomainWrapOp.h)
 
-list(APPEND Thunderegg_SRCS Thunderegg/Experimental/DomGen.cpp)
+list(APPEND Thunderegg_HDRS Thunderegg/GhostFiller.h)
 
-list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurMatrixHelper.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurMatrixHelper2d.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurInfo.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurHelper.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Schur/TriLinInterp.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Schur/BilinearInterpolator.cpp)
-list(APPEND Thunderegg_SRCS Thunderegg/Schur/PolyChebPrec.cpp)
+list(APPEND Thunderegg_HDRS Thunderegg/Loops.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/Operator.h)
 
 if(p4est_FOUND)
-  list(APPEND Thunderegg_SRCS Thunderegg/P4estDomGen.cpp)
-endif()
 
-list(APPEND Thunderegg_SRCS Thunderegg/Experimental/PBMatrix.cpp)
+  list(APPEND Thunderegg_HDRS Thunderegg/P4estDomGen.h)
+  list(APPEND Thunderegg_HDRS Thunderegg/P4estDomGen.cpp)
+
+endif(p4est_FOUND)
+
+list(APPEND Thunderegg_HDRS Thunderegg/PatchInfo.h)
+list(APPEND Thunderegg_SRCS Thunderegg/PatchInfo.cpp)
+
+list(APPEND Thunderegg_HDRS Thunderegg/PatchOperator.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/PatchSolver.h)
+
+if(PETSC_FOUND)
+
+  list(APPEND Thunderegg_HDRS Thunderegg/PetscMatOp.h)
+  list(APPEND Thunderegg_HDRS Thunderegg/PetscShellCreator.h)
+  list(APPEND Thunderegg_HDRS Thunderegg/PetscVector.h)
+  list(APPEND Thunderegg_HDRS Thunderegg/PW.h)
+
+endif(PETSC_FOUND)
+
+list(APPEND Thunderegg_HDRS Thunderegg/SchurDomainOp.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/SchwarzPrec.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/Serializable.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/Side.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/SimpleGhostFiller.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/Timer.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/TypeDefs.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/ValVector.h)
+
+list(APPEND Thunderegg_HDRS Thunderegg/Vector.h)
+list(APPEND Thunderegg_SRCS Thunderegg/Vector.cpp)
+
+include(Thunderegg/Poisson/CMakeLists.txt)
+include(Thunderegg/VarPoisson/CMakeLists.txt)
+include(Thunderegg/GMG/CMakeLists.txt)
+include(Thunderegg/Schur/CMakeLists.txt)
+include(Thunderegg/Experimental/CMakeLists.txt)
 
 add_library(Thunderegg ${Thunderegg_SRCS} ${Thunderegg_HDRS})
 target_compile_features(Thunderegg PUBLIC cxx_std_11)
 
+foreach(HDR ${Thunderegg_HDRS})
+  get_filename_component(DIR ${HDR} PATH)
+  file(COPY ${HDR} DESTINATION include/${DIR})
+endforeach()
+
 # set include directories
 target_include_directories(
-  Thunderegg PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  Thunderegg PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SRC_DIR}>
                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 list(APPEND Thunderegg_Includes ${MPI_CXX_INCLUDE_PATH})
 list(APPEND Thunderegg_Includes ${PETSC_INCLUDES})

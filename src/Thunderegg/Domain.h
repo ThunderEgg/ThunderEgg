@@ -21,7 +21,6 @@
 
 #ifndef THUNDEREGG_DOMAIN_H
 #define THUNDEREGG_DOMAIN_H
-#include <Thunderegg/PW.h>
 #include <Thunderegg/PatchInfo.h>
 #include <Thunderegg/Vector.h>
 #include <cmath>
