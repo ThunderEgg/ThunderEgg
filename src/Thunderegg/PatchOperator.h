@@ -21,12 +21,23 @@
 
 #ifndef THUNDEREGG_PATCHOPERATOR_H
 #define THUNDEREGG_PATCHOPERATOR_H
+#include <Thunderegg/GhostFiller.h>
 #include <Thunderegg/Operator.h>
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
 {
 template <size_t D> class PatchOperator : public Operator<D>
 {
+	protected:
+	/**
+	 * @brief the domain that is being solved over
+	 */
+	std::shared_ptr<const Domain<D>> domain;
+	/**
+	 * @brief The ghost filler, needed for smoothing
+	 */
+	std::shared_ptr<const GhostFiller<D>> ghost_filler;
+
 	public:
 	virtual ~PatchOperator() {}
 
@@ -34,6 +45,16 @@ template <size_t D> class PatchOperator : public Operator<D>
 	                              LocalData<D> f) const = 0;
 	virtual void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
 	                           LocalData<D> f) const    = 0;
+
+	virtual void apply(std::shared_ptr<const Vector<D>> f,
+	                   std::shared_ptr<Vector<D>>       u) const override
+	{
+		ghost_filler->fillGhost(u);
+		for (auto pinfo : domain->getPatchInfoVector()) {
+			applySinglePatch(pinfo, u->getLocalData(pinfo->local_index),
+			                 f->getLocalData(pinfo->local_index));
+		}
+	}
 };
 } // namespace Thunderegg
 #endif

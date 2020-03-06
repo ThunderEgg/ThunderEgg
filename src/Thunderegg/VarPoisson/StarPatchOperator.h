@@ -35,10 +35,8 @@ namespace VarPoisson
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	protected:
-	std::shared_ptr<const Vector<D>>      coeffs;
-	std::shared_ptr<const Vector<D - 1>>  gamma_coeffs;
-	std::shared_ptr<const GhostFiller<D>> ghost_filler;
-	std::shared_ptr<const Domain<D>>      domain;
+	std::shared_ptr<const Vector<D>>     coeffs;
+	std::shared_ptr<const Vector<D - 1>> gamma_coeffs;
 
 	constexpr int addValue(int axis)
 	{
@@ -50,7 +48,9 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	                  std::shared_ptr<const Domain<D>>      domain,
 	                  std::shared_ptr<const GhostFiller<D>> ghost_filler)
 	{
-		if (domain->getNumGhostCells() < 1) { throw 88; }
+		if (domain->getNumGhostCells() < 1) {
+			throw 88;
+		}
 		this->coeffs       = coeffs;
 		this->domain       = domain;
 		this->ghost_filler = ghost_filler;
@@ -152,14 +152,6 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			}
 		}
 	}
-	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f) const override
-	{
-		ghost_filler->fillGhost(u);
-		for (auto pinfo : domain->getPatchInfoVector()) {
-			applySinglePatch(pinfo, u->getLocalData(pinfo->local_index),
-			                 f->getLocalData(pinfo->local_index));
-		}
-	}
 	/**
 	 * @brief Generator for GMG levels.
 	 *
@@ -206,7 +198,9 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		operator()(std::shared_ptr<const GMG::Level<D>> level)
 		{
 			auto &coarser_op = generated_operators[level->getDomain()];
-			if (coarser_op != nullptr) { return coarser_op; }
+			if (coarser_op != nullptr) {
+				return coarser_op;
+			}
 
 			std::shared_ptr<const Domain<D>> finer_domain = level->getFiner()->getDomain();
 			auto                             finer_op     = generated_operators[finer_domain];
