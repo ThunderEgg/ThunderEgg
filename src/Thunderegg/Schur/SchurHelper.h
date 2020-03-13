@@ -22,15 +22,11 @@
 #ifndef THUNDEREGG_SCHUR_SCHURHELPER_H
 #define THUNDEREGG_SCHUR_SCHURHELPER_H
 #include <Thunderegg/Domain.h>
-#include <Thunderegg/PetscVector.h>
 #include <Thunderegg/Schur/IfaceSet.h>
 #include <Thunderegg/Schur/SchurInfo.h>
+#include <Thunderegg/ValVector.h>
 #include <deque>
 #include <memory>
-#include <petscao.h>
-#include <petscmat.h>
-#include <petscpc.h>
-#include <petscvec.h>
 #include <valarray>
 namespace Thunderegg
 {
@@ -152,19 +148,15 @@ template <size_t D> class SchurHelper
 		// wait for all
 		MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
 	}
-	std::shared_ptr<PetscVector<D - 1>> getNewSchurVec()
+	std::shared_ptr<ValVector<D - 1>> getNewSchurVec()
 	{
-		Vec u;
-		VecCreateSeq(MPI_COMM_SELF, matrix_extra_ghost_start * iface_stride, &u);
-		return std::shared_ptr<PetscVector<D - 1>>(
-		new PetscVector<D - 1>(u, ghost_start, lengths, 0));
+		return std::shared_ptr<ValVector<D - 1>>(
+		new ValVector<D - 1>(lengths, 0, matrix_extra_ghost_start));
 	}
-	std::shared_ptr<PetscVector<D - 1>> getNewSchurDistVec()
+	std::shared_ptr<ValVector<D - 1>> getNewSchurDistVec()
 	{
-		Vec u;
-		VecCreateSeq(PETSC_COMM_SELF, matrix_extra_ghost_start * iface_stride, &u);
-		return std::shared_ptr<PetscVector<D - 1>>(
-		new PetscVector<D - 1>(u, ghost_start, lengths, 0));
+		return std::shared_ptr<ValVector<D - 1>>(
+		new ValVector<D - 1>(lengths, 0, matrix_extra_ghost_start));
 	}
 
 	int getSchurVecLocalSize() const

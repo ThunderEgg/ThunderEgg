@@ -56,6 +56,11 @@ template <size_t D> class ValVector : public Vector<D>
 		vec.resize(size);
 	}
 	~ValVector() = default;
+	static std::shared_ptr<ValVector<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain)
+	{
+		return std::shared_ptr<ValVector<D>>(new ValVector<D>(
+		domain->getNs(), domain->getNumGhostCells(), domain->getNumLocalPatches()));
+	}
 	LocalData<D> getLocalData(int local_patch_id)
 	{
 		double *data = &vec[patch_stride * local_patch_id + first_offset];

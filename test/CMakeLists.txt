@@ -1,3 +1,4 @@
+if(PETSC_FOUND)
 add_executable(
   unit_tests_mpiany
   test.cpp
@@ -44,3 +45,5 @@ endfunction(add_mpi_test)
 
 add_mpi_test(2)
 add_mpi_test(3)
+
+endif(PETSC_FOUND)

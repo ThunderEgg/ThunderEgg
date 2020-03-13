@@ -85,14 +85,14 @@ include(Thunderegg/Experimental/CMakeLists.txt)
 add_library(Thunderegg ${Thunderegg_SRCS} ${Thunderegg_HDRS})
 target_compile_features(Thunderegg PUBLIC cxx_std_11)
 
-foreach(HDR ${Thunderegg_HDRS})
-  get_filename_component(DIR ${HDR} PATH)
-  file(COPY ${HDR} DESTINATION include/${DIR})
-endforeach()
+#foreach(HDR ${Thunderegg_HDRS})
+#  get_filename_component(DIR ${HDR} PATH)
+#  file(COPY ${HDR} DESTINATION include/${DIR})
+#endforeach()
 
 # set include directories
 target_include_directories(
-  Thunderegg PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SRC_DIR}>
+  Thunderegg PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 list(APPEND Thunderegg_Includes ${MPI_CXX_INCLUDE_PATH})
 list(APPEND Thunderegg_Includes ${PETSC_INCLUDES})

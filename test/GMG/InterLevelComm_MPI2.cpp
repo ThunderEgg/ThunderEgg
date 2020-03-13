@@ -22,7 +22,7 @@
 #include "utils/DomainReader.h"
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/GMG/InterLevelComm.h>
-#include <Thunderegg/PetscVector.h>
+#include <Thunderegg/ValVector.h>
 using namespace Thunderegg;
 using namespace std;
 const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi2.json";
@@ -94,7 +94,7 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec = PetscVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 

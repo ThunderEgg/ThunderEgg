@@ -13,9 +13,6 @@ list(APPEND Thunderegg_HDRS Thunderegg/Schur/PatchOperator.h)
 
 list(APPEND Thunderegg_HDRS Thunderegg/Schur/PatchSolver.h)
 
-list(APPEND Thunderegg_HDRS Thunderegg/Schur/PolyChebPrec.h)
-list(APPEND Thunderegg_SRCS Thunderegg/Schur/PolyChebPrec.cpp)
-
 list(APPEND Thunderegg_HDRS Thunderegg/Schur/SchurHelper.h)
 list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurHelper.cpp)
 
@@ -23,6 +20,9 @@ list(APPEND Thunderegg_HDRS Thunderegg/Schur/SchurInfo.h)
 list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurInfo.cpp)
 
 if(PETSC_FOUND)
+    list(APPEND Thunderegg_HDRS Thunderegg/Schur/PolyChebPrec.h)
+    list(APPEND Thunderegg_SRCS Thunderegg/Schur/PolyChebPrec.cpp)
+
     list(APPEND Thunderegg_HDRS Thunderegg/Schur/SchurMatrixHelper.h)
     list(APPEND Thunderegg_SRCS Thunderegg/Schur/SchurMatrixHelper.cpp)
 
