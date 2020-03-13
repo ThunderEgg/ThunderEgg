@@ -76,5 +76,20 @@ template <size_t D> class ValVector : public Vector<D>
 		ghost_data.resize(patch_stride * num_ghost_patches);
 	}
 };
+template <size_t D> class DomainVG : public VectorGenerator<D>
+{
+	private:
+	std::shared_ptr<Domain<D>> dc;
+
+	public:
+	DomainVG(std::shared_ptr<Domain<D>> dc)
+	{
+		this->dc = dc;
+	}
+	std::shared_ptr<Vector<D>> getNewVector()
+	{
+		return ValVector<D>::GetNewVector(dc);
+	}
+};
 } // namespace Thunderegg
 #endif

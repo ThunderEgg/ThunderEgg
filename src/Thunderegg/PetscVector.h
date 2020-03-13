@@ -145,7 +145,9 @@ template <size_t D> class PetscVector : public Vector<D>
 	 */
 	~PetscVector()
 	{
-		if (own) { VecDestroy(&vec); }
+		if (own) {
+			VecDestroy(&vec);
+		}
 	}
 	/**
 	 * @brief Get the LocalData object for the given local patch index
@@ -208,20 +210,6 @@ template <size_t D> class PetscVector : public Vector<D>
 	}
 	*/
 };
-template <size_t D> class DomainVG : public VectorGenerator<D>
-{
-	private:
-	std::shared_ptr<Domain<D>> dc;
 
-	public:
-	DomainVG(std::shared_ptr<Domain<D>> dc)
-	{
-		this->dc = dc;
-	}
-	std::shared_ptr<Vector<D>> getNewVector()
-	{
-		return PetscVector<D>::GetNewVector(dc);
-	}
-};
 } // namespace Thunderegg
 #endif
