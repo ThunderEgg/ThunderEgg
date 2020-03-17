@@ -3,12 +3,13 @@ compiler: gcc
 
 os: linux
 dist: bionic
+apt:
+  sources:
+    - sourceline: 'ppa:scottaiton/thunderegg-deps'
 jobs:
   include:
-    addons:
+  - addons:
       apt:
-        sources:
-          - sourceline: 'ppa:scottaiton/thunderegg-deps'
         packages:
           - cmake
           - libfftw3-dev
@@ -16,6 +17,20 @@ jobs:
           - openmpi-bin
           - petsc-dev
           - libblas-dev
+  - addons:
+      apt:
+        packages:
+          - cmake
+          - libopenmpi-dev
+          - openmpi-bin
+          - petsc-dev
+  - addons:
+      apt:
+        packages:
+          - cmake
+          - libfftw3-dev
+          - libopenmpi-dev
+          - openmpi-bin
 before_install:
   - pip install --user cpp-coveralls
   - export CXXFLAGS="-std=c++11"
@@ -25,8 +40,6 @@ script:
   - export LDFLAGS="-lgcov"
   - cmake .
   - make
-  - cd test
-  - ./unit_tests
   - cd ../
   - make test
 after_success:
