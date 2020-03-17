@@ -3,19 +3,19 @@ compiler: gcc
 
 os: linux
 dist: bionic
-addons:
-  apt:
-    sources:
-      - sourceline: 'ppa:scottaiton/thunderegg-deps'
-    packages:
-      - cmake
-      - libfftw3-dev
-      - libopenmpi-dev
-      - openmpi-bin
-      - petsc-dev
-      - libblas-dev
-      - liblapack-dev
-      - libtrilinos-zoltan-dev
+jobs:
+  include:
+    addons:
+      apt:
+        sources:
+          - sourceline: 'ppa:scottaiton/thunderegg-deps'
+        packages:
+          - cmake
+          - libfftw3-dev
+          - libopenmpi-dev
+          - openmpi-bin
+          - petsc-dev
+          - libblas-dev
 before_install:
   - pip install --user cpp-coveralls
   - export CXXFLAGS="-std=c++11"
