@@ -24,6 +24,7 @@ jobs:
           - libopenmpi-dev
           - openmpi-bin
           - petsc-dev
+          - libblas-dev
   - addons:
       apt:
         packages:
@@ -31,6 +32,7 @@ jobs:
           - libfftw3-dev
           - libopenmpi-dev
           - openmpi-bin
+          - libblas-dev
 before_install:
   - pip install --user cpp-coveralls
   - export CXXFLAGS="-std=c++11"
