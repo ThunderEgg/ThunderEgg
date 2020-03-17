@@ -17,6 +17,8 @@ jobs:
           - openmpi-bin
           - petsc-dev
           - libblas-dev
+          - liblapack-dev
+          - libtrilinos-zoltan-dev
   - addons:
       apt:
         packages:
@@ -25,6 +27,8 @@ jobs:
           - openmpi-bin
           - petsc-dev
           - libblas-dev
+          - liblapack-dev
+          - libtrilinos-zoltan-dev
   - addons:
       apt:
         packages:
@@ -33,6 +37,8 @@ jobs:
           - libopenmpi-dev
           - openmpi-bin
           - libblas-dev
+          - liblapack-dev
+          - libtrilinos-zoltan-dev
 before_install:
   - pip install --user cpp-coveralls
   - export CXXFLAGS="-std=c++11"
