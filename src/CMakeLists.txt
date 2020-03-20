@@ -1,15 +1,5 @@
 project(Thunderegg_Lib)
 
-find_package(PETSc)
-find_package(FFTW)
-find_package(Zoltan)
-find_package(p4est)
-find_package(BLAS)
-find_package(LAPACK)
-if(p4est_FOUND)
-  find_package(sc REQUIRED)
-endif()
-
 # determine sources first
 list(APPEND Thunderegg_HDRS Thunderegg/BiCGStab.h)
 
@@ -85,10 +75,8 @@ include(Thunderegg/Experimental/CMakeLists.txt)
 add_library(Thunderegg ${Thunderegg_SRCS} ${Thunderegg_HDRS})
 target_compile_features(Thunderegg PUBLIC cxx_std_11)
 
-#foreach(HDR ${Thunderegg_HDRS})
-#  get_filename_component(DIR ${HDR} PATH)
-#  file(COPY ${HDR} DESTINATION include/${DIR})
-#endforeach()
+# foreach(HDR ${Thunderegg_HDRS}) get_filename_component(DIR ${HDR} PATH)
+# file(COPY ${HDR} DESTINATION include/${DIR}) endforeach()
 
 # set include directories
 target_include_directories(

@@ -25,6 +25,7 @@
 #include <Thunderegg/Schur/IfaceInterp.h>
 #include <Thunderegg/Schur/PatchSolver.h>
 #include <Thunderegg/Schur/SchurHelper.h>
+#include <Thunderegg/PetscVector.h>
 #include <functional>
 #include <petscmat.h>
 #include <valarray>

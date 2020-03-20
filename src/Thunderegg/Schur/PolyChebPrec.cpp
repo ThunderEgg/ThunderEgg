@@ -35,12 +35,12 @@ PolyChebPrec::PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<Sc
 }
 void PolyChebPrec::apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const
 {
-	std::shared_ptr<PetscVector<3>> f = PetscVector<3>::GetNewVector(domain);
-	std::shared_ptr<PetscVector<3>> u = PetscVector<3>::GetNewVector(domain);
+	std::shared_ptr<Vector<3>> f = PetscVector<3>::GetNewVector(domain);
+	std::shared_ptr<Vector<3>> u = PetscVector<3>::GetNewVector(domain);
 
-	std::shared_ptr<PetscVector<2>> bk  = sh->getNewSchurVec();
-	std::shared_ptr<PetscVector<2>> bk1 = sh->getNewSchurVec();
-	std::shared_ptr<PetscVector<2>> bk2 = sh->getNewSchurVec();
+	std::shared_ptr<Vector<2>> bk  = sh->getNewSchurVec();
+	std::shared_ptr<Vector<2>> bk1 = sh->getNewSchurVec();
+	std::shared_ptr<Vector<2>> bk2 = sh->getNewSchurVec();
 
 	for (int i = coeffs.size() - 1; i > 0; i--) {
 		solver->solve(f, u, bk1);

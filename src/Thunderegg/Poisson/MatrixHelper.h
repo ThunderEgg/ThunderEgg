@@ -24,6 +24,7 @@
 
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/PetscVector.h>
+#include <Thunderegg/PW.h>
 #include <petscmat.h>
 
 namespace Thunderegg

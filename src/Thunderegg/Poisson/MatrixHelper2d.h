@@ -23,6 +23,7 @@
 #define THUNDEREGG_POISSON_MATRIXHELPER2D_H
 
 #include <Thunderegg/Domain.h>
+#include <Thunderegg/PW.h>
 #include <petscmat.h>
 
 namespace Thunderegg

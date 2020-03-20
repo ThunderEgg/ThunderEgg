@@ -98,7 +98,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			});
 		});
 	}
-	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
+	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
 	                   LocalData<D> f) const
 	{
 		const LocalData<D> c = coeffs->getLocalData(pinfo->local_index);
@@ -106,12 +106,13 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			if (pinfo->hasNbr(s)) {
 				double                 h2      = pow(pinfo->spacings[s.axis()], 2);
 				LocalData<D - 1>       f_inner = f.getSliceOnSide(s);
-				const LocalData<D - 1> u_ghost = f.getSliceOnSide(s, -1);
+				LocalData<D - 1> u_ghost = f.getSliceOnSide(s, -1);
 				const LocalData<D - 1> c_ghost = f.getSliceOnSide(s, -1);
 				const LocalData<D - 1> c_inner = f.getSliceOnSide(s);
 				nested_loop<D - 1>(
 				f_inner.getStart(), f_inner.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					f_inner[coord] -= u_ghost[coord] * (c_inner[coord] + c_ghost[coord]) / (2 * h2);
+					u_ghost[coord] = 0;
 				});
 			}
 		}

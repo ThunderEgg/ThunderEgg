@@ -23,6 +23,9 @@
 #define THUNDEREGG_PETSCMATOP_H
 
 #include <Thunderegg/Operator.h>
+#include <Thunderegg/PW.h>
+#include <Thunderegg/PetscVector.h>
+#include <petscmat.h>
 
 namespace Thunderegg
 {

@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_PETSCSHELLCREATOR_H
 #define THUNDEREGG_PETSCSHELLCREATOR_H
 #include <Thunderegg/Operator.h>
+#include <petscpc.h>
 namespace Thunderegg
 {
 /**

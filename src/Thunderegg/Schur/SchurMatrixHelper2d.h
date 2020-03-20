@@ -22,6 +22,8 @@
 #ifndef THUNDEREGG_SHUR_SCHURMATRIXHELPER2D_H
 #define THUNDEREGG_SHUR_SCHURMATRIXHELPER2D_H
 #include <Thunderegg/Schur/SchurHelper.h>
+#include <Thunderegg/PW.h>
+#include <Thunderegg/PetscVector.h>
 #include <functional>
 #include <memory>
 #include <petscmat.h>

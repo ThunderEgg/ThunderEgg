@@ -43,7 +43,7 @@ template <size_t D> class PatchOperator : public Operator<D>
 
 	virtual void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
 	                              LocalData<D> f) const = 0;
-	virtual void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
+	virtual void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
 	                           LocalData<D> f) const    = 0;
 
 	virtual void apply(std::shared_ptr<const Vector<D>> u,
