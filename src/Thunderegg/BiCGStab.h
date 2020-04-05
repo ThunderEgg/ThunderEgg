@@ -72,17 +72,26 @@ template <size_t D> class BiCGStab
 		double                     rho = rhat->dot(resid);
 
 		int    num_its  = 0;
+        if (r0_norm == 0)
+        {
+            return num_its;
+        }
 		double residual = resid->twoNorm() / r0_norm;
 		while (residual > tolerance && num_its < max_it) {
 			if (timer) {
 				timer->start("Iteration");
 			}
 
-			if (Mr != nullptr) {
+			if (Mr != nullptr)    
+            {
+                printf("%5d %16.8e\n", num_its, residual);                   
 				Mr->apply(p, mp);
 				A->apply(mp, ap);
-			} else {
+			} 
+            else 
+            {
 				A->apply(p, ap);
+                //printf("       %5d %16.8e\n", num_its, residual);
 			}
 			double alpha = rho / rhat->dot(ap);
 			s->copy(resid);
@@ -111,6 +120,7 @@ template <size_t D> class BiCGStab
 			num_its++;
 			rho      = rho_new;
 			residual = resid->twoNorm() / r0_norm;
+            //printf("%5d %16.8e\n", num_its, residual);
 
 			if (timer) {
 				timer->stop("Iteration");

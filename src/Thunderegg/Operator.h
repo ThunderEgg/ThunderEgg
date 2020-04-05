@@ -32,6 +32,7 @@ namespace Thunderegg
 template <size_t D> class Operator
 {
 	public:
+
 	/**
 	 * @brief Virtual function that base classes have to implement.
 	 *

@@ -187,9 +187,12 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		std::shared_ptr<Vector<D>> u_single(new SinglePatchVec(u));
 
 		auto f_copy = vg->getNewVector();
+        auto u_copy = vg->getNewVector();
 		f_copy->copy(f_single);
+        u_copy->copy(u_single);
 		op->addGhostToRHS(pinfo, u, f_copy->getLocalData(0));
 
+        // printf("Calling BiCG patch solver\n");
 		BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
 	}
 	/**

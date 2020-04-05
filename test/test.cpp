@@ -5,12 +5,12 @@
 int main(int argc, char *argv[])
 {
 	// global setup...
-	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
+	//PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
 	int result = Catch::Session().run(argc, argv);
 
 	// global clean-up...
-	PetscFinalize();
+	//PetscFinalize();
 
 	return result;
 }

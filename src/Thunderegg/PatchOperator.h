@@ -41,7 +41,7 @@ template <size_t D> class PatchOperator : public Operator<D>
 	public:
 	virtual ~PatchOperator() {}
 
-	virtual void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
+	virtual void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
 	                              LocalData<D> f) const = 0;
 	virtual void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
 	                           LocalData<D> f) const    = 0;
@@ -50,7 +50,8 @@ template <size_t D> class PatchOperator : public Operator<D>
 	                   std::shared_ptr<Vector<D>>       f) const override
 	{
 		ghost_filler->fillGhost(u);
-		for (auto pinfo : domain->getPatchInfoVector()) {
+		for (auto pinfo : domain->getPatchInfoVector()) 
+        {
 			applySinglePatch(pinfo, u->getLocalData(pinfo->local_index),
 			                 f->getLocalData(pinfo->local_index));
 		}
