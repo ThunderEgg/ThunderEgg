@@ -84,6 +84,7 @@ template <size_t D> class BiCGStab
 
 			if (Mr != nullptr)    
             {
+                /* Solve M*mp = p;  */
                 printf("%5d %16.8e\n", num_its, residual);                   
 				Mr->apply(p, mp);
 				A->apply(mp, ap);
