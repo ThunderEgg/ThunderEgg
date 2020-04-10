@@ -123,7 +123,7 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		/**
 		 * @brief the PatchInfo object for the patch
 		 */
-		std::shared_ptr<const PatchInfo<D>> pinfo;
+		std::shared_ptr<PatchInfo<D>> pinfo;
 
 		public:
 		/**
@@ -135,7 +135,8 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		SinglePatchOp(std::shared_ptr<const PatchInfo<D>>     pinfo,
 		              std::shared_ptr<const PatchOperator<D>> op)
 		{
-			this->pinfo = pinfo;
+			this->pinfo = std::make_shared<PatchInfo<D>>(*pinfo);
+			this->pinfo->nbr_info.fill(nullptr);
 			this->op    = op;
 		}
 		void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
