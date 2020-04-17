@@ -106,7 +106,8 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			if (pinfo->hasNbr(s)) {
 				double                 h2      = pow(pinfo->spacings[s.axis()], 2);
 				LocalData<D - 1>       f_inner = f.getSliceOnSide(s);
-				LocalData<D - 1> u_ghost = f.getSliceOnSide(s, -1);
+				LocalData<D - 1> u_ghost = u.getSliceOnSide(s, -1);
+				LocalData<D - 1> u_inner = u.getSliceOnSide(s);
 				const LocalData<D - 1> c_ghost = c.getSliceOnSide(s, -1);
 				const LocalData<D - 1> c_inner = c.getSliceOnSide(s);
 				nested_loop<D - 1>(
@@ -118,7 +119,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		}
 	}
 	/**
-	 * @brief Helper fucntion for adding Dirichlet boundary conditions to right hand side.
+	 * @brief Helper function for adding Dirichlet boundary conditions to right hand side.
 	 *
 	 * @param domain The domain associated with the vector
 	 * @param f the right hand side vector
