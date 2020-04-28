@@ -1,16 +1,16 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
-#include <petsc.h>
+#include <mpi.h>
 
 int main(int argc, char *argv[])
 {
 	// global setup...
-	//PetscInitialize(nullptr, nullptr, nullptr, nullptr);
+	MPI_Init(&argc, &argv);
 
 	int result = Catch::Session().run(argc, argv);
 
 	// global clean-up...
-	//PetscFinalize();
+	MPI_Finalize();
 
 	return result;
 }

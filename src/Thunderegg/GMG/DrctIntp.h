@@ -24,7 +24,7 @@
 
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/GMG/InterLevelComm.h>
-#include <Thunderegg/GMG/Interpolator.h>
+#include <Thunderegg/GMG/MPIInterpolator.h>
 #include <memory>
 
 namespace Thunderegg
@@ -35,45 +35,50 @@ namespace GMG
  * @brief Simple class that directly places values from coarse cell into the corresponding fine
  * cells.
  */
-template <size_t D> class DrctIntp : public Interpolator<D>
+template <size_t D> class DrctIntp : public MPIInterpolator<D>
 {
 	private:
-	/**
-	 * @brief The coarser set of domains
-	 */
-	std::shared_ptr<const Domain<D>> coarse_domain;
-	/**
-	 * @brief The finer set of domains
-	 */
-	std::shared_ptr<const Domain<D>> fine_domain;
-	/**
-	 * @brief The comm package between the levels.
-	 */
-	std::shared_ptr<InterLevelComm<D>> ilc;
+	void interpolatePatches(
+	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
+	std::shared_ptr<const Vector<D>>                                        coarser_vector,
+	std::shared_ptr<Vector<D>> finer_vector) const override
+	{
+		for (auto pair : patches) {
+			auto         pinfo             = pair.second;
+			LocalData<D> coarse_local_data = coarser_vector->getLocalData(pair.first);
+			LocalData<D> fine_data         = finer_vector->getLocalData(pinfo->local_index);
+
+			if (pinfo->hasCoarseParent()) {
+				Orthant<D>         orth = pinfo->orth_on_parent;
+				std::array<int, D> starts;
+				for (size_t i = 0; i < D; i++) {
+					starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
+				}
+
+				nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
+				               [&](const std::array<int, D> &coord) {
+					               std::array<int, D> coarse_coord;
+					               for (size_t x = 0; x < D; x++) {
+						               coarse_coord[x] = (coord[x] + starts[x]) / 2;
+					               }
+					               fine_data[coord] += coarse_local_data[coarse_coord];
+				               });
+			} else {
+				nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
+				               [&](const std::array<int, D> &coord) {
+					               fine_data[coord] += coarse_local_data[coord];
+				               });
+			}
+		}
+	}
 
 	public:
 	/**
 	 * @brief Create new DrctIntp object.
 	 *
-	 * @param coarse_domain the coarser set of domains.
-	 * @param fine_domain the finer set of domains.
-	 * @param ilc the comm package between the levels.
+	 * @param ilc the communcation package for the two levels.
 	 */
-	DrctIntp(std::shared_ptr<const Domain<D>> coarse_domain,
-	         std::shared_ptr<const Domain<D>> fine_domain, std::shared_ptr<InterLevelComm<D>> ilc)
-	{
-		this->coarse_domain = coarse_domain;
-		this->fine_domain   = fine_domain;
-		this->ilc           = ilc;
-	}
-	/**
-	 * @brief Interpolate from the finer level to the coarser level.
-	 *
-	 * @param coarse the input vector from the coarser level
-	 * @param fine the output vector for the finer level
-	 */
-	void interpolate(std::shared_ptr<const Vector<D>> coarse,
-	                 std::shared_ptr<Vector<D>>       fine) const;
+	DrctIntp(std::shared_ptr<InterLevelComm<D>> ilc_in) : MPIInterpolator<D>(ilc_in) {}
 
 	class Generator
 	{
@@ -83,48 +88,11 @@ template <size_t D> class DrctIntp : public Interpolator<D>
 		{
 			auto ilc = std::make_shared<InterLevelComm<D>>(level->getDomain(),
 			                                               level->getFiner()->getDomain());
-			return std::make_shared<DrctIntp<D>>(level->getDomain(), level->getFiner()->getDomain(),
-			                                     ilc);
+			return std::make_shared<DrctIntp<D>>(ilc);
 		}
 	};
 };
-template <size_t D>
-inline void DrctIntp<D>::interpolate(std::shared_ptr<const Vector<D>> coarse,
-                                     std::shared_ptr<Vector<D>>       fine) const
-{
-	// scatter
-	/*
-	std::shared_ptr<Vector<D>> coarse_local = ilc->getNewCoarseDistVec();
-	ilc->scatter(coarse_local, coarse);
 
-	for (auto data : ilc->getFineDomains()) {
-	    const PatchInfo<D> &pinfo             = *data.pinfo;
-	    LocalData<D>        coarse_local_data = coarse_local->getLocalData(data.local_index);
-	    LocalData<D>        fine_data         = fine->getLocalData(pinfo.local_index);
-
-	    if (pinfo.hasCoarseParent()) {
-	        Orthant<D>         orth = pinfo.orth_on_parent;
-	        std::array<int, D> starts;
-	        for (size_t i = 0; i < D; i++) {
-	            starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
-	        }
-
-	        nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
-	                       [&](const std::array<int, D> &coord) {
-	                           std::array<int, D> coarse_coord;
-	                           for (size_t x = 0; x < D; x++) {
-	                               coarse_coord[x] = (coord[x] + starts[x]) / 2;
-	                           }
-	                           fine_data[coord] += coarse_local_data[coarse_coord];
-	                       });
-	    } else {
-	        nested_loop<D>(
-	        fine_data.getStart(), fine_data.getEnd(),
-	        [&](const std::array<int, D> &coord) { fine_data[coord] += coarse_local_data[coord]; });
-	    }
-	}
-	*/
-}
 } // namespace GMG
 } // namespace Thunderegg
 #endif

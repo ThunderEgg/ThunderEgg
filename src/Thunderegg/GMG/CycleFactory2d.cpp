@@ -63,14 +63,14 @@ static std::shared_ptr<Interpolator<2>> getNewInterpolator(std::string interpola
                                                            std::shared_ptr<Domain<2>> finer_domain,
                                                            std::shared_ptr<InterLevelComm<2>> ilc)
 {
-	return std::shared_ptr<Interpolator<2>>(new DrctIntp<2>(domain, finer_domain, ilc));
+	return std::shared_ptr<Interpolator<2>>(new DrctIntp<2>(ilc));
 }
 static std::shared_ptr<Restrictor<2>> getNewRestrictor(std::string                restrictor_type,
                                                        std::shared_ptr<Domain<2>> domain,
                                                        std::shared_ptr<Domain<2>> finer_domain,
                                                        std::shared_ptr<InterLevelComm<2>> ilc)
 {
-	return std::shared_ptr<Restrictor<2>>(new AvgRstr<2>(domain, finer_domain, ilc));
+	return std::shared_ptr<Restrictor<2>>(new AvgRstr<2>(ilc));
 }
 std::shared_ptr<Cycle<2>> CycleFactory2d::getCycle(const CycleOpts &                        opts,
                                                    std::shared_ptr<DomainGenerator<2>>      dcg,
@@ -95,7 +95,7 @@ std::shared_ptr<Cycle<2>> CycleFactory2d::getCycle(const CycleOpts &            
 		shared_ptr<Domain<2>>             domain = dcg->getFinestDomain();
 		shared_ptr<Schur::SchurHelper<2>> sh(new Schur::SchurHelper<2>(domain));
 		shared_ptr<VectorGenerator<2>>    vg(new DomainVG<2>(domain));
-		finest_level.reset(new Level<2>(vg));
+		finest_level.reset(new Level<2>(domain, vg));
 		finest_level->setOperator(getNewOperator(op_type, domain, sh, interp, op));
 		finest_level->setSmoother(getNewSmoother(smoother_type, domain, sh, interp, solver));
 
@@ -107,10 +107,12 @@ std::shared_ptr<Cycle<2>> CycleFactory2d::getCycle(const CycleOpts &            
 	while (dcg->hasCoarserDomain() && (opts.max_levels <= 0 || curr_level < opts.max_levels)) {
 		// create new level
 		shared_ptr<Domain<2>> domain = dcg->getCoarserDomain();
-		if ((domain->getNumGlobalPatches() + 0.0) / size < opts.patches_per_proc) { break; }
+		if ((domain->getNumGlobalPatches() + 0.0) / size < opts.patches_per_proc) {
+			break;
+		}
 		shared_ptr<Schur::SchurHelper<2>> sh(new Schur::SchurHelper<2>(domain));
 		shared_ptr<VectorGenerator<2>>    vg(new DomainVG<2>(domain));
-		shared_ptr<Level<2>>              coarser_level(new Level<2>(vg));
+		shared_ptr<Level<2>>              coarser_level(new Level<2>(domain, vg));
 
 		// link levels
 		coarser_level->setFiner(finer_level);

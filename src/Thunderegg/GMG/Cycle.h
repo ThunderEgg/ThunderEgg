@@ -122,7 +122,7 @@ template <size_t D> class Cycle : public Operator<D>
 		u->set(0);
 		VecList      u_vectors;
 		ConstVecList f_vectors;
-		f_vectors.push_back(f);  /* Appends */
+		f_vectors.push_back(f); /* Appends */
 		u_vectors.push_back(u);
 		visit(*finest_level, u_vectors, f_vectors);
 		f_vectors.pop_front();

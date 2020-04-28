@@ -2,7 +2,7 @@
  *  Thunderegg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019-2020 Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-#include "catch.hpp"
-#include <Thunderegg/GMG/InterLevelComm.h>
-TEST_CASE("2-processor InterLevelComm", "[GMG::InterLevelComm]") {}
+
+#include <Thunderegg/GMG/MPIInterpolator.h>
+template class Thunderegg::GMG::MPIInterpolator<2>;
+template class Thunderegg::GMG::MPIInterpolator<3>;

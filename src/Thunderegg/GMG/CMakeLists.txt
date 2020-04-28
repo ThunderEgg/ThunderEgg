@@ -5,6 +5,9 @@ list(APPEND Thunderegg_SRCS Thunderegg/GMG/Cycle.cpp)
 
 list(APPEND Thunderegg_HDRS Thunderegg/GMG/CycleFactory.h)
 
+list(APPEND Thunderegg_HDRS Thunderegg/GMG/CycleFactory2d.h)
+list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory2d.cpp)
+
 list(APPEND Thunderegg_HDRS Thunderegg/GMG/CycleFactoryCtx.h)
 
 list(APPEND Thunderegg_HDRS Thunderegg/GMG/CycleOpts.h)
@@ -21,6 +24,9 @@ list(APPEND Thunderegg_HDRS Thunderegg/GMG/Level.h)
 
 list(APPEND Thunderegg_HDRS Thunderegg/GMG/LinearRestrictor.h)
 list(APPEND Thunderegg_SRCS Thunderegg/GMG/LinearRestrictor.cpp)
+
+list(APPEND Thunderegg_HDRS Thunderegg/GMG/MPIInterpolator.h)
+list(APPEND Thunderegg_SRCS Thunderegg/GMG/MPIInterpolator.cpp)
 
 list(APPEND Thunderegg_HDRS Thunderegg/GMG/MPIRestrictor.h)
 list(APPEND Thunderegg_SRCS Thunderegg/GMG/MPIRestrictor.cpp)

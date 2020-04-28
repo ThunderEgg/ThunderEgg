@@ -26,22 +26,22 @@
 #include <Thunderegg/Experimental/DomGen.h>
 #include <Thunderegg/Experimental/OctTree.h>
 #include <Thunderegg/GMG/LinearRestrictor.h>
-#include <Thunderegg/PetscVector.h>
+#include <Thunderegg/ValVector.h>
 using namespace std;
 using namespace Thunderegg;
-TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
+const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+TEST_CASE("Linear Test LinearRestrictor on uniform 4x4", "[GMG::LinearRestrictor]")
 {
-	auto            nx        = GENERATE(2, 10);
-	auto            ny        = GENERATE(2, 10);
-	int             num_ghost = 1;
-	DomainReader<2> domain_reader("mesh_inputs/uiform_single_patch_coarser_level.json", {nx, ny},
-	                              num_ghost);
+	auto                  nx        = GENERATE(2, 10);
+	auto                  ny        = GENERATE(2, 10);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = PetscVector<2>::GetNewVector(d_fine);
-	auto coarse_vec      = PetscVector<2>::GetNewVector(d_coarse);
-	auto coarse_expected = PetscVector<2>::GetNewVector(d_coarse);
+	auto fine_vec        = ValVector<2>::GetNewVector(d_fine);
+	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];

@@ -36,18 +36,6 @@ namespace GMG
 template <size_t D> class AvgRstr : public MPIRestrictor<D>
 {
 	private:
-	/**
-	 * @brief The coarse DomainCollection that is being restricted to.
-	 */
-	std::shared_ptr<const Domain<D>> coarse_domain;
-	/**
-	 * @brief The fine DomainCollection that is being restricted from.
-	 */
-	std::shared_ptr<const Domain<D>> fine_domain;
-	/**
-	 * @brief The communication package for restricting between levels.
-	 */
-	std::shared_ptr<InterLevelComm<D>> ilc;
 
 	void
 	restrictPatches(const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
@@ -59,7 +47,7 @@ template <size_t D> class AvgRstr : public MPIRestrictor<D>
 			LocalData<D> coarse_local_data            = coarser_vector->getLocalData(pair.first);
 			LocalData<D> fine_data = finer_vector->getLocalData(pinfo->local_index);
 
-			if (pinfo.hasCoarseParent()) {
+			if (pinfo->hasCoarseParent()) {
 				Orthant<D>         orth = pinfo->orth_on_parent;
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
@@ -85,19 +73,11 @@ template <size_t D> class AvgRstr : public MPIRestrictor<D>
 
 	public:
 	/**
-	 * @brief Create new AvgRstr object.
-	 *
-	 * @param coarse_domain the DomainColleciton that is being restricted to.
-	 * @param fine_domain the DomainCollection that is being restricted from.
-	 * @param ilc the communcation package for these two levels.
+	 * @brief Construct a new Avg Rstr object
+	 * 
+	 * @param ilc_in the InterLevelComm
 	 */
-	AvgRstr(std::shared_ptr<const Domain<D>> coarse_domain,
-	        std::shared_ptr<const Domain<D>> fine_domain, std::shared_ptr<InterLevelComm<D>> ilc)
-	{
-		this->coarse_domain = coarse_domain;
-		this->fine_domain   = fine_domain;
-		this->ilc           = ilc;
-	}
+	AvgRstr(std::shared_ptr<InterLevelComm<D>> ilc_in) : MPIRestrictor<D>(ilc_in) {}
 	class Generator
 	{
 		public:

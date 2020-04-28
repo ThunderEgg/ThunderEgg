@@ -19,22 +19,22 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_GMG_MPIRESTRICTOR_H
-#define THUNDEREGG_GMG_MPIRESTRICTOR_H
+#ifndef THUNDEREGG_GMG_MPIINTERPOLATOR_H
+#define THUNDEREGG_GMG_MPIINTERPOLATOR_H
 #include <Thunderegg/Domain.h>
 #include <Thunderegg/GMG/InterLevelComm.h>
+#include <Thunderegg/GMG/Interpolator.h>
 #include <Thunderegg/GMG/Level.h>
-#include <Thunderegg/GMG/Restrictor.h>
 #include <memory>
 namespace Thunderegg
 {
 namespace GMG
 {
 /**
- * @brief Restrictor that implements the necessary mpi calls, derived classes only have to
- * implement restrictorPatches method
+ * @brief Interpolator that implements the necessary mpi calls, derived classes only have to
+ * implement interpolatePatches method
  */
-template <size_t D> class MPIRestrictor : public Restrictor<D>
+template <size_t D> class MPIInterpolator : public Interpolator<D>
 {
 	private:
 	/**
@@ -43,61 +43,59 @@ template <size_t D> class MPIRestrictor : public Restrictor<D>
 	std::shared_ptr<InterLevelComm<D>> ilc;
 
 	/**
-	 * @brief Restrict values into coarse vector
+	 * @brief Interpolate values from coarse vector to the finer vector
 	 *
-	 * The idea behind this is that this function will be called twice. Once to fill in the ghost
-	 * values, and once to fill in the local values. The ghost values will be filled first and the
-	 * local values will be fill while MPI communication is happening.
+	 * The idea behind this is that this function will be called twice. Once to interpolate from the
+	 * local values, and once to interpolate from the ghost values. The local values will be
+	 * interpolated from first, while MPI communication is happening, and the ghost values will be
+	 * interpolated from last.
 	 *
 	 * @param patches pairs where the first value is the index in the coarse vector and the second
 	 * value is a pointer to the PatchInfo object
 	 * @param finer_vector the finer vector
 	 * @param coarser_vector the coaser vector
 	 */
-	virtual void
-	restrictPatches(const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
-	                std::shared_ptr<const Vector<D>> finer_vector,
-	                std::shared_ptr<Vector<D>>       coarser_vector) const = 0;
+	virtual void interpolatePatches(
+	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
+	std::shared_ptr<const Vector<D>>                                        coarser_vector,
+	std::shared_ptr<Vector<D>>                                              finer_vector) const = 0;
 
 	public:
 	/**
-	 * @brief Create new LinearRestrictor object.
+	 * @brief Create new MPIInterpolator object.
 	 *
 	 * @param ilc the communcation package for the two levels.
 	 */
-	MPIRestrictor(std::shared_ptr<InterLevelComm<D>> ilc_in)
+	MPIInterpolator(std::shared_ptr<InterLevelComm<D>> ilc_in)
 	{
 		this->ilc = ilc_in;
 	}
 	/**
-	 * @brief restriction function
+	 * @brief interpolation function
 	 *
-	 * @param coarse the output vector that is restricted to.
-	 * @param fine the input vector that is restricted.
+	 * @param coarse the input vector that is interpolated from
+	 * @param fine the output vector that is interpolated to.
 	 */
-	void restrict(std::shared_ptr<Vector<D>> coarse, std::shared_ptr<const Vector<D>> fine) const
+	void interpolate(std::shared_ptr<const Vector<D>> coarse, std::shared_ptr<Vector<D>> fine) const
 	{
 		std::shared_ptr<Vector<D>> coarse_ghost = ilc->getNewGhostVector();
 
-		// fill in ghost values
-		restrictPatches(ilc->getPatchesWithGhostParent(), fine, coarse_ghost);
-
-		// clear values in coarse vector
-		coarse->set(0);
-
 		// start scatter for ghost values
-		ilc->sendGhostPatchesStart(coarse, coarse_ghost);
+		ilc->getGhostPatchesStart(coarse, coarse_ghost);
 
-		// fill in local values
-		restrictPatches(ilc->getPatchesWithLocalParent(), fine, coarse);
+		// interpolate form local values
+		interpolatePatches(ilc->getPatchesWithLocalParent(), coarse, fine);
 
 		// finish scatter for ghost values
-		ilc->sendGhostPatchesFinish(coarse, coarse_ghost);
+		ilc->getGhostPatchesFinish(coarse, coarse_ghost);
+
+		// interpolator from ghost values
+		interpolatePatches(ilc->getPatchesWithGhostParent(), coarse_ghost, fine);
 	}
 };
 } // namespace GMG
 } // namespace Thunderegg
 // explicit instantiation
-extern template class Thunderegg::GMG::MPIRestrictor<2>;
-extern template class Thunderegg::GMG::MPIRestrictor<3>;
+extern template class Thunderegg::GMG::MPIInterpolator<2>;
+extern template class Thunderegg::GMG::MPIInterpolator<3>;
 #endif
