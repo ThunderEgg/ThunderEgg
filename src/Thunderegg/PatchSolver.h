@@ -121,7 +121,7 @@ template <size_t D> class PatchSolver : public virtual Operator<D>, public virtu
 	                    std::shared_ptr<Vector<D>>       u) const override
 	{
 		if (timer) {
-			timer->start("Total Patch Solve");
+			timer->start("Total Patch Smooth");
 		}
 		ghost_filler->fillGhost(u);
 		for (std::shared_ptr<const PatchInfo<D>> pinfo : domain->getPatchInfoVector()) {
@@ -135,7 +135,7 @@ template <size_t D> class PatchSolver : public virtual Operator<D>, public virtu
 			}
 		}
 		if (timer) {
-			timer->stop("Total Patch Solve");
+			timer->stop("Total Patch Smooth");
 		}
 	}
 };

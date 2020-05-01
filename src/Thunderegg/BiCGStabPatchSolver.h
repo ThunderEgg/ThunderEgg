@@ -136,8 +136,8 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		              std::shared_ptr<const PatchOperator<D>> op)
 		{
 			this->pinfo = std::make_shared<PatchInfo<D>>(*pinfo);
-			//this->pinfo->nbr_info.fill(nullptr);
-			this->op    = op;
+			this->pinfo->nbr_info.fill(nullptr);
+			this->op = op;
 		}
 		void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 		{
@@ -190,8 +190,9 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		auto f_copy = vg->getNewVector();
 		f_copy->copy(f_single);
 		op->addGhostToRHS(pinfo, u, f_copy->getLocalData(0));
+		// u_single->set(0);
 
-        // printf("Calling BiCG patch solver\n");
+		// printf("Calling BiCG patch solver\n");
 		BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
 	}
 	/**

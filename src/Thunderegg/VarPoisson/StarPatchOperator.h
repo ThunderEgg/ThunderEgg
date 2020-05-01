@@ -106,13 +106,14 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			if (pinfo->hasNbr(s)) {
 				double                 h2      = pow(pinfo->spacings[s.axis()], 2);
 				LocalData<D - 1>       f_inner = f.getSliceOnSide(s);
-				LocalData<D - 1> u_ghost = u.getSliceOnSide(s, -1);
-				LocalData<D - 1> u_inner = u.getSliceOnSide(s);
+				LocalData<D - 1>       u_ghost = u.getSliceOnSide(s, -1);
+				LocalData<D - 1>       u_inner = u.getSliceOnSide(s);
 				const LocalData<D - 1> c_ghost = c.getSliceOnSide(s, -1);
 				const LocalData<D - 1> c_inner = c.getSliceOnSide(s);
 				nested_loop<D - 1>(
 				f_inner.getStart(), f_inner.getEnd(), [&](const std::array<int, D - 1> &coord) {
-					f_inner[coord] -= u_ghost[coord] * (c_inner[coord] + c_ghost[coord]) / (2 * h2);
+					f_inner[coord] -= (u_ghost[coord] + u_inner[coord])
+					                  * (c_inner[coord] + c_ghost[coord]) / (2 * h2);
 					u_ghost[coord] = 0;
 				});
 			}
@@ -208,6 +209,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			auto                             finer_op     = generated_operators[finer_domain];
 			auto new_coeffs = ValVector<D>::GetNewVector(level->getDomain());
 			level->getFiner()->getRestrictor().restrict(new_coeffs, finer_op->coeffs);
+			new_coeffs->setWithGhost(1);
 			coarser_op.reset(
 			new StarPatchOperator<D>(new_coeffs, level->getDomain(), filler_gen(level)));
 			return coarser_op;

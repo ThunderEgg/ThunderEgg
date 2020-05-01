@@ -487,7 +487,7 @@ template <size_t D> class Vector
 		return global_max;
 	}
 	/**
-	 * @brief get the infnorm
+	 * @brief get the dot product
 	 */
 	virtual double dot(std::shared_ptr<const Vector<D>> b) const
 	{

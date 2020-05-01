@@ -606,21 +606,21 @@ int main(int argc, char *argv[])
 		}
 		timer->stop("Preconditioner Setup");
 
-		PW<KSP> solver;
+		//PW<KSP> solver;
 		// setup petsc if needed
 		if (solver_type == "petsc") {
 			timer->start("Petsc Setup");
 
-			KSPCreate(MPI_COMM_WORLD, &solver);
-			KSPSetFromOptions(solver);
-			KSPSetOperators(solver, A_petsc, A_petsc);
+			//KSPCreate(MPI_COMM_WORLD, &solver);
+			//KSPSetFromOptions(solver);
+			//KSPSetOperators(solver, A_petsc, A_petsc);
 			if (M != nullptr) {
 				PC M_petsc;
-				KSPGetPC(solver, &M_petsc);
+				//KSPGetPC(solver, &M_petsc);
 				PetscShellCreator::getPCShell(M_petsc, M, domain);
 			}
-			KSPSetUp(solver);
-			KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
+			//KSPSetUp(solver);
+			//KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
 
 			timer->stop("Petsc Setup");
 		}
@@ -633,7 +633,7 @@ int main(int argc, char *argv[])
 		if (solver_type == "petsc") {
 			//KSPSolve(solver, f->vec, u->vec);
 			int its;
-			KSPGetIterationNumber(solver, &its);
+			//KSPGetIterationNumber(solver, &its);
 			if (my_global_rank == 0) {
 				cout << "Iterations: " << its << endl;
 			}
