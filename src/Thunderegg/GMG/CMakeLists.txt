@@ -5,8 +5,10 @@ list(APPEND Thunderegg_SRCS Thunderegg/GMG/Cycle.cpp)
 
 list(APPEND Thunderegg_HDRS Thunderegg/GMG/CycleFactory.h)
 
-list(APPEND Thunderegg_HDRS Thunderegg/GMG/CycleFactory2d.h)
-list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory2d.cpp)
+if(PETSC_FOUND)
+  list(APPEND Thunderegg_HDRS Thunderegg/GMG/CycleFactory2d.h)
+  list(APPEND Thunderegg_SRCS Thunderegg/GMG/CycleFactory2d.cpp)
+endif(PETSC_FOUND)
 
 list(APPEND Thunderegg_HDRS Thunderegg/GMG/CycleFactoryCtx.h)
 
