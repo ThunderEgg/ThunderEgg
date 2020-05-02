@@ -58,18 +58,6 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[GMG::StarPatchOperator]")
 	auto g_zero = ValVector<2>::GetNewVector(d_fine);
 	DomainTools<2>::setValuesWithGhost(d_fine, g_zero, gfun);
 	g_zero->set(0);
-	/*
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
-	    auto ld = g_zero->getLocalData(0);
-	    for (Side<2> s : Side<2>::getValues()) {
-	        if (!pinfo->hasNbr(s)) {
-	            auto ghosts = ld.getGhostSliceOnSide(s, 1);
-	            nested_loop<1>(ghosts.getStart(), ghosts.getEnd(),
-	                           [&](const array<int, 1> &coord) { ghosts[coord] = 0; });
-	        }
-	    }
-	}
-	*/
 
 	auto h_vec = ValVector<2>::GetNewVector(d_fine);
 	DomainTools<2>::setValuesWithGhost(d_fine, h_vec, hfun);
@@ -80,11 +68,22 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[GMG::StarPatchOperator]")
 	VarPoisson::StarPatchOperator<2>::addDrichletBCToRHS(d_fine, f_vec, gfun, hfun);
 
 	auto f_expected = ValVector<2>::GetNewVector(d_fine);
+	f_expected->copy(f_vec);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		p_operator->applySinglePatch(pinfo, g_zero->getLocalData(pinfo->local_index),
-		                             f_expected->getLocalData(pinfo->local_index));
+		auto u = g_vec->getLocalData(pinfo->local_index);
+		auto f = f_expected->getLocalData(pinfo->local_index);
+		for (Side<2> s : Side<2>::getValues()) {
+			if (pinfo->hasNbr(s)) {
+				double h2      = std::pow(pinfo->spacings[s.axis()], 2);
+				auto   f_slice = f.getSliceOnSide(s);
+				auto   u_inner = u.getSliceOnSide(s);
+				auto   u_ghost = u.getSliceOnSide(s, -1);
+				nested_loop<1>(f_slice.getStart(), f_slice.getEnd(), [&](std::array<int, 1> coord) {
+					f_slice[coord] += -(u_inner[coord] + u_ghost[coord]) / (h2);
+				});
+			}
+		}
 	}
-	f_expected->scaleThenAdd(-1.0, f_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		p_operator->addGhostToRHS(pinfo, g_vec->getLocalData(pinfo->local_index),
