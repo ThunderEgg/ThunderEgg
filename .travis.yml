@@ -21,6 +21,8 @@ jobs:
           - libblas-dev
           - liblapack-dev
           - libtrilinos-zoltan-dev
+    after_script: 
+        - sonar-scanner
   - addons:
       apt:
         packages:
