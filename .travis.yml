@@ -9,6 +9,8 @@ apt:
 jobs:
   include:
   - addons:
+      sonarcloud:
+          organization: "thunderegg"
       apt:
         packages:
           - cmake
