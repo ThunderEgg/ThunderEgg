@@ -22,6 +22,7 @@ jobs:
           - liblapack-dev
           - libtrilinos-zoltan-dev
     after_script: 
+        - build-wrapper-linux-x86-64 --out-dir bw-output make clean all
         - sonar-scanner
   - addons:
       apt:
