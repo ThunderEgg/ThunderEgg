@@ -4,7 +4,6 @@ if(PETSC_FOUND)
     test.cpp
     SchurInfo.cpp
     PatchInfo.cpp
-    GMG.cpp
     test.cpp
     Side.cpp
     Octant.cpp
@@ -28,6 +27,16 @@ if(PETSC_FOUND)
   include(CTest)
   include(ParseAndAddCatchTests)
   set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
+
+  foreach(ARG1 RANGE 1 1)
+    set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
+    set(AdditionalCatchParameters WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    parseandaddcatchtests(unit_tests_mpiany)
+    unset(OptionalCatchTestLauncher)
+    unset(AdditionalCatchParameters)
+
+  endforeach(ARG1 RANGE 3)
+
   function(add_mpi_test ARG1)
     set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
     set(AdditionalCatchParameters WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
