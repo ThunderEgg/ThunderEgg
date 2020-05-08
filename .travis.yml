@@ -21,7 +21,6 @@ jobs:
           - libblas-dev
           - liblapack-dev
           - libtrilinos-zoltan-dev
-          - gcovr
     after_script: 
         - gcovr -f src/ -b --sonarqube coverage.xml
         - build-wrapper-linux-x86-64 --out-dir bw-output make clean all
@@ -48,6 +47,7 @@ jobs:
           - libtrilinos-zoltan-dev
 before_install:
   - pip install --user cpp-coveralls
+  - pip install --user gcovr
   - export CXXFLAGS="-std=c++11"
 script:
   - export CXXFLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
