@@ -24,7 +24,7 @@ jobs:
     before_script:
         - export BUILD_WRAPPER="build-wrapper-linux-x86-64 --out-dir bw-output"
     after_script: 
-        - gcovr -f src/ -b --sonarqube coverage.xml
+        - gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
         - sonar-scanner
   - addons:
       apt:
