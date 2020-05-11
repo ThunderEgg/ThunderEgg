@@ -21,9 +21,10 @@ jobs:
           - libblas-dev
           - liblapack-dev
           - libtrilinos-zoltan-dev
+    before_script:
+        - export BUILD_WRAPPER="build-wrapper-linux-x86-64 --out-dir bw-output"
     after_script: 
         - gcovr -f src/ -b --sonarqube coverage.xml
-        - build-wrapper-linux-x86-64 --out-dir bw-output make clean all
         - sonar-scanner
   - addons:
       apt:
@@ -54,7 +55,7 @@ script:
   - export CFLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
   - export LDFLAGS="-lgcov"
   - cmake .
-  - make
+  - $BUILD_WRAPPER make
   - make test
 after_success:
   - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'
