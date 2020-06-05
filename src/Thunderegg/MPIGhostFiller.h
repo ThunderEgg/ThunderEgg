@@ -29,13 +29,21 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 {
 	private:
 	virtual void fillGhostCellsForNbrPatch(const LocalData<D> local_data, LocalData<D> nbr_data,
-	                                       std::vector<Side<D>> side, bool use_orthant,
-	                                       Orthant<D> orthant) const = 0;
+	                                       const std::vector<Side<D>> &side, const NbrType nbr_type,
+	                                       const Orthant<D> orthant) const = 0;
 
-	virtual void fillGhostCellsForLocalPatch(LocalData<D> local_data, std::vector<Side<D>> side,
-	                                         bool use_orthant, Orthant<D> orthant) const = 0;
+	virtual void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                                         LocalData<D> local_data) const = 0;
+
+	protected:
+	std::shared_ptr<Domain<D>> domain;
+	int                        side_cases;
 
 	public:
+	MPIGhostFiller(std::shared_ptr<Domain<D>> domain_in, int side_cases_in)
+	: domain(domain_in), side_cases(side_cases_in)
+	{
+	}
 	/**
 	 * @brief Fill ghost cells on a vector
 	 *
