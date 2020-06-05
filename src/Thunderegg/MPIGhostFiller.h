@@ -28,12 +28,14 @@ namespace Thunderegg
 template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 {
 	private:
-	virtual void fillGhostCellsForNbrPatch(const LocalData<D> local_data, LocalData<D> nbr_data,
-	                                       const std::vector<Side<D>> &side, const NbrType nbr_type,
+	virtual void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                                       const LocalData<D>                  local_data,
+	                                       const LocalData<D> nbr_data, const Side<D> side,
+	                                       const NbrType    nbr_type,
 	                                       const Orthant<D> orthant) const = 0;
 
 	virtual void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                                         LocalData<D> local_data) const = 0;
+	                                         const LocalData<D> local_data) const = 0;
 
 	protected:
 	std::shared_ptr<Domain<D>> domain;
