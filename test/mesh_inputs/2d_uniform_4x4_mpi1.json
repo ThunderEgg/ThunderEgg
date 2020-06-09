@@ -29,15 +29,29 @@
       "nbrs": [
         {
           "side": "east",
-          "type": "normal",
-          "id": 2,
-          "rank": 0
+          "type": "fine",
+          "ids": [
+            9,
+            11
+          ],
+          "ranks": [
+            0,
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
-          "type": "normal",
-          "id": 3,
-          "rank": 0
+          "type": "fine",
+          "ids": [
+            13,
+            14
+          ],
+          "ranks": [
+            0,
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -70,15 +84,29 @@
       "nbrs": [
         {
           "side": "west",
-          "type": "normal",
-          "id": 1,
-          "rank": 0
+          "type": "fine",
+          "ids": [
+            6,
+            8
+          ],
+          "ranks": [
+            0,
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
-          "type": "normal",
-          "id": 4,
-          "rank": 0
+          "type": "fine",
+          "ids": [
+            17,
+            18
+          ],
+          "ranks": [
+            0,
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -111,15 +139,29 @@
       "nbrs": [
         {
           "side": "east",
-          "type": "normal",
-          "id": 4,
-          "rank": 0
+          "type": "fine",
+          "ids": [
+            17,
+            19
+          ],
+          "ranks": [
+            0,
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
-          "type": "normal",
-          "id": 1,
-          "rank": 0
+          "type": "fine",
+          "ids": [
+            7,
+            8
+          ],
+          "ranks": [
+            0,
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -152,15 +194,29 @@
       "nbrs": [
         {
           "side": "west",
-          "type": "normal",
-          "id": 3,
-          "rank": 0
+          "type": "fine",
+          "ids": [
+            14,
+            16
+          ],
+          "ranks": [
+            0,
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
-          "type": "normal",
-          "id": 2,
-          "rank": 0
+          "type": "fine",
+          "ids": [
+            11,
+            12
+          ],
+          "ranks": [
+            0,
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     }
@@ -184,14 +240,24 @@
         {
           "side": "east",
           "type": "normal",
-          "id": 6,
-          "rank": 0
+          "ids": [
+            6
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 7,
-          "rank": 0
+          "ids": [
+            7
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -213,20 +279,35 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 5,
-          "rank": 0
+          "ids": [
+            5
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "east",
           "type": "normal",
-          "id": 9,
-          "rank": 0
+          "ids": [
+            9
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 8,
-          "rank": 0
+          "ids": [
+            8
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -248,20 +329,35 @@
         {
           "side": "east",
           "type": "normal",
-          "id": 8,
-          "rank": 0
+          "ids": [
+            8
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 5,
-          "rank": 0
+          "ids": [
+            5
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 13,
-          "rank": 0
+          "ids": [
+            13
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -283,20 +379,35 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 6,
-          "rank": 0
+          "ids": [
+            6
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "east",
           "type": "normal",
-          "id": 10,
-          "rank": 0
+          "ids": [
+            10
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 11,
-          "rank": 0
+          "ids": [
+            11
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -318,26 +429,46 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 7,
-          "rank": 0
+          "ids": [
+            7
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "east",
           "type": "normal",
-          "id": 11,
-          "rank": 0
+          "ids": [
+            11
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 6,
-          "rank": 0
+          "ids": [
+            6
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 14,
-          "rank": 0
+          "ids": [
+            14
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -359,20 +490,35 @@
         {
           "side": "east",
           "type": "normal",
-          "id": 14,
-          "rank": 0
+          "ids": [
+            14
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 7,
-          "rank": 0
+          "ids": [
+            7
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 15,
-          "rank": 0
+          "ids": [
+            15
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -394,14 +540,24 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 9,
-          "rank": 0
+          "ids": [
+            9
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 12,
-          "rank": 0
+          "ids": [
+            12
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -423,26 +579,46 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 8,
-          "rank": 0
+          "ids": [
+            8
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "east",
           "type": "normal",
-          "id": 12,
-          "rank": 0
+          "ids": [
+            12
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 9,
-          "rank": 0
+          "ids": [
+            9
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 17,
-          "rank": 0
+          "ids": [
+            17
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -464,26 +640,46 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 13,
-          "rank": 0
+          "ids": [
+            13
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "east",
           "type": "normal",
-          "id": 17,
-          "rank": 0
+          "ids": [
+            17
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 8,
-          "rank": 0
+          "ids": [
+            8
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 16,
-          "rank": 0
+          "ids": [
+            16
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -505,14 +701,24 @@
         {
           "side": "east",
           "type": "normal",
-          "id": 16,
-          "rank": 0
+          "ids": [
+            16
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 13,
-          "rank": 0
+          "ids": [
+            13
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -534,20 +740,35 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 11,
-          "rank": 0
+          "ids": [
+            11
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 10,
-          "rank": 0
+          "ids": [
+            10
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 18,
-          "rank": 0
+          "ids": [
+            18
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -569,26 +790,46 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 14,
-          "rank": 0
+          "ids": [
+            14
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "east",
           "type": "normal",
-          "id": 18,
-          "rank": 0
+          "ids": [
+            18
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 11,
-          "rank": 0
+          "ids": [
+            11
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 19,
-          "rank": 0
+          "ids": [
+            19
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -610,20 +851,35 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 15,
-          "rank": 0
+          "ids": [
+            15
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "east",
           "type": "normal",
-          "id": 19,
-          "rank": 0
+          "ids": [
+            19
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 14,
-          "rank": 0
+          "ids": [
+            14
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -645,20 +901,35 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 17,
-          "rank": 0
+          "ids": [
+            17
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 12,
-          "rank": 0
+          "ids": [
+            12
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 20,
-          "rank": 0
+          "ids": [
+            20
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -680,20 +951,35 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 16,
-          "rank": 0
+          "ids": [
+            16
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "east",
           "type": "normal",
-          "id": 20,
-          "rank": 0
+          "ids": [
+            20
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 17,
-          "rank": 0
+          "ids": [
+            17
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -715,14 +1001,24 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 19,
-          "rank": 0
+          "ids": [
+            19
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 18,
-          "rank": 0
+          "ids": [
+            18
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     }

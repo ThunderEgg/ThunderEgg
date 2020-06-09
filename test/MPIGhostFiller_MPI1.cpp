@@ -117,10 +117,14 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 							check_for_nbr_call(call);
 
 						} break;
+						default:
+							REQUIRE(false);
 					}
 				}
 			}
 		}
+		CHECK(remaining_local_calls.empty());
+		CHECK(remaining_nbr_calls.empty());
 	}
 };
 template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
@@ -288,7 +292,8 @@ TEST_CASE("No calls for 1 patch domain", "[MPIGhostFiller]")
 
 	mgf.fillGhost(vec);
 
-	CHECK(mgf.called == false);
+	CHECK(mgf.called == true);
+	mgf.checkCalls();
 }
 TEST_CASE("Calls for various domains 1-side cases", "[MPIGhostFiller]")
 {

@@ -48,14 +48,24 @@
         {
           "side": "east",
           "type": "normal",
-          "id": 2,
-          "rank": 0
+          "ids": [
+            2
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 3,
-          "rank": 0
+          "ids": [
+            3
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -77,14 +87,24 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 1,
-          "rank": 0
+          "ids": [
+            1
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "north",
           "type": "normal",
-          "id": 4,
-          "rank": 0
+          "ids": [
+            4
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -106,14 +126,24 @@
         {
           "side": "east",
           "type": "normal",
-          "id": 4,
-          "rank": 0
+          "ids": [
+            4
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 1,
-          "rank": 0
+          "ids": [
+            1
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     },
@@ -135,14 +165,24 @@
         {
           "side": "west",
           "type": "normal",
-          "id": 3,
-          "rank": 0
+          "ids": [
+            3
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         },
         {
           "side": "south",
           "type": "normal",
-          "id": 2,
-          "rank": 0
+          "ids": [
+            2
+          ],
+          "ranks": [
+            0
+          ],
+          "orth_on_coarse": 0
         }
       ]
     }

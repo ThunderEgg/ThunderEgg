@@ -79,11 +79,23 @@ template <size_t D> class DomainReader
 			} else {
 				throw "parsing error";
 			}
+			using array  = std::array<int, Thunderegg::Orthant<D - 1>::num_orthants>;
+			using array1 = std::array<int, 1>;
 			switch (nbr_type) {
 				case Thunderegg::NbrType::Normal: {
 					pinfo->nbr_info[side.toInt()].reset(
-					new Thunderegg::NormalNbrInfo<2>(nbr_j.at("id")));
-					pinfo->getNormalNbrInfo(side).updateRank(nbr_j.at("rank"));
+					new Thunderegg::NormalNbrInfo<2>(nbr_j.at("ids").get<array1>()[0]));
+					pinfo->getNormalNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
+				} break;
+				case Thunderegg::NbrType::Fine: {
+					pinfo->nbr_info[side.toInt()].reset(
+					new Thunderegg::FineNbrInfo<2>(nbr_j.at("ids").get<array>()));
+					pinfo->getFineNbrInfo(side).ranks = nbr_j.at("ranks").get<array>();
+				} break;
+				case Thunderegg::NbrType::Coarse: {
+					pinfo->nbr_info[side.toInt()].reset(new Thunderegg::CoarseNbrInfo<2>(
+					nbr_j.at("ids").get<array1>()[0], nbr_j.at("orth_on_coarse").get<int>()));
+					pinfo->getCoarseNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
 				} break;
 				default:
 					throw "parsing error";
