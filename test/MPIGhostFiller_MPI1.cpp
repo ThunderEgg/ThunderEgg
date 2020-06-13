@@ -70,10 +70,11 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		  };
 		for (auto patch : this->domain->getPatchInfoVector()) {
 			INFO("id: " << patch->id);
-			INFO("start: ");
+			std::string starts = "starts: ";
 			for (size_t i = 0; i < D; i++) {
-				INFO(patch->starts[i]);
+				starts = starts + " " + std::to_string(patch->starts[i]);
 			}
+			INFO(starts);
 
 			// check for local call
 			auto found_call
@@ -109,22 +110,50 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 							INFO("NbrType: Coarse");
 
 							auto orthant = Orthant<D>::getValuesOnSide(
-							side)[patch->getCoarseNbrInfo(side).orth_on_coarse.toInt()];
+							side.opposite())[patch->getCoarseNbrInfo(side).orth_on_coarse.toInt()];
 
 							INFO("Orthant: " << orthant.toInt());
 
-							auto call = make_tuple(patch, side, NbrType::Fine, orthant);
+							auto call = make_tuple(patch, side, NbrType::Coarse, orthant);
 							check_for_nbr_call(call);
 
 						} break;
 						default:
-							REQUIRE(false);
+							CHECK(false);
 					}
 				}
 			}
 		}
 		CHECK(remaining_local_calls.empty());
 		CHECK(remaining_nbr_calls.empty());
+		INFO("REMAINING CALL")
+		for (auto call : remaining_nbr_calls) {
+			auto patch = std::get<0>(call);
+			INFO("id: " << patch->id);
+			std::string starts = "starts: ";
+			for (size_t i = 0; i < D; i++) {
+				starts = starts + " " + std::to_string(patch->starts[i]);
+			}
+			INFO(starts);
+			INFO("side: " << std::get<1>(call));
+			string nbrtype = "";
+			switch (std::get<2>(call)) {
+				case NbrType::Normal:
+					nbrtype = "normal";
+					break;
+				case NbrType::Fine:
+					nbrtype = "fine";
+					break;
+				case NbrType::Coarse:
+					nbrtype = "coarse";
+					break;
+				default:
+					nbrtype = "???";
+			}
+			INFO("nbrtype: " << nbrtype);
+			INFO("orthant: " << std::get<3>(call).toInt());
+			CHECK(false);
+		}
 	}
 };
 template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
@@ -176,10 +205,11 @@ template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 			auto data = vec->getLocalData(pinfo->local_index);
 			// check that vector was not modified on the interior
 			nested_loop<D>(data.getStart(), data.getEnd(), [&](const std::array<int, D> &coord) {
-				INFO("coord: ");
+				std::string coord_str = "coord: ";
 				for (size_t i = 0; i < D; i++) {
-					INFO(coord[i]);
+					coord_str += " " + std::to_string(coord[i]);
 				}
+				INFO(coord_str);
 				CHECK(data[coord] == pinfo->id);
 			});
 			// check the ghost cells
@@ -199,10 +229,12 @@ template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 								nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
 								                   [&](std::array<int, D - 1> &coord) {
-									                   INFO("coord: ");
+									                   std::string coord_str = "coord: ";
 									                   for (size_t i = 0; i < D - 1; i++) {
-										                   INFO(coord[i]);
+										                   coord_str
+										                   += " " + std::to_string(coord[i]);
 									                   }
+									                   INFO(coord_str);
 									                   CHECK(slice[coord] == nbrinfo.id + index);
 									                   index++;
 								                   });
@@ -223,16 +255,17 @@ template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 							for (int i = 0; i < pinfo->num_ghost_cells; i++) {
 								auto slice = data.getGhostSliceOnSide(s, i + 1);
 
-								nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
-								                   [&](std::array<int, D - 1> &coord) {
-									                   INFO("coord: ");
-									                   for (size_t i = 0; i < D - 1; i++) {
-										                   INFO(coord[i]);
-									                   }
-									                   CHECK(slice[coord]
-									                         == ids + 1 << (D - 1) * index);
-									                   index++;
-								                   });
+								nested_loop<D - 1>(
+								slice.getStart(), slice.getEnd(),
+								[&](std::array<int, D - 1> &coord) {
+									std::string coord_str = "coord: ";
+									for (size_t i = 0; i < D - 1; i++) {
+										coord_str += " " + std::to_string(coord[i]);
+									}
+									INFO(coord_str);
+									CHECK(slice[coord] == ids + (1 << (D - 1)) * index);
+									index++;
+								});
 							}
 						} break;
 						case NbrType::Coarse: {
@@ -246,10 +279,12 @@ template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 								nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
 								                   [&](std::array<int, D - 1> &coord) {
-									                   INFO("coord: ");
+									                   std::string coord_str = "coord: ";
 									                   for (size_t i = 0; i < D - 1; i++) {
-										                   INFO(coord[i]);
+										                   coord_str
+										                   += " " + std::to_string(coord[i]);
 									                   }
+									                   INFO(coord_str);
 									                   CHECK(slice[coord] == nbrinfo.id + index);
 									                   index++;
 								                   });

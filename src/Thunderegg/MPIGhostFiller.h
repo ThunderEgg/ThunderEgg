@@ -51,7 +51,42 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 	 *
 	 * @param u  the vector
 	 */
-	void fillGhost(std::shared_ptr<const Vector<D>> u) const {}
+	void fillGhost(std::shared_ptr<const Vector<D>> u) const
+	{
+		for (auto pinfo : domain->getPatchInfoVector()) {
+			auto data = u->getLocalData(pinfo->local_index);
+			fillGhostCellsForLocalPatch(pinfo, data);
+
+			for (Side<D> s : Side<D>::getValues()) {
+				if (pinfo->hasNbr(s)) {
+					switch (pinfo->getNbrType(s)) {
+						case NbrType::Normal: {
+							auto nbrinfo  = pinfo->getNormalNbrInfo(s);
+							auto nbr_data = u->getLocalData(nbrinfo.local_index);
+							fillGhostCellsForNbrPatch(pinfo, data, nbr_data, s, NbrType::Normal, 0);
+						} break;
+						case NbrType::Fine: {
+							auto nbrinfo  = pinfo->getFineNbrInfo(s);
+							auto orthants = Orthant<D>::getValuesOnSide(s);
+							for (size_t i = 0; i < orthants.size(); i++) {
+								auto nbr_data = u->getLocalData(nbrinfo.local_indexes[i]);
+								fillGhostCellsForNbrPatch(pinfo, data, nbr_data, s, NbrType::Fine,
+								                          orthants[i]);
+							}
+						} break;
+						case NbrType::Coarse: {
+							auto nbrinfo  = pinfo->getCoarseNbrInfo(s);
+							auto nbr_data = u->getLocalData(nbrinfo.local_index);
+							auto orthant  = Orthant<D>::getValuesOnSide(
+                            s.opposite())[nbrinfo.orth_on_coarse.toInt()];
+							fillGhostCellsForNbrPatch(pinfo, data, nbr_data, s, NbrType::Coarse,
+							                          orthant);
+						} break;
+					}
+				}
+			}
+		}
+	}
 };
 } // namespace Thunderegg
 #endif
