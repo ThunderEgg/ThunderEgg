@@ -235,6 +235,30 @@ template <size_t D> class Orthant
 	 */
 	static constexpr int null = -1;
 	/**
+	 * @brief Lower half of line.
+	 */
+	static constexpr int lower = 0b000;
+	/**
+	 * @brief Upper half of line.
+	 */
+	static constexpr int upper = 0b001;
+	/**
+	 * @brief South-West quadrant of square.
+	 */
+	static constexpr int sw = 0b000;
+	/**
+	 * @brief South-East quadrant of square.
+	 */
+	static constexpr int se = 0b001;
+	/**
+	 * @brief North-West quadrant of square.
+	 */
+	static constexpr int nw = 0b010;
+	/**
+	 * @brief North-East quadrant of square.
+	 */
+	static constexpr int ne = 0b011;
+	/**
 	 * @brief Bottom-South-West octant of cube.
 	 */
 	static constexpr int bsw = 0b000;
@@ -355,6 +379,18 @@ template <size_t D> class Orthant
 		return is_bit_set == remainder;
 	}
 	/**
+	 * @brief From the point of view of an axis, get orthant that this orthant lies on in the D-1
+	 * dimension
+	 *
+	 * @param axis the axis
+	 * @return Orthant<D - 1> the resulting orthant
+	 */
+	inline Orthant<D - 1> collapseOnAxis(int axis) const
+	{
+		int upper_mask = (~0x0) << axis;
+		return Orthant<D - 1>(((val >> 1) & upper_mask) | (val & ~upper_mask));
+	}
+	/**
 	 * @brief Get an array of all Orthant<D> values, in increasing order.
 	 *
 	 * @return The array.
@@ -428,6 +464,12 @@ template <size_t D> inline std::array<Orthant<D>, Orthant<D>::num_orthants> Orth
 	return retval;
 }
 template <size_t D> constexpr int Orthant<D>::null;
+template <size_t D> constexpr int Orthant<D>::lower;
+template <size_t D> constexpr int Orthant<D>::upper;
+template <size_t D> constexpr int Orthant<D>::sw;
+template <size_t D> constexpr int Orthant<D>::se;
+template <size_t D> constexpr int Orthant<D>::nw;
+template <size_t D> constexpr int Orthant<D>::ne;
 template <size_t D> constexpr int Orthant<D>::bsw;
 template <size_t D> constexpr int Orthant<D>::bse;
 template <size_t D> constexpr int Orthant<D>::bnw;
@@ -502,7 +544,7 @@ inline std::ostream &operator<<(std::ostream &os, const Side<3> &s)
 /**
  * @brief ostream operator that prints a string representation of orthant enum.
  *
- * For example, Side::west will print out "Orthant::bsw".
+ * For example, Orthant::bsw will print out "Orthant::bsw".
  *
  * @param os the ostream
  * @param s the side to print out.
@@ -536,6 +578,39 @@ inline std::ostream &operator<<(std::ostream &os, const Orthant<3> &o)
 		case Orthant<3>::tne:
 			os << "Orthant::tne";
 			break;
+	}
+	return os;
+}
+/**
+ * @brief ostream operator that prints a string representation of quadrant enum.
+ *
+ * For example, Orthant::sw will print out "Orthant::sw".
+ *
+ * @param os the ostream
+ * @param s the side to print out.
+ *
+ * @return  the ostream
+ */
+inline std::ostream &operator<<(std::ostream &os, const Orthant<2> &o)
+{
+	switch (o.toInt()) {
+		case Orthant<2>::null:
+			os << "Orthant::null";
+			break;
+		case Orthant<2>::sw:
+			os << "Orthant::sw";
+			break;
+		case Orthant<2>::se:
+			os << "Orthant::se";
+			break;
+		case Orthant<2>::nw:
+			os << "Orthant::nw";
+			break;
+		case Orthant<2>::ne:
+			os << "Orthant::ne";
+			break;
+		default:
+			os << "(Invalid Value)";
 	}
 	return os;
 }

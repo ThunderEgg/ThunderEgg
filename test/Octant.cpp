@@ -1,5 +1,7 @@
-#include "catch.hpp"
 #include <Thunderegg/Side.h>
+
+#include "catch.hpp"
+
 using namespace std;
 using namespace Thunderegg;
 TEST_CASE("Orthant<3> Default constructor works", "[Octant]")
@@ -432,5 +434,128 @@ TEST_CASE("Orthant<3> getValuesOnSide() is as expected", "[Octant]")
 		CHECK(values[1] == Orthant<3>(Orthant<3>::tse));
 		CHECK(values[2] == Orthant<3>(Orthant<3>::tnw));
 		CHECK(values[3] == Orthant<3>(Orthant<3>::tne));
+	}
+}
+TEST_CASE("Orthant<3> collapseOnAxis() is as expected", "[Octant]")
+{
+	SECTION("Orthant<3>::bsw")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bsw).collapseOnAxis(0) == Orthant<2>(Orthant<2>::sw));
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bsw).collapseOnAxis(1) == Orthant<2>(Orthant<2>::sw));
+		}
+		SECTION("z axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bsw).collapseOnAxis(2) == Orthant<2>(Orthant<2>::sw));
+		}
+	}
+	SECTION("Orthant<3>::bse")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bse).collapseOnAxis(0) == Orthant<2>(Orthant<2>::sw));
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bse).collapseOnAxis(1) == Orthant<2>(Orthant<2>::se));
+		}
+		SECTION("z axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bse).collapseOnAxis(2) == Orthant<2>(Orthant<2>::se));
+		}
+	}
+	SECTION("Orthant<3>::bnw")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bnw).collapseOnAxis(0) == Orthant<2>(Orthant<2>::se));
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bnw).collapseOnAxis(1) == Orthant<2>(Orthant<2>::sw));
+		}
+		SECTION("z axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bnw).collapseOnAxis(2) == Orthant<2>(Orthant<2>::nw));
+		}
+	}
+	SECTION("Orthant<3>::bne")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bne).collapseOnAxis(0) == Orthant<2>(Orthant<2>::se));
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bne).collapseOnAxis(1) == Orthant<2>(Orthant<2>::se));
+		}
+		SECTION("z axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::bne).collapseOnAxis(2) == Orthant<2>(Orthant<2>::ne));
+		}
+	}
+	SECTION("Orthant<3>::tsw")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tsw).collapseOnAxis(0) == Orthant<2>(Orthant<2>::nw));
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tsw).collapseOnAxis(1) == Orthant<2>(Orthant<2>::nw));
+		}
+		SECTION("z axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tsw).collapseOnAxis(2) == Orthant<2>(Orthant<2>::sw));
+		}
+	}
+	SECTION("Orthant<3>::tse")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tse).collapseOnAxis(0) == Orthant<2>(Orthant<2>::nw));
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tse).collapseOnAxis(1) == Orthant<2>(Orthant<2>::ne));
+		}
+		SECTION("z axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tse).collapseOnAxis(2) == Orthant<2>(Orthant<2>::se));
+		}
+	}
+	SECTION("Orthant<3>::tnw")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tnw).collapseOnAxis(0) == Orthant<2>(Orthant<2>::ne));
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tnw).collapseOnAxis(1) == Orthant<2>(Orthant<2>::nw));
+		}
+		SECTION("z axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tnw).collapseOnAxis(2) == Orthant<2>(Orthant<2>::nw));
+		}
+	}
+	SECTION("Orthant<3>::tne")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tne).collapseOnAxis(0) == Orthant<2>(Orthant<2>::ne));
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tne).collapseOnAxis(1) == Orthant<2>(Orthant<2>::ne));
+		}
+		SECTION("z axis")
+		{
+			CHECK(Orthant<3>(Orthant<3>::tne).collapseOnAxis(2) == Orthant<2>(Orthant<2>::ne));
+		}
 	}
 }
