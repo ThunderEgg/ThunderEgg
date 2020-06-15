@@ -227,71 +227,71 @@ template <size_t D> class Orthant
 	/**
 	 * @brief the value of the enum.
 	 */
-	int val = -1;
+	unsigned int val = ~0x0;
 
 	public:
 	/**
 	 * @brief null value
 	 */
-	static constexpr int null = -1;
+	static constexpr unsigned int null = ~0x0;
 	/**
 	 * @brief Lower half of line.
 	 */
-	static constexpr int lower = 0b000;
+	static constexpr unsigned int lower = 0b000;
 	/**
 	 * @brief Upper half of line.
 	 */
-	static constexpr int upper = 0b001;
+	static constexpr unsigned int upper = 0b001;
 	/**
 	 * @brief South-West quadrant of square.
 	 */
-	static constexpr int sw = 0b000;
+	static constexpr unsigned int sw = 0b000;
 	/**
 	 * @brief South-East quadrant of square.
 	 */
-	static constexpr int se = 0b001;
+	static constexpr unsigned int se = 0b001;
 	/**
 	 * @brief North-West quadrant of square.
 	 */
-	static constexpr int nw = 0b010;
+	static constexpr unsigned int nw = 0b010;
 	/**
 	 * @brief North-East quadrant of square.
 	 */
-	static constexpr int ne = 0b011;
+	static constexpr unsigned int ne = 0b011;
 	/**
 	 * @brief Bottom-South-West octant of cube.
 	 */
-	static constexpr int bsw = 0b000;
+	static constexpr unsigned int bsw = 0b000;
 	/**
 	 * @brief Bottom-South-East octant of cube.
 	 */
-	static constexpr int bse = 0b001;
+	static constexpr unsigned int bse = 0b001;
 	/**
 	 * @brief Bottom-North-West octant of cube.
 	 */
-	static constexpr int bnw = 0b010;
+	static constexpr unsigned int bnw = 0b010;
 	/**
 	 * @brief Bottom-North-East octant of cube.
 	 */
-	static constexpr int bne = 0b011;
+	static constexpr unsigned int bne = 0b011;
 	/**
 	 * @brief Top-South-West octant of cube.
 	 */
-	static constexpr int tsw = 0b100;
+	static constexpr unsigned int tsw = 0b100;
 	/**
 	 * @brief Top-South-East octant of cube.
 	 */
-	static constexpr int tse = 0b101;
+	static constexpr unsigned int tse = 0b101;
 	/**
 	 * @brief Top-North-West octant of cube.
 	 */
-	static constexpr int tnw = 0b110;
+	static constexpr unsigned int tnw = 0b110;
 	/**
 	 * @brief Top-North-East octant of cube.
 	 */
-	static constexpr int tne = 0b111;
+	static constexpr unsigned int tne = 0b111;
 
-	static constexpr int num_orthants = 1 << D;
+	static constexpr unsigned int num_orthants = 1 << D;
 	/**
 	 * @brief Default constructor that initializes the value to -1.
 	 */
@@ -301,7 +301,7 @@ template <size_t D> class Orthant
 	 *
 	 * @param val the value
 	 */
-	Orthant(const int val)
+	Orthant(const unsigned int val)
 	{
 		this->val = val;
 	}
@@ -387,7 +387,7 @@ template <size_t D> class Orthant
 	 */
 	inline Orthant<D - 1> collapseOnAxis(int axis) const
 	{
-		int upper_mask = (~0x0) << axis;
+		unsigned int upper_mask = (~0x0) << axis;
 		return Orthant<D - 1>(((val >> 1) & upper_mask) | (val & ~upper_mask));
 	}
 	/**
@@ -443,10 +443,10 @@ template <size_t D> inline Orthant<D> Orthant<D>::getExteriorNbrOnSide(Side<D> s
 template <size_t D>
 inline std::array<Orthant<D>, Orthant<D>::num_orthants / 2> Orthant<D>::getValuesOnSide(Side<D> s)
 {
-	size_t bit_to_insert = s.toInt() / 2;
-	size_t set_bit       = s.isLowerOnAxis() ? 0 : 1;
-	size_t lower_mask    = ~((~0x0) << bit_to_insert);
-	size_t upper_mask    = (~0x0) << (bit_to_insert + 1);
+	unsigned int bit_to_insert = s.toInt() / 2;
+	unsigned int set_bit       = s.isLowerOnAxis() ? 0 : 1;
+	unsigned int lower_mask    = ~((~0x0) << bit_to_insert);
+	unsigned int upper_mask    = (~0x0) << (bit_to_insert + 1);
 
 	std::array<Orthant<D>, Orthant<D>::num_orthants / 2> retval;
 	for (size_t i = 0; i < Orthant<D>::num_orthants / 2; i++) {
@@ -463,22 +463,22 @@ template <size_t D> inline std::array<Orthant<D>, Orthant<D>::num_orthants> Orth
 	std::iota(retval.begin(), retval.end(), 0);
 	return retval;
 }
-template <size_t D> constexpr int Orthant<D>::null;
-template <size_t D> constexpr int Orthant<D>::lower;
-template <size_t D> constexpr int Orthant<D>::upper;
-template <size_t D> constexpr int Orthant<D>::sw;
-template <size_t D> constexpr int Orthant<D>::se;
-template <size_t D> constexpr int Orthant<D>::nw;
-template <size_t D> constexpr int Orthant<D>::ne;
-template <size_t D> constexpr int Orthant<D>::bsw;
-template <size_t D> constexpr int Orthant<D>::bse;
-template <size_t D> constexpr int Orthant<D>::bnw;
-template <size_t D> constexpr int Orthant<D>::bne;
-template <size_t D> constexpr int Orthant<D>::tsw;
-template <size_t D> constexpr int Orthant<D>::tse;
-template <size_t D> constexpr int Orthant<D>::tnw;
-template <size_t D> constexpr int Orthant<D>::tne;
-template <size_t D> constexpr int Orthant<D>::num_orthants;
+template <size_t D> constexpr unsigned int Orthant<D>::null;
+template <size_t D> constexpr unsigned int Orthant<D>::lower;
+template <size_t D> constexpr unsigned int Orthant<D>::upper;
+template <size_t D> constexpr unsigned int Orthant<D>::sw;
+template <size_t D> constexpr unsigned int Orthant<D>::se;
+template <size_t D> constexpr unsigned int Orthant<D>::nw;
+template <size_t D> constexpr unsigned int Orthant<D>::ne;
+template <size_t D> constexpr unsigned int Orthant<D>::bsw;
+template <size_t D> constexpr unsigned int Orthant<D>::bse;
+template <size_t D> constexpr unsigned int Orthant<D>::bnw;
+template <size_t D> constexpr unsigned int Orthant<D>::bne;
+template <size_t D> constexpr unsigned int Orthant<D>::tsw;
+template <size_t D> constexpr unsigned int Orthant<D>::tse;
+template <size_t D> constexpr unsigned int Orthant<D>::tnw;
+template <size_t D> constexpr unsigned int Orthant<D>::tne;
+template <size_t D> constexpr unsigned int Orthant<D>::num_orthants;
 /**
  * @brief ostream operator that prints a string representation of side enum.
  *
