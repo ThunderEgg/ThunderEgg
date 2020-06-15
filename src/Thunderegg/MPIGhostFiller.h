@@ -38,11 +38,11 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 	                                         const LocalData<D> local_data) const = 0;
 
 	protected:
-	std::shared_ptr<Domain<D>> domain;
-	int                        side_cases;
+	std::shared_ptr<const Domain<D>> domain;
+	int                              side_cases;
 
 	public:
-	MPIGhostFiller(std::shared_ptr<Domain<D>> domain_in, int side_cases_in)
+	MPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in)
 	: domain(domain_in), side_cases(side_cases_in)
 	{
 	}
@@ -53,6 +53,19 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	void fillGhost(std::shared_ptr<const Vector<D>> u) const
 	{
+		for (auto pinfo : domain->getPatchInfoVector()) {
+			const LocalData<2> this_patch = u->getLocalData(pinfo->local_index);
+			for (Side<2> s : Side<2>::getValues()) {
+				if (pinfo->hasNbr(s)) {
+					for (int i = 0; i < pinfo->num_ghost_cells; i++) {
+						auto this_ghost = this_patch.getGhostSliceOnSide(s, i + 1);
+						nested_loop<1>(
+						this_ghost.getStart(), this_ghost.getEnd(),
+						[&](const std::array<int, 1> &coord) { this_ghost[coord] = 0; });
+					}
+				}
+			}
+		}
 		for (auto pinfo : domain->getPatchInfoVector()) {
 			auto data = u->getLocalData(pinfo->local_index);
 			fillGhostCellsForLocalPatch(pinfo, data);

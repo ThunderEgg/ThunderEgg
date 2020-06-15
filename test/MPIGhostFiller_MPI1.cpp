@@ -37,7 +37,7 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 	}
 
 	public:
-	CallMockMPIGhostFiller(std::shared_ptr<Domain<D>> domain_in, int side_cases_in)
+	CallMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in)
 	: MPIGhostFiller<D>(domain_in, side_cases_in)
 	{
 	}
@@ -181,7 +181,7 @@ template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 	}
 
 	public:
-	ExchangeMockMPIGhostFiller(std::shared_ptr<Domain<D>> domain_in, int side_cases_in)
+	ExchangeMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in)
 	: MPIGhostFiller<D>(domain_in, side_cases_in)
 	{
 	}
@@ -371,6 +371,31 @@ TEST_CASE("Exchange for various domains 1-side cases", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, 1);
 
+	mgf.fillGhost(vec);
+
+	mgf.checkVector(vec);
+}
+TEST_CASE("Two Exchanges for various domains 1-side cases", "[MPIGhostFiller]")
+{
+	auto mesh_file
+	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto                  nx        = GENERATE(2);
+	auto                  ny        = GENERATE(2);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+
+	auto vec = ValVector<2>::GetNewVector(d_fine);
+	for (auto pinfo : d_fine->getPatchInfoVector()) {
+		auto data = vec->getLocalData(pinfo->local_index);
+		nested_loop<2>(data.getStart(), data.getEnd(),
+		               [&](const std::array<int, 2> &coord) { data[coord] = pinfo->id; });
+	}
+
+	ExchangeMockMPIGhostFiller<2> mgf(d_fine, 1);
+
+	mgf.fillGhost(vec);
 	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
