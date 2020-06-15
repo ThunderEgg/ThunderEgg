@@ -56,6 +56,6 @@ script:
   - export LDFLAGS="-lgcov"
   - cmake .
   - $BUILD_WRAPPER make
-  - make test
+  - ctest -V
 after_success:
   - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'
