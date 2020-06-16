@@ -8,31 +8,12 @@
 using namespace std;
 using namespace Thunderegg;
 
-constexpr auto single_mesh_file  = "mesh_inputs/2d_uniform_2x2_mpi1.json";
-constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
-constexpr auto cross_mesh_file   = "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json";
+constexpr auto uniform = "mesh_inputs/2d_uniform_2x2_mpi3.json";
+constexpr auto refined = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi3.json";
 
-TEST_CASE("No calls for 1 patch domain", "[MPIGhostFiller]")
+TEST_CASE("Calls for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 {
-	auto                  nx        = GENERATE(2);
-	auto                  ny        = GENERATE(2);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(single_mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-
-	auto vec = ValVector<2>::GetNewVector(d_coarse);
-
-	CallMockMPIGhostFiller<2> mgf(d_coarse, 1);
-
-	mgf.fillGhost(vec);
-
-	CHECK(mgf.called == true);
-	mgf.checkCalls();
-}
-TEST_CASE("Calls for various domains 1-side cases", "[MPIGhostFiller]")
-{
-	auto mesh_file
-	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	auto mesh_file = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
 	auto                  nx        = GENERATE(2);
 	auto                  ny        = GENERATE(2);
@@ -50,10 +31,9 @@ TEST_CASE("Calls for various domains 1-side cases", "[MPIGhostFiller]")
 
 	mgf.checkCalls();
 }
-TEST_CASE("Exchange for various domains 1-side cases", "[MPIGhostFiller]")
+TEST_CASE("Exchange for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 {
-	auto mesh_file
-	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	auto mesh_file = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
 	auto                  nx        = GENERATE(2);
 	auto                  ny        = GENERATE(2);
@@ -74,10 +54,9 @@ TEST_CASE("Exchange for various domains 1-side cases", "[MPIGhostFiller]")
 
 	mgf.checkVector(vec);
 }
-TEST_CASE("Two Exchanges for various domains 1-side cases", "[MPIGhostFiller]")
+TEST_CASE("Two Exchanges for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 {
-	auto mesh_file
-	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	auto mesh_file = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
 	auto                  nx        = GENERATE(2);
 	auto                  ny        = GENERATE(2);
