@@ -233,7 +233,10 @@ template <size_t D> class Orthant
 	/**
 	 * @brief null value
 	 */
-	static constexpr unsigned int null = ~0x0;
+	static Orthant<D> null()
+	{
+		return Orthant<D>(~0x0);
+	}
 	/**
 	 * @brief Lower half of line.
 	 */
@@ -463,7 +466,6 @@ template <size_t D> inline std::array<Orthant<D>, Orthant<D>::num_orthants> Orth
 	std::iota(retval.begin(), retval.end(), 0);
 	return retval;
 }
-template <size_t D> constexpr unsigned int Orthant<D>::null;
 template <size_t D> constexpr unsigned int Orthant<D>::lower;
 template <size_t D> constexpr unsigned int Orthant<D>::upper;
 template <size_t D> constexpr unsigned int Orthant<D>::sw;
@@ -594,7 +596,7 @@ inline std::ostream &operator<<(std::ostream &os, const Orthant<3> &o)
 inline std::ostream &operator<<(std::ostream &os, const Orthant<2> &o)
 {
 	switch (o.toInt()) {
-		case Orthant<2>::null:
+		case ~0x0:
 			os << "Orthant::null";
 			break;
 		case Orthant<2>::sw:

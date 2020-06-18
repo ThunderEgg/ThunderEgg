@@ -123,7 +123,7 @@ TEST_CASE("PatchInfo Default Values", "[PatchInfo]")
 	}
 	CHECK(pinfo.num_ghost_cells == 0);
 	CHECK(pinfo.rank == -1);
-	CHECK(pinfo.orth_on_parent == Orthant<3>::null);
+	CHECK(pinfo.orth_on_parent == Orthant<3>::null());
 	CHECK(pinfo.neumann.to_ulong() == 0);
 	for (int n : pinfo.ns) {
 		CHECK(n == 1);

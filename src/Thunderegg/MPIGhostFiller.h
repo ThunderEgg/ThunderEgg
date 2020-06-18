@@ -28,6 +28,15 @@ namespace Thunderegg
 template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 {
 	private:
+	using remote_call = std::tuple<std::shared_ptr<const PatchInfo<D>>, const Side<D>,
+	                               const NbrType, const Orthant<D>>;
+	using LocalCall = std::tuple<std::shared_ptr<const PatchInfo<D>>, const Side<D>, const NbrType,
+	                             const Orthant<D>, int, int>;
+
+	std::deque<remote_call> remote_calls;
+	std::deque<LocalCall>   local_calls;
+	std::map<int, size_t>   rank_buff_size_map;
+
 	virtual void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
 	                                       const LocalData<D>                  local_data,
 	                                       const LocalData<D> nbr_data, const Side<D> side,
@@ -45,6 +54,48 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 	MPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in)
 	: domain(domain_in), side_cases(side_cases_in)
 	{
+		int rank;
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		using risop = std::tuple<int, int, const Side<D>, const Orthant<D>, size_t>;
+		// std::map < riso,
+		std::set<remote_call> remote_calls_set;
+		for (auto pinfo : domain->getPatchInfoVector()) {
+			for (Side<D> s : Side<D>::getValues()) {
+				if (pinfo->hasNbr(s)) {
+					switch (pinfo->getNbrType(s)) {
+						case NbrType::Normal: {
+							auto nbrinfo = pinfo->getNormalNbrInfo(s);
+							if (nbrinfo.rank == rank) {
+								local_calls.emplace_back(pinfo, s, NbrType::Normal,
+								                         Orthant<D>::null(), pinfo->local_index,
+								                         nbrinfo.local_index);
+							} else {
+							}
+						} break;
+						case NbrType::Fine: {
+							auto nbrinfo  = pinfo->getFineNbrInfo(s);
+							auto orthants = Orthant<D>::getValuesOnSide(s);
+							for (size_t i = 0; i < orthants.size(); i++) {
+								if (nbrinfo.ranks[i] == rank) {
+									local_calls.emplace_back(pinfo, s, NbrType::Fine, orthants[i],
+									                         pinfo->local_index,
+									                         nbrinfo.local_indexes[i]);
+								}
+							}
+						} break;
+						case NbrType::Coarse: {
+							auto nbrinfo = pinfo->getCoarseNbrInfo(s);
+							auto orthant = Orthant<D>::getValuesOnSide(
+							s.opposite())[nbrinfo.orth_on_coarse.toInt()];
+							if (nbrinfo.rank == rank) {
+								local_calls.emplace_back(pinfo, s, NbrType::Coarse, orthant,
+								                         pinfo->local_index, nbrinfo.local_index);
+							}
+						} break;
+					}
+				}
+			}
+		}
 	}
 	/**
 	 * @brief Fill ghost cells on a vector
@@ -69,35 +120,15 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 		for (auto pinfo : domain->getPatchInfoVector()) {
 			auto data = u->getLocalData(pinfo->local_index);
 			fillGhostCellsForLocalPatch(pinfo, data);
-
-			for (Side<D> s : Side<D>::getValues()) {
-				if (pinfo->hasNbr(s)) {
-					switch (pinfo->getNbrType(s)) {
-						case NbrType::Normal: {
-							auto nbrinfo  = pinfo->getNormalNbrInfo(s);
-							auto nbr_data = u->getLocalData(nbrinfo.local_index);
-							fillGhostCellsForNbrPatch(pinfo, data, nbr_data, s, NbrType::Normal, 0);
-						} break;
-						case NbrType::Fine: {
-							auto nbrinfo  = pinfo->getFineNbrInfo(s);
-							auto orthants = Orthant<D>::getValuesOnSide(s);
-							for (size_t i = 0; i < orthants.size(); i++) {
-								auto nbr_data = u->getLocalData(nbrinfo.local_indexes[i]);
-								fillGhostCellsForNbrPatch(pinfo, data, nbr_data, s, NbrType::Fine,
-								                          orthants[i]);
-							}
-						} break;
-						case NbrType::Coarse: {
-							auto nbrinfo  = pinfo->getCoarseNbrInfo(s);
-							auto nbr_data = u->getLocalData(nbrinfo.local_index);
-							auto orthant  = Orthant<D>::getValuesOnSide(
-                            s.opposite())[nbrinfo.orth_on_coarse.toInt()];
-							fillGhostCellsForNbrPatch(pinfo, data, nbr_data, s, NbrType::Coarse,
-							                          orthant);
-						} break;
-					}
-				}
-			}
+		}
+		for (const LocalCall &call : local_calls) {
+			auto pinfo      = std::get<0>(call);
+			auto side       = std::get<1>(call);
+			auto nbr_type   = std::get<2>(call);
+			auto orthant    = std::get<3>(call);
+			auto local_data = u->getLocalData(std::get<4>(call));
+			auto nbr_data   = u->getLocalData(std::get<5>(call));
+			fillGhostCellsForNbrPatch(pinfo, local_data, nbr_data, side, nbr_type, orthant);
 		}
 	}
 };

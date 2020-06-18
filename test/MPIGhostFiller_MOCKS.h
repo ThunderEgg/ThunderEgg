@@ -113,7 +113,8 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 						case NbrType::Normal: {
 							INFO("NbrType: Normal");
 
-							auto call = make_tuple(patch, side, NbrType::Normal, Orthant<D>(0));
+							auto call
+							= make_tuple(patch, side, NbrType::Normal, Orthant<D>::null());
 							check_for_nbr_call(call);
 
 						} break;
