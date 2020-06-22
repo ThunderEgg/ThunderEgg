@@ -426,6 +426,17 @@ template <size_t D> class Orthant
 	{
 		return val == other.val;
 	}
+	/**
+	 * @brief Less Tan operator.
+	 *
+	 * @param other The other octant.
+	 *
+	 * @return Whether or not the value of this octant is less than the value other octant.
+	 */
+	bool operator<(const Orthant<D> &other) const
+	{
+		return val < other.val;
+	}
 };
 
 // function definitions

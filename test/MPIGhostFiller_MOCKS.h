@@ -213,14 +213,16 @@ template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 		INFO("NumGlobalPatches: " << this->domain->getNumGlobalPatches());
 		for (auto pinfo : this->domain->getPatchInfoVector()) {
 			INFO("id: " << pinfo->id);
-			INFO("start: ");
+			std::string starts = "start: ";
 			for (size_t i = 0; i < D; i++) {
-				INFO(pinfo->starts[i]);
+				starts += " " + std::to_string(pinfo->starts[i]);
 			}
-			INFO("ns: ");
+			INFO(starts);
+			std::string ns = "ns: ";
 			for (size_t i = 0; i < D; i++) {
-				INFO(pinfo->ns[i]);
+				ns += " " + std::to_string(pinfo->ns[i]);
 			}
+			INFO(ns);
 			INFO("num_ghost_cells: " << pinfo->num_ghost_cells);
 
 			auto data = vec->getLocalData(pinfo->local_index);
