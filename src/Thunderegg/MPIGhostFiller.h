@@ -26,6 +26,14 @@
 #include <mpi.h>
 namespace Thunderegg
 {
+/**
+ * @brief Parallell ghostfiller implimented with MPI
+ *
+ * There are two private functions that have to be overridden derived classes.
+ * fillGhostCellsForNbrPatch, and fillGhostCellsForLocalPatch
+ *
+ * @tparam D the number of Cartesian dimensions
+ */
 template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 {
 	private:
@@ -40,22 +48,70 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 	using LocalCall = std::tuple<std::shared_ptr<const PatchInfo<D>>, const Side<D>, const NbrType,
 	                             const Orthant<D>, int, int>;
 
-	std::vector<std::deque<RemoteCall>>                       remote_calls;
-	std::deque<LocalCall>                                     local_calls;
+	/**
+	 * @brief A vector of RemoteCall deques, one sperate deque for each rank
+	 */
+	std::vector<std::deque<RemoteCall>> remote_calls;
+	/**
+	 * @brief deque of local calls to be made
+	 */
+	std::deque<LocalCall> local_calls;
+	/**
+	 * @brief vector of deques for incoming ghost cells, one deque for each rank
+	 *
+	 * the deques contain a tuple with the local index of the patch, the side that the ghost cells
+	 * are on, and the offset in the buffer for those ghost cells
+	 */
 	std::vector<std::deque<std::tuple<int, Side<D>, size_t>>> incoming_ghosts;
-	std::vector<size_t>                                       index_rank_map;
-	std::vector<size_t>                                       out_buff_lengths;
-	std::vector<size_t>                                       in_buff_lengths;
+	/**
+	 * @brief vectors ranks, the position of the ranks correlate with other vectors.
+	 */
+	std::vector<size_t> index_rank_map;
+	/**
+	 * @brief lengths of send buffers for each rank
+	 */
+	std::vector<size_t> send_buff_lengths;
+	/**
+	 * @brief lengths of recv buffers for each rank
+	 */
+	std::vector<size_t> recv_buff_lengths;
 
+	/**
+	 * @brief Fill the ghost cells for the neighboring patch
+	 *
+	 * @param pinfo the patch that ghost cells are being filled from
+	 * @param local_data the local data for patch that ghost cells are being filled from
+	 * @param nbr_data  the local data for the neighboring patch, where ghost cells are being
+	 * filled.
+	 * @param side the sided that the neighboring patch is on
+	 * @param nbr_type the type of neighbor
+	 * @param orthant the orthant that the neighbors ghost cells lie on
+	 */
 	virtual void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
 	                                       const LocalData<D>                  local_data,
 	                                       const LocalData<D> nbr_data, const Side<D> side,
 	                                       const NbrType    nbr_type,
 	                                       const Orthant<D> orthant) const = 0;
 
+	/**
+	 * @brief Perform any on this patches ghost cells.
+	 *
+	 * This may be necessary on some schemes because it needs data from the patch itself, not just
+	 * the neighboring patch
+	 *
+	 * @param pinfo the patch
+	 * @param local_data the LocalData for the patch
+	 */
 	virtual void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
 	                                         const LocalData<D> local_data) const = 0;
 
+	/**
+	 * @brief Get the LocalData object for the buffer
+	 *
+	 * @param buffer_ptr pointer to the ghost cells position in the buffer
+	 * @param side  the side that the ghost cells are on
+	 * @return LocalData<D> the LocalData object
+	 */
 	LocalData<D> getLocalDataForBuffer(double *buffer_ptr, const Side<D> side) const
 	{
 		auto ns              = domain->getNs();
@@ -83,10 +139,22 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 	}
 
 	protected:
+	/**
+	 * @brief The domain that this ghostfiller operates on
+	 */
 	std::shared_ptr<const Domain<D>> domain;
-	int                              side_cases;
+	/**
+	 * @brief Number of sides to address
+	 */
+	int side_cases;
 
 	public:
+	/**
+	 * @brief Construct a new MPIGhostFiller object
+	 *
+	 * @param domain_in  the domain being used
+	 * @param side_cases_in  the number of side cases to address
+	 */
 	MPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in)
 	: domain(domain_in), side_cases(side_cases_in)
 	{
@@ -178,7 +246,7 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 			curr_index++;
 		}
 		std::tuple<int, Side<D>> prev_id_side;
-		out_buff_lengths.resize(ranks.size());
+		send_buff_lengths.resize(ranks.size());
 		remote_calls.resize(ranks.size());
 		for (auto call : remote_call_set) {
 			int  local_buffer_index = rank_index_map[std::get<0>(call)];
@@ -189,7 +257,7 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 			auto pinfo              = std::get<5>(call);
 			auto local_index        = std::get<6>(call);
 
-			size_t offset = out_buff_lengths[local_buffer_index];
+			size_t offset = send_buff_lengths[local_buffer_index];
 
 			// calculate length in buffer need for ghost cells
 			size_t length = axis_ghost_lengths[side.axis()];
@@ -198,14 +266,14 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 			if (std::make_tuple(id, side) == prev_id_side) {
 				offset -= length;
 			} else {
-				out_buff_lengths[local_buffer_index] += length;
+				send_buff_lengths[local_buffer_index] += length;
 			}
 
 			remote_calls[local_buffer_index].emplace_back(pinfo, side, nbr_type, orthant,
 			                                              local_index, offset);
 			prev_id_side = std::make_tuple(id, side);
 		}
-		in_buff_lengths.resize(ranks.size());
+		recv_buff_lengths.resize(ranks.size());
 		incoming_ghosts.resize(ranks.size());
 		for (auto t : incoming_ghost_set) {
 			int     local_buffer_index = rank_index_map[std::get<0>(t)];
@@ -214,8 +282,8 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 
 			// add length for ghosts to buffer length
 			size_t length = axis_ghost_lengths[side.axis()];
-			size_t offset = in_buff_lengths[local_buffer_index];
-			in_buff_lengths[local_buffer_index] += length;
+			size_t offset = recv_buff_lengths[local_buffer_index];
+			recv_buff_lengths[local_buffer_index] += length;
 
 			// add ghost to incoming ghosts
 			incoming_ghosts[local_buffer_index].emplace_back(local_index, side, offset);
@@ -244,23 +312,23 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 		}
 
 		// allocate recv buffers and post recvs
-		std::vector<std::vector<double>> recv_buffers(in_buff_lengths.size());
-		for (size_t i = 0; i < in_buff_lengths.size(); i++) {
-			recv_buffers[i].resize(in_buff_lengths[i]);
+		std::vector<std::vector<double>> recv_buffers(recv_buff_lengths.size());
+		for (size_t i = 0; i < recv_buff_lengths.size(); i++) {
+			recv_buffers[i].resize(recv_buff_lengths[i]);
 		}
-		std::vector<MPI_Request> recv_requests(in_buff_lengths.size());
+		std::vector<MPI_Request> recv_requests(recv_buff_lengths.size());
 		for (size_t i = 0; i < recv_requests.size(); i++) {
 			MPI_Irecv(recv_buffers[i].data(), recv_buffers[i].size(), MPI_DOUBLE, index_rank_map[i],
 			          0, MPI_COMM_WORLD, &recv_requests[i]);
 		}
 
 		// allocate send buffers
-		std::vector<std::vector<double>> out_buffers(out_buff_lengths.size());
-		for (size_t i = 0; i < out_buff_lengths.size(); i++) {
-			out_buffers[i].resize(out_buff_lengths[i]);
+		std::vector<std::vector<double>> out_buffers(send_buff_lengths.size());
+		for (size_t i = 0; i < send_buff_lengths.size(); i++) {
+			out_buffers[i].resize(send_buff_lengths[i]);
 		}
 		// perform fill operations for mpi buffers
-		std::vector<MPI_Request> send_requests(out_buff_lengths.size());
+		std::vector<MPI_Request> send_requests(send_buff_lengths.size());
 		for (size_t i = 0; i < remote_calls.size(); i++) {
 			for (const RemoteCall &call : remote_calls[i]) {
 				auto    pinfo         = std::get<0>(call);
