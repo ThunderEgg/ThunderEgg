@@ -1,11 +1,15 @@
-#include "catch.hpp"
+#include "utils/DomainReader.h"
 #include <Thunderegg/BiLinearGhostFiller.h>
 #include <Thunderegg/DomainTools.h>
-#include <Thunderegg/Experimental/DomGen.h>
-#include <Thunderegg/Experimental/OctTree.h>
 #include <Thunderegg/ValVector.h>
+
+#include "catch.hpp"
 using namespace std;
 using namespace Thunderegg;
+
+constexpr auto single_mesh_file  = "mesh_inputs/2d_uniform_2x2_mpi1.json";
+constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
+constexpr auto cross_mesh_file   = "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json";
 TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]")
 {
 	auto   nx        = GENERATE(1, 2, 10, 13);
@@ -243,19 +247,20 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		}
 	}
 }
-TEST_CASE("exchange refined 2D BiLinearGhostFiller", "[BiLinearGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFiller]")
 {
+	auto mesh_file
+	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	INFO("MESH: " << mesh_file);
 	auto nx        = GENERATE(2, 10);
 	auto ny        = GENERATE(2, 10);
 	int  num_ghost = 1;
 
-	Experimental::Tree<2>   t("middle_refine.bin");
-	Experimental::DomGen<2> dg(t, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>   d = dg.getFinestDomain();
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec(new ValVector<2>({nx, ny}, num_ghost, d->getNumGlobalPatches()));
-	shared_ptr<ValVector<2>> expected(
-	new ValVector<2>({nx, ny}, num_ghost, d->getNumGlobalPatches()));
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -297,19 +302,21 @@ TEST_CASE("exchange refined 2D BiLinearGhostFiller", "[BiLinearGhostFiller]")
 		}
 	}
 }
-TEST_CASE("exchange refined 2D BiLinearGhostFiller ghost already set", "[BiLinearGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
+          "[BiLinearGhostFiller]")
 {
+	auto mesh_file
+	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	INFO("MESH: " << mesh_file);
 	auto nx        = GENERATE(2, 10);
 	auto ny        = GENERATE(2, 10);
 	int  num_ghost = 1;
 
-	Experimental::Tree<2>   t("middle_refine.bin");
-	Experimental::DomGen<2> dg(t, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>   d = dg.getFinestDomain();
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec(new ValVector<2>({nx, ny}, num_ghost, d->getNumGlobalPatches()));
-	shared_ptr<ValVector<2>> expected(
-	new ValVector<2>({nx, ny}, num_ghost, d->getNumGlobalPatches()));
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
