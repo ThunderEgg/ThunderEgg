@@ -223,7 +223,8 @@ template <size_t D> class InterLevelComm
 	 */
 	std::shared_ptr<Vector<D>> getNewGhostVector() const
 	{
-		return std::make_shared<ValVector<D>>(ns, num_ghost_cells, num_ghost_patches);
+		return std::make_shared<ValVector<D>>(MPI_COMM_SELF, ns, num_ghost_cells,
+		                                      num_ghost_patches);
 	}
 
 	/**

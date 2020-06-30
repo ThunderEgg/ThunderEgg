@@ -37,7 +37,7 @@ TEST_CASE("exchange uniform 1D east-west", "[SimpleGhostFiller]")
 	pinfo_map[1]->nbr_info[0].reset(new NormalNbrInfo<1>(0));
 	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
-	shared_ptr<ValVector<1>> vec(new ValVector<1>(pinfo_map[0]->ns, num_ghost, 2));
+	shared_ptr<ValVector<1>> vec(new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 2));
 
 	DomainTools<1>::setValues(d, vec, f);
 	SimpleGhostFiller<1> sgf(d);
@@ -127,7 +127,7 @@ TEST_CASE("exchange uniform 2D quad", "[SimpleGhostFiller]")
 
 	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
-	shared_ptr<ValVector<2>> vec(new ValVector<2>(pinfo_map[1]->ns, num_ghost, 4));
+	shared_ptr<ValVector<2>> vec(new ValVector<2>(MPI_COMM_WORLD, pinfo_map[1]->ns, num_ghost, 4));
 
 	DomainTools<2>::setValues(d, vec, f);
 

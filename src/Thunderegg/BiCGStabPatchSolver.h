@@ -74,7 +74,8 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		 */
 		std::shared_ptr<Vector<D>> getNewVector()
 		{
-			return std::shared_ptr<Vector<D>>(new ValVector<D>(lengths, 1, num_ghost_cells));
+			return std::shared_ptr<Vector<D>>(
+			new ValVector<D>(MPI_COMM_SELF, lengths, 1, num_ghost_cells));
 		}
 	};
 	/**
@@ -94,8 +95,9 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		 *
 		 * @param ld the localdata for the patch
 		 */
-		SinglePatchVec(const LocalData<D> &ld)
+		SinglePatchVec(const LocalData<D> &ld) : Vector<D>(MPI_COMM_SELF)
 		{
+			this->comm              = MPI_COMM_SELF;
 			this->num_local_patches = 1;
 			this->ld                = ld;
 		}

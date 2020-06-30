@@ -788,14 +788,18 @@ template <size_t D> inline void PatchInfo<D>::setLocalNeighborIndexes(std::map<i
 {
 	local_index = rev_map.at(id);
 	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) { nbr_info[s.toInt()]->setLocalIndexes(rev_map); }
+		if (hasNbr(s)) {
+			nbr_info[s.toInt()]->setLocalIndexes(rev_map);
+		}
 	}
 }
 template <size_t D> inline void PatchInfo<D>::setGlobalNeighborIndexes(std::map<int, int> &rev_map)
 {
 	global_index = rev_map.at(local_index);
 	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) { nbr_info[s.toInt()]->setGlobalIndexes(rev_map); }
+		if (hasNbr(s)) {
+			nbr_info[s.toInt()]->setGlobalIndexes(rev_map);
+		}
 	}
 }
 template <size_t D> inline void PatchInfo<D>::setNeumann(IsNeumannFunc<D> inf)
@@ -803,10 +807,14 @@ template <size_t D> inline void PatchInfo<D>::setNeumann(IsNeumannFunc<D> inf)
 	for (Side<D> s : Side<D>::getValues()) {
 		if (!hasNbr(s)) {
 			std::array<double, D> bound_start = starts;
-			if (!s.isLowerOnAxis()) { bound_start[s.axis()] += spacings[s.axis()] * ns[s.axis()]; }
+			if (!s.isLowerOnAxis()) {
+				bound_start[s.axis()] += spacings[s.axis()] * ns[s.axis()];
+			}
 			std::array<double, D> bound_end = bound_start;
 			for (size_t dir = 0; dir < D; dir++) {
-				if (dir != s.axis()) { bound_end[dir] += spacings[dir] * ns[dir]; }
+				if (dir != s.axis()) {
+					bound_end[dir] += spacings[dir] * ns[dir];
+				}
 			}
 			neumann[s.toInt()] = inf(s, bound_end, bound_start);
 		}
@@ -816,7 +824,9 @@ template <size_t D> inline std::deque<int> PatchInfo<D>::getNbrIds()
 {
 	std::deque<int> retval;
 	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) { nbr_info[s.toInt()]->getNbrIds(retval); }
+		if (hasNbr(s)) {
+			nbr_info[s.toInt()]->getNbrIds(retval);
+		}
 	}
 	return retval;
 }
@@ -824,7 +834,9 @@ template <size_t D> inline std::deque<int> PatchInfo<D>::getNbrRanks()
 {
 	std::deque<int> retval;
 	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) { nbr_info[s.toInt()]->getNbrRanks(retval); }
+		if (hasNbr(s)) {
+			nbr_info[s.toInt()]->getNbrRanks(retval);
+		}
 	}
 	return retval;
 }
@@ -916,14 +928,18 @@ template <size_t D>
 inline void PatchInfo<D>::setPtrs(std::map<int, std::shared_ptr<PatchInfo>> &domains)
 {
 	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) { nbr_info[s.toInt()]->setPtrs(domains); }
+		if (hasNbr(s)) {
+			nbr_info[s.toInt()]->setPtrs(domains);
+		}
 	}
 }
 template <size_t D> inline void PatchInfo<D>::updateRank(int rank)
 {
 	this->rank = rank;
 	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) { nbr_info[s.toInt()]->updateRankOnNeighbors(rank, s); }
+		if (hasNbr(s)) {
+			nbr_info[s.toInt()]->updateRankOnNeighbors(rank, s);
+		}
 	}
 }
 extern template class PatchInfo<2>;

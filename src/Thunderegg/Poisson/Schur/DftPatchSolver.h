@@ -69,9 +69,9 @@ template <size_t D> class DftPatchSolver : public Thunderegg::Schur::PatchSolver
 	double                                                                      lambda;
 	std::map<DomainK<D>, std::array<std::shared_ptr<std::valarray<double>>, D>> plan1;
 	std::map<DomainK<D>, std::array<std::shared_ptr<std::valarray<double>>, D>> plan2;
-	ValVector<D>                                                                f_copy;
-	ValVector<D>                                                                tmp;
-	ValVector<D>                                                                local_tmp;
+	std::shared_ptr<ValVector<D>>                                               f_copy;
+	std::shared_ptr<ValVector<D>>                                               tmp;
+	std::shared_ptr<ValVector<D>>                                               local_tmp;
 	std::map<DomainK<D>, std::valarray<double>>                                 eigen_vals;
 	std::array<std::shared_ptr<std::valarray<double>>, 6>                       transforms
 	= {{nullptr, nullptr, nullptr, nullptr, nullptr, nullptr}};
@@ -118,9 +118,11 @@ template <size_t D> inline void DftPatchSolver<D>::addPatch(Thunderegg::Schur::S
 		initialized = true;
 		std::array<int, D> lengths;
 		lengths.fill(n);
-		f_copy = ValVector<D>(lengths, 0, 1);
-		tmp    = ValVector<D>(lengths, 0, 1);
-		if (!(D % 2)) { local_tmp = ValVector<D>(lengths, 0, 1); }
+		f_copy = std::make_shared<ValVector<D>>(MPI_COMM_SELF, lengths, 0, 1);
+		tmp    = std::make_shared<ValVector<D>>(MPI_COMM_SELF, lengths, 0, 1);
+		if (!(D % 2)) {
+			local_tmp = std::make_shared<ValVector<D>>(MPI_COMM_SELF, lengths, 0, 1);
+		}
 	}
 
 	DftType transforms[D];
@@ -192,8 +194,8 @@ DftPatchSolver<D>::solve(Thunderegg::Schur::SchurInfo<D> &sinfo, std::shared_ptr
 {
 	using namespace std;
 	const LocalData<D> f_view      = f->getLocalData(sinfo.pinfo->local_index);
-	LocalData<D>       f_copy_view = f_copy.getLocalData(0);
-	LocalData<D>       tmp_view    = tmp.getLocalData(0);
+	LocalData<D>       f_copy_view = f_copy->getLocalData(0);
+	LocalData<D>       tmp_view    = tmp->getLocalData(0);
 
 	std::array<int, D> start, end;
 	start.fill(0);
@@ -209,7 +211,7 @@ DftPatchSolver<D>::solve(Thunderegg::Schur::SchurInfo<D> &sinfo, std::shared_ptr
 
 		if (sinfo.pinfo->hasNbr(s)) {
 			const LocalData<D - 1> gamma_view = gamma->getLocalData(sinfo.getIfaceLocalIndex(s));
-			LocalData<D - 1>       slice      = f_copy.getLocalData(0).getSliceOnSide(s);
+			LocalData<D - 1>       slice      = f_copy->getLocalData(0).getSliceOnSide(s);
 			double                 h2         = pow(sinfo.pinfo->spacings[s.toInt() / 2], 2);
 			nested_loop<D - 1>(start, end, [&](std::array<int, D - 1> coord) {
 				slice[coord] -= 2.0 / h2 * gamma_view[coord];
@@ -219,9 +221,11 @@ DftPatchSolver<D>::solve(Thunderegg::Schur::SchurInfo<D> &sinfo, std::shared_ptr
 
 	execute_plan(plan1[sinfo], f_copy_view, tmp_view, false);
 
-	tmp.vec /= eigen_vals[sinfo];
+	tmp->vec /= eigen_vals[sinfo];
 
-	if (sinfo.pinfo->neumann.all()) { tmp.vec[0] = 0; }
+	if (sinfo.pinfo->neumann.all()) {
+		tmp->vec[0] = 0;
+	}
 
 	LocalData<D> u_view = u->getLocalData(sinfo.pinfo->local_index);
 
@@ -338,7 +342,7 @@ DftPatchSolver<D>::execute_plan(std::array<std::shared_ptr<std::valarray<double>
 			if (dim == D - 1) {
 				new_result = out;
 			} else if (dim == D - 2) {
-				new_result = local_tmp.getLocalData(0);
+				new_result = local_tmp->getLocalData(0);
 			} else if (dim % 2) {
 				new_result = in;
 			} else {

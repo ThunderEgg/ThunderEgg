@@ -278,9 +278,15 @@ template <size_t D> class Vector
 	/**
 	 * @brief the mpi comm
 	 */
-	MPI_Comm comm = MPI_COMM_WORLD;
+	MPI_Comm comm;
 
 	public:
+	/**
+	 * @brief Construct a new Vector object
+	 *
+	 * @param comm_in the MPI_Comm to use
+	 */
+	Vector(MPI_Comm comm_in) : comm(comm_in){};
 	/**
 	 * @brief Destroy the Vector object
 	 */

@@ -38,8 +38,9 @@ template <size_t D> class ValVector : public Vector<D>
 	public:
 	std::valarray<double> vec;
 	std::valarray<double> ghost_data;
-	ValVector() = default;
-	ValVector(const std::array<int, D> &lengths, int num_ghost_cells, int num_patches)
+	ValVector(MPI_Comm comm_in, const std::array<int, D> &lengths, int num_ghost_cells,
+	          int num_patches)
+	: Vector<D>(comm_in)
 	{
 		this->num_local_patches = num_patches;
 		this->num_ghost_cells   = num_ghost_cells;
@@ -59,7 +60,7 @@ template <size_t D> class ValVector : public Vector<D>
 	static std::shared_ptr<ValVector<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain)
 	{
 		return std::shared_ptr<ValVector<D>>(new ValVector<D>(
-		domain->getNs(), domain->getNumGhostCells(), domain->getNumLocalPatches()));
+		MPI_COMM_WORLD, domain->getNs(), domain->getNumGhostCells(), domain->getNumLocalPatches()));
 	}
 	LocalData<D> getLocalData(int local_patch_id)
 	{

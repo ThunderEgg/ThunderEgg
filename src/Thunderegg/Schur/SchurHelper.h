@@ -151,12 +151,12 @@ template <size_t D> class SchurHelper
 	std::shared_ptr<ValVector<D - 1>> getNewSchurVec()
 	{
 		return std::shared_ptr<ValVector<D - 1>>(
-		new ValVector<D - 1>(lengths, 0, matrix_extra_ghost_start));
+		new ValVector<D - 1>(MPI_COMM_WORLD, lengths, 0, matrix_extra_ghost_start));
 	}
 	std::shared_ptr<ValVector<D - 1>> getNewSchurDistVec()
 	{
 		return std::shared_ptr<ValVector<D - 1>>(
-		new ValVector<D - 1>(lengths, 0, matrix_extra_ghost_start));
+		new ValVector<D - 1>(MPI_COMM_SELF, lengths, 0, matrix_extra_ghost_start));
 	}
 
 	int getSchurVecLocalSize() const

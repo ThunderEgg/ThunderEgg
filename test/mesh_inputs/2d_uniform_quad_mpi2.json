@@ -15,7 +15,7 @@
       "child_ranks": [
         0,
         0,
-        1,
+        0,
         1
       ],
       "starts": [
@@ -63,7 +63,7 @@
             3
           ],
           "ranks": [
-            1
+            0
           ],
           "orth_on_coarse": 0
         }
@@ -113,7 +113,7 @@
       "parent_id": 0,
       "parent_rank": 0,
       "orth_on_parent": 2,
-      "rank": 1,
+      "rank": 0,
       "starts": [
         0.0,
         0.5
@@ -169,7 +169,7 @@
             3
           ],
           "ranks": [
-            1
+            0
           ],
           "orth_on_coarse": 0
         },

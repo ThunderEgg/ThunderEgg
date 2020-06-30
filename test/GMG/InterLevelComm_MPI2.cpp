@@ -25,9 +25,15 @@
 #include <Thunderegg/ValVector.h>
 using namespace Thunderegg;
 using namespace std;
-const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi2.json";
-TEST_CASE("2-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterLevelComm]")
+const string uniform     = "mesh_inputs/2d_uniform_quad_mpi2.json";
+const string mid_uniform = "mesh_inputs/2d_4x4_mid_on_1_mpi2.json";
+#define MESHES uniform
+#define MESHE_FILES uniform, mid_uniform
+
+TEST_CASE("Check number of local and ghost parents", "[GMG::InterLevelComm]")
 {
+	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+	INFO("MESH FILE " << mesh_file);
 	auto                  nx        = GENERATE(2);
 	auto                  ny        = GENERATE(2);
 	int                   num_ghost = 1;
@@ -40,32 +46,56 @@ TEST_CASE("2-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterL
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
-		CHECK(ilc->getPatchesWithGhostParent().size() == 0);
-		CHECK(ilc->getPatchesWithLocalParent().size() == 2);
-
-		map<int, set<int>> parents_to_children;
-		for (auto pair : ilc->getPatchesWithLocalParent()) {
-			parents_to_children[pair.first].insert(pair.second->id);
+	INFO("RANK " << rank);
+	int                num_ghost_parents = 0;
+	int                num_local_parents = 0;
+	map<int, set<int>> my_local_parents_to_children;
+	for (auto pinfo : d_fine->getPatchInfoVector()) {
+		if (pinfo->parent_rank == rank) {
+			num_local_parents++;
+		} else {
+			num_ghost_parents++;
 		}
-		CHECK(parents_to_children.count(0));
-		CHECK(parents_to_children[0].count(1));
-		CHECK(parents_to_children[0].count(2));
-	} else {
-		CHECK(ilc->getPatchesWithGhostParent().size() == 2);
-		CHECK(ilc->getPatchesWithLocalParent().size() == 0);
+	}
+	CHECK(ilc->getPatchesWithGhostParent().size() == num_ghost_parents);
+	CHECK(ilc->getPatchesWithLocalParent().size() == num_local_parents);
+}
+TEST_CASE("Check that parents have unique local indexes", "[GMG::InterLevelComm]")
+{
+	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+	INFO("MESH FILE " << mesh_file);
+	auto                  nx        = GENERATE(2);
+	auto                  ny        = GENERATE(2);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
+	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+	INFO("d_fine: " << d_fine->getNumLocalPatches());
+	INFO("d_coarse: " << d_coarse->getNumLocalPatches());
+	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-		map<int, set<int>> parents_to_children;
-		for (auto pair : ilc->getPatchesWithGhostParent()) {
-			parents_to_children[pair.first].insert(pair.second->id);
-		}
-		CHECK(parents_to_children.count(0) == 1);
-		CHECK(parents_to_children[0].count(3) == 1);
-		CHECK(parents_to_children[0].count(4) == 1);
+	int rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	INFO("RANK " << rank);
+
+	map<int, set<int>> local_index_id_map;
+	for (auto pair : ilc->getPatchesWithLocalParent()) {
+		local_index_id_map[pair.first].insert(pair.second->parent_id);
+	}
+	for (auto pair : local_index_id_map) {
+		CHECK(pair.second.size() == 1);
+	}
+	map<int, set<int>> ghost_local_index_id_map;
+	for (auto pair : ilc->getPatchesWithGhostParent()) {
+		ghost_local_index_id_map[pair.first].insert(pair.second->parent_id);
+	}
+	for (auto pair : ghost_local_index_id_map) {
+		CHECK(pair.second.size() == 1);
 	}
 }
 TEST_CASE("2-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -86,6 +116,7 @@ TEST_CASE("2-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm
 }
 TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -134,6 +165,7 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when start isn't called before finish on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2);
 	auto                  ny        = GENERATE(2);
 	int                   num_ghost = 1;
@@ -153,6 +185,7 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2);
 	auto                  ny        = GENERATE(2);
 	int                   num_ghost = 1;
@@ -174,6 +207,7 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -195,6 +229,7 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -217,6 +252,7 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when start is called twice on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -237,6 +273,7 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when get start is called after send start on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -256,6 +293,7 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when sned start is called after get start on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -274,6 +312,7 @@ TEST_CASE(
 }
 TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -313,6 +352,7 @@ TEST_CASE(
 "2-processor getGhostPatches throws exception when start isn't called before finish on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -332,6 +372,7 @@ TEST_CASE(
 "2-processor getGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -353,6 +394,7 @@ TEST_CASE(
 "2-processor getGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -374,6 +416,7 @@ TEST_CASE(
 "2-processor getGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -395,6 +438,7 @@ TEST_CASE(
 TEST_CASE("2-processor getGhostPatches throws exception when start is called twice on uniform quad",
           "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -413,6 +457,7 @@ TEST_CASE("2-processor getGhostPatches throws exception when start is called twi
 TEST_CASE("2-processor getGhostPatches throws exception when send finish is called on get start",
           "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -432,6 +477,7 @@ TEST_CASE("2-processor getGhostPatches throws exception when send finish is call
 TEST_CASE("2-processor getGhostPatches throws exception when get finish is called on send start",
           "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -451,6 +497,7 @@ TEST_CASE("2-processor getGhostPatches throws exception when get finish is calle
 TEST_CASE("2-processor getGhostPatches throws exception when send start is called after get start",
           "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -470,6 +517,7 @@ TEST_CASE("2-processor getGhostPatches throws exception when send start is calle
 TEST_CASE("2-processor getGhostPatches throws exception when get start is called after send start",
           "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -489,6 +537,7 @@ TEST_CASE(
 "2-processor getGhostPatches throws exception when send finish is called after get start and finish",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -510,6 +559,7 @@ TEST_CASE(
 "2-processor getGhostPatches throws exception when get finish is called after send start and finish",
 "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -529,6 +579,7 @@ TEST_CASE(
 }
 TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -568,6 +619,7 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 }
 TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -608,6 +660,7 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform quad",
           "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
@@ -663,6 +716,7 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform quad",
           "[GMG::InterLevelComm]")
 {
+	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;

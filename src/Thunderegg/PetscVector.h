@@ -87,6 +87,7 @@ template <size_t D> class PetscVector : public Vector<D>
 	public:
 	PetscVector(Vec vec, int num_local_patches, const std::array<int, D> &lengths,
 	            int num_ghost_cells, bool own = true)
+	: Vector<D>(MPI_COMM_WORLD)
 	{
 		this->own             = own;
 		this->lengths         = lengths;

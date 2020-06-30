@@ -62,9 +62,9 @@ template <size_t D> class FftwPatchSolver : public Thunderegg::Schur::PatchSolve
 	double                                             lambda;
 	std::map<DomainK<D>, fftw_plan>                    plan1;
 	std::map<DomainK<D>, fftw_plan>                    plan2;
-	ValVector<D>                                       f_copy;
-	ValVector<D>                                       tmp;
-	ValVector<D>                                       sol;
+	std::shared_ptr<ValVector<D>>                      f_copy;
+	std::shared_ptr<ValVector<D>>                      tmp;
+	std::shared_ptr<ValVector<D>>                      sol;
 	std::array<int, D + 1>                             npow;
 	std::map<DomainK<D>, std::valarray<double>>        denoms;
 	std::shared_ptr<Thunderegg::Schur::SchurHelper<D>> sh;
@@ -118,9 +118,9 @@ template <size_t D> void FftwPatchSolver<D>::addPatch(Thunderegg::Schur::SchurIn
 		}
 		std::array<int, D> lengths;
 		lengths.fill(n);
-		f_copy = ValVector<D>(lengths, 0, 1);
-		tmp    = ValVector<D>(lengths, 0, 1);
-		sol    = ValVector<D>(lengths, 0, 1);
+		f_copy = std::make_shared<ValVector<D>>(MPI_COMM_SELF, lengths, 0, 1);
+		tmp    = std::make_shared<ValVector<D>>(MPI_COMM_SELF, lengths, 0, 1);
+		sol    = std::make_shared<ValVector<D>>(MPI_COMM_SELF, lengths, 0, 1);
 	}
 
 	int           ns[D];
@@ -145,9 +145,9 @@ template <size_t D> void FftwPatchSolver<D>::addPatch(Thunderegg::Schur::SchurIn
 			}
 		}
 
-		plan1[sinfo] = fftw_plan_r2r(D, ns, &f_copy.vec[0], &tmp.vec[0], transforms,
+		plan1[sinfo] = fftw_plan_r2r(D, ns, &f_copy->vec[0], &tmp->vec[0], transforms,
 		                             FFTW_MEASURE | FFTW_DESTROY_INPUT);
-		plan2[sinfo] = fftw_plan_r2r(D, ns, &tmp.vec[0], &sol.vec[0], transforms_inv,
+		plan2[sinfo] = fftw_plan_r2r(D, ns, &tmp->vec[0], &sol->vec[0], transforms_inv,
 		                             FFTW_MEASURE | FFTW_DESTROY_INPUT);
 	}
 
@@ -195,8 +195,8 @@ void FftwPatchSolver<D>::solve(Thunderegg::Schur::SchurInfo<D> &sinfo,
 {
 	using namespace std;
 	const LocalData<D> f_view      = f->getLocalData(sinfo.pinfo->local_index);
-	LocalData<D>       f_copy_view = f_copy.getLocalData(0);
-	LocalData<D>       tmp_view    = tmp.getLocalData(0);
+	LocalData<D>       f_copy_view = f_copy->getLocalData(0);
+	LocalData<D>       tmp_view    = tmp->getLocalData(0);
 
 	std::array<int, D> start, end;
 	start.fill(0);
@@ -206,20 +206,22 @@ void FftwPatchSolver<D>::solve(Thunderegg::Schur::SchurInfo<D> &sinfo,
 	               [&](std::array<int, D> coord) { f_copy_view[coord] = f_view[coord]; });
 
 	StarPatchOperator<D> op(sh);
-	op.addInterfaceToRHS(sinfo, gamma, f_copy.getLocalData(0));
+	op.addInterfaceToRHS(sinfo, gamma, f_copy->getLocalData(0));
 
 	fftw_execute(plan1[sinfo]);
 
-	tmp.vec /= denoms[sinfo];
+	tmp->vec /= denoms[sinfo];
 
-	if (sinfo.pinfo->neumann.all()) { tmp.vec[0] = 0; }
+	if (sinfo.pinfo->neumann.all()) {
+		tmp->vec[0] = 0;
+	}
 
 	fftw_execute(plan2[sinfo]);
 
-	sol.vec /= pow(2.0 * n, D);
+	sol->vec /= pow(2.0 * n, D);
 
 	LocalData<D> u_view   = u->getLocalData(sinfo.pinfo->local_index);
-	LocalData<D> sol_view = sol.getLocalData(0);
+	LocalData<D> sol_view = sol->getLocalData(0);
 	nested_loop<D>(start, end, [&](std::array<int, D> coord) { u_view[coord] = sol_view[coord]; });
 }
 extern template class FftwPatchSolver<2>;
