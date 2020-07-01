@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_SCHUR_IFACETYPE_H
 #define THUNDEREGG_SCHUR_IFACETYPE_H
-#include <Thunderegg/Side.h>
+#include <Thunderegg/Orthant.h>
 #include <tuple>
 namespace Thunderegg
 {

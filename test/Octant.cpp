@@ -1,4 +1,4 @@
-#include <Thunderegg/Side.h>
+#include <Thunderegg/Orthant.h>
 
 #include "catch.hpp"
 

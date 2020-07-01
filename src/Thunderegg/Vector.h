@@ -286,7 +286,7 @@ template <size_t D> class Vector
 	 *
 	 * @param comm_in the MPI_Comm to use
 	 */
-	Vector(MPI_Comm comm_in) : comm(comm_in){};
+	explicit Vector(MPI_Comm comm_in) : comm(comm_in){};
 	/**
 	 * @brief Destroy the Vector object
 	 */

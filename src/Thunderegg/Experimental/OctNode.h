@@ -22,7 +22,7 @@
 #ifndef THUNDEREGG_EXPERIMENTAL_OCTNODE_H
 #define THUNDEREGG_EXPERIMENTAL_OCTNODE_H
 
-#include <Thunderegg/Side.h>
+#include <Thunderegg/Orthant.h>
 #include <array>
 
 namespace Thunderegg

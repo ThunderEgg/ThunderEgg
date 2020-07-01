@@ -25,8 +25,8 @@
 #ifndef THUNDEREGG_PATCHINFO_H
 #define THUNDEREGG_PATCHINFO_H
 #include <Thunderegg/BufferIO.h>
+#include <Thunderegg/Orthant.h>
 #include <Thunderegg/Serializable.h>
-#include <Thunderegg/Side.h>
 #include <Thunderegg/TypeDefs.h>
 #include <array>
 #include <bitset>
