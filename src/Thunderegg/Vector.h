@@ -239,7 +239,7 @@ template <size_t D> class LocalData
 template <size_t D>
 inline LocalData<D - 1> LocalData<D>::getSliceOnSidePriv(Side<D> s, int offset) const
 {
-	size_t                 axis = s.toInt() / 2;
+	size_t                 axis = s.getAxisIndex();
 	std::array<int, D - 1> new_strides;
 	for (size_t i = 0; i < axis; i++) {
 		new_strides[i] = strides[i];

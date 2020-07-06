@@ -39,23 +39,26 @@ struct Block {
 	bool                flip_j;
 	bitset<4>           flip_j_table = 0b0110;
 	array<bitset<4>, 4> flip_i_table = {{0b0000, 0b1111, 0b0011, 0b1100}};
-	Side<2> rot_table[4][4] = {{Side<2>::west, Side<2>::east, Side<2>::south, Side<2>::north},
-	                           {Side<2>::east, Side<2>::west, Side<2>::north, Side<2>::south},
-	                           {Side<2>::north, Side<2>::south, Side<2>::west, Side<2>::east},
-	                           {Side<2>::south, Side<2>::north, Side<2>::east, Side<2>::west}};
+	Side<2>             rot_table[4][4]
+	= {{Side<2>::west(), Side<2>::east(), Side<2>::south(), Side<2>::north()},
+	   {Side<2>::east(), Side<2>::west(), Side<2>::north(), Side<2>::south()},
+	   {Side<2>::north(), Side<2>::south(), Side<2>::west(), Side<2>::east()},
+	   {Side<2>::south(), Side<2>::north(), Side<2>::east(), Side<2>::west()}};
 
 	Block(Side<2> main, int j, Side<2> aux, int i, bitset<4> neumann, IfaceType<2> type)
 	{
-		s          = rot_table[main.toInt()][aux.toInt()];
+		s          = rot_table[main.getIndex()][aux.getIndex()];
 		this->i    = i;
 		this->j    = j;
 		this->type = type;
 		for (int s = 0; s < 4; s++) {
-			this->neumann[rot_table[main.toInt()][s].toInt()] = neumann[s];
+			this->neumann[rot_table[main.getIndex()][s].getIndex()] = neumann[s];
 		}
-		flip_j = flip_j_table[main.toInt()];
-		flip_i = flip_i_table[main.toInt()][s.toInt()];
-		if (flip_i) { this->type.setOrthant(!type.getOrthant().toInt()); }
+		flip_j = flip_j_table[main.getIndex()];
+		flip_i = flip_i_table[main.getIndex()][s.getIndex()];
+		if (flip_i) {
+			this->type.setOrthant(!type.getOrthant().toInt());
+		}
 	}
 	bool operator==(const Block &b) const
 	{
@@ -143,7 +146,7 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 		pinfo->ns.fill(n);
 		pinfo->spacings.fill(1.0 / n);
 		pinfo->neumann = curr_type.neumann;
-		sd->getIfaceInfoPtr(Side<2>::west).reset(new NormalIfaceInfo<2>());
+		sd->getIfaceInfoPtr(Side<2>::west()).reset(new NormalIfaceInfo<2>());
 		// solver->addPatch(*sd);
 		std::vector<std::shared_ptr<SchurInfo<2>>> single_domain;
 		single_domain.push_back(sd);
@@ -172,7 +175,7 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 				for (int i = 0; i < n; i++) {
 					block[i * n + j] = -interp_view[i];
 				}
-				if (s == Side<2>::west) {
+				if (s == Side<2>::west()) {
 					switch (type.toInt()) {
 						case IfaceType<2>::normal:
 							block[n * j + j] += 0.5;
@@ -215,10 +218,14 @@ PW_explicit<Mat> SchurMatrixHelper2d::formCRSMatrix()
 		  valarray<double>  copy(n * n);
 		  for (int i = 0; i < n; i++) {
 			  int block_i = i;
-			  if (flip_i) { block_i = n - i - 1; }
+			  if (flip_i) {
+				  block_i = n - i - 1;
+			  }
 			  for (int j = 0; j < n; j++) {
 				  int block_j = j;
-				  if (flip_j) { block_j = n - j - 1; }
+				  if (flip_j) {
+					  block_j = n - j - 1;
+				  }
 				  copy[i * n + j] = orig[block_i * n + block_j];
 			  }
 		  }

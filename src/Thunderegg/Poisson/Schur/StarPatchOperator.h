@@ -63,9 +63,9 @@ template <size_t D> class StarPatchOperator : public Thunderegg::Schur::PatchOpe
 			h2[i] *= h2[i];
 		}
 		{
-			constexpr int axis       = 0;
-			Side<D>       lower_side = axis * 2;
-			Side<D>       upper_side = axis * 2 + 1;
+			constexpr size_t axis = 0;
+			Side<D>          lower_side(axis * 2);
+			Side<D>          upper_side(axis * 2 + 1);
 			if (sinfo.pinfo->hasNbr(lower_side)) {
 				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
 				const LocalData<D - 1> bnd
@@ -138,8 +138,8 @@ template <size_t D> class StarPatchOperator : public Thunderegg::Schur::PatchOpe
 			}
 		}
 		for (size_t axis = 1; axis < D; axis++) {
-			Side<D> lower_side = axis * 2;
-			Side<D> upper_side = axis * 2 + 1;
+			Side<D> lower_side(axis * 2);
+			Side<D> upper_side(axis * 2 + 1);
 			if (sinfo.pinfo->hasNbr(lower_side)) {
 				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
 				const LocalData<D - 1> bnd
@@ -222,7 +222,7 @@ template <size_t D> class StarPatchOperator : public Thunderegg::Schur::PatchOpe
 
 				LocalData<D - 1> slice = f.getSliceOnSide(s);
 
-				double h2 = pow(sinfo.pinfo->spacings[s.axis()], 2);
+				double h2 = pow(sinfo.pinfo->spacings[s.getAxisIndex()], 2);
 
 				nested_loop<D - 1>(gamma_view.getStart(), gamma_view.getEnd(),
 				                   [&](std::array<int, D - 1> coord) {
@@ -239,9 +239,9 @@ template <size_t D> class StarPatchOperator : public Thunderegg::Schur::PatchOpe
 			h2[i] *= h2[i];
 		}
 		{
-			constexpr int axis       = 0;
-			Side<D>       lower_side = axis * 2;
-			Side<D>       upper_side = axis * 2 + 1;
+			constexpr size_t axis = 0;
+			Side<D>          lower_side(axis * 2);
+			Side<D>          upper_side(axis * 2 + 1);
 			if (sinfo.pinfo->isNeumann(lower_side)) {
 				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
 				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);
@@ -294,8 +294,8 @@ template <size_t D> class StarPatchOperator : public Thunderegg::Schur::PatchOpe
 			}
 		}
 		for (size_t axis = 1; axis < D; axis++) {
-			Side<D> lower_side = axis * 2;
-			Side<D> upper_side = axis * 2 + 1;
+			Side<D> lower_side(axis * 2);
+			Side<D> upper_side(axis * 2 + 1);
 			if (sinfo.pinfo->isNeumann(lower_side)) {
 				LocalData<D - 1>       f_slice = f.getSliceOnSide(lower_side);
 				const LocalData<D - 1> mid     = u.getSliceOnSide(lower_side);

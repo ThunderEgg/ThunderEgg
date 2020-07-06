@@ -187,7 +187,7 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 
 		auto link_side_to_side = [&](p4est_iter_face_side_t side_info1,
 		                             p4est_iter_face_side_t side_info2) {
-			Side<2> side = side_info1.face;
+			Side<2> side(side_info1.face);
 			if (side_info1.is_hanging) {
 				// coarse nbr
 				int nbr_id, nbr_rank;
@@ -204,7 +204,7 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 					if (!side_info1.is.hanging.is_ghost[i]) {
 						my_data *     data = (my_data *) side_info1.is.hanging.quad[i]->p.user_data;
 						PatchInfo<2> &pinfo = *dmap[data->id];
-						pinfo.nbr_info[side.toInt()].reset(new CoarseNbrInfo<2>(nbr_id, i));
+						pinfo.nbr_info[side.getIndex()].reset(new CoarseNbrInfo<2>(nbr_id, i));
 						pinfo.getCoarseNbrInfo(side).updateRank(nbr_rank);
 					}
 				}
@@ -228,7 +228,7 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 						}
 					}
 					PatchInfo<2> &pinfo = *dmap[id];
-					pinfo.nbr_info[side.toInt()].reset(new FineNbrInfo<2>(nbr_ids));
+					pinfo.nbr_info[side.getIndex()].reset(new FineNbrInfo<2>(nbr_ids));
 					pinfo.getFineNbrInfo(side).updateRank(ranks[0], 0);
 					pinfo.getFineNbrInfo(side).updateRank(ranks[1], 1);
 				}
@@ -248,7 +248,7 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 						nbr_rank      = info->p4est->mpirank;
 					}
 					PatchInfo<2> &pinfo = *dmap[id];
-					pinfo.nbr_info[side.toInt()].reset(new NormalNbrInfo<2>(nbr_id));
+					pinfo.nbr_info[side.getIndex()].reset(new NormalNbrInfo<2>(nbr_id));
 					pinfo.getNormalNbrInfo(side).updateRank(nbr_rank);
 				}
 			}

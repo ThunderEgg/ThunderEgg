@@ -36,7 +36,6 @@ namespace GMG
 template <size_t D> class AvgRstr : public MPIRestrictor<D>
 {
 	private:
-
 	void
 	restrictPatches(const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
 	                std::shared_ptr<const Vector<D>> finer_vector,
@@ -51,7 +50,8 @@ template <size_t D> class AvgRstr : public MPIRestrictor<D>
 				Orthant<D>         orth = pinfo->orth_on_parent;
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
-					starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
+					starts[i]
+					= orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_data.getLengths()[i];
 				}
 
 				nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
@@ -74,7 +74,7 @@ template <size_t D> class AvgRstr : public MPIRestrictor<D>
 	public:
 	/**
 	 * @brief Construct a new Avg Rstr object
-	 * 
+	 *
 	 * @param ilc_in the InterLevelComm
 	 */
 	AvgRstr(std::shared_ptr<InterLevelComm<D>> ilc_in) : MPIRestrictor<D>(ilc_in) {}

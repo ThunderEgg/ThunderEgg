@@ -61,173 +61,159 @@ using namespace Thunderegg::Experimental;
 using namespace Thunderegg::VarPoisson;
 class fivePoint : public PatchOperator<2>
 {
-public:
-    fivePoint(std::shared_ptr<const Domain<2>>      domain,
-              std::shared_ptr<const GhostFiller<2>> ghost_filler);
+	public:
+	fivePoint(std::shared_ptr<const Domain<2>>      domain,
+	          std::shared_ptr<const GhostFiller<2>> ghost_filler);
 
-    void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, const LocalData<2> u,
-                          LocalData<2> f) const;
-    void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
-                       LocalData<2> f) const;
+	void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, const LocalData<2> u,
+	                      LocalData<2> f) const;
+	void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
+	                   LocalData<2> f) const;
 
+	class Generator
+	{
+		private:
+		/**
+		 * @brief generator for ghost fillers
+		 */
+		std::function<std::shared_ptr<const GhostFiller<2>>(
+		std::shared_ptr<const GMG::Level<2>> level)>
+		filler_gen;
+		/**
+		 * @brief Generated operators are stored here.
+		 */
+		std::map<std::shared_ptr<const Domain<2>>, std::shared_ptr<const fivePoint>>
+		generated_operators;
 
-    class Generator
-    {
-        private:
-        /**
-         * @brief generator for ghost fillers
-         */
-        std::function<std::shared_ptr<const GhostFiller<2>>(
-        std::shared_ptr<const GMG::Level<2>> level)>
-        filler_gen;
-        /**
-         * @brief Generated operators are stored here.
-         */
-        std::map<std::shared_ptr<const Domain<2>>, std::shared_ptr<const fivePoint>>
-        generated_operators;
+		public:
+		/**
+		 * @brief Construct a new fivePoint 2enerator
+		 *
+		 * @param finest_op the finest star pach operator
+		 * @param filler_gen returns a GhostFiller for a given level
+		 */
+		Generator(std::shared_ptr<const fivePoint> finest_op,
+		          std::function<
+		          std::shared_ptr<const GhostFiller<2>>(std::shared_ptr<const GMG::Level<2>> level)>
+		          filler_gen)
+		{
+			generated_operators[finest_op->domain] = finest_op;
+			this->filler_gen                       = filler_gen;
+		}
+		/**
+		 * @brief Return a fivePoint 2or a given level
+		 *
+		 * @param level the level in GMG
+		 * @return std::shared_ptr<const fivePoint> the operator
+		 */
+		std::shared_ptr<const fivePoint> operator()(std::shared_ptr<const GMG::Level<2>> level)
+		{
+			auto &coarser_op = generated_operators[level->getDomain()];
+			if (coarser_op != nullptr) {
+				return coarser_op;
+			}
 
-        public:
-        /**
-         * @brief Construct a new fivePoint 2enerator
-         *
-         * @param finest_op the finest star pach operator
-         * @param filler_gen returns a GhostFiller for a given level
-         */
-        Generator(std::shared_ptr<const fivePoint> finest_op,
-                  std::function<
-                  std::shared_ptr<const GhostFiller<2>>(std::shared_ptr<const GMG::Level<2>> level)>
-                  filler_gen)
-        {
-            generated_operators[finest_op->domain] = finest_op;
-            this->filler_gen                       = filler_gen;
-        }
-        /**
-         * @brief Return a fivePoint 2or a given level
-         *
-         * @param level the level in GMG
-         * @return std::shared_ptr<const fivePoint> the operator
-         */
-        std::shared_ptr<const fivePoint>
-        operator()(std::shared_ptr<const GMG::Level<2>> level)
-        {
-            auto &coarser_op = generated_operators[level->getDomain()];
-            if (coarser_op != nullptr) {
-                return coarser_op;
-            }
-
-            std::shared_ptr<const Domain<2>> finer_domain = level->getFiner()->getDomain();
-            auto                             finer_op     = generated_operators[finer_domain];
-            //auto new_coeffs = PetscVector<2>::GetNewVector(level->getDomain());
-            //level->getFiner()->getRestrictor().restrict(new_coeffs, finer_op->coeffs);
-            coarser_op.reset(
-            new fivePoint(level->getDomain(), filler_gen(level)));
-            return coarser_op;
-        }
-    };
+			std::shared_ptr<const Domain<2>> finer_domain = level->getFiner()->getDomain();
+			auto                             finer_op     = generated_operators[finer_domain];
+			// auto new_coeffs = PetscVector<2>::GetNewVector(level->getDomain());
+			// level->getFiner()->getRestrictor().restrict(new_coeffs, finer_op->coeffs);
+			coarser_op.reset(new fivePoint(level->getDomain(), filler_gen(level)));
+			return coarser_op;
+		}
+	};
 };
-
 
 #if 0
 /* Store beta as member in fivePoint */
 void fivePoint::fivePoint>(beta_vec,te_domain,ghost_filler);
 #endif
 
-
 fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain,
                      std::shared_ptr<const GhostFiller<2>> ghost_filler)
 {
-    if (domain->getNumGhostCells() < 1) {
-        throw 88;
-    }
-    this->domain       = domain;
-    this->ghost_filler = ghost_filler;
+	if (domain->getNumGhostCells() < 1) {
+		throw 88;
+	}
+	this->domain       = domain;
+	this->ghost_filler = ghost_filler;
 }
 
-
-void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                                 LocalData<2> u,
-                                 LocalData<2> f) const 
+void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
+                                 LocalData<2> f) const
 {
-
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
+	int mx = pinfo->ns[0];
+	int my = pinfo->ns[1];
 
 #if 0    
     int mbc = pinfo->num_ghost_cells;
     double xlower = pinfo->starts[0];
     double ylower = pinfo->starts[1];
     double dy = pinfo->spacings[1];
-#endif    
-    double dx = pinfo->spacings[0];
+#endif
+	double dx = pinfo->spacings[0];
 
-    /* Apply homogeneous physical boundary conditions */
-    for(int j = 0; j < my; j++)
-    {
-        /* bool hasNbr(Side<D> s) */
-        if (!pinfo->hasNbr(Side<2>::west))
-        {
-            u[{-1,j}] = -u[{0,j}];
-        }
-        //u[{-1,j}] = -u[{0,j}];
+	/* Apply homogeneous physical boundary conditions */
+	for (int j = 0; j < my; j++) {
+		/* bool hasNbr(Side<D> s) */
+		if (!pinfo->hasNbr(Side<2>::west())) {
+			u[{-1, j}] = -u[{0, j}];
+		}
+		// u[{-1,j}] = -u[{0,j}];
 
-        if (!pinfo->hasNbr(Side<2>::east))
-        {
-            u[{mx,j}] = -u[{mx-1,j}];;
-        }
-        //u[{mx,j}] = -u[{mx-1,j}];;
-    }
+		if (!pinfo->hasNbr(Side<2>::east())) {
+			u[{mx, j}] = -u[{mx - 1, j}];
+			;
+		}
+		// u[{mx,j}] = -u[{mx-1,j}];;
+	}
 
-    for(int i = 0; i < mx; i++)
-    {
-        if (!pinfo->hasNbr(Side<2>::south))
-        {
-            u[{i,-1}] = -u[{i,0}];
-        }
-        //u[{i,-1}] = -u[{i,0}];
-        if (!pinfo->hasNbr(Side<2>::north))
-        {
-            u[{i,my}] = -u[{i,my-1}];
-        }
-        //u[{i,my}] = -u[{i,my-1}];
-    }
-
+	for (int i = 0; i < mx; i++) {
+		if (!pinfo->hasNbr(Side<2>::south())) {
+			u[{i, -1}] = -u[{i, 0}];
+		}
+		// u[{i,-1}] = -u[{i,0}];
+		if (!pinfo->hasNbr(Side<2>::north())) {
+			u[{i, my}] = -u[{i, my - 1}];
+		}
+		// u[{i,my}] = -u[{i,my-1}];
+	}
 
 #if 1
-    //if physical boundary
-    if (!pinfo->hasNbr(Side<2>::west)){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::west,1);
-        for(int j = 0; j < my; j++){
-            ghosts[{j}] = -u[{0,j}];
-        }
-    }
-    if (!pinfo->hasNbr(Side<2>::east)){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::east,1);
-        for(int j = 0; j < my; j++){
-            ghosts[{j}] = -u[{mx-1,j}];
-        }
-    }
+	// if physical boundary
+	if (!pinfo->hasNbr(Side<2>::west())) {
+		auto ghosts = u.getGhostSliceOnSide(Side<2>::west(), 1);
+		for (int j = 0; j < my; j++) {
+			ghosts[{j}] = -u[{0, j}];
+		}
+	}
+	if (!pinfo->hasNbr(Side<2>::east())) {
+		auto ghosts = u.getGhostSliceOnSide(Side<2>::east(), 1);
+		for (int j = 0; j < my; j++) {
+			ghosts[{j}] = -u[{mx - 1, j}];
+		}
+	}
 
-    if (!pinfo->hasNbr(Side<2>::south)){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::south,1);
-        for(int i = 0; i < mx; i++){
-            ghosts[{i}] = -u[{i,0}];
-        }
-    }
-    if (!pinfo->hasNbr(Side<2>::north)){
-        auto ghosts = u.getGhostSliceOnSide(Side<2>::north,1);
-        for(int i = 0; i < mx; i++){
-            ghosts[{i}] = -u[{i,my-1}];
-        }
-    }
+	if (!pinfo->hasNbr(Side<2>::south())) {
+		auto ghosts = u.getGhostSliceOnSide(Side<2>::south(), 1);
+		for (int i = 0; i < mx; i++) {
+			ghosts[{i}] = -u[{i, 0}];
+		}
+	}
+	if (!pinfo->hasNbr(Side<2>::north())) {
+		auto ghosts = u.getGhostSliceOnSide(Side<2>::north(), 1);
+		for (int i = 0; i < mx; i++) {
+			ghosts[{i}] = -u[{i, my - 1}];
+		}
+	}
 #endif
 
-    for(int i = 0; i < mx; i++)
-    {
-        for(int j = 0; j < my; j++)
-        {
-            f[{i,j}] = (u[{i+1,j}] + u[{i-1,j}] + u[{i,j+1}] + u[{i,j-1}] - 4*u[{i,j}])/(dx*dx);
-        }
-    }
+	for (int i = 0; i < mx; i++) {
+		for (int j = 0; j < my; j++) {
+			f[{i, j}]
+			= (u[{i + 1, j}] + u[{i - 1, j}] + u[{i, j + 1}] + u[{i, j - 1}] - 4 * u[{i, j}])
+			  / (dx * dx);
+		}
+	}
 }
 
 #if 0
@@ -241,55 +227,48 @@ void fivePoint::apply(std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector
 }
 #endif
 
-
-void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, 
-                              LocalData<2> u, LocalData<2> f) const 
+void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
+                              LocalData<2> f) const
 {
-    int mx = pinfo->ns[0]; 
-    int my = pinfo->ns[1];
+	int mx = pinfo->ns[0];
+	int my = pinfo->ns[1];
 #if 0    
     int mbc = pinfo->num_ghost_cells;
     double xlower = pinfo->starts[0];
     double ylower = pinfo->starts[1];
-#endif    
-    double dx = pinfo->spacings[0];
-    double dx2 = dx*dx;
+#endif
+	double dx  = pinfo->spacings[0];
+	double dx2 = dx * dx;
 
-    double dy = pinfo->spacings[1];
-    double dy2 = dy*dy;
+	double dy  = pinfo->spacings[1];
+	double dy2 = dy * dy;
 
-    //return;
+	// return;
 
-    for(int j = 0; j < my; j++)
-    {
-        /* bool hasNbr(Side<D> s) */
-        if (pinfo->hasNbr(Side<2>::west))
-        {
-            f[{0,j}] += -u[{-1,j}]/dx2;
-            u[{-1,j}] = 0;
-        }
+	for (int j = 0; j < my; j++) {
+		/* bool hasNbr(Side<D> s) */
+		if (pinfo->hasNbr(Side<2>::west())) {
+			f[{0, j}] += -u[{-1, j}] / dx2;
+			u[{-1, j}] = 0;
+		}
 
-        if (pinfo->hasNbr(Side<2>::east))
-        {
-            f[{mx-1,j}] += -u[{mx,j}]/dx2;
-            u[{mx,j}] = 0;
-        }
-    }
+		if (pinfo->hasNbr(Side<2>::east())) {
+			f[{mx - 1, j}] += -u[{mx, j}] / dx2;
+			u[{mx, j}] = 0;
+		}
+	}
 
-    for(int i = 0; i < mx; i++)
-    {
-        if (pinfo->hasNbr(Side<2>::south))
-        {
-            f[{i,0}] += -u[{i,-1}]/dy2;
-            u[{i,-1}]=0;
-        }
+	for (int i = 0; i < mx; i++) {
+		if (pinfo->hasNbr(Side<2>::south())) {
+			f[{i, 0}] += -u[{i, -1}] / dy2;
+			u[{i, -1}] = 0;
+		}
 
-        if (pinfo->hasNbr(Side<2>::north))
-        {
-            f[{i,my-1}] += -u[{i,my}]/dy2;
-            u[{i,my}]=0;
-        }
-    }
+		if (pinfo->hasNbr(Side<2>::north())) {
+			f[{i, my - 1}] += -u[{i, my}] / dy2;
+			u[{i, my}] = 0;
+		}
+	}
 }
 int main(int argc, char *argv[])
 {
@@ -494,7 +473,7 @@ int main(int argc, char *argv[])
 		hfun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[1];
-			//return 1 + x * y;
+			// return 1 + x * y;
 			return 1;
 		};
 	} else {
@@ -536,11 +515,11 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		shared_ptr<ValVector<2>> u     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>> exact = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>> f     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>> au    = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>> h     = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>   u     = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>   exact = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>   f     = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>   au    = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>   h     = ValVector<2>::GetNewVector(domain);
 		shared_ptr<PetscVector<1>> h_bc  = PetscVector<2>::GetNewBCVector(domain);
 
 		DomainTools<2>::setValues(domain, f, ffun);
@@ -558,7 +537,7 @@ int main(int argc, char *argv[])
 		// patch operator
 		shared_ptr<BiLinearGhostFiller>  gf(new BiLinearGhostFiller(domain));
 		shared_ptr<StarPatchOperator<2>> p_operator(new StarPatchOperator<2>(h, domain, gf));
-		//shared_ptr<fivePoint> p_operator(new fivePoint(domain, gf));
+		// shared_ptr<fivePoint> p_operator(new fivePoint(domain, gf));
 		StarPatchOperator<2>::addDrichletBCToRHS(domain, f, gfun, hfun);
 
 		// set the patch solver
@@ -591,9 +570,9 @@ int main(int argc, char *argv[])
 		} else if (preconditioner == "GMG") {
 			timer->start("GMG Setup");
 
-			BiLinearGhostFiller::Generator      filler_gen(gf);
-			StarPatchOperator<2>::Generator     op_gen(p_operator, filler_gen);
-			//fivePoint::Generator     op_gen(p_operator, filler_gen);
+			BiLinearGhostFiller::Generator  filler_gen(gf);
+			StarPatchOperator<2>::Generator op_gen(p_operator, filler_gen);
+			// fivePoint::Generator     op_gen(p_operator, filler_gen);
 			BiCGStabPatchSolver<2>::Generator   smooth_gen(p_solver, filler_gen, op_gen);
 			GMG::LinearRestrictor<2>::Generator restrictor_gen;
 			GMG::DrctIntp<2>::Generator         interpolator_gen;
@@ -606,21 +585,21 @@ int main(int argc, char *argv[])
 		}
 		timer->stop("Preconditioner Setup");
 
-		//PW<KSP> solver;
+		// PW<KSP> solver;
 		// setup petsc if needed
 		if (solver_type == "petsc") {
 			timer->start("Petsc Setup");
 
-			//KSPCreate(MPI_COMM_WORLD, &solver);
-			//KSPSetFromOptions(solver);
-			//KSPSetOperators(solver, A_petsc, A_petsc);
+			// KSPCreate(MPI_COMM_WORLD, &solver);
+			// KSPSetFromOptions(solver);
+			// KSPSetOperators(solver, A_petsc, A_petsc);
 			if (M != nullptr) {
 				PC M_petsc;
-				//KSPGetPC(solver, &M_petsc);
+				// KSPGetPC(solver, &M_petsc);
 				PetscShellCreator::getPCShell(M_petsc, M, domain);
 			}
-			//KSPSetUp(solver);
-			//KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
+			// KSPSetUp(solver);
+			// KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
 
 			timer->stop("Petsc Setup");
 		}
@@ -631,9 +610,9 @@ int main(int argc, char *argv[])
 
 		timer->start("Linear Solve");
 		if (solver_type == "petsc") {
-			//KSPSolve(solver, f->vec, u->vec);
+			// KSPSolve(solver, f->vec, u->vec);
 			int its;
-			//KSPGetIterationNumber(solver, &its);
+			// KSPGetIterationNumber(solver, &its);
 			if (my_global_rank == 0) {
 				cout << "Iterations: " << its << endl;
 			}
@@ -652,13 +631,13 @@ int main(int argc, char *argv[])
 
 		// residual
 		shared_ptr<ValVector<2>> resid = ValVector<2>::GetNewVector(domain);
-		//VecAXPBYPCZ(resid->vec, -1.0, 1.0, 0.0, au->vec, f->vec);
+		// VecAXPBYPCZ(resid->vec, -1.0, 1.0, 0.0, au->vec, f->vec);
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
 		shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain);
-		//VecAXPBYPCZ(error->vec, -1.0, 1.0, 0.0, exact->vec, u->vec);
+		// VecAXPBYPCZ(error->vec, -1.0, 1.0, 0.0, exact->vec, u->vec);
 		if (neumann) {
 			double uavg = domain->integrate(u) / domain->volume();
 			double eavg = domain->integrate(exact) / domain->volume();
@@ -668,7 +647,7 @@ int main(int argc, char *argv[])
 				cout << "Average of exact solution: " << eavg << endl;
 			}
 
-            error->shift(eavg-uavg);
+			error->shift(eavg - uavg);
 		}
 		double error_norm = error->twoNorm();
 		double exact_norm = exact->twoNorm();

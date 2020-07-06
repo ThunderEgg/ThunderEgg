@@ -131,11 +131,11 @@ template <size_t D> class NormalIfaceInfo : public IfaceInfo<D>
 	{
 		nbr_info = pinfo->getNormalNbrInfoPtr(s);
 		if (s.isLowerOnAxis()) {
-			this->id = pinfo->id * Side<D>::num_sides + s.toInt();
+			this->id = pinfo->id * Side<D>::num_sides + s.getIndex();
 			// lower axis interface belongs to neighboring rank
 			this->rank = nbr_info->rank;
 		} else {
-			this->id = nbr_info->id * Side<D>::num_sides + s.opposite().toInt();
+			this->id = nbr_info->id * Side<D>::num_sides + s.opposite().getIndex();
 			// higher axis interafce belongs to this patch's rank
 			this->rank = pinfo->rank;
 		}
@@ -213,9 +213,9 @@ template <size_t D> class CoarseIfaceInfo : public IfaceInfo<D>
 	CoarseIfaceInfo(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
 	{
 		nbr_info       = pinfo->getCoarseNbrInfoPtr(s);
-		this->id       = pinfo->id * Side<D>::num_sides + s.toInt();
+		this->id       = pinfo->id * Side<D>::num_sides + s.getIndex();
 		orth_on_coarse = nbr_info->orth_on_coarse;
-		coarse_id      = nbr_info->id * Side<D>::num_sides + s.opposite().toInt();
+		coarse_id      = nbr_info->id * Side<D>::num_sides + s.opposite().getIndex();
 		// fine and coarse interfaces always belong to their patches
 		this->rank        = pinfo->rank;
 		this->coarse_rank = nbr_info->rank;
@@ -251,7 +251,8 @@ template <size_t D> class CoarseIfaceInfo : public IfaceInfo<D>
 	{
 		this->local_index = rev_map.at(this->id);
 		auto it           = rev_map.find(coarse_id);
-		if (it != rev_map.end()) coarse_local_index = it->second;
+		if (it != rev_map.end())
+			coarse_local_index = it->second;
 	}
 	void setGlobalIndexes(const std::map<int, int> &rev_map)
 	{
@@ -299,10 +300,10 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 	FineIfaceInfo(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
 	{
 		nbr_info   = pinfo->getFineNbrInfoPtr(s);
-		this->id   = pinfo->id * Side<D>::num_sides + s.toInt();
+		this->id   = pinfo->id * Side<D>::num_sides + s.getIndex();
 		this->rank = pinfo->rank;
 		for (size_t i = 0; i < fine_ids.size(); i++) {
-			fine_ids[i]   = nbr_info->ids[i] * Side<D>::num_sides + s.opposite().toInt();
+			fine_ids[i]   = nbr_info->ids[i] * Side<D>::num_sides + s.opposite().getIndex();
 			fine_ranks[i] = nbr_info->ranks[i];
 		}
 	}
@@ -357,7 +358,8 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 		this->local_index = rev_map.at(this->id);
 		for (size_t i = 0; i < fine_ids.size(); i++) {
 			auto it = rev_map.find(this->fine_ids[i]);
-			if (it != rev_map.end()) fine_local_indexes[i] = it->second;
+			if (it != rev_map.end())
+				fine_local_indexes[i] = it->second;
 		}
 	}
 	void setGlobalIndexes(const std::map<int, int> &rev_map)
@@ -424,7 +426,7 @@ template <size_t D> struct SchurInfo : public Serializable {
 	 */
 	std::shared_ptr<IfaceInfo<D>> &getIfaceInfoPtr(Side<D> s)
 	{
-		return iface_info[s.toInt()];
+		return iface_info[s.getIndex()];
 	}
 	/*
 	 * @brief Get a reference to the NormalIfaceInfo object.
@@ -435,7 +437,7 @@ template <size_t D> struct SchurInfo : public Serializable {
 	 */
 	NormalIfaceInfo<D> &getNormalIfaceInfo(Side<D> s)
 	{
-		return *std::dynamic_pointer_cast<NormalIfaceInfo<D>>(iface_info[s.toInt()]);
+		return *std::dynamic_pointer_cast<NormalIfaceInfo<D>>(iface_info[s.getIndex()]);
 	}
 	/*
 	 * @brief Get a reference to the CoarseIfaceInfo object.
@@ -446,7 +448,7 @@ template <size_t D> struct SchurInfo : public Serializable {
 	 */
 	CoarseIfaceInfo<D> &getCoarseIfaceInfo(Side<D> s)
 	{
-		return *std::dynamic_pointer_cast<CoarseIfaceInfo<D>>(iface_info[s.toInt()]);
+		return *std::dynamic_pointer_cast<CoarseIfaceInfo<D>>(iface_info[s.getIndex()]);
 	}
 	/*
 	 * @brief Get a reference to the FineIfaceInfo object.
@@ -457,7 +459,7 @@ template <size_t D> struct SchurInfo : public Serializable {
 	 */
 	FineIfaceInfo<D> &getFineIfaceInfo(Side<D> s)
 	{
-		return *std::dynamic_pointer_cast<FineIfaceInfo<D>>(iface_info[s.toInt()]);
+		return *std::dynamic_pointer_cast<FineIfaceInfo<D>>(iface_info[s.getIndex()]);
 	}
 	/*
 	 * @brief Get a reference to the NormalIfaceInfo object.
@@ -468,7 +470,7 @@ template <size_t D> struct SchurInfo : public Serializable {
 	 */
 	const NormalIfaceInfo<D> &getNormalIfaceInfo(Side<D> s) const
 	{
-		return *std::dynamic_pointer_cast<NormalIfaceInfo<D>>(iface_info[s.toInt()]);
+		return *std::dynamic_pointer_cast<NormalIfaceInfo<D>>(iface_info[s.getIndex()]);
 	}
 	/*
 	 * @brief Get a reference to the CoarseIfaceInfo object.
@@ -479,7 +481,7 @@ template <size_t D> struct SchurInfo : public Serializable {
 	 */
 	const CoarseIfaceInfo<D> &getCoarseIfaceInfo(Side<D> s) const
 	{
-		return *std::dynamic_pointer_cast<CoarseIfaceInfo<D>>(iface_info[s.toInt()]);
+		return *std::dynamic_pointer_cast<CoarseIfaceInfo<D>>(iface_info[s.getIndex()]);
 	}
 	/*
 	 * @brief Get a reference to the FineIfaceInfo object.
@@ -490,7 +492,7 @@ template <size_t D> struct SchurInfo : public Serializable {
 	 */
 	const FineIfaceInfo<D> &getFineIfaceInfo(Side<D> s) const
 	{
-		return *std::dynamic_pointer_cast<FineIfaceInfo<D>>(iface_info[s.toInt()]);
+		return *std::dynamic_pointer_cast<FineIfaceInfo<D>>(iface_info[s.getIndex()]);
 	}
 	/**
 	 * @brief
@@ -504,25 +506,31 @@ template <size_t D> struct SchurInfo : public Serializable {
 	{
 		std::deque<int> retval;
 		for (Side<D> s : Side<D>::getValues()) {
-			if (pinfo->hasNbr(s)) { getIfaceInfoPtr(s)->getIds(retval); }
+			if (pinfo->hasNbr(s)) {
+				getIfaceInfoPtr(s)->getIds(retval);
+			}
 		}
 		return retval;
 	}
 	void setLocalIndexes(const std::map<int, int> &rev_map)
 	{
 		for (Side<D> s : Side<D>::getValues()) {
-			if (pinfo->hasNbr(s)) { getIfaceInfoPtr(s)->setLocalIndexes(rev_map); }
+			if (pinfo->hasNbr(s)) {
+				getIfaceInfoPtr(s)->setLocalIndexes(rev_map);
+			}
 		}
 	}
 	void setGlobalIndexes(const std::map<int, int> &rev_map)
 	{
 		for (Side<D> s : Side<D>::getValues()) {
-			if (pinfo->hasNbr(s)) { getIfaceInfoPtr(s)->setGlobalIndexes(rev_map); }
+			if (pinfo->hasNbr(s)) {
+				getIfaceInfoPtr(s)->setGlobalIndexes(rev_map);
+			}
 		}
 	}
 	int getIfaceLocalIndex(Side<D> s) const
 	{
-		return iface_info[s.toInt()]->local_index;
+		return iface_info[s.getIndex()]->local_index;
 	}
 	int serialize(char *buffer) const
 	{

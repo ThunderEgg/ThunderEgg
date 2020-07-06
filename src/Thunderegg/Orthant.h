@@ -157,11 +157,11 @@ template <size_t D> class Orthant
 	{
 		std::array<Side<D>, D> retval;
 		for (size_t i = 0; i < D; i++) {
-			int side = 2 * i;
+			size_t side = 2 * i;
 			if (!((1 << i) & val)) {
 				side |= 1;
 			}
-			retval[i] = side;
+			retval[i] = Side<D>(side);
 		}
 		return retval;
 	}
@@ -174,11 +174,11 @@ template <size_t D> class Orthant
 	{
 		std::array<Side<D>, D> retval;
 		for (size_t i = 0; i < D; i++) {
-			int side = 2 * i;
+			size_t side = 2 * i;
 			if ((1 << i) & val) {
 				side |= 1;
 			}
-			retval[i] = side;
+			retval[i] = Side<D>(side);
 		}
 		return retval;
 	}
@@ -191,8 +191,8 @@ template <size_t D> class Orthant
 	 */
 	inline bool isOnSide(Side<D> s) const
 	{
-		int  idx        = s.toInt() / 2;
-		int  remainder  = s.toInt() % 2;
+		int  idx        = s.getIndex() / 2;
+		int  remainder  = s.getIndex() % 2;
 		bool is_bit_set = val & (0x1 << idx);
 		return is_bit_set == remainder;
 	}
@@ -259,20 +259,20 @@ template <size_t D> inline Orthant<D> Orthant<D>::getInteriorNbrOnSide(Side<D> s
 {
 	Orthant<D> retval = *this;
 	// flip the bit for that side
-	retval.val ^= (0x1 << (s.toInt() / 2));
+	retval.val ^= (0x1 << s.getAxisIndex());
 	return retval;
 }
 template <size_t D> inline Orthant<D> Orthant<D>::getExteriorNbrOnSide(Side<D> s) const
 {
 	Orthant<D> retval = *this;
 	// flip the bit for that side
-	retval.val ^= (0x1 << (s.toInt() / 2));
+	retval.val ^= (0x1 << s.getAxisIndex());
 	return retval;
 }
 template <size_t D>
 inline std::array<Orthant<D>, Orthant<D>::num_orthants / 2> Orthant<D>::getValuesOnSide(Side<D> s)
 {
-	unsigned int bit_to_insert = s.toInt() / 2;
+	unsigned int bit_to_insert = s.getAxisIndex();
 	unsigned int set_bit       = s.isLowerOnAxis() ? 0 : 1;
 	unsigned int lower_mask    = ~((~0x0) << bit_to_insert);
 	unsigned int upper_mask    = (~0x0) << (bit_to_insert + 1);

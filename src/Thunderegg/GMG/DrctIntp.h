@@ -52,7 +52,8 @@ template <size_t D> class DrctIntp : public MPIInterpolator<D>
 				Orthant<D>         orth = pinfo->orth_on_parent;
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
-					starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
+					starts[i]
+					= orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_data.getLengths()[i];
 				}
 
 				nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),

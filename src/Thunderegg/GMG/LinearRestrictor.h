@@ -48,7 +48,8 @@ template <size_t D> class LinearRestrictor : public MPIRestrictor<D>
 				// get starting index in coarser patch
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
-					starts[i] = orth.isOnSide(2 * i) ? 0 : coarse_local_data.getLengths()[i];
+					starts[i]
+					= orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_data.getLengths()[i];
 				}
 
 				// interpolate interior values
@@ -69,10 +70,10 @@ template <size_t D> class LinearRestrictor : public MPIRestrictor<D>
 					nested_loop<D>(fine_ghost.getStart(), fine_ghost.getEnd(),
 					               [&](const std::array<int, D - 1> &coord) {
 						               std::array<int, D - 1> coarse_coord;
-						               for (size_t x = 0; x < s.axis(); x++) {
+						               for (size_t x = 0; x < s.getAxisIndex(); x++) {
 							               coarse_coord[x] = (coord[x] + starts[x]) / 2;
 						               }
-						               for (size_t x = s.axis() + 1; x < D; x++) {
+						               for (size_t x = s.getAxisIndex() + 1; x < D; x++) {
 							               coarse_coord[x - 1] = (coord[x - 1] + starts[x]) / 2;
 						               }
 						               coarse_ghost[coarse_coord]

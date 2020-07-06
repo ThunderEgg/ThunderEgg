@@ -65,10 +65,10 @@ void TriLinInterp::interpolate(SchurInfo<3> &sinfo, Side<3> s, int local_index, 
                                std::shared_ptr<Vector<2>>       interp)
 {
 	std::array<int, 2> ns;
-	for (int i = 0; i < s.axis(); i++) {
+	for (int i = 0; i < s.getAxisIndex(); i++) {
 		ns[i] = sinfo.pinfo->ns[i];
 	}
-	for (int i = s.axis(); i < 2; i++) {
+	for (int i = s.getAxisIndex(); i < 2; i++) {
 		ns[i] = sinfo.pinfo->ns[i + 1];
 	}
 	int nx = ns[0];

@@ -120,7 +120,7 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 		std::array<int, D> strides;
 		strides[0] = 1;
 		for (size_t i = 1; i < D; i++) {
-			if (i == side.axis() + 1) {
+			if (i == side.getAxisIndex() + 1) {
 				strides[i] = num_ghost_cells * strides[i - 1];
 			} else {
 				strides[i] = ns[i - 1] * strides[i - 1];
@@ -129,9 +129,10 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 		// transform buffer ptr so that it points to first non-ghost cell
 		double *transformed_buffer_ptr;
 		if (side.isLowerOnAxis()) {
-			transformed_buffer_ptr = buffer_ptr - (-num_ghost_cells) * strides[side.axis()];
+			transformed_buffer_ptr = buffer_ptr - (-num_ghost_cells) * strides[side.getAxisIndex()];
 		} else {
-			transformed_buffer_ptr = buffer_ptr - ns[side.axis()] * strides[side.axis()];
+			transformed_buffer_ptr
+			= buffer_ptr - ns[side.getAxisIndex()] * strides[side.getAxisIndex()];
 		}
 
 		LocalData<D> buffer_data(transformed_buffer_ptr, strides, ns, num_ghost_cells);
@@ -260,7 +261,7 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 			size_t offset = send_buff_lengths[local_buffer_index];
 
 			// calculate length in buffer need for ghost cells
-			size_t length = axis_ghost_lengths[side.axis()];
+			size_t length = axis_ghost_lengths[side.getAxisIndex()];
 			// add length to buffer length
 			// if its the same side of the patch, resuse the previous buffer space
 			if (std::make_tuple(id, side) == prev_id_side) {
@@ -281,7 +282,7 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 			int     local_index        = std::get<3>(t);
 
 			// add length for ghosts to buffer length
-			size_t length = axis_ghost_lengths[side.axis()];
+			size_t length = axis_ghost_lengths[side.getAxisIndex()];
 			size_t offset = recv_buff_lengths[local_buffer_index];
 			recv_buff_lengths[local_buffer_index] += length;
 

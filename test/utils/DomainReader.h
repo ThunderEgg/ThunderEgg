@@ -69,13 +69,13 @@ template <size_t D> class DomainReader
 			std::string         side_str = nbr_j["side"];
 			Thunderegg::Side<2> side;
 			if (side_str == "west") {
-				side = Thunderegg::Side<2>::west;
+				side = Thunderegg::Side<2>::west();
 			} else if (side_str == "east") {
-				side = Thunderegg::Side<2>::east;
+				side = Thunderegg::Side<2>::east();
 			} else if (side_str == "south") {
-				side = Thunderegg::Side<2>::south;
+				side = Thunderegg::Side<2>::south();
 			} else if (side_str == "north") {
-				side = Thunderegg::Side<2>::north;
+				side = Thunderegg::Side<2>::north();
 			} else {
 				throw "parsing error";
 			}
@@ -83,17 +83,17 @@ template <size_t D> class DomainReader
 			using array1 = std::array<int, 1>;
 			switch (nbr_type) {
 				case Thunderegg::NbrType::Normal: {
-					pinfo->nbr_info[side.toInt()].reset(
+					pinfo->nbr_info[side.getIndex()].reset(
 					new Thunderegg::NormalNbrInfo<2>(nbr_j.at("ids").get<array1>()[0]));
 					pinfo->getNormalNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
 				} break;
 				case Thunderegg::NbrType::Fine: {
-					pinfo->nbr_info[side.toInt()].reset(
+					pinfo->nbr_info[side.getIndex()].reset(
 					new Thunderegg::FineNbrInfo<2>(nbr_j.at("ids").get<array>()));
 					pinfo->getFineNbrInfo(side).ranks = nbr_j.at("ranks").get<array>();
 				} break;
 				case Thunderegg::NbrType::Coarse: {
-					pinfo->nbr_info[side.toInt()].reset(new Thunderegg::CoarseNbrInfo<2>(
+					pinfo->nbr_info[side.getIndex()].reset(new Thunderegg::CoarseNbrInfo<2>(
 					nbr_j.at("ids").get<array1>()[0], nbr_j.at("orth_on_coarse").get<int>()));
 					pinfo->getCoarseNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
 				} break;

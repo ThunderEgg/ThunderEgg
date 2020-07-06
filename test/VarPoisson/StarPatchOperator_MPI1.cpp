@@ -74,7 +74,7 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[GMG::StarPatchOperator]")
 		auto f = f_expected->getLocalData(pinfo->local_index);
 		for (Side<2> s : Side<2>::getValues()) {
 			if (pinfo->hasNbr(s)) {
-				double h2      = std::pow(pinfo->spacings[s.axis()], 2);
+				double h2      = std::pow(pinfo->spacings[s.getAxisIndex()], 2);
 				auto   f_slice = f.getSliceOnSide(s);
 				auto   u_inner = u.getSliceOnSide(s);
 				auto   u_ghost = u.getSliceOnSide(s, -1);

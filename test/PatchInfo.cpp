@@ -70,9 +70,9 @@ TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 	PatchInfo<3> *d_ptr = new PatchInfo<3>;
 	PatchInfo<3> &d     = *d_ptr;
 	d.id                = 0;
-	d.nbr_info[Side<3>::north].reset(new NormalNbrInfo<3>(1));
-	d.nbr_info[Side<3>::east].reset(new CoarseNbrInfo<3>(2, 3));
-	d.nbr_info[Side<3>::south].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
+	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
+	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, 3));
+	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
 
 	// serialize and then deserialize
 	char *buff = new char[d.serialize(nullptr)];
@@ -85,26 +85,26 @@ TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 	// check that deserialized version has the same information
 	REQUIRE(out.id == 0);
 
-	REQUIRE(!out.hasNbr(Side<3>::west));
+	REQUIRE(!out.hasNbr(Side<3>::west()));
 
-	REQUIRE(out.hasNbr(Side<3>::east));
-	REQUIRE(out.getNbrType(Side<3>::east) == NbrType::Coarse);
-	REQUIRE(out.getCoarseNbrInfo(Side<3>::east).id == 2);
-	REQUIRE(out.getCoarseNbrInfo(Side<3>::east).orth_on_coarse == 3);
+	REQUIRE(out.hasNbr(Side<3>::east()));
+	REQUIRE(out.getNbrType(Side<3>::east()) == NbrType::Coarse);
+	REQUIRE(out.getCoarseNbrInfo(Side<3>::east()).id == 2);
+	REQUIRE(out.getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == 3);
 
-	REQUIRE(out.hasNbr(Side<3>::south));
-	REQUIRE(out.getNbrType(Side<3>::south) == NbrType::Fine);
-	REQUIRE(out.getFineNbrInfo(Side<3>::south).ids[0] == 3);
-	REQUIRE(out.getFineNbrInfo(Side<3>::south).ids[1] == 4);
-	REQUIRE(out.getFineNbrInfo(Side<3>::south).ids[2] == 5);
-	REQUIRE(out.getFineNbrInfo(Side<3>::south).ids[3] == 6);
+	REQUIRE(out.hasNbr(Side<3>::south()));
+	REQUIRE(out.getNbrType(Side<3>::south()) == NbrType::Fine);
+	REQUIRE(out.getFineNbrInfo(Side<3>::south()).ids[0] == 3);
+	REQUIRE(out.getFineNbrInfo(Side<3>::south()).ids[1] == 4);
+	REQUIRE(out.getFineNbrInfo(Side<3>::south()).ids[2] == 5);
+	REQUIRE(out.getFineNbrInfo(Side<3>::south()).ids[3] == 6);
 
-	REQUIRE(out.hasNbr(Side<3>::north));
-	REQUIRE(out.getNbrType(Side<3>::north) == NbrType::Normal);
-	REQUIRE(out.getNormalNbrInfo(Side<3>::north).id == 1);
+	REQUIRE(out.hasNbr(Side<3>::north()));
+	REQUIRE(out.getNbrType(Side<3>::north()) == NbrType::Normal);
+	REQUIRE(out.getNormalNbrInfo(Side<3>::north()).id == 1);
 
-	REQUIRE(!out.hasNbr(Side<3>::bottom));
-	REQUIRE(!out.hasNbr(Side<3>::top));
+	REQUIRE(!out.hasNbr(Side<3>::bottom()));
+	REQUIRE(!out.hasNbr(Side<3>::top()));
 }
 TEST_CASE("PatchInfo Default Values", "[PatchInfo]")
 {

@@ -65,8 +65,8 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			h2[i] *= h2[i];
 		}
 		loop<0, D - 1>([&](int axis) {
-			Side<D> lower_side = axis * 2;
-			Side<D> upper_side = axis * 2 + 1;
+			Side<D> lower_side(axis * 2);
+			Side<D> upper_side(axis * 2 + 1);
 			if (!pinfo->hasNbr(lower_side)) {
 				LocalData<D - 1>       lower = u.getGhostSliceOnSide(lower_side, 1);
 				const LocalData<D - 1> mid   = u.getSliceOnSide(lower_side);
@@ -104,7 +104,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		const LocalData<D> c = coeffs->getLocalData(pinfo->local_index);
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo->hasNbr(s)) {
-				double                 h2      = pow(pinfo->spacings[s.axis()], 2);
+				double                 h2      = pow(pinfo->spacings[s.getAxisIndex()], 2);
 				LocalData<D - 1>       f_inner = f.getSliceOnSide(s);
 				LocalData<D - 1>       u_ghost = u.getSliceOnSide(s, -1);
 				LocalData<D - 1>       u_inner = u.getSliceOnSide(s);
@@ -136,7 +136,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			auto         pinfo = domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo->hasNbr(s)) {
-					double           h2 = pow(pinfo->spacings[s.axis()], 2);
+					double           h2 = pow(pinfo->spacings[s.getAxisIndex()], 2);
 					LocalData<D - 1> ld = f_ld.getSliceOnSide(s);
 					nested_loop<D - 1>(
 					ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
@@ -144,9 +144,9 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 						DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
 						std::array<double, D> other_real_coord = real_coord;
 						if (s.isLowerOnAxis()) {
-							other_real_coord[s.axis()] -= pinfo->spacings[s.axis()];
+							other_real_coord[s.getAxisIndex()] -= pinfo->spacings[s.getAxisIndex()];
 						} else {
-							other_real_coord[s.axis()] += pinfo->spacings[s.axis()];
+							other_real_coord[s.getAxisIndex()] += pinfo->spacings[s.getAxisIndex()];
 						}
 						ld[coord] += gfunc(real_coord)
 						             * (hfunc(real_coord) + hfunc(other_real_coord)) / (2 * h2);

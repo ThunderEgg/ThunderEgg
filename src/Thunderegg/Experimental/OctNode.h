@@ -87,7 +87,7 @@ template <size_t D> struct Node {
 		for (size_t i = 0; i < D; i++) {
 			lengths[i] = parent.lengths[i] / 2;
 			starts[i]
-			= o.isOnSide(2 * i) ? parent.starts[i] : (parent.starts[i] + this->lengths[i]);
+			= o.isOnSide(Side<D>(2 * i)) ? parent.starts[i] : (parent.starts[i] + this->lengths[i]);
 		}
 	}
 	/**
@@ -106,7 +106,7 @@ template <size_t D> struct Node {
 	 */
 	bool hasNbr(Side<D> s) const
 	{
-		return nbr_id[s.toInt()] != -1;
+		return nbr_id[s.getIndex()] != -1;
 	}
 	/**
 	 * @brief Return reference to the child id for a particular octant.
@@ -128,11 +128,11 @@ template <size_t D> struct Node {
 	 */
 	int &nbrId(Side<D> s)
 	{
-		return nbr_id[s.toInt()];
+		return nbr_id[s.getIndex()];
 	}
 	int nbrId(Side<D> s) const
 	{
-		return nbr_id[s.toInt()];
+		return nbr_id[s.getIndex()];
 	}
 };
 } // namespace Experimental

@@ -233,9 +233,9 @@ TEST_CASE("DomainTools::GetRealCoordBound 1D", "[DomainTools]")
 
 	std::array<int, 0>    coord;
 	std::array<double, 1> result;
-	DomainTools<1>::getRealCoordBound(pinfo, coord, Side<1>::west, result);
+	DomainTools<1>::getRealCoordBound(pinfo, coord, Side<1>::west(), result);
 	CHECK(result[0] + 100 == Approx(startx + 100));
-	DomainTools<1>::getRealCoordBound(pinfo, coord, Side<1>::east, result);
+	DomainTools<1>::getRealCoordBound(pinfo, coord, Side<1>::east(), result);
 	CHECK(result[0] + 100 == Approx(startx + lengthx + 100));
 }
 TEST_CASE("DomainTools::GetRealCoordBound 2D", "[getRealCoord][DomainTools]")
@@ -265,12 +265,12 @@ TEST_CASE("DomainTools::GetRealCoordBound 2D", "[getRealCoord][DomainTools]")
 
 		array<double, 2> result;
 		array<int, 1>    coord = {coordx};
-		DomainTools<2>::getRealCoordBound(pinfo, coord, Side<2>::south, result);
+		DomainTools<2>::getRealCoordBound(pinfo, coord, Side<2>::south(), result);
 
 		CHECK(result[0] + 100 == Approx(expected[0] + 100));
 		CHECK(result[1] + 100 == Approx(starty + 100));
 
-		DomainTools<2>::getRealCoordBound(pinfo, coord, Side<2>::north, result);
+		DomainTools<2>::getRealCoordBound(pinfo, coord, Side<2>::north(), result);
 		CHECK(result[0] + 100 == Approx(expected[0] + 100));
 		CHECK(result[1] + 100 == Approx(starty + lengthy + 100));
 	}
@@ -286,12 +286,12 @@ TEST_CASE("DomainTools::GetRealCoordBound 2D", "[getRealCoord][DomainTools]")
 
 		array<double, 2> result;
 		array<int, 1>    coord = {coordy};
-		DomainTools<2>::getRealCoordBound(pinfo, coord, Side<2>::west, result);
+		DomainTools<2>::getRealCoordBound(pinfo, coord, Side<2>::west(), result);
 
 		CHECK(result[0] + 100 == Approx(startx + 100));
 		CHECK(result[1] + 100 == Approx(expected[1] + 100));
 
-		DomainTools<2>::getRealCoordBound(pinfo, coord, Side<2>::east, result);
+		DomainTools<2>::getRealCoordBound(pinfo, coord, Side<2>::east(), result);
 
 		CHECK(result[0] + 100 == Approx(startx + lengthx + 100));
 		CHECK(result[1] + 100 == Approx(expected[1] + 100));

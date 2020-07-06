@@ -130,13 +130,14 @@ template <size_t D> inline void DftPatchSolver<D>::addPatch(Thunderegg::Schur::S
 	if (!plan1.count(sinfo)) {
 		for (size_t i = 0; i < D; i++) {
 			// x direction
-			if (sinfo.pinfo->isNeumann(2 * i) && sinfo.pinfo->isNeumann(2 * i + 1)) {
+			if (sinfo.pinfo->isNeumann(Side<D>(2 * i))
+			    && sinfo.pinfo->isNeumann(Side<D>(2 * i + 1))) {
 				transforms[i]     = DftType::DCT_II;
 				transforms_inv[i] = DftType::DCT_III;
-			} else if (sinfo.pinfo->isNeumann(2 * i)) {
+			} else if (sinfo.pinfo->isNeumann(Side<D>(2 * i))) {
 				transforms[i]     = DftType::DCT_IV;
 				transforms_inv[i] = DftType::DCT_IV;
-			} else if (sinfo.pinfo->isNeumann(2 * i + 1)) {
+			} else if (sinfo.pinfo->isNeumann(Side<D>(2 * i + 1))) {
 				transforms[i]     = DftType::DST_IV;
 				transforms_inv[i] = DftType::DST_IV;
 			} else {
@@ -165,12 +166,14 @@ template <size_t D> inline void DftPatchSolver<D>::addPatch(Thunderegg::Schur::S
 			}
 			double h = sinfo.pinfo->spacings[0];
 
-			if (sinfo.pinfo->isNeumann(i * 2) && sinfo.pinfo->isNeumann(i * 2 + 1)) {
+			if (sinfo.pinfo->isNeumann(Side<D>(i * 2))
+			    && sinfo.pinfo->isNeumann(Side<D>(i * 2 + 1))) {
 				for (int xi = 0; xi < n; xi++) {
 					denom[gslice(xi * pow(n, i), sizes, strides)]
 					-= 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2) * ones;
 				}
-			} else if (sinfo.pinfo->isNeumann(i * 2) || sinfo.pinfo->isNeumann(i * 2 + 1)) {
+			} else if (sinfo.pinfo->isNeumann(Side<D>(i * 2))
+			           || sinfo.pinfo->isNeumann(Side<D>(i * 2 + 1))) {
 				for (int xi = 0; xi < n; xi++) {
 					denom[gslice(xi * pow(n, i), sizes, strides)]
 					-= 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2) * ones;
@@ -212,7 +215,7 @@ DftPatchSolver<D>::solve(Thunderegg::Schur::SchurInfo<D> &sinfo, std::shared_ptr
 		if (sinfo.pinfo->hasNbr(s)) {
 			const LocalData<D - 1> gamma_view = gamma->getLocalData(sinfo.getIfaceLocalIndex(s));
 			LocalData<D - 1>       slice      = f_copy->getLocalData(0).getSliceOnSide(s);
-			double                 h2         = pow(sinfo.pinfo->spacings[s.toInt() / 2], 2);
+			double                 h2         = pow(sinfo.pinfo->spacings[s.getAxisIndex()], 2);
 			nested_loop<D - 1>(start, end, [&](std::array<int, D - 1> coord) {
 				slice[coord] -= 2.0 / h2 * gamma_view[coord];
 			});

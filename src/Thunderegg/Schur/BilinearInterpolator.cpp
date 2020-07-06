@@ -70,7 +70,7 @@ void BilinearInterpolator::interpolate(SchurInfo<2> &sinfo, Side<2> s, int local
                                        IfaceType<2> itype, std::shared_ptr<const Vector<2>> u,
                                        std::shared_ptr<Vector<1>> interp)
 {
-	int n = sinfo.pinfo->ns[!s.axis()];
+	int n = sinfo.pinfo->ns[!s.getAxisIndex()];
 
 	LocalData<1>       interp_data = interp->getLocalData(local_index);
 	const LocalData<1> sl          = u->getLocalData(sinfo.pinfo->local_index).getSliceOnSide(s);

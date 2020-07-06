@@ -58,28 +58,28 @@ struct Thunderegg::Schur::Block {
 		char r;
 		// main rotation
 		r = (data & ~(~0u << 2) << 4) >> 4;
-		r = (r + rots_table[static_cast<int>(rot)][main.toInt()]) & 0b11;
+		r = (r + rots_table[static_cast<int>(rot)][main.getIndex()]) & 0b11;
 		data &= ~(~(~0u << 2) << 4);
 		data |= r << 4;
 		// aux rotation
 		r = data & ~(~0u << 2);
-		r = (r + rots_table[static_cast<int>(rot)][aux.toInt()]) & 0b11;
+		r = (r + rots_table[static_cast<int>(rot)][aux.getIndex()]) & 0b11;
 		data &= ~0u << 2;
 		data |= r;
-		main                  = side_table[static_cast<int>(rot)][main.toInt()];
-		aux                   = side_table[static_cast<int>(rot)][aux.toInt()];
+		main                  = side_table[static_cast<int>(rot)][main.getIndex()];
+		aux                   = side_table[static_cast<int>(rot)][aux.getIndex()];
 		bitset<6> old_neumann = neumann;
 		for (int i = 0; i < 6; i++) {
-			neumann[side_table[(int) rot][i].toInt()] = old_neumann[i];
+			neumann[side_table[(int) rot][i].getIndex()] = old_neumann[i];
 		}
 	}
 	void rotate()
 	{
-		for (Rotation rot : main_rot_plan[main.toInt()]) {
+		for (Rotation rot : main_rot_plan[main.getIndex()]) {
 			applyRotation(rot);
 		}
 		if (neumann.to_ulong() == 0) {
-			for (Rotation rot : aux_rot_plan_dirichlet[aux.toInt()]) {
+			for (Rotation rot : aux_rot_plan_dirichlet[aux.getIndex()]) {
 				applyRotation(rot);
 			}
 		} else {
@@ -94,7 +94,9 @@ struct Thunderegg::Schur::Block {
 			} else {
 				quad = rot_quad_lookup_right[auxRot()][quad];
 			}
-			if (auxFlipped()) { quad = quad_flip_lookup[quad]; }
+			if (auxFlipped()) {
+				quad = quad_flip_lookup[quad];
+			}
 			return quad;
 		};
 		switch (type.toInt()) {
@@ -167,14 +169,19 @@ struct BlockKey {
 	}
 };
 
-const Side<3> Block::side_table[6][6]
-= {{Side<3>::west, Side<3>::east, Side<3>::top, Side<3>::bottom, Side<3>::south, Side<3>::north},
-   {Side<3>::west, Side<3>::east, Side<3>::bottom, Side<3>::top, Side<3>::north, Side<3>::south},
-   {Side<3>::bottom, Side<3>::top, Side<3>::south, Side<3>::north, Side<3>::east, Side<3>::west},
-   {Side<3>::top, Side<3>::bottom, Side<3>::south, Side<3>::north, Side<3>::west, Side<3>::east},
-   {Side<3>::north, Side<3>::south, Side<3>::west, Side<3>::east, Side<3>::bottom, Side<3>::top},
-   {Side<3>::south, Side<3>::north, Side<3>::east, Side<3>::west, Side<3>::bottom, Side<3>::top}};
-const char Block::rots_table[6][6] = {{3, 1, 0, 0, 2, 2}, {1, 3, 2, 2, 0, 0}, {1, 3, 3, 1, 1, 3},
+const Side<3> Block::side_table[6][6] = {{Side<3>::west(), Side<3>::east(), Side<3>::top(),
+                                          Side<3>::bottom(), Side<3>::south(), Side<3>::north()},
+                                         {Side<3>::west(), Side<3>::east(), Side<3>::bottom(),
+                                          Side<3>::top(), Side<3>::north(), Side<3>::south()},
+                                         {Side<3>::bottom(), Side<3>::top(), Side<3>::south(),
+                                          Side<3>::north(), Side<3>::east(), Side<3>::west()},
+                                         {Side<3>::top(), Side<3>::bottom(), Side<3>::south(),
+                                          Side<3>::north(), Side<3>::west(), Side<3>::east()},
+                                         {Side<3>::north(), Side<3>::south(), Side<3>::west(),
+                                          Side<3>::east(), Side<3>::bottom(), Side<3>::top()},
+                                         {Side<3>::south(), Side<3>::north(), Side<3>::east(),
+                                          Side<3>::west(), Side<3>::bottom(), Side<3>::top()}};
+const char    Block::rots_table[6][6] = {{3, 1, 0, 0, 2, 2}, {1, 3, 2, 2, 0, 0}, {1, 3, 3, 1, 1, 3},
                                       {1, 3, 1, 3, 3, 1}, {0, 0, 0, 0, 3, 1}, {0, 0, 0, 0, 1, 3}};
 const vector<Rotation> Block::main_rot_plan[6] = {{},
                                                   {Rotation::z_cw, Rotation::z_cw},
@@ -265,7 +272,7 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 		pinfo->ns.fill(n);
 		pinfo->spacings.fill(1.0 / n);
 		pinfo->neumann = curr_type.neumann;
-		sd->getIfaceInfoPtr(Side<3>::west).reset(new NormalIfaceInfo<3>());
+		sd->getIfaceInfoPtr(Side<3>::west()).reset(new NormalIfaceInfo<3>());
 		solver->addPatch(*sd);
 		std::vector<std::shared_ptr<SchurInfo<3>>> single_domain;
 		single_domain.push_back(sd);
@@ -295,7 +302,7 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 				for (int i = 0; i < n * n; i++) {
 					block[i * n * n + j] = -interp_view[i];
 				}
-				if (s == Side<3>::west) {
+				if (s == Side<3>::west()) {
 					switch (type.toInt()) {
 						case IfaceType<3>::normal:
 							block[n * n * j + j] += 0.5;

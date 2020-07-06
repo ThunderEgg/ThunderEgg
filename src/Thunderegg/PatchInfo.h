@@ -228,7 +228,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	std::shared_ptr<NormalNbrInfo<D>> getNormalNbrInfoPtr(Side<D> s) const
 	{
-		return std::dynamic_pointer_cast<NormalNbrInfo<D>>(nbr_info[s.toInt()]);
+		return std::dynamic_pointer_cast<NormalNbrInfo<D>>(nbr_info[s.getIndex()]);
 	}
 	/**
 	 * @brief Get the CoarseNbrInfo object
@@ -248,7 +248,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	std::shared_ptr<CoarseNbrInfo<D>> getCoarseNbrInfoPtr(Side<D> s) const
 	{
-		return std::dynamic_pointer_cast<CoarseNbrInfo<D>>(nbr_info[s.toInt()]);
+		return std::dynamic_pointer_cast<CoarseNbrInfo<D>>(nbr_info[s.getIndex()]);
 	}
 	/**
 	 * @brief Get the FineNbrInfo object
@@ -269,7 +269,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	std::shared_ptr<FineNbrInfo<D>> getFineNbrInfoPtr(Side<D> s) const
 	{
-		return std::dynamic_pointer_cast<FineNbrInfo<D>>(nbr_info[s.toInt()]);
+		return std::dynamic_pointer_cast<FineNbrInfo<D>>(nbr_info[s.getIndex()]);
 	}
 	/**
 	 * @brief Return whether the patch has a neighbor
@@ -338,7 +338,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	void setBCLocalIndex(Side<D> s, int local_index)
 	{
-		bc_local_index[s.toInt()] = local_index;
+		bc_local_index[s.getIndex()] = local_index;
 	}
 	/**
 	 * @brief get the local index in the boundnary condition vector
@@ -348,7 +348,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	int getBCLocalIndex(Side<D> s)
 	{
-		return bc_local_index[s.toInt()];
+		return bc_local_index[s.getIndex()];
 	}
 	/**
 	 * @brief set the global index in the boundary condition vector
@@ -358,7 +358,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	void setBCGlobalIndex(Side<D> s, int global_index)
 	{
-		bc_global_index[s.toInt()] = global_index;
+		bc_global_index[s.getIndex()] = global_index;
 	}
 	/**
 	 * @brief get the global index in the boundnary condition vector
@@ -368,7 +368,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	int getBCGlobalIndex(Side<D> s)
 	{
-		return bc_global_index[s.toInt()];
+		return bc_global_index[s.getIndex()];
 	}
 	int serialize(char *buffer) const;
 	int deserialize(char *buffer);
@@ -758,23 +758,23 @@ template <size_t D> inline void CoarseNbrInfo<D>::updateRankOnNeighbors(int new_
 }
 template <size_t D> inline NbrType PatchInfo<D>::getNbrType(Side<D> s) const
 {
-	return nbr_info[s.toInt()]->getNbrType();
+	return nbr_info[s.getIndex()]->getNbrType();
 }
 template <size_t D> inline NormalNbrInfo<D> &PatchInfo<D>::getNormalNbrInfo(Side<D> s) const
 {
-	return *std::dynamic_pointer_cast<NormalNbrInfo<D>>(nbr_info[s.toInt()]);
+	return *std::dynamic_pointer_cast<NormalNbrInfo<D>>(nbr_info[s.getIndex()]);
 }
 template <size_t D> inline CoarseNbrInfo<D> &PatchInfo<D>::getCoarseNbrInfo(Side<D> s) const
 {
-	return *std::dynamic_pointer_cast<CoarseNbrInfo<D>>(nbr_info[s.toInt()]);
+	return *std::dynamic_pointer_cast<CoarseNbrInfo<D>>(nbr_info[s.getIndex()]);
 }
 template <size_t D> inline FineNbrInfo<D> &PatchInfo<D>::getFineNbrInfo(Side<D> s) const
 {
-	return *std::dynamic_pointer_cast<FineNbrInfo<D>>(nbr_info[s.toInt()]);
+	return *std::dynamic_pointer_cast<FineNbrInfo<D>>(nbr_info[s.getIndex()]);
 }
 template <size_t D> inline bool PatchInfo<D>::hasNbr(Side<D> s) const
 {
-	return nbr_info[s.toInt()] != nullptr;
+	return nbr_info[s.getIndex()] != nullptr;
 }
 template <size_t D> inline bool PatchInfo<D>::hasCoarseParent() const
 {
@@ -782,14 +782,14 @@ template <size_t D> inline bool PatchInfo<D>::hasCoarseParent() const
 }
 template <size_t D> inline bool PatchInfo<D>::isNeumann(Side<D> s) const
 {
-	return neumann[s.toInt()];
+	return neumann[s.getIndex()];
 }
 template <size_t D> inline void PatchInfo<D>::setLocalNeighborIndexes(std::map<int, int> &rev_map)
 {
 	local_index = rev_map.at(id);
 	for (Side<D> s : Side<D>::getValues()) {
 		if (hasNbr(s)) {
-			nbr_info[s.toInt()]->setLocalIndexes(rev_map);
+			nbr_info[s.getIndex()]->setLocalIndexes(rev_map);
 		}
 	}
 }
@@ -798,7 +798,7 @@ template <size_t D> inline void PatchInfo<D>::setGlobalNeighborIndexes(std::map<
 	global_index = rev_map.at(local_index);
 	for (Side<D> s : Side<D>::getValues()) {
 		if (hasNbr(s)) {
-			nbr_info[s.toInt()]->setGlobalIndexes(rev_map);
+			nbr_info[s.getIndex()]->setGlobalIndexes(rev_map);
 		}
 	}
 }
@@ -808,15 +808,15 @@ template <size_t D> inline void PatchInfo<D>::setNeumann(IsNeumannFunc<D> inf)
 		if (!hasNbr(s)) {
 			std::array<double, D> bound_start = starts;
 			if (!s.isLowerOnAxis()) {
-				bound_start[s.axis()] += spacings[s.axis()] * ns[s.axis()];
+				bound_start[s.getAxisIndex()] += spacings[s.getAxisIndex()] * ns[s.getAxisIndex()];
 			}
 			std::array<double, D> bound_end = bound_start;
 			for (size_t dir = 0; dir < D; dir++) {
-				if (dir != s.axis()) {
+				if (dir != s.getAxisIndex()) {
 					bound_end[dir] += spacings[dir] * ns[dir];
 				}
 			}
-			neumann[s.toInt()] = inf(s, bound_end, bound_start);
+			neumann[s.getIndex()] = inf(s, bound_end, bound_start);
 		}
 	}
 }
@@ -825,7 +825,7 @@ template <size_t D> inline std::deque<int> PatchInfo<D>::getNbrIds()
 	std::deque<int> retval;
 	for (Side<D> s : Side<D>::getValues()) {
 		if (hasNbr(s)) {
-			nbr_info[s.toInt()]->getNbrIds(retval);
+			nbr_info[s.getIndex()]->getNbrIds(retval);
 		}
 	}
 	return retval;
@@ -835,7 +835,7 @@ template <size_t D> inline std::deque<int> PatchInfo<D>::getNbrRanks()
 	std::deque<int> retval;
 	for (Side<D> s : Side<D>::getValues()) {
 		if (hasNbr(s)) {
-			nbr_info[s.toInt()]->getNbrRanks(retval);
+			nbr_info[s.getIndex()]->getNbrRanks(retval);
 		}
 	}
 	return retval;
@@ -929,7 +929,7 @@ inline void PatchInfo<D>::setPtrs(std::map<int, std::shared_ptr<PatchInfo>> &dom
 {
 	for (Side<D> s : Side<D>::getValues()) {
 		if (hasNbr(s)) {
-			nbr_info[s.toInt()]->setPtrs(domains);
+			nbr_info[s.getIndex()]->setPtrs(domains);
 		}
 	}
 }
@@ -938,7 +938,7 @@ template <size_t D> inline void PatchInfo<D>::updateRank(int rank)
 	this->rank = rank;
 	for (Side<D> s : Side<D>::getValues()) {
 		if (hasNbr(s)) {
-			nbr_info[s.toInt()]->updateRankOnNeighbors(rank, s);
+			nbr_info[s.getIndex()]->updateRankOnNeighbors(rank, s);
 		}
 	}
 }

@@ -88,7 +88,7 @@ void Init::initNeumann(Domain<3> &domain, Vec f, Vec exact,
 		double h_y = pinfo->spacings[1];
 		double h_z = pinfo->spacings[2];
 		// west
-		if (!pinfo->hasNbr(Side<3>::west)) {
+		if (!pinfo->hasNbr(Side<3>::west())) {
 			for (int zi = 0; zi < pinfo->ns[2]; zi++) {
 				for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 					double x, y, z;
@@ -98,7 +98,7 @@ void Init::initNeumann(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// east
-		if (!pinfo->hasNbr(Side<3>::east)) {
+		if (!pinfo->hasNbr(Side<3>::east())) {
 			for (int zi = 0; zi < pinfo->ns[2]; zi++) {
 				for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 					double x, y, z;
@@ -108,7 +108,7 @@ void Init::initNeumann(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// south
-		if (!pinfo->hasNbr(Side<3>::south)) {
+		if (!pinfo->hasNbr(Side<3>::south())) {
 			for (int zi = 0; zi < pinfo->ns[2]; zi++) {
 				for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 					double x, y, z;
@@ -118,7 +118,7 @@ void Init::initNeumann(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// north
-		if (!pinfo->hasNbr(Side<3>::north)) {
+		if (!pinfo->hasNbr(Side<3>::north())) {
 			for (int zi = 0; zi < pinfo->ns[2]; zi++) {
 				for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 					double x, y, z;
@@ -128,7 +128,7 @@ void Init::initNeumann(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// bottom
-		if (!pinfo->hasNbr(Side<3>::bottom)) {
+		if (!pinfo->hasNbr(Side<3>::bottom())) {
 			for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 				for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 					double x, y, z;
@@ -138,7 +138,7 @@ void Init::initNeumann(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// top
-		if (!pinfo->hasNbr(Side<3>::top)) {
+		if (!pinfo->hasNbr(Side<3>::top())) {
 			for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 				for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 					double x, y, z;
@@ -182,7 +182,7 @@ void Init::initDirichlet(Domain<3> &domain, Vec f, Vec exact,
 		}
 		// apply boundaries
 		// west
-		if (!pinfo->hasNbr(Side<3>::west)) {
+		if (!pinfo->hasNbr(Side<3>::west())) {
 			for (int zi = 0; zi < pinfo->ns[2]; zi++) {
 				for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 					double x, y, z;
@@ -192,7 +192,7 @@ void Init::initDirichlet(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// east
-		if (!pinfo->hasNbr(Side<3>::east)) {
+		if (!pinfo->hasNbr(Side<3>::east())) {
 			for (int zi = 0; zi < pinfo->ns[2]; zi++) {
 				for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 					double x, y, z;
@@ -202,7 +202,7 @@ void Init::initDirichlet(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// south
-		if (!pinfo->hasNbr(Side<3>::south)) {
+		if (!pinfo->hasNbr(Side<3>::south())) {
 			for (int zi = 0; zi < pinfo->ns[2]; zi++) {
 				for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 					double x, y, z;
@@ -212,7 +212,7 @@ void Init::initDirichlet(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// north
-		if (!pinfo->hasNbr(Side<3>::north)) {
+		if (!pinfo->hasNbr(Side<3>::north())) {
 			for (int zi = 0; zi < pinfo->ns[2]; zi++) {
 				for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 					double x, y, z;
@@ -222,7 +222,7 @@ void Init::initDirichlet(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// bottom
-		if (!pinfo->hasNbr(Side<3>::bottom)) {
+		if (!pinfo->hasNbr(Side<3>::bottom())) {
 			for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 				for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 					double x, y, z;
@@ -232,7 +232,7 @@ void Init::initDirichlet(Domain<3> &domain, Vec f, Vec exact,
 			}
 		}
 		// top
-		if (!pinfo->hasNbr(Side<3>::top)) {
+		if (!pinfo->hasNbr(Side<3>::top())) {
 			for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 				for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 					double x, y, z;
@@ -271,14 +271,14 @@ void Init::initNeumann2d(Domain<2> &domain, Vec f, Vec exact, function<double(do
 		}
 		// apply boundaries
 		// west
-		if (!pinfo->hasNbr(Side<2>::west)) {
+		if (!pinfo->hasNbr(Side<2>::west())) {
 			for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 				double y = pinfo->starts[1] + h_y / 2.0 + h_y * yi;
 				f_vals[yi * pinfo->ns[0]] += nfunx(pinfo->starts[0], y) / h_x;
 			}
 		}
 		// east
-		if (!pinfo->hasNbr(Side<2>::east)) {
+		if (!pinfo->hasNbr(Side<2>::east())) {
 			for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 				double y = pinfo->starts[1] + h_y / 2.0 + h_y * yi;
 				f_vals[yi * pinfo->ns[0] + pinfo->ns[0] - 1]
@@ -286,14 +286,14 @@ void Init::initNeumann2d(Domain<2> &domain, Vec f, Vec exact, function<double(do
 			}
 		}
 		// south
-		if (!pinfo->hasNbr(Side<2>::south)) {
+		if (!pinfo->hasNbr(Side<2>::south())) {
 			for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 				double x = pinfo->starts[0] + h_x / 2.0 + h_x * xi;
 				f_vals[xi] += nfuny(x, pinfo->starts[1]) / h_y;
 			}
 		}
 		// north
-		if (!pinfo->hasNbr(Side<2>::north)) {
+		if (!pinfo->hasNbr(Side<2>::north())) {
 			for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 				double x = pinfo->starts[0] + h_x / 2.0 + h_x * xi;
 				f_vals[pinfo->ns[0] * (pinfo->ns[1] - 1) + xi]
@@ -328,14 +328,14 @@ void Init::initDirichlet2d(Domain<2> &domain, Vec f, Vec exact,
 		}
 		// apply boundaries
 		// west
-		if (!pinfo->hasNbr(Side<2>::west)) {
+		if (!pinfo->hasNbr(Side<2>::west())) {
 			for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 				double y = pinfo->starts[1] + h_y / 2.0 + h_y * yi;
 				f_vals[yi * pinfo->ns[0]] -= efun(pinfo->starts[0], y) * 2 / (h_x * h_x);
 			}
 		}
 		// east
-		if (!pinfo->hasNbr(Side<2>::east)) {
+		if (!pinfo->hasNbr(Side<2>::east())) {
 			for (int yi = 0; yi < pinfo->ns[1]; yi++) {
 				double y = pinfo->starts[1] + h_y / 2.0 + h_y * yi;
 				f_vals[yi * pinfo->ns[0] + pinfo->ns[0] - 1]
@@ -343,14 +343,14 @@ void Init::initDirichlet2d(Domain<2> &domain, Vec f, Vec exact,
 			}
 		}
 		// south
-		if (!pinfo->hasNbr(Side<2>::south)) {
+		if (!pinfo->hasNbr(Side<2>::south())) {
 			for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 				double x = pinfo->starts[0] + h_x / 2.0 + h_x * xi;
 				f_vals[xi] -= efun(x, pinfo->starts[1]) * 2 / (h_y * h_y);
 			}
 		}
 		// north
-		if (!pinfo->hasNbr(Side<2>::north)) {
+		if (!pinfo->hasNbr(Side<2>::north())) {
 			for (int xi = 0; xi < pinfo->ns[0]; xi++) {
 				double x = pinfo->starts[0] + h_x / 2.0 + h_x * xi;
 				f_vals[pinfo->ns[0] * (pinfo->ns[1] - 1) + xi]

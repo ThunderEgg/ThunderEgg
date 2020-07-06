@@ -130,13 +130,14 @@ template <size_t D> void FftwPatchSolver<D>::addPatch(Thunderegg::Schur::SchurIn
 		for (size_t i = 0; i < D; i++) {
 			ns[D - 1 - i] = n;
 			// x direction
-			if (sinfo.pinfo->isNeumann(2 * i) && sinfo.pinfo->isNeumann(2 * i + 1)) {
+			if (sinfo.pinfo->isNeumann(Side<D>(2 * i))
+			    && sinfo.pinfo->isNeumann(Side<D>(2 * i + 1))) {
 				transforms[D - 1 - i]     = FFTW_REDFT10;
 				transforms_inv[D - 1 - i] = FFTW_REDFT01;
-			} else if (sinfo.pinfo->isNeumann(2 * i)) {
+			} else if (sinfo.pinfo->isNeumann(Side<D>(2 * i))) {
 				transforms[D - 1 - i]     = FFTW_REDFT11;
 				transforms_inv[D - 1 - i] = FFTW_REDFT11;
-			} else if (sinfo.pinfo->isNeumann(2 * i + 1)) {
+			} else if (sinfo.pinfo->isNeumann(Side<D>(2 * i + 1))) {
 				transforms[D - 1 - i]     = FFTW_RODFT11;
 				transforms_inv[D - 1 - i] = FFTW_RODFT11;
 			} else {
@@ -167,12 +168,14 @@ template <size_t D> void FftwPatchSolver<D>::addPatch(Thunderegg::Schur::SchurIn
 			}
 			double h = sinfo.pinfo->spacings[i];
 
-			if (sinfo.pinfo->isNeumann(i * 2) && sinfo.pinfo->isNeumann(i * 2 + 1)) {
+			if (sinfo.pinfo->isNeumann(Side<D>(i * 2))
+			    && sinfo.pinfo->isNeumann(Side<D>(i * 2 + 1))) {
 				for (int xi = 0; xi < n; xi++) {
 					denom[gslice(xi * pow(n, i), sizes, strides)]
 					-= 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2) * ones;
 				}
-			} else if (sinfo.pinfo->isNeumann(i * 2) || sinfo.pinfo->isNeumann(i * 2 + 1)) {
+			} else if (sinfo.pinfo->isNeumann(Side<D>(i * 2))
+			           || sinfo.pinfo->isNeumann(Side<D>(i * 2 + 1))) {
 				for (int xi = 0; xi < n; xi++) {
 					denom[gslice(xi * pow(n, i), sizes, strides)]
 					-= 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2) * ones;

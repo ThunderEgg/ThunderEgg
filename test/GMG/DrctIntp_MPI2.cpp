@@ -62,7 +62,7 @@ TEST_CASE("Test DrctIntp", "[GMG::DrctIntp]")
 		Orthant<2>         orth = pinfo->orth_on_parent;
 		std::array<int, 2> starts;
 		for (size_t i = 0; i < 2; i++) {
-			starts[i] = orth.isOnSide(2 * i) ? 0 : ld.getLengths()[i];
+			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : ld.getLengths()[i];
 		}
 
 		nested_loop<2>(ld.getStart(), ld.getEnd(), [&](const array<int, 2> &coord) {
@@ -123,7 +123,7 @@ TEST_CASE("Linear Test DrctIntp with values already set", "[GMG::DrctIntp]")
 		Orthant<2>         orth = pinfo->orth_on_parent;
 		std::array<int, 2> starts;
 		for (size_t i = 0; i < 2; i++) {
-			starts[i] = orth.isOnSide(2 * i) ? 0 : ld.getLengths()[i];
+			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : ld.getLengths()[i];
 		}
 
 		nested_loop<2>(ld.getStart(), ld.getEnd(), [&](const array<int, 2> &coord) {

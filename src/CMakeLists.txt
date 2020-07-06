@@ -106,6 +106,7 @@ if(p4est_FOUND)
 endif()
 target_link_libraries(Thunderegg PUBLIC ${Thunderegg_Libs})
 target_link_libraries(Thunderegg PUBLIC ${MPI_CXX_LIBRARIES})
+target_link_libraries(Thunderegg PUBLIC ${CMAKE_DL_LIBS})
 
 install(
   TARGETS Thunderegg

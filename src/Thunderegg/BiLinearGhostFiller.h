@@ -49,8 +49,8 @@ class BiLinearGhostFiller : public MPIGhostFiller<2>
 				auto local_slice = local_data.getSliceOnSide(side);
 				auto nbr_ghosts  = nbr_data.getGhostSliceOnSide(side.opposite(), 1);
 				int  offset      = 0;
-				if (orthant.collapseOnAxis(side.axis()) == Orthant<1>::upper) {
-					offset = pinfo->ns[!side.axis()];
+				if (orthant.collapseOnAxis(side.getAxisIndex()) == Orthant<1>::upper) {
+					offset = pinfo->ns[!side.getAxisIndex()];
 				}
 				nested_loop<1>(
 				nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
@@ -62,8 +62,8 @@ class BiLinearGhostFiller : public MPIGhostFiller<2>
 				auto local_slice = local_data.getSliceOnSide(side);
 				auto nbr_ghosts  = nbr_data.getGhostSliceOnSide(side.opposite(), 1);
 				int  offset      = 0;
-				if (orthant.collapseOnAxis(side.axis()) == Orthant<1>::upper) {
-					offset = pinfo->ns[!side.axis()];
+				if (orthant.collapseOnAxis(side.getAxisIndex()) == Orthant<1>::upper) {
+					offset = pinfo->ns[!side.getAxisIndex()];
 				}
 				nested_loop<1>(
 				nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
@@ -84,7 +84,7 @@ class BiLinearGhostFiller : public MPIGhostFiller<2>
 						auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
 						int  offset       = 0;
 						if (pinfo->getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper) {
-							offset = pinfo->ns[!side.axis()];
+							offset = pinfo->ns[!side.getAxisIndex()];
 						}
 						nested_loop<1>(local_ghosts.getStart(), local_ghosts.getEnd(),
 						               [&](const std::array<int, 1> &coord) {

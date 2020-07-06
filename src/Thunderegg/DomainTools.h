@@ -73,7 +73,7 @@ template <size_t D> struct DomainTools {
 	                              const std::array<int, D - 1> &coord, Side<D> s,
 	                              std::array<double, D> &real_coord)
 	{
-		for (size_t dir = 0; dir < s.axis(); dir++) {
+		for (size_t dir = 0; dir < s.getAxisIndex(); dir++) {
 			if (coord[dir] == -1) {
 				real_coord[dir] = pinfo->starts[dir];
 			} else if (coord[dir] == pinfo->ns[dir]) {
@@ -84,12 +84,13 @@ template <size_t D> struct DomainTools {
 			}
 		}
 		if (s.isLowerOnAxis()) {
-			real_coord[s.axis()] = pinfo->starts[s.axis()];
+			real_coord[s.getAxisIndex()] = pinfo->starts[s.getAxisIndex()];
 		} else {
-			real_coord[s.axis()]
-			= pinfo->starts[s.axis()] + pinfo->spacings[s.axis()] * pinfo->ns[s.axis()];
+			real_coord[s.getAxisIndex()]
+			= pinfo->starts[s.getAxisIndex()]
+			  + pinfo->spacings[s.getAxisIndex()] * pinfo->ns[s.getAxisIndex()];
 		}
-		for (size_t dir = s.axis() + 1; dir < D; dir++) {
+		for (size_t dir = s.getAxisIndex() + 1; dir < D; dir++) {
 			if (coord[dir - 1] == -1) {
 				real_coord[dir] = pinfo->starts[dir];
 			} else if (coord[dir - 1] == pinfo->ns[dir]) {

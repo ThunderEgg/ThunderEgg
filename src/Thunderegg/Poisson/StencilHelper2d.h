@@ -50,31 +50,26 @@ class DirichletSH : public StencilHelper
 	{
 		double h   = 0;
 		int    idx = d.global_index * d.ns[0] * d.ns[1];
-		switch (s.toInt()) {
-			case Side<2>::west:
-				h      = d.spacings[1];
-				start  = idx;
-				stride = d.ns[0];
-				n      = d.ns[1];
-				break;
-			case Side<2>::east:
-				h      = d.spacings[1];
-				start  = idx + (d.ns[0] - 1);
-				stride = d.ns[0];
-				n      = d.ns[1];
-				break;
-			case Side<2>::south:
-				h      = d.spacings[0];
-				start  = idx;
-				stride = 1;
-				n      = d.ns[0];
-				break;
-			case Side<2>::north:
-				h      = d.spacings[0];
-				start  = idx + (d.ns[1] - 1) * d.ns[0];
-				stride = 1;
-				n      = d.ns[0];
-				break;
+		if (s == Side<2>::west()) {
+			h      = d.spacings[1];
+			start  = idx;
+			stride = d.ns[0];
+			n      = d.ns[1];
+		} else if (s == Side<2>::east()) {
+			h      = d.spacings[1];
+			start  = idx + (d.ns[0] - 1);
+			stride = d.ns[0];
+			n      = d.ns[1];
+		} else if (s == Side<2>::south()) {
+			h      = d.spacings[0];
+			start  = idx;
+			stride = 1;
+			n      = d.ns[0];
+		} else if (s == Side<2>::north()) {
+			h      = d.spacings[0];
+			start  = idx + (d.ns[1] - 1) * d.ns[0];
+			stride = 1;
+			n      = d.ns[0];
 		}
 		coeff = -1.0 / (h * h);
 	}
@@ -109,31 +104,26 @@ class NeumannSH : public StencilHelper
 	{
 		double h   = 0;
 		int    idx = d.global_index * d.ns[0] * d.ns[1];
-		switch (s.toInt()) {
-			case Side<2>::west:
-				h      = d.spacings[1];
-				start  = idx;
-				stride = d.ns[0];
-				n      = d.ns[1];
-				break;
-			case Side<2>::east:
-				h      = d.spacings[1];
-				start  = idx + (d.ns[0] - 1);
-				stride = d.ns[0];
-				n      = d.ns[1];
-				break;
-			case Side<2>::south:
-				h      = d.spacings[0];
-				start  = idx;
-				stride = 1;
-				n      = d.ns[0];
-				break;
-			case Side<2>::north:
-				h      = d.spacings[0];
-				start  = idx + (d.ns[1] - 1) * d.ns[0];
-				stride = 1;
-				n      = d.ns[0];
-				break;
+		if (s == Side<2>::west()) {
+			h      = d.spacings[1];
+			start  = idx;
+			stride = d.ns[0];
+			n      = d.ns[1];
+		} else if (s == Side<2>::east()) {
+			h      = d.spacings[1];
+			start  = idx + (d.ns[0] - 1);
+			stride = d.ns[0];
+			n      = d.ns[1];
+		} else if (s == Side<2>::south()) {
+			h      = d.spacings[0];
+			start  = idx;
+			stride = 1;
+			n      = d.ns[0];
+		} else if (s == Side<2>::north()) {
+			h      = d.spacings[0];
+			start  = idx + (d.ns[1] - 1) * d.ns[0];
+			stride = 1;
+			n      = d.ns[0];
 		}
 		coeff = 1.0 / (h * h);
 	}
@@ -170,35 +160,30 @@ class NormalSH : public StencilHelper
 		double h       = 0;
 		int    idx     = d.global_index * d.ns[0] * d.ns[1];
 		int    nbr_idx = d.getNormalNbrInfo(s).global_index * d.ns[0] * d.ns[1];
-		switch (s.toInt()) {
-			case Side<2>::west:
-				h         = d.spacings[1];
-				start     = idx;
-				nbr_start = nbr_idx + d.ns[0] - 1;
-				stride    = d.ns[0];
-				n         = d.ns[1];
-				break;
-			case Side<2>::east:
-				h         = d.spacings[1];
-				start     = idx + (d.ns[0] - 1);
-				nbr_start = nbr_idx;
-				stride    = d.ns[0];
-				n         = d.ns[1];
-				break;
-			case Side<2>::south:
-				h         = d.spacings[0];
-				start     = idx;
-				nbr_start = nbr_idx + (d.ns[1] - 1) * d.ns[0];
-				stride    = 1;
-				n         = d.ns[0];
-				break;
-			case Side<2>::north:
-				h         = d.spacings[0];
-				start     = idx + (d.ns[1] - 1) * d.ns[0];
-				nbr_start = nbr_idx;
-				stride    = 1;
-				n         = d.ns[0];
-				break;
+		if (s == Side<2>::west()) {
+			h         = d.spacings[1];
+			start     = idx;
+			nbr_start = nbr_idx + d.ns[0] - 1;
+			stride    = d.ns[0];
+			n         = d.ns[1];
+		} else if (s == Side<2>::east()) {
+			h         = d.spacings[1];
+			start     = idx + (d.ns[0] - 1);
+			nbr_start = nbr_idx;
+			stride    = d.ns[0];
+			n         = d.ns[1];
+		} else if (s == Side<2>::south()) {
+			h         = d.spacings[0];
+			start     = idx;
+			nbr_start = nbr_idx + (d.ns[1] - 1) * d.ns[0];
+			stride    = 1;
+			n         = d.ns[0];
+		} else if (s == Side<2>::north()) {
+			h         = d.spacings[0];
+			start     = idx + (d.ns[1] - 1) * d.ns[0];
+			nbr_start = nbr_idx;
+			stride    = 1;
+			n         = d.ns[0];
 		}
 		coeff = 1.0 / (h * h);
 	}
@@ -241,47 +226,42 @@ class CoarseSH : public StencilHelper
 		int    idx           = d.global_index * d.ns[0] * d.ns[1];
 		int    nbr_idx_left  = d.getFineNbrInfo(s).global_indexes[0] * d.ns[0] * d.ns[1];
 		int    nbr_idx_right = d.getFineNbrInfo(s).global_indexes[1] * d.ns[0] * d.ns[1];
-		switch (s.toInt()) {
-			case Side<2>::west:
-				h             = d.spacings[1];
-				start         = idx;
-				bnbr_start    = nbr_idx_left + d.ns[0] - 1;
-				bnbr_start_in = bnbr_start - 1;
-				enbr_start    = nbr_idx_right + d.ns[0] - 1;
-				enbr_start_in = enbr_start - 1;
-				stride        = d.ns[0];
-				n             = d.ns[1];
-				break;
-			case Side<2>::east:
-				h             = d.spacings[1];
-				start         = idx + (d.ns[0] - 1);
-				bnbr_start    = nbr_idx_left;
-				bnbr_start_in = bnbr_start + 1;
-				enbr_start    = nbr_idx_right;
-				enbr_start_in = enbr_start + 1;
-				stride        = d.ns[0];
-				n             = d.ns[1];
-				break;
-			case Side<2>::south:
-				h             = d.spacings[0];
-				start         = idx;
-				bnbr_start    = nbr_idx_left + (d.ns[1] - 1) * d.ns[0];
-				bnbr_start_in = bnbr_start - d.ns[0];
-				enbr_start    = nbr_idx_right + (d.ns[1] - 1) * d.ns[0];
-				enbr_start_in = enbr_start - d.ns[0];
-				stride        = 1;
-				n             = d.ns[0];
-				break;
-			case Side<2>::north:
-				h             = d.spacings[0];
-				start         = idx + (d.ns[1] - 1) * d.ns[0];
-				bnbr_start    = nbr_idx_left;
-				bnbr_start_in = bnbr_start + d.ns[0];
-				enbr_start    = nbr_idx_right;
-				enbr_start_in = enbr_start + d.ns[0];
-				stride        = 1;
-				n             = d.ns[0];
-				break;
+		if (s == Side<2>::west()) {
+			h             = d.spacings[1];
+			start         = idx;
+			bnbr_start    = nbr_idx_left + d.ns[0] - 1;
+			bnbr_start_in = bnbr_start - 1;
+			enbr_start    = nbr_idx_right + d.ns[0] - 1;
+			enbr_start_in = enbr_start - 1;
+			stride        = d.ns[0];
+			n             = d.ns[1];
+		} else if (s == Side<2>::east()) {
+			h             = d.spacings[1];
+			start         = idx + (d.ns[0] - 1);
+			bnbr_start    = nbr_idx_left;
+			bnbr_start_in = bnbr_start + 1;
+			enbr_start    = nbr_idx_right;
+			enbr_start_in = enbr_start + 1;
+			stride        = d.ns[0];
+			n             = d.ns[1];
+		} else if (s == Side<2>::south()) {
+			h             = d.spacings[0];
+			start         = idx;
+			bnbr_start    = nbr_idx_left + (d.ns[1] - 1) * d.ns[0];
+			bnbr_start_in = bnbr_start - d.ns[0];
+			enbr_start    = nbr_idx_right + (d.ns[1] - 1) * d.ns[0];
+			enbr_start_in = enbr_start - d.ns[0];
+			stride        = 1;
+			n             = d.ns[0];
+		} else if (s == Side<2>::north()) {
+			h             = d.spacings[0];
+			start         = idx + (d.ns[1] - 1) * d.ns[0];
+			bnbr_start    = nbr_idx_left;
+			bnbr_start_in = bnbr_start + d.ns[0];
+			enbr_start    = nbr_idx_right;
+			enbr_start_in = enbr_start + d.ns[0];
+			stride        = 1;
+			n             = d.ns[0];
 		}
 		mid_coeffs /= h * h;
 		end_coeffs /= h * h;
@@ -363,39 +343,34 @@ class FineSH : public StencilHelper
 		int    idx     = d.global_index * d.ns[0] * d.ns[1];
 		int    nbr_idx = d.getCoarseNbrInfo(s).global_index * d.ns[0] * d.ns[1];
 		end            = d.getCoarseNbrInfo(s).orth_on_coarse.toInt() == 1;
-		switch (s.toInt()) {
-			case Side<2>::west:
-				h         = d.spacings[1];
-				start     = idx;
-				start_in  = idx + 1;
-				nbr_start = nbr_idx + d.ns[0] - 1;
-				stride    = d.ns[0];
-				n         = d.ns[1];
-				break;
-			case Side<2>::east:
-				h         = d.spacings[1];
-				start     = idx + (d.ns[0] - 1);
-				start_in  = idx + (d.ns[0] - 2);
-				nbr_start = nbr_idx;
-				stride    = d.ns[0];
-				n         = d.ns[1];
-				break;
-			case Side<2>::south:
-				h         = d.spacings[0];
-				start     = idx;
-				start_in  = idx + d.ns[0];
-				nbr_start = nbr_idx + (d.ns[1] - 1) * d.ns[0];
-				stride    = 1;
-				n         = d.ns[0];
-				break;
-			case Side<2>::north:
-				h         = d.spacings[0];
-				start     = idx + (d.ns[1] - 1) * d.ns[0];
-				start_in  = idx + (d.ns[1] - 2) * d.ns[0];
-				nbr_start = nbr_idx;
-				stride    = 1;
-				n         = d.ns[0];
-				break;
+		if (s == Side<2>::west()) {
+			h         = d.spacings[1];
+			start     = idx;
+			start_in  = idx + 1;
+			nbr_start = nbr_idx + d.ns[0] - 1;
+			stride    = d.ns[0];
+			n         = d.ns[1];
+		} else if (s == Side<2>::east()) {
+			h         = d.spacings[1];
+			start     = idx + (d.ns[0] - 1);
+			start_in  = idx + (d.ns[0] - 2);
+			nbr_start = nbr_idx;
+			stride    = d.ns[0];
+			n         = d.ns[1];
+		} else if (s == Side<2>::south()) {
+			h         = d.spacings[0];
+			start     = idx;
+			start_in  = idx + d.ns[0];
+			nbr_start = nbr_idx + (d.ns[1] - 1) * d.ns[0];
+			stride    = 1;
+			n         = d.ns[0];
+		} else if (s == Side<2>::north()) {
+			h         = d.spacings[0];
+			start     = idx + (d.ns[1] - 1) * d.ns[0];
+			start_in  = idx + (d.ns[1] - 2) * d.ns[0];
+			nbr_start = nbr_idx;
+			stride    = 1;
+			n         = d.ns[0];
 		}
 		end_coeffs /= h * h;
 		pen_coeffs /= h * h;

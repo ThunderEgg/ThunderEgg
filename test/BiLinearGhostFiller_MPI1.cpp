@@ -39,8 +39,8 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	pinfo_map[1]->spacings        = {lengthx / nx, lengthy / ny};
 	pinfo_map[1]->starts          = {startx, starty};
 	pinfo_map[1]->num_ghost_cells = num_ghost;
-	pinfo_map[1]->nbr_info[Side<2>::east].reset(new NormalNbrInfo<2>(2));
-	pinfo_map[1]->nbr_info[Side<2>::north].reset(new NormalNbrInfo<2>(3));
+	pinfo_map[1]->nbr_info[Side<2>::east().getIndex()].reset(new NormalNbrInfo<2>(2));
+	pinfo_map[1]->nbr_info[Side<2>::north().getIndex()].reset(new NormalNbrInfo<2>(3));
 
 	pinfo_map[2].reset(new PatchInfo<2>());
 	pinfo_map[2]->id              = 2;
@@ -48,8 +48,8 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	pinfo_map[2]->spacings        = {lengthx / nx, lengthy / ny};
 	pinfo_map[2]->starts          = {startx + lengthx, starty};
 	pinfo_map[2]->num_ghost_cells = num_ghost;
-	pinfo_map[2]->nbr_info[Side<2>::west].reset(new NormalNbrInfo<2>(1));
-	pinfo_map[2]->nbr_info[Side<2>::north].reset(new NormalNbrInfo<2>(4));
+	pinfo_map[2]->nbr_info[Side<2>::west().getIndex()].reset(new NormalNbrInfo<2>(1));
+	pinfo_map[2]->nbr_info[Side<2>::north().getIndex()].reset(new NormalNbrInfo<2>(4));
 
 	pinfo_map[3].reset(new PatchInfo<2>());
 	pinfo_map[3]->id              = 3;
@@ -57,8 +57,8 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	pinfo_map[3]->spacings        = {lengthx / nx, lengthy / ny};
 	pinfo_map[3]->starts          = {startx, starty + lengthy};
 	pinfo_map[3]->num_ghost_cells = num_ghost;
-	pinfo_map[3]->nbr_info[Side<2>::east].reset(new NormalNbrInfo<2>(4));
-	pinfo_map[3]->nbr_info[Side<2>::south].reset(new NormalNbrInfo<2>(1));
+	pinfo_map[3]->nbr_info[Side<2>::east().getIndex()].reset(new NormalNbrInfo<2>(4));
+	pinfo_map[3]->nbr_info[Side<2>::south().getIndex()].reset(new NormalNbrInfo<2>(1));
 
 	pinfo_map[4].reset(new PatchInfo<2>());
 	pinfo_map[4]->id              = 4;
@@ -66,8 +66,8 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	pinfo_map[4]->spacings        = {lengthx / nx, lengthy / ny};
 	pinfo_map[4]->starts          = {startx + lengthx, starty + lengthy};
 	pinfo_map[4]->num_ghost_cells = num_ghost;
-	pinfo_map[4]->nbr_info[Side<2>::west].reset(new NormalNbrInfo<2>(3));
-	pinfo_map[4]->nbr_info[Side<2>::south].reset(new NormalNbrInfo<2>(2));
+	pinfo_map[4]->nbr_info[Side<2>::west().getIndex()].reset(new NormalNbrInfo<2>(3));
+	pinfo_map[4]->nbr_info[Side<2>::south().getIndex()].reset(new NormalNbrInfo<2>(2));
 
 	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
@@ -89,13 +89,13 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		});
 		// check that west values are not modified
 		{
-			auto west_ghost = patch_1.getGhostSliceOnSide(Side<2>::west, 1);
+			auto west_ghost = patch_1.getGhostSliceOnSide(Side<2>::west(), 1);
 			nested_loop<1>(west_ghost.getStart(), west_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
 		}
 		// check that east values are correct
 		{
-			auto east_ghost = patch_1.getGhostSliceOnSide(Side<2>::east, 1);
+			auto east_ghost = patch_1.getGhostSliceOnSide(Side<2>::east(), 1);
 			nested_loop<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -105,13 +105,13 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		}
 		// check that south values are not modified
 		{
-			auto south_ghost = patch_1.getGhostSliceOnSide(Side<2>::south, 1);
+			auto south_ghost = patch_1.getGhostSliceOnSide(Side<2>::south(), 1);
 			nested_loop<1>(south_ghost.getStart(), south_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
 		}
 		// check that north values are correct
 		{
-			auto north_ghost = patch_1.getGhostSliceOnSide(Side<2>::north, 1);
+			auto north_ghost = patch_1.getGhostSliceOnSide(Side<2>::north(), 1);
 			nested_loop<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -131,7 +131,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		});
 		// check that west values correct
 		{
-			auto west_ghost = patch_2.getGhostSliceOnSide(Side<2>::west, 1);
+			auto west_ghost = patch_2.getGhostSliceOnSide(Side<2>::west(), 1);
 			nested_loop<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -141,19 +141,19 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		}
 		// check that east values are not modified
 		{
-			auto east_ghost = patch_2.getGhostSliceOnSide(Side<2>::east, 1);
+			auto east_ghost = patch_2.getGhostSliceOnSide(Side<2>::east(), 1);
 			nested_loop<1>(east_ghost.getStart(), east_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
 		}
 		// check that south values are not modified
 		{
-			auto south_ghost = patch_2.getGhostSliceOnSide(Side<2>::south, 1);
+			auto south_ghost = patch_2.getGhostSliceOnSide(Side<2>::south(), 1);
 			nested_loop<1>(south_ghost.getStart(), south_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
 		}
 		// check that north values are correct
 		{
-			auto north_ghost = patch_2.getGhostSliceOnSide(Side<2>::north, 1);
+			auto north_ghost = patch_2.getGhostSliceOnSide(Side<2>::north(), 1);
 			nested_loop<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -173,13 +173,13 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		});
 		// check that west values are not modified
 		{
-			auto west_ghost = patch_1.getGhostSliceOnSide(Side<2>::west, 1);
+			auto west_ghost = patch_1.getGhostSliceOnSide(Side<2>::west(), 1);
 			nested_loop<1>(west_ghost.getStart(), west_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
 		}
 		// check that east values are correct
 		{
-			auto east_ghost = patch_1.getGhostSliceOnSide(Side<2>::east, 1);
+			auto east_ghost = patch_1.getGhostSliceOnSide(Side<2>::east(), 1);
 			nested_loop<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -189,7 +189,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		}
 		// check that south values are not modified
 		{
-			auto south_ghost = patch_1.getGhostSliceOnSide(Side<2>::south, 1);
+			auto south_ghost = patch_1.getGhostSliceOnSide(Side<2>::south(), 1);
 			nested_loop<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -199,7 +199,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		}
 		// check that north values are correct
 		{
-			auto north_ghost = patch_1.getGhostSliceOnSide(Side<2>::north, 1);
+			auto north_ghost = patch_1.getGhostSliceOnSide(Side<2>::north(), 1);
 			nested_loop<1>(north_ghost.getStart(), north_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
 		}
@@ -215,7 +215,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		});
 		// check that west values correct
 		{
-			auto west_ghost = patch_2.getGhostSliceOnSide(Side<2>::west, 1);
+			auto west_ghost = patch_2.getGhostSliceOnSide(Side<2>::west(), 1);
 			nested_loop<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -225,13 +225,13 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		}
 		// check that east values are not modified
 		{
-			auto east_ghost = patch_2.getGhostSliceOnSide(Side<2>::east, 1);
+			auto east_ghost = patch_2.getGhostSliceOnSide(Side<2>::east(), 1);
 			nested_loop<1>(east_ghost.getStart(), east_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
 		}
 		// check that south values are correct
 		{
-			auto south_ghost = patch_2.getGhostSliceOnSide(Side<2>::south, 1);
+			auto south_ghost = patch_2.getGhostSliceOnSide(Side<2>::south(), 1);
 			nested_loop<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -241,7 +241,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		}
 		// check that north values are not modified
 		{
-			auto north_ghost = patch_2.getGhostSliceOnSide(Side<2>::north, 1);
+			auto north_ghost = patch_2.getGhostSliceOnSide(Side<2>::north(), 1);
 			nested_loop<1>(north_ghost.getStart(), north_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
 		}

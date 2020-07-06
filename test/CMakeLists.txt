@@ -5,7 +5,6 @@ if(PETSC_FOUND)
     SchurInfo.cpp
     PatchInfo.cpp
     test.cpp
-    Side.cpp
     Octant.cpp
     OctTree.cpp
     Domain.cpp

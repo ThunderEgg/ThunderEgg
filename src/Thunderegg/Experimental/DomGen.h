@@ -203,7 +203,7 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 					while (parent.childId(octs[quad]) != n.id) {
 						quad++;
 					}
-					pinfo.nbr_info[s.toInt()].reset(new CoarseNbrInfo<D>(nbr.id, quad));
+					pinfo.nbr_info[s.getIndex()].reset(new CoarseNbrInfo<D>(nbr.id, quad));
 					if (!qed.count(nbr.id)) {
 						q.push_back(nbr.id);
 						qed.insert(nbr.id);
@@ -221,14 +221,14 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 							qed.insert(id);
 						}
 					}
-					pinfo.nbr_info[s.toInt()].reset(new FineNbrInfo<D>(nbr_ids));
+					pinfo.nbr_info[s.getIndex()].reset(new FineNbrInfo<D>(nbr_ids));
 				} else if (n.nbrId(s) != -1) {
 					int id = n.nbrId(s);
 					if (!qed.count(id)) {
 						q.push_back(id);
 						qed.insert(id);
 					}
-					pinfo.nbr_info[s.toInt()].reset(new NormalNbrInfo<D>(id));
+					pinfo.nbr_info[s.getIndex()].reset(new NormalNbrInfo<D>(id));
 				}
 			}
 			new_level[pinfo.id] = d_ptr;
@@ -374,7 +374,7 @@ template <size_t D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
 						break;
 				}
 			}
-			graph.edges.push_back(edge_id * Side<D>::num_sides + s.toInt());
+			graph.edges.push_back(edge_id * Side<D>::num_sides + s.getIndex());
 		}
 	}
 
@@ -580,7 +580,7 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 						break;
 				}
 			}
-			graph.edges.push_back(edge_id * Side<D>::num_sides + s.toInt());
+			graph.edges.push_back(edge_id * Side<D>::num_sides + s.getIndex());
 		}
 		// level to level communication
 		graph.edges.push_back(-pinfo.id - 1);
