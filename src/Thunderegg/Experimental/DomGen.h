@@ -172,11 +172,11 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 			} else {
 				pinfo.parent_id = n.parent;
 				if (pinfo.parent_id != -1) {
-					char orth_on_parent = 0;
-					while (t.nodes.at(n.parent).child_id[orth_on_parent] != n.id) {
-						orth_on_parent++;
+					auto orth_iter = Orthant<D>::getValues().begin();
+					while (t.nodes.at(n.parent).child_id[orth_iter->getIndex()] != n.id) {
+						orth_iter++;
 					}
-					pinfo.orth_on_parent = orth_on_parent;
+					pinfo.orth_on_parent = *orth_iter;
 				}
 				if (!n.hasChildren() && curr_level != num_levels) {
 					pinfo.child_ids[0] = n.id;
@@ -196,14 +196,14 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 			// set and enqueue nbrs
 			for (Side<D> s : Side<D>::getValues()) {
 				if (n.nbrId(s) == -1 && n.parent != -1 && t.nodes.at(n.parent).nbrId(s) != -1) {
-					Node<D> parent = t.nodes.at(n.parent);
-					Node<D> nbr    = t.nodes.at(parent.nbrId(s));
-					auto    octs   = Orthant<D>::getValuesOnSide(s);
-					int     quad   = 0;
-					while (parent.childId(octs[quad]) != n.id) {
-						quad++;
+					Node<D> parent    = t.nodes.at(n.parent);
+					Node<D> nbr       = t.nodes.at(parent.nbrId(s));
+					auto    octs      = Orthant<D>::getValuesOnSide(s);
+					auto    orth_iter = Orthant<D - 1>::getValues().begin();
+					while (parent.childId(octs[orth_iter->getIndex()]) != n.id) {
+						orth_iter++;
 					}
-					pinfo.nbr_info[s.getIndex()].reset(new CoarseNbrInfo<D>(nbr.id, quad));
+					pinfo.nbr_info[s.getIndex()].reset(new CoarseNbrInfo<D>(nbr.id, *orth_iter));
 					if (!qed.count(nbr.id)) {
 						q.push_back(nbr.id);
 						qed.insert(nbr.id);

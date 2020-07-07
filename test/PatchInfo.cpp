@@ -28,7 +28,7 @@ TEST_CASE("CoarseNbrInfo Serialization/Deserialization", "[PatchInfo]")
 	CoarseNbrInfo<3> info;
 	info.id             = 5;
 	info.rank           = 1;
-	info.orth_on_coarse = 2;
+	info.orth_on_coarse = Orthant<2>::nw();
 	// serialize and then deserialize
 	char *buff = new char[info.serialize(nullptr)];
 	info.serialize(buff);
@@ -37,7 +37,7 @@ TEST_CASE("CoarseNbrInfo Serialization/Deserialization", "[PatchInfo]")
 	delete[] buff;
 	REQUIRE(out.id == 5);
 	REQUIRE(out.rank == 1);
-	REQUIRE(out.orth_on_coarse == 2);
+	REQUIRE(out.orth_on_coarse == Orthant<2>::nw());
 }
 TEST_CASE("FineNbrInfo Serialization/Deserialization", "[PatchInfo]")
 {
@@ -71,7 +71,7 @@ TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 	PatchInfo<3> &d     = *d_ptr;
 	d.id                = 0;
 	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
-	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, 3));
+	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
 	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
 
 	// serialize and then deserialize
@@ -90,7 +90,7 @@ TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 	REQUIRE(out.hasNbr(Side<3>::east()));
 	REQUIRE(out.getNbrType(Side<3>::east()) == NbrType::Coarse);
 	REQUIRE(out.getCoarseNbrInfo(Side<3>::east()).id == 2);
-	REQUIRE(out.getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == 3);
+	REQUIRE(out.getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::nw());
 
 	REQUIRE(out.hasNbr(Side<3>::south()));
 	REQUIRE(out.getNbrType(Side<3>::south()) == NbrType::Fine);

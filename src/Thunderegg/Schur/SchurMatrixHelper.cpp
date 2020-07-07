@@ -105,7 +105,7 @@ struct Thunderegg::Schur::Block {
 			case IfaceType<3>::coarse_to_fine: {
 				int quad = type.getOrthant().toInt();
 				quad     = rotateQuad(quad);
-				type.setOrthant(quad);
+				type.setOrthant(Orthant<2>(quad));
 			} break;
 			default:
 				break;

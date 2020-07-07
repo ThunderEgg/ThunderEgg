@@ -114,11 +114,15 @@ template <size_t D> inline Tree<D>::Tree(std::string file_name)
 		input.read((char *) &n.nbr_id[0], sizeof(n.nbr_id));
 		input.read((char *) &n.child_id[0], sizeof(n.child_id));
 
-		if (i == 0) { root = n.id; }
+		if (i == 0) {
+			root = n.id;
+		}
 		max_id      = max(max_id, n.id);
 		nodes[n.id] = n;
 
-		if (n.level > num_levels) { num_levels = n.level; }
+		if (n.level > num_levels) {
+			num_levels = n.level;
+		}
 		levels[n.level] = &nodes[n.id];
 	}
 }
@@ -186,12 +190,12 @@ template <size_t D> inline void Tree<D>::refineLeaves()
 template <size_t D> inline void Tree<D>::refineNode(Node<D> &n)
 {
 	std::array<Node<D>, Orthant<D>::num_orthants> new_children;
-	for (int i = 0; i < Orthant<D>::num_orthants; i++) {
-		new_children[i] = Node<D>(n, i);
-		Node<D> &child  = new_children[i];
+	for (Orthant<D> o : Orthant<D>::getValues()) {
+		new_children[o.getIndex()] = Node<D>(n, o);
+		Node<D> &child             = new_children[o.getIndex()];
 		max_id++;
-		child.id      = max_id;
-		n.child_id[i] = max_id;
+		child.id                 = max_id;
+		n.child_id[o.getIndex()] = max_id;
 	}
 	// set new neighbors
 	for (Orthant<D> o : Orthant<D>::getValues()) {

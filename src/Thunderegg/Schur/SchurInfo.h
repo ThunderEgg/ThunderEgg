@@ -341,8 +341,8 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 	void getIfaceTypes(std::deque<IfaceType<D>> &types)
 	{
 		types.push_back(IfaceType<D>::coarse_to_coarse);
-		for (size_t i = 0; i < fine_ids.size(); i++) {
-			IfaceType<D> type(IfaceType<D>::coarse_to_fine, i);
+		for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
+			IfaceType<D> type(IfaceType<D>::coarse_to_fine, o);
 			types.push_back(type);
 		}
 	}

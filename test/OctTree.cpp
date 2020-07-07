@@ -134,15 +134,14 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node with two calls",
 				REQUIRE(!child.hasNbr(s));
 			}
 			// check the child's child nodes
-			for (int i = 0; i < 8; i++) {
-				Orthant<3> child_o     = i;
-				int        id          = child.child_id[i];
-				Node<3>    child_child = tree.nodes.at(id);
+			for (Orthant<3> child_o : Orthant<3>::getValues()) {
+				int     id          = child.child_id[child_o.getIndex()];
+				Node<3> child_child = tree.nodes.at(id);
 				REQUIRE(id > 8);
 				REQUIRE(id == child_child.id);
 
 				// check interior neighbors
-				for (Side<3> s : child_o.getInteriorSides()) {
+				for (Side<3> s : o.getInteriorSides()) {
 					REQUIRE(child_child.hasNbr(s));
 					REQUIRE(child_child.nbrId(s)
 					        == child.child_id[child_o.getInteriorNbrOnSide(s).toInt()]);

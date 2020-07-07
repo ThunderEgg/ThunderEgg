@@ -112,10 +112,10 @@ template <size_t D> struct IfaceSet : public Serializable {
 				if (info.id == id) {
 					types.push_back(IfaceType<D>::coarse_to_coarse);
 				} else {
-					for (int i = 0; i < Orthant<D - 1>::num_orthants; i++) {
-						if (info.fine_ids[i] == id) {
+					for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
+						if (info.fine_ids[o.getIndex()] == id) {
 							types.push_back(IfaceType<D>::coarse_to_fine);
-							types.back().setOrthant(i);
+							types.back().setOrthant(o);
 							break;
 						}
 					}

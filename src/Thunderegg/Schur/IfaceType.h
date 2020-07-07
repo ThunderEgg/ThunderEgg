@@ -42,7 +42,7 @@ template <size_t D> class IfaceType
 	/**
 	 * @brief Orthant that the interface lies on
 	 */
-	Orthant<D - 1> orthant = -1;
+	Orthant<D - 1> orthant = Orthant<D - 1>::null();
 
 	public:
 	// enum definitions

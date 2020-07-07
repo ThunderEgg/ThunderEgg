@@ -200,11 +200,12 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 					nbr_id        = data->id;
 					nbr_rank      = info->p4est->mpirank;
 				}
-				for (int i = 0; i < 2; i++) {
-					if (!side_info1.is.hanging.is_ghost[i]) {
-						my_data *     data = (my_data *) side_info1.is.hanging.quad[i]->p.user_data;
+				for (Orthant<1> o : Orthant<1>::getValues()) {
+					if (!side_info1.is.hanging.is_ghost[o.getIndex()]) {
+						my_data *data
+						= (my_data *) side_info1.is.hanging.quad[o.getIndex()]->p.user_data;
 						PatchInfo<2> &pinfo = *dmap[data->id];
-						pinfo.nbr_info[side.getIndex()].reset(new CoarseNbrInfo<2>(nbr_id, i));
+						pinfo.nbr_info[side.getIndex()].reset(new CoarseNbrInfo<2>(nbr_id, o));
 						pinfo.getCoarseNbrInfo(side).updateRank(nbr_rank);
 					}
 				}
@@ -229,8 +230,8 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 					}
 					PatchInfo<2> &pinfo = *dmap[id];
 					pinfo.nbr_info[side.getIndex()].reset(new FineNbrInfo<2>(nbr_ids));
-					pinfo.getFineNbrInfo(side).updateRank(ranks[0], 0);
-					pinfo.getFineNbrInfo(side).updateRank(ranks[1], 1);
+					pinfo.getFineNbrInfo(side).updateRank(ranks[0], Orthant<1>::lower());
+					pinfo.getFineNbrInfo(side).updateRank(ranks[1], Orthant<1>::upper());
 				}
 			} else {
 				// normal nbr
@@ -302,12 +303,12 @@ static void coarsen_replace(p4est_t *p4est, p4est_topidx_t which_tree, int num_o
 	data->id                       = fine_data->id;
 	data->child_rank               = fine_data->rank;
 
-	for (int i = 0; i < 4; i++) {
-		my_data *     fine_data = (my_data *) outgoing[i]->p.user_data;
-		PatchInfo<2> &pinfo     = *dmap.at(fine_data->id);
-		pinfo.orth_on_parent    = i;
-		pinfo.parent_id         = data->id;
-		data->child_ids[i]      = fine_data->id;
+	for (Orthant<2> o : Orthant<2>::getValues()) {
+		my_data *     fine_data       = (my_data *) outgoing[o.getIndex()]->p.user_data;
+		PatchInfo<2> &pinfo           = *dmap.at(fine_data->id);
+		pinfo.orth_on_parent          = o;
+		pinfo.parent_id               = data->id;
+		data->child_ids[o.getIndex()] = fine_data->id;
 	}
 }
 void P4estDomGen::extractLevel()

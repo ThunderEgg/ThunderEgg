@@ -94,7 +94,8 @@ template <size_t D> class DomainReader
 				} break;
 				case Thunderegg::NbrType::Coarse: {
 					pinfo->nbr_info[side.getIndex()].reset(new Thunderegg::CoarseNbrInfo<2>(
-					nbr_j.at("ids").get<array1>()[0], nbr_j.at("orth_on_coarse").get<int>()));
+					nbr_j.at("ids").get<array1>()[0],
+					Thunderegg::Orthant<1>(nbr_j.at("orth_on_coarse").get<unsigned char>())));
 					pinfo->getCoarseNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
 				} break;
 				default:
