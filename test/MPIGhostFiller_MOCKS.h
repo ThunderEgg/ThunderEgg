@@ -122,7 +122,7 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 							INFO("NbrType: Fine");
 
 							for (auto orthant : Orthant<D>::getValuesOnSide(side)) {
-								INFO("Orthant: " << orthant.toInt());
+								INFO("Orthant: " << orthant.getIndex());
 								auto call = make_tuple(patch, side, NbrType::Fine, orthant);
 								check_for_nbr_call(call);
 							}
@@ -131,9 +131,10 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 							INFO("NbrType: Coarse");
 
 							auto orthant = Orthant<D>::getValuesOnSide(
-							side.opposite())[patch->getCoarseNbrInfo(side).orth_on_coarse.toInt()];
+							side
+							.opposite())[patch->getCoarseNbrInfo(side).orth_on_coarse.getIndex()];
 
-							INFO("Orthant: " << orthant.toInt());
+							INFO("Orthant: " << orthant.getIndex());
 
 							auto call = make_tuple(patch, side, NbrType::Coarse, orthant);
 							check_for_nbr_call(call);
@@ -172,7 +173,7 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 					nbrtype = "???";
 			}
 			INFO("nbrtype: " << nbrtype);
-			INFO("orthant: " << std::get<3>(call).toInt());
+			INFO("orthant: " << std::get<3>(call).getIndex());
 			CHECK(false);
 		}
 	}

@@ -117,7 +117,7 @@ template <size_t D> struct Node {
 	 */
 	int &childId(Orthant<D> o)
 	{
-		return child_id[o.toInt()];
+		return child_id[o.getIndex()];
 	}
 	/**
 	 * @brief Return reference to neighbor id on a particular side.

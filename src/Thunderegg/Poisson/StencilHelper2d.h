@@ -342,7 +342,7 @@ class FineSH : public StencilHelper
 		double h       = 0;
 		int    idx     = d.global_index * d.ns[0] * d.ns[1];
 		int    nbr_idx = d.getCoarseNbrInfo(s).global_index * d.ns[0] * d.ns[1];
-		end            = d.getCoarseNbrInfo(s).orth_on_coarse.toInt() == 1;
+		end            = d.getCoarseNbrInfo(s).orth_on_coarse.getIndex() == 1;
 		if (s == Side<2>::west()) {
 			h         = d.spacings[1];
 			start     = idx;

@@ -144,7 +144,7 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 *
 	 * If the parent is the same size, it should be set to Orthant::null
 	 */
-	Orthant<D> orth_on_parent;
+	Orthant<D> orth_on_parent = Orthant<D>::null();
 	/**
 	 * @brief Whether the patch has neumann boundary conditions on one side.
 	 */
@@ -729,7 +729,7 @@ template <size_t D> class FineNbrInfo : public NbrInfo<D>
 	 */
 	void updateRank(int new_rank, Orthant<D - 1> orth_on_coarse)
 	{
-		ranks[orth_on_coarse.toInt()] = new_rank;
+		ranks[orth_on_coarse.getIndex()] = new_rank;
 	}
 	void updateRankOnNeighbors(int new_rank, Side<D> s)
 	{
@@ -778,7 +778,7 @@ template <size_t D> inline bool PatchInfo<D>::hasNbr(Side<D> s) const
 }
 template <size_t D> inline bool PatchInfo<D>::hasCoarseParent() const
 {
-	return orth_on_parent.toInt() != -1;
+	return orth_on_parent != Orthant<D>::null();
 }
 template <size_t D> inline bool PatchInfo<D>::isNeumann(Side<D> s) const
 {

@@ -129,8 +129,8 @@ template <size_t D> class IfaceType
 	 */
 	bool operator<(const IfaceType &b) const
 	{
-		int orth   = orthant.toInt();
-		int b_orth = b.orthant.toInt();
+		int orth   = orthant.getIndex();
+		int b_orth = b.orthant.getIndex();
 		return std::tie(val, orth) < std::tie(b.val, b_orth);
 	}
 };

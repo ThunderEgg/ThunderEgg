@@ -388,14 +388,14 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 					case NbrType::Fine: {
 						FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
 						for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
-							if (info.nbr_info->ptrs[o.toInt()] == nullptr) {
+							if (info.nbr_info->ptrs[o.getIndex()] == nullptr) {
 								in_patch_offs.insert(
-								make_pair(info.nbr_info->ranks[o.toInt()], id));
-								out_patch_offs.insert(make_pair(info.nbr_info->ranks[o.toInt()],
-								                                info.fine_ids[o.toInt()]));
-								if (!rev_map.count(info.fine_ids[o.toInt()])) {
-									id_map_vec.push_back(info.fine_ids[o.toInt()]);
-									rev_map[info.fine_ids[o.toInt()]] = curr_i;
+								make_pair(info.nbr_info->ranks[o.getIndex()], id));
+								out_patch_offs.insert(make_pair(info.nbr_info->ranks[o.getIndex()],
+								                                info.fine_ids[o.getIndex()]));
+								if (!rev_map.count(info.fine_ids[o.getIndex()])) {
+									id_map_vec.push_back(info.fine_ids[o.getIndex()]);
+									rev_map[info.fine_ids[o.getIndex()]] = curr_i;
 									curr_i++;
 								}
 							}

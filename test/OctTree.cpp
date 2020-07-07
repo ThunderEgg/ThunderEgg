@@ -69,11 +69,11 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node", "[Side]")
 	{
 		array<int, 8> children = tree.nodes[0].child_id;
 		for (Orthant<3> o : Orthant<3>::getValues()) {
-			Node<3> child = tree.nodes[children[o.toInt()]];
-			REQUIRE(child.id == children[o.toInt()]);
+			Node<3> child = tree.nodes[children[o.getIndex()]];
+			REQUIRE(child.id == children[o.getIndex()]);
 			for (Side<3> s : o.getInteriorSides()) {
 				REQUIRE(child.hasNbr(s));
-				REQUIRE(child.nbrId(s) == children[o.getInteriorNbrOnSide(s).toInt()]);
+				REQUIRE(child.nbrId(s) == children[o.getInteriorNbrOnSide(s).getIndex()]);
 			}
 			for (Side<3> s : o.getExteriorSides()) {
 				REQUIRE(!child.hasNbr(s));
@@ -124,11 +124,11 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node with two calls",
 	{
 		array<int, 8> children = tree.nodes.at(0).child_id;
 		for (Orthant<3> o : Orthant<3>::getValues()) {
-			Node<3> child = tree.nodes.at(children[o.toInt()]);
-			REQUIRE(child.id == children[o.toInt()]);
+			Node<3> child = tree.nodes.at(children[o.getIndex()]);
+			REQUIRE(child.id == children[o.getIndex()]);
 			for (Side<3> s : o.getInteriorSides()) {
 				REQUIRE(child.hasNbr(s));
-				REQUIRE(child.nbrId(s) == children[o.getInteriorNbrOnSide(s).toInt()]);
+				REQUIRE(child.nbrId(s) == children[o.getInteriorNbrOnSide(s).getIndex()]);
 			}
 			for (Side<3> s : o.getExteriorSides()) {
 				REQUIRE(!child.hasNbr(s));
@@ -144,7 +144,7 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node with two calls",
 				for (Side<3> s : o.getInteriorSides()) {
 					REQUIRE(child_child.hasNbr(s));
 					REQUIRE(child_child.nbrId(s)
-					        == child.child_id[child_o.getInteriorNbrOnSide(s).toInt()]);
+					        == child.child_id[child_o.getInteriorNbrOnSide(s).getIndex()]);
 				}
 				// check exterior neighbors
 				{
@@ -157,8 +157,8 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node with two calls",
 							Side<3> s = child_o_ext[i];
 							REQUIRE(child_child.hasNbr(s));
 							REQUIRE(child_child.nbrId(s)
-							        == tree.nodes.at(children[o.getInteriorNbrOnSide(s).toInt()])
-							           .child_id[child_o.getExteriorNbrOnSide(s).toInt()]);
+							        == tree.nodes.at(children[o.getInteriorNbrOnSide(s).getIndex()])
+							           .child_id[child_o.getExteriorNbrOnSide(s).getIndex()]);
 						}
 					}
 				}

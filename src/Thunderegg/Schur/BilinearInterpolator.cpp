@@ -88,7 +88,7 @@ void BilinearInterpolator::interpolate(SchurInfo<2> &sinfo, Side<2> s, int local
 			}
 		} break;
 		case IfaceType<2>::fine_to_coarse: {
-			if (itype.getOrthant().toInt() == 0) {
+			if (itype.getOrthant() == Orthant<1>::lower()) {
 				// middle cases
 				for (int i = 0; i < n; i += 2) {
 					interp_data[{i / 2}] += 1.0 / 3 * sl[{i}] + 1.0 / 3 * sl[{i + 1}];
@@ -110,7 +110,7 @@ void BilinearInterpolator::interpolate(SchurInfo<2> &sinfo, Side<2> s, int local
 			}
 		} break;
 		case IfaceType<2>::coarse_to_fine: {
-			if (itype.getOrthant().toInt() == 0) {
+			if (itype.getOrthant() == Orthant<1>::lower()) {
 				for (int i = 0; i < n; i++) {
 					interp_data[{i}] += 2.0 / 6 * sl[{i / 2}];
 				}

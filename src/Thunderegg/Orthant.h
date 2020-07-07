@@ -167,15 +167,6 @@ template <size_t D> class Orthant
 	 *
 	 * @return The integer value.
 	 */
-	int toInt() const
-	{
-		return val;
-	}
-	/**
-	 * @brief Get the integer value of the octant.
-	 *
-	 * @return The integer value.
-	 */
 	size_t getIndex() const
 	{
 		return val;
@@ -288,6 +279,17 @@ template <size_t D> class Orthant
 	bool operator==(const Orthant<D> &other) const
 	{
 		return val == other.val;
+	}
+	/**
+	 * @brief Not Equals operator.
+	 *
+	 * @param other The other octant.
+	 *
+	 * @return Whether or not the value of this octant is not equal the value other octant.
+	 */
+	bool operator!=(const Orthant<D> &other) const
+	{
+		return val != other.val;
 	}
 	/**
 	 * @brief Less Tan operator.

@@ -100,38 +100,31 @@ void TriLinInterp::interpolate(SchurInfo<3> &sinfo, Side<3> s, int local_index, 
 			}
 		} break;
 		case IfaceType<3>::coarse_to_fine:
-			switch (itype.getOrthant().toInt()) {
-				case 0: {
-					for (int yi = 0; yi < ny; yi++) {
-						for (int xi = 0; xi < nx; xi++) {
-							interp_data[{xi, yi}] += 4.0 * sl[{(xi) / 2, (yi) / 2}] / 12.0;
-						}
+			if (itype.getOrthant() == Orthant<2>::sw()) {
+				for (int yi = 0; yi < ny; yi++) {
+					for (int xi = 0; xi < nx; xi++) {
+						interp_data[{xi, yi}] += 4.0 * sl[{(xi) / 2, (yi) / 2}] / 12.0;
 					}
-				} break;
-				case 1: {
-					for (int yi = 0; yi < ny; yi++) {
-						for (int xi = 0; xi < nx; xi++) {
-							interp_data[{xi, yi}] += 4.0 * sl[{(xi + nx) / 2, (yi) / 2}] / 12.0;
-						}
+				}
+			} else if (itype.getOrthant() == Orthant<2>::se()) {
+				for (int yi = 0; yi < ny; yi++) {
+					for (int xi = 0; xi < nx; xi++) {
+						interp_data[{xi, yi}] += 4.0 * sl[{(xi + nx) / 2, (yi) / 2}] / 12.0;
 					}
-				} break;
-				case 2: {
-					for (int yi = 0; yi < ny; yi++) {
-						for (int xi = 0; xi < nx; xi++) {
-							interp_data[{xi, yi}] += 4.0 * sl[{(xi) / 2, (yi + ny) / 2}] / 12.0;
-						}
+				}
+			} else if (itype.getOrthant() == Orthant<2>::nw()) {
+				for (int yi = 0; yi < ny; yi++) {
+					for (int xi = 0; xi < nx; xi++) {
+						interp_data[{xi, yi}] += 4.0 * sl[{(xi) / 2, (yi + ny) / 2}] / 12.0;
 					}
-				} break;
-				case 3: {
-					for (int yi = 0; yi < ny; yi++) {
-						for (int xi = 0; xi < nx; xi++) {
-							interp_data[{xi, yi}]
-							+= 4.0 * sl[{(xi + nx) / 2, (yi + ny) / 2}] / 12.0;
-						}
+				}
+			} else if (itype.getOrthant() == Orthant<2>::ne()) {
+				for (int yi = 0; yi < ny; yi++) {
+					for (int xi = 0; xi < nx; xi++) {
+						interp_data[{xi, yi}] += 4.0 * sl[{(xi + nx) / 2, (yi + ny) / 2}] / 12.0;
 					}
-				} break;
+				}
 			}
-			break;
 		case IfaceType<3>::coarse_to_coarse: {
 			for (int yi = 0; yi < ny; yi++) {
 				for (int xi = 0; xi < nx; xi++) {
@@ -140,35 +133,30 @@ void TriLinInterp::interpolate(SchurInfo<3> &sinfo, Side<3> s, int local_index, 
 			}
 		} break;
 		case IfaceType<3>::fine_to_coarse:
-			switch (itype.getOrthant().toInt()) {
-				case 0: {
-					for (int yi = 0; yi < ny; yi++) {
-						for (int xi = 0; xi < nx; xi++) {
-							interp_data[{(xi) / 2, (yi) / 2}] += 1.0 / 6.0 * sl[{xi, yi}];
-						}
+			if (itype.getOrthant() == Orthant<2>::sw()) {
+				for (int yi = 0; yi < ny; yi++) {
+					for (int xi = 0; xi < nx; xi++) {
+						interp_data[{(xi) / 2, (yi) / 2}] += 1.0 / 6.0 * sl[{xi, yi}];
 					}
-				} break;
-				case 1: {
-					for (int yi = 0; yi < ny; yi++) {
-						for (int xi = 0; xi < nx; xi++) {
-							interp_data[{(xi + nx) / 2, (yi) / 2}] += 1.0 / 6.0 * sl[{xi, yi}];
-						}
+				}
+			} else if (itype.getOrthant() == Orthant<2>::se()) {
+				for (int yi = 0; yi < ny; yi++) {
+					for (int xi = 0; xi < nx; xi++) {
+						interp_data[{(xi + nx) / 2, (yi) / 2}] += 1.0 / 6.0 * sl[{xi, yi}];
 					}
-				} break;
-				case 2: {
-					for (int yi = 0; yi < ny; yi++) {
-						for (int xi = 0; xi < nx; xi++) {
-							interp_data[{(xi) / 2, (yi + ny) / 2}] += 1.0 / 6.0 * sl[{xi, yi}];
-						}
+				}
+			} else if (itype.getOrthant() == Orthant<2>::nw()) {
+				for (int yi = 0; yi < ny; yi++) {
+					for (int xi = 0; xi < nx; xi++) {
+						interp_data[{(xi) / 2, (yi + ny) / 2}] += 1.0 / 6.0 * sl[{xi, yi}];
 					}
-				} break;
-				case 3: {
-					for (int yi = 0; yi < ny; yi++) {
-						for (int xi = 0; xi < nx; xi++) {
-							interp_data[{(xi + nx) / 2, (yi + ny) / 2}] += 1.0 / 6.0 * sl[{xi, yi}];
-						}
+				}
+			} else if (itype.getOrthant() == Orthant<2>::ne()) {
+				for (int yi = 0; yi < ny; yi++) {
+					for (int xi = 0; xi < nx; xi++) {
+						interp_data[{(xi + nx) / 2, (yi + ny) / 2}] += 1.0 / 6.0 * sl[{xi, yi}];
 					}
-				} break;
+				}
 			}
 			break;
 	}

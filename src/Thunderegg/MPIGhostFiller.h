@@ -221,7 +221,7 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 						case NbrType::Coarse: {
 							auto nbrinfo = pinfo->getCoarseNbrInfo(s);
 							auto orthant = Orthant<D>::getValuesOnSide(
-							s.opposite())[nbrinfo.orth_on_coarse.toInt()];
+							s.opposite())[nbrinfo.orth_on_coarse.getIndex()];
 							if (nbrinfo.rank == rank) {
 								local_calls.emplace_back(pinfo, s, NbrType::Coarse, orthant,
 								                         pinfo->local_index, nbrinfo.local_index);
