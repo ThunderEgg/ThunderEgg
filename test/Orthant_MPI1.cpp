@@ -4,6 +4,21 @@
 
 using namespace std;
 using namespace Thunderegg;
+TEST_CASE("Orthant<1> unsigned char constructor works", "[Octant]")
+{
+	Orthant<1> o(13);
+	CHECK(o.getIndex() == 13);
+}
+TEST_CASE("Orthant<2> unsigned char constructor works", "[Octant]")
+{
+	Orthant<2> o(13);
+	CHECK(o.getIndex() == 13);
+}
+TEST_CASE("Orthant<3> unsigned char constructor works", "[Octant]")
+{
+	Orthant<3> o(13);
+	CHECK(o.getIndex() == 13);
+}
 TEST_CASE("Orthant<1> Default constructor works", "[Octant]")
 {
 	Orthant<1> o;
@@ -113,6 +128,40 @@ TEST_CASE("Orthant<3> getExteriorNbrOnSide() is as expected", "[Octant]")
 	CHECK(Orthant<3>::tne().getExteriorNbrOnSide(Side<3>::north()) == Orthant<3>::tse());
 	CHECK(Orthant<3>::tne().getExteriorNbrOnSide(Side<3>::top()) == Orthant<3>::bne());
 }
+TEST_CASE("Orthant<1> getInteriorSides() is as expected", "[Octant]")
+{
+	{
+		auto array = Orthant<1>::lower().getInteriorSides();
+		CHECK(array[0] == Side<1>::east());
+	}
+	{
+		auto array = Orthant<1>::upper().getInteriorSides();
+		CHECK(array[0] == Side<1>::west());
+	}
+}
+TEST_CASE("Orthant<2> getInteriorSides() is as expected", "[Octant]")
+{
+	{
+		auto array = Orthant<2>::sw().getInteriorSides();
+		CHECK(array[0] == Side<2>::east());
+		CHECK(array[1] == Side<2>::north());
+	}
+	{
+		auto array = Orthant<2>::se().getInteriorSides();
+		CHECK(array[0] == Side<2>::west());
+		CHECK(array[1] == Side<2>::north());
+	}
+	{
+		auto array = Orthant<2>::nw().getInteriorSides();
+		CHECK(array[0] == Side<2>::east());
+		CHECK(array[1] == Side<2>::south());
+	}
+	{
+		auto array = Orthant<2>::ne().getInteriorSides();
+		CHECK(array[0] == Side<2>::west());
+		CHECK(array[1] == Side<2>::south());
+	}
+}
 TEST_CASE("Orthant<3> getInteriorSides() is as expected", "[Octant]")
 {
 	{
@@ -162,6 +211,40 @@ TEST_CASE("Orthant<3> getInteriorSides() is as expected", "[Octant]")
 		CHECK(array[0] == Side<3>::west());
 		CHECK(array[1] == Side<3>::south());
 		CHECK(array[2] == Side<3>::bottom());
+	}
+}
+TEST_CASE("Orthant<1> getExteriorSides() is as expected", "[Octant]")
+{
+	{
+		auto array = Orthant<1>::lower().getExteriorSides();
+		CHECK(array[0] == Side<1>::west());
+	}
+	{
+		auto array = Orthant<1>::upper().getExteriorSides();
+		CHECK(array[0] == Side<1>::east());
+	}
+}
+TEST_CASE("Orthant<2> getExteriorSides() is as expected", "[Octant]")
+{
+	{
+		auto array = Orthant<2>::sw().getExteriorSides();
+		CHECK(array[0] == Side<2>::west());
+		CHECK(array[1] == Side<2>::south());
+	}
+	{
+		auto array = Orthant<2>::se().getExteriorSides();
+		CHECK(array[0] == Side<2>::east());
+		CHECK(array[1] == Side<2>::south());
+	}
+	{
+		auto array = Orthant<2>::nw().getExteriorSides();
+		CHECK(array[0] == Side<2>::west());
+		CHECK(array[1] == Side<2>::north());
+	}
+	{
+		auto array = Orthant<2>::ne().getExteriorSides();
+		CHECK(array[0] == Side<2>::east());
+		CHECK(array[1] == Side<2>::north());
 	}
 }
 TEST_CASE("Orthant<3> getExteriorSides() is as expected", "[Octant]")
@@ -215,63 +298,105 @@ TEST_CASE("Orthant<3> getExteriorSides() is as expected", "[Octant]")
 		CHECK(array[2] == Side<3>::top());
 	}
 }
+TEST_CASE("Orthant<1> isOnSide() is as expected", "[Octant]")
+{
+	CHECK(Orthant<1>::lower().isOnSide(Side<1>::west()));
+	CHECK_FALSE(Orthant<1>::lower().isOnSide(Side<1>::east()));
+
+	CHECK_FALSE(Orthant<1>::upper().isOnSide(Side<1>::west()));
+	CHECK(Orthant<1>::upper().isOnSide(Side<1>::east()));
+}
+TEST_CASE("Orthant<2> isOnSide() is as expected", "[Octant]")
+{
+	CHECK(Orthant<2>::sw().isOnSide(Side<2>::west()));
+	CHECK_FALSE(Orthant<2>::sw().isOnSide(Side<2>::east()));
+	CHECK(Orthant<2>::sw().isOnSide(Side<2>::south()));
+	CHECK_FALSE(Orthant<2>::sw().isOnSide(Side<2>::north()));
+
+	CHECK_FALSE(Orthant<2>::se().isOnSide(Side<2>::west()));
+	CHECK(Orthant<2>::se().isOnSide(Side<2>::east()));
+	CHECK(Orthant<2>::se().isOnSide(Side<2>::south()));
+	CHECK_FALSE(Orthant<2>::se().isOnSide(Side<2>::north()));
+
+	CHECK(Orthant<2>::nw().isOnSide(Side<2>::west()));
+	CHECK_FALSE(Orthant<2>::nw().isOnSide(Side<2>::east()));
+	CHECK_FALSE(Orthant<2>::nw().isOnSide(Side<2>::south()));
+	CHECK(Orthant<2>::nw().isOnSide(Side<2>::north()));
+
+	CHECK_FALSE(Orthant<2>::ne().isOnSide(Side<2>::west()));
+	CHECK(Orthant<2>::ne().isOnSide(Side<2>::east()));
+	CHECK_FALSE(Orthant<2>::ne().isOnSide(Side<2>::south()));
+	CHECK(Orthant<2>::ne().isOnSide(Side<2>::north()));
+}
 TEST_CASE("Orthant<3> isOnSide() is as expected", "[Octant]")
 {
 	CHECK(Orthant<3>::bsw().isOnSide(Side<3>::west()));
-	CHECK(!Orthant<3>::bsw().isOnSide(Side<3>::east()));
+	CHECK_FALSE(Orthant<3>::bsw().isOnSide(Side<3>::east()));
 	CHECK(Orthant<3>::bsw().isOnSide(Side<3>::south()));
-	CHECK(!Orthant<3>::bsw().isOnSide(Side<3>::north()));
+	CHECK_FALSE(Orthant<3>::bsw().isOnSide(Side<3>::north()));
 	CHECK(Orthant<3>::bsw().isOnSide(Side<3>::bottom()));
-	CHECK(!Orthant<3>::bsw().isOnSide(Side<3>::top()));
+	CHECK_FALSE(Orthant<3>::bsw().isOnSide(Side<3>::top()));
 
-	CHECK(!Orthant<3>::bse().isOnSide(Side<3>::west()));
+	CHECK_FALSE(Orthant<3>::bse().isOnSide(Side<3>::west()));
 	CHECK(Orthant<3>::bse().isOnSide(Side<3>::east()));
 	CHECK(Orthant<3>::bse().isOnSide(Side<3>::south()));
-	CHECK(!Orthant<3>::bse().isOnSide(Side<3>::north()));
+	CHECK_FALSE(Orthant<3>::bse().isOnSide(Side<3>::north()));
 	CHECK(Orthant<3>::bse().isOnSide(Side<3>::bottom()));
-	CHECK(!Orthant<3>::bse().isOnSide(Side<3>::top()));
+	CHECK_FALSE(Orthant<3>::bse().isOnSide(Side<3>::top()));
 
 	CHECK(Orthant<3>::bnw().isOnSide(Side<3>::west()));
-	CHECK(!Orthant<3>::bnw().isOnSide(Side<3>::east()));
-	CHECK(!Orthant<3>::bnw().isOnSide(Side<3>::south()));
+	CHECK_FALSE(Orthant<3>::bnw().isOnSide(Side<3>::east()));
+	CHECK_FALSE(Orthant<3>::bnw().isOnSide(Side<3>::south()));
 	CHECK(Orthant<3>::bnw().isOnSide(Side<3>::north()));
 	CHECK(Orthant<3>::bnw().isOnSide(Side<3>::bottom()));
-	CHECK(!Orthant<3>::bnw().isOnSide(Side<3>::top()));
+	CHECK_FALSE(Orthant<3>::bnw().isOnSide(Side<3>::top()));
 
-	CHECK(!Orthant<3>::bne().isOnSide(Side<3>::west()));
+	CHECK_FALSE(Orthant<3>::bne().isOnSide(Side<3>::west()));
 	CHECK(Orthant<3>::bne().isOnSide(Side<3>::east()));
-	CHECK(!Orthant<3>::bne().isOnSide(Side<3>::south()));
+	CHECK_FALSE(Orthant<3>::bne().isOnSide(Side<3>::south()));
 	CHECK(Orthant<3>::bne().isOnSide(Side<3>::north()));
 	CHECK(Orthant<3>::bne().isOnSide(Side<3>::bottom()));
-	CHECK(!Orthant<3>::bne().isOnSide(Side<3>::top()));
+	CHECK_FALSE(Orthant<3>::bne().isOnSide(Side<3>::top()));
 
 	CHECK(Orthant<3>::tsw().isOnSide(Side<3>::west()));
-	CHECK(!Orthant<3>::tsw().isOnSide(Side<3>::east()));
+	CHECK_FALSE(Orthant<3>::tsw().isOnSide(Side<3>::east()));
 	CHECK(Orthant<3>::tsw().isOnSide(Side<3>::south()));
-	CHECK(!Orthant<3>::tsw().isOnSide(Side<3>::north()));
-	CHECK(!Orthant<3>::tsw().isOnSide(Side<3>::bottom()));
+	CHECK_FALSE(Orthant<3>::tsw().isOnSide(Side<3>::north()));
+	CHECK_FALSE(Orthant<3>::tsw().isOnSide(Side<3>::bottom()));
 	CHECK(Orthant<3>::tsw().isOnSide(Side<3>::top()));
 
-	CHECK(!Orthant<3>::tse().isOnSide(Side<3>::west()));
+	CHECK_FALSE(Orthant<3>::tse().isOnSide(Side<3>::west()));
 	CHECK(Orthant<3>::tse().isOnSide(Side<3>::east()));
 	CHECK(Orthant<3>::tse().isOnSide(Side<3>::south()));
-	CHECK(!Orthant<3>::tse().isOnSide(Side<3>::north()));
-	CHECK(!Orthant<3>::tse().isOnSide(Side<3>::bottom()));
+	CHECK_FALSE(Orthant<3>::tse().isOnSide(Side<3>::north()));
+	CHECK_FALSE(Orthant<3>::tse().isOnSide(Side<3>::bottom()));
 	CHECK(Orthant<3>::tse().isOnSide(Side<3>::top()));
 
 	CHECK(Orthant<3>::tnw().isOnSide(Side<3>::west()));
-	CHECK(!Orthant<3>::tnw().isOnSide(Side<3>::east()));
-	CHECK(!Orthant<3>::tnw().isOnSide(Side<3>::south()));
+	CHECK_FALSE(Orthant<3>::tnw().isOnSide(Side<3>::east()));
+	CHECK_FALSE(Orthant<3>::tnw().isOnSide(Side<3>::south()));
 	CHECK(Orthant<3>::tnw().isOnSide(Side<3>::north()));
-	CHECK(!Orthant<3>::tnw().isOnSide(Side<3>::bottom()));
+	CHECK_FALSE(Orthant<3>::tnw().isOnSide(Side<3>::bottom()));
 	CHECK(Orthant<3>::tnw().isOnSide(Side<3>::top()));
 
-	CHECK(!Orthant<3>::tne().isOnSide(Side<3>::west()));
+	CHECK_FALSE(Orthant<3>::tne().isOnSide(Side<3>::west()));
 	CHECK(Orthant<3>::tne().isOnSide(Side<3>::east()));
-	CHECK(!Orthant<3>::tne().isOnSide(Side<3>::south()));
+	CHECK_FALSE(Orthant<3>::tne().isOnSide(Side<3>::south()));
 	CHECK(Orthant<3>::tne().isOnSide(Side<3>::north()));
-	CHECK(!Orthant<3>::tne().isOnSide(Side<3>::bottom()));
+	CHECK_FALSE(Orthant<3>::tne().isOnSide(Side<3>::bottom()));
 	CHECK(Orthant<3>::tne().isOnSide(Side<3>::top()));
+}
+TEST_CASE("Orthant<3> getValues() is as expected", "[Octant]")
+{
+	std::array<Orthant<3>, 8> values = Orthant<3>::getValues();
+	CHECK(values[0] == Orthant<3>::bsw());
+	CHECK(values[1] == Orthant<3>::bse());
+	CHECK(values[2] == Orthant<3>::bnw());
+	CHECK(values[3] == Orthant<3>::bne());
+	CHECK(values[4] == Orthant<3>::tsw());
+	CHECK(values[5] == Orthant<3>::tse());
+	CHECK(values[6] == Orthant<3>::tnw());
+	CHECK(values[7] == Orthant<3>::tne());
 }
 TEST_CASE("Orthant<3> getValues() is as expected", "[Octant]")
 {
@@ -334,6 +459,121 @@ TEST_CASE("Orthant<3> getValuesOnSide() is as expected", "[Octant]")
 		CHECK(values[1] == Orthant<3>::tse());
 		CHECK(values[2] == Orthant<3>::tnw());
 		CHECK(values[3] == Orthant<3>::tne());
+	}
+}
+TEST_CASE("Orthant<3> getValuesOnSide() is as expected", "[Octant]")
+{
+	SECTION("Side<3>::west()")
+	{
+		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::west());
+		CHECK(values[0] == Orthant<3>::bsw());
+		CHECK(values[1] == Orthant<3>::bnw());
+		CHECK(values[2] == Orthant<3>::tsw());
+		CHECK(values[3] == Orthant<3>::tnw());
+	}
+	SECTION("Side<3>::east()")
+	{
+		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::east());
+		CHECK(values[0] == Orthant<3>::bse());
+		CHECK(values[1] == Orthant<3>::bne());
+		CHECK(values[2] == Orthant<3>::tse());
+		CHECK(values[3] == Orthant<3>::tne());
+	}
+	SECTION("Side<3>::south()")
+	{
+		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::south());
+		CHECK(values[0] == Orthant<3>::bsw());
+		CHECK(values[1] == Orthant<3>::bse());
+		CHECK(values[2] == Orthant<3>::tsw());
+		CHECK(values[3] == Orthant<3>::tse());
+	}
+	SECTION("Side<3>::north()")
+	{
+		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::north());
+		CHECK(values[0] == Orthant<3>::bnw());
+		CHECK(values[1] == Orthant<3>::bne());
+		CHECK(values[2] == Orthant<3>::tnw());
+		CHECK(values[3] == Orthant<3>::tne());
+	}
+	SECTION("Side<3>::bottom()")
+	{
+		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::bottom());
+		CHECK(values[0] == Orthant<3>::bsw());
+		CHECK(values[1] == Orthant<3>::bse());
+		CHECK(values[2] == Orthant<3>::bnw());
+		CHECK(values[3] == Orthant<3>::bne());
+	}
+	SECTION("Side<3>::top()")
+	{
+		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::top());
+		CHECK(values[0] == Orthant<3>::tsw());
+		CHECK(values[1] == Orthant<3>::tse());
+		CHECK(values[2] == Orthant<3>::tnw());
+		CHECK(values[3] == Orthant<3>::tne());
+	}
+}
+TEST_CASE("Orthant<1> collapseOnAxis() is as expected", "[Octant]")
+{
+	SECTION("Orthant<1>::lower()")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<1>::lower().collapseOnAxis(0) == Orthant<0>::null());
+		}
+	}
+	SECTION("Orthant<1>::upper()")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<1>::upper().collapseOnAxis(0) == Orthant<0>::null());
+		}
+	}
+}
+TEST_CASE("Orthant<2> collapseOnAxis() is as expected", "[Octant]")
+{
+	SECTION("Orthant<2>::sw()")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<2>::sw().collapseOnAxis(0) == Orthant<1>::lower());
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<2>::sw().collapseOnAxis(1) == Orthant<1>::lower());
+		}
+	}
+	SECTION("Orthant<2>::se()")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<2>::se().collapseOnAxis(0) == Orthant<1>::lower());
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<2>::se().collapseOnAxis(1) == Orthant<1>::upper());
+		}
+	}
+	SECTION("Orthant<2>::nw()")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<2>::nw().collapseOnAxis(0) == Orthant<1>::upper());
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<2>::nw().collapseOnAxis(1) == Orthant<1>::lower());
+		}
+	}
+	SECTION("Orthant<2>::ne()")
+	{
+		SECTION("x axis")
+		{
+			CHECK(Orthant<2>::ne().collapseOnAxis(0) == Orthant<1>::upper());
+		}
+		SECTION("y axis")
+		{
+			CHECK(Orthant<2>::ne().collapseOnAxis(1) == Orthant<1>::upper());
+		}
 	}
 }
 TEST_CASE("Orthant<3> collapseOnAxis() is as expected", "[Octant]")
