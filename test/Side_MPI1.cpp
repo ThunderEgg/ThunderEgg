@@ -66,19 +66,19 @@ TEST_CASE("Test that named constructors for Side<3> give expected axis index val
 	CHECK(Side<3>::top().getAxisIndex() == 2);
 	CHECK(Side<3>::null().getAxisIndex() == 3);
 }
-TEST_CASE("Test opposite() for Side<1>", "[Side]")
+TEST_CASE("Test opposite for Side<1>", "[Side]")
 {
 	CHECK(Side<1>::west().opposite() == Side<1>::east());
 	CHECK(Side<1>::east().opposite() == Side<1>::west());
 }
-TEST_CASE("Test opposite() for Side<2>", "[Side]")
+TEST_CASE("Test opposite for Side<2>", "[Side]")
 {
 	CHECK(Side<2>::west().opposite() == Side<2>::east());
 	CHECK(Side<2>::east().opposite() == Side<2>::west());
 	CHECK(Side<2>::south().opposite() == Side<2>::north());
 	CHECK(Side<2>::north().opposite() == Side<2>::south());
 }
-TEST_CASE("Test opposite() for Side<3>", "[Side]")
+TEST_CASE("Test opposite for Side<3>", "[Side]")
 {
 	CHECK(Side<3>::west().opposite() == Side<3>::east());
 	CHECK(Side<3>::east().opposite() == Side<3>::west());
@@ -87,19 +87,19 @@ TEST_CASE("Test opposite() for Side<3>", "[Side]")
 	CHECK(Side<3>::bottom().opposite() == Side<3>::top());
 	CHECK(Side<3>::top().opposite() == Side<3>::bottom());
 }
-TEST_CASE("Test isLowerOnAxis() for Side<1>", "[Side]")
+TEST_CASE("Test isLowerOnAxis for Side<1>", "[Side]")
 {
 	CHECK(Side<1>::west().isLowerOnAxis());
 	CHECK_FALSE(Side<1>::east().isLowerOnAxis());
 }
-TEST_CASE("Test isLowerOnAxis() for Side<2>", "[Side]")
+TEST_CASE("Test isLowerOnAxis for Side<2>", "[Side]")
 {
 	CHECK(Side<2>::west().isLowerOnAxis());
 	CHECK_FALSE(Side<2>::east().isLowerOnAxis());
 	CHECK(Side<2>::south().isLowerOnAxis());
 	CHECK_FALSE(Side<2>::north().isLowerOnAxis());
 }
-TEST_CASE("Test isLowerOnAxis() for Side<3>", "[Side]")
+TEST_CASE("Test isLowerOnAxis for Side<3>", "[Side]")
 {
 	CHECK(Side<3>::west().isLowerOnAxis());
 	CHECK_FALSE(Side<3>::east().isLowerOnAxis());
@@ -108,19 +108,19 @@ TEST_CASE("Test isLowerOnAxis() for Side<3>", "[Side]")
 	CHECK(Side<3>::bottom().isLowerOnAxis());
 	CHECK_FALSE(Side<3>::top().isLowerOnAxis());
 }
-TEST_CASE("Test isHigherOnAxis() for Side<1>", "[Side]")
+TEST_CASE("Test isHigherOnAxis for Side<1>", "[Side]")
 {
 	CHECK_FALSE(Side<1>::west().isHigherOnAxis());
 	CHECK(Side<1>::east().isHigherOnAxis());
 }
-TEST_CASE("Test isHigherOnAxis() for Side<2>", "[Side]")
+TEST_CASE("Test isHigherOnAxis for Side<2>", "[Side]")
 {
 	CHECK_FALSE(Side<2>::west().isHigherOnAxis());
 	CHECK(Side<2>::east().isHigherOnAxis());
 	CHECK_FALSE(Side<2>::south().isHigherOnAxis());
 	CHECK(Side<2>::north().isHigherOnAxis());
 }
-TEST_CASE("Test isHigherOnAxis() for Side<3>", "[Side]")
+TEST_CASE("Test isHigherOnAxis for Side<3>", "[Side]")
 {
 	CHECK_FALSE(Side<3>::west().isHigherOnAxis());
 	CHECK(Side<3>::east().isHigherOnAxis());

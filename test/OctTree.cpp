@@ -32,7 +32,7 @@ TEST_CASE("Tree<3> default constructor works", "[Side]")
 		REQUIRE(id == -1);
 	}
 }
-TEST_CASE("Tree<3> refineLeaves() works on single starting node", "[Side]")
+TEST_CASE("Tree<3> refineLeaves works on single starting node", "[Side]")
 {
 	Tree<3> tree;
 	tree.refineLeaves();
@@ -84,7 +84,7 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node", "[Side]")
 		}
 	}
 }
-TEST_CASE("Tree<3> refineLeaves() works on single starting node with two calls", "[Side]")
+TEST_CASE("Tree<3> refineLeaves works on single starting node with two calls", "[Side]")
 {
 	Tree<3> tree;
 	tree.refineLeaves();
