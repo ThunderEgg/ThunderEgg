@@ -398,67 +398,44 @@ TEST_CASE("Orthant<3> getValues() is as expected", "[Octant]")
 	CHECK(values[6] == Orthant<3>::tnw());
 	CHECK(values[7] == Orthant<3>::tne());
 }
-TEST_CASE("Orthant<3> getValues() is as expected", "[Octant]")
+TEST_CASE("Orthant<1> getValuesOnSide() is as expected", "[Octant]")
 {
-	std::array<Orthant<3>, 8> values = Orthant<3>::getValues();
-	CHECK(values[0] == Orthant<3>::bsw());
-	CHECK(values[1] == Orthant<3>::bse());
-	CHECK(values[2] == Orthant<3>::bnw());
-	CHECK(values[3] == Orthant<3>::bne());
-	CHECK(values[4] == Orthant<3>::tsw());
-	CHECK(values[5] == Orthant<3>::tse());
-	CHECK(values[6] == Orthant<3>::tnw());
-	CHECK(values[7] == Orthant<3>::tne());
+	SECTION("Side<1>::west()")
+	{
+		std::array<Orthant<1>, 1> values = Orthant<1>::getValuesOnSide(Side<1>::west());
+		CHECK(values[0] == Orthant<1>::lower());
+	}
+	SECTION("Side<1>::east()")
+	{
+		std::array<Orthant<1>, 1> values = Orthant<1>::getValuesOnSide(Side<1>::east());
+		CHECK(values[0] == Orthant<1>::upper());
+	}
 }
-TEST_CASE("Orthant<3> getValuesOnSide() is as expected", "[Octant]")
+TEST_CASE("Orthant<2> getValuesOnSide() is as expected", "[Octant]")
 {
-	SECTION("Side<3>::west()")
+	SECTION("Side<2>::west()")
 	{
-		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::west());
-		CHECK(values[0] == Orthant<3>::bsw());
-		CHECK(values[1] == Orthant<3>::bnw());
-		CHECK(values[2] == Orthant<3>::tsw());
-		CHECK(values[3] == Orthant<3>::tnw());
+		std::array<Orthant<2>, 2> values = Orthant<2>::getValuesOnSide(Side<2>::west());
+		CHECK(values[0] == Orthant<2>::sw());
+		CHECK(values[1] == Orthant<2>::nw());
 	}
-	SECTION("Side<3>::east()")
+	SECTION("Side<2>::east()")
 	{
-		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::east());
-		CHECK(values[0] == Orthant<3>::bse());
-		CHECK(values[1] == Orthant<3>::bne());
-		CHECK(values[2] == Orthant<3>::tse());
-		CHECK(values[3] == Orthant<3>::tne());
+		std::array<Orthant<2>, 2> values = Orthant<2>::getValuesOnSide(Side<2>::east());
+		CHECK(values[0] == Orthant<2>::se());
+		CHECK(values[1] == Orthant<2>::ne());
 	}
-	SECTION("Side<3>::south()")
+	SECTION("Side<2>::south()")
 	{
-		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::south());
-		CHECK(values[0] == Orthant<3>::bsw());
-		CHECK(values[1] == Orthant<3>::bse());
-		CHECK(values[2] == Orthant<3>::tsw());
-		CHECK(values[3] == Orthant<3>::tse());
+		std::array<Orthant<2>, 2> values = Orthant<2>::getValuesOnSide(Side<2>::south());
+		CHECK(values[0] == Orthant<2>::sw());
+		CHECK(values[1] == Orthant<2>::se());
 	}
-	SECTION("Side<3>::north()")
+	SECTION("Side<2>::north()")
 	{
-		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::north());
-		CHECK(values[0] == Orthant<3>::bnw());
-		CHECK(values[1] == Orthant<3>::bne());
-		CHECK(values[2] == Orthant<3>::tnw());
-		CHECK(values[3] == Orthant<3>::tne());
-	}
-	SECTION("Side<3>::bottom()")
-	{
-		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::bottom());
-		CHECK(values[0] == Orthant<3>::bsw());
-		CHECK(values[1] == Orthant<3>::bse());
-		CHECK(values[2] == Orthant<3>::bnw());
-		CHECK(values[3] == Orthant<3>::bne());
-	}
-	SECTION("Side<3>::top()")
-	{
-		std::array<Orthant<3>, 4> values = Orthant<3>::getValuesOnSide(Side<3>::top());
-		CHECK(values[0] == Orthant<3>::tsw());
-		CHECK(values[1] == Orthant<3>::tse());
-		CHECK(values[2] == Orthant<3>::tnw());
-		CHECK(values[3] == Orthant<3>::tne());
+		std::array<Orthant<2>, 2> values = Orthant<2>::getValuesOnSide(Side<2>::north());
+		CHECK(values[0] == Orthant<2>::nw());
+		CHECK(values[1] == Orthant<2>::ne());
 	}
 }
 TEST_CASE("Orthant<3> getValuesOnSide() is as expected", "[Octant]")
@@ -698,4 +675,418 @@ TEST_CASE("Orthant<3> collapseOnAxis() is as expected", "[Octant]")
 			CHECK(Orthant<3>::tne().collapseOnAxis(2) == Orthant<2>::ne());
 		}
 	}
+}
+TEST_CASE("Orthant<1> ==", "[Octant]")
+{
+	CHECK(Orthant<1>::lower() == Orthant<1>::lower());
+	CHECK_FALSE(Orthant<1>::lower() == Orthant<1>::upper());
+	CHECK_FALSE(Orthant<1>::lower() == Orthant<1>::null());
+
+	CHECK_FALSE(Orthant<1>::upper() == Orthant<1>::lower());
+	CHECK(Orthant<1>::upper() == Orthant<1>::upper());
+	CHECK_FALSE(Orthant<1>::upper() == Orthant<1>::null());
+
+	CHECK_FALSE(Orthant<1>::null() == Orthant<1>::lower());
+	CHECK_FALSE(Orthant<1>::null() == Orthant<1>::upper());
+	CHECK(Orthant<1>::null() == Orthant<1>::null());
+}
+TEST_CASE("Orthant<2> ==", "[Octant]")
+{
+	CHECK(Orthant<2>::sw() == Orthant<2>::sw());
+	CHECK_FALSE(Orthant<2>::sw() == Orthant<2>::se());
+	CHECK_FALSE(Orthant<2>::sw() == Orthant<2>::nw());
+	CHECK_FALSE(Orthant<2>::sw() == Orthant<2>::ne());
+	CHECK_FALSE(Orthant<2>::sw() == Orthant<2>::null());
+
+	CHECK_FALSE(Orthant<2>::se() == Orthant<2>::sw());
+	CHECK(Orthant<2>::se() == Orthant<2>::se());
+	CHECK_FALSE(Orthant<2>::se() == Orthant<2>::nw());
+	CHECK_FALSE(Orthant<2>::se() == Orthant<2>::ne());
+	CHECK_FALSE(Orthant<2>::se() == Orthant<2>::null());
+
+	CHECK_FALSE(Orthant<2>::nw() == Orthant<2>::sw());
+	CHECK_FALSE(Orthant<2>::nw() == Orthant<2>::se());
+	CHECK(Orthant<2>::nw() == Orthant<2>::nw());
+	CHECK_FALSE(Orthant<2>::nw() == Orthant<2>::ne());
+	CHECK_FALSE(Orthant<2>::nw() == Orthant<2>::null());
+
+	CHECK_FALSE(Orthant<2>::ne() == Orthant<2>::sw());
+	CHECK_FALSE(Orthant<2>::ne() == Orthant<2>::se());
+	CHECK_FALSE(Orthant<2>::ne() == Orthant<2>::nw());
+	CHECK(Orthant<2>::ne() == Orthant<2>::ne());
+	CHECK_FALSE(Orthant<2>::ne() == Orthant<2>::null());
+
+	CHECK_FALSE(Orthant<2>::null() == Orthant<2>::sw());
+	CHECK_FALSE(Orthant<2>::null() == Orthant<2>::se());
+	CHECK_FALSE(Orthant<2>::null() == Orthant<2>::nw());
+	CHECK_FALSE(Orthant<2>::null() == Orthant<2>::ne());
+	CHECK(Orthant<2>::null() == Orthant<2>::null());
+}
+TEST_CASE("Orthant<3> ==", "[Octant]")
+{
+	CHECK(Orthant<3>::bsw() == Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::bsw() == Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::bsw() == Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::bsw() == Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::bsw() == Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::bsw() == Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::bsw() == Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::bsw() == Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::bsw() == Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::bse() == Orthant<3>::bsw());
+	CHECK(Orthant<3>::bse() == Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::bse() == Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::bse() == Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::bse() == Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::bse() == Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::bse() == Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::bse() == Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::bse() == Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::bnw() == Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::bnw() == Orthant<3>::bse());
+	CHECK(Orthant<3>::bnw() == Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::bnw() == Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::bnw() == Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::bnw() == Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::bnw() == Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::bnw() == Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::bnw() == Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::bne() == Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::bne() == Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::bne() == Orthant<3>::bnw());
+	CHECK(Orthant<3>::bne() == Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::bne() == Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::bne() == Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::bne() == Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::bne() == Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::bne() == Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::tsw() == Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::tsw() == Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::tsw() == Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::tsw() == Orthant<3>::bne());
+	CHECK(Orthant<3>::tsw() == Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::tsw() == Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::tsw() == Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::tsw() == Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::tsw() == Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::tse() == Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::tse() == Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::tse() == Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::tse() == Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::tse() == Orthant<3>::tsw());
+	CHECK(Orthant<3>::tse() == Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::tse() == Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::tse() == Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::tse() == Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::tnw() == Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::tnw() == Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::tnw() == Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::tnw() == Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::tnw() == Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::tnw() == Orthant<3>::tse());
+	CHECK(Orthant<3>::tnw() == Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::tnw() == Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::tnw() == Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::tne() == Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::tne() == Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::tne() == Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::tne() == Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::tne() == Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::tne() == Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::tne() == Orthant<3>::tnw());
+	CHECK(Orthant<3>::tne() == Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::tne() == Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::null() == Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::null() == Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::null() == Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::null() == Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::null() == Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::null() == Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::null() == Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::null() == Orthant<3>::tne());
+	CHECK(Orthant<3>::null() == Orthant<3>::null());
+}
+TEST_CASE("Orthant<1> !=", "[Octant]")
+{
+	CHECK_FALSE(Orthant<1>::lower() != Orthant<1>::lower());
+	CHECK(Orthant<1>::lower() != Orthant<1>::upper());
+	CHECK(Orthant<1>::lower() != Orthant<1>::null());
+
+	CHECK(Orthant<1>::upper() != Orthant<1>::lower());
+	CHECK_FALSE(Orthant<1>::upper() != Orthant<1>::upper());
+	CHECK(Orthant<1>::upper() != Orthant<1>::null());
+
+	CHECK(Orthant<1>::null() != Orthant<1>::lower());
+	CHECK(Orthant<1>::null() != Orthant<1>::upper());
+	CHECK_FALSE(Orthant<1>::null() != Orthant<1>::null());
+}
+TEST_CASE("Orthant<2> !=", "[Octant]")
+{
+	CHECK_FALSE(Orthant<2>::sw() != Orthant<2>::sw());
+	CHECK(Orthant<2>::sw() != Orthant<2>::se());
+	CHECK(Orthant<2>::sw() != Orthant<2>::nw());
+	CHECK(Orthant<2>::sw() != Orthant<2>::ne());
+	CHECK(Orthant<2>::sw() != Orthant<2>::null());
+
+	CHECK(Orthant<2>::se() != Orthant<2>::sw());
+	CHECK_FALSE(Orthant<2>::se() != Orthant<2>::se());
+	CHECK(Orthant<2>::se() != Orthant<2>::nw());
+	CHECK(Orthant<2>::se() != Orthant<2>::ne());
+	CHECK(Orthant<2>::se() != Orthant<2>::null());
+
+	CHECK(Orthant<2>::nw() != Orthant<2>::sw());
+	CHECK(Orthant<2>::nw() != Orthant<2>::se());
+	CHECK_FALSE(Orthant<2>::nw() != Orthant<2>::nw());
+	CHECK(Orthant<2>::nw() != Orthant<2>::ne());
+	CHECK(Orthant<2>::nw() != Orthant<2>::null());
+
+	CHECK(Orthant<2>::ne() != Orthant<2>::sw());
+	CHECK(Orthant<2>::ne() != Orthant<2>::se());
+	CHECK(Orthant<2>::ne() != Orthant<2>::nw());
+	CHECK_FALSE(Orthant<2>::ne() != Orthant<2>::ne());
+	CHECK(Orthant<2>::ne() != Orthant<2>::null());
+
+	CHECK(Orthant<2>::null() != Orthant<2>::sw());
+	CHECK(Orthant<2>::null() != Orthant<2>::se());
+	CHECK(Orthant<2>::null() != Orthant<2>::nw());
+	CHECK(Orthant<2>::null() != Orthant<2>::ne());
+	CHECK_FALSE(Orthant<2>::null() != Orthant<2>::null());
+}
+TEST_CASE("Orthant<3> !=", "[Octant]")
+{
+	CHECK_FALSE(Orthant<3>::bsw() != Orthant<3>::bsw());
+	CHECK(Orthant<3>::bsw() != Orthant<3>::bse());
+	CHECK(Orthant<3>::bsw() != Orthant<3>::bnw());
+	CHECK(Orthant<3>::bsw() != Orthant<3>::bne());
+	CHECK(Orthant<3>::bsw() != Orthant<3>::tsw());
+	CHECK(Orthant<3>::bsw() != Orthant<3>::tse());
+	CHECK(Orthant<3>::bsw() != Orthant<3>::tnw());
+	CHECK(Orthant<3>::bsw() != Orthant<3>::tne());
+	CHECK(Orthant<3>::bsw() != Orthant<3>::null());
+
+	CHECK(Orthant<3>::bse() != Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::bse() != Orthant<3>::bse());
+	CHECK(Orthant<3>::bse() != Orthant<3>::bnw());
+	CHECK(Orthant<3>::bse() != Orthant<3>::bne());
+	CHECK(Orthant<3>::bse() != Orthant<3>::tsw());
+	CHECK(Orthant<3>::bse() != Orthant<3>::tse());
+	CHECK(Orthant<3>::bse() != Orthant<3>::tnw());
+	CHECK(Orthant<3>::bse() != Orthant<3>::tne());
+	CHECK(Orthant<3>::bse() != Orthant<3>::null());
+
+	CHECK(Orthant<3>::bnw() != Orthant<3>::bsw());
+	CHECK(Orthant<3>::bnw() != Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::bnw() != Orthant<3>::bnw());
+	CHECK(Orthant<3>::bnw() != Orthant<3>::bne());
+	CHECK(Orthant<3>::bnw() != Orthant<3>::tsw());
+	CHECK(Orthant<3>::bnw() != Orthant<3>::tse());
+	CHECK(Orthant<3>::bnw() != Orthant<3>::tnw());
+	CHECK(Orthant<3>::bnw() != Orthant<3>::tne());
+	CHECK(Orthant<3>::bnw() != Orthant<3>::null());
+
+	CHECK(Orthant<3>::bne() != Orthant<3>::bsw());
+	CHECK(Orthant<3>::bne() != Orthant<3>::bse());
+	CHECK(Orthant<3>::bne() != Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::bne() != Orthant<3>::bne());
+	CHECK(Orthant<3>::bne() != Orthant<3>::tsw());
+	CHECK(Orthant<3>::bne() != Orthant<3>::tse());
+	CHECK(Orthant<3>::bne() != Orthant<3>::tnw());
+	CHECK(Orthant<3>::bne() != Orthant<3>::tne());
+	CHECK(Orthant<3>::bne() != Orthant<3>::null());
+
+	CHECK(Orthant<3>::tsw() != Orthant<3>::bsw());
+	CHECK(Orthant<3>::tsw() != Orthant<3>::bse());
+	CHECK(Orthant<3>::tsw() != Orthant<3>::bnw());
+	CHECK(Orthant<3>::tsw() != Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::tsw() != Orthant<3>::tsw());
+	CHECK(Orthant<3>::tsw() != Orthant<3>::tse());
+	CHECK(Orthant<3>::tsw() != Orthant<3>::tnw());
+	CHECK(Orthant<3>::tsw() != Orthant<3>::tne());
+	CHECK(Orthant<3>::tsw() != Orthant<3>::null());
+
+	CHECK(Orthant<3>::tse() != Orthant<3>::bsw());
+	CHECK(Orthant<3>::tse() != Orthant<3>::bse());
+	CHECK(Orthant<3>::tse() != Orthant<3>::bnw());
+	CHECK(Orthant<3>::tse() != Orthant<3>::bne());
+	CHECK(Orthant<3>::tse() != Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::tse() != Orthant<3>::tse());
+	CHECK(Orthant<3>::tse() != Orthant<3>::tnw());
+	CHECK(Orthant<3>::tse() != Orthant<3>::tne());
+	CHECK(Orthant<3>::tse() != Orthant<3>::null());
+
+	CHECK(Orthant<3>::tnw() != Orthant<3>::bsw());
+	CHECK(Orthant<3>::tnw() != Orthant<3>::bse());
+	CHECK(Orthant<3>::tnw() != Orthant<3>::bnw());
+	CHECK(Orthant<3>::tnw() != Orthant<3>::bne());
+	CHECK(Orthant<3>::tnw() != Orthant<3>::tsw());
+	CHECK(Orthant<3>::tnw() != Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::tnw() != Orthant<3>::tnw());
+	CHECK(Orthant<3>::tnw() != Orthant<3>::tne());
+	CHECK(Orthant<3>::tnw() != Orthant<3>::null());
+
+	CHECK(Orthant<3>::tne() != Orthant<3>::bsw());
+	CHECK(Orthant<3>::tne() != Orthant<3>::bse());
+	CHECK(Orthant<3>::tne() != Orthant<3>::bnw());
+	CHECK(Orthant<3>::tne() != Orthant<3>::bne());
+	CHECK(Orthant<3>::tne() != Orthant<3>::tsw());
+	CHECK(Orthant<3>::tne() != Orthant<3>::tse());
+	CHECK(Orthant<3>::tne() != Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::tne() != Orthant<3>::tne());
+	CHECK(Orthant<3>::tne() != Orthant<3>::null());
+
+	CHECK(Orthant<3>::null() != Orthant<3>::bsw());
+	CHECK(Orthant<3>::null() != Orthant<3>::bse());
+	CHECK(Orthant<3>::null() != Orthant<3>::bnw());
+	CHECK(Orthant<3>::null() != Orthant<3>::bne());
+	CHECK(Orthant<3>::null() != Orthant<3>::tsw());
+	CHECK(Orthant<3>::null() != Orthant<3>::tse());
+	CHECK(Orthant<3>::null() != Orthant<3>::tnw());
+	CHECK(Orthant<3>::null() != Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::null() != Orthant<3>::null());
+}
+TEST_CASE("Orthant<1> <", "[Octant]")
+{
+	CHECK_FALSE(Orthant<1>::lower() < Orthant<1>::lower());
+	CHECK(Orthant<1>::lower() < Orthant<1>::upper());
+	CHECK(Orthant<1>::lower() < Orthant<1>::null());
+
+	CHECK_FALSE(Orthant<1>::upper() < Orthant<1>::lower());
+	CHECK_FALSE(Orthant<1>::upper() < Orthant<1>::upper());
+	CHECK(Orthant<1>::upper() < Orthant<1>::null());
+
+	CHECK_FALSE(Orthant<1>::null() < Orthant<1>::lower());
+	CHECK_FALSE(Orthant<1>::null() < Orthant<1>::upper());
+	CHECK_FALSE(Orthant<1>::null() < Orthant<1>::null());
+}
+TEST_CASE("Orthant<2> <", "[Octant]")
+{
+	CHECK_FALSE(Orthant<2>::sw() < Orthant<2>::sw());
+	CHECK(Orthant<2>::sw() < Orthant<2>::se());
+	CHECK(Orthant<2>::sw() < Orthant<2>::nw());
+	CHECK(Orthant<2>::sw() < Orthant<2>::ne());
+	CHECK(Orthant<2>::sw() < Orthant<2>::null());
+
+	CHECK_FALSE(Orthant<2>::se() < Orthant<2>::sw());
+	CHECK_FALSE(Orthant<2>::se() < Orthant<2>::se());
+	CHECK(Orthant<2>::se() < Orthant<2>::nw());
+	CHECK(Orthant<2>::se() < Orthant<2>::ne());
+	CHECK(Orthant<2>::se() < Orthant<2>::null());
+
+	CHECK_FALSE(Orthant<2>::nw() < Orthant<2>::sw());
+	CHECK_FALSE(Orthant<2>::nw() < Orthant<2>::se());
+	CHECK_FALSE(Orthant<2>::nw() < Orthant<2>::nw());
+	CHECK(Orthant<2>::nw() < Orthant<2>::ne());
+	CHECK(Orthant<2>::nw() < Orthant<2>::null());
+
+	CHECK_FALSE(Orthant<2>::ne() < Orthant<2>::sw());
+	CHECK_FALSE(Orthant<2>::ne() < Orthant<2>::se());
+	CHECK_FALSE(Orthant<2>::ne() < Orthant<2>::nw());
+	CHECK_FALSE(Orthant<2>::ne() < Orthant<2>::ne());
+	CHECK(Orthant<2>::ne() < Orthant<2>::null());
+
+	CHECK_FALSE(Orthant<2>::null() < Orthant<2>::sw());
+	CHECK_FALSE(Orthant<2>::null() < Orthant<2>::se());
+	CHECK_FALSE(Orthant<2>::null() < Orthant<2>::nw());
+	CHECK_FALSE(Orthant<2>::null() < Orthant<2>::ne());
+	CHECK_FALSE(Orthant<2>::null() < Orthant<2>::null());
+}
+TEST_CASE("Orthant<3> <", "[Octant]")
+{
+	CHECK_FALSE(Orthant<3>::bsw() < Orthant<3>::bsw());
+	CHECK(Orthant<3>::bsw() < Orthant<3>::bse());
+	CHECK(Orthant<3>::bsw() < Orthant<3>::bnw());
+	CHECK(Orthant<3>::bsw() < Orthant<3>::bne());
+	CHECK(Orthant<3>::bsw() < Orthant<3>::tsw());
+	CHECK(Orthant<3>::bsw() < Orthant<3>::tse());
+	CHECK(Orthant<3>::bsw() < Orthant<3>::tnw());
+	CHECK(Orthant<3>::bsw() < Orthant<3>::tne());
+	CHECK(Orthant<3>::bsw() < Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::bse() < Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::bse() < Orthant<3>::bse());
+	CHECK(Orthant<3>::bse() < Orthant<3>::bnw());
+	CHECK(Orthant<3>::bse() < Orthant<3>::bne());
+	CHECK(Orthant<3>::bse() < Orthant<3>::tsw());
+	CHECK(Orthant<3>::bse() < Orthant<3>::tse());
+	CHECK(Orthant<3>::bse() < Orthant<3>::tnw());
+	CHECK(Orthant<3>::bse() < Orthant<3>::tne());
+	CHECK(Orthant<3>::bse() < Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::bnw() < Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::bnw() < Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::bnw() < Orthant<3>::bnw());
+	CHECK(Orthant<3>::bnw() < Orthant<3>::bne());
+	CHECK(Orthant<3>::bnw() < Orthant<3>::tsw());
+	CHECK(Orthant<3>::bnw() < Orthant<3>::tse());
+	CHECK(Orthant<3>::bnw() < Orthant<3>::tnw());
+	CHECK(Orthant<3>::bnw() < Orthant<3>::tne());
+	CHECK(Orthant<3>::bnw() < Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::bne() < Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::bne() < Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::bne() < Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::bne() < Orthant<3>::bne());
+	CHECK(Orthant<3>::bne() < Orthant<3>::tsw());
+	CHECK(Orthant<3>::bne() < Orthant<3>::tse());
+	CHECK(Orthant<3>::bne() < Orthant<3>::tnw());
+	CHECK(Orthant<3>::bne() < Orthant<3>::tne());
+	CHECK(Orthant<3>::bne() < Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::tsw() < Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::tsw() < Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::tsw() < Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::tsw() < Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::tsw() < Orthant<3>::tsw());
+	CHECK(Orthant<3>::tsw() < Orthant<3>::tse());
+	CHECK(Orthant<3>::tsw() < Orthant<3>::tnw());
+	CHECK(Orthant<3>::tsw() < Orthant<3>::tne());
+	CHECK(Orthant<3>::tsw() < Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::tse() < Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::tse() < Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::tse() < Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::tse() < Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::tse() < Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::tse() < Orthant<3>::tse());
+	CHECK(Orthant<3>::tse() < Orthant<3>::tnw());
+	CHECK(Orthant<3>::tse() < Orthant<3>::tne());
+	CHECK(Orthant<3>::tse() < Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::tnw() < Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::tnw() < Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::tnw() < Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::tnw() < Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::tnw() < Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::tnw() < Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::tnw() < Orthant<3>::tnw());
+	CHECK(Orthant<3>::tnw() < Orthant<3>::tne());
+	CHECK(Orthant<3>::tnw() < Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::tne() < Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::tne() < Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::tne() < Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::tne() < Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::tne() < Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::tne() < Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::tne() < Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::tne() < Orthant<3>::tne());
+	CHECK(Orthant<3>::tne() < Orthant<3>::null());
+
+	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::bsw());
+	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::bse());
+	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::bnw());
+	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::bne());
+	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::tsw());
+	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::tse());
+	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::tnw());
+	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::tne());
+	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::null());
 }
