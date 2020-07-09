@@ -1,6 +1,7 @@
 #include <Thunderegg/Orthant.h>
 
 #include "catch.hpp"
+#include <sstream>
 
 using namespace std;
 using namespace Thunderegg;
@@ -1089,4 +1090,73 @@ TEST_CASE("Orthant<3> <", "[Octant]")
 	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::tnw());
 	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::tne());
 	CHECK_FALSE(Orthant<3>::null() < Orthant<3>::null());
+}
+TEST_CASE("Test ostream for Orthant<1>", "[Orthant]")
+{
+	stringstream ss;
+	ss << Orthant<1>::lower();
+	CHECK(ss.str() == "Orthant<1>::lower()");
+	ss.str("");
+	ss << Orthant<1>::upper();
+	CHECK(ss.str() == "Orthant<1>::upper()");
+	ss.str("");
+	ss << Orthant<1>::null();
+	CHECK(ss.str() == "Orthant<1>::null()");
+	ss.str("");
+	ss << Orthant<1>(13);
+	CHECK(ss.str() == "Orthant<1> invalid value: 13");
+}
+TEST_CASE("Test ostream for Orthant<2>", "[Orthant]")
+{
+	stringstream ss;
+	ss << Orthant<2>::sw();
+	CHECK(ss.str() == "Orthant<2>::sw()");
+	ss.str("");
+	ss << Orthant<2>::se();
+	CHECK(ss.str() == "Orthant<2>::se()");
+	ss.str("");
+	ss << Orthant<2>::nw();
+	CHECK(ss.str() == "Orthant<2>::nw()");
+	ss.str("");
+	ss << Orthant<2>::ne();
+	CHECK(ss.str() == "Orthant<2>::ne()");
+	ss.str("");
+	ss << Orthant<2>::null();
+	CHECK(ss.str() == "Orthant<2>::null()");
+	ss.str("");
+	ss << Orthant<2>(13);
+	CHECK(ss.str() == "Orthant<2> invalid value: 13");
+}
+TEST_CASE("Test ostream for Orthant<3>", "[Orthant]")
+{
+	stringstream ss;
+	ss << Orthant<3>::bsw();
+	CHECK(ss.str() == "Orthant<3>::bsw()");
+	ss.str("");
+	ss << Orthant<3>::bse();
+	CHECK(ss.str() == "Orthant<3>::bse()");
+	ss.str("");
+	ss << Orthant<3>::bnw();
+	CHECK(ss.str() == "Orthant<3>::bnw()");
+	ss.str("");
+	ss << Orthant<3>::bne();
+	CHECK(ss.str() == "Orthant<3>::bne()");
+	ss.str("");
+	ss << Orthant<3>::tsw();
+	CHECK(ss.str() == "Orthant<3>::tsw()");
+	ss.str("");
+	ss << Orthant<3>::tse();
+	CHECK(ss.str() == "Orthant<3>::tse()");
+	ss.str("");
+	ss << Orthant<3>::tnw();
+	CHECK(ss.str() == "Orthant<3>::tnw()");
+	ss.str("");
+	ss << Orthant<3>::tne();
+	CHECK(ss.str() == "Orthant<3>::tne()");
+	ss.str("");
+	ss << Orthant<3>::null();
+	CHECK(ss.str() == "Orthant<3>::null()");
+	ss.str("");
+	ss << Orthant<3>(13);
+	CHECK(ss.str() == "Orthant<3> invalid value: 13");
 }

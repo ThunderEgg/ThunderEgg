@@ -345,58 +345,90 @@ template <size_t D> inline std::array<Orthant<D>, Orthant<D>::num_orthants> Orth
 	return retval;
 }
 /**
- * @brief ostream operator that prints a string representation of orthant enum.
+ * @brief ostream operator that prints a string representation of Orthant<1> enum.
  *
- * For example, Orthant::bsw will print out "Orthant::bsw".
+ * For example, Orthant<1>::lower() will print out "Orthant<1>::lower()".
  *
  * @param os the ostream
- * @param s the side to print out.
+ * @param o the orthant
  *
  * @return  the ostream
  */
-inline std::ostream &operator<<(std::ostream &os, const Orthant<3> &o)
+inline std::ostream &operator<<(std::ostream &os, const Orthant<1> &o)
 {
-	if (o == Orthant<3>::bsw()) {
-		os << "Orthant::bsw";
-	} else if (o == Orthant<3>::bse()) {
-		os << "Orthant::bse";
-	} else if (o == Orthant<3>::bnw()) {
-		os << "Orthant::bnw";
-	} else if (o == Orthant<3>::bne()) {
-		os << "Orthant::bne";
-	} else if (o == Orthant<3>::tsw()) {
-		os << "Orthant::tsw";
-	} else if (o == Orthant<3>::tse()) {
-		os << "Orthant::tse";
-	} else if (o == Orthant<3>::tnw()) {
-		os << "Orthant::tnw";
-	} else if (o == Orthant<3>::tne()) {
-		os << "Orthant::tne";
+	if (o == Orthant<1>::lower()) {
+		os << "Orthant<1>::lower()";
+	} else if (o == Orthant<1>::upper()) {
+		os << "Orthant<1>::upper()";
+	} else if (o == Orthant<1>::null()) {
+		os << "Orthant<1>::null()";
+	} else {
+		os << "Orthant<1> invalid value: " << o.getIndex();
 	}
 	return os;
 }
 /**
  * @brief ostream operator that prints a string representation of quadrant enum.
  *
- * For example, Orthant::sw will print out "Orthant::sw".
+ * For example, Orthant<2>::sw() will print out "Orthant<2>::sw()".
  *
  * @param os the ostream
- * @param s the side to print out.
+ * @param o the orthant
  *
  * @return  the ostream
  */
 inline std::ostream &operator<<(std::ostream &os, const Orthant<2> &o)
 {
 	if (o == Orthant<2>::sw()) {
-		os << "Orthant::sw";
+		os << "Orthant<2>::sw()";
 	} else if (o == Orthant<2>::se()) {
-		os << "Orthant::se";
+		os << "Orthant<2>::se()";
 	} else if (o == Orthant<2>::nw()) {
-		os << "Orthant::nw";
+		os << "Orthant<2>::nw()";
 	} else if (o == Orthant<2>::ne()) {
-		os << "Orthant::ne";
+		os << "Orthant<2>::ne()";
+	} else if (o == Orthant<2>::null()) {
+		os << "Orthant<2>::null()";
+	} else {
+		os << "Orthant<2> invalid value: " << o.getIndex();
 	}
 	return os;
 }
+/**
+ * @brief ostream operator that prints a string representation of orthant enum.
+ *
+ * For example, Orthant<3>::bsw() will print out "Orthant<3>::bsw()".
+ *
+ * @param os the ostream
+ * @param o the orthant
+ *
+ * @return  the ostream
+ */
+inline std::ostream &operator<<(std::ostream &os, const Orthant<3> &o)
+{
+	if (o == Orthant<3>::bsw()) {
+		os << "Orthant<3>::bsw()";
+	} else if (o == Orthant<3>::bse()) {
+		os << "Orthant<3>::bse()";
+	} else if (o == Orthant<3>::bnw()) {
+		os << "Orthant<3>::bnw()";
+	} else if (o == Orthant<3>::bne()) {
+		os << "Orthant<3>::bne()";
+	} else if (o == Orthant<3>::tsw()) {
+		os << "Orthant<3>::tsw()";
+	} else if (o == Orthant<3>::tse()) {
+		os << "Orthant<3>::tse()";
+	} else if (o == Orthant<3>::tnw()) {
+		os << "Orthant<3>::tnw()";
+	} else if (o == Orthant<3>::tne()) {
+		os << "Orthant<3>::tne()";
+	} else if (o == Orthant<3>::null()) {
+		os << "Orthant<3>::null()";
+	} else {
+		os << "Orthant<3> invalid value: " << o.getIndex();
+	}
+	return os;
+}
+
 } // namespace Thunderegg
 #endif
