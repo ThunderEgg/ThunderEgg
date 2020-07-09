@@ -51,8 +51,8 @@ before_install:
   - pip install --user gcovr
   - export CXXFLAGS="-std=c++11"
 script:
-  - export CXXFLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
-  - export CFLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage"
+  - export CXXFLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
+  - export CFLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
   - export LDFLAGS="-lgcov"
   - cmake .
   - $BUILD_WRAPPER make
