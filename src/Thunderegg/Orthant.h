@@ -178,7 +178,13 @@ template <size_t D> class Orthant
 	 *
 	 * @return  The octant that neighbors on that side.
 	 */
-	Orthant<D> getInteriorNbrOnSide(Side<D> s) const;
+	Orthant<D> getInteriorNbrOnSide(Side<D> s) const
+	{
+		Orthant<D> retval = *this;
+		// flip the bit for that side
+		retval.val ^= (0x1 << s.getAxisIndex());
+		return retval;
+	}
 	/**
 	 * @brief Return the octant that neighbors this octant on a particular side.
 	 *
@@ -186,7 +192,13 @@ template <size_t D> class Orthant
 	 *
 	 * @return  The octant that neighbors on that side.
 	 */
-	Orthant<D> getExteriorNbrOnSide(Side<D> s) const;
+	Orthant<D> getExteriorNbrOnSide(Side<D> s) const
+	{
+		Orthant<D> retval = *this;
+		// flip the bit for that side
+		retval.val ^= (0x1 << s.getAxisIndex());
+		return retval;
+	}
 	/**
 	 * @brief Get the sides of the octant that are on the interior of the cube.
 	 *
@@ -252,7 +264,14 @@ template <size_t D> class Orthant
 	 *
 	 * @return The array.
 	 */
-	static std::array<Orthant, num_orthants> getValues();
+	static std::array<Orthant, num_orthants> getValues()
+	{
+		std::array<Orthant<D>, Orthant<D>::num_orthants> retval;
+		for (size_t i = 0; i < retval.size(); i++) {
+			retval[i] = Orthant<D>(i);
+		}
+		return retval;
+	}
 	/**
 	 * @brief Get an array of all Orthant<D> values that lie on a particular side of the cube.
 	 *
@@ -268,7 +287,22 @@ template <size_t D> class Orthant
 	 *
 	 * @return The array.
 	 */
-	static std::array<Orthant, num_orthants / 2> getValuesOnSide(Side<D> s);
+	static std::array<Orthant, num_orthants / 2> getValuesOnSide(Side<D> s)
+	{
+		unsigned int bit_to_insert = s.getAxisIndex();
+		unsigned int set_bit       = s.isLowerOnAxis() ? 0 : 1;
+		unsigned int lower_mask    = ~((~0x0) << bit_to_insert);
+		unsigned int upper_mask    = (~0x0) << (bit_to_insert + 1);
+
+		std::array<Orthant<D>, Orthant<D>::num_orthants / 2> retval;
+		for (size_t i = 0; i < Orthant<D>::num_orthants / 2; i++) {
+			size_t value = (i << 1) & upper_mask;
+			value |= i & lower_mask;
+			value |= set_bit << bit_to_insert;
+			retval[i] = Orthant<D>(value);
+		}
+		return retval;
+	}
 	/**
 	 * @brief Equals operator.
 	 *
@@ -304,46 +338,6 @@ template <size_t D> class Orthant
 	}
 };
 
-// function definitions
-template <size_t D> inline Orthant<D> Orthant<D>::getInteriorNbrOnSide(Side<D> s) const
-{
-	Orthant<D> retval = *this;
-	// flip the bit for that side
-	retval.val ^= (0x1 << s.getAxisIndex());
-	return retval;
-}
-template <size_t D> inline Orthant<D> Orthant<D>::getExteriorNbrOnSide(Side<D> s) const
-{
-	Orthant<D> retval = *this;
-	// flip the bit for that side
-	retval.val ^= (0x1 << s.getAxisIndex());
-	return retval;
-}
-template <size_t D>
-inline std::array<Orthant<D>, Orthant<D>::num_orthants / 2> Orthant<D>::getValuesOnSide(Side<D> s)
-{
-	unsigned int bit_to_insert = s.getAxisIndex();
-	unsigned int set_bit       = s.isLowerOnAxis() ? 0 : 1;
-	unsigned int lower_mask    = ~((~0x0) << bit_to_insert);
-	unsigned int upper_mask    = (~0x0) << (bit_to_insert + 1);
-
-	std::array<Orthant<D>, Orthant<D>::num_orthants / 2> retval;
-	for (size_t i = 0; i < Orthant<D>::num_orthants / 2; i++) {
-		size_t value = (i << 1) & upper_mask;
-		value |= i & lower_mask;
-		value |= set_bit << bit_to_insert;
-		retval[i] = Orthant<D>(value);
-	}
-	return retval;
-}
-template <size_t D> inline std::array<Orthant<D>, Orthant<D>::num_orthants> Orthant<D>::getValues()
-{
-	std::array<Orthant<D>, Orthant<D>::num_orthants> retval;
-	for (size_t i = 0; i < retval.size(); i++) {
-		retval[i] = Orthant<D>(i);
-	}
-	return retval;
-}
 /**
  * @brief ostream operator that prints a string representation of Orthant<1> enum.
  *
