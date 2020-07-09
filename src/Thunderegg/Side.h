@@ -45,11 +45,11 @@ template <size_t D> class Side
 	/**
 	 * @brief the value of the enum
 	 */
-	unsigned char val = -1;
+	unsigned char val = num_sides;
 
 	public:
 	static constexpr size_t num_sides = 2 * D;
-	Side() : val(num_sides) {}
+	Side() {}
 	explicit Side(unsigned char val_in) : val(val_in) {}
 	static Side<D> west()
 	{

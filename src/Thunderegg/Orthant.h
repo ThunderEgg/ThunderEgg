@@ -42,7 +42,7 @@ template <size_t D> class Orthant
 	/**
 	 * @brief the value of the enum.
 	 */
-	unsigned char val;
+	unsigned char val = num_orthants;
 
 	public:
 	static constexpr size_t num_orthants = 1 << D;
@@ -55,7 +55,7 @@ template <size_t D> class Orthant
 	/**
 	 * @brief Default constructor that initializes the value to null().
 	 */
-	Orthant() : val(num_orthants) {}
+	Orthant() {}
 	/**
 	 * @brief null value
 	 */
