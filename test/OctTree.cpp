@@ -73,7 +73,7 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node", "[Side]")
 			REQUIRE(child.id == children[o.getIndex()]);
 			for (Side<3> s : o.getInteriorSides()) {
 				REQUIRE(child.hasNbr(s));
-				REQUIRE(child.nbrId(s) == children[o.getInteriorNbrOnSide(s).getIndex()]);
+				REQUIRE(child.nbrId(s) == children[o.getNbrOnSide(s).getIndex()]);
 			}
 			for (Side<3> s : o.getExteriorSides()) {
 				REQUIRE(!child.hasNbr(s));
@@ -128,7 +128,7 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node with two calls",
 			REQUIRE(child.id == children[o.getIndex()]);
 			for (Side<3> s : o.getInteriorSides()) {
 				REQUIRE(child.hasNbr(s));
-				REQUIRE(child.nbrId(s) == children[o.getInteriorNbrOnSide(s).getIndex()]);
+				REQUIRE(child.nbrId(s) == children[o.getNbrOnSide(s).getIndex()]);
 			}
 			for (Side<3> s : o.getExteriorSides()) {
 				REQUIRE(!child.hasNbr(s));
@@ -144,7 +144,7 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node with two calls",
 				for (Side<3> s : o.getInteriorSides()) {
 					REQUIRE(child_child.hasNbr(s));
 					REQUIRE(child_child.nbrId(s)
-					        == child.child_id[child_o.getInteriorNbrOnSide(s).getIndex()]);
+					        == child.child_id[child_o.getNbrOnSide(s).getIndex()]);
 				}
 				// check exterior neighbors
 				{
@@ -157,8 +157,8 @@ TEST_CASE("Tree<3> refineLeaves() works on single starting node with two calls",
 							Side<3> s = child_o_ext[i];
 							REQUIRE(child_child.hasNbr(s));
 							REQUIRE(child_child.nbrId(s)
-							        == tree.nodes.at(children[o.getInteriorNbrOnSide(s).getIndex()])
-							           .child_id[child_o.getExteriorNbrOnSide(s).getIndex()]);
+							        == tree.nodes.at(children[o.getNbrOnSide(s).getIndex()])
+							           .child_id[child_o.getNbrOnSide(s).getIndex()]);
 						}
 					}
 				}

@@ -61,73 +61,93 @@ TEST_CASE("Orthant<3> named constructors give expected index values", "[Octant]"
 	CHECK(Orthant<3>::tne().getIndex() == 7);
 	CHECK(Orthant<3>::null().getIndex() == 8);
 }
-TEST_CASE("Orthant<3> getInteriorNbrOnSide() is as expected", "[Octant]")
+TEST_CASE("Orthant<1> getNbrOnSide() is as expected", "[Octant]")
 {
-	CHECK(Orthant<3>::bsw().getInteriorNbrOnSide(Side<3>::east()) == Orthant<3>::bse());
-	CHECK(Orthant<3>::bsw().getInteriorNbrOnSide(Side<3>::north()) == Orthant<3>::bnw());
-	CHECK(Orthant<3>::bsw().getInteriorNbrOnSide(Side<3>::top()) == Orthant<3>::tsw());
+	CHECK(Orthant<1>::lower().getNbrOnSide(Side<1>::west()) == Orthant<1>::upper());
+	CHECK(Orthant<1>::lower().getNbrOnSide(Side<1>::east()) == Orthant<1>::upper());
 
-	CHECK(Orthant<3>::bse().getInteriorNbrOnSide(Side<3>::west()) == Orthant<3>::bsw());
-	CHECK(Orthant<3>::bse().getInteriorNbrOnSide(Side<3>::north()) == Orthant<3>::bne());
-	CHECK(Orthant<3>::bse().getInteriorNbrOnSide(Side<3>::top()) == Orthant<3>::tse());
-
-	CHECK(Orthant<3>::bnw().getInteriorNbrOnSide(Side<3>::east()) == Orthant<3>::bne());
-	CHECK(Orthant<3>::bnw().getInteriorNbrOnSide(Side<3>::south()) == Orthant<3>::bsw());
-	CHECK(Orthant<3>::bnw().getInteriorNbrOnSide(Side<3>::top()) == Orthant<3>::tnw());
-
-	CHECK(Orthant<3>::bne().getInteriorNbrOnSide(Side<3>::west()) == Orthant<3>::bnw());
-	CHECK(Orthant<3>::bne().getInteriorNbrOnSide(Side<3>::south()) == Orthant<3>::bse());
-	CHECK(Orthant<3>::bne().getInteriorNbrOnSide(Side<3>::top()) == Orthant<3>::tne());
-
-	CHECK(Orthant<3>::tsw().getInteriorNbrOnSide(Side<3>::east()) == Orthant<3>::tse());
-	CHECK(Orthant<3>::tsw().getInteriorNbrOnSide(Side<3>::north()) == Orthant<3>::tnw());
-	CHECK(Orthant<3>::tsw().getInteriorNbrOnSide(Side<3>::bottom()) == Orthant<3>::bsw());
-
-	CHECK(Orthant<3>::tse().getInteriorNbrOnSide(Side<3>::west()) == Orthant<3>::tsw());
-	CHECK(Orthant<3>::tse().getInteriorNbrOnSide(Side<3>::north()) == Orthant<3>::tne());
-	CHECK(Orthant<3>::tse().getInteriorNbrOnSide(Side<3>::bottom()) == Orthant<3>::bse());
-
-	CHECK(Orthant<3>::tnw().getInteriorNbrOnSide(Side<3>::east()) == Orthant<3>::tne());
-	CHECK(Orthant<3>::tnw().getInteriorNbrOnSide(Side<3>::south()) == Orthant<3>::tsw());
-	CHECK(Orthant<3>::tnw().getInteriorNbrOnSide(Side<3>::bottom()) == Orthant<3>::bnw());
-
-	CHECK(Orthant<3>::tne().getInteriorNbrOnSide(Side<3>::west()) == Orthant<3>::tnw());
-	CHECK(Orthant<3>::tne().getInteriorNbrOnSide(Side<3>::south()) == Orthant<3>::tse());
-	CHECK(Orthant<3>::tne().getInteriorNbrOnSide(Side<3>::bottom()) == Orthant<3>::bne());
+	CHECK(Orthant<1>::upper().getNbrOnSide(Side<1>::west()) == Orthant<1>::lower());
+	CHECK(Orthant<1>::upper().getNbrOnSide(Side<1>::east()) == Orthant<1>::lower());
 }
-TEST_CASE("Orthant<3> getExteriorNbrOnSide() is as expected", "[Octant]")
+TEST_CASE("Orthant<2> getNbrOnSide() is as expected", "[Octant]")
 {
-	CHECK(Orthant<3>::bsw().getExteriorNbrOnSide(Side<3>::west()) == Orthant<3>::bse());
-	CHECK(Orthant<3>::bsw().getExteriorNbrOnSide(Side<3>::south()) == Orthant<3>::bnw());
-	CHECK(Orthant<3>::bsw().getExteriorNbrOnSide(Side<3>::bottom()) == Orthant<3>::tsw());
+	CHECK(Orthant<2>::sw().getNbrOnSide(Side<2>::west()) == Orthant<2>::se());
+	CHECK(Orthant<2>::sw().getNbrOnSide(Side<2>::east()) == Orthant<2>::se());
+	CHECK(Orthant<2>::sw().getNbrOnSide(Side<2>::south()) == Orthant<2>::nw());
+	CHECK(Orthant<2>::sw().getNbrOnSide(Side<2>::north()) == Orthant<2>::nw());
 
-	CHECK(Orthant<3>::bse().getExteriorNbrOnSide(Side<3>::east()) == Orthant<3>::bsw());
-	CHECK(Orthant<3>::bse().getExteriorNbrOnSide(Side<3>::south()) == Orthant<3>::bne());
-	CHECK(Orthant<3>::bse().getExteriorNbrOnSide(Side<3>::bottom()) == Orthant<3>::tse());
+	CHECK(Orthant<2>::se().getNbrOnSide(Side<2>::west()) == Orthant<2>::sw());
+	CHECK(Orthant<2>::se().getNbrOnSide(Side<2>::east()) == Orthant<2>::sw());
+	CHECK(Orthant<2>::se().getNbrOnSide(Side<2>::south()) == Orthant<2>::ne());
+	CHECK(Orthant<2>::se().getNbrOnSide(Side<2>::north()) == Orthant<2>::ne());
 
-	CHECK(Orthant<3>::bnw().getExteriorNbrOnSide(Side<3>::west()) == Orthant<3>::bne());
-	CHECK(Orthant<3>::bnw().getExteriorNbrOnSide(Side<3>::north()) == Orthant<3>::bsw());
-	CHECK(Orthant<3>::bnw().getExteriorNbrOnSide(Side<3>::bottom()) == Orthant<3>::tnw());
+	CHECK(Orthant<2>::nw().getNbrOnSide(Side<2>::west()) == Orthant<2>::ne());
+	CHECK(Orthant<2>::nw().getNbrOnSide(Side<2>::east()) == Orthant<2>::ne());
+	CHECK(Orthant<2>::nw().getNbrOnSide(Side<2>::south()) == Orthant<2>::sw());
+	CHECK(Orthant<2>::nw().getNbrOnSide(Side<2>::north()) == Orthant<2>::sw());
 
-	CHECK(Orthant<3>::bne().getExteriorNbrOnSide(Side<3>::east()) == Orthant<3>::bnw());
-	CHECK(Orthant<3>::bne().getExteriorNbrOnSide(Side<3>::north()) == Orthant<3>::bse());
-	CHECK(Orthant<3>::bne().getExteriorNbrOnSide(Side<3>::bottom()) == Orthant<3>::tne());
+	CHECK(Orthant<2>::ne().getNbrOnSide(Side<2>::west()) == Orthant<2>::nw());
+	CHECK(Orthant<2>::ne().getNbrOnSide(Side<2>::east()) == Orthant<2>::nw());
+	CHECK(Orthant<2>::ne().getNbrOnSide(Side<2>::south()) == Orthant<2>::se());
+	CHECK(Orthant<2>::ne().getNbrOnSide(Side<2>::north()) == Orthant<2>::se());
+}
+TEST_CASE("Orthant<3> getNbrOnSide() is as expected", "[Octant]")
+{
+	CHECK(Orthant<3>::bsw().getNbrOnSide(Side<3>::west()) == Orthant<3>::bse());
+	CHECK(Orthant<3>::bsw().getNbrOnSide(Side<3>::east()) == Orthant<3>::bse());
+	CHECK(Orthant<3>::bsw().getNbrOnSide(Side<3>::south()) == Orthant<3>::bnw());
+	CHECK(Orthant<3>::bsw().getNbrOnSide(Side<3>::north()) == Orthant<3>::bnw());
+	CHECK(Orthant<3>::bsw().getNbrOnSide(Side<3>::bottom()) == Orthant<3>::tsw());
+	CHECK(Orthant<3>::bsw().getNbrOnSide(Side<3>::top()) == Orthant<3>::tsw());
 
-	CHECK(Orthant<3>::tsw().getExteriorNbrOnSide(Side<3>::west()) == Orthant<3>::tse());
-	CHECK(Orthant<3>::tsw().getExteriorNbrOnSide(Side<3>::south()) == Orthant<3>::tnw());
-	CHECK(Orthant<3>::tsw().getExteriorNbrOnSide(Side<3>::top()) == Orthant<3>::bsw());
+	CHECK(Orthant<3>::bse().getNbrOnSide(Side<3>::west()) == Orthant<3>::bsw());
+	CHECK(Orthant<3>::bse().getNbrOnSide(Side<3>::east()) == Orthant<3>::bsw());
+	CHECK(Orthant<3>::bse().getNbrOnSide(Side<3>::south()) == Orthant<3>::bne());
+	CHECK(Orthant<3>::bse().getNbrOnSide(Side<3>::north()) == Orthant<3>::bne());
+	CHECK(Orthant<3>::bse().getNbrOnSide(Side<3>::bottom()) == Orthant<3>::tse());
+	CHECK(Orthant<3>::bse().getNbrOnSide(Side<3>::top()) == Orthant<3>::tse());
 
-	CHECK(Orthant<3>::tse().getExteriorNbrOnSide(Side<3>::east()) == Orthant<3>::tsw());
-	CHECK(Orthant<3>::tse().getExteriorNbrOnSide(Side<3>::south()) == Orthant<3>::tne());
-	CHECK(Orthant<3>::tse().getExteriorNbrOnSide(Side<3>::top()) == Orthant<3>::bse());
+	CHECK(Orthant<3>::bnw().getNbrOnSide(Side<3>::west()) == Orthant<3>::bne());
+	CHECK(Orthant<3>::bnw().getNbrOnSide(Side<3>::east()) == Orthant<3>::bne());
+	CHECK(Orthant<3>::bnw().getNbrOnSide(Side<3>::south()) == Orthant<3>::bsw());
+	CHECK(Orthant<3>::bnw().getNbrOnSide(Side<3>::north()) == Orthant<3>::bsw());
+	CHECK(Orthant<3>::bnw().getNbrOnSide(Side<3>::bottom()) == Orthant<3>::tnw());
+	CHECK(Orthant<3>::bnw().getNbrOnSide(Side<3>::top()) == Orthant<3>::tnw());
 
-	CHECK(Orthant<3>::tnw().getExteriorNbrOnSide(Side<3>::west()) == Orthant<3>::tne());
-	CHECK(Orthant<3>::tnw().getExteriorNbrOnSide(Side<3>::north()) == Orthant<3>::tsw());
-	CHECK(Orthant<3>::tnw().getExteriorNbrOnSide(Side<3>::top()) == Orthant<3>::bnw());
+	CHECK(Orthant<3>::bne().getNbrOnSide(Side<3>::west()) == Orthant<3>::bnw());
+	CHECK(Orthant<3>::bne().getNbrOnSide(Side<3>::east()) == Orthant<3>::bnw());
+	CHECK(Orthant<3>::bne().getNbrOnSide(Side<3>::south()) == Orthant<3>::bse());
+	CHECK(Orthant<3>::bne().getNbrOnSide(Side<3>::north()) == Orthant<3>::bse());
+	CHECK(Orthant<3>::bne().getNbrOnSide(Side<3>::bottom()) == Orthant<3>::tne());
+	CHECK(Orthant<3>::bne().getNbrOnSide(Side<3>::top()) == Orthant<3>::tne());
 
-	CHECK(Orthant<3>::tne().getExteriorNbrOnSide(Side<3>::east()) == Orthant<3>::tnw());
-	CHECK(Orthant<3>::tne().getExteriorNbrOnSide(Side<3>::north()) == Orthant<3>::tse());
-	CHECK(Orthant<3>::tne().getExteriorNbrOnSide(Side<3>::top()) == Orthant<3>::bne());
+	CHECK(Orthant<3>::tsw().getNbrOnSide(Side<3>::west()) == Orthant<3>::tse());
+	CHECK(Orthant<3>::tsw().getNbrOnSide(Side<3>::east()) == Orthant<3>::tse());
+	CHECK(Orthant<3>::tsw().getNbrOnSide(Side<3>::south()) == Orthant<3>::tnw());
+	CHECK(Orthant<3>::tsw().getNbrOnSide(Side<3>::north()) == Orthant<3>::tnw());
+	CHECK(Orthant<3>::tsw().getNbrOnSide(Side<3>::bottom()) == Orthant<3>::bsw());
+	CHECK(Orthant<3>::tsw().getNbrOnSide(Side<3>::top()) == Orthant<3>::bsw());
+
+	CHECK(Orthant<3>::tse().getNbrOnSide(Side<3>::east()) == Orthant<3>::tsw());
+	CHECK(Orthant<3>::tse().getNbrOnSide(Side<3>::west()) == Orthant<3>::tsw());
+	CHECK(Orthant<3>::tse().getNbrOnSide(Side<3>::south()) == Orthant<3>::tne());
+	CHECK(Orthant<3>::tse().getNbrOnSide(Side<3>::north()) == Orthant<3>::tne());
+	CHECK(Orthant<3>::tse().getNbrOnSide(Side<3>::bottom()) == Orthant<3>::bse());
+	CHECK(Orthant<3>::tse().getNbrOnSide(Side<3>::top()) == Orthant<3>::bse());
+
+	CHECK(Orthant<3>::tnw().getNbrOnSide(Side<3>::west()) == Orthant<3>::tne());
+	CHECK(Orthant<3>::tnw().getNbrOnSide(Side<3>::east()) == Orthant<3>::tne());
+	CHECK(Orthant<3>::tnw().getNbrOnSide(Side<3>::south()) == Orthant<3>::tsw());
+	CHECK(Orthant<3>::tnw().getNbrOnSide(Side<3>::north()) == Orthant<3>::tsw());
+	CHECK(Orthant<3>::tnw().getNbrOnSide(Side<3>::bottom()) == Orthant<3>::bnw());
+	CHECK(Orthant<3>::tnw().getNbrOnSide(Side<3>::top()) == Orthant<3>::bnw());
+
+	CHECK(Orthant<3>::tne().getNbrOnSide(Side<3>::east()) == Orthant<3>::tnw());
+	CHECK(Orthant<3>::tne().getNbrOnSide(Side<3>::west()) == Orthant<3>::tnw());
+	CHECK(Orthant<3>::tne().getNbrOnSide(Side<3>::south()) == Orthant<3>::tse());
+	CHECK(Orthant<3>::tne().getNbrOnSide(Side<3>::north()) == Orthant<3>::tse());
+	CHECK(Orthant<3>::tne().getNbrOnSide(Side<3>::bottom()) == Orthant<3>::bne());
+	CHECK(Orthant<3>::tne().getNbrOnSide(Side<3>::top()) == Orthant<3>::bne());
 }
 TEST_CASE("Orthant<1> getInteriorSides() is as expected", "[Octant]")
 {

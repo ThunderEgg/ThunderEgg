@@ -178,21 +178,7 @@ template <size_t D> class Orthant
 	 *
 	 * @return  The octant that neighbors on that side.
 	 */
-	Orthant<D> getInteriorNbrOnSide(Side<D> s) const
-	{
-		Orthant<D> retval = *this;
-		// flip the bit for that side
-		retval.val ^= (0x1 << s.getAxisIndex());
-		return retval;
-	}
-	/**
-	 * @brief Return the octant that neighbors this octant on a particular side.
-	 *
-	 * @param s the side of the octant that you want the neighbor of.
-	 *
-	 * @return  The octant that neighbors on that side.
-	 */
-	Orthant<D> getExteriorNbrOnSide(Side<D> s) const
+	Orthant<D> getNbrOnSide(Side<D> s) const
 	{
 		Orthant<D> retval = *this;
 		// flip the bit for that side

@@ -57,7 +57,7 @@ struct Block {
 		flip_j = flip_j_table[main.getIndex()];
 		flip_i = flip_i_table[main.getIndex()][s.getIndex()];
 		if (flip_i) {
-			this->type.setOrthant(type.getOrthant().getInteriorNbrOnSide(Side<1>::west()));
+			this->type.setOrthant(type.getOrthant().getNbrOnSide(Side<1>::west()));
 		}
 	}
 	bool operator==(const Block &b) const

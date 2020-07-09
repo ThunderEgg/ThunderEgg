@@ -200,8 +200,7 @@ template <size_t D> inline void Tree<D>::refineNode(Node<D> &n)
 	// set new neighbors
 	for (Orthant<D> o : Orthant<D>::getValues()) {
 		for (Side<D> s : o.getInteriorSides()) {
-			new_children[o.getIndex()].nbrId(s)
-			= new_children[o.getInteriorNbrOnSide(s).getIndex()].id;
+			new_children[o.getIndex()].nbrId(s) = new_children[o.getNbrOnSide(s).getIndex()].id;
 		}
 	}
 
@@ -211,7 +210,7 @@ template <size_t D> inline void Tree<D>::refineNode(Node<D> &n)
 			Node<D> &nbr = nodes[n.nbrId(s)];
 			for (Orthant<D> o : Orthant<D>::getValuesOnSide(s)) {
 				Node<D> &child                = new_children[o.getIndex()];
-				Node<D> &nbr_child            = nodes[nbr.childId(o.getExteriorNbrOnSide(s))];
+				Node<D> &nbr_child            = nodes[nbr.childId(o.getNbrOnSide(s))];
 				child.nbrId(s)                = nbr_child.id;
 				nbr_child.nbrId(s.opposite()) = child.id;
 			}
