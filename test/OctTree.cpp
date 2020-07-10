@@ -141,7 +141,7 @@ TEST_CASE("Tree<3> refineLeaves works on single starting node with two calls", "
 				REQUIRE(id == child_child.id);
 
 				// check interior neighbors
-				for (Side<3> s : o.getInteriorSides()) {
+				for (Side<3> s : child_o.getInteriorSides()) {
 					REQUIRE(child_child.hasNbr(s));
 					REQUIRE(child_child.nbrId(s)
 					        == child.child_id[child_o.getNbrOnSide(s).getIndex()]);
