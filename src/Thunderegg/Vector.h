@@ -294,7 +294,7 @@ template <size_t D> class Vector
 	/**
 	 * @brief Get the number of local patches
 	 */
-	int getNumLocalPatches()
+	int getNumLocalPatches() const
 	{
 		return num_local_patches;
 	}
