@@ -174,7 +174,7 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 				if (pinfo.parent_id != -1) {
 					auto orth_iter = Orthant<D>::getValues().begin();
 					while (t.nodes.at(n.parent).child_id[orth_iter->getIndex()] != n.id) {
-						orth_iter++;
+						++orth_iter;
 					}
 					pinfo.orth_on_parent = *orth_iter;
 				}
@@ -201,7 +201,7 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 					auto    octs      = Orthant<D>::getValuesOnSide(s);
 					auto    orth_iter = Orthant<D - 1>::getValues().begin();
 					while (parent.childId(octs[orth_iter->getIndex()]) != n.id) {
-						orth_iter++;
+						++orth_iter;
 					}
 					pinfo.nbr_info[s.getIndex()].reset(new CoarseNbrInfo<D>(nbr.id, *orth_iter));
 					if (!qed.count(nbr.id)) {

@@ -161,7 +161,111 @@ template <size_t D> class Orthant
 	{
 		return Orthant<3>(0b111);
 	}
+	/**
+	 * @brief Range class for Orthant
+	 *
+	 * It provides the begin and end fuctions for iterator loops
+	 */
+	class Range
+	{
+		public:
+		/**
+		 * @brief Input iterator for Orthant values
+		 */
+		class Iterator : public std::input_iterator_tag
+		{
+			private:
+			/**
+			 * @brief The current side
+			 */
+			Orthant<D> o;
 
+			public:
+			/**
+			 * @brief Construct a new Iterator object with the given Orthant value
+			 *
+			 * @param o_in the orthant
+			 */
+			explicit Iterator(Orthant<D> o_in) : o(o_in) {}
+			/**
+			 * @brief Increment the Orthant value
+			 *
+			 * @return const Orthant<D>& the resulting value
+			 */
+			const Orthant<D> &operator++()
+			{
+				++o.val;
+				return o;
+			}
+			/**
+			 * @brief Get a reference to the Orthant object
+			 *
+			 * @return const Orthant<D>&  the reference
+			 */
+			const Orthant<D> &operator*() const
+			{
+				return o;
+			}
+			/**
+			 * @brief Get a pointer to the Orthant object
+			 *
+			 * @return const Orthant<D>* the pointer
+			 */
+			const Orthant<D> *operator->() const
+			{
+				return &o;
+			}
+			/**
+			 * @brief Check the iterators reference the same value
+			 *
+			 * @param b the other iterator
+			 * @return true if the same
+			 * @return false if different
+			 */
+			bool operator==(const Iterator &b) const
+			{
+				return o.val == b.o.val;
+			}
+			/**
+			 * @brief Check the iterators don't reference the same value
+			 *
+			 * @param b the other iterator
+			 * @return true if different
+			 * @return false if the same
+			 */
+			bool operator!=(const Iterator &b) const
+			{
+				return o.val != b.o.val;
+			}
+		};
+		/**
+		 * @brief Returns an iterator with the lowest Orthant value
+		 *
+		 * @return Iterator the iterator
+		 */
+		Iterator begin()
+		{
+			return Iterator(Orthant<D>(0));
+		}
+		/**
+		 * @brief Returns an iterator with Orthant<D>::null()
+		 *
+		 * @return Iterator the iterator
+		 */
+		Iterator end()
+		{
+			return Iterator(null());
+		}
+	};
+	/**
+	 * @brief Get a range of values that can be iterated over
+	 *
+	 * @return Range the range of values
+	 */
+	static Range getValues()
+	{
+		return Range();
+	}
 	/**
 	 * @brief Get the integer value of the octant.
 	 *
@@ -244,19 +348,6 @@ template <size_t D> class Orthant
 	{
 		unsigned int upper_mask = (~0x0) << axis;
 		return Orthant<D - 1>(((val >> 1) & upper_mask) | (val & ~upper_mask));
-	}
-	/**
-	 * @brief Get an array of all Orthant<D> values, in increasing order.
-	 *
-	 * @return The array.
-	 */
-	static std::array<Orthant, num_orthants> getValues()
-	{
-		std::array<Orthant<D>, Orthant<D>::num_orthants> retval;
-		for (size_t i = 0; i < retval.size(); i++) {
-			retval[i] = Orthant<D>(i);
-		}
-		return retval;
 	}
 	/**
 	 * @brief Get an array of all Orthant<D> values that lie on a particular side of the cube.

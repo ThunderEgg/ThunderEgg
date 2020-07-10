@@ -5,43 +5,43 @@
 
 using namespace std;
 using namespace Thunderegg;
-TEST_CASE("Orthant<1> unsigned char constructor works", "[Octant]")
+TEST_CASE("Orthant<1> unsigned char constructor works", "[Orthant]")
 {
 	Orthant<1> o(13);
 	CHECK(o.getIndex() == 13);
 }
-TEST_CASE("Orthant<2> unsigned char constructor works", "[Octant]")
+TEST_CASE("Orthant<2> unsigned char constructor works", "[Orthant]")
 {
 	Orthant<2> o(13);
 	CHECK(o.getIndex() == 13);
 }
-TEST_CASE("Orthant<3> unsigned char constructor works", "[Octant]")
+TEST_CASE("Orthant<3> unsigned char constructor works", "[Orthant]")
 {
 	Orthant<3> o(13);
 	CHECK(o.getIndex() == 13);
 }
-TEST_CASE("Orthant<1> Default constructor works", "[Octant]")
+TEST_CASE("Orthant<1> Default constructor works", "[Orthant]")
 {
 	Orthant<1> o;
 	CHECK(o == Orthant<1>::null());
 }
-TEST_CASE("Orthant<2> Default constructor works", "[Octant]")
+TEST_CASE("Orthant<2> Default constructor works", "[Orthant]")
 {
 	Orthant<2> o;
 	CHECK(o == Orthant<2>::null());
 }
-TEST_CASE("Orthant<3> Default constructor works", "[Octant]")
+TEST_CASE("Orthant<3> Default constructor works", "[Orthant]")
 {
 	Orthant<3> o;
 	CHECK(o == Orthant<3>::null());
 }
-TEST_CASE("Orthant<1> named constructors give expected index values", "[Octant]")
+TEST_CASE("Orthant<1> named constructors give expected index values", "[Orthant]")
 {
 	CHECK(Orthant<1>::lower().getIndex() == 0);
 	CHECK(Orthant<1>::upper().getIndex() == 1);
 	CHECK(Orthant<1>::null().getIndex() == 2);
 }
-TEST_CASE("Orthant<2> named constructors give expected index values", "[Octant]")
+TEST_CASE("Orthant<2> named constructors give expected index values", "[Orthant]")
 {
 	CHECK(Orthant<2>::sw().getIndex() == 0);
 	CHECK(Orthant<2>::se().getIndex() == 1);
@@ -49,7 +49,7 @@ TEST_CASE("Orthant<2> named constructors give expected index values", "[Octant]"
 	CHECK(Orthant<2>::ne().getIndex() == 3);
 	CHECK(Orthant<2>::null().getIndex() == 4);
 }
-TEST_CASE("Orthant<3> named constructors give expected index values", "[Octant]")
+TEST_CASE("Orthant<3> named constructors give expected index values", "[Orthant]")
 {
 	CHECK(Orthant<3>::bsw().getIndex() == 0);
 	CHECK(Orthant<3>::bse().getIndex() == 1);
@@ -61,7 +61,7 @@ TEST_CASE("Orthant<3> named constructors give expected index values", "[Octant]"
 	CHECK(Orthant<3>::tne().getIndex() == 7);
 	CHECK(Orthant<3>::null().getIndex() == 8);
 }
-TEST_CASE("Orthant<1> getNbrOnSide is as expected", "[Octant]")
+TEST_CASE("Orthant<1> getNbrOnSide is as expected", "[Orthant]")
 {
 	CHECK(Orthant<1>::lower().getNbrOnSide(Side<1>::west()) == Orthant<1>::upper());
 	CHECK(Orthant<1>::lower().getNbrOnSide(Side<1>::east()) == Orthant<1>::upper());
@@ -69,7 +69,7 @@ TEST_CASE("Orthant<1> getNbrOnSide is as expected", "[Octant]")
 	CHECK(Orthant<1>::upper().getNbrOnSide(Side<1>::west()) == Orthant<1>::lower());
 	CHECK(Orthant<1>::upper().getNbrOnSide(Side<1>::east()) == Orthant<1>::lower());
 }
-TEST_CASE("Orthant<2> getNbrOnSide is as expected", "[Octant]")
+TEST_CASE("Orthant<2> getNbrOnSide is as expected", "[Orthant]")
 {
 	CHECK(Orthant<2>::sw().getNbrOnSide(Side<2>::west()) == Orthant<2>::se());
 	CHECK(Orthant<2>::sw().getNbrOnSide(Side<2>::east()) == Orthant<2>::se());
@@ -91,7 +91,7 @@ TEST_CASE("Orthant<2> getNbrOnSide is as expected", "[Octant]")
 	CHECK(Orthant<2>::ne().getNbrOnSide(Side<2>::south()) == Orthant<2>::se());
 	CHECK(Orthant<2>::ne().getNbrOnSide(Side<2>::north()) == Orthant<2>::se());
 }
-TEST_CASE("Orthant<3> getNbrOnSide is as expected", "[Octant]")
+TEST_CASE("Orthant<3> getNbrOnSide is as expected", "[Orthant]")
 {
 	CHECK(Orthant<3>::bsw().getNbrOnSide(Side<3>::west()) == Orthant<3>::bse());
 	CHECK(Orthant<3>::bsw().getNbrOnSide(Side<3>::east()) == Orthant<3>::bse());
@@ -149,7 +149,7 @@ TEST_CASE("Orthant<3> getNbrOnSide is as expected", "[Octant]")
 	CHECK(Orthant<3>::tne().getNbrOnSide(Side<3>::bottom()) == Orthant<3>::bne());
 	CHECK(Orthant<3>::tne().getNbrOnSide(Side<3>::top()) == Orthant<3>::bne());
 }
-TEST_CASE("Orthant<1> getInteriorSides is as expected", "[Octant]")
+TEST_CASE("Orthant<1> getInteriorSides is as expected", "[Orthant]")
 {
 	{
 		auto array = Orthant<1>::lower().getInteriorSides();
@@ -160,7 +160,7 @@ TEST_CASE("Orthant<1> getInteriorSides is as expected", "[Octant]")
 		CHECK(array[0] == Side<1>::west());
 	}
 }
-TEST_CASE("Orthant<2> getInteriorSides is as expected", "[Octant]")
+TEST_CASE("Orthant<2> getInteriorSides is as expected", "[Orthant]")
 {
 	{
 		auto array = Orthant<2>::sw().getInteriorSides();
@@ -183,7 +183,7 @@ TEST_CASE("Orthant<2> getInteriorSides is as expected", "[Octant]")
 		CHECK(array[1] == Side<2>::south());
 	}
 }
-TEST_CASE("Orthant<3> getInteriorSides is as expected", "[Octant]")
+TEST_CASE("Orthant<3> getInteriorSides is as expected", "[Orthant]")
 {
 	{
 		auto array = Orthant<3>::bsw().getInteriorSides();
@@ -234,7 +234,7 @@ TEST_CASE("Orthant<3> getInteriorSides is as expected", "[Octant]")
 		CHECK(array[2] == Side<3>::bottom());
 	}
 }
-TEST_CASE("Orthant<1> getExteriorSides is as expected", "[Octant]")
+TEST_CASE("Orthant<1> getExteriorSides is as expected", "[Orthant]")
 {
 	{
 		auto array = Orthant<1>::lower().getExteriorSides();
@@ -245,7 +245,7 @@ TEST_CASE("Orthant<1> getExteriorSides is as expected", "[Octant]")
 		CHECK(array[0] == Side<1>::east());
 	}
 }
-TEST_CASE("Orthant<2> getExteriorSides is as expected", "[Octant]")
+TEST_CASE("Orthant<2> getExteriorSides is as expected", "[Orthant]")
 {
 	{
 		auto array = Orthant<2>::sw().getExteriorSides();
@@ -268,7 +268,7 @@ TEST_CASE("Orthant<2> getExteriorSides is as expected", "[Octant]")
 		CHECK(array[1] == Side<2>::north());
 	}
 }
-TEST_CASE("Orthant<3> getExteriorSides is as expected", "[Octant]")
+TEST_CASE("Orthant<3> getExteriorSides is as expected", "[Orthant]")
 {
 	{
 		auto array = Orthant<3>::bsw().getExteriorSides();
@@ -319,7 +319,7 @@ TEST_CASE("Orthant<3> getExteriorSides is as expected", "[Octant]")
 		CHECK(array[2] == Side<3>::top());
 	}
 }
-TEST_CASE("Orthant<1> isOnSide is as expected", "[Octant]")
+TEST_CASE("Orthant<1> isOnSide is as expected", "[Orthant]")
 {
 	CHECK(Orthant<1>::lower().isOnSide(Side<1>::west()));
 	CHECK_FALSE(Orthant<1>::lower().isOnSide(Side<1>::east()));
@@ -327,7 +327,7 @@ TEST_CASE("Orthant<1> isOnSide is as expected", "[Octant]")
 	CHECK_FALSE(Orthant<1>::upper().isOnSide(Side<1>::west()));
 	CHECK(Orthant<1>::upper().isOnSide(Side<1>::east()));
 }
-TEST_CASE("Orthant<2> isOnSide is as expected", "[Octant]")
+TEST_CASE("Orthant<2> isOnSide is as expected", "[Orthant]")
 {
 	CHECK(Orthant<2>::sw().isOnSide(Side<2>::west()));
 	CHECK_FALSE(Orthant<2>::sw().isOnSide(Side<2>::east()));
@@ -349,7 +349,7 @@ TEST_CASE("Orthant<2> isOnSide is as expected", "[Octant]")
 	CHECK_FALSE(Orthant<2>::ne().isOnSide(Side<2>::south()));
 	CHECK(Orthant<2>::ne().isOnSide(Side<2>::north()));
 }
-TEST_CASE("Orthant<3> isOnSide is as expected", "[Octant]")
+TEST_CASE("Orthant<3> isOnSide is as expected", "[Orthant]")
 {
 	CHECK(Orthant<3>::bsw().isOnSide(Side<3>::west()));
 	CHECK_FALSE(Orthant<3>::bsw().isOnSide(Side<3>::east()));
@@ -407,19 +407,7 @@ TEST_CASE("Orthant<3> isOnSide is as expected", "[Octant]")
 	CHECK_FALSE(Orthant<3>::tne().isOnSide(Side<3>::bottom()));
 	CHECK(Orthant<3>::tne().isOnSide(Side<3>::top()));
 }
-TEST_CASE("Orthant<3> getValues is as expected", "[Octant]")
-{
-	std::array<Orthant<3>, 8> values = Orthant<3>::getValues();
-	CHECK(values[0] == Orthant<3>::bsw());
-	CHECK(values[1] == Orthant<3>::bse());
-	CHECK(values[2] == Orthant<3>::bnw());
-	CHECK(values[3] == Orthant<3>::bne());
-	CHECK(values[4] == Orthant<3>::tsw());
-	CHECK(values[5] == Orthant<3>::tse());
-	CHECK(values[6] == Orthant<3>::tnw());
-	CHECK(values[7] == Orthant<3>::tne());
-}
-TEST_CASE("Orthant<1> getValuesOnSide is as expected", "[Octant]")
+TEST_CASE("Orthant<1> getValuesOnSide is as expected", "[Orthant]")
 {
 	SECTION("Side<1>::west()")
 	{
@@ -432,7 +420,7 @@ TEST_CASE("Orthant<1> getValuesOnSide is as expected", "[Octant]")
 		CHECK(values[0] == Orthant<1>::upper());
 	}
 }
-TEST_CASE("Orthant<2> getValuesOnSide is as expected", "[Octant]")
+TEST_CASE("Orthant<2> getValuesOnSide is as expected", "[Orthant]")
 {
 	SECTION("Side<2>::west()")
 	{
@@ -459,7 +447,7 @@ TEST_CASE("Orthant<2> getValuesOnSide is as expected", "[Octant]")
 		CHECK(values[1] == Orthant<2>::ne());
 	}
 }
-TEST_CASE("Orthant<3> getValuesOnSide is as expected", "[Octant]")
+TEST_CASE("Orthant<3> getValuesOnSide is as expected", "[Orthant]")
 {
 	SECTION("Side<3>::west()")
 	{
@@ -510,7 +498,7 @@ TEST_CASE("Orthant<3> getValuesOnSide is as expected", "[Octant]")
 		CHECK(values[3] == Orthant<3>::tne());
 	}
 }
-TEST_CASE("Orthant<1> collapseOnAxis is as expected", "[Octant]")
+TEST_CASE("Orthant<1> collapseOnAxis is as expected", "[Orthant]")
 {
 	SECTION("Orthant<1>::lower()")
 	{
@@ -527,7 +515,7 @@ TEST_CASE("Orthant<1> collapseOnAxis is as expected", "[Octant]")
 		}
 	}
 }
-TEST_CASE("Orthant<2> collapseOnAxis is as expected", "[Octant]")
+TEST_CASE("Orthant<2> collapseOnAxis is as expected", "[Orthant]")
 {
 	SECTION("Orthant<2>::sw()")
 	{
@@ -574,7 +562,7 @@ TEST_CASE("Orthant<2> collapseOnAxis is as expected", "[Octant]")
 		}
 	}
 }
-TEST_CASE("Orthant<3> collapseOnAxis is as expected", "[Octant]")
+TEST_CASE("Orthant<3> collapseOnAxis is as expected", "[Orthant]")
 {
 	SECTION("Orthant<3>::bsw()")
 	{
@@ -697,7 +685,7 @@ TEST_CASE("Orthant<3> collapseOnAxis is as expected", "[Octant]")
 		}
 	}
 }
-TEST_CASE("Orthant<1> ==", "[Octant]")
+TEST_CASE("Orthant<1> ==", "[Orthant]")
 {
 	CHECK(Orthant<1>::lower() == Orthant<1>::lower());
 	CHECK_FALSE(Orthant<1>::lower() == Orthant<1>::upper());
@@ -711,7 +699,7 @@ TEST_CASE("Orthant<1> ==", "[Octant]")
 	CHECK_FALSE(Orthant<1>::null() == Orthant<1>::upper());
 	CHECK(Orthant<1>::null() == Orthant<1>::null());
 }
-TEST_CASE("Orthant<2> ==", "[Octant]")
+TEST_CASE("Orthant<2> ==", "[Orthant]")
 {
 	CHECK(Orthant<2>::sw() == Orthant<2>::sw());
 	CHECK_FALSE(Orthant<2>::sw() == Orthant<2>::se());
@@ -743,7 +731,7 @@ TEST_CASE("Orthant<2> ==", "[Octant]")
 	CHECK_FALSE(Orthant<2>::null() == Orthant<2>::ne());
 	CHECK(Orthant<2>::null() == Orthant<2>::null());
 }
-TEST_CASE("Orthant<3> ==", "[Octant]")
+TEST_CASE("Orthant<3> ==", "[Orthant]")
 {
 	CHECK(Orthant<3>::bsw() == Orthant<3>::bsw());
 	CHECK_FALSE(Orthant<3>::bsw() == Orthant<3>::bse());
@@ -835,7 +823,7 @@ TEST_CASE("Orthant<3> ==", "[Octant]")
 	CHECK_FALSE(Orthant<3>::null() == Orthant<3>::tne());
 	CHECK(Orthant<3>::null() == Orthant<3>::null());
 }
-TEST_CASE("Orthant<1> !=", "[Octant]")
+TEST_CASE("Orthant<1> !=", "[Orthant]")
 {
 	CHECK_FALSE(Orthant<1>::lower() != Orthant<1>::lower());
 	CHECK(Orthant<1>::lower() != Orthant<1>::upper());
@@ -849,7 +837,7 @@ TEST_CASE("Orthant<1> !=", "[Octant]")
 	CHECK(Orthant<1>::null() != Orthant<1>::upper());
 	CHECK_FALSE(Orthant<1>::null() != Orthant<1>::null());
 }
-TEST_CASE("Orthant<2> !=", "[Octant]")
+TEST_CASE("Orthant<2> !=", "[Orthant]")
 {
 	CHECK_FALSE(Orthant<2>::sw() != Orthant<2>::sw());
 	CHECK(Orthant<2>::sw() != Orthant<2>::se());
@@ -881,7 +869,7 @@ TEST_CASE("Orthant<2> !=", "[Octant]")
 	CHECK(Orthant<2>::null() != Orthant<2>::ne());
 	CHECK_FALSE(Orthant<2>::null() != Orthant<2>::null());
 }
-TEST_CASE("Orthant<3> !=", "[Octant]")
+TEST_CASE("Orthant<3> !=", "[Orthant]")
 {
 	CHECK_FALSE(Orthant<3>::bsw() != Orthant<3>::bsw());
 	CHECK(Orthant<3>::bsw() != Orthant<3>::bse());
@@ -973,7 +961,7 @@ TEST_CASE("Orthant<3> !=", "[Octant]")
 	CHECK(Orthant<3>::null() != Orthant<3>::tne());
 	CHECK_FALSE(Orthant<3>::null() != Orthant<3>::null());
 }
-TEST_CASE("Orthant<1> <", "[Octant]")
+TEST_CASE("Orthant<1> <", "[Orthant]")
 {
 	CHECK_FALSE(Orthant<1>::lower() < Orthant<1>::lower());
 	CHECK(Orthant<1>::lower() < Orthant<1>::upper());
@@ -987,7 +975,7 @@ TEST_CASE("Orthant<1> <", "[Octant]")
 	CHECK_FALSE(Orthant<1>::null() < Orthant<1>::upper());
 	CHECK_FALSE(Orthant<1>::null() < Orthant<1>::null());
 }
-TEST_CASE("Orthant<2> <", "[Octant]")
+TEST_CASE("Orthant<2> <", "[Orthant]")
 {
 	CHECK_FALSE(Orthant<2>::sw() < Orthant<2>::sw());
 	CHECK(Orthant<2>::sw() < Orthant<2>::se());
@@ -1019,7 +1007,7 @@ TEST_CASE("Orthant<2> <", "[Octant]")
 	CHECK_FALSE(Orthant<2>::null() < Orthant<2>::ne());
 	CHECK_FALSE(Orthant<2>::null() < Orthant<2>::null());
 }
-TEST_CASE("Orthant<3> <", "[Octant]")
+TEST_CASE("Orthant<3> <", "[Orthant]")
 {
 	CHECK_FALSE(Orthant<3>::bsw() < Orthant<3>::bsw());
 	CHECK(Orthant<3>::bsw() < Orthant<3>::bse());
@@ -1179,4 +1167,59 @@ TEST_CASE("Test ostream for Orthant<3>", "[Orthant]")
 	ss.str("");
 	ss << Orthant<3>(13);
 	CHECK(ss.str() == "Orthant<3> invalid value: 13");
+}
+TEST_CASE("Test iterator for Orthant<1>", "[Orthant]")
+{
+	auto iter = Orthant<1>::getValues().begin();
+	CHECK(iter == Orthant<1>::getValues().begin());
+	CHECK(iter != Orthant<1>::getValues().end());
+	CHECK(*iter == Orthant<1>::lower());
+	++iter;
+	CHECK(iter->getIndex() == 1);
+	CHECK(*iter == Orthant<1>::upper());
+	++iter;
+	CHECK(*iter == Orthant<1>::null());
+	CHECK(iter == Orthant<1>::getValues().end());
+}
+TEST_CASE("Test iterator for Orthant<2>", "[Orthant]")
+{
+	auto iter = Orthant<2>::getValues().begin();
+	CHECK(iter == Orthant<2>::getValues().begin());
+	CHECK(iter != Orthant<2>::getValues().end());
+	CHECK(*iter == Orthant<2>::sw());
+	++iter;
+	CHECK(iter->getIndex() == 1);
+	CHECK(*iter == Orthant<2>::se());
+	++iter;
+	CHECK(*iter == Orthant<2>::nw());
+	++iter;
+	CHECK(*iter == Orthant<2>::ne());
+	++iter;
+	CHECK(*iter == Orthant<2>::null());
+	CHECK(iter == Orthant<2>::getValues().end());
+}
+TEST_CASE("Test iterator for Orthant<3>", "[Orthant]")
+{
+	auto iter = Orthant<3>::getValues().begin();
+	CHECK(iter == Orthant<3>::getValues().begin());
+	CHECK(iter != Orthant<3>::getValues().end());
+	CHECK(*iter == Orthant<3>::bsw());
+	++iter;
+	CHECK(iter->getIndex() == 1);
+	CHECK(*iter == Orthant<3>::bse());
+	++iter;
+	CHECK(*iter == Orthant<3>::bnw());
+	++iter;
+	CHECK(*iter == Orthant<3>::bne());
+	++iter;
+	CHECK(*iter == Orthant<3>::tsw());
+	++iter;
+	CHECK(*iter == Orthant<3>::tse());
+	++iter;
+	CHECK(*iter == Orthant<3>::tnw());
+	++iter;
+	CHECK(*iter == Orthant<3>::tne());
+	++iter;
+	CHECK(*iter == Orthant<3>::null());
+	CHECK(iter == Orthant<3>::getValues().end());
 }

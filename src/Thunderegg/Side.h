@@ -79,47 +79,107 @@ template <size_t D> class Side
 	{
 		return Side(num_sides);
 	}
+	/**
+	 * @brief Range class for Side
+	 *
+	 * It provides the begin and end fuctions for iterator loops
+	 */
 	class Range
 	{
 		public:
+		/**
+		 * @brief Input iterator for Side values
+		 */
 		class Iterator : public std::input_iterator_tag
 		{
 			private:
+			/**
+			 * @brief The current side
+			 */
 			Side<D> s;
 
 			public:
-			Iterator(Side<D> s_in) : s(s_in) {}
+			/**
+			 * @brief Construct a new Iterator object with the given Side value
+			 *
+			 * @param s_in the side
+			 */
+			explicit Iterator(Side<D> s_in) : s(s_in) {}
+			/**
+			 * @brief Increment the side value
+			 *
+			 * @return const Side<D>& the resulting value
+			 */
 			const Side<D> &operator++()
 			{
 				++s.val;
 				return s;
 			}
+			/**
+			 * @brief Get a reference to the side object
+			 *
+			 * @return const Side<D>&  the reference
+			 */
 			const Side<D> &operator*() const
 			{
 				return s;
 			}
+			/**
+			 * @brief Get a pointer to the side object
+			 *
+			 * @return const Side<D>* the pointer
+			 */
 			const Side<D> *operator->() const
 			{
 				return &s;
 			}
+			/**
+			 * @brief Check the iterators reference the same value
+			 *
+			 * @param b the other iterator
+			 * @return true if the same
+			 * @return false if different
+			 */
 			bool operator==(const Iterator &b) const
 			{
 				return s.val == b.s.val;
 			}
+			/**
+			 * @brief Check the iterators don't reference the same value
+			 *
+			 * @param b the other iterator
+			 * @return true if different
+			 * @return false if the same
+			 */
 			bool operator!=(const Iterator &b) const
 			{
 				return s.val != b.s.val;
 			}
 		};
+		/**
+		 * @brief Returns an iterator with the lowest Side value
+		 *
+		 * @return Iterator the iterator
+		 */
 		Iterator begin()
 		{
 			return Iterator(Side<D>(0));
 		}
+		/**
+		 * @brief Returns an iterator with Side<D>::null()
+		 *
+		 * @return Iterator the iterator
+		 */
 		Iterator end()
 		{
 			return Iterator(null());
 		}
 	};
+	/**
+	 * @brief Get a range of values that can be iterated over
+	 *
+	 * @return Range the range of values
+	 */
 	static Range getValues()
 	{
 		return Range();
