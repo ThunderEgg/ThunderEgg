@@ -191,6 +191,9 @@ TEST_CASE("Test ostream for Side<1>", "[Side]")
 	ss.str("");
 	ss << Side<1>::null();
 	CHECK(ss.str() == "Side<1>::null()");
+	ss.str("");
+	ss << Side<1>(13);
+	CHECK(ss.str() == "Side<1> undefined value: 13");
 }
 TEST_CASE("Test ostream for Side<2>", "[Side]")
 {
@@ -209,6 +212,9 @@ TEST_CASE("Test ostream for Side<2>", "[Side]")
 	ss.str("");
 	ss << Side<2>::null();
 	CHECK(ss.str() == "Side<2>::null()");
+	ss.str("");
+	ss << Side<2>(13);
+	CHECK(ss.str() == "Side<2> undefined value: 13");
 }
 TEST_CASE("Test ostream for Side<3>", "[Side]")
 {
@@ -233,6 +239,9 @@ TEST_CASE("Test ostream for Side<3>", "[Side]")
 	ss.str("");
 	ss << Side<3>::null();
 	CHECK(ss.str() == "Side<3>::null()");
+	ss.str("");
+	ss << Side<3>(13);
+	CHECK(ss.str() == "Side<3> undefined value: 13");
 }
 TEST_CASE("== operator works for Side<1>", "[Side]")
 {
