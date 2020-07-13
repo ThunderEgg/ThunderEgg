@@ -128,14 +128,13 @@ class fivePoint : public PatchOperator<2>
 void fivePoint::fivePoint>(beta_vec,te_domain,ghost_filler);
 #endif
 
-fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain,
-                     std::shared_ptr<const GhostFiller<2>> ghost_filler)
+fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain_in,
+                     std::shared_ptr<const GhostFiller<2>> ghost_filler_in)
+: PatchOperator<2>(domain_in, ghost_filler_in)
 {
-	if (domain->getNumGhostCells() < 1) {
+	if (this->domain->getNumGhostCells() < 1) {
 		throw 88;
 	}
-	this->domain       = domain;
-	this->ghost_filler = ghost_filler;
 }
 
 void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
@@ -473,8 +472,7 @@ int main(int argc, char *argv[])
 		hfun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[1];
-			// return 1 + x * y;
-			return 1;
+			return 1 + x * y;
 		};
 	} else {
 		ffun = [](const std::array<double, 2> &coord) {

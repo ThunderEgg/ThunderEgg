@@ -30,34 +30,28 @@
 
 namespace Thunderegg
 {
-namespace VarPoisson
+namespace Poisson
 {
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
-	protected:
-	std::shared_ptr<const Vector<D>>     coeffs;
-	std::shared_ptr<const Vector<D - 1>> gamma_coeffs;
-
+	private:
 	constexpr int addValue(int axis)
 	{
 		return (axis == 0) ? 0 : 1;
 	}
 
 	public:
-	StarPatchOperator(std::shared_ptr<const Vector<D>>      coeffs_in,
-	                  std::shared_ptr<const Domain<D>>      domain_in,
+	StarPatchOperator(std::shared_ptr<const Domain<D>>      domain_in,
 	                  std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
-	: PatchOperator<D>(domain_in, ghost_filler_in), coeffs(coeffs_in)
+	: PatchOperator<D>(domain_in, ghost_filler_in)
 	{
 		if (this->domain->getNumGhostCells() < 1) {
 			throw 88;
 		}
-		this->ghost_filler->fillGhost(this->coeffs);
 	}
 	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
 	                      LocalData<D> f) const override
 	{
-		const LocalData<D>    c  = coeffs->getLocalData(pinfo->local_index);
 		std::array<double, D> h2 = pinfo->spacings;
 		for (size_t i = 0; i < D; i++) {
 			h2[i] *= h2[i];
@@ -79,41 +73,30 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 					upper[coord] = -mid[coord];
 				});
 			}
-			int stride   = u.getStrides()[axis];
-			int c_stride = c.getStrides()[axis];
+			int stride = u.getStrides()[axis];
 			nested_loop<D>(u.getStart(), u.getEnd(), [&](std::array<int, D> coord) {
-				const double *ptr     = u.getPtr(coord);
-				const double *c_ptr   = c.getPtr(coord);
-				double        lower   = *(ptr - stride);
-				double        mid     = *ptr;
-				double        upper   = *(ptr + stride);
-				double        c_lower = *(c_ptr - c_stride);
-				double        c_mid   = *c_ptr;
-				double        c_upper = *(c_ptr + c_stride);
-				f[coord]              = addValue(axis) * f[coord]
-				           + ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower))
-				             / (2 * h2[axis]);
+				const double *ptr   = u.getPtr(coord);
+				double        lower = *(ptr - stride);
+				double        mid   = *ptr;
+				double        upper = *(ptr + stride);
+				f[coord] = addValue(axis) * f[coord] + (upper - 2 * mid + lower) / h2[axis];
 			});
 		});
 	}
 	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
 	                   LocalData<D> f) const
 	{
-		const LocalData<D> c = coeffs->getLocalData(pinfo->local_index);
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo->hasNbr(s)) {
-				double                 h2      = pow(pinfo->spacings[s.getAxisIndex()], 2);
-				LocalData<D - 1>       f_inner = f.getSliceOnSide(s);
-				LocalData<D - 1>       u_ghost = u.getSliceOnSide(s, -1);
-				LocalData<D - 1>       u_inner = u.getSliceOnSide(s);
-				const LocalData<D - 1> c_ghost = c.getSliceOnSide(s, -1);
-				const LocalData<D - 1> c_inner = c.getSliceOnSide(s);
-				nested_loop<D - 1>(
-				f_inner.getStart(), f_inner.getEnd(), [&](const std::array<int, D - 1> &coord) {
-					f_inner[coord] -= (u_ghost[coord] + u_inner[coord])
-					                  * (c_inner[coord] + c_ghost[coord]) / (2 * h2);
-					u_ghost[coord] = 0;
-				});
+				double           h2      = pow(pinfo->spacings[s.getAxisIndex()], 2);
+				LocalData<D - 1> f_inner = f.getSliceOnSide(s);
+				LocalData<D - 1> u_ghost = u.getSliceOnSide(s, -1);
+				LocalData<D - 1> u_inner = u.getSliceOnSide(s);
+				nested_loop<D - 1>(f_inner.getStart(), f_inner.getEnd(),
+				                   [&](const std::array<int, D - 1> &coord) {
+					                   f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2;
+					                   u_ghost[coord] = 0;
+				                   });
 			}
 		}
 	}
@@ -126,8 +109,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	 * @param hfunc the coefficients
 	 */
 	static void addDrichletBCToRHS(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> f,
-	                               std::function<double(const std::array<double, D> &)> gfunc,
-	                               std::function<double(const std::array<double, D> &)> hfunc)
+	                               std::function<double(const std::array<double, D> &)> gfunc)
 	{
 		for (int i = 0; i < f->getNumLocalPatches(); i++) {
 			LocalData<D> f_ld  = f->getLocalData(i);
@@ -140,14 +122,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 					ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 						std::array<double, D> real_coord;
 						DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
-						std::array<double, D> other_real_coord = real_coord;
-						if (s.isLowerOnAxis()) {
-							other_real_coord[s.getAxisIndex()] -= pinfo->spacings[s.getAxisIndex()];
-						} else {
-							other_real_coord[s.getAxisIndex()] += pinfo->spacings[s.getAxisIndex()];
-						}
-						ld[coord] += gfunc(real_coord)
-						             * (hfunc(real_coord) + hfunc(other_real_coord)) / (2 * h2);
+						ld[coord] += -2.0 * gfunc(real_coord) / h2;
 					});
 				}
 			}
@@ -205,11 +180,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 
 			std::shared_ptr<const Domain<D>> finer_domain = level->getFiner()->getDomain();
 			auto                             finer_op     = generated_operators[finer_domain];
-			auto new_coeffs = ValVector<D>::GetNewVector(level->getDomain());
-			level->getFiner()->getRestrictor().restrict(new_coeffs, finer_op->coeffs);
-			new_coeffs->setWithGhost(1);
-			coarser_op.reset(
-			new StarPatchOperator<D>(new_coeffs, level->getDomain(), filler_gen(level)));
+			coarser_op.reset(new StarPatchOperator<D>(level->getDomain(), filler_gen(level)));
 			return coarser_op;
 		}
 	};
@@ -217,6 +188,6 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 extern template class StarPatchOperator<2>;
 extern template class StarPatchOperator<3>;
 
-} // namespace VarPoisson
+} // namespace Poisson
 } // namespace Thunderegg
 #endif

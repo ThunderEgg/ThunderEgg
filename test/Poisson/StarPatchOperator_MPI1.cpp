@@ -24,14 +24,14 @@
 #include <Thunderegg/BiLinearGhostFiller.h>
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/GMG/LinearRestrictor.h>
+#include <Thunderegg/Poisson/StarPatchOperator.h>
 #include <Thunderegg/ValVector.h>
-#include <Thunderegg/VarPoisson/StarPatchOperator.h>
 using namespace std;
 using namespace Thunderegg;
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
-TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPatchOperator]")
 {
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
@@ -64,10 +64,10 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 	auto h_vec = ValVector<2>::GetNewVector(d_fine);
 	DomainTools<2>::setValuesWithGhost(d_fine, h_vec, hfun);
 
-	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine));
-	shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
-	new VarPoisson::StarPatchOperator<2>(h_vec, d_fine, gf));
-	VarPoisson::StarPatchOperator<2>::addDrichletBCToRHS(d_fine, f_vec, gfun, hfun);
+	shared_ptr<BiLinearGhostFiller>           gf(new BiLinearGhostFiller(d_fine));
+	shared_ptr<Poisson::StarPatchOperator<2>> p_operator(
+	new Poisson::StarPatchOperator<2>(d_fine, gf));
+	Poisson::StarPatchOperator<2>::addDrichletBCToRHS(d_fine, f_vec, gfun);
 
 	auto f_expected = ValVector<2>::GetNewVector(d_fine);
 	f_expected->copy(f_vec);
@@ -107,8 +107,8 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 		});
 	}
 }
-TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff",
-          "[VarPoisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
+          "[Poisson::StarPatchOperator]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
@@ -138,9 +138,9 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff",
 	auto h_vec = ValVector<2>::GetNewVector(d_fine);
 	DomainTools<2>::setValuesWithGhost(d_fine, h_vec, hfun);
 
-	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine));
-	shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
-	new VarPoisson::StarPatchOperator<2>(h_vec, d_fine, gf));
+	shared_ptr<BiLinearGhostFiller>           gf(new BiLinearGhostFiller(d_fine));
+	shared_ptr<Poisson::StarPatchOperator<2>> p_operator(
+	new Poisson::StarPatchOperator<2>(d_fine, gf));
 	p_operator->apply(f_vec, g_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
@@ -157,7 +157,8 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff",
 		});
 	}
 }
-TEST_CASE("Test StarPatchOperator gets 2nd order convergence", "[VarPoisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence",
+          "[Poisson::StarPatchOperator]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
@@ -205,7 +206,7 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence", "[VarPoisson::Sta
 		auto f_vec          = ValVector<2>::GetNewVector(d_fine);
 		auto f_vec_expected = ValVector<2>::GetNewVector(d_fine);
 		DomainTools<2>::setValues(d_fine, f_vec_expected, ffun);
-		VarPoisson::StarPatchOperator<2>::addDrichletBCToRHS(d_fine, f_vec_expected, gfun, hfun);
+		Poisson::StarPatchOperator<2>::addDrichletBCToRHS(d_fine, f_vec_expected, gfun);
 
 		auto g_vec = ValVector<2>::GetNewVector(d_fine);
 		DomainTools<2>::setValues(d_fine, g_vec, gfun);
@@ -213,10 +214,8 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence", "[VarPoisson::Sta
 		auto h_vec = ValVector<2>::GetNewVector(d_fine);
 		DomainTools<2>::setValuesWithGhost(d_fine, h_vec, hfun);
 
-		shared_ptr<BiLinearGhostFiller> gf(new BiLinearGhostFiller(d_fine));
-
-		shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
-		new VarPoisson::StarPatchOperator<2>(h_vec, d_fine, gf));
+		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 		p_operator->apply(g_vec, f_vec);
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine);
