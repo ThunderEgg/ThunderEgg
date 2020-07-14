@@ -32,11 +32,16 @@ namespace Thunderegg
 {
 namespace VarPoisson
 {
+/**
+ * @brief Exception that the StarPatchOperator class trows
+ */
+struct StarPatchOperatorException : std::runtime_error {
+	StarPatchOperatorException(std::string message) : std::runtime_error(message){};
+};
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	protected:
-	std::shared_ptr<const Vector<D>>     coeffs;
-	std::shared_ptr<const Vector<D - 1>> gamma_coeffs;
+	std::shared_ptr<const Vector<D>> coeffs;
 
 	constexpr int addValue(int axis)
 	{
@@ -50,7 +55,8 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain_in, ghost_filler_in), coeffs(coeffs_in)
 	{
 		if (this->domain->getNumGhostCells() < 1) {
-			throw 88;
+			throw StarPatchOperatorException(
+			"StarPatchOperator needs at least one set of ghost cells");
 		}
 		this->ghost_filler->fillGhost(this->coeffs);
 	}
