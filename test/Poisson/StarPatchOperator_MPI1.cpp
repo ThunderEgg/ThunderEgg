@@ -225,3 +225,41 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence",
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
 }
+TEST_CASE("Test Poisson::StarPatchOperator constructor throws exception with no ghost cells",
+          "[Poisson::StarPatchOperator]")
+{
+	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+	INFO("MESH FILE " << mesh_file);
+	int n         = 32;
+	int num_ghost = 0;
+
+	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
+	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+
+	auto gf = make_shared<BiLinearGhostFiller>(d_fine);
+	CHECK_THROWS_AS(make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf),
+	                Thunderegg::Poisson::StarPatchOperatorException);
+}
+TEST_CASE("Test Poisson::StarPatchOperator::Generator", "[Poisson::StarPatchOperator]")
+{
+	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+	INFO("MESH FILE " << mesh_file);
+	int n         = 32;
+	int num_ghost = 1;
+
+	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
+	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
+	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+
+	auto gf            = make_shared<BiLinearGhostFiller>(d_fine);
+	auto gf_gen        = BiLinearGhostFiller::Generator(gf);
+	auto op            = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
+	auto op_gen        = Poisson::StarPatchOperator<2>::Generator(op, gf_gen);
+	auto finer_level   = make_shared<GMG::Level<2>>(d_fine, nullptr);
+	auto coarser_level = make_shared<GMG::Level<2>>(d_coarse, nullptr);
+	finer_level->setCoarser(coarser_level);
+	finer_level->setOperator(op);
+	coarser_level->setFiner(finer_level);
+	auto coarser_op  = op_gen(coarser_level);
+	auto coarser_op2 = op_gen(coarser_level);
+}

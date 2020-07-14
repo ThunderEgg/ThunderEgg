@@ -32,6 +32,12 @@ namespace Thunderegg
 {
 namespace Poisson
 {
+/**
+ * @brief Exception that the StarPatchOperator class trows
+ */
+struct StarPatchOperatorException : std::runtime_error {
+	StarPatchOperatorException(std::string message) : std::runtime_error(message){};
+};
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	private:
@@ -46,7 +52,8 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain_in, ghost_filler_in)
 	{
 		if (this->domain->getNumGhostCells() < 1) {
-			throw 88;
+			throw StarPatchOperatorException(
+			"StarPatchOperator needs at least one set of ghost cells");
 		}
 	}
 	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
@@ -159,10 +166,10 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		Generator(std::shared_ptr<const StarPatchOperator<D>> finest_op,
 		          std::function<
 		          std::shared_ptr<const GhostFiller<D>>(std::shared_ptr<const GMG::Level<D>> level)>
-		          filler_gen)
+		          filler_gen_in)
+		: filler_gen(filler_gen_in)
 		{
 			generated_operators[finest_op->domain] = finest_op;
-			this->filler_gen                       = filler_gen;
 		}
 		/**
 		 * @brief Return a StarPatchOperator for a given level
