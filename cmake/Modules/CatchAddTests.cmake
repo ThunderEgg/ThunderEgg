@@ -59,7 +59,7 @@ foreach(line ${output})
   # ...and add to script
   add_command(add_test
     "${prefix}${test}${suffix}"
-    ${TEST_EXECUTOR}
+    "${THUNDEREGG_TEST_EXECUTOR}"
     "${TEST_EXECUTABLE}"
     "${test_name}"
     ${extra_args}

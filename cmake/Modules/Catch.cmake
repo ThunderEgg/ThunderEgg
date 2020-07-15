@@ -98,7 +98,7 @@ function(catch_discover_tests TARGET)
     ""
     ""
     "TEST_PREFIX;TEST_SUFFIX;WORKING_DIRECTORY;TEST_LIST"
-    "TEST_SPEC;EXTRA_ARGS;PROPERTIES"
+    "TEST_SPEC;EXTRA_ARGS;PROPERTIES;THUNDEREGG_TEST_EXECUTOR"
     ${ARGN}
   )
 
@@ -127,6 +127,7 @@ function(catch_discover_tests TARGET)
             -D "TEST_TARGET=${TARGET}"
             -D "TEST_EXECUTABLE=$<TARGET_FILE:${TARGET}>"
             -D "TEST_EXECUTOR=${crosscompiling_emulator}"
+            -D "THUNDEREGG_TEST_EXECUTOR=${_THUNDEREGG_TEST_EXECUTOR}"
             -D "TEST_WORKING_DIR=${_WORKING_DIRECTORY}"
             -D "TEST_SPEC=${_TEST_SPEC}"
             -D "TEST_EXTRA_ARGS=${_EXTRA_ARGS}"

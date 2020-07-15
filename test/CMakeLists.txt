@@ -22,31 +22,61 @@ if(PETSC_FOUND)
   endif(VTK_FOUND)
 
   include(CTest)
-  include(ParseAndAddCatchTests)
-  set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
+  include(Catch)
 
   foreach(ARG1 RANGE 1 1)
-    set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
-    set(AdditionalCatchParameters WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    parseandaddcatchtests(unit_tests_mpiany)
-    unset(OptionalCatchTestLauncher)
-    unset(AdditionalCatchParameters)
-
+    catch_discover_tests(
+      unit_tests_mpiany
+      WORKING_DIRECTORY
+      ${PROJECT_SOURCE_DIR}/test
+      THUNDEREGG_TEST_EXECUTOR
+      ${MPIEXEC}
+      ${MPIEXEC_NUMPROC_FLAG}
+      ${ARG1})
   endforeach(ARG1 RANGE 3)
 
   function(add_mpi_test ARG1)
-    set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
-    set(AdditionalCatchParameters WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     file(GLOB_RECURSE TEST_MPI${ARG1}_SRC ${PROJECT_SOURCE_DIR}/test
          *_MPI${ARG1}.cpp)
-    add_executable(unit_tests_mpi${ARG1} ${TEST_MPI${ARG1}_SRC} test.cpp
-                                         utils/DomainReader.cpp)
-    target_link_libraries(unit_tests_mpi${ARG1} Thunderegg)
-    target_include_directories(unit_tests_mpi${ARG1}
-                               PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-    parseandaddcatchtests(unit_tests_mpi${ARG1})
-    unset(OptionalCatchTestLauncher)
-    unset(AdditionalCatchParameters)
+    set(TEST_MPI${ARG1}_PETSC_SRC ${TEST_MPI${ARG1}_SRC})
+
+    list(FILTER TEST_MPI${ARG1}_SRC EXCLUDE REGEX ".*_PETSC_.*")
+    list(FILTER TEST_MPI${ARG1}_PETSC_SRC INCLUDE REGEX ".*_PETSC_.*")
+
+    if(TEST_MPI${ARG1}_SRC)
+      add_executable(unit_tests_mpi${ARG1} ${TEST_MPI${ARG1}_SRC} test.cpp
+                                           utils/DomainReader.cpp)
+      target_link_libraries(unit_tests_mpi${ARG1} Thunderegg)
+      target_include_directories(unit_tests_mpi${ARG1}
+                                 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+      catch_discover_tests(
+        unit_tests_mpi${ARG1}
+        WORKING_DIRECTORY
+        ${PROJECT_SOURCE_DIR}/test
+        THUNDEREGG_TEST_EXECUTOR
+        ${MPIEXEC}
+        ${MPIEXEC_NUMPROC_FLAG}
+        ${ARG1})
+    endif()
+    if(TEST_MPI${ARG1}_PETSC_SRC AND PETSC_FOUND)
+      add_executable(
+        unit_tests_petsc_mpi${ARG1} ${TEST_MPI${ARG1}_PETSC_SRC} test_PETSC.cpp
+                                    utils/DomainReader.cpp)
+      target_link_libraries(unit_tests_petsc_mpi${ARG1} Thunderegg)
+      target_include_directories(unit_tests_petsc_mpi${ARG1}
+                                 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+      catch_discover_tests(
+        unit_tests_petsc_mpi${ARG1}
+        WORKING_DIRECTORY
+        ${PROJECT_SOURCE_DIR}/test
+        EXTRA_ARGS
+        -x
+        10
+        THUNDEREGG_TEST_EXECUTOR
+        ${MPIEXEC}
+        ${MPIEXEC_NUMPROC_FLAG}
+        ${ARG1})
+    endif()
   endfunction(add_mpi_test)
 
   add_mpi_test(1)
