@@ -55,6 +55,11 @@ template <size_t D> class Side
 	 */
 	static constexpr size_t num_sides = 2 * D;
 	/**
+	 * @brief Default constructor that sets the value to null()
+	 */
+	Side() : val(num_sides) {}
+
+	/**
 	 * @brief Construct a new Side object
 	 *
 	 * @param val_in the value of the side object
