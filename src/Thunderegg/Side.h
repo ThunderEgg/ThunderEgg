@@ -28,9 +28,9 @@
 namespace Thunderegg
 {
 /**
- * @brief An enum-style class that represents the sides of a cube.
+ * @brief An enum-style class that represents the sides of a patch
  *
- * The sides of the cube are named in the following way:
+ * The sides of the patch are named in the following way:
  *
  * Orthogonal to axis | Lower on axis | Higher on axis
  * ------------------ | ------------- | --------------
@@ -38,6 +38,7 @@ namespace Thunderegg
  *  y-axis            | south         | north
  *  z-axis            | bottom        | top
  *
+ * @tparam D the number of cartesian dimensions
  */
 template <size_t D> class Side
 {
@@ -48,33 +49,64 @@ template <size_t D> class Side
 	unsigned char val = num_sides;
 
 	public:
+	/**
+	 * @brief The number of possible side values
+	 *
+	 */
 	static constexpr size_t num_sides = 2 * D;
-	Side() {}
+	/**
+	 * @brief Construct a new Side object
+	 *
+	 * @param val_in the value of the side object
+	 */
 	explicit Side(unsigned char val_in) : val(val_in) {}
+	/**
+	 * @brief Construct a new side object for the western side
+	 */
 	static Side<D> west()
 	{
 		return Side(0);
 	}
+	/**
+	 * @brief Construct a new side object for the eastern side
+	 */
 	static Side<D> east()
 	{
 		return Side(1);
 	}
+	/**
+	 * @brief Construct a new side object for the southern side
+	 */
 	static Side<D> south()
 	{
 		return Side(2);
 	}
+	/**
+	 * @brief Construct a new side object for the northern side
+	 */
 	static Side<D> north()
 	{
 		return Side(3);
 	}
+	/**
+	 * @brief Construct a new side object for the bottom side
+	 */
 	static Side<D> bottom()
 	{
 		return Side(4);
 	}
+	/**
+	 * @brief Construct a new side object for the top side
+	 */
 	static Side<D> top()
 	{
 		return Side(5);
 	}
+	/**
+	 * @brief Construct a new side object with a null value.
+	 *
+	 * The value of the side will be num_sides
+	 */
 	static Side<D> null()
 	{
 		return Side(num_sides);
