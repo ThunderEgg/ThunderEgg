@@ -23,6 +23,9 @@ jobs:
           - libtrilinos-zoltan-dev
     before_script:
         - export BUILD_WRAPPER="build-wrapper-linux-x86-64 --out-dir bw-output"
+        - export CXXFLAGS="-ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
+        - export CFLAGS="-fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
+        - export LDFLAGS="-lgcov"
     after_script: 
         - gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
         - sonar-scanner
@@ -53,9 +56,8 @@ before_install:
   - pip install --user gcovr
   - export CXXFLAGS="-std=c++11"
 script:
-  - export CXXFLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
-  - export CFLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
-  - export LDFLAGS="-lgcov"
+  - export CXXFLAGS="-g -O0 -Wall -W $CXXFLAGS"
+  - export CFLAGS="-g -O0 -Wall -W $CFLAGS"
   - cmake .
   - $BUILD_WRAPPER make
   - ctest -V
