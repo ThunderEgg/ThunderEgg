@@ -60,6 +60,6 @@ script:
   - export CFLAGS="-g -O0 -Wall -W $CFLAGS"
   - cmake .
   - $BUILD_WRAPPER make
-  - ctest -V
+  - ctest --output-on-failure
 after_success:
   - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'
