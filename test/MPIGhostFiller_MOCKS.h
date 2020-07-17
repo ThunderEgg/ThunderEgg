@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_OPERATOR_H
-#define THUNDEREGG_OPERATOR_H
+#ifndef MPIGHOSTFILLER_MOCKS_H
+#define MPIGHOSTFILLER_MOCKS_H
 
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/MPIGhostFiller.h>

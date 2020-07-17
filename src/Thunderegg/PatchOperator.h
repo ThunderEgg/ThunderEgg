@@ -21,11 +21,18 @@
 
 #ifndef THUNDEREGG_PATCHOPERATOR_H
 #define THUNDEREGG_PATCHOPERATOR_H
+#include <Thunderegg/Domain.h>
 #include <Thunderegg/GhostFiller.h>
 #include <Thunderegg/Operator.h>
 #include <Thunderegg/Vector.h>
 namespace Thunderegg
 {
+/**
+ * @brief This is an Operator where derived classes only have to implement the two virtual functions
+ * that operate on single patch.
+ *
+ * @tparam D the number of Cartesian dimensions.
+ */
 template <size_t D> class PatchOperator : public Operator<D>
 {
 	protected:
@@ -39,26 +46,77 @@ template <size_t D> class PatchOperator : public Operator<D>
 	std::shared_ptr<const GhostFiller<D>> ghost_filler;
 
 	public:
+	/**
+	 * @brief Construct a new Patch Operator object
+	 *
+	 *  This sets the Domain and GhostFiller
+	 *
+	 * @param domain_in  the Domain
+	 * @param ghost_filler_in the GhostFiller
+	 */
 	PatchOperator(std::shared_ptr<const Domain<D>>      domain_in,
 	              std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
 	: domain(domain_in), ghost_filler(ghost_filler_in)
 	{
 	}
+	/**
+	 * @brief Destroy the PatchOperator object
+	 */
 	virtual ~PatchOperator() {}
 
+	/**
+	 * @brief Apply the operator to a single patch
+	 *
+	 * The ghost values in u will be updated to the latest values
+	 *
+	 * @param pinfo  the patch
+	 * @param u the right hand side
+	 * @param f the left hand side
+	 */
 	virtual void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
 	                              LocalData<D> f) const = 0;
+	/**
+	 * @brief Treat the internal patch boundaries as an dirichlet boundary condition, and modify the
+	 * RHS accordingly.
+	 *
+	 * This will be used in patch solvers to formulate a RHS for the individual patch to solve for.
+	 *
+	 * @param pinfo the patch
+	 * @param u the left hand side
+	 * @param f the right hand side
+	 */
 	virtual void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                           LocalData<D> f) const    = 0;
+	                           LocalData<D> f) const = 0;
 
-	virtual void apply(std::shared_ptr<const Vector<D>> u,
-	                   std::shared_ptr<Vector<D>>       f) const override
+	/**
+	 * @brief Apply the operator
+	 *
+	 * This will update the ghost values in u, and then will call applySinglePatch for each patch
+	 *
+	 * @param u the left hand side
+	 * @param f the right hand side
+	 */
+	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f) const override
 	{
 		ghost_filler->fillGhost(u);
 		for (auto pinfo : domain->getPatchInfoVector()) {
 			applySinglePatch(pinfo, u->getLocalData(pinfo->local_index),
 			                 f->getLocalData(pinfo->local_index));
 		}
+	}
+	/**
+	 * @brief Get the Domain object associated with this PatchOperator
+	 */
+	std::shared_ptr<const Domain<D>> getDomain() const
+	{
+		return domain;
+	}
+	/**
+	 * @brief Get the GhostFiller object associated with this PatchOperator
+	 */
+	std::shared_ptr<const GhostFiller<D>> getGhostFiller() const
+	{
+		return ghost_filler;
 	}
 };
 } // namespace Thunderegg
