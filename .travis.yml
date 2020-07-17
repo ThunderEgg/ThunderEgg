@@ -1,5 +1,4 @@
 language: cpp
-compiler: gcc
 
 os: linux
 dist: bionic
@@ -8,7 +7,8 @@ apt:
     - sourceline: 'ppa:scottaiton/thunderegg-deps'
 jobs:
   include:
-  - addons:
+  - compiler: gcc
+    addons:
       sonarcloud:
           organization: "thunderegg"
       apt:
@@ -26,7 +26,8 @@ jobs:
     after_script: 
         - gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
         - sonar-scanner
-  - addons:
+  - compiler: gcc
+    addons:
       apt:
         packages:
           - cmake
@@ -36,7 +37,8 @@ jobs:
           - libblas-dev
           - liblapack-dev
           - libtrilinos-zoltan-dev
-  - addons:
+  - compiler: gcc
+    addons:
       apt:
         packages:
           - cmake
