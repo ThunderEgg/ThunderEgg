@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
 	// global setup...
-	MPI_Init(&argc, &argv);
+	MPI_Init(nullptr, nullptr);
 
 	int result = Catch::Session().run(argc, argv);
 

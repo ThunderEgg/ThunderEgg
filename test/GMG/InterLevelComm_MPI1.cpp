@@ -46,30 +46,30 @@ TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLe
 		parents_to_children[pair.first].insert(pair.second->id);
 	}
 	CHECK(parents_to_children.size() == 4);
-	CHECK(parents_to_children.count(0));
-	CHECK(parents_to_children.count(1));
-	CHECK(parents_to_children.count(2));
-	CHECK(parents_to_children.count(3));
+	CHECK(parents_to_children.count(0) == 1);
+	CHECK(parents_to_children.count(1) == 1);
+	CHECK(parents_to_children.count(2) == 1);
+	CHECK(parents_to_children.count(3) == 1);
 
-	CHECK(parents_to_children[0].count(5));
-	CHECK(parents_to_children[0].count(6));
-	CHECK(parents_to_children[0].count(7));
-	CHECK(parents_to_children[0].count(8));
+	CHECK(parents_to_children[0].count(13) == 1);
+	CHECK(parents_to_children[0].count(14) == 1);
+	CHECK(parents_to_children[0].count(15) == 1);
+	CHECK(parents_to_children[0].count(16) == 1);
 
-	CHECK(parents_to_children[1].count(9));
-	CHECK(parents_to_children[1].count(10));
-	CHECK(parents_to_children[1].count(11));
-	CHECK(parents_to_children[1].count(12));
+	CHECK(parents_to_children[1].count(17) == 1);
+	CHECK(parents_to_children[1].count(18) == 1);
+	CHECK(parents_to_children[1].count(19) == 1);
+	CHECK(parents_to_children[1].count(20) == 1);
 
-	CHECK(parents_to_children[2].count(13));
-	CHECK(parents_to_children[2].count(14));
-	CHECK(parents_to_children[2].count(15));
-	CHECK(parents_to_children[2].count(16));
+	CHECK(parents_to_children[2].count(9) == 1);
+	CHECK(parents_to_children[2].count(10) == 1);
+	CHECK(parents_to_children[2].count(11) == 1);
+	CHECK(parents_to_children[2].count(12) == 1);
 
-	CHECK(parents_to_children[3].count(17));
-	CHECK(parents_to_children[3].count(18));
-	CHECK(parents_to_children[3].count(19));
-	CHECK(parents_to_children[3].count(20));
+	CHECK(parents_to_children[3].count(5) == 1);
+	CHECK(parents_to_children[3].count(6) == 1);
+	CHECK(parents_to_children[3].count(7) == 1);
+	CHECK(parents_to_children[3].count(8) == 1);
 }
 TEST_CASE("1-processor getNewGhostVector on uniform 4x4", "[GMG::InterLevelComm]")
 {

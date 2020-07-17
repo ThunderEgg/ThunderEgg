@@ -91,13 +91,11 @@
         },
         {
           "side": "north",
-          "type": "fine",
+          "type": "normal",
           "ids": [
-            5,
-            6
+            4
           ],
           "ranks": [
-            0,
             0
           ],
           "orth_on_coarse": 0
@@ -133,13 +131,11 @@
       "nbrs": [
         {
           "side": "east",
-          "type": "fine",
+          "type": "normal",
           "ids": [
-            5,
-            7
+            4
           ],
           "ranks": [
-            0,
             0
           ],
           "orth_on_coarse": 0

@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
 	// global setup...
-	PetscInitialize(&argc, &argv, nullptr, nullptr);
+	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
 	int result = Catch::Session().run(argc, argv);
 
