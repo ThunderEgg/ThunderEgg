@@ -9,8 +9,6 @@ jobs:
   include:
   - compiler: clang
     addons:
-      sonarcloud:
-          organization: "thunderegg"
       apt:
         packages:
           - cmake
