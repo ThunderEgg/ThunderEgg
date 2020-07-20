@@ -72,10 +72,10 @@ inline std::ostream &operator<<(std::ostream &os, const NbrType &type)
 	return os;
 }
 
-template <size_t D> struct NbrInfo;
-template <size_t D> struct NormalNbrInfo;
-template <size_t D> struct CoarseNbrInfo;
-template <size_t D> struct FineNbrInfo;
+template <size_t D> class NbrInfo;
+template <size_t D> class NormalNbrInfo;
+template <size_t D> class CoarseNbrInfo;
+template <size_t D> class FineNbrInfo;
 
 /**
  * @brief Contains useful information for a patch
