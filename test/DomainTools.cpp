@@ -297,7 +297,7 @@ TEST_CASE("DomainTools::GetRealCoordBound 2D", "[getRealCoord][DomainTools]")
 		CHECK(result[1] + 100 == Approx(expected[1] + 100));
 	}
 }
-TEST_CASE("DomainTools::setValues 1D f(x)=x", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 1> coord) { return coord[0]; };
 
@@ -330,7 +330,7 @@ TEST_CASE("DomainTools::setValues 1D f(x)=x", "[DomainTools]")
 		}
 	});
 }
-TEST_CASE("DomainTools::setValues 1D f(x)=x^2", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 1> coord) { return coord[0] * coord[0]; };
 
@@ -363,7 +363,7 @@ TEST_CASE("DomainTools::setValues 1D f(x)=x^2", "[DomainTools]")
 		}
 	});
 }
-TEST_CASE("DomainTools::setValues 2D f(x,y)=x+y", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 
@@ -399,7 +399,7 @@ TEST_CASE("DomainTools::setValues 2D f(x,y)=x+y", "[DomainTools]")
 		}
 	});
 }
-TEST_CASE("DomainTools::setValues 2D f(x,y)=x*y", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
@@ -435,7 +435,7 @@ TEST_CASE("DomainTools::setValues 2D f(x,y)=x*y", "[DomainTools]")
 		}
 	});
 }
-TEST_CASE("DomainTools::setValuesWithGhost 1D f(x)=x", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 1D f=x", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 1> coord) { return coord[0]; };
 
@@ -464,7 +464,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f(x)=x", "[DomainTools]")
 		CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 	});
 }
-TEST_CASE("DomainTools::setValuesWithGhost 1D f(x)=x^2", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 1> coord) { return coord[0] * coord[0]; };
 
@@ -493,7 +493,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f(x)=x^2", "[DomainTools]")
 		CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 	});
 }
-TEST_CASE("DomainTools::setValuesWithGhost 2D f(x,y)=x+y", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 
@@ -525,7 +525,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f(x,y)=x+y", "[DomainTools]")
 		CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 	});
 }
-TEST_CASE("DomainTools::setValuesWithGhost 2D f(x,y)=x*y", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
