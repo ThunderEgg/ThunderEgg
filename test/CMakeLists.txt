@@ -32,7 +32,12 @@ if(PETSC_FOUND)
       THUNDEREGG_TEST_EXECUTOR
       ${MPIEXEC}
       ${MPIEXEC_NUMPROC_FLAG}
-      ${ARG1})
+      ${ARG1}
+      THUNDEREGG_SINGLE_EXECUTOR
+      ${MPIEXEC}
+      ${MPIEXEC_NUMPROC_FLAG}
+      1
+      -q)
   endforeach(ARG1 RANGE 3)
 
   function(add_mpi_test ARG1)
@@ -56,7 +61,12 @@ if(PETSC_FOUND)
         THUNDEREGG_TEST_EXECUTOR
         ${MPIEXEC}
         ${MPIEXEC_NUMPROC_FLAG}
-        ${ARG1})
+        ${ARG1}
+        THUNDEREGG_SINGLE_EXECUTOR
+        ${MPIEXEC}
+        ${MPIEXEC_NUMPROC_FLAG}
+        1
+        -q)
     endif()
     if(TEST_MPI${ARG1}_PETSC_SRC AND PETSC_FOUND)
       add_executable(
@@ -75,7 +85,12 @@ if(PETSC_FOUND)
         THUNDEREGG_TEST_EXECUTOR
         ${MPIEXEC}
         ${MPIEXEC_NUMPROC_FLAG}
-        ${ARG1})
+        ${ARG1}
+        THUNDEREGG_SINGLE_EXECUTOR
+        ${MPIEXEC}
+        ${MPIEXEC_NUMPROC_FLAG}
+        1
+        -q)
     endif()
   endfunction(add_mpi_test)
 
