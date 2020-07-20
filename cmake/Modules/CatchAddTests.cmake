@@ -31,6 +31,7 @@ endif()
 execute_process(
   COMMAND ${TEST_EXECUTOR} "${TEST_EXECUTABLE}" ${spec} --list-test-names-only
   OUTPUT_VARIABLE output
+  ERROR_VARIABLE error
   RESULT_VARIABLE result
 )
 # Catch --list-test-names-only reports the number of tests, so 0 is... surprising
