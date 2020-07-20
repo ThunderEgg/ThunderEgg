@@ -72,7 +72,7 @@ template <int D, typename T, typename A> class NestedLoop<D, 0, T, A>
 template <typename T, typename A> class NestedLoop<0, -1, T, A>
 {
 	public:
-	static void inline nested_loop_loop(A coord, A start, A end, T lambda)
+	static void inline nested_loop_loop(A coord, A, A, T lambda)
 	{
 		lambda(coord);
 	}
