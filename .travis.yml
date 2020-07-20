@@ -74,6 +74,8 @@ script:
   - export CFLAGS="-g -O0 -Wall -W $CFLAGS"
   - cmake .
   - $BUILD_WRAPPER make
+  - if [ $? -eq 0]; then
+      ctest --output-on-failure
+    fi
 after_success:
-  - ctest --output-on-failure
   - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'
