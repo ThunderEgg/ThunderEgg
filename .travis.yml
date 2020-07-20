@@ -71,6 +71,7 @@ script:
   - export CXXFLAGS="-g -O0 -Wall -W $CXXFLAGS"
   - export CFLAGS="-g -O0 -Wall -W $CFLAGS"
   - cmake .
-  - $BUILD_WRAPPER make && ctest --output-on-failure
+  - $BUILD_WRAPPER make
+  - ctest --output-on-failure
 after_success:
   - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'
