@@ -942,7 +942,7 @@ template <size_t D> inline void PatchInfo<D>::updateRank(int rank)
 		}
 	}
 }
-extern template class PatchInfo<2>;
-extern template class PatchInfo<3>;
+extern template struct PatchInfo<2>;
+extern template struct PatchInfo<3>;
 } // namespace Thunderegg
 #endif

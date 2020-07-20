@@ -20,5 +20,5 @@
  ***************************************************************************/
 
 #include <Thunderegg/PatchInfo.h>
-template class Thunderegg::PatchInfo<2>;
-template class Thunderegg::PatchInfo<3>;
+template struct Thunderegg::PatchInfo<2>;
+template struct Thunderegg::PatchInfo<3>;
