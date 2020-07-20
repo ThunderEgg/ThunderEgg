@@ -75,7 +75,7 @@ script:
   - cmake .
   - $BUILD_WRAPPER make
   - if [ $? -eq 0]; then
-      ctest --output-on-failure
-    fi
+  -   ctest --output-on-failure
+  - fi
 after_success:
   - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'
