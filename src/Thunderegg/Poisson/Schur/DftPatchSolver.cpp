@@ -21,7 +21,8 @@
 
 #include "DftPatchSolver.h"
 
-using namespace Thunderegg::Poisson::Schur;
-
+namespace Thunderegg::Poisson::Schur
+{
 template class DftPatchSolver<2>;
 template class DftPatchSolver<3>;
+} // namespace Thunderegg::Poisson::Schur
