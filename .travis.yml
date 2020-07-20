@@ -7,6 +7,20 @@ apt:
     - sourceline: 'ppa:scottaiton/thunderegg-deps'
 jobs:
   include:
+  - compiler: clang
+    addons:
+      sonarcloud:
+          organization: "thunderegg"
+      apt:
+        packages:
+          - cmake
+          - libfftw3-dev
+          - libopenmpi-dev
+          - openmpi-bin
+          - petsc-dev
+          - libblas-dev
+          - liblapack-dev
+          - libtrilinos-zoltan-dev
   - compiler: gcc
     addons:
       sonarcloud:
