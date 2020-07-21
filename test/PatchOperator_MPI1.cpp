@@ -34,7 +34,7 @@ TEST_CASE("Check PatchOperator calls for various domains", "[PatchOperator]")
 	CHECK(mgf->wasCalled());
 	CHECK(mpo.allPatchesCalled());
 }
-TEST_CASE("PatchOperator check getDomain()", "[PatchOperator]")
+TEST_CASE("PatchOperator check getDomain", "[PatchOperator]")
 {
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
@@ -53,7 +53,7 @@ TEST_CASE("PatchOperator check getDomain()", "[PatchOperator]")
 
 	CHECK(mpo.getDomain() == d_fine);
 }
-TEST_CASE("PatchOperator check getGhostFiller()", "[PatchOperator]")
+TEST_CASE("PatchOperator check getGhostFiller", "[PatchOperator]")
 {
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);

@@ -1,6 +1,9 @@
 list(APPEND Thunderegg_HDRS Thunderegg/Poisson/StarPatchOperator.h)
 list(APPEND Thunderegg_SRCS Thunderegg/Poisson/StarPatchOperator.cpp)
 
+list(APPEND Thunderegg_HDRS Thunderegg/Poisson/DftPatchSolver.h)
+list(APPEND Thunderegg_SRCS Thunderegg/Poisson/DftPatchSolver.cpp)
+
 if(PETSC_FOUND)
   list(APPEND Thunderegg_HDRS Thunderegg/Poisson/MatrixHelper.h)
   list(APPEND Thunderegg_SRCS Thunderegg/Poisson/MatrixHelper.cpp)
