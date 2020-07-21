@@ -69,6 +69,7 @@ before_install:
   - export CXXFLAGS="-std=c++11"
 script:
   - export CXXFLAGS="-g -O0 -Wall -W $CXXFLAGS"
+  - echo $CXXFLAGS
   - export CFLAGS="-g -O0 -Wall -W $CFLAGS"
   - cmake .
   - $BUILD_WRAPPER make
