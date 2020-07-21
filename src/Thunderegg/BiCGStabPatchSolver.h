@@ -163,22 +163,17 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 
 	public:
 	/**
-	 * @brief Construct a new BiCGStabSolver object
+	 * @brief Construct a new BiCGStabPatchSolver object
 	 *
-	 * @param op the operator to use
-	 * @param tol the tolerance
-	 * @param max_it the maximum iterations
+	 * @param op_in the PatchOperator to use
+	 * @param tol_in the tolerance to use for patch solves
+	 * @param max_it_in the maximum number of iterations to use for patch solves
 	 */
-	BiCGStabPatchSolver(std::shared_ptr<const Domain<D>>        domain,
-	                    std::shared_ptr<const GhostFiller<D>>   ghost_filler,
-	                    std::shared_ptr<const PatchOperator<D>> op, double tol = 1e-12,
-	                    int max_it = 1000)
+	BiCGStabPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in, double tol_in = 1e-12,
+	                    int max_it_in = 1000)
+	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), op(op_in), tol(tol_in),
+	  max_it(max_it_in)
 	{
-		this->domain       = domain;
-		this->ghost_filler = ghost_filler;
-		this->op           = op;
-		this->tol          = tol;
-		this->max_it       = max_it;
 	}
 	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
 	                      const LocalData<D> f) const override
@@ -269,8 +264,7 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 			if (solver != nullptr) {
 				return solver;
 			}
-			solver.reset(new BiCGStabPatchSolver<D>(level->getDomain(), filler_gen(level),
-			                                        op_gen(level), tol, max_it));
+			solver.reset(new BiCGStabPatchSolver<D>(op_gen(level), tol, max_it));
 			solver->setTimer(timer);
 			return solver;
 		}

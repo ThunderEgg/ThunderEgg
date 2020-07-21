@@ -539,8 +539,7 @@ int main(int argc, char *argv[])
 		StarPatchOperator<2>::addDrichletBCToRHS(domain, f, gfun, hfun);
 
 		// set the patch solver
-		auto p_solver
-		= make_shared<BiCGStabPatchSolver<2>>(domain, gf, p_operator, ps_tol, ps_max_it);
+		auto p_solver = make_shared<BiCGStabPatchSolver<2>>(p_operator, ps_tol, ps_max_it);
 		p_solver->setTimer(timer);
 
 		if (neumann && !no_zero_rhs_avg) {

@@ -263,7 +263,13 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 	}
 
 	public:
-	DftPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in)
+	/**
+	 * @brief Construct a new DftPatchSolver object
+	 *
+	 * @param patch_op the Poisson PatchOperator that cooresponds to this DftPatchSolver
+	 */
+	DftPatchSolver(std::shared_ptr<const PatchOperator<D>> patch_op)
+	: PatchSolver<D>(patch_op->getDomain(), patch_op->getGhostFiller())
 	{
 		/*
 		f_copy = std::make_shared<ValVector<D>>(MPI_COMM_SELF, domain->getNs(), 0, 1);

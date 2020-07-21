@@ -54,6 +54,19 @@ template <size_t D> class PatchSolver : public virtual Operator<D>, public virtu
 
 	public:
 	/**
+	 * @brief Construct a new PatchSolver object
+	 *
+	 * 	This sets the Domain and the GhostFiller that the object uses.
+	 *
+	 * @param domain_in the Domain
+	 * @param ghost_filler_in the GhostFiller
+	 */
+	PatchSolver(std::shared_ptr<const Domain<D>>      domain_in,
+	            std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
+	: domain(domain_in), ghost_filler(ghost_filler_in)
+	{
+	}
+	/**
 	 * @brief Destroy the Patch Solver object
 	 */
 	virtual ~PatchSolver() {}
