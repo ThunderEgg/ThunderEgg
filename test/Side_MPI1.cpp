@@ -555,3 +555,33 @@ TEST_CASE("< operator works for Side<3>", "[Side]")
 	CHECK_FALSE(Side<3>::null() < Side<3>::top());
 	CHECK_FALSE(Side<3>::null() < Side<3>::null());
 }
+TEST_CASE("LowerSideOnAxis works for Side<3>", "[Side]")
+{
+	CHECK(Side<3>::LowerSideOnAxis(0) == Side<3>::west());
+	CHECK(Side<3>::LowerSideOnAxis(1) == Side<3>::south());
+	CHECK(Side<3>::LowerSideOnAxis(2) == Side<3>::bottom());
+}
+TEST_CASE("LowerSideOnAxis works for Side<2>", "[Side]")
+{
+	CHECK(Side<2>::LowerSideOnAxis(0) == Side<2>::west());
+	CHECK(Side<2>::LowerSideOnAxis(1) == Side<2>::south());
+}
+TEST_CASE("LowerSideOnAxis works for Side<1>", "[Side]")
+{
+	CHECK(Side<1>::LowerSideOnAxis(0) == Side<1>::west());
+}
+TEST_CASE("HigherSideOnAxis works for Side<3>", "[Side]")
+{
+	CHECK(Side<3>::HigherSideOnAxis(0) == Side<3>::east());
+	CHECK(Side<3>::HigherSideOnAxis(1) == Side<3>::north());
+	CHECK(Side<3>::HigherSideOnAxis(2) == Side<3>::top());
+}
+TEST_CASE("HigherSideOnAxis works for Side<2>", "[Side]")
+{
+	CHECK(Side<2>::HigherSideOnAxis(0) == Side<2>::east());
+	CHECK(Side<2>::HigherSideOnAxis(1) == Side<2>::north());
+}
+TEST_CASE("HigherSideOnAxis works for Side<1>", "[Side]")
+{
+	CHECK(Side<1>::HigherSideOnAxis(0) == Side<1>::east());
+}

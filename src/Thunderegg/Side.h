@@ -66,6 +66,26 @@ template <size_t D> class Side
 	 */
 	explicit Side(unsigned char val_in) : val(val_in) {}
 	/**
+	 * @brief Get the side that is lower on the specified axis
+	 *
+	 * @param axis the axis
+	 * @return Side<D> the resulting side
+	 */
+	static Side<D> LowerSideOnAxis(size_t axis)
+	{
+		return Side<D>(2 * axis);
+	}
+	/**
+	 * @brief Get the side that is higher on the specified axis
+	 *
+	 * @param axis the axis
+	 * @return Side<D> the resulting side
+	 */
+	static Side<D> HigherSideOnAxis(size_t axis)
+	{
+		return Side<D>(2 * axis + 1);
+	}
+	/**
 	 * @brief Construct a new side object for the western side
 	 */
 	static Side<D> west()
