@@ -43,6 +43,7 @@ TEST_CASE("Test Poisson::DftPatchSolver gets 2nd order convergence", "[Poisson::
 	int    num_ghost = 1;
 	double errors[2];
 	for (int i = 1; i <= 2; i++) {
+		INFO("MULT      " << i);
 		DomainReader<2>       domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
 		shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
@@ -73,7 +74,7 @@ TEST_CASE("Test Poisson::DftPatchSolver gets 2nd order convergence", "[Poisson::
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine);
 		error_vec->addScaled(1.0, g_vec, -1.0, g_vec_expected);
-		errors[i] = error_vec->twoNorm() / g_vec_expected->twoNorm();
+		errors[i - 1] = error_vec->twoNorm() / g_vec_expected->twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
