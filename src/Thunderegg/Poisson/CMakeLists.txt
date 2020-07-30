@@ -4,6 +4,13 @@ list(APPEND Thunderegg_SRCS Thunderegg/Poisson/StarPatchOperator.cpp)
 list(APPEND Thunderegg_HDRS Thunderegg/Poisson/DftPatchSolver.h)
 list(APPEND Thunderegg_SRCS Thunderegg/Poisson/DftPatchSolver.cpp)
 
+if(FFTW_FOUND)
+
+  list(APPEND Thunderegg_HDRS Thunderegg/Poisson/FFTWPatchSolver.h)
+  list(APPEND Thunderegg_SRCS Thunderegg/Poisson/FFTWPatchSolver.cpp)
+
+endif(FFTW_FOUND)
+
 if(PETSC_FOUND)
   list(APPEND Thunderegg_HDRS Thunderegg/Poisson/MatrixHelper.h)
   list(APPEND Thunderegg_SRCS Thunderegg/Poisson/MatrixHelper.cpp)
