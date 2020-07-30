@@ -107,6 +107,11 @@ template <size_t D> class PetscVector : public Vector<D>
 		} else {
 			this->num_local_patches = num_local_patches;
 		}
+		int num_cells_in_patch = 1;
+		for (size_t i = 0; i < D; i++) {
+			num_cells_in_patch *= this->lengths[i];
+		}
+		this->num_local_cells = this->num_local_patches * num_cells_in_patch;
 	}
 
 	/**
@@ -210,6 +215,10 @@ template <size_t D> class PetscVector : public Vector<D>
 	    }
 	}
 	*/
+	int getNumGhostCells() const
+	{
+		return num_ghost_cells;
+	}
 };
 
 } // namespace Thunderegg

@@ -55,6 +55,12 @@ template <size_t D> class ValVector : public Vector<D>
 		patch_stride = size;
 		size *= num_patches;
 		vec.resize(size);
+
+		int num_cells_in_patch = 1;
+		for (size_t i = 0; i < D; i++) {
+			num_cells_in_patch *= this->lengths[i];
+		}
+		this->num_local_cells = this->num_local_patches * num_cells_in_patch;
 	}
 	~ValVector() = default;
 	static std::shared_ptr<ValVector<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain)

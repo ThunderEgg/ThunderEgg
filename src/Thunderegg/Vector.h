@@ -276,6 +276,11 @@ template <size_t D> class Vector
 	 */
 	int num_local_patches;
 	/**
+	 * @brief The number of local cells in the vector
+	 * This exclude ghost cells
+	 */
+	int num_local_cells;
+	/**
 	 * @brief the mpi comm
 	 */
 	MPI_Comm comm;
@@ -292,11 +297,24 @@ template <size_t D> class Vector
 	 */
 	virtual ~Vector(){};
 	/**
+	 * @brief get the MPI Comm that this vector uses
+	 *
+	 * @return MPI_Comm the comm
+	 */
+	MPI_Comm getMPIComm() const
+	{
+		return comm;
+	}
+	/**
 	 * @brief Get the number of local patches
 	 */
 	int getNumLocalPatches() const
 	{
 		return num_local_patches;
+	}
+	int getNumLocalCells() const
+	{
+		return num_local_cells;
 	}
 	/**
 	 * @brief Get the LocalData object for the specified path
@@ -512,6 +530,7 @@ template <size_t D> class Vector
 template <size_t D> class VectorGenerator
 {
 	public:
+	virtual ~VectorGenerator() {}
 	virtual std::shared_ptr<Vector<D>> getNewVector() = 0;
 };
 extern template class LocalData<1>;

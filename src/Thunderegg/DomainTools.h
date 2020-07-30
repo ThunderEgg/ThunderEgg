@@ -39,8 +39,8 @@ template <size_t D> struct DomainTools {
 	 * If one of the values is -1 or ns[axis] it will give the coordinate of the cooresponding
 	 * interface
 	 */
-	static void getRealCoord(std::shared_ptr<PatchInfo<D>> pinfo, const std::array<int, D> &coord,
-	                         std::array<double, D> &real_coord)
+	static void getRealCoord(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                         const std::array<int, D> &coord, std::array<double, D> &real_coord)
 	{
 		loop<0, D - 1>([&](int dir) {
 			if (coord[dir] == -1) {
@@ -56,9 +56,9 @@ template <size_t D> struct DomainTools {
 	/**
 	 * @brief Given a path info object, get the coordinate from a given index into the patch.
 	 */
-	static void getRealCoordGhost(std::shared_ptr<PatchInfo<D>> pinfo,
-	                              const std::array<int, D> &    coord,
-	                              std::array<double, D> &       real_coord)
+	static void getRealCoordGhost(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                              const std::array<int, D> &          coord,
+	                              std::array<double, D> &             real_coord)
 	{
 		loop<0, D - 1>([&](int dir) {
 			real_coord[dir]
@@ -69,7 +69,7 @@ template <size_t D> struct DomainTools {
 	 * @brief Given a path info object and a side of the patch, get the coordinate from a given
 	 * index into the interface of the patch.
 	 */
-	static void getRealCoordBound(std::shared_ptr<PatchInfo<D>> pinfo,
+	static void getRealCoordBound(std::shared_ptr<const PatchInfo<D>> pinfo,
 	                              const std::array<int, D - 1> &coord, Side<D> s,
 	                              std::array<double, D> &real_coord)
 	{

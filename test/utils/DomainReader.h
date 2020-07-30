@@ -25,6 +25,7 @@
 template <size_t D> class DomainReader
 {
 	private:
+	bool                                      neumann;
 	std::array<int, 2>                        ns;
 	int                                       num_ghost;
 	std::shared_ptr<Thunderegg::Domain<2>>    coarser_domain;
@@ -102,12 +103,18 @@ template <size_t D> class DomainReader
 					throw "parsing error";
 			}
 		}
+		for (Thunderegg::Side<D> s : Thunderegg::Side<D>::getValues()) {
+			if (!pinfo->hasNbr(s)) {
+				pinfo->neumann[s.getIndex()] = neumann;
+			}
+		}
 		return pinfo;
 	}
 
 	public:
-	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in)
-	: ns(ns_in), num_ghost(num_ghost_in)
+	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in,
+	             bool neumann_in = false)
+	: ns(ns_in), num_ghost(num_ghost_in), neumann(neumann_in)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);

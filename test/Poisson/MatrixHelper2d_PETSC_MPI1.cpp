@@ -21,7 +21,7 @@
 
 #include "../utils/DomainReader.h"
 #include "catch.hpp"
-#include <Thunderegg/BiLinearGhostFiller.h>
+#include <Thunderegg/BiQuadraticGhostFiller.h>
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/GMG/LinearRestrictor.h>
 #include <Thunderegg/PetscMatOp.h>
@@ -55,7 +55,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 	auto g_vec = PetscVector<2>::GetNewVector(d_fine);
 	DomainTools<2>::setValues(d_fine, g_vec, gfun);
 
-	auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 	p_operator->apply(g_vec, f_vec_expected);
 
@@ -64,15 +64,21 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 	auto                    m_operator = make_shared<PetscMatOp<2>>(mh.formCRSMatrix());
 	m_operator->apply(g_vec, f_vec);
 
+	REQUIRE(f_vec->infNorm() > 0);
+
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo->id);
 		INFO("x:     " << pinfo->starts[0]);
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
+		INFO("dx:    " << pinfo->spacings[0]);
+		INFO("dy:    " << pinfo->spacings[1]);
 		LocalData<2> f_vec_ld          = f_vec->getLocalData(pinfo->local_index);
 		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(pinfo->local_index);
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+			INFO("xi:    " << coord[0]);
+			INFO("yi:    " << coord[1]);
 			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
 		});
 	}

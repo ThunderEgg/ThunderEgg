@@ -36,6 +36,63 @@ template <size_t D> class PetscMatOp : public Operator<D>
 {
 	private:
 	PW<Mat> A;
+	Vec     getPetscVecWithoutGhost(std::shared_ptr<const Vector<D>> vec) const
+	{
+		Vec                                   petsc_vec;
+		std::shared_ptr<const PetscVector<D>> petsc_vec_ptr
+		= std::dynamic_pointer_cast<const PetscVector<D>>(vec);
+		if (petsc_vec_ptr != nullptr && petsc_vec_ptr->getNumGhostCells() == 0) {
+			petsc_vec = petsc_vec_ptr->vec;
+		} else {
+			// have to create a new petsc vector without ghostcells for petsc call
+			VecCreateMPI(vec->getMPIComm(), vec->getNumLocalCells(), PETSC_DETERMINE, &petsc_vec);
+		}
+		return petsc_vec;
+	}
+	void copyToPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
+	{
+		std::shared_ptr<const PetscVector<D>> petsc_vec_ptr
+		= std::dynamic_pointer_cast<const PetscVector<D>>(vec);
+		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
+			double *petsc_vec_view;
+			size_t  curr_index = 0;
+			VecGetArray(petsc_vec, &petsc_vec_view);
+			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
+				const LocalData<D> ld = vec->getLocalData(i);
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+					petsc_vec_view[curr_index] = ld[coord];
+					curr_index++;
+				});
+			}
+			VecRestoreArray(petsc_vec, &petsc_vec_view);
+		}
+	}
+	void copyToVec(Vec petsc_vec, std::shared_ptr<Vector<D>> vec) const
+	{
+		std::shared_ptr<PetscVector<D>> petsc_vec_ptr
+		= std::dynamic_pointer_cast<PetscVector<D>>(vec);
+		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
+			const double *petsc_vec_view;
+			size_t        curr_index = 0;
+			VecGetArrayRead(petsc_vec, &petsc_vec_view);
+			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
+				LocalData<D> ld = vec->getLocalData(i);
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+					ld[coord] = petsc_vec_view[curr_index];
+					curr_index++;
+				});
+			}
+			VecRestoreArrayRead(petsc_vec, &petsc_vec_view);
+		}
+	}
+	void destroyPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
+	{
+		std::shared_ptr<const PetscVector<D>> petsc_vec_ptr
+		= std::dynamic_pointer_cast<const PetscVector<D>>(vec);
+		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
+			VecDestroy(&petsc_vec);
+		}
+	}
 
 	public:
 	PetscMatOp(PW<Mat> A)
@@ -50,10 +107,17 @@ template <size_t D> class PetscMatOp : public Operator<D>
 	 */
 	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 	{
-		const PetscVector<D> *x_vec = dynamic_cast<const PetscVector<D> *>(x.get());
-		PetscVector<D> *      b_vec = dynamic_cast<PetscVector<D> *>(b.get());
-		if (x_vec == nullptr || b_vec == nullptr) { throw 3; }
-		MatMult(A, x_vec->vec, b_vec->vec);
+		Vec petsc_x = getPetscVecWithoutGhost(x);
+		copyToPetscVec(x, petsc_x);
+
+		Vec petsc_b = getPetscVecWithoutGhost(b);
+
+		MatMult(A, petsc_x, petsc_b);
+
+		copyToVec(petsc_b, b);
+
+		destroyPetscVec(x, petsc_x);
+		destroyPetscVec(b, petsc_b);
 	}
 };
 } // namespace Thunderegg

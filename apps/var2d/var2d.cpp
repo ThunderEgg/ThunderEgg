@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
 		shared_ptr<BiLinearGhostFiller>  gf(new BiLinearGhostFiller(domain));
 		shared_ptr<StarPatchOperator<2>> p_operator(new StarPatchOperator<2>(h, domain, gf));
 		// shared_ptr<fivePoint> p_operator(new fivePoint(domain, gf));
-		StarPatchOperator<2>::addDrichletBCToRHS(domain, f, gfun, hfun);
+		p_operator->addDrichletBCToRHS(f, gfun, hfun);
 
 		// set the patch solver
 		auto p_solver = make_shared<BiCGStabPatchSolver<2>>(p_operator, ps_tol, ps_max_it);
