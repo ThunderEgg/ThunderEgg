@@ -38,6 +38,13 @@ namespace VarPoisson
 struct StarPatchOperatorException : std::runtime_error {
 	StarPatchOperatorException(std::string message) : std::runtime_error(message){};
 };
+/**
+ * @brief Implements a variable coefficient Laplacian f=Div[h*Grad[u]]
+ *
+ * h is a cell-centered coefficient
+ *
+ * @tparam D the number of Cartesian dimensions
+ */
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	protected:
@@ -49,6 +56,13 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	}
 
 	public:
+	/**
+	 * @brief Construct a new StarPatchOperator object
+	 *
+	 * @param coeffs_in the cell centered coefficients
+	 * @param domain_in the Domain associated with the operator
+	 * @param ghost_filler_in the GhostFiller to use before calling applySinglePatch
+	 */
 	StarPatchOperator(std::shared_ptr<const Vector<D>>      coeffs_in,
 	                  std::shared_ptr<const Domain<D>>      domain_in,
 	                  std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
@@ -126,18 +140,17 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	/**
 	 * @brief Helper function for adding Dirichlet boundary conditions to right hand side.
 	 *
-	 * @param domain The domain associated with the vector
 	 * @param f the right hand side vector
 	 * @param gfunc the exact solution
 	 * @param hfunc the coefficients
 	 */
-	static void addDrichletBCToRHS(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> f,
-	                               std::function<double(const std::array<double, D> &)> gfunc,
-	                               std::function<double(const std::array<double, D> &)> hfunc)
+	void addDrichletBCToRHS(std::shared_ptr<Vector<D>>                           f,
+	                        std::function<double(const std::array<double, D> &)> gfunc,
+	                        std::function<double(const std::array<double, D> &)> hfunc)
 	{
 		for (int i = 0; i < f->getNumLocalPatches(); i++) {
 			LocalData<D> f_ld  = f->getLocalData(i);
-			auto         pinfo = domain->getPatchInfoVector()[i];
+			auto         pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo->hasNbr(s)) {
 					double           h2 = pow(pinfo->spacings[s.getAxisIndex()], 2);
@@ -152,8 +165,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 						} else {
 							other_real_coord[s.getAxisIndex()] += pinfo->spacings[s.getAxisIndex()];
 						}
-						ld[coord] += gfunc(real_coord)
-						             * (hfunc(real_coord) + hfunc(other_real_coord)) / (2 * h2);
+						ld[coord] -= 2 * gfunc(real_coord) * hfunc(real_coord) / h2;
 					});
 				}
 			}
