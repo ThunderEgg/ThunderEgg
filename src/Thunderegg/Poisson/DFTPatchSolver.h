@@ -127,8 +127,10 @@ template <size_t D> class DFTPatchSolver : public PatchSolver<D>
 		std::shared_ptr<std::valarray<double>> matrix_ptr;
 
 		if (transform_matrixes.count(std::make_tuple(type, n)) == 0) {
-			matrix_ptr.reset(new std::valarray<double>(n * n));
-			std::valarray<double> &matrix = *matrix_ptr;
+			matrix_ptr = std::make_shared<std::valarray<double>>(n * n);
+			transform_matrixes[std::make_tuple(type, n)] = matrix_ptr;
+			std::valarray<double> &matrix                = *matrix_ptr;
+
 			switch (type) {
 				case DftType::DCT_II:
 					for (int j = 0; j < n; j++) {
@@ -180,8 +182,6 @@ template <size_t D> class DFTPatchSolver : public PatchSolver<D>
 							matrix[i * n + j] = sin(M_PI / n * ((i + 0.5) * (j + 0.5)));
 						}
 					}
-				default:
-					break;
 			}
 		} else {
 			matrix_ptr = transform_matrixes.at(std::make_tuple(type, n));
