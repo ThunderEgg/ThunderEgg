@@ -97,10 +97,10 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 	/**
 	 * @brief map of DFT transforms for each type and size
 	 */
-	std::map<std::tuple<DftType, int>, std::shared_ptr<std::valarray<double>>> transforms;
+	std::map<std::tuple<DftType, int>, std::shared_ptr<std::valarray<double>>> transform_matrixes;
 
 	/**
-	 * @brief get arrays of coefficients necessary for each transoform.
+	 * @brief get arrays of coefficients necessary for each transform.
 	 *
 	 * @param types the tranforms for each axis
 	 * @return std::array<std::shared_ptr<std::valarray<double>>, D> the coefficients for each
@@ -126,7 +126,7 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 	{
 		std::shared_ptr<std::valarray<double>> matrix_ptr;
 
-		if (transforms.count(std::make_tuple(type, n)) == 0) {
+		if (transform_matrixes.count(std::make_tuple(type, n)) == 0) {
 			matrix_ptr.reset(new std::valarray<double>(n * n));
 			std::valarray<double> &matrix = *matrix_ptr;
 			switch (type) {
@@ -180,10 +180,11 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 							matrix[i * n + j] = sin(M_PI / n * ((i + 0.5) * (j + 0.5)));
 						}
 					}
+				default:
 					break;
 			}
 		} else {
-			matrix_ptr = transforms.at(std::make_tuple(type, n));
+			matrix_ptr = transform_matrixes.at(std::make_tuple(type, n));
 		}
 		return matrix_ptr;
 	}
@@ -320,7 +321,7 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 				sizes[i]   = pinfo->ns[i];
 				ones_size *= pinfo->ns[i];
 			}
-			int curr_stride = all_strides[axis];
+			int input_stride = (int) all_strides[axis];
 			for (size_t i = axis + 1; i < D; i++) {
 				strides[i - 1] = all_strides[i];
 				sizes[i - 1]   = pinfo->ns[i];
@@ -333,18 +334,18 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 			if (pinfo->isNeumann(Side<D>::LowerSideOnAxis(axis))
 			    && pinfo->isNeumann(Side<D>::HigherSideOnAxis(axis))) {
 				for (int xi = 0; xi < n; xi++) {
-					retval[std::gslice(xi * curr_stride, sizes, strides)]
+					retval[std::gslice(xi * input_stride, sizes, strides)]
 					-= 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2) * ones;
 				}
 			} else if (pinfo->isNeumann(Side<D>::LowerSideOnAxis(axis))
 			           || pinfo->isNeumann(Side<D>::HigherSideOnAxis(axis))) {
 				for (int xi = 0; xi < n; xi++) {
-					retval[std::gslice(xi * curr_stride, sizes, strides)]
+					retval[std::gslice(xi * input_stride, sizes, strides)]
 					-= 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2) * ones;
 				}
 			} else {
 				for (int xi = 0; xi < n; xi++) {
-					retval[std::gslice(xi * curr_stride, sizes, strides)]
+					retval[std::gslice(xi * input_stride, sizes, strides)]
 					-= 4 / (h * h) * pow(sin((xi + 1) * M_PI / (2 * n)), 2) * ones;
 				}
 			}
@@ -373,7 +374,7 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 	 *
 	 * @param op_in the Poisson PatchOperator that cooresponds to this DftPatchSolver
 	 */
-	DftPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in)
+	explicit DftPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in)
 	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), op(op_in)
 	{
 		f_copy = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1);
