@@ -7,6 +7,8 @@ list(APPEND Thunderegg_HDRS Thunderegg/BiCGStabPatchSolver.h)
 
 list(APPEND Thunderegg_HDRS Thunderegg/BiLinearGhostFiller.h)
 
+list(APPEND Thunderegg_HDRS Thunderegg/BiQuadraticGhostFiller.h)
+
 list(APPEND Thunderegg_HDRS Thunderegg/BufferIO.h)
 
 list(APPEND Thunderegg_HDRS Thunderegg/Domain.h)
