@@ -38,6 +38,13 @@ namespace Poisson
 struct StarPatchOperatorException : std::runtime_error {
 	StarPatchOperatorException(std::string message) : std::runtime_error(message){};
 };
+/**
+ * @brief Implements 2nd order laplacian operator
+ *
+ * Supports both Dirichlet and Neumann boundary conditions
+ *
+ * @tparam D the number of Cartesian dimensions
+ */
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	private:
@@ -45,11 +52,20 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	{
 		return (axis == 0) ? 0 : 1;
 	}
+	bool neumann;
 
 	public:
+	/**
+	 * @brief Construct a new StarPatchOperator object
+	 *
+	 * @param domain_in the Domain that the operator is associated with
+	 * @param ghost_filler_in the GhostFiller to use before calling applySinglePatch
+	 * @param neumann_in whether or not to use Neumann boundary conditions
+	 */
 	StarPatchOperator(std::shared_ptr<const Domain<D>>      domain_in,
-	                  std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
-	: PatchOperator<D>(domain_in, ghost_filler_in)
+	                  std::shared_ptr<const GhostFiller<D>> ghost_filler_in,
+	                  bool                                  neumann_in = false)
+	: PatchOperator<D>(domain_in, ghost_filler_in), neumann(neumann_in)
 	{
 		if (this->domain->getNumGhostCells() < 1) {
 			throw StarPatchOperatorException(
@@ -63,22 +79,35 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		for (size_t i = 0; i < D; i++) {
 			h2[i] *= h2[i];
 		}
+
 		loop<0, D - 1>([&](int axis) {
-			Side<D> lower_side(axis * 2);
-			Side<D> upper_side(axis * 2 + 1);
+			Side<D> lower_side = Side<D>::LowerSideOnAxis(axis);
+			Side<D> upper_side = Side<D>::HigherSideOnAxis(axis);
 			if (!pinfo->hasNbr(lower_side)) {
 				LocalData<D - 1>       lower = u.getGhostSliceOnSide(lower_side, 1);
 				const LocalData<D - 1> mid   = u.getSliceOnSide(lower_side);
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					lower[coord] = -mid[coord];
-				});
+				if (neumann) {
+					nested_loop<D - 1>(
+					mid.getStart(), mid.getEnd(),
+					[&](std::array<int, D - 1> coord) { lower[coord] = mid[coord]; });
+				} else {
+					nested_loop<D - 1>(
+					mid.getStart(), mid.getEnd(),
+					[&](std::array<int, D - 1> coord) { lower[coord] = -mid[coord]; });
+				}
 			}
 			if (!pinfo->hasNbr(upper_side)) {
 				LocalData<D - 1>       upper = u.getGhostSliceOnSide(upper_side, 1);
 				const LocalData<D - 1> mid   = u.getSliceOnSide(upper_side);
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
-					upper[coord] = -mid[coord];
-				});
+				if (neumann) {
+					nested_loop<D - 1>(
+					mid.getStart(), mid.getEnd(),
+					[&](std::array<int, D - 1> coord) { upper[coord] = mid[coord]; });
+				} else {
+					nested_loop<D - 1>(
+					mid.getStart(), mid.getEnd(),
+					[&](std::array<int, D - 1> coord) { upper[coord] = -mid[coord]; });
+				}
 			}
 			int stride = u.getStrides()[axis];
 			nested_loop<D>(u.getStart(), u.getEnd(), [&](std::array<int, D> coord) {
@@ -110,17 +139,15 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	/**
 	 * @brief Helper function for adding Dirichlet boundary conditions to right hand side.
 	 *
-	 * @param domain The domain associated with the vector
 	 * @param f the right hand side vector
 	 * @param gfunc the exact solution
-	 * @param hfunc the coefficients
 	 */
-	static void addDrichletBCToRHS(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> f,
-	                               std::function<double(const std::array<double, D> &)> gfunc)
+	void addDrichletBCToRHS(std::shared_ptr<Vector<D>>                           f,
+	                        std::function<double(const std::array<double, D> &)> gfunc)
 	{
 		for (int i = 0; i < f->getNumLocalPatches(); i++) {
 			LocalData<D> f_ld  = f->getLocalData(i);
-			auto         pinfo = domain->getPatchInfoVector()[i];
+			auto         pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo->hasNbr(s)) {
 					double           h2 = pow(pinfo->spacings[s.getAxisIndex()], 2);
@@ -131,6 +158,43 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 						DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
 						ld[coord] += -2.0 * gfunc(real_coord) / h2;
 					});
+				}
+			}
+		}
+	}
+	/**
+	 * @brief Helper function for adding Neumann boundary conditions to right hand side.
+	 *
+	 * @param f the right hand side vector
+	 * @param gfunc the exact solution
+	 * @param gfunc_grad the gradient of gfunc
+	 */
+	void addNeumannBCToRHS(
+	std::shared_ptr<Vector<D>> f, std::function<double(const std::array<double, D> &)> gfunc,
+	std::array<std::function<double(const std::array<double, D> &)>, D> gfunc_grad)
+	{
+		for (int i = 0; i < f->getNumLocalPatches(); i++) {
+			LocalData<D> f_ld  = f->getLocalData(i);
+			auto         pinfo = this->domain->getPatchInfoVector()[i];
+			for (Side<D> s : Side<D>::getValues()) {
+				if (!pinfo->hasNbr(s)) {
+					double           h  = pinfo->spacings[s.getAxisIndex()];
+					LocalData<D - 1> ld = f_ld.getSliceOnSide(s);
+					if (s.isLowerOnAxis()) {
+						nested_loop<D - 1>(
+						ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
+							std::array<double, D> real_coord;
+							DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
+							ld[coord] += gfunc_grad[s.getAxisIndex()](real_coord) / h;
+						});
+					} else {
+						nested_loop<D - 1>(
+						ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
+							std::array<double, D> real_coord;
+							DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
+							ld[coord] -= gfunc_grad[s.getAxisIndex()](real_coord) / h;
+						});
+					}
 				}
 			}
 		}
