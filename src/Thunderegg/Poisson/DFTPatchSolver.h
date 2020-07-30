@@ -41,7 +41,7 @@ namespace Poisson
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class DftPatchSolver : public PatchSolver<D>
+template <size_t D> class DFTPatchSolver : public PatchSolver<D>
 {
 	private:
 	/**
@@ -370,11 +370,11 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 
 	public:
 	/**
-	 * @brief Construct a new DftPatchSolver object
+	 * @brief Construct a new DFTPatchSolver object
 	 *
-	 * @param op_in the Poisson PatchOperator that cooresponds to this DftPatchSolver
+	 * @param op_in the Poisson PatchOperator that cooresponds to this DFTPatchSolver
 	 */
-	explicit DftPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in)
+	explicit DFTPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in)
 	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), op(op_in)
 	{
 		f_copy = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1);
@@ -417,8 +417,8 @@ template <size_t D> class DftPatchSolver : public PatchSolver<D>
 	}
 };
 
-extern template class DftPatchSolver<2>;
-extern template class DftPatchSolver<3>;
+extern template class DFTPatchSolver<2>;
+extern template class DFTPatchSolver<3>;
 } // namespace Poisson
 } // namespace Thunderegg
 #endif

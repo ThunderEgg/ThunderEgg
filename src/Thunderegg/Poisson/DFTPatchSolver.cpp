@@ -19,10 +19,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "DftPatchSolver.h"
+#include "DFTPatchSolver.h"
 
-namespace Thunderegg::Poisson
-{
-template class DftPatchSolver<2>;
-template class DftPatchSolver<3>;
-} // namespace Thunderegg::Poisson
+template class Thunderegg::Poisson::DFTPatchSolver<2>;
+template class Thunderegg::Poisson::DFTPatchSolver<3>;

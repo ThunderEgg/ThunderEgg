@@ -24,7 +24,7 @@
 #include <Thunderegg/BiLinearGhostFiller.h>
 #include <Thunderegg/DomainTools.h>
 #include <Thunderegg/GMG/LinearRestrictor.h>
-#include <Thunderegg/Poisson/DftPatchSolver.h>
+#include <Thunderegg/Poisson/DFTPatchSolver.h>
 #include <Thunderegg/Poisson/StarPatchOperator.h>
 #include <Thunderegg/ValVector.h>
 using namespace std;
@@ -32,7 +32,7 @@ using namespace Thunderegg;
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
-TEST_CASE("Test Poisson::DftPatchSolver gets 2nd order convergence", "[Poisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::StarPatchOperator]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
@@ -68,7 +68,7 @@ TEST_CASE("Test Poisson::DftPatchSolver gets 2nd order convergence", "[Poisson::
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-		auto p_solver   = make_shared<Poisson::DftPatchSolver<2>>(p_operator);
+		auto p_solver   = make_shared<Poisson::DFTPatchSolver<2>>(p_operator);
 		p_operator->addDrichletBCToRHS(f_vec, gfun);
 
 		p_solver->smooth(f_vec, g_vec);
@@ -80,7 +80,7 @@ TEST_CASE("Test Poisson::DftPatchSolver gets 2nd order convergence", "[Poisson::
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
 }
-TEST_CASE("Test Poisson::DftPatchSolver gets 2nd order convergence with neumann boundary",
+TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann boundary",
           "[Poisson::StarPatchOperator]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
@@ -127,7 +127,7 @@ TEST_CASE("Test Poisson::DftPatchSolver gets 2nd order convergence with neumann 
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-		auto p_solver   = make_shared<Poisson::DftPatchSolver<2>>(p_operator);
+		auto p_solver   = make_shared<Poisson::DFTPatchSolver<2>>(p_operator);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
 		p_solver->smooth(f_vec, g_vec);
@@ -142,7 +142,7 @@ TEST_CASE("Test Poisson::DftPatchSolver gets 2nd order convergence with neumann 
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
 }
 TEST_CASE(
-"Test Poisson::DftPatchSolver gets 2nd order convergence with neumann boundary single patch",
+"Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann boundary single patch",
 "[Poisson::StarPatchOperator]")
 {
 	auto mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
@@ -189,7 +189,7 @@ TEST_CASE(
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-		auto p_solver   = make_shared<Poisson::DftPatchSolver<2>>(p_operator);
+		auto p_solver   = make_shared<Poisson::DFTPatchSolver<2>>(p_operator);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
 		p_solver->smooth(f_vec, g_vec);

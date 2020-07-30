@@ -1,8 +1,8 @@
 list(APPEND Thunderegg_HDRS Thunderegg/Poisson/StarPatchOperator.h)
 list(APPEND Thunderegg_SRCS Thunderegg/Poisson/StarPatchOperator.cpp)
 
-list(APPEND Thunderegg_HDRS Thunderegg/Poisson/DftPatchSolver.h)
-list(APPEND Thunderegg_SRCS Thunderegg/Poisson/DftPatchSolver.cpp)
+list(APPEND Thunderegg_HDRS Thunderegg/Poisson/DFTPatchSolver.h)
+list(APPEND Thunderegg_SRCS Thunderegg/Poisson/DFTPatchSolver.cpp)
 
 if(FFTW_FOUND)
 
