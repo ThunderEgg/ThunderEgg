@@ -192,7 +192,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 	DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
+	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 	p_operator->addNeumannBCToRHS(f_vec_expected, gfun, {gfun_x, gfun_y});
 
 	p_operator->apply(g_vec, f_vec);
