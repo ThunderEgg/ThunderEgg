@@ -74,3 +74,7 @@ script:
   - ctest --output-on-failure
 after_success:
   - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'
+  - |
+    if [ [ $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop" ]  && $TRAVIS_PULL_REQUEST == "false" ]; then
+      echo testing
+    fi
