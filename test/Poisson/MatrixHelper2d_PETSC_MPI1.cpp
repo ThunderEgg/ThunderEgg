@@ -83,3 +83,54 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 		});
 	}
 }
+TEST_CASE(
+"Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPatchOperator with Neumann BC",
+"[Poisson::MatrixHelper2d]")
+{
+	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+	INFO("MESH FILE " << mesh_file);
+	int                   n         = 32;
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost, true);
+	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+
+	auto gfun = [](const std::array<double, 2> &coord) {
+		double x = coord[0];
+		double y = coord[1];
+		return sinl(M_PI * y) * cosl(2 * M_PI * x);
+	};
+
+	auto f_vec          = PetscVector<2>::GetNewVector(d_fine);
+	auto f_vec_expected = PetscVector<2>::GetNewVector(d_fine);
+
+	auto g_vec = PetscVector<2>::GetNewVector(d_fine);
+	DomainTools<2>::setValues(d_fine, g_vec, gfun);
+
+	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine);
+	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
+	p_operator->apply(g_vec, f_vec_expected);
+
+	// generate matrix with matrix_helper
+	Poisson::MatrixHelper2d mh(d_fine);
+	auto                    m_operator = make_shared<PetscMatOp<2>>(mh.formCRSMatrix());
+	m_operator->apply(g_vec, f_vec);
+
+	REQUIRE(f_vec->infNorm() > 0);
+
+	for (auto pinfo : d_fine->getPatchInfoVector()) {
+		INFO("Patch: " << pinfo->id);
+		INFO("x:     " << pinfo->starts[0]);
+		INFO("y:     " << pinfo->starts[1]);
+		INFO("nx:    " << pinfo->ns[0]);
+		INFO("ny:    " << pinfo->ns[1]);
+		INFO("dx:    " << pinfo->spacings[0]);
+		INFO("dy:    " << pinfo->spacings[1]);
+		LocalData<2> f_vec_ld          = f_vec->getLocalData(pinfo->local_index);
+		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(pinfo->local_index);
+		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+			INFO("xi:    " << coord[0]);
+			INFO("yi:    " << coord[1]);
+			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
+		});
+	}
+}
