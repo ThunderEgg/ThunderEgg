@@ -43,7 +43,7 @@ jobs:
         - sonar-scanner
     after_success:
         - |
-          if [ [ $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop" ]  && $TRAVIS_PULL_REQUEST == "false" ]; then
+          if [[ ( $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop" )  && $TRAVIS_PULL_REQUEST == "false" ]]; then
             echo testing
           fi
   - compiler: gcc
