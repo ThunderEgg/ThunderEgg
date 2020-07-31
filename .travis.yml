@@ -33,6 +33,7 @@ jobs:
           - libblas-dev
           - liblapack-dev
           - libtrilinos-zoltan-dev
+          - doxygen
     before_script:
         - export BUILD_WRAPPER="build-wrapper-linux-x86-64 --out-dir bw-output"
         - export CXXFLAGS="-fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
@@ -40,6 +41,11 @@ jobs:
     after_script: 
         - gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
         - sonar-scanner
+    after_success:
+        - |
+          if [ [ $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop" ]  && $TRAVIS_PULL_REQUEST == "false" ]; then
+            echo testing
+          fi
   - compiler: gcc
     addons:
       apt:
@@ -72,9 +78,3 @@ script:
   - cmake .
   - $BUILD_WRAPPER make
   - ctest --output-on-failure
-after_success:
-  - coveralls --include src --exclude src/Thunderegg/Experimental --gcov-options '\-lp'
-  - |
-    if [ [ $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop" ]  && $TRAVIS_PULL_REQUEST == "false" ]; then
-      echo testing
-    fi
