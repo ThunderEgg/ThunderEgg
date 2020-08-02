@@ -20,6 +20,12 @@ jobs:
           - liblapack-dev
           - libtrilinos-zoltan-dev
   - compiler: gcc
+    env:
+      global:
+        - GH_REPO_NAME: thunderegg.github.io
+        - DOXYFILE: $TRAVIS_BUILD_DIR/Doxyfile
+        - GH_REPO_REF: github.com/ThunderEgg/thunderegg.github.io.git
+        - GH_SUB_DIR: docs/$TRAVIS_BRANCH
     addons:
       sonarcloud:
           organization: "thunderegg"
@@ -44,7 +50,7 @@ jobs:
     after_success:
         - |
           if [[ ( $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop" )  && $TRAVIS_PULL_REQUEST == "false" ]]; then
-            echo testing
+            ./TravisScripts/DeployDocs.sh
           fi
   - compiler: gcc
     addons:
