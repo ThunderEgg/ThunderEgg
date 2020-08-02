@@ -47,11 +47,12 @@ jobs:
     after_script: 
         - gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
         - sonar-scanner
-    after_success:
-        - |
-          if [[ ( $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop" )  && $TRAVIS_PULL_REQUEST == "false" ]]; then
-            ./TravisScripts/DeployDocs.sh
-          fi
+    deploy:
+      provider: script
+      script: bash TravisScripts/Deploy.sh
+      on:
+        all_branches: true
+        condition: $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop"
   - compiler: gcc
     addons:
       apt:
