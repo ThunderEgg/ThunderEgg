@@ -39,6 +39,7 @@ jobs:
           - liblapack-dev
           - libtrilinos-zoltan-dev
           - doxygen
+          - graphviz
     before_script:
         - export BUILD_WRAPPER="build-wrapper-linux-x86-64 --out-dir bw-output"
         - export CXXFLAGS="-fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
