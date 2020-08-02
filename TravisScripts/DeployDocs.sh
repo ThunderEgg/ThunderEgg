@@ -47,7 +47,7 @@ mkdir code_docs
 cd code_docs
 
 # Get the current gh-pages branch
-git clone -b gh-pages https://git@$GH_REPO_REF
+git clone https://git@$GH_REPO_REF
 [ -d $GH_REPO_NAME/$GH_SUB_DIR ] || mkdir -p $GH_REPO_NAME/$GH_SUB_DIR
 cd $GH_REPO_NAME/$GH_SUB_DIR
 
