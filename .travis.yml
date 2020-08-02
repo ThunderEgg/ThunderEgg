@@ -49,7 +49,7 @@ jobs:
         - sonar-scanner
     deploy:
       provider: script
-      script: bash TravisScripts/Deploy.sh
+      script: bash TravisScripts/DeployDocs.sh
       on:
         all_branches: true
         condition: $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop"
