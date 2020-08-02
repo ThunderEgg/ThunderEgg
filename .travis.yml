@@ -47,6 +47,7 @@ jobs:
         - gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
         - sonar-scanner
     deploy:
+      skip_cleanup: true
       provider: script
       script: bash TravisScripts/DeployDocs.sh
       on:
