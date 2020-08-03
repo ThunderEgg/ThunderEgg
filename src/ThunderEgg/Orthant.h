@@ -346,7 +346,7 @@ template <size_t D> class Orthant
 	 */
 	Orthant<D - 1> collapseOnAxis(int axis) const
 	{
-		unsigned int upper_mask = (~0x0) << axis;
+		unsigned int upper_mask = (~0x0U) << axis;
 		return Orthant<D - 1>(((val >> 1) & upper_mask) | (val & ~upper_mask));
 	}
 	/**
@@ -368,8 +368,8 @@ template <size_t D> class Orthant
 	{
 		unsigned int bit_to_insert = s.getAxisIndex();
 		unsigned int set_bit       = s.isLowerOnAxis() ? 0 : 1;
-		unsigned int lower_mask    = ~((~0x0) << bit_to_insert);
-		unsigned int upper_mask    = (~0x0) << (bit_to_insert + 1);
+		unsigned int lower_mask    = ~((~0x0U) << bit_to_insert);
+		unsigned int upper_mask    = (~0x0U) << (bit_to_insert + 1);
 
 		std::array<Orthant<D>, Orthant<D>::num_orthants / 2> retval;
 		for (size_t i = 0; i < Orthant<D>::num_orthants / 2; i++) {
