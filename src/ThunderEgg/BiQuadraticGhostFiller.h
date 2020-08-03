@@ -136,6 +136,9 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 		for (Side<2> side : Side<2>::getValues()) {
 			if (pinfo->hasNbr(side)) {
 				switch (pinfo->getNbrType(side)) {
+					case NbrType::Normal:
+						// nothing need to be done
+						break;
 					case NbrType::Coarse: {
 						auto inner_local_slice = local_data.getSliceOnSide(side, 1);
 						auto local_slice       = local_data.getSliceOnSide(side);

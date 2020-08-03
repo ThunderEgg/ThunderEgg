@@ -47,8 +47,8 @@ TEST_CASE("Check number of local and ghost parents", "[GMG::InterLevelComm]")
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	INFO("RANK " << rank);
-	int                num_ghost_parents = 0;
-	int                num_local_parents = 0;
+	size_t             num_ghost_parents = 0;
+	size_t             num_local_parents = 0;
 	map<int, set<int>> my_local_parents_to_children;
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		if (pinfo->parent_rank == rank) {

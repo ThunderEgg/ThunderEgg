@@ -171,8 +171,8 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 	 */
 	BiCGStabPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in, double tol_in = 1e-12,
 	                    int max_it_in = 1000)
-	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), op(op_in), tol(tol_in),
-	  max_it(max_it_in)
+	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), op(op_in), max_it(max_it_in),
+	  tol(tol_in)
 	{
 	}
 	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,

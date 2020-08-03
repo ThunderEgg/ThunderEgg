@@ -259,7 +259,7 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 											in_matrix_offs.emplace(info.rank, info.id);
 											out_matrix_offs.emplace(info.rank, id);
 										}
-										for (int i = 0; i < Orthant<D - 1>::num_orthants; i++) {
+										for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
 											if (info.fine_ranks[i] != rank) {
 												out_matrix_offs.emplace(info.fine_ranks[i], id);
 											}
@@ -297,7 +297,7 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 									in_matrix_offs.emplace(info.rank, info.id);
 									out_matrix_offs.emplace(info.rank, id);
 								}
-								for (int i = 0; i < Orthant<D - 1>::num_orthants; i++) {
+								for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
 									if (info.fine_ranks[i] != rank) {
 										out_matrix_offs.emplace(info.fine_ranks[i], id);
 									}

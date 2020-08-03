@@ -360,7 +360,7 @@ template <size_t D> class InterLevelComm
 		}
 
 		// finish recvs
-		for (int i = 0; i < rank_and_local_indexes_for_vector.size(); i++) {
+		for (size_t i = 0; i < rank_and_local_indexes_for_vector.size(); i++) {
 			int finished_idx;
 			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx,
 			            MPI_STATUS_IGNORE);
@@ -499,7 +499,7 @@ template <size_t D> class InterLevelComm
 		}
 
 		// finish recvs
-		for (int i = 0; i < rank_and_local_indexes_for_ghost_vector.size(); i++) {
+		for (size_t i = 0; i < rank_and_local_indexes_for_ghost_vector.size(); i++) {
 			int finished_idx;
 			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx,
 			            MPI_STATUS_IGNORE);

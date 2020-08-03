@@ -591,7 +591,7 @@ int main(int argc, char *argv[])
 			// KSPSetFromOptions(solver);
 			// KSPSetOperators(solver, A_petsc, A_petsc);
 			if (M != nullptr) {
-				PC M_petsc;
+				PC M_petsc = nullptr;
 				// KSPGetPC(solver, &M_petsc);
 				PetscShellCreator::getPCShell(M_petsc, M, domain);
 			}
@@ -607,12 +607,14 @@ int main(int argc, char *argv[])
 
 		timer->start("Linear Solve");
 		if (solver_type == "petsc") {
-			// KSPSolve(solver, f->vec, u->vec);
+			/*
+			KSPSolve(solver, f->vec, u->vec);
 			int its;
-			// KSPGetIterationNumber(solver, &its);
+			KSPGetIterationNumber(solver, &its);
 			if (my_global_rank == 0) {
-				cout << "Iterations: " << its << endl;
+			    cout << "Iterations: " << its << endl;
 			}
+			*/
 		} else {
 			std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
 

@@ -127,3 +127,8 @@ apps/var2d/*
 .gitignore
 misc/*
 test/unit_tests
+test/unit_tests_mpi1
+test/unit_tests_mpiany
+test/unit_tests_petsc_mpi1
+test/unit_tests_mpi3
+test/unit_tests_mpi2

@@ -41,12 +41,6 @@ TEST_CASE("Test DrctIntp", "[GMG::DrctIntp]")
 	auto fine_vec      = ValVector<2>::GetNewVector(d_fine);
 	auto fine_expected = ValVector<2>::GetNewVector(d_fine);
 
-	auto f = [&](const std::array<double, 2> coord) -> double {
-		double x = coord[0];
-		double y = coord[1];
-		return 1 + ((x * 0.3) + y);
-	};
-
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		auto ld = coarse_vec->getLocalData(pinfo->local_index);
@@ -101,12 +95,6 @@ TEST_CASE("Linear Test DrctIntp with values already set", "[GMG::DrctIntp]")
 	auto coarse_vec    = ValVector<2>::GetNewVector(d_coarse);
 	auto fine_vec      = ValVector<2>::GetNewVector(d_fine);
 	auto fine_expected = ValVector<2>::GetNewVector(d_fine);
-
-	auto f = [&](const std::array<double, 2> coord) -> double {
-		double x = coord[0];
-		double y = coord[1];
-		return 1 + ((x * 0.3) + y);
-	};
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {

@@ -79,6 +79,9 @@ class BiLinearGhostFiller : public MPIGhostFiller<2>
 		for (Side<2> side : Side<2>::getValues()) {
 			if (pinfo->hasNbr(side)) {
 				switch (pinfo->getNbrType(side)) {
+					case NbrType::Normal:
+						// nothing needs to be done
+						break;
 					case NbrType::Coarse: {
 						auto local_slice  = local_data.getSliceOnSide(side);
 						auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);

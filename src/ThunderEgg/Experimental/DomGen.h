@@ -250,7 +250,7 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 		for (auto pair : new_level) {
 			id_rank_map[pair.first] = rank;
 			auto &pinfo             = pair.second;
-			for (int i = 0; i < Orthant<D>::num_orthants; i++) {
+			for (size_t i = 0; i < Orthant<D>::num_orthants; i++) {
 				if (pinfo->child_ranks[i] != -1 && pinfo->child_ranks[i] != rank) {
 					out_info[pinfo->child_ranks[i]].insert(pinfo->id);
 				}

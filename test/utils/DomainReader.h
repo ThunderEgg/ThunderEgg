@@ -114,7 +114,7 @@ template <size_t D> class DomainReader
 	public:
 	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in,
 	             bool neumann_in = false)
-	: ns(ns_in), num_ghost(num_ghost_in), neumann(neumann_in)
+	: neumann(neumann_in), ns(ns_in), num_ghost(num_ghost_in)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);

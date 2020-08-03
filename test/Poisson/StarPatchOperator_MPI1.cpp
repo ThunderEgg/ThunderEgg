@@ -126,14 +126,11 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
 		double y = coord[1];
 		return 1 + 5 * x + 13 * y;
 	};
-	auto ffun = [](const std::array<double, 2> &coord) {
-		double y = coord[1];
-		return 0;
-	};
-	auto hfun = [](const std::array<double, 2> &coord) { return 1; };
+	auto ffun = [](const std::array<double, 2> &coord) { return 0; };
 
 	auto f_vec          = ValVector<2>::GetNewVector(d_fine);
 	auto f_vec_expected = ValVector<2>::GetNewVector(d_fine);
+	DomainTools<2>::setValuesWithGhost(d_fine, f_vec_expected, ffun);
 
 	auto g_vec = ValVector<2>::GetNewVector(d_fine);
 	DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
@@ -175,18 +172,13 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 		double y = coord[1];
 		return 1 + 5 * x + 13 * y;
 	};
-	auto ffun = [](const std::array<double, 2> &coord) {
-		double x = coord[0];
-		double y = coord[1];
-		return 0;
-	};
+	auto ffun   = [](const std::array<double, 2> &coord) { return 0; };
 	auto gfun_x = [](const std::array<double, 2> &coord) { return 5; };
 	auto gfun_y = [](const std::array<double, 2> &coord) { return 13; };
 
-	auto hfun = [](const std::array<double, 2> &coord) { return 1; };
-
 	auto f_vec          = ValVector<2>::GetNewVector(d_fine);
 	auto f_vec_expected = ValVector<2>::GetNewVector(d_fine);
+	DomainTools<2>::setValuesWithGhost(d_fine, f_vec_expected, ffun);
 
 	auto g_vec = ValVector<2>::GetNewVector(d_fine);
 	DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);

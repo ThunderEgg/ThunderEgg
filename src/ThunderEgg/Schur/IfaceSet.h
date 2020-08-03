@@ -231,7 +231,7 @@ std::map<int, IfaceSet<D>> IfaceSet<D>::EnumerateIfaces(Iter begin, Iter end)
 					case NbrType::Fine: {
 						const FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
 						ifaces[info.id].insert(info.id, s, sinfo);
-						for (int i = 0; i < Orthant<D - 1>::num_orthants; i++) {
+						for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
 							if (info.fine_ranks[i] == rank) {
 								ifaces[info.fine_ids[i]].insert(info.fine_ids[i], s, sinfo);
 							} else {

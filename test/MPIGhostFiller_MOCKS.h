@@ -270,7 +270,7 @@ template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 							int  ids     = 0;
 							auto nbrinfo = pinfo->getFineNbrInfo(s);
-							for (int i = 0; i < nbrinfo.ids.size(); i++) {
+							for (size_t i = 0; i < nbrinfo.ids.size(); i++) {
 								ids += nbrinfo.ids[i];
 							}
 
