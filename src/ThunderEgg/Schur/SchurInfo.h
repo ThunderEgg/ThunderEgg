@@ -42,6 +42,10 @@ template <size_t D> class IfaceInfo
 {
 	public:
 	/**
+	 * @brief Destroy the IfaceInfo object
+	 */
+	virtual ~IfaceInfo() {}
+	/**
 	 * @brief The rank that the interface resides on.
 	 */
 	int rank;

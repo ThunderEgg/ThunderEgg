@@ -93,9 +93,9 @@ template <size_t D> class DftPatchSolver : public ThunderEgg::Schur::PatchSolver
 			solve(*sinfo, f, u, gamma);
 		}
 	}
-	void addPatch(ThunderEgg::Schur::SchurInfo<D> &sinfo);
+	void addPatch(ThunderEgg::Schur::SchurInfo<D> &sinfo) override;
 	std::shared_ptr<ThunderEgg::Schur::PatchSolver<D>>
-	getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx)
+	getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx) override
 	{
 		return std::shared_ptr<ThunderEgg::Schur::PatchSolver<D>>(new DftPatchSolver(ctx.sh));
 	}

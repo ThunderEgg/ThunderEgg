@@ -32,6 +32,10 @@ namespace ThunderEgg
 template <size_t D> class Operator
 {
 	public:
+	/**
+	 * @brief Destroy the Operator object
+	 */
+	virtual ~Operator() {}
 
 	/**
 	 * @brief Virtual function that base classes have to implement.

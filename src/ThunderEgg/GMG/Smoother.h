@@ -33,6 +33,10 @@ template <size_t D> class Smoother
 {
 	public:
 	/**
+	 * @brief Destroy the Smoother object
+	 */
+	virtual ~Smoother() {}
+	/**
 	 * @brief Virtual function that derived classes have to implement.
 	 *
 	 * @param f the RHS vector

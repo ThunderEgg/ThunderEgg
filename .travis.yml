@@ -81,7 +81,7 @@ before_install:
   - pip install --user gcovr
   - export CXXFLAGS="-std=c++11"
 script:
-  - export CXXFLAGS="-g -O0 -Wall -W -Wno-unused-parameter -Wno-maybe-uninitialized $CXXFLAGS"
+  - export CXXFLAGS="-g -O0 -Wall -W -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option $CXXFLAGS"
   - echo $CXXFLAGS
   - cmake .
   - $BUILD_WRAPPER make

@@ -12,7 +12,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3") set
 # (CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g -O0 -DDD_DEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
-    "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Wall -g -O3 -Wno-unused-parameter -Wno-maybe-uninitialized"
+    "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Wall -g -O3 -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option"
 )
 set(CMAKE_CXX_STANDARD 11)
 

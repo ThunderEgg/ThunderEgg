@@ -30,6 +30,9 @@ namespace ThunderEgg
 class Serializable
 {
 	public:
+	/**
+	 * @brief Destroy the Serializable object
+	 */
 	virtual ~Serializable() = default;
 	/**
 	 * @brief Serialize object into buffer

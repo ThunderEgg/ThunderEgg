@@ -21,8 +21,5 @@
 
 #include "FftwPatchSolver.h"
 
-namespace ThunderEgg::Poisson::Schur
-{
-template class FftwPatchSolver<2>;
-template class FftwPatchSolver<3>;
-} // namespace ThunderEgg::Poisson::Schur
+template class ThunderEgg::Poisson::Schur::FftwPatchSolver<2>;
+template class ThunderEgg::Poisson::Schur::FftwPatchSolver<3>;

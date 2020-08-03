@@ -38,7 +38,7 @@ template <size_t D> class DomainGenerator
 	/**
 	 * @brief Destroy the DomainGenerator object
 	 */
-	~DomainGenerator(){};
+	virtual ~DomainGenerator(){};
 	/**
 	 * @brief Return the finest domain
 	 */

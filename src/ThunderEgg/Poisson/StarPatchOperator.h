@@ -48,7 +48,7 @@ struct StarPatchOperatorException : std::runtime_error {
 template <size_t D> class StarPatchOperator : public PatchOperator<D>
 {
 	private:
-	constexpr int addValue(int axis)
+	constexpr int addValue(int axis) const
 	{
 		return (axis == 0) ? 0 : 1;
 	}
@@ -120,7 +120,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		});
 	}
 	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                   LocalData<D> f) const
+	                   LocalData<D> f) const override
 	{
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo->hasNbr(s)) {

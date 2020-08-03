@@ -35,6 +35,10 @@ template <size_t D> class Restrictor
 {
 	public:
 	/**
+	 * @brief Destroy the Restrictor object
+	 */
+	virtual ~Restrictor() {}
+	/**
 	 * @brief Virtual function that base classes have to implement.
 	 *
 	 * @param coarse the output vector that is restricted to.

@@ -35,6 +35,10 @@ template <size_t D> class Interpolator
 {
 	public:
 	/**
+	 * @brief Destroy the Interpolator object
+	 */
+	virtual ~Interpolator() {}
+	/**
 	 * @brief Virtual interpolation operation that needs to be implemented in derived classes.
 	 *
 	 * @param coarse the input vector from the coarser level.

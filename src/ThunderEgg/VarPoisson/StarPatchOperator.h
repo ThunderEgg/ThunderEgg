@@ -50,7 +50,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	protected:
 	std::shared_ptr<const Vector<D>> coeffs;
 
-	constexpr int addValue(int axis)
+	constexpr int addValue(int axis) const
 	{
 		return (axis == 0) ? 0 : 1;
 	}
@@ -117,7 +117,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 		});
 	}
 	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                   LocalData<D> f) const
+	                   LocalData<D> f) const override
 	{
 		const LocalData<D> c = coeffs->getLocalData(pinfo->local_index);
 		for (Side<D> s : Side<D>::getValues()) {
