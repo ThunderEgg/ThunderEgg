@@ -1,9 +1,9 @@
 #include "catch.hpp"
-#include <Thunderegg/Schur/IfaceSet.h>
-#include <Thunderegg/Schur/SchurInfo.h>
+#include <ThunderEgg/Schur/IfaceSet.h>
+#include <ThunderEgg/Schur/SchurInfo.h>
 
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 TEST_CASE("SchurInfo enumerateIfaces function works", "[SchurInfo]")
 {
 	/*

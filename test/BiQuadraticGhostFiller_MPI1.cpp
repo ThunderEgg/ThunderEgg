@@ -1,11 +1,11 @@
 #include "utils/DomainReader.h"
-#include <Thunderegg/BiQuadraticGhostFiller.h>
-#include <Thunderegg/DomainTools.h>
-#include <Thunderegg/ValVector.h>
+#include <ThunderEgg/BiQuadraticGhostFiller.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/ValVector.h>
 
 #include "catch.hpp"
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 
 constexpr auto single_mesh_file  = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";

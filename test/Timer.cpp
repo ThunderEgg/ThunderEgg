@@ -1,8 +1,8 @@
 #include "catch.hpp"
-#include <Thunderegg/Timer.h>
+#include <ThunderEgg/Timer.h>
 #include <sstream>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 TEST_CASE("No Timing", "[Timer]")
 {
 	Timer timer;

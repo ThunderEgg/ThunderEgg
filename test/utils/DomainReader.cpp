@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019-2020 Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019-2020 ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify

@@ -15,7 +15,7 @@ if(PETSC_FOUND)
     Timer.cpp)
   target_include_directories(unit_tests_mpiany
                              PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-  target_link_libraries(unit_tests_mpiany Thunderegg)
+  target_link_libraries(unit_tests_mpiany ThunderEgg)
   if(VTK_FOUND)
     target_link_libraries(unit_tests_mpiany VtkWriter)
   endif(VTK_FOUND)
@@ -66,7 +66,7 @@ if(PETSC_FOUND)
     if(TEST_MPI${ARG1}_SRC)
       add_executable(unit_tests_mpi${ARG1} ${TEST_MPI${ARG1}_SRC} test.cpp
                                            utils/DomainReader.cpp)
-      target_link_libraries(unit_tests_mpi${ARG1} Thunderegg)
+      target_link_libraries(unit_tests_mpi${ARG1} ThunderEgg)
       target_include_directories(unit_tests_mpi${ARG1}
                                  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
       parseandaddcatchtests(unit_tests_mpi${ARG1})
@@ -76,7 +76,7 @@ if(PETSC_FOUND)
       add_executable(
         unit_tests_petsc_mpi${ARG1} ${TEST_MPI${ARG1}_PETSC_SRC} test_PETSC.cpp
                                     utils/DomainReader.cpp)
-      target_link_libraries(unit_tests_petsc_mpi${ARG1} Thunderegg)
+      target_link_libraries(unit_tests_petsc_mpi${ARG1} ThunderEgg)
       target_include_directories(unit_tests_petsc_mpi${ARG1}
                                  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
       parseandaddcatchtests(unit_tests_petsc_mpi${ARG1})

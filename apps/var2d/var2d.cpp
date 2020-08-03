@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -21,27 +21,27 @@
 
 #include "Init.h"
 #include "Writers/ClawWriter.h"
-#include <Thunderegg/BiCGStab.h>
-#include <Thunderegg/BiCGStabPatchSolver.h>
-#include <Thunderegg/BiLinearGhostFiller.h>
-#include <Thunderegg/Domain.h>
-#include <Thunderegg/DomainTools.h>
-#include <Thunderegg/DomainWrapOp.h>
-#include <Thunderegg/Experimental/DomGen.h>
-#include <Thunderegg/GMG/CycleFactory.h>
-#include <Thunderegg/GMG/DrctIntp.h>
-#include <Thunderegg/GMG/LinearRestrictor.h>
-#include <Thunderegg/PetscMatOp.h>
-#include <Thunderegg/PetscShellCreator.h>
-#include <Thunderegg/SchwarzPrec.h>
-#include <Thunderegg/Timer.h>
-#include <Thunderegg/VarPoisson/StarPatchOperator.h>
+#include <ThunderEgg/BiCGStab.h>
+#include <ThunderEgg/BiCGStabPatchSolver.h>
+#include <ThunderEgg/BiLinearGhostFiller.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/DomainWrapOp.h>
+#include <ThunderEgg/Experimental/DomGen.h>
+#include <ThunderEgg/GMG/CycleFactory.h>
+#include <ThunderEgg/GMG/DrctIntp.h>
+#include <ThunderEgg/GMG/LinearRestrictor.h>
+#include <ThunderEgg/PetscMatOp.h>
+#include <ThunderEgg/PetscShellCreator.h>
+#include <ThunderEgg/SchwarzPrec.h>
+#include <ThunderEgg/Timer.h>
+#include <ThunderEgg/VarPoisson/StarPatchOperator.h>
 #ifdef HAVE_VTK
 #include "Writers/VtkWriter2d.h"
 #endif
 #ifdef HAVE_P4EST
 #include "TreeToP4est.h"
-#include <Thunderegg/P4estDomGen.h>
+#include <ThunderEgg/P4estDomGen.h>
 #endif
 #include "CLI11.hpp"
 #include <cmath>
@@ -56,9 +56,9 @@
 // =========== //
 
 using namespace std;
-using namespace Thunderegg;
-using namespace Thunderegg::Experimental;
-using namespace Thunderegg::VarPoisson;
+using namespace ThunderEgg;
+using namespace ThunderEgg::Experimental;
+using namespace ThunderEgg::VarPoisson;
 class fivePoint : public PatchOperator<2>
 {
 	public:
@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
 	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
 	// parse input
-	CLI::App app{"Thunderegg 3d poisson solver example"};
+	CLI::App app{"ThunderEgg 3d poisson solver example"};
 
 	app.set_config("--config", "", "Read an ini file", false);
 	// program options

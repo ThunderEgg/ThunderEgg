@@ -1,10 +1,10 @@
-#include <Thunderegg/Orthant.h>
+#include <ThunderEgg/Orthant.h>
 
 #include "catch.hpp"
 #include <sstream>
 
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 TEST_CASE("Orthant<1> unsigned char constructor works", "[Orthant]")
 {
 	Orthant<1> o(13);

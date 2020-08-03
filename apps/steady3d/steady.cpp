@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,27 +22,27 @@
 #include "CLI11.hpp"
 #include "Init.h"
 #include "Writers/ClawWriter.h"
-#include <Thunderegg/BiCGStab.h>
-#include <Thunderegg/Domain.h>
-#include <Thunderegg/DomainWrapOp.h>
-#include <Thunderegg/Experimental/DomGen.h>
-#include <Thunderegg/Experimental/OctTree.h>
-#include <Thunderegg/GMG/CycleFactory3d.h>
-#include <Thunderegg/GMG/CycleOpts.h>
-#include <Thunderegg/PetscMatOp.h>
-#include <Thunderegg/PetscShellCreator.h>
-#include <Thunderegg/Poisson/MatrixHelper.h>
-#include <Thunderegg/Poisson/Schur/DftPatchSolver.h>
-#include <Thunderegg/Poisson/Schur/FftwPatchSolver.h>
-#include <Thunderegg/Poisson/Schur/SevenPtPatchOperator.h>
-#include <Thunderegg/Poisson/Schur/StarPatchOperator.h>
-#include <Thunderegg/Schur/PolyChebPrec.h>
-#include <Thunderegg/Schur/SchurHelper.h>
-#include <Thunderegg/Schur/SchurMatrixHelper.h>
-#include <Thunderegg/Schur/SchurWrapOp.h>
-#include <Thunderegg/Schur/TriLinInterp.h>
-#include <Thunderegg/SchwarzPrec.h>
-#include <Thunderegg/Timer.h>
+#include <ThunderEgg/BiCGStab.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainWrapOp.h>
+#include <ThunderEgg/Experimental/DomGen.h>
+#include <ThunderEgg/Experimental/OctTree.h>
+#include <ThunderEgg/GMG/CycleFactory3d.h>
+#include <ThunderEgg/GMG/CycleOpts.h>
+#include <ThunderEgg/PetscMatOp.h>
+#include <ThunderEgg/PetscShellCreator.h>
+#include <ThunderEgg/Poisson/MatrixHelper.h>
+#include <ThunderEgg/Poisson/Schur/DftPatchSolver.h>
+#include <ThunderEgg/Poisson/Schur/FftwPatchSolver.h>
+#include <ThunderEgg/Poisson/Schur/SevenPtPatchOperator.h>
+#include <ThunderEgg/Poisson/Schur/StarPatchOperator.h>
+#include <ThunderEgg/Schur/PolyChebPrec.h>
+#include <ThunderEgg/Schur/SchurHelper.h>
+#include <ThunderEgg/Schur/SchurMatrixHelper.h>
+#include <ThunderEgg/Schur/SchurWrapOp.h>
+#include <ThunderEgg/Schur/TriLinInterp.h>
+#include <ThunderEgg/SchwarzPrec.h>
+#include <ThunderEgg/Timer.h>
 #ifdef ENABLE_AMGX
 #include "AmgxWrapper.h"
 #endif
@@ -70,18 +70,18 @@
 // =========== //
 
 using namespace std;
-using namespace Thunderegg;
-using namespace Thunderegg::Schur;
-using namespace Thunderegg::Experimental;
-using namespace Thunderegg::Poisson;
-using namespace Thunderegg::Poisson::Schur;
+using namespace ThunderEgg;
+using namespace ThunderEgg::Schur;
+using namespace ThunderEgg::Experimental;
+using namespace ThunderEgg::Poisson;
+using namespace ThunderEgg::Poisson::Schur;
 
 int main(int argc, char *argv[])
 {
 	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 
 	// parse input
-	CLI::App app{"Thunderegg 3d poisson solver example"};
+	CLI::App app{"ThunderEgg 3d poisson solver example"};
 
 	app.set_config("--config", "", "Read an ini file", false);
 	// program options

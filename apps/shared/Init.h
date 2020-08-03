@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -19,29 +19,29 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <Thunderegg/Domain.h>
+#include <ThunderEgg/Domain.h>
 #include <functional>
 #include <petscvec.h>
 class Init
 {
 	public:
-	static void initNeumann(Thunderegg::Domain<3> &domain, Vec f, Vec exact,
+	static void initNeumann(ThunderEgg::Domain<3> &domain, Vec f, Vec exact,
 	                        std::function<double(double, double, double)> ffun,
 	                        std::function<double(double, double, double)> efun,
 	                        std::function<double(double, double, double)> nfunx,
 	                        std::function<double(double, double, double)> nfuny,
 	                        std::function<double(double, double, double)> nfunz);
-	static void initDirichlet(Thunderegg::Domain<3> &domain, Vec f, Vec exact,
+	static void initDirichlet(ThunderEgg::Domain<3> &domain, Vec f, Vec exact,
 	                          std::function<double(double, double, double)> ffun,
 	                          std::function<double(double, double, double)> efun);
-	static void initNeumann2d(Thunderegg::Domain<2> &domain, Vec f, Vec exact,
+	static void initNeumann2d(ThunderEgg::Domain<2> &domain, Vec f, Vec exact,
 	                          std::function<double(double, double)> ffun,
 	                          std::function<double(double, double)> efun,
 	                          std::function<double(double, double)> nfunx,
 	                          std::function<double(double, double)> nfuny);
-	static void initDirichlet2d(Thunderegg::Domain<2> &domain, Vec f, Vec exact,
+	static void initDirichlet2d(ThunderEgg::Domain<2> &domain, Vec f, Vec exact,
 	                            std::function<double(double, double)> ffun,
 	                            std::function<double(double, double)> efun);
-	static void fillSolution2d(Thunderegg::Domain<2> &domain, Vec u,
+	static void fillSolution2d(ThunderEgg::Domain<2> &domain, Vec u,
 	                           std::function<double(double, double, double)> fun, double time);
 };

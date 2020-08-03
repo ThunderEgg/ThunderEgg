@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -21,19 +21,19 @@
 
 #ifndef CLAWWRITER_H
 #define CLAWWRITER_H
-#include <Thunderegg/Domain.h>
-#include <Thunderegg/Vector.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Vector.h>
 #include <list>
 class ClawWriter
 {
 	private:
-	std::shared_ptr<Thunderegg::Domain<2>>            domain;
-	std::list<std::shared_ptr<Thunderegg::Vector<2>>> vectors;
-	void writePatch(Thunderegg::PatchInfo<2> &d, std::ostream &os);
+	std::shared_ptr<ThunderEgg::Domain<2>>            domain;
+	std::list<std::shared_ptr<ThunderEgg::Vector<2>>> vectors;
+	void writePatch(ThunderEgg::PatchInfo<2> &d, std::ostream &os);
 
 	public:
-	ClawWriter(std::shared_ptr<Thunderegg::Domain<2>> domain);
-	void addVector(std::shared_ptr<Thunderegg::Vector<2>> vec);
+	ClawWriter(std::shared_ptr<ThunderEgg::Domain<2>> domain);
+	void addVector(std::shared_ptr<ThunderEgg::Vector<2>> vec);
 	void write();
 };
 #endif

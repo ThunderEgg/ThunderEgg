@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -21,15 +21,15 @@
 
 #include "../utils/DomainReader.h"
 #include "catch.hpp"
-#include <Thunderegg/BiQuadraticGhostFiller.h>
-#include <Thunderegg/DomainTools.h>
-#include <Thunderegg/GMG/LinearRestrictor.h>
-#include <Thunderegg/PetscMatOp.h>
-#include <Thunderegg/PetscVector.h>
-#include <Thunderegg/Poisson/MatrixHelper2d.h>
-#include <Thunderegg/Poisson/StarPatchOperator.h>
+#include <ThunderEgg/BiQuadraticGhostFiller.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/GMG/LinearRestrictor.h>
+#include <ThunderEgg/PetscMatOp.h>
+#include <ThunderEgg/PetscVector.h>
+#include <ThunderEgg/Poisson/MatrixHelper2d.h>
+#include <ThunderEgg/Poisson/StarPatchOperator.h>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";

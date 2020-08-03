@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -21,32 +21,32 @@
 
 #include "Init.h"
 #include "Writers/ClawWriter.h"
-#include <Thunderegg/BiCGStab.h>
-#include <Thunderegg/Domain.h>
-#include <Thunderegg/DomainWrapOp.h>
-#include <Thunderegg/Experimental/DomGen.h>
-#include <Thunderegg/GMG/CycleFactory2d.h>
-#include <Thunderegg/PetscMatOp.h>
-#include <Thunderegg/PetscShellCreator.h>
-#include <Thunderegg/Poisson/MatrixHelper2d.h>
-#include <Thunderegg/Poisson/Schur/DftPatchSolver.h>
-#include <Thunderegg/Poisson/Schur/FftwPatchSolver.h>
-#include <Thunderegg/Poisson/Schur/FivePtPatchOperator.h>
-#include <Thunderegg/Poisson/Schur/StarPatchOperator.h>
-#include <Thunderegg/Schur/BiCGStabSolver.h>
-#include <Thunderegg/Schur/BilinearInterpolator.h>
-#include <Thunderegg/Schur/PolyChebPrec.h>
-#include <Thunderegg/Schur/SchurHelper.h>
-#include <Thunderegg/Schur/SchurMatrixHelper2d.h>
-#include <Thunderegg/Schur/SchurWrapOp.h>
-#include <Thunderegg/SchwarzPrec.h>
-#include <Thunderegg/Timer.h>
+#include <ThunderEgg/BiCGStab.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainWrapOp.h>
+#include <ThunderEgg/Experimental/DomGen.h>
+#include <ThunderEgg/GMG/CycleFactory2d.h>
+#include <ThunderEgg/PetscMatOp.h>
+#include <ThunderEgg/PetscShellCreator.h>
+#include <ThunderEgg/Poisson/MatrixHelper2d.h>
+#include <ThunderEgg/Poisson/Schur/DftPatchSolver.h>
+#include <ThunderEgg/Poisson/Schur/FftwPatchSolver.h>
+#include <ThunderEgg/Poisson/Schur/FivePtPatchOperator.h>
+#include <ThunderEgg/Poisson/Schur/StarPatchOperator.h>
+#include <ThunderEgg/Schur/BiCGStabSolver.h>
+#include <ThunderEgg/Schur/BilinearInterpolator.h>
+#include <ThunderEgg/Schur/PolyChebPrec.h>
+#include <ThunderEgg/Schur/SchurHelper.h>
+#include <ThunderEgg/Schur/SchurMatrixHelper2d.h>
+#include <ThunderEgg/Schur/SchurWrapOp.h>
+#include <ThunderEgg/SchwarzPrec.h>
+#include <ThunderEgg/Timer.h>
 #ifdef HAVE_VTK
 #include "Writers/VtkWriter2d.h"
 #endif
 #ifdef HAVE_P4EST
 #include "TreeToP4est.h"
-#include <Thunderegg/P4estDomGen.h>
+#include <ThunderEgg/P4estDomGen.h>
 #endif
 #include "CLI11.hpp"
 #include <cmath>
@@ -65,11 +65,11 @@
 // =========== //
 
 using namespace std;
-using namespace Thunderegg;
-using namespace Thunderegg::Experimental;
-using namespace Thunderegg::Poisson::Schur;
-using namespace Thunderegg::Poisson;
-using namespace Thunderegg::Schur;
+using namespace ThunderEgg;
+using namespace ThunderEgg::Experimental;
+using namespace ThunderEgg::Poisson::Schur;
+using namespace ThunderEgg::Poisson;
+using namespace ThunderEgg::Schur;
 
 int main(int argc, char *argv[])
 {
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 	*/
 
 	// parse input
-	CLI::App app{"Thunderegg 3d poisson solver example"};
+	CLI::App app{"ThunderEgg 3d poisson solver example"};
 
 	app.set_config("--config", "", "Read an ini file", false);
 	// program options

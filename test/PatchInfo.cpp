@@ -1,7 +1,7 @@
 #include "catch.hpp"
-#include <Thunderegg/PatchInfo.h>
+#include <ThunderEgg/PatchInfo.h>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 TEST_CASE("NormalNbrInfo getNbrType works", "[PatchInfo]")
 {
 	NbrInfo<3> *info = new NormalNbrInfo<3>();

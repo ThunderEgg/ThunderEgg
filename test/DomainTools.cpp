@@ -1,8 +1,8 @@
 #include "catch.hpp"
-#include <Thunderegg/DomainTools.h>
-#include <Thunderegg/ValVector.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/ValVector.h>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 TEST_CASE("DomainTools::GetRealCoord 1D", "[getRealCoord][DomainTools]")
 {
 	std::shared_ptr<PatchInfo<1>> pinfo(new PatchInfo<1>());

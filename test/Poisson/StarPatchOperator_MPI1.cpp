@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -21,14 +21,14 @@
 
 #include "../utils/DomainReader.h"
 #include "catch.hpp"
-#include <Thunderegg/BiLinearGhostFiller.h>
-#include <Thunderegg/BiQuadraticGhostFiller.h>
-#include <Thunderegg/DomainTools.h>
-#include <Thunderegg/GMG/LinearRestrictor.h>
-#include <Thunderegg/Poisson/StarPatchOperator.h>
-#include <Thunderegg/ValVector.h>
+#include <ThunderEgg/BiLinearGhostFiller.h>
+#include <ThunderEgg/BiQuadraticGhostFiller.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/GMG/LinearRestrictor.h>
+#include <ThunderEgg/Poisson/StarPatchOperator.h>
+#include <ThunderEgg/ValVector.h>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_4x4_mpi1.json",                \
 	"mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json",                                             \
@@ -325,7 +325,7 @@ TEST_CASE("Test Poisson::StarPatchOperator constructor throws exception with no 
 
 	auto gf = make_shared<BiLinearGhostFiller>(d_fine);
 	CHECK_THROWS_AS(make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf),
-	                Thunderegg::Poisson::StarPatchOperatorException);
+	                ThunderEgg::Poisson::StarPatchOperatorException);
 }
 TEST_CASE("Test Poisson::StarPatchOperator::Generator", "[Poisson::StarPatchOperator]")
 {

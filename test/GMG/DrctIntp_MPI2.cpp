@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -21,12 +21,12 @@
 
 #include "../utils/DomainReader.h"
 #include "catch.hpp"
-#include <Thunderegg/BiLinearGhostFiller.h>
-#include <Thunderegg/DomainTools.h>
-#include <Thunderegg/GMG/DrctIntp.h>
-#include <Thunderegg/ValVector.h>
+#include <ThunderEgg/BiLinearGhostFiller.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/GMG/DrctIntp.h>
+#include <ThunderEgg/ValVector.h>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi2.json";
 TEST_CASE("Test DrctIntp", "[GMG::DrctIntp]")
 {

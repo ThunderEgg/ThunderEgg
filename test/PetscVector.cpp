@@ -1,7 +1,7 @@
 #include "catch.hpp"
-#include <Thunderegg/Domain.h>
+#include <ThunderEgg/Domain.h>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 TEST_CASE("Domain constructors work", "[Domain]")
 {
 	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;

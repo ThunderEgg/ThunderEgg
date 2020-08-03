@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.8)
-project(Thunderegg)
+project(ThunderEgg)
 enable_language(CXX)
 enable_language(C)
 enable_testing()

@@ -1,9 +1,9 @@
 #include "catch.hpp"
-#include <Thunderegg/DomainTools.h>
-#include <Thunderegg/SimpleGhostFiller.h>
-#include <Thunderegg/ValVector.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/SimpleGhostFiller.h>
+#include <ThunderEgg/ValVector.h>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 TEST_CASE("exchange uniform 1D east-west", "[SimpleGhostFiller]")
 {
 	map<int, shared_ptr<PatchInfo<1>>> pinfo_map;

@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,7 @@
 #include "Init.h"
 #include <algorithm>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 static void getXYZ(shared_ptr<PatchInfo<3>> pinfo, int xi, int yi, int zi, double &x, double &y,
                    double &z)
 {

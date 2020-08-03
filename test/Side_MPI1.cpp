@@ -1,8 +1,8 @@
 #include "catch.hpp"
-#include <Thunderegg/Side.h>
+#include <ThunderEgg/Side.h>
 #include <sstream>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 TEST_CASE("Test num_sides for Side<1>", "[Side]")
 {
 	size_t sides = Side<1>::num_sides;

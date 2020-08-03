@@ -1,6 +1,6 @@
 #ifndef TREETOP4EST
 #define TREETOP4EST
-#include <Thunderegg/Experimental/OctTree.h>
+#include <ThunderEgg/Experimental/OctTree.h>
 #include <p4est.h>
 #include <p4est_mesh.h>
 class TreeToP4est
@@ -10,6 +10,6 @@ class TreeToP4est
 	p4est_t *             p4est;
 	p4est_ghost_t *       ghost;
 	p4est_mesh_t *        mesh;
-	TreeToP4est(Thunderegg::Experimental::Tree<2> t);
+	TreeToP4est(ThunderEgg::Experimental::Tree<2> t);
 };
 #endif

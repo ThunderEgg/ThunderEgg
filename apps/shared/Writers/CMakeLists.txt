@@ -11,7 +11,7 @@ if(VTK_FOUND)
     target_include_directories(UTILS_WRITERS PUBLIC ${VTK_INCLUDE_DIRS})
 endif()
 
-target_link_libraries(UTILS_WRITERS Thunderegg)
+target_link_libraries(UTILS_WRITERS ThunderEgg)
 if(VTK_FOUND)
     target_link_libraries(UTILS_WRITERS ${VTK_LIBRARIES})
 endif()

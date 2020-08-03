@@ -1,7 +1,7 @@
 #include "catch.hpp"
-#include <Thunderegg/Vector.h>
+#include <ThunderEgg/Vector.h>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 TEST_CASE("LocalData constructor", "[DomainTools]")
 {
 	auto nx        = GENERATE(1, 2, 10, 13);

@@ -1,12 +1,12 @@
 #include "MPIGhostFiller_MOCKS.h"
 #include "catch.hpp"
 #include "utils/DomainReader.h"
-#include <Thunderegg/DomainTools.h>
-#include <Thunderegg/MPIGhostFiller.h>
-#include <Thunderegg/ValVector.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/MPIGhostFiller.h>
+#include <ThunderEgg/ValVector.h>
 #include <list>
 using namespace std;
-using namespace Thunderegg;
+using namespace ThunderEgg;
 
 constexpr auto uniform = "mesh_inputs/2d_uniform_2x2_nw_on_1_mpi2.json";
 constexpr auto refined = "mesh_inputs/2d_uniform_2x2_refined_nw_on_1_mpi2.json";

@@ -1,8 +1,8 @@
 /***************************************************************************
- *  Thunderegg, a library for solving Poisson's equation on adaptively
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019  Thunderegg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -22,14 +22,14 @@
 #ifndef MPIGHOSTFILLER_MOCKS_H
 #define MPIGHOSTFILLER_MOCKS_H
 
-#include <Thunderegg/DomainTools.h>
-#include <Thunderegg/MPIGhostFiller.h>
-#include <Thunderegg/ValVector.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/MPIGhostFiller.h>
+#include <ThunderEgg/ValVector.h>
 #include <list>
 
 #include "catch.hpp"
 
-namespace Thunderegg
+namespace ThunderEgg
 {
 template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 {
@@ -337,5 +337,5 @@ template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 		}
 	}
 };
-} // namespace Thunderegg
+} // namespace ThunderEgg
 #endif

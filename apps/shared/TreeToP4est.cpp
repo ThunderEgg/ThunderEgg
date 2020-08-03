@@ -1,7 +1,7 @@
 #include "TreeToP4est.h"
 #include <p4est_connectivity.h>
 #include <p4est_extended.h>
-using namespace Thunderegg::Experimental;
+using namespace ThunderEgg::Experimental;
 int refine_fn(p4est_t *p4est, p4est_topidx_t which_tree, p4est_quadrant_t *quadrant)
 {
 	Tree<2> &t = *(Tree<2> *) p4est->user_pointer;
