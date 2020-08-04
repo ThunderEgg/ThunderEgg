@@ -81,6 +81,7 @@ template <size_t D> class LocalData
 		start.fill(0);
 		end = lengths;
 		for (size_t i = 0; i < D; i++) {
+			start[i] = 0;
 			end[i]--;
 		}
 		ghost_start = start;

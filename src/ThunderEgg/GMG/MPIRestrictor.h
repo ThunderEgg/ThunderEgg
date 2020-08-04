@@ -83,7 +83,7 @@ template <size_t D> class MPIRestrictor : public Restrictor<D>
 		restrictPatches(ilc->getPatchesWithGhostParent(), fine, coarse_ghost);
 
 		// clear values in coarse vector
-		coarse->set(0);
+		coarse->setWithGhost(0);
 
 		// start scatter for ghost values
 		ilc->sendGhostPatchesStart(coarse, coarse_ghost);

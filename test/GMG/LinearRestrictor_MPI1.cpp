@@ -58,11 +58,12 @@ TEST_CASE("Linear Test LinearRestrictor on uniform 4x4", "[GMG::LinearRestrictor
 	restrictor->restrict(coarse_vec, fine_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
+		INFO("Patch:          " << pinfo->id);
+		INFO("x:              " << pinfo->starts[0]);
+		INFO("y:              " << pinfo->starts[1]);
+		INFO("nx:             " << pinfo->ns[0]);
+		INFO("ny:             " << pinfo->ns[1]);
+		INFO("parent_orth:    " << pinfo->orth_on_parent);
 		LocalData<2> vec_ld      = coarse_vec->getLocalData(pinfo->local_index);
 		LocalData<2> expected_ld = coarse_expected->getLocalData(pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
