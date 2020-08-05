@@ -18,18 +18,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-/**
- * \file
- */
-
 #ifndef THUNDEREGG_PATCHINFO_H
 #define THUNDEREGG_PATCHINFO_H
+#include <ThunderEgg/CoarseNbrInfo.h>
 #include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NormalNbrInfo.h>
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/Serializable.h>
 #include <ThunderEgg/TypeDefs.h>
-#include <array>
 #include <bitset>
 #include <deque>
 #include <map>
@@ -37,8 +33,6 @@
 
 namespace ThunderEgg
 {
-template <size_t D> class CoarseNbrInfo;
-
 /**
  * @brief Contains useful information for a patch
  *
@@ -321,88 +315,6 @@ template <size_t D> struct PatchInfo : public Serializable {
 	}
 	int serialize(char *buffer) const;
 	int deserialize(char *buffer);
-};
-/**
- * @brief Represents a neighbor that is at a coarser refinement level.
- *
- * @tparam D the number of Cartesian dimensions.
- */
-template <size_t D> class CoarseNbrInfo : public NbrInfo<D>
-{
-	public:
-	/**
-	 * @brief The mpi rank that the neighbor resides on.
-	 */
-	int rank = 0;
-	/**
-	 * @brief The id of the neighbor
-	 */
-	int id = 0;
-	/**
-	 * @brief The local index of the neighbor
-	 */
-	int local_index = 0;
-	/**
-	 * @brief The global index of the neighbor
-	 */
-	int global_index = 0;
-	/**
-	 * @brief The orthant that this patch in relation to the coarser patch's interface.
-	 */
-	Orthant<D - 1> orth_on_coarse;
-	/**
-	 * @brief Construct a new empty CoarseNbrInfo object
-	 */
-	CoarseNbrInfo()  = default;
-	~CoarseNbrInfo() = default;
-	/**
-	 * @brief Construct a new CoarseNbrInfo object
-	 *
-	 * @param id the id of the neighbor
-	 * @param orth_on_coarse The orthant that this patch in relation to the coarser
-	 * patch's interface.
-	 */
-	CoarseNbrInfo(int id, Orthant<D - 1> orth_on_coarse)
-	{
-		this->id             = id;
-		this->orth_on_coarse = orth_on_coarse;
-	}
-	NbrType getNbrType()
-	{
-		return NbrType::Coarse;
-	}
-	void getNbrIds(std::deque<int> &nbr_ids)
-	{
-		nbr_ids.push_back(id);
-	};
-	void getNbrRanks(std::deque<int> &nbr_ranks)
-	{
-		nbr_ranks.push_back(rank);
-	}
-	void setGlobalIndexes(std::map<int, int> &rev_map)
-	{
-		global_index = rev_map.at(local_index);
-	}
-	void setLocalIndexes(std::map<int, int> &rev_map)
-	{
-		local_index = rev_map.at(id);
-	}
-	int serialize(char *buffer) const
-	{
-		BufferWriter writer(buffer);
-		writer << rank;
-		writer << id;
-		writer << orth_on_coarse;
-		return writer.getPos();
-	}
-	int deserialize(char *buffer)
-	{
-		BufferReader reader(buffer);
-		reader >> rank;
-		reader >> id;
-		reader >> orth_on_coarse;
-		return reader.getPos();
-	}
 };
 template <size_t D> inline NbrType PatchInfo<D>::getNbrType(Side<D> s) const
 {
