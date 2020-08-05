@@ -24,6 +24,9 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/GhostFiller.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Loops.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/LocalData.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/LocalData.cpp)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/Operator.h)
 
 if(p4est_FOUND)
