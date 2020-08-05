@@ -26,6 +26,7 @@
 #define THUNDEREGG_PATCHINFO_H
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
+#include <ThunderEgg/NbrType.h>
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/Serializable.h>
 #include <ThunderEgg/TypeDefs.h>
@@ -37,42 +38,6 @@
 
 namespace ThunderEgg
 {
-/**
- * @brief The type of neighbor
- */
-enum class NbrType {
-	/**
-	 * @brief The neighbor is at the same refinement level.
-	 */
-	Normal,
-	/**
-	 * @brief The neighbor is at a coarser refinement level.
-	 */
-	Coarse,
-	/**
-	 * @brief The nighbor is at a finer refinement level.
-	 */
-	Fine
-};
-/**
- * @brief ostream operator that prints a string representation of NbrType enum.
- */
-inline std::ostream &operator<<(std::ostream &os, const NbrType &type)
-{
-	switch (type) {
-		case NbrType::Coarse:
-			os << "NbrType::Coarse";
-			break;
-		case NbrType::Fine:
-			os << "NbrType::Fine";
-			break;
-		case NbrType::Normal:
-			os << "NbrType::Normal";
-			break;
-	}
-	return os;
-}
-
 template <size_t D> class NbrInfo;
 template <size_t D> class NormalNbrInfo;
 template <size_t D> class CoarseNbrInfo;
