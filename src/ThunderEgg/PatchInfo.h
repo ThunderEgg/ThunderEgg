@@ -26,7 +26,7 @@
 #define THUNDEREGG_PATCHINFO_H
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
-#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/NbrInfo.h>
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/Serializable.h>
 #include <ThunderEgg/TypeDefs.h>
@@ -38,7 +38,6 @@
 
 namespace ThunderEgg
 {
-template <size_t D> class NbrInfo;
 template <size_t D> class NormalNbrInfo;
 template <size_t D> class CoarseNbrInfo;
 template <size_t D> class FineNbrInfo;
@@ -325,45 +324,6 @@ template <size_t D> struct PatchInfo : public Serializable {
 	}
 	int serialize(char *buffer) const;
 	int deserialize(char *buffer);
-};
-/**
- * @brief Represents information about a patch's neighbor.
- *
- * Includes information like neighbor id and and indexes.
- *
- * @tparam D the number of Cartesian dimensions in a patch
- */
-template <size_t D> class NbrInfo : virtual public Serializable
-{
-	public:
-	/**
-	 * @brief Destroy the NbrInfo object
-	 */
-	virtual ~NbrInfo() = default;
-	/**
-	 * @brief Get the NbrType
-	 */
-	virtual NbrType getNbrType() = 0;
-	/**
-	 * @brief Add to a deque of neighbor ids
-	 */
-	virtual void getNbrIds(std::deque<int> &nbr_ids) = 0;
-	/**
-	 * @brief Add to a deque of neighbor ranks
-	 */
-	virtual void getNbrRanks(std::deque<int> &nbr_ranks) = 0;
-	/**
-	 * @brief Set the local indexes in the NbrInfo objects
-	 *
-	 * @param rev_map map from id to local_index
-	 */
-	virtual void setGlobalIndexes(std::map<int, int> &rev_map) = 0;
-	/**
-	 * @brief Set the global indexes in the NbrInfo objects
-	 *
-	 * @param rev_map map from local_index to global_index
-	 */
-	virtual void setLocalIndexes(std::map<int, int> &rev_map) = 0;
 };
 /**
  * @brief Represents a neighbor that is at the same refinement level.

@@ -31,6 +31,8 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/LocalData.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/NbrType.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/NbrInfo.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/Operator.h)
 
 if(p4est_FOUND)
