@@ -1,7 +1,7 @@
 #include "utils/DomainReader.h"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/ValVectorGenerator.h>
 
 #include "catch.hpp"
 using namespace std;
@@ -370,8 +370,10 @@ TEST_CASE("Test BiLinearGhostFiller::Generator", "[Poisson::StarPatchOperator]")
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto finer_level   = make_shared<GMG::Level<2>>(d_fine, make_shared<DomainVG<2>>(d_fine));
-	auto coarser_level = make_shared<GMG::Level<2>>(d_coarse, make_shared<DomainVG<2>>(d_coarse));
+	auto finer_level
+	= make_shared<GMG::Level<2>>(d_fine, make_shared<ValVectorGenerator<2>>(d_fine));
+	auto coarser_level
+	= make_shared<GMG::Level<2>>(d_coarse, make_shared<ValVectorGenerator<2>>(d_coarse));
 
 	finer_level->setCoarser(coarser_level);
 	coarser_level->setFiner(finer_level);

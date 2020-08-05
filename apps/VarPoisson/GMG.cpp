@@ -405,7 +405,7 @@ int main(int argc, char *argv[])
 				cout << "Iterations: " << its << endl;
 			}
 		} else {
-			std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
+			std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain));
 
 			u->set(0);
 			int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000, 1e-12, timer);

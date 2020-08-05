@@ -19,23 +19,46 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef VALVECTOR_H
-#define VALVECTOR_H
+#ifndef THUNDEREGG_VALVECTOR_H
+#define THUNDEREGG_VALVECTOR_H
 #include <ThunderEgg/Vector.h>
 #include <valarray>
 namespace ThunderEgg
 {
+/**
+ * @brief Vector class the uses std::valarray for data storage
+ *
+ * @tparam D the number of Cartesian dimensions
+ */
 template <size_t D> class ValVector : public Vector<D>
 
 {
 	private:
-	int                patch_stride;
+	/**
+	 * @brief the number of cells in each patch
+	 */
+	int patch_stride;
+	/**
+	 * @brief the number of non-ghost cells in each direction of the patch
+	 */
 	std::array<int, D> lengths;
+	/**
+	 * @brief the strides for each axis of the patch
+	 */
 	std::array<int, D> strides;
-	int                num_ghost_cells;
-	int                first_offset;
+	/**
+	 * @brief the number of ghost cells on each side of the patch
+	 */
+	int num_ghost_cells;
+	/**
+	 * @brief the offset of the first element in each patch
+	 */
+	int first_offset;
 
 	public:
+	/**
+	 * @brief the underlying vector
+	 */
 	std::valarray<double> vec;
 	std::valarray<double> ghost_data;
 	ValVector(MPI_Comm comm_in, const std::array<int, D> &lengths, int num_ghost_cells,
@@ -62,7 +85,12 @@ template <size_t D> class ValVector : public Vector<D>
 		}
 		this->num_local_cells = this->num_local_patches * num_cells_in_patch;
 	}
-	~ValVector() = default;
+	/**
+	 * @brief Get a new ValVector object for a given Domain
+	 *
+	 * @param domain the Domain
+	 * @return std::shared_ptr<ValVector<D>> the new Vector
+	 */
 	static std::shared_ptr<ValVector<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain)
 	{
 		return std::shared_ptr<ValVector<D>>(new ValVector<D>(
@@ -81,21 +109,6 @@ template <size_t D> class ValVector : public Vector<D>
 	void setNumGhostPatches(int num_ghost_patches)
 	{
 		ghost_data.resize(patch_stride * num_ghost_patches);
-	}
-};
-template <size_t D> class DomainVG : public VectorGenerator<D>
-{
-	private:
-	std::shared_ptr<Domain<D>> dc;
-
-	public:
-	DomainVG(std::shared_ptr<Domain<D>> dc)
-	{
-		this->dc = dc;
-	}
-	std::shared_ptr<Vector<D>> getNewVector()
-	{
-		return ValVector<D>::GetNewVector(dc);
 	}
 };
 } // namespace ThunderEgg

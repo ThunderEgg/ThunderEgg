@@ -24,7 +24,7 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/ValVectorGenerator.h>
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>
 using namespace std;
 using namespace ThunderEgg;
@@ -288,8 +288,10 @@ TEST_CASE("Test VarPoisson::StarPatchOperator::Generator", "[Poisson::StarPatchO
 	auto op     = make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf);
 	auto op_gen = VarPoisson::StarPatchOperator<2>::Generator(op, gf_gen);
 
-	auto finer_level   = make_shared<GMG::Level<2>>(d_fine, make_shared<DomainVG<2>>(d_fine));
-	auto coarser_level = make_shared<GMG::Level<2>>(d_coarse, make_shared<DomainVG<2>>(d_coarse));
+	auto finer_level
+	= make_shared<GMG::Level<2>>(d_fine, make_shared<ValVectorGenerator<2>>(d_fine));
+	auto coarser_level
+	= make_shared<GMG::Level<2>>(d_coarse, make_shared<ValVectorGenerator<2>>(d_coarse));
 
 	finer_level->setCoarser(coarser_level);
 	finer_level->setOperator(op);

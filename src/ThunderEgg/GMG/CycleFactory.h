@@ -23,6 +23,7 @@
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/VCycle.h>
 #include <ThunderEgg/GMG/WCycle.h>
+#include <ThunderEgg/ValVectorGenerator.h>
 namespace ThunderEgg
 {
 namespace GMG
@@ -80,7 +81,7 @@ template <size_t D> class CycleFactory
 		{
 			std::shared_ptr<Domain<D>>             domain = domain_gen->getFinestDomain();
 			std::shared_ptr<Schur::SchurHelper<D>> sh(new Schur::SchurHelper<2>(domain));
-			std::shared_ptr<VectorGenerator<D>>    vg(new DomainVG<2>(domain));
+			std::shared_ptr<VectorGenerator<D>>    vg(new ValVectorGenerator<2>(domain));
 			finest_level.reset(new Level<D>(domain, vg));
 			finest_level->setOperator(operator_gen(finest_level));
 			finest_level->setSmoother(smoother_gen(finest_level));
@@ -92,8 +93,10 @@ template <size_t D> class CycleFactory
 		       && (opts.max_levels <= 0 || curr_level < opts.max_levels)) {
 			// create new level
 			std::shared_ptr<Domain<D>> domain = domain_gen->getCoarserDomain();
-			if ((domain->getNumGlobalPatches() + 0.0) / size < opts.patches_per_proc) { break; }
-			std::shared_ptr<VectorGenerator<D>> vg(new DomainVG<2>(domain));
+			if ((domain->getNumGlobalPatches() + 0.0) / size < opts.patches_per_proc) {
+				break;
+			}
+			std::shared_ptr<VectorGenerator<D>> vg(new ValVectorGenerator<2>(domain));
 			std::shared_ptr<Level<D>>           coarser_level(new Level<2>(domain, vg));
 
 			// link levels

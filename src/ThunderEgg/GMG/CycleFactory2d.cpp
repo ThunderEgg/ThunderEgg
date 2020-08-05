@@ -29,6 +29,7 @@
 #include <ThunderEgg/PetscMatOp.h>
 #include <ThunderEgg/Poisson/MatrixHelper2d.h>
 #include <ThunderEgg/SchurDomainOp.h>
+#include <ThunderEgg/ValVectorGenerator.h>
 #include <limits>
 #include <locale>
 using namespace ThunderEgg::GMG;
@@ -94,7 +95,7 @@ std::shared_ptr<Cycle<2>> CycleFactory2d::getCycle(const CycleOpts &            
 	{
 		shared_ptr<Domain<2>>             domain = dcg->getFinestDomain();
 		shared_ptr<Schur::SchurHelper<2>> sh(new Schur::SchurHelper<2>(domain));
-		shared_ptr<VectorGenerator<2>>    vg(new DomainVG<2>(domain));
+		shared_ptr<VectorGenerator<2>>    vg(new ValVectorGenerator<2>(domain));
 		finest_level.reset(new Level<2>(domain, vg));
 		finest_level->setOperator(getNewOperator(op_type, domain, sh, interp, op));
 		finest_level->setSmoother(getNewSmoother(smoother_type, domain, sh, interp, solver));
@@ -111,7 +112,7 @@ std::shared_ptr<Cycle<2>> CycleFactory2d::getCycle(const CycleOpts &            
 			break;
 		}
 		shared_ptr<Schur::SchurHelper<2>> sh(new Schur::SchurHelper<2>(domain));
-		shared_ptr<VectorGenerator<2>>    vg(new DomainVG<2>(domain));
+		shared_ptr<VectorGenerator<2>>    vg(new ValVectorGenerator<2>(domain));
 		shared_ptr<Level<2>>              coarser_level(new Level<2>(domain, vg));
 
 		// link levels

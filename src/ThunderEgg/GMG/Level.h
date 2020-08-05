@@ -26,7 +26,7 @@
 #include <ThunderEgg/GMG/Restrictor.h>
 #include <ThunderEgg/GMG/Smoother.h>
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/VectorGenerator.h>
 #include <memory>
 namespace ThunderEgg
 {

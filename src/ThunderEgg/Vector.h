@@ -295,12 +295,6 @@ template <size_t D> class Vector
 		return global_retval;
 	}
 };
-template <size_t D> class VectorGenerator
-{
-	public:
-	virtual ~VectorGenerator() {}
-	virtual std::shared_ptr<Vector<D>> getNewVector() = 0;
-};
 extern template class Vector<1>;
 extern template class Vector<2>;
 extern template class Vector<3>;

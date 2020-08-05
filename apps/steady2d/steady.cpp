@@ -287,20 +287,26 @@ int main(int argc, char *argv[])
 			xdist = x - 0.5;
 			ydist = y - 0.5;
 			dist  = sqrt(xdist * xdist + ydist * ydist);
-			if (dist < 0.2) { return 1; }
+			if (dist < 0.2) {
+				return 1;
+			}
 			for (int i = 0; i < 4; i++) {
 				// larger circles
 				double theta = i * M_PI / 2.0;
 				xdist        = x - (0.3 * cos(theta) + 0.5);
 				ydist        = y - (0.3 * sin(theta) + 0.5);
 				dist         = sqrt(xdist * xdist + ydist * ydist);
-				if (dist < 0.1) { return 1; }
+				if (dist < 0.1) {
+					return 1;
+				}
 				// smaller circles
 				theta = M_PI / 4.0 + i * M_PI / 2.0;
 				xdist = x - (0.275 * cos(theta) + 0.5);
 				ydist = y - (0.275 * sin(theta) + 0.5);
 				dist  = sqrt(xdist * xdist + ydist * ydist);
-				if (dist < 0.075) { return 1; }
+				if (dist < 0.075) {
+					return 1;
+				}
 			}
 			return 0;
 		};
@@ -388,7 +394,8 @@ int main(int argc, char *argv[])
 
 		if (neumann && !no_zero_rhs_avg) {
 			double fdiff = domain->integrate(f) / domain->volume();
-			if (my_global_rank == 0) cout << "Fdiff: " << fdiff << endl;
+			if (my_global_rank == 0)
+				cout << "Fdiff: " << fdiff << endl;
 			f->shift(-fdiff);
 		}
 
@@ -477,12 +484,16 @@ int main(int argc, char *argv[])
 				KSPSolve(solver, b->vec, gamma->vec);
 				int its;
 				KSPGetIterationNumber(solver, &its);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+				if (my_global_rank == 0) {
+					cout << "Iterations: " << its << endl;
+				}
 			} else {
 				std::shared_ptr<VectorGenerator<1>> vg(new SchurHelperVG<1>(sch));
 
 				int its = BiCGStab<1>::solve(vg, A, gamma, b, M);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+				if (my_global_rank == 0) {
+					cout << "Iterations: " << its << endl;
+				}
 			}
 			timer.stop("Linear Solve");
 
@@ -570,12 +581,16 @@ int main(int argc, char *argv[])
 				KSPSolve(solver, f->vec, u->vec);
 				int its;
 				KSPGetIterationNumber(solver, &its);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+				if (my_global_rank == 0) {
+					cout << "Iterations: " << its << endl;
+				}
 			} else {
-				std::shared_ptr<VectorGenerator<2>> vg(new DomainVG<2>(domain));
+				std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain));
 
 				int its = BiCGStab<2>::solve(vg, A, u, f, M);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+				if (my_global_rank == 0) {
+					cout << "Iterations: " << its << endl;
+				}
 			}
 			timer.stop("Linear Solve");
 
@@ -644,20 +659,30 @@ int main(int argc, char *argv[])
 #endif
 		cout.unsetf(std::ios_base::floatfield);
 #ifdef ENABLE_MUELU
-		if (meulusolver != nullptr) { delete meulusolver; }
+		if (meulusolver != nullptr) {
+			delete meulusolver;
+		}
 #endif
 #ifdef ENABLE_MUELU_CUDA
-		if (meulucudasolver != nullptr) { delete meulucudasolver; }
+		if (meulucudasolver != nullptr) {
+			delete meulucudasolver;
+		}
 #endif
 	}
 
 #ifdef ENABLE_AMGX
-	if (amgxsolver != nullptr) { delete amgxsolver; }
+	if (amgxsolver != nullptr) {
+		delete amgxsolver;
+	}
 #endif
 #ifdef ENABLE_MUELU_CUDA
-	if (f_meulucuda) { MueLuCudaWrapper::finalize(); }
+	if (f_meulucuda) {
+		MueLuCudaWrapper::finalize();
+	}
 #endif
-	if (my_global_rank == 0) { cout << timer; }
+	if (my_global_rank == 0) {
+		cout << timer;
+	}
 	PetscFinalize();
 	return 0;
 }

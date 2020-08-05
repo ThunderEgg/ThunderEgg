@@ -25,6 +25,7 @@
 #include <ThunderEgg/Schur/IfaceSet.h>
 #include <ThunderEgg/Schur/SchurInfo.h>
 #include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/VectorGenerator.h>
 #include <deque>
 #include <memory>
 #include <valarray>

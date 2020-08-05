@@ -334,7 +334,8 @@ int main(int argc, char *argv[])
 
 		if (neumann && !no_zero_rhs_avg) {
 			double fdiff = dc->integrate(f) / dc->volume();
-			if (my_global_rank == 0) cout << "Fdiff: " << fdiff << endl;
+			if (my_global_rank == 0)
+				cout << "Fdiff: " << fdiff << endl;
 			f->shift(-fdiff);
 		}
 
@@ -429,12 +430,16 @@ int main(int argc, char *argv[])
 				KSPSolve(solver, b->vec, gamma->vec);
 				int its;
 				KSPGetIterationNumber(solver, &its);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+				if (my_global_rank == 0) {
+					cout << "Iterations: " << its << endl;
+				}
 			} else {
 				std::shared_ptr<VectorGenerator<2>> vg(new SchurHelperVG<2>(sch));
 
 				int its = BiCGStab<2>::solve(vg, A, gamma, b, M);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+				if (my_global_rank == 0) {
+					cout << "Iterations: " << its << endl;
+				}
 			}
 			timer.stop("Linear Solve");
 
@@ -522,12 +527,16 @@ int main(int argc, char *argv[])
 				KSPSolve(solver, f->vec, u->vec);
 				int its;
 				KSPGetIterationNumber(solver, &its);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+				if (my_global_rank == 0) {
+					cout << "Iterations: " << its << endl;
+				}
 			} else {
-				std::shared_ptr<VectorGenerator<3>> vg(new DomainVG<3>(dc));
+				std::shared_ptr<VectorGenerator<3>> vg(new ValVectorGenerator<3>(dc));
 
 				int its = BiCGStab<3>::solve(vg, A, u, f, M);
-				if (my_global_rank == 0) { cout << "Iterations: " << its << endl; }
+				if (my_global_rank == 0) {
+					cout << "Iterations: " << its << endl;
+				}
 			}
 			timer.stop("Linear Solve");
 
@@ -594,9 +603,13 @@ int main(int argc, char *argv[])
 	}
 
 #ifdef ENABLE_AMGX
-	if (amgxsolver != nullptr) { delete amgxsolver; }
+	if (amgxsolver != nullptr) {
+		delete amgxsolver;
+	}
 #endif
-	if (my_global_rank == 0) { cout << timer; }
+	if (my_global_rank == 0) {
+		cout << timer;
+	}
 	PetscFinalize();
 	return 0;
 }
