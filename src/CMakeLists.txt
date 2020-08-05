@@ -9,7 +9,9 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/BiLinearGhostFiller.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiQuadraticGhostFiller.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/BufferIO.h)
+list(APPEND ThunderEgg_HDRS ThunderEgg/BufferReader.h)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/BufferWriter.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Domain.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Domain.cpp)
@@ -68,8 +70,12 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/TypeDefs.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/ValVector.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/ValVectorGenerator.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/Vector.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Vector.cpp)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/VectorGenerator.h)
 
 include(ThunderEgg/Poisson/CMakeLists.txt)
 include(ThunderEgg/VarPoisson/CMakeLists.txt)
