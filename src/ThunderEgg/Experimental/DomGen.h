@@ -463,7 +463,7 @@ template <size_t D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
 		int curr_id          = exportGlobalIds[i];
 		int dest_rank        = exportProcs[i];
 		id_rank_map[curr_id] = dest_rank;
-		level[curr_id]->updateRank(dest_rank);
+		level[curr_id]->rank = dest_rank;
 	}
 
 	rc = Zoltan_Migrate(zz, numImport, importGlobalIds, importLocalIds, importProcs, importToPart,
@@ -704,7 +704,8 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 		auto iter      = levels.upper->find(curr_id);
 		if (iter != levels.upper->end()) {
 			id_rank_map[curr_id] = dest_rank;
-			iter->second->updateRank(dest_rank);
+			iter->second->rank   = dest_rank;
+			// TODO update ranks on nbrs
 		}
 	}
 

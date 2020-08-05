@@ -206,7 +206,7 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 						= (my_data *) side_info1.is.hanging.quad[o.getIndex()]->p.user_data;
 						PatchInfo<2> &pinfo = *dmap[data->id];
 						pinfo.nbr_info[side.getIndex()].reset(new CoarseNbrInfo<2>(nbr_id, o));
-						pinfo.getCoarseNbrInfo(side).updateRank(nbr_rank);
+						pinfo.getCoarseNbrInfo(side).rank = nbr_rank;
 					}
 				}
 			} else if (side_info2.is_hanging) {
@@ -230,8 +230,8 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 					}
 					PatchInfo<2> &pinfo = *dmap[id];
 					pinfo.nbr_info[side.getIndex()].reset(new FineNbrInfo<2>(nbr_ids));
-					pinfo.getFineNbrInfo(side).updateRank(ranks[0], Orthant<1>::lower());
-					pinfo.getFineNbrInfo(side).updateRank(ranks[1], Orthant<1>::upper());
+					pinfo.getFineNbrInfo(side).ranks[0] = ranks[0];
+					pinfo.getFineNbrInfo(side).ranks[1] = ranks[1];
 				}
 			} else {
 				// normal nbr
@@ -250,7 +250,7 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 					}
 					PatchInfo<2> &pinfo = *dmap[id];
 					pinfo.nbr_info[side.getIndex()].reset(new NormalNbrInfo<2>(nbr_id));
-					pinfo.getNormalNbrInfo(side).updateRank(nbr_rank);
+					pinfo.getNormalNbrInfo(side).rank = nbr_rank;
 				}
 			}
 		};

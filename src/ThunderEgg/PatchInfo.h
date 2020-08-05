@@ -325,13 +325,6 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	void setPtrs(std::map<int, std::shared_ptr<PatchInfo>> &patches);
 	/**
-	 * @brief change the rank of this object and update the neighbors. (if they are on
-	 * the same processor)
-	 *
-	 * @param rank the mpi rank
-	 */
-	void updateRank(int rank);
-	/**
 	 * @brief set the local index in the boundary condition vector
 	 *
 	 * @param s the side that the boundary is on
@@ -418,16 +411,6 @@ template <size_t D> class NbrInfo : virtual public Serializable
 	 * @param domains map of patch id to PatchInfo ptr of patches on this processor.
 	 */
 	virtual void setPtrs(std::map<int, std::shared_ptr<PatchInfo<D>>> &domains) = 0;
-	/**
-	 * @brief Update the ranks on the neighbor objects.
-	 *
-	 * TODO make this work across processors. This only updates the objects on the same
-	 * processor
-	 *
-	 * @param new_rank The new rank of this patch
-	 * @param s the side of tha patch that the neighbor is on.
-	 */
-	virtual void updateRankOnNeighbors(int new_rank, Side<D> s) = 0;
 };
 /**
  * @brief Represents a neighbor that is at the same refinement level.
@@ -500,17 +483,6 @@ template <size_t D> class NormalNbrInfo : public NbrInfo<D>
 		} catch (std::out_of_range) {
 			ptr = nullptr;
 		}
-	}
-	/**
-	 * @brief Update the rank value on this object.
-	 */
-	void updateRank(int new_rank)
-	{
-		rank = new_rank;
-	}
-	void updateRankOnNeighbors(int new_rank, Side<D> s)
-	{
-		ptr->getNormalNbrInfo(s.opposite()).updateRank(new_rank);
 	}
 	int serialize(char *buffer) const
 	{
@@ -606,15 +578,7 @@ template <size_t D> class CoarseNbrInfo : public NbrInfo<D>
 			ptr = nullptr;
 		}
 	}
-	/**
-	 * @brief Update the rank value on this object.
-	 */
-	void updateRank(int new_rank)
-	{
-		rank = new_rank;
-	}
-	void updateRankOnNeighbors(int new_rank, Side<D> s);
-	int  serialize(char *buffer) const
+	int serialize(char *buffer) const
 	{
 		BufferWriter writer(buffer);
 		writer << rank;
@@ -722,22 +686,6 @@ template <size_t D> class FineNbrInfo : public NbrInfo<D>
 			}
 		}
 	}
-	/**
-	 * @brief Update a rank in this object
-	 *
-	 * @param new_rank the new rank
-	 * @param orth_on_coarse the orthant of the neighbor being updated
-	 */
-	void updateRank(int new_rank, Orthant<D - 1> orth_on_coarse)
-	{
-		ranks[orth_on_coarse.getIndex()] = new_rank;
-	}
-	void updateRankOnNeighbors(int new_rank, Side<D> s)
-	{
-		for (size_t i = 0; i < ptrs.size(); i++) {
-			ptrs[i]->getCoarseNbrInfo(s.opposite()).updateRank(new_rank);
-		}
-	}
 	int serialize(char *buffer) const
 	{
 		BufferWriter writer(buffer);
@@ -753,10 +701,6 @@ template <size_t D> class FineNbrInfo : public NbrInfo<D>
 		return reader.getPos();
 	}
 };
-template <size_t D> inline void CoarseNbrInfo<D>::updateRankOnNeighbors(int new_rank, Side<D> s)
-{
-	ptr->getFineNbrInfo(s.opposite()).updateRank(new_rank, orth_on_coarse);
-}
 template <size_t D> inline NbrType PatchInfo<D>::getNbrType(Side<D> s) const
 {
 	return nbr_info[s.getIndex()]->getNbrType();
@@ -931,15 +875,6 @@ inline void PatchInfo<D>::setPtrs(std::map<int, std::shared_ptr<PatchInfo>> &dom
 	for (Side<D> s : Side<D>::getValues()) {
 		if (hasNbr(s)) {
 			nbr_info[s.getIndex()]->setPtrs(domains);
-		}
-	}
-}
-template <size_t D> inline void PatchInfo<D>::updateRank(int rank)
-{
-	this->rank = rank;
-	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) {
-			nbr_info[s.getIndex()]->updateRankOnNeighbors(rank, s);
 		}
 	}
 }
