@@ -24,7 +24,8 @@
 
 #ifndef THUNDEREGG_PATCHINFO_H
 #define THUNDEREGG_PATCHINFO_H
-#include <ThunderEgg/BufferIO.h>
+#include <ThunderEgg/BufferReader.h>
+#include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/Serializable.h>
 #include <ThunderEgg/TypeDefs.h>

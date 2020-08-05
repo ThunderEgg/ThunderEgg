@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_BUFFERIO_H
-#define THUNDEREGG_BUFFERIO_H
+#ifndef THUNDEREGG_BUFFERREADER_H
+#define THUNDEREGG_BUFFERREADER_H
 
 #include <ThunderEgg/Serializable.h>
 #include <cstddef>
@@ -29,79 +29,31 @@
 
 namespace ThunderEgg
 {
-template <typename T> constexpr bool isSerializable()
-{
-	return std::is_base_of<Serializable, T>::value;
-}
-/**
- * @brief Class that is used to help serialize objects into a buffer.
- */
-class BufferWriter
-{
-	private:
-	char *buffer = nullptr;
-	int   pos    = 0;
-
-	public:
-	/**
-	 * @brief Create a new BufferWriter with the buffer set to nullptr. This is helpful for
-	 * determining the size needed for the buffer.
-	 */
-	BufferWriter() = default;
-	/**
-	 * @brief Create a new BufferWriter with given buffer.
-	 *
-	 * @param buffer the pointer to the beginning of the buffer.
-	 */
-	BufferWriter(char *buffer)
-	{
-		this->buffer = buffer;
-	}
-	/**
-	 * @brief get the current position in the buffer
-	 *
-	 * @return  the current position
-	 */
-	int getPos()
-	{
-		return pos;
-	}
-	/**
-	 * @brief  Add object to the buffer.
-	 *
-	 * @param obj the Serializable object.
-	 *
-	 * @return  this BufferWriter
-	 */
-	BufferWriter &operator<<(const Serializable &obj)
-	{
-		pos += obj.serialize(buffer == nullptr ? nullptr : (buffer + pos));
-		return *this;
-	}
-	/**
-	 * @brief Add an object to the buffer.
-	 *
-	 * @tparam T the type of the object.
-	 * @param obj the object. This object must be in serialized form.
-	 *
-	 * @return  this BufferWriter
-	 */
-	template <typename T>
-	typename std::enable_if<!isSerializable<T>(), BufferWriter>::type &operator<<(const T &obj)
-	{
-		if (buffer != nullptr) *(T *) (buffer + pos) = obj;
-		pos += sizeof(T);
-		return *this;
-	}
-};
 /**
  * @brief Class that is used to help read serialized objects from a buffer.
  */
 class BufferReader
 {
 	private:
+	/**
+	 * @brief The pointer to the buffer
+	 */
 	char *buffer = nullptr;
-	int   pos    = 0;
+	/**
+	 * @brief The current position in the buffer
+	 */
+	int pos = 0;
+	/**
+	 * @brief return if T is derived from Serializable
+	 *
+	 * @tparam T the type
+	 * @return true if derived from Serializable
+	 * @return false if not derived from Serializable
+	 */
+	template <typename T> static constexpr bool isSerializable()
+	{
+		return std::is_base_of<Serializable, T>::value;
+	}
 
 	public:
 	/**

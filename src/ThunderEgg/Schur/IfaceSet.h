@@ -21,7 +21,8 @@
 
 #ifndef THUNDEREGG_SCHUR_IFACESET_H
 #define THUNDEREGG_SCHUR_IFACESET_H
-#include <ThunderEgg/BufferIO.h>
+#include <ThunderEgg/BufferReader.h>
+#include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/Schur/IfaceType.h>
 #include <ThunderEgg/Schur/SchurInfo.h>
 #include <bitset>
