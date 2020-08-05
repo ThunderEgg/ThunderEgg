@@ -24,6 +24,7 @@
 
 #ifndef THUNDEREGG_PATCHINFO_H
 #define THUNDEREGG_PATCHINFO_H
+#include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NormalNbrInfo.h>
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/Serializable.h>
@@ -36,9 +37,7 @@
 
 namespace ThunderEgg
 {
-template <size_t D> class NormalNbrInfo;
 template <size_t D> class CoarseNbrInfo;
-template <size_t D> class FineNbrInfo;
 
 /**
  * @brief Contains useful information for a patch
@@ -402,94 +401,6 @@ template <size_t D> class CoarseNbrInfo : public NbrInfo<D>
 		reader >> rank;
 		reader >> id;
 		reader >> orth_on_coarse;
-		return reader.getPos();
-	}
-};
-/**
- * @brief Represents neighbors that are at a finer refinement level.
- *
- * @tparam D the number of Cartesian dimensions.
- */
-template <size_t D> class FineNbrInfo : public NbrInfo<D>
-{
-	public:
-	/**
-	 * @brief The mpi rank that the neighbor resides on.
-	 */
-	std::array<int, Orthant<D - 1>::num_orthants> ranks;
-	/**
-	 * @brief The ids of the neighbors
-	 */
-	std::array<int, Orthant<D - 1>::num_orthants> ids;
-	/**
-	 * @brief The global indexes of the neighbors
-	 */
-	std::array<int, Orthant<D - 1>::num_orthants> global_indexes;
-	/**
-	 * @brief The local indexes of the neighbors
-	 */
-	std::array<int, Orthant<D - 1>::num_orthants> local_indexes;
-	/**
-	 * @brief Construct a new empty FineNbrInfo object
-	 */
-	FineNbrInfo()
-	{
-		ranks.fill(0);
-		ids.fill(0);
-		global_indexes.fill(0);
-		local_indexes.fill(0);
-	}
-	~FineNbrInfo() = default;
-	/**
-	 * @brief Construct a new FineNbrInfo object
-	 *
-	 * @param ids the ids of the neighbors
-	 */
-	FineNbrInfo(std::array<int, Orthant<D - 1>::num_orthants> ids)
-	{
-		ranks.fill(0);
-		this->ids = ids;
-	}
-	NbrType getNbrType()
-	{
-		return NbrType::Fine;
-	}
-	void getNbrIds(std::deque<int> &nbr_ids)
-	{
-		for (size_t i = 0; i < ids.size(); i++) {
-			nbr_ids.push_back(ids[i]);
-		}
-	};
-	void getNbrRanks(std::deque<int> &nbr_ranks)
-	{
-		for (size_t i = 0; i < ranks.size(); i++) {
-			nbr_ranks.push_back(ranks[i]);
-		}
-	}
-	void setGlobalIndexes(std::map<int, int> &rev_map)
-	{
-		for (size_t i = 0; i < global_indexes.size(); i++) {
-			global_indexes[i] = rev_map.at(local_indexes[i]);
-		}
-	}
-	void setLocalIndexes(std::map<int, int> &rev_map)
-	{
-		for (size_t i = 0; i < local_indexes.size(); i++) {
-			local_indexes[i] = rev_map.at(ids[i]);
-		}
-	}
-	int serialize(char *buffer) const
-	{
-		BufferWriter writer(buffer);
-		writer << ranks;
-		writer << ids;
-		return writer.getPos();
-	}
-	int deserialize(char *buffer)
-	{
-		BufferReader reader(buffer);
-		reader >> ranks;
-		reader >> ids;
 		return reader.getPos();
 	}
 };

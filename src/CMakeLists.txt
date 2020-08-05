@@ -22,6 +22,8 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/DomainTools.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/DomainWrapOp.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/FineNbrInfo.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/GhostFiller.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Loops.h)
