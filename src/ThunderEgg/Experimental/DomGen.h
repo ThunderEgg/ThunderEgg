@@ -233,9 +233,6 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 			}
 			new_level[pinfo.id] = d_ptr;
 		}
-		for (auto &p : new_level) {
-			p.second->setPtrs(new_level);
-		}
 	}
 	// balance
 	if (curr_level == num_levels) {
@@ -492,9 +489,6 @@ template <size_t D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
 	std::cout << prev << "\n";
 	std::cout << std::endl;
 #endif
-	for (auto &p : level) {
-		p.second->setPtrs(level);
-	}
 }
 template <size_t D>
 inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_level)
@@ -735,9 +729,6 @@ inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_le
 	std::cout << prev << "\n";
 	std::cout << std::endl;
 #endif
-	for (auto &p : level) {
-		p.second->setPtrs(level);
-	}
 }
 extern template class DomGen<2>;
 extern template class DomGen<3>;

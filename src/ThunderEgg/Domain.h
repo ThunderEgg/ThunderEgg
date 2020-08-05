@@ -187,10 +187,6 @@ template <size_t D> class Domain
 		MPI_Allreduce(&num_local_domains, &global_num_patches, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
 		reIndex(local_id_set, global_id_set);
-
-		for (auto &p : pinfo_id_map) {
-			p.second->setPtrs(pinfo_id_map);
-		}
 	}
 	/**
 	 * @brief Get a vector of PatchInfo pointers where index in the vector corresponds to the

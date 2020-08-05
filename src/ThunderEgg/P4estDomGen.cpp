@@ -341,9 +341,6 @@ void P4estDomGen::extractLevel()
 
 	p4est_ghost_destroy(ghost);
 
-	for (auto p : new_level) {
-		p.second->setPtrs(new_level);
-	}
 	if (domain_list.size() > 0) {
 		auto &old_level = domain_list.back()->getPatchInfoMap();
 		// update parent ranks

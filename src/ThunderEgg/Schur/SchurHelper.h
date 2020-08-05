@@ -369,14 +369,14 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 				switch (sinfo->pinfo->getNbrType(s)) {
 					case NbrType::Normal: {
 						NormalIfaceInfo<D> &info = sinfo->getNormalIfaceInfo(s);
-						if (info.nbr_info->ptr == nullptr) {
+						if (info.nbr_info->rank != rank) {
 							in_patch_offs.insert(make_pair(info.nbr_info->rank, id));
 							out_patch_offs.insert(make_pair(info.nbr_info->rank, id));
 						}
 					} break;
 					case NbrType::Coarse: {
 						CoarseIfaceInfo<D> &info = sinfo->getCoarseIfaceInfo(s);
-						if (info.nbr_info->ptr == nullptr) {
+						if (info.nbr_info->rank != rank) {
 							in_patch_offs.insert(make_pair(info.nbr_info->rank, id));
 							out_patch_offs.insert(make_pair(info.nbr_info->rank, info.coarse_id));
 							if (!rev_map.count(info.coarse_id)) {
@@ -389,7 +389,7 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 					case NbrType::Fine: {
 						FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
 						for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
-							if (info.nbr_info->ptrs[o.getIndex()] == nullptr) {
+							if (info.nbr_info->ranks[o.getIndex()] != rank) {
 								in_patch_offs.insert(
 								make_pair(info.nbr_info->ranks[o.getIndex()], id));
 								out_patch_offs.insert(make_pair(info.nbr_info->ranks[o.getIndex()],

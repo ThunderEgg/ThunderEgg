@@ -319,12 +319,6 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 */
 	std::deque<int> getNbrRanks();
 	/**
-	 * @brief set the ptrs to PatchInfo objects in the NbrInfo objects.
-	 *
-	 * @param patches map of id to patches on this processor
-	 */
-	void setPtrs(std::map<int, std::shared_ptr<PatchInfo>> &patches);
-	/**
 	 * @brief set the local index in the boundary condition vector
 	 *
 	 * @param s the side that the boundary is on
@@ -405,12 +399,6 @@ template <size_t D> class NbrInfo : virtual public Serializable
 	 * @param rev_map map from local_index to global_index
 	 */
 	virtual void setLocalIndexes(std::map<int, int> &rev_map) = 0;
-	/**
-	 * @brief Set the pointers to neighboring patches.
-	 *
-	 * @param domains map of patch id to PatchInfo ptr of patches on this processor.
-	 */
-	virtual void setPtrs(std::map<int, std::shared_ptr<PatchInfo<D>>> &domains) = 0;
 };
 /**
  * @brief Represents a neighbor that is at the same refinement level.
@@ -420,12 +408,6 @@ template <size_t D> class NbrInfo : virtual public Serializable
 template <size_t D> class NormalNbrInfo : public NbrInfo<D>
 {
 	public:
-	/**
-	 * @brief Pointer to neighboring PatchInfo object.
-	 *
-	 * If the neighbor is on a different processor, it will be set to nullptr.
-	 */
-	std::shared_ptr<PatchInfo<D>> ptr = nullptr;
 	/**
 	 * @brief The mpi rank that the neighbor resides on.
 	 */
@@ -476,14 +458,6 @@ template <size_t D> class NormalNbrInfo : public NbrInfo<D>
 	{
 		local_index = rev_map.at(id);
 	}
-	void setPtrs(std::map<int, std::shared_ptr<PatchInfo<D>>> &domains)
-	{
-		try {
-			ptr = domains.at(id);
-		} catch (std::out_of_range) {
-			ptr = nullptr;
-		}
-	}
 	int serialize(char *buffer) const
 	{
 		BufferWriter writer(buffer);
@@ -507,12 +481,6 @@ template <size_t D> class NormalNbrInfo : public NbrInfo<D>
 template <size_t D> class CoarseNbrInfo : public NbrInfo<D>
 {
 	public:
-	/**
-	 * @brief Pointer to neighboring PatchInfo object.
-	 *
-	 * If the neighbor is on a different processor, it will be set to nullptr.
-	 */
-	std::shared_ptr<PatchInfo<D>> ptr;
 	/**
 	 * @brief The mpi rank that the neighbor resides on.
 	 */
@@ -570,14 +538,6 @@ template <size_t D> class CoarseNbrInfo : public NbrInfo<D>
 	{
 		local_index = rev_map.at(id);
 	}
-	void setPtrs(std::map<int, std::shared_ptr<PatchInfo<D>>> &domains)
-	{
-		try {
-			ptr = domains.at(id);
-		} catch (std::out_of_range) {
-			ptr = nullptr;
-		}
-	}
 	int serialize(char *buffer) const
 	{
 		BufferWriter writer(buffer);
@@ -604,12 +564,6 @@ template <size_t D> class FineNbrInfo : public NbrInfo<D>
 {
 	public:
 	/**
-	 * @brief Pointers to neighboring PatchInfo objects.
-	 *
-	 * If the neighbor is on a different processor, it will be set to nullptr.
-	 */
-	std::array<std::shared_ptr<PatchInfo<D>>, Orthant<D - 1>::num_orthants> ptrs;
-	/**
 	 * @brief The mpi rank that the neighbor resides on.
 	 */
 	std::array<int, Orthant<D - 1>::num_orthants> ranks;
@@ -630,7 +584,6 @@ template <size_t D> class FineNbrInfo : public NbrInfo<D>
 	 */
 	FineNbrInfo()
 	{
-		ptrs.fill(nullptr);
 		ranks.fill(0);
 		ids.fill(0);
 		global_indexes.fill(0);
@@ -644,7 +597,6 @@ template <size_t D> class FineNbrInfo : public NbrInfo<D>
 	 */
 	FineNbrInfo(std::array<int, Orthant<D - 1>::num_orthants> ids)
 	{
-		ptrs.fill(nullptr);
 		ranks.fill(0);
 		this->ids = ids;
 	}
@@ -674,16 +626,6 @@ template <size_t D> class FineNbrInfo : public NbrInfo<D>
 	{
 		for (size_t i = 0; i < local_indexes.size(); i++) {
 			local_indexes[i] = rev_map.at(ids[i]);
-		}
-	}
-	void setPtrs(std::map<int, std::shared_ptr<PatchInfo<D>>> &domains)
-	{
-		for (size_t i = 0; i < ids.size(); i++) {
-			try {
-				ptrs[i] = domains.at(ids[i]);
-			} catch (std::out_of_range) {
-				ptrs[i] = nullptr;
-			}
 		}
 	}
 	int serialize(char *buffer) const
@@ -868,15 +810,6 @@ template <size_t D> inline int PatchInfo<D>::deserialize(char *buffer)
 		}
 	}
 	return reader.getPos();
-}
-template <size_t D>
-inline void PatchInfo<D>::setPtrs(std::map<int, std::shared_ptr<PatchInfo>> &domains)
-{
-	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) {
-			nbr_info[s.getIndex()]->setPtrs(domains);
-		}
-	}
 }
 extern template struct PatchInfo<2>;
 extern template struct PatchInfo<3>;
