@@ -164,7 +164,10 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 * @param s the side
 	 * @return The NbrType
 	 */
-	NbrType getNbrType(Side<D> s) const;
+	NbrType getNbrType(Side<D> s) const
+	{
+		return nbr_info[s.getIndex()]->getNbrType();
+	}
 	/**
 	 * @brief Get the NormalNbrInfo object for a side
 	 *
@@ -173,7 +176,10 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 * @param s the side
 	 * @return NormalNbrInfo<D>& the object
 	 */
-	NormalNbrInfo<D> &getNormalNbrInfo(Side<D> s) const;
+	NormalNbrInfo<D> &getNormalNbrInfo(Side<D> s) const
+	{
+		return *std::dynamic_pointer_cast<NormalNbrInfo<D>>(nbr_info[s.getIndex()]);
+	}
 	/**
 	 * @brief Get the NormalNbrInfo pointer
 	 *
@@ -193,7 +199,10 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 * @param s the side
 	 * @return CoarseNbrInfo<D>& the object
 	*/
-	CoarseNbrInfo<D> &getCoarseNbrInfo(Side<D> s) const;
+	CoarseNbrInfo<D> &getCoarseNbrInfo(Side<D> s) const
+	{
+		return *std::dynamic_pointer_cast<CoarseNbrInfo<D>>(nbr_info[s.getIndex()]);
+	}
 	/**
 	 * @brief Get the CoarseNbrInfo pointer
 	 *
@@ -214,7 +223,10 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 * @param s the side
 	 * @return FineNbrInfo<D>& the object
 	 */
-	FineNbrInfo<D> &getFineNbrInfo(Side<D> s) const;
+	FineNbrInfo<D> &getFineNbrInfo(Side<D> s) const
+	{
+		return *std::dynamic_pointer_cast<FineNbrInfo<D>>(nbr_info[s.getIndex()]);
+	}
 	/**
 	 * @brief Get the FineNbrInfo pointer
 	 *
@@ -234,45 +246,106 @@ template <size_t D> struct PatchInfo : public Serializable {
 	 * @return true if the is neighbor
 	 * @return false if at domain boundary
 	 */
-	inline bool hasNbr(Side<D> s) const;
+	inline bool hasNbr(Side<D> s) const
+	{
+		return nbr_info[s.getIndex()] != nullptr;
+	}
 	/**
 	 * @brief Return whether the patch has a coarser parent
 	 *
 	 * @return true if there is a parent
 	 */
-	inline bool hasCoarseParent() const;
+	inline bool hasCoarseParent() const
+	{
+		return orth_on_parent != Orthant<D>::null();
+	}
 	/**
 	 * @brief Return wether the boundary conditions are neumann
 	 *
 	 * @param s the side
 	 */
-	inline bool isNeumann(Side<D> s) const;
+	inline bool isNeumann(Side<D> s) const
+	{
+		return neumann[s.getIndex()];
+	}
 	/**
 	 * @brief Set the local indexes in the NbrInfo objects
 	 *
 	 * @param rev_map map from id to local_index
 	 */
-	void setLocalNeighborIndexes(std::map<int, int> &rev_map);
+	void setLocalNeighborIndexes(std::map<int, int> &rev_map)
+	{
+		local_index = rev_map.at(id);
+		for (Side<D> s : Side<D>::getValues()) {
+			if (hasNbr(s)) {
+				nbr_info[s.getIndex()]->setLocalIndexes(rev_map);
+			}
+		}
+	}
 	/**
 	 * @brief Set the global indexes in the NbrInfo objects
 	 *
 	 * @param rev_map map form local_index to global_index
 	 */
-	void setGlobalNeighborIndexes(std::map<int, int> &rev_map);
+	void setGlobalNeighborIndexes(std::map<int, int> &rev_map)
+	{
+		global_index = rev_map.at(local_index);
+		for (Side<D> s : Side<D>::getValues()) {
+			if (hasNbr(s)) {
+				nbr_info[s.getIndex()]->setGlobalIndexes(rev_map);
+			}
+		}
+	}
 	/**
 	 * @brief Set the neumann boundary conditions
 	 *
 	 * @param inf the function for determining boundary conditions
 	 */
-	void setNeumann(IsNeumannFunc<D> inf);
+	void setNeumann(IsNeumannFunc<D> inf)
+	{
+		for (Side<D> s : Side<D>::getValues()) {
+			if (!hasNbr(s)) {
+				std::array<double, D> bound_start = starts;
+				if (!s.isLowerOnAxis()) {
+					bound_start[s.getAxisIndex()]
+					+= spacings[s.getAxisIndex()] * ns[s.getAxisIndex()];
+				}
+				std::array<double, D> bound_end = bound_start;
+				for (size_t dir = 0; dir < D; dir++) {
+					if (dir != s.getAxisIndex()) {
+						bound_end[dir] += spacings[dir] * ns[dir];
+					}
+				}
+				neumann[s.getIndex()] = inf(s, bound_end, bound_start);
+			}
+		}
+	}
 	/**
 	 * @brief return a vector of neighbor ids
 	 */
-	std::deque<int> getNbrIds();
+	std::deque<int> getNbrIds()
+	{
+		std::deque<int> retval;
+		for (Side<D> s : Side<D>::getValues()) {
+			if (hasNbr(s)) {
+				nbr_info[s.getIndex()]->getNbrIds(retval);
+			}
+		}
+		return retval;
+	}
 	/**
 	 * @brief return a vector of neighbor ranks
 	 */
-	std::deque<int> getNbrRanks();
+	std::deque<int> getNbrRanks()
+	{
+		std::deque<int> retval;
+		for (Side<D> s : Side<D>::getValues()) {
+			if (hasNbr(s)) {
+				nbr_info[s.getIndex()]->getNbrRanks(retval);
+			}
+		}
+		return retval;
+	}
 	/**
 	 * @brief set the local index in the boundary condition vector
 	 *
@@ -313,177 +386,90 @@ template <size_t D> struct PatchInfo : public Serializable {
 	{
 		return bc_global_index[s.getIndex()];
 	}
-	int serialize(char *buffer) const;
-	int deserialize(char *buffer);
-};
-template <size_t D> inline NbrType PatchInfo<D>::getNbrType(Side<D> s) const
-{
-	return nbr_info[s.getIndex()]->getNbrType();
-}
-template <size_t D> inline NormalNbrInfo<D> &PatchInfo<D>::getNormalNbrInfo(Side<D> s) const
-{
-	return *std::dynamic_pointer_cast<NormalNbrInfo<D>>(nbr_info[s.getIndex()]);
-}
-template <size_t D> inline CoarseNbrInfo<D> &PatchInfo<D>::getCoarseNbrInfo(Side<D> s) const
-{
-	return *std::dynamic_pointer_cast<CoarseNbrInfo<D>>(nbr_info[s.getIndex()]);
-}
-template <size_t D> inline FineNbrInfo<D> &PatchInfo<D>::getFineNbrInfo(Side<D> s) const
-{
-	return *std::dynamic_pointer_cast<FineNbrInfo<D>>(nbr_info[s.getIndex()]);
-}
-template <size_t D> inline bool PatchInfo<D>::hasNbr(Side<D> s) const
-{
-	return nbr_info[s.getIndex()] != nullptr;
-}
-template <size_t D> inline bool PatchInfo<D>::hasCoarseParent() const
-{
-	return orth_on_parent != Orthant<D>::null();
-}
-template <size_t D> inline bool PatchInfo<D>::isNeumann(Side<D> s) const
-{
-	return neumann[s.getIndex()];
-}
-template <size_t D> inline void PatchInfo<D>::setLocalNeighborIndexes(std::map<int, int> &rev_map)
-{
-	local_index = rev_map.at(id);
-	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) {
-			nbr_info[s.getIndex()]->setLocalIndexes(rev_map);
+	int serialize(char *buffer) const
+	{
+		BufferWriter writer(buffer);
+		writer << id;
+		writer << ns;
+		writer << refine_level;
+		writer << parent_id;
+		writer << parent_rank;
+		writer << child_ids;
+		writer << child_ranks;
+		writer << rank;
+		writer << orth_on_parent;
+		writer << neumann;
+		writer << starts;
+		writer << spacings;
+		std::bitset<Side<D>::num_sides> has_nbr;
+		for (size_t i = 0; i < Side<D>::num_sides; i++) {
+			has_nbr[i] = nbr_info[i] != nullptr;
 		}
-	}
-}
-template <size_t D> inline void PatchInfo<D>::setGlobalNeighborIndexes(std::map<int, int> &rev_map)
-{
-	global_index = rev_map.at(local_index);
-	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) {
-			nbr_info[s.getIndex()]->setGlobalIndexes(rev_map);
-		}
-	}
-}
-template <size_t D> inline void PatchInfo<D>::setNeumann(IsNeumannFunc<D> inf)
-{
-	for (Side<D> s : Side<D>::getValues()) {
-		if (!hasNbr(s)) {
-			std::array<double, D> bound_start = starts;
-			if (!s.isLowerOnAxis()) {
-				bound_start[s.getAxisIndex()] += spacings[s.getAxisIndex()] * ns[s.getAxisIndex()];
-			}
-			std::array<double, D> bound_end = bound_start;
-			for (size_t dir = 0; dir < D; dir++) {
-				if (dir != s.getAxisIndex()) {
-					bound_end[dir] += spacings[dir] * ns[dir];
+		writer << has_nbr;
+		for (Side<D> s : Side<D>::getValues()) {
+			if (hasNbr(s)) {
+				NbrType type = getNbrType(s);
+				writer << type;
+				switch (type) {
+					case NbrType::Normal: {
+						NormalNbrInfo<D> tmp = getNormalNbrInfo(s);
+						writer << tmp;
+					} break;
+					case NbrType::Fine: {
+						FineNbrInfo<D> tmp = getFineNbrInfo(s);
+						writer << tmp;
+					} break;
+					case NbrType::Coarse: {
+						CoarseNbrInfo<D> tmp = getCoarseNbrInfo(s);
+						writer << tmp;
+					} break;
 				}
 			}
-			neumann[s.getIndex()] = inf(s, bound_end, bound_start);
 		}
+		return writer.getPos();
 	}
-}
-template <size_t D> inline std::deque<int> PatchInfo<D>::getNbrIds()
-{
-	std::deque<int> retval;
-	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) {
-			nbr_info[s.getIndex()]->getNbrIds(retval);
-		}
-	}
-	return retval;
-}
-template <size_t D> inline std::deque<int> PatchInfo<D>::getNbrRanks()
-{
-	std::deque<int> retval;
-	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) {
-			nbr_info[s.getIndex()]->getNbrRanks(retval);
-		}
-	}
-	return retval;
-}
-
-template <size_t D> inline int PatchInfo<D>::serialize(char *buffer) const
-{
-	BufferWriter writer(buffer);
-	writer << id;
-	writer << ns;
-	writer << refine_level;
-	writer << parent_id;
-	writer << parent_rank;
-	writer << child_ids;
-	writer << child_ranks;
-	writer << rank;
-	writer << orth_on_parent;
-	writer << neumann;
-	writer << starts;
-	writer << spacings;
-	std::bitset<Side<D>::num_sides> has_nbr;
-	for (size_t i = 0; i < Side<D>::num_sides; i++) {
-		has_nbr[i] = nbr_info[i] != nullptr;
-	}
-	writer << has_nbr;
-	for (Side<D> s : Side<D>::getValues()) {
-		if (hasNbr(s)) {
-			NbrType type = getNbrType(s);
-			writer << type;
-			switch (type) {
-				case NbrType::Normal: {
-					NormalNbrInfo<D> tmp = getNormalNbrInfo(s);
-					writer << tmp;
-				} break;
-				case NbrType::Fine: {
-					FineNbrInfo<D> tmp = getFineNbrInfo(s);
-					writer << tmp;
-				} break;
-				case NbrType::Coarse: {
-					CoarseNbrInfo<D> tmp = getCoarseNbrInfo(s);
-					writer << tmp;
-				} break;
+	int deserialize(char *buffer)
+	{
+		BufferReader reader(buffer);
+		reader >> id;
+		reader >> ns;
+		reader >> refine_level;
+		reader >> parent_id;
+		reader >> parent_rank;
+		reader >> child_ids;
+		reader >> child_ranks;
+		reader >> rank;
+		reader >> orth_on_parent;
+		reader >> neumann;
+		reader >> starts;
+		reader >> spacings;
+		std::bitset<Side<D>::num_sides> has_nbr;
+		reader >> has_nbr;
+		for (size_t i = 0; i < Side<D>::num_sides; i++) {
+			if (has_nbr[i]) {
+				NbrType type;
+				reader >> type;
+				std::shared_ptr<NbrInfo<D>> info;
+				switch (type) {
+					case NbrType::Normal:
+						info.reset(new NormalNbrInfo<D>());
+						reader >> *std::static_pointer_cast<NormalNbrInfo<D>>(info);
+						break;
+					case NbrType::Fine:
+						info.reset(new FineNbrInfo<D>());
+						reader >> *std::static_pointer_cast<FineNbrInfo<D>>(info);
+						break;
+					case NbrType::Coarse:
+						info.reset(new CoarseNbrInfo<D>());
+						reader >> *std::static_pointer_cast<CoarseNbrInfo<D>>(info);
+						break;
+				}
+				nbr_info[i] = info;
 			}
 		}
+		return reader.getPos();
 	}
-	return writer.getPos();
-}
-template <size_t D> inline int PatchInfo<D>::deserialize(char *buffer)
-{
-	BufferReader reader(buffer);
-	reader >> id;
-	reader >> ns;
-	reader >> refine_level;
-	reader >> parent_id;
-	reader >> parent_rank;
-	reader >> child_ids;
-	reader >> child_ranks;
-	reader >> rank;
-	reader >> orth_on_parent;
-	reader >> neumann;
-	reader >> starts;
-	reader >> spacings;
-	std::bitset<Side<D>::num_sides> has_nbr;
-	reader >> has_nbr;
-	for (size_t i = 0; i < Side<D>::num_sides; i++) {
-		if (has_nbr[i]) {
-			NbrType type;
-			reader >> type;
-			std::shared_ptr<NbrInfo<D>> info;
-			switch (type) {
-				case NbrType::Normal:
-					info.reset(new NormalNbrInfo<D>());
-					reader >> *std::static_pointer_cast<NormalNbrInfo<D>>(info);
-					break;
-				case NbrType::Fine:
-					info.reset(new FineNbrInfo<D>());
-					reader >> *std::static_pointer_cast<FineNbrInfo<D>>(info);
-					break;
-				case NbrType::Coarse:
-					info.reset(new CoarseNbrInfo<D>());
-					reader >> *std::static_pointer_cast<CoarseNbrInfo<D>>(info);
-					break;
-			}
-			nbr_info[i] = info;
-		}
-	}
-	return reader.getPos();
-}
+};
 extern template struct PatchInfo<2>;
 extern template struct PatchInfo<3>;
 } // namespace ThunderEgg
