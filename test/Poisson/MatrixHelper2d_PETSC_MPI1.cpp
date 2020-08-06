@@ -61,7 +61,8 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper2d mh(d_fine);
-	auto                    m_operator = make_shared<PetscMatOp<2>>(mh.formCRSMatrix());
+	Mat                     A          = mh.formCRSMatrix();
+	auto                    m_operator = make_shared<PetscMatOp<2>>(A);
 	m_operator->apply(g_vec, f_vec);
 
 	REQUIRE(f_vec->infNorm() > 0);
@@ -82,6 +83,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
 		});
 	}
+	MatDestroy(&A);
 }
 TEST_CASE(
 "Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPatchOperator with Neumann BC",
@@ -112,7 +114,8 @@ TEST_CASE(
 
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper2d mh(d_fine);
-	auto                    m_operator = make_shared<PetscMatOp<2>>(mh.formCRSMatrix());
+	Mat                     A          = mh.formCRSMatrix();
+	auto                    m_operator = make_shared<PetscMatOp<2>>(A);
 	m_operator->apply(g_vec, f_vec);
 
 	REQUIRE(f_vec->infNorm() > 0);
@@ -133,4 +136,5 @@ TEST_CASE(
 			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
 		});
 	}
+	MatDestroy(&A);
 }
