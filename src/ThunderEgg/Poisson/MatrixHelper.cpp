@@ -29,9 +29,9 @@ MatrixHelper::MatrixHelper(std::shared_ptr<Domain<3>> domain)
 {
 	this->domain = domain;
 }
-PW_explicit<Mat> MatrixHelper::formCRSMatrix(double lambda)
+Mat MatrixHelper::formCRSMatrix(double lambda)
 {
-	PW<Mat> A;
+	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
 	int nx          = domain->getNs()[0];
 	int ny          = domain->getNs()[1];

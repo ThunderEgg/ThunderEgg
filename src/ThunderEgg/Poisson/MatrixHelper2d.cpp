@@ -29,9 +29,9 @@ MatrixHelper2d::MatrixHelper2d(std::shared_ptr<Domain<2>> domain)
 {
 	this->domain = domain;
 }
-PW_explicit<Mat> MatrixHelper2d::formCRSMatrix(double lambda)
+Mat MatrixHelper2d::formCRSMatrix(double lambda)
 {
-	PW<Mat> A;
+	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
 	int nx          = domain->getNs()[0];
 	int ny          = domain->getNs()[1];
@@ -103,22 +103,5 @@ PW_explicit<Mat> MatrixHelper2d::formCRSMatrix(double lambda)
 	}
 	MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
 	MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
-	/*
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-	if (domain->neumann&&rank==0) {
-	    int           ncols;
-	    const int *   cols;
-	    const double *vals;
-	    int row = 0;
-	    MatGetRow(A, 0, &ncols, &cols, &vals);
-	    vector<double> zeros(ncols);
-	    zeros[0]=1;
-	    MatSetValues(A, 1, &row, ncols, cols, &zeros[0], INSERT_VALUES);
-	MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
-	MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
-	    MatRestoreRow(A, 0, &ncols, &cols, &vals);
-	}
-	*/
 	return A;
 }

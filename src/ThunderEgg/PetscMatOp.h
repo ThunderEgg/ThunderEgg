@@ -23,7 +23,6 @@
 #define THUNDEREGG_PETSCMATOP_H
 
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/PW.h>
 #include <ThunderEgg/PetscVector.h>
 #include <petscmat.h>
 
@@ -35,8 +34,8 @@ namespace ThunderEgg
 template <size_t D> class PetscMatOp : public Operator<D>
 {
 	private:
-	PW<Mat> A;
-	Vec     getPetscVecWithoutGhost(std::shared_ptr<const Vector<D>> vec) const
+	Mat A;
+	Vec getPetscVecWithoutGhost(std::shared_ptr<const Vector<D>> vec) const
 	{
 		Vec                                   petsc_vec;
 		std::shared_ptr<const PetscVector<D>> petsc_vec_ptr
@@ -95,7 +94,7 @@ template <size_t D> class PetscMatOp : public Operator<D>
 	}
 
 	public:
-	PetscMatOp(PW<Mat> A)
+	PetscMatOp(Mat A)
 	{
 		this->A = A;
 	}

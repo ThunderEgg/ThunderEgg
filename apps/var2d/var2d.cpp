@@ -549,8 +549,8 @@ int main(int argc, char *argv[])
 			f->shift(-fdiff);
 		}
 
-		std::shared_ptr<Operator<2>> A = p_operator;
-		PW<Mat>                      A_petsc;
+		std::shared_ptr<Operator<2>> A       = p_operator;
+		Mat                          A_petsc = nullptr;
 		std::shared_ptr<Operator<2>> M;
 		///////////////////
 		// setup start
@@ -685,6 +685,9 @@ int main(int argc, char *argv[])
 			writer.write();
 		}
 #endif
+		if (A_petsc != nullptr) {
+			MatDestroy(&A_petsc);
+		}
 	}
 	cout.unsetf(std::ios_base::floatfield);
 	if (my_global_rank == 0) {

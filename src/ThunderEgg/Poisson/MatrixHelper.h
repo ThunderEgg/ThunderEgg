@@ -24,7 +24,6 @@
 
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/PetscVector.h>
-#include <ThunderEgg/PW.h>
 #include <petscmat.h>
 
 namespace ThunderEgg
@@ -55,7 +54,7 @@ class MatrixHelper
 	 *
 	 * @return the formed matrix
 	 */
-	PW_explicit<Mat> formCRSMatrix(double lambda = 0);
+	Mat formCRSMatrix(double lambda = 0);
 };
 } // namespace Poisson
 } // namespace ThunderEgg

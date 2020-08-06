@@ -332,9 +332,9 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 	VecDestroy(&gamma);
 	VecDestroy(&interp);
 }
-PW_explicit<Mat> SchurMatrixHelper::formCRSMatrix()
+Mat SchurMatrixHelper::formCRSMatrix()
 {
-	PW<Mat> A;
+	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
 	int local_size  = sh->getIfaces().size() * n * n;
 	int global_size = sh->getSchurVecGlobalSize();
@@ -542,11 +542,11 @@ PBMatrix *SchurMatrixHelper::formPBMatrix()
 
 	return APB;
 }
-PW_explicit<Mat> SchurMatrixHelper::getPBMatrix()
+Mat SchurMatrixHelper::getPBMatrix()
 {
 	return formPBMatrix()->getMatrix();
 }
-PW_explicit<Mat> SchurMatrixHelper::getPBDiagInv()
+Mat SchurMatrixHelper::getPBDiagInv()
 {
 	return formPBMatrix()->getDiagInv()->getMatrix();
 }

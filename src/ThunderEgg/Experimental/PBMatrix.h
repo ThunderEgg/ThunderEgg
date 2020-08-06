@@ -21,7 +21,6 @@
 
 #ifndef THUNDEREGG_EXPERIMENTAL_PBMATRIX_H
 #define THUNDEREGG_EXPERIMENTAL_PBMATRIX_H
-#include <ThunderEgg/PW.h>
 #include <functional>
 #include <map>
 #include <memory>
@@ -87,9 +86,9 @@ class PBMatrix
 		delete pba;
 		return 0;
 	}
-	PW_explicit<Mat> getMatrix()
+	Mat getMatrix()
 	{
-		PW<Mat> A;
+		Mat A;
 		MatCreateShell(MPI_COMM_WORLD, local_size, local_size, global_size, global_size, this, &A);
 		MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) multiply);
 		MatShellSetOperation(A, MATOP_DESTROY, (void (*)(void)) destroy);
@@ -114,11 +113,12 @@ struct BlockJacobiSmoother {
 	std::shared_ptr<PBMatrix> R;
 	void                      apply(Vec x, Vec b)
 	{
-		PW<Vec> tmp;
+		Vec tmp;
 		VecDuplicate(x, &tmp);
 		R->apply(x, tmp);
 		VecAYPX(tmp, -1, b);
 		D->apply(tmp, x);
+		VecDestroy(&tmp);
 	}
 };
 } // namespace Experimental

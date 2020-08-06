@@ -199,9 +199,9 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 	VecRestoreArray(interp, &interp_view);
 	VecRestoreArray(gamma, &gamma_view);
 }
-PW_explicit<Mat> SchurMatrixHelper2d::formCRSMatrix()
+Mat SchurMatrixHelper2d::formCRSMatrix()
 {
-	PW<Mat> A;
+	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
 	int local_size  = sh->getIfaces().size() * n;
 	int global_size = sh->getSchurVecGlobalSize();

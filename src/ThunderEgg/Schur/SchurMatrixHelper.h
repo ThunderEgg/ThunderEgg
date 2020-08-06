@@ -22,10 +22,10 @@
 #ifndef THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #define THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #include <ThunderEgg/Experimental/PBMatrix.h>
+#include <ThunderEgg/PetscVector.h>
 #include <ThunderEgg/Schur/IfaceInterp.h>
 #include <ThunderEgg/Schur/PatchSolver.h>
 #include <ThunderEgg/Schur/SchurHelper.h>
-#include <ThunderEgg/PetscVector.h>
 #include <functional>
 #include <petscmat.h>
 #include <valarray>
@@ -54,11 +54,11 @@ class SchurMatrixHelper
 		this->interp = interp;
 		n            = sh->getLengths()[0];
 	}
-	PW_explicit<Mat>        formCRSMatrix();
+	Mat                     formCRSMatrix();
 	Experimental::PBMatrix *formPBMatrix();
 	void                    getPBDiagInv(PC p);
-	PW_explicit<Mat>        getPBMatrix();
-	PW_explicit<Mat>        getPBDiagInv();
+	Mat                     getPBMatrix();
+	Mat                     getPBDiagInv();
 };
 } // namespace Schur
 } // namespace ThunderEgg

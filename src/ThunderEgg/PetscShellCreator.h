@@ -180,13 +180,12 @@ class PetscShellCreator
 	 * @return PW_explicit<Mat> Return a new Mat object
 	 */
 	template <size_t D>
-	static PW_explicit<Mat> getMatShell(std::shared_ptr<Operator<D>> op,
-	                                    std::shared_ptr<Domain<D>>   domain)
+	static Mat getMatShell(std::shared_ptr<Operator<D>> op, std::shared_ptr<Domain<D>> domain)
 	{
 		PetscPCShellOpDomain<D> *wrap = new PetscPCShellOpDomain<D>(op, domain);
 		int                      M    = domain->getNumGlobalCells();
 		int                      m    = domain->getNumLocalCells();
-		PW<Mat>                  A;
+		Mat                      A;
 		MatCreateShell(MPI_COMM_WORLD, m, m, M, M, wrap, &A);
 		MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) PetscPCShellOpDomain<D>::applyMat);
 		MatShellSetOperation(A, MATOP_DESTROY,
@@ -204,13 +203,13 @@ class PetscShellCreator
 	 * @return PW_explicit<Mat> Return a new Mat object
 	 */
 	template <size_t D>
-	static PW_explicit<Mat> getMatShell(std::shared_ptr<Operator<D>>           op,
-	                                    std::shared_ptr<Schur::SchurHelper<D>> sh)
+	static Mat getMatShell(std::shared_ptr<Operator<D>>           op,
+	                       std::shared_ptr<Schur::SchurHelper<D>> sh)
 	{
 		PetscPCShellOpSchur<D> *wrap = new PetscPCShellOpSchur<D>(op, sh);
 		int                     M    = sh->getSchurVecGlobalSize();
 		int                     m    = sh->getSchurVecLocalSize();
-		PW<Mat>                 A;
+		Mat                     A;
 		MatCreateShell(MPI_COMM_WORLD, m, m, M, M, wrap, &A);
 		MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) PetscPCShellOpSchur<D>::applyMat);
 		MatShellSetOperation(A, MATOP_DESTROY, (void (*)(void)) PetscPCShellOpSchur<D>::destroyMat);

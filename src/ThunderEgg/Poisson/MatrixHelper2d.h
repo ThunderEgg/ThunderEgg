@@ -23,7 +23,6 @@
 #define THUNDEREGG_POISSON_MATRIXHELPER2D_H
 
 #include <ThunderEgg/Domain.h>
-#include <ThunderEgg/PW.h>
 #include <petscmat.h>
 
 namespace ThunderEgg
@@ -51,7 +50,7 @@ class MatrixHelper2d
 	 *
 	 * @return the formed matrix
 	 */
-	PW_explicit<Mat> formCRSMatrix(double lambda = 0);
+	Mat formCRSMatrix(double lambda = 0);
 };
 } // namespace Poisson
 } // namespace ThunderEgg

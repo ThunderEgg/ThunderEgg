@@ -21,9 +21,8 @@
 
 #ifndef THUNDEREGG_SHUR_SCHURMATRIXHELPER2D_H
 #define THUNDEREGG_SHUR_SCHURMATRIXHELPER2D_H
-#include <ThunderEgg/Schur/SchurHelper.h>
-#include <ThunderEgg/PW.h>
 #include <ThunderEgg/PetscVector.h>
+#include <ThunderEgg/Schur/SchurHelper.h>
 #include <functional>
 #include <memory>
 #include <petscmat.h>
@@ -62,7 +61,7 @@ class SchurMatrixHelper2d
 	 *
 	 * @return the formed matrix
 	 */
-	PW_explicit<Mat> formCRSMatrix();
+	Mat formCRSMatrix();
 };
 } // namespace Schur
 } // namespace ThunderEgg
