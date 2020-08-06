@@ -1,2 +1,5 @@
 ignore:
   - "test/*"
+  - "apps/*"
+  - "tpl/*"
+  - "src/ThunderEgg/Experimental*"
