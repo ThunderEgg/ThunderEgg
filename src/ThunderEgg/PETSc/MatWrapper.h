@@ -128,12 +128,9 @@ template <size_t D> class MatWrapper : public Operator<D>
 	 *
 	 * This object will not deallocate the PETSc Mat, you are responsible for deallocating it.
 	 *
-	 * @param A the PETSc Mat to wrap
+	 * @param A_in the PETSc Mat to wrap
 	 */
-	MatWrapper(Mat A)
-	{
-		this->A = A;
-	}
+	explicit MatWrapper(Mat A_in) : A(A_in) {}
 	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 	{
 		Vec petsc_x = getPetscVecWithoutGhost(x);
