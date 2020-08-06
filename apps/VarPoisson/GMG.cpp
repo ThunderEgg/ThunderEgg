@@ -31,7 +31,7 @@
 #include <ThunderEgg/GMG/CycleFactory.h>
 #include <ThunderEgg/GMG/DrctIntp.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/PetscMatOp.h>
+#include <ThunderEgg/MatWrapper.h>
 #include <ThunderEgg/PetscShellCreator.h>
 #include <ThunderEgg/SchwarzPrec.h>
 #include <ThunderEgg/Timer.h>

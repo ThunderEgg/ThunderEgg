@@ -26,7 +26,7 @@
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/VCycle.h>
 #include <ThunderEgg/GMG/WCycle.h>
-#include <ThunderEgg/PetscMatOp.h>
+#include <ThunderEgg/PETSc/MatWrapper.h>
 #include <ThunderEgg/Poisson/MatrixHelper2d.h>
 #include <ThunderEgg/SchurDomainOp.h>
 #include <ThunderEgg/ValVectorGenerator.h>
@@ -45,7 +45,7 @@ static std::shared_ptr<Operator<2>> getNewOperator(std::string                  
 	std::shared_ptr<Operator<2>> op;
 	if (op_type == "crs_matrix") {
 		MatrixHelper2d mh(domain);
-		op.reset(new PetscMatOp<2>(mh.formCRSMatrix()));
+		op.reset(new PETSc::MatWrapper<2>(mh.formCRSMatrix()));
 	} else if (op_type == "matrix_free") {
 		op.reset(new SchurDomainOp<2>(sh, interp, pop));
 	}

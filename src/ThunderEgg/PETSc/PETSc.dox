@@ -1,0 +1,4 @@
+/**
+ * @namespace PETSc
+ * @brief A collection of wrapper for operating with PETSc
+ */

@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_PETSCMATOP_H
-#define THUNDEREGG_PETSCMATOP_H
+#ifndef THUNDEREGG_PETSC_MATWRAPPER_H
+#define THUNDEREGG_PETSC_MATWRAPPER_H
 
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/PetscVector.h>
@@ -28,13 +28,24 @@
 
 namespace ThunderEgg
 {
+namespace PETSc
+{
 /**
- * @brief Base class for operators
+ * @brief Wraps a PETSc Mat object for use as a ThunderEgg Operator
  */
-template <size_t D> class PetscMatOp : public Operator<D>
+template <size_t D> class MatWrapper : public Operator<D>
 {
 	private:
+	/**
+	 * @brief The PETSc matrix
+	 */
 	Mat A;
+	/**
+	 * @brief Allocate a PETSc Vec without the additional padding for ghost cells
+	 *
+	 * @param vec the ThunderEgg Vector
+	 * @return Vec the PETSc Vec
+	 */
 	Vec getPetscVecWithoutGhost(std::shared_ptr<const Vector<D>> vec) const
 	{
 		Vec                                   petsc_vec;
@@ -48,6 +59,12 @@ template <size_t D> class PetscMatOp : public Operator<D>
 		}
 		return petsc_vec;
 	}
+	/**
+	 * @brief Copy to a PETSc Vec from a ThunderEgg Vector
+	 *
+	 * @param vec the ThunderEgg Vector
+	 * @param petsc_vec the PETSc Vec to copy to
+	 */
 	void copyToPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
 	{
 		std::shared_ptr<const PetscVector<D>> petsc_vec_ptr
@@ -66,6 +83,12 @@ template <size_t D> class PetscMatOp : public Operator<D>
 			VecRestoreArray(petsc_vec, &petsc_vec_view);
 		}
 	}
+	/**
+	 * @brief Copy from a PETSc Vec to a ThunderEgg Vector
+	 *
+	 * @param petsc_vec the PETSc Vec
+	 * @param vec the ThunderEgg Vector
+	 */
 	void copyToVec(Vec petsc_vec, std::shared_ptr<Vector<D>> vec) const
 	{
 		std::shared_ptr<PetscVector<D>> petsc_vec_ptr
@@ -84,6 +107,12 @@ template <size_t D> class PetscMatOp : public Operator<D>
 			VecRestoreArrayRead(petsc_vec, &petsc_vec_view);
 		}
 	}
+	/**
+	 * @brief Deallocate the PETSc vector
+	 *
+	 * @param vec the corresponding ThunderEgg Vector
+	 * @param petsc_vec the PETSc Vec to deallocate
+	 */
 	void destroyPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
 	{
 		std::shared_ptr<const PetscVector<D>> petsc_vec_ptr
@@ -94,16 +123,17 @@ template <size_t D> class PetscMatOp : public Operator<D>
 	}
 
 	public:
-	PetscMatOp(Mat A)
+	/**
+	 * @brief Construct a new MatWrapper object
+	 *
+	 * This object will not deallocate the PETSc Mat, you are responsible for deallocating it.
+	 *
+	 * @param A the PETSc Mat to wrap
+	 */
+	MatWrapper(Mat A)
 	{
 		this->A = A;
 	}
-	/**
-	 * @brief Apply Petsc matrix
-	 *
-	 * @param x the input vector.
-	 * @param b the output vector.
-	 */
 	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 	{
 		Vec petsc_x = getPetscVecWithoutGhost(x);
@@ -119,5 +149,6 @@ template <size_t D> class PetscMatOp : public Operator<D>
 		destroyPetscVec(b, petsc_b);
 	}
 };
+} // namespace PETSc
 } // namespace ThunderEgg
 #endif

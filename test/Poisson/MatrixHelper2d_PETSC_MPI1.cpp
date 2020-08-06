@@ -24,7 +24,7 @@
 #include <ThunderEgg/BiQuadraticGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/PetscMatOp.h>
+#include <ThunderEgg/PETSc/MatWrapper.h>
 #include <ThunderEgg/PetscVector.h>
 #include <ThunderEgg/Poisson/MatrixHelper2d.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
@@ -62,7 +62,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper2d mh(d_fine);
 	Mat                     A          = mh.formCRSMatrix();
-	auto                    m_operator = make_shared<PetscMatOp<2>>(A);
+	auto                    m_operator = make_shared<PETSc::MatWrapper<2>>(A);
 	m_operator->apply(g_vec, f_vec);
 
 	REQUIRE(f_vec->infNorm() > 0);
@@ -115,7 +115,7 @@ TEST_CASE(
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper2d mh(d_fine);
 	Mat                     A          = mh.formCRSMatrix();
-	auto                    m_operator = make_shared<PetscMatOp<2>>(A);
+	auto                    m_operator = make_shared<PETSc::MatWrapper<2>>(A);
 	m_operator->apply(g_vec, f_vec);
 
 	REQUIRE(f_vec->infNorm() > 0);

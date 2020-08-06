@@ -57,7 +57,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
 
 if(PETSC_FOUND)
 
-  list(APPEND ThunderEgg_HDRS ThunderEgg/PetscMatOp.h)
+  list(APPEND ThunderEgg_HDRS ThunderEgg/PETSc/MatWrapper.h)
   list(APPEND ThunderEgg_HDRS ThunderEgg/PetscShellCreator.h)
   list(APPEND ThunderEgg_HDRS ThunderEgg/PetscVector.h)
 

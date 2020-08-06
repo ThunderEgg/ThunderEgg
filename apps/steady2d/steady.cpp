@@ -26,7 +26,7 @@
 #include <ThunderEgg/DomainWrapOp.h>
 #include <ThunderEgg/Experimental/DomGen.h>
 #include <ThunderEgg/GMG/CycleFactory2d.h>
-#include <ThunderEgg/PetscMatOp.h>
+#include <ThunderEgg/MatWrapper.h>
 #include <ThunderEgg/PetscShellCreator.h>
 #include <ThunderEgg/Poisson/MatrixHelper2d.h>
 #include <ThunderEgg/Poisson/Schur/DftPatchSolver.h>
@@ -432,7 +432,7 @@ int main(int argc, char *argv[])
 			} else if (matrix_type == "crs") {
 				SchurMatrixHelper2d smh(sch);
 				A_petsc = smh.formCRSMatrix();
-				A.reset(new PetscMatOp<1>(A_petsc));
+				A.reset(new MatWrapper<1>(A_petsc));
 				if (setrow) {
 					int row = 0;
 					MatZeroRows(A_petsc, 1, &row, 1.0, nullptr, nullptr);
@@ -521,7 +521,7 @@ int main(int argc, char *argv[])
 			} else if (matrix_type == "crs") {
 				MatrixHelper2d mh(domain);
 				A_petsc = mh.formCRSMatrix();
-				A.reset(new PetscMatOp<2>(A_petsc));
+				A.reset(new MatWrapper<2>(A_petsc));
 				if (setrow) {
 					int row = 0;
 					MatZeroRows(A_petsc, 1, &row, 1.0, nullptr, nullptr);
