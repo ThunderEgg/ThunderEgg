@@ -47,6 +47,7 @@ jobs:
     after_script: 
         - gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
         - sonar-scanner
+        - bash <(curl -s https://codecov.io/bash)
     deploy:
       skip_cleanup: true
       provider: script
