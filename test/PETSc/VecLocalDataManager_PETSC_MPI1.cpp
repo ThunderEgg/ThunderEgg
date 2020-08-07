@@ -60,7 +60,11 @@ TEST_CASE("PETSc::VecLocalDataManager throws exception when Vec is read only",
 {
 	Vec vec;
 	VecCreateMPI(MPI_COMM_WORLD, 100, PETSC_DETERMINE, &vec);
+#if PETSC_VERSION_LT(3, 11, 0)
+	VecLockPush(vec);
+#else
 	VecLockReadPush(vec);
+#endif
 
 	CHECK_THROWS_AS(PETSc::VecLocalDataManager(vec, false), RuntimeError);
 
