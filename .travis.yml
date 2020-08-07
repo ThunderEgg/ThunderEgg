@@ -15,7 +15,7 @@ jobs:
           - libfftw3-dev
           - libopenmpi-dev
           - openmpi-bin
-          - petsc-dev
+          - libpetsc3.7.7-dbg
           - libblas-dev
           - liblapack-dev
           - libtrilinos-zoltan-dev
@@ -34,7 +34,7 @@ jobs:
           - libfftw3-dev
           - libopenmpi-dev
           - openmpi-bin
-          - petsc-dev
+          - libpetsc3.7.7-dbg
           - libblas-dev
           - liblapack-dev
           - libtrilinos-zoltan-dev
