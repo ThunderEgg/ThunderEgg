@@ -66,7 +66,9 @@ TEST_CASE("PETSc::VecLocalDataManager throws exception when Vec is read only",
 	VecLockReadPush(vec);
 #endif
 
+#if PETSC_USE_DEBUG
 	CHECK_THROWS_AS(PETSc::VecLocalDataManager(vec, false), RuntimeError);
+#endif
 
 	VecDestroy(&vec);
 }
