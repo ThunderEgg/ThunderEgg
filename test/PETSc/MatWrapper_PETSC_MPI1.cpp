@@ -23,7 +23,7 @@
 #include "catch.hpp"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
-#include <ThunderEgg/PetscVector.h>
+#include <ThunderEgg/PETSc/VecWrapper.h>
 #include <ThunderEgg/ValVector.h>
 #include <petscmat.h>
 using namespace std;
@@ -80,7 +80,8 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 	}
 	MatDestroy(&A);
 }
-TEST_CASE("PETSc::MatWrapper works with PetscVector with ghost and 0.5I", "[PETSc::MatWrapper]")
+TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper with ghost and 0.5I",
+          "[PETSc::MatWrapper]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
@@ -95,9 +96,9 @@ TEST_CASE("PETSc::MatWrapper works with PetscVector with ghost and 0.5I", "[PETS
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto x = PetscVector<2>::GetNewVector(d_fine);
+	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine);
 	DomainTools<2>::setValues(d_fine, x, gfun);
-	auto b = PetscVector<2>::GetNewVector(d_fine);
+	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine);
 
 	// create an Identity matrix
 	Mat A;
@@ -129,7 +130,8 @@ TEST_CASE("PETSc::MatWrapper works with PetscVector with ghost and 0.5I", "[PETS
 	}
 	MatDestroy(&A);
 }
-TEST_CASE("PETSc::MatWrapper works with PetscVector without ghost and 0.5I", "[PETSc::MatWrapper]")
+TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper without ghost and 0.5I",
+          "[PETSc::MatWrapper]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
@@ -144,9 +146,9 @@ TEST_CASE("PETSc::MatWrapper works with PetscVector without ghost and 0.5I", "[P
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto x = PetscVector<2>::GetNewVector(d_fine);
+	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine);
 	DomainTools<2>::setValues(d_fine, x, gfun);
-	auto b = PetscVector<2>::GetNewVector(d_fine);
+	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine);
 
 	// create an Identity matrix
 	Mat A;

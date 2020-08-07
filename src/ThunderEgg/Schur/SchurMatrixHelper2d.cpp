@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include "SchurMatrixHelper2d.h"
+#include <ThunderEgg/PETSc/VecWrapper.h>
 #include <array>
 #include <numeric>
 #include <tuple>
@@ -111,12 +112,12 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 	VecCreateSeq(PETSC_COMM_SELF, n * n, &e);
 	VecCreateSeq(PETSC_COMM_SELF, n, &gamma);
 	VecCreateSeq(PETSC_COMM_SELF, n, &interp);
-	std::shared_ptr<Vector<2>> u_vec(new PetscVector<2>(u, -1, {n, n}, 0));
-	std::shared_ptr<Vector<2>> f_vec(new PetscVector<2>(f, -1, {n, n}, 0));
-	std::shared_ptr<Vector<2>> r_vec(new PetscVector<2>(r, -1, {n, n}, 0));
-	std::shared_ptr<Vector<2>> e_vec(new PetscVector<2>(e, -1, {n, n}, 0));
-	std::shared_ptr<Vector<1>> interp_vec(new PetscVector<1>(interp, -1, {n}, 0));
-	std::shared_ptr<Vector<1>> gamma_vec(new PetscVector<1>(gamma, -1, {n}, 0));
+	std::shared_ptr<Vector<2>> u_vec(new PETSc::VecWrapper<2>(u, {n, n}, 0, false));
+	std::shared_ptr<Vector<2>> f_vec(new PETSc::VecWrapper<2>(f, {n, n}, 0, false));
+	std::shared_ptr<Vector<2>> r_vec(new PETSc::VecWrapper<2>(r, {n, n}, 0, false));
+	std::shared_ptr<Vector<2>> e_vec(new PETSc::VecWrapper<2>(e, {n, n}, 0, false));
+	std::shared_ptr<Vector<1>> interp_vec(new PETSc::VecWrapper<1>(interp, {n}, 0, false));
+	std::shared_ptr<Vector<1>> gamma_vec(new PETSc::VecWrapper<1>(gamma, {n}, 0, false));
 	double *                   interp_view, *gamma_view;
 	VecGetArray(interp, &interp_view);
 	VecGetArray(gamma, &gamma_view);

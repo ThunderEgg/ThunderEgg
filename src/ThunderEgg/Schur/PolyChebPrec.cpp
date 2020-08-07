@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include "PolyChebPrec.h"
+#include <ThunderEgg/ValVector.h>
 #include <iostream>
 using namespace std;
 using namespace ThunderEgg;
@@ -35,8 +36,8 @@ PolyChebPrec::PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<Sc
 }
 void PolyChebPrec::apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const
 {
-	std::shared_ptr<Vector<3>> f = PetscVector<3>::GetNewVector(domain);
-	std::shared_ptr<Vector<3>> u = PetscVector<3>::GetNewVector(domain);
+	std::shared_ptr<Vector<3>> f = ValVector<3>::GetNewVector(domain);
+	std::shared_ptr<Vector<3>> u = ValVector<3>::GetNewVector(domain);
 
 	std::shared_ptr<Vector<2>> bk  = sh->getNewSchurVec();
 	std::shared_ptr<Vector<2>> bk1 = sh->getNewSchurVec();

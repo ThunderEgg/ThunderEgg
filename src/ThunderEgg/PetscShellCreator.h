@@ -49,9 +49,9 @@ class PetscShellCreator
 			PetscPCShellOpDomain<D> *wrap = nullptr;
 			MatShellGetContext(A, &wrap);
 			std::shared_ptr<const Vector<D>> x_vec(
-			new PetscVector<D>(x, -1, wrap->domain->getNs(), false));
+			new PETSc::VecWrapper<D>(x, wrap->domain->getNs(), false));
 			std::shared_ptr<Vector<D>> b_vec(
-			new PetscVector<D>(b, -1, wrap->domain->getNs(), false));
+			new PETSc::VecWrapper<D>(b, wrap->domain->getNs(), false));
 			wrap->op->apply(x_vec, b_vec);
 			return 0;
 		}
@@ -67,9 +67,9 @@ class PetscShellCreator
 			PetscPCShellOpDomain<D> *wrap = nullptr;
 			PCShellGetContext(P, (void **) &wrap);
 			std::shared_ptr<Vector<D>> x_vec(
-			new PetscVector<D>(x, -1, wrap->domain->getNs(), false));
+			new PETSc::VecWrapper<D>(x, wrap->domain->getNs(), 0, false));
 			std::shared_ptr<Vector<D>> b_vec(
-			new PetscVector<D>(b, -1, wrap->domain->getNs(), false));
+			new PETSc::VecWrapper<D>(b, wrap->domain->getNs(), 0, false));
 			wrap->op->apply(x_vec, b_vec);
 			return 0;
 		}
@@ -99,9 +99,9 @@ class PetscShellCreator
 			PetscPCShellOpSchur<D> *wrap = nullptr;
 			MatShellGetContext(A, &wrap);
 			std::shared_ptr<Vector<D>> x_vec(
-			new PetscVector<D>(x, -1, wrap->sh->getLengths(), false));
+			new PETSc::VecWrapper<D>(x, -1, wrap->sh->getLengths(), false));
 			std::shared_ptr<Vector<D>> b_vec(
-			new PetscVector<D>(b, -1, wrap->sh->getLengths(), false));
+			new PETSc::VecWrapper<D>(b, -1, wrap->sh->getLengths(), false));
 			wrap->op->apply(x_vec, b_vec);
 			return 0;
 		}
@@ -117,9 +117,9 @@ class PetscShellCreator
 			PetscPCShellOpSchur<D> *wrap = nullptr;
 			PCShellGetContext(P, (void **) &wrap);
 			std::shared_ptr<Vector<D>> x_vec(
-			new PetscVector<D>(x, -1, wrap->sh->getLengths(), false));
+			new PETSc::VecWrapper<D>(x, -1, wrap->sh->getLengths(), false));
 			std::shared_ptr<Vector<D>> b_vec(
-			new PetscVector<D>(b, -1, wrap->sh->getLengths(), false));
+			new PETSc::VecWrapper<D>(b, -1, wrap->sh->getLengths(), false));
 			wrap->op->apply(x_vec, b_vec);
 			return 0;
 		}

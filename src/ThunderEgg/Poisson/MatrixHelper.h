@@ -23,7 +23,6 @@
 #define THUNDEREGG_POISSON_MATRIXHELPER_H
 
 #include <ThunderEgg/Domain.h>
-#include <ThunderEgg/PetscVector.h>
 #include <petscmat.h>
 
 namespace ThunderEgg

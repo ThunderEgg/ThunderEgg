@@ -23,7 +23,6 @@
 #define THUNDEREGG_SCHUR_POLYCHEBPREC_H
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/PetscVector.h>
 #include <ThunderEgg/Schur/IfaceInterp.h>
 #include <ThunderEgg/Schur/PatchSolver.h>
 #include <ThunderEgg/Schur/SchurHelper.h>

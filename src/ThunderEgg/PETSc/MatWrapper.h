@@ -23,7 +23,7 @@
 #define THUNDEREGG_PETSC_MATWRAPPER_H
 
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/PetscVector.h>
+#include <ThunderEgg/PETSc/VecWrapper.h>
 #include <petscmat.h>
 
 namespace ThunderEgg
@@ -48,11 +48,11 @@ template <size_t D> class MatWrapper : public Operator<D>
 	 */
 	Vec getPetscVecWithoutGhost(std::shared_ptr<const Vector<D>> vec) const
 	{
-		Vec                                   petsc_vec;
-		std::shared_ptr<const PetscVector<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<const PetscVector<D>>(vec);
+		Vec                                         petsc_vec;
+		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr
+		= std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
 		if (petsc_vec_ptr != nullptr && petsc_vec_ptr->getNumGhostCells() == 0) {
-			petsc_vec = petsc_vec_ptr->vec;
+			petsc_vec = petsc_vec_ptr->getVec();
 		} else {
 			// have to create a new petsc vector without ghostcells for petsc call
 			VecCreateMPI(vec->getMPIComm(), vec->getNumLocalCells(), PETSC_DETERMINE, &petsc_vec);
@@ -67,8 +67,8 @@ template <size_t D> class MatWrapper : public Operator<D>
 	 */
 	void copyToPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
 	{
-		std::shared_ptr<const PetscVector<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<const PetscVector<D>>(vec);
+		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr
+		= std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
 		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
 			double *petsc_vec_view;
 			size_t  curr_index = 0;
@@ -91,8 +91,8 @@ template <size_t D> class MatWrapper : public Operator<D>
 	 */
 	void copyToVec(Vec petsc_vec, std::shared_ptr<Vector<D>> vec) const
 	{
-		std::shared_ptr<PetscVector<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<PetscVector<D>>(vec);
+		std::shared_ptr<PETSc::VecWrapper<D>> petsc_vec_ptr
+		= std::dynamic_pointer_cast<PETSc::VecWrapper<D>>(vec);
 		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
 			const double *petsc_vec_view;
 			size_t        curr_index = 0;
@@ -115,8 +115,8 @@ template <size_t D> class MatWrapper : public Operator<D>
 	 */
 	void destroyPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
 	{
-		std::shared_ptr<const PetscVector<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<const PetscVector<D>>(vec);
+		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr
+		= std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
 		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
 			VecDestroy(&petsc_vec);
 		}

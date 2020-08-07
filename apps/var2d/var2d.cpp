@@ -115,7 +115,7 @@ class fivePoint : public PatchOperator<2>
 
 			std::shared_ptr<const Domain<2>> finer_domain = level->getFiner()->getDomain();
 			auto                             finer_op     = generated_operators[finer_domain];
-			// auto new_coeffs = PetscVector<2>::GetNewVector(level->getDomain());
+			// auto new_coeffs = PETSc::VecWrapper<2>::GetNewVector(level->getDomain());
 			// level->getFiner()->getRestrictor().restrict(new_coeffs, finer_op->coeffs);
 			coarser_op.reset(new fivePoint(level->getDomain(), filler_gen(level)));
 			return coarser_op;
@@ -513,12 +513,12 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		shared_ptr<ValVector<2>>   u     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>   exact = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>   f     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>   au    = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>   h     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<PetscVector<1>> h_bc  = PetscVector<2>::GetNewBCVector(domain);
+		shared_ptr<ValVector<2>>         u     = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>         exact = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>         f     = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>         au    = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>         h     = ValVector<2>::GetNewVector(domain);
+		shared_ptr<PETSc::VecWrapper<1>> h_bc  = PETSc::VecWrapper<2>::GetNewBCVector(domain);
 
 		DomainTools<2>::setValues(domain, f, ffun);
 		DomainTools<2>::setValues(domain, exact, gfun);

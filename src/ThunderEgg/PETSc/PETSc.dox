@@ -1,4 +1,4 @@
 /**
  * @namespace ThunderEgg::PETSc
- * @brief A collection of wrapper for operating with PETSc
+ * @brief A collection of wrappers for operating with PETSc
  */

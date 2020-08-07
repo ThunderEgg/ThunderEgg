@@ -22,7 +22,6 @@
 #ifndef THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #define THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #include <ThunderEgg/Experimental/PBMatrix.h>
-#include <ThunderEgg/PetscVector.h>
 #include <ThunderEgg/Schur/IfaceInterp.h>
 #include <ThunderEgg/Schur/PatchSolver.h>
 #include <ThunderEgg/Schur/SchurHelper.h>

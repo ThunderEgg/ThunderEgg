@@ -59,7 +59,7 @@ if(PETSC_FOUND)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/PETSc/MatWrapper.h)
   list(APPEND ThunderEgg_HDRS ThunderEgg/PetscShellCreator.h)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/PetscVector.h)
+  list(APPEND ThunderEgg_HDRS ThunderEgg/PETSc/VecWrapper.h)
 
 endif(PETSC_FOUND)
 
