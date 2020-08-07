@@ -55,3 +55,14 @@ TEST_CASE("PETSc::VecLocalDataManager getVecView read only", "[PETSc::VecLocalDa
 	VecRestoreArray(vec, &view);
 	VecDestroy(&vec);
 }
+TEST_CASE("PETSc::VecLocalDataManager throws exception when Vec is read only",
+          "[PETSc::VecLocalDataManager]")
+{
+	Vec vec;
+	VecCreateMPI(MPI_COMM_WORLD, 100, PETSC_DETERMINE, &vec);
+	VecLockReadPush(vec);
+
+	CHECK_THROWS_AS(PETSc::VecLocalDataManager(vec, false), RuntimeError);
+
+	VecDestroy(&vec);
+}

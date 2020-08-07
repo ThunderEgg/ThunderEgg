@@ -60,8 +60,11 @@ if(PETSC_FOUND)
   list(APPEND ThunderEgg_HDRS ThunderEgg/PETSc/MatWrapper.h)
   list(APPEND ThunderEgg_HDRS ThunderEgg/PetscShellCreator.h)
   list(APPEND ThunderEgg_HDRS ThunderEgg/PETSc/VecWrapper.h)
+  list(APPEND ThunderEgg_HDRS ThunderEgg/PETSc/VecLocalDataManager.h)
 
 endif(PETSC_FOUND)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/SchurDomainOp.h)
 

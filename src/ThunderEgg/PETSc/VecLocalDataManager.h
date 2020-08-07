@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_PETSC_VECLOCALDATAMANAGER_H
 #define THUNDEREGG_PETSC_VECLOCALDATAMANAGER_H
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
 #include <petscvec.h>
 
@@ -65,7 +66,7 @@ class VecLocalDataManager : public LocalDataManager
 			int state;
 			VecLockGet(vec, &state);
 			if (state != 0) {
-				throw std::runtime_error("Vector is in state " + std::to_string(state));
+				throw RuntimeError("PETSc Vec is in state " + std::to_string(state));
 			}
 			VecGetArray(vec, &vec_view);
 		}
