@@ -8,6 +8,8 @@ apt:
 jobs:
   include:
   - compiler: clang
+    env:
+      - CMAKE_FLAGS: "-DPETSC_DIR=/usr/lib/petscdir/3.7.7/x86_64-linux-gnu-real-debug/"
     addons:
       apt:
         packages:
@@ -25,6 +27,7 @@ jobs:
       - DOXYFILE: $TRAVIS_BUILD_DIR/Doxyfile
       - GH_REPO_REF: github.com/ThunderEgg/thunderegg.github.io
       - GH_SUB_DIR: docs/$TRAVIS_BRANCH
+      - CMAKE_FLAGS: "-DPETSC_DIR=/usr/lib/petscdir/3.7.7/x86_64-linux-gnu-real-debug/"
     addons:
       sonarcloud:
           organization: "thunderegg"
@@ -84,6 +87,6 @@ before_install:
 script:
   - export CXXFLAGS="-g -O0 -Wall -W -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option $CXXFLAGS"
   - echo $CXXFLAGS
-  - cmake .
+  - cmake $CMAKE_FLAGS .
   - $BUILD_WRAPPER make
   - ctest --output-on-failure
