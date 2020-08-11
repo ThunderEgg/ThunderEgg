@@ -61,6 +61,9 @@ template <size_t D> class PCShellCreator
 	{
 	}
 	PCShellCreator(const PCShellCreator &) = delete;
+	PCShellCreator &operator=(const PCShellCreator &) = delete;
+	PCShellCreator(PCShellCreator &&) noexcept        = delete;
+	PCShellCreator &operator=(PCShellCreator &&) noexcept = delete;
 	/**
 	 * @brief Destroy the PCShellCreator object
 	 */

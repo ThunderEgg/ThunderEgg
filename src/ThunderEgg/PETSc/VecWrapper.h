@@ -96,6 +96,8 @@ template <size_t D> class VecWrapper : public Vector<D>
 	}
 	VecWrapper(const VecWrapper &) = delete;
 	VecWrapper &operator=(const VecWrapper &) = delete;
+	VecWrapper(VecWrapper &&) noexcept        = delete;
+	VecWrapper &operator=(VecWrapper &&) noexcept = delete;
 
 	/**
 	 * @brief Get a new VecWrapper object for a given Domain
