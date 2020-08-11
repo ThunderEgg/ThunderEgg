@@ -94,6 +94,8 @@ template <size_t D> class VecWrapper : public Vector<D>
 		}
 		this->num_local_cells = this->num_local_patches * num_cells_in_patch;
 	}
+	VecWrapper(const VecWrapper &) = delete;
+	VecWrapper &operator=(const VecWrapper &) = delete;
 
 	/**
 	 * @brief Get a new VecWrapper object for a given Domain

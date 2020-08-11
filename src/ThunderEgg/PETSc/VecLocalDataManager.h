@@ -72,6 +72,7 @@ class VecLocalDataManager : public LocalDataManager
 		}
 	}
 	VecLocalDataManager(const VecLocalDataManager &) = delete;
+	VecLocalDataManager &operator=(const VecLocalDataManager &) = delete;
 	/**
 	 * @brief Destroy the VecLocalDataManager object
 	 */
