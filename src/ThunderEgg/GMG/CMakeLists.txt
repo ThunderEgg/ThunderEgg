@@ -12,6 +12,8 @@ endif(PETSC_FOUND)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleFactoryCtx.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleBuilder.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleOpts.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/DrctIntp.h)
