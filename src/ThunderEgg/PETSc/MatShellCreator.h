@@ -28,16 +28,41 @@ namespace ThunderEgg
 {
 namespace PETSc
 {
+/**
+ * @brief Wraps a ThunderEgg operator for use as a PETSc Mat
+ *
+ * @tparam D the number of Cartesian dimensions
+ */
 template <size_t D> class MatShellCreator
 {
 	private:
-	std::shared_ptr<Operator<D>>        op;
+	/**
+	 * @brief the operator we are wrapping
+	 */
+	std::shared_ptr<Operator<D>> op;
+	/**
+	 * @brief the vector generator we are using
+	 */
 	std::shared_ptr<VectorGenerator<D>> vg;
 
+	/**
+	 * @brief Construct a new MatShellCreator object
+	 *
+	 * @param op_in the Operator
+	 * @param vg_in the VectorGenerator
+	 */
 	MatShellCreator(std::shared_ptr<Operator<D>> op_in, std::shared_ptr<VectorGenerator<D>> vg_in)
 	: op(op_in), vg(vg_in)
 	{
 	}
+	/**
+	 * @brief Apply the PETSC MatShell
+	 *
+	 * @param A the MatShell
+	 * @param x the x vector (input)
+	 * @param b the b vector (output)
+	 * @return int PETSC error
+	 */
 	static int applyMat(Mat A, Vec x, Vec b)
 	{
 		MatShellCreator<D> *msc = nullptr;
@@ -76,6 +101,12 @@ template <size_t D> class MatShellCreator
 
 		return 0;
 	}
+	/**
+	 * @brief Deallocate the wrapper
+	 *
+	 * @param A the wrapped operator
+	 * @return int PETSc error code
+	 */
 	static int destroyMat(Mat A)
 	{
 		MatShellCreator<D> *msc = nullptr;
@@ -85,6 +116,13 @@ template <size_t D> class MatShellCreator
 	}
 
 	public:
+	/**
+	 * @brief Get a new MatShell for use with PETSc
+	 *
+	 * @param op the operator we are wrapping
+	 * @param vg the associated vectorGenerator for that object
+	 * @return Mat the wrapped operator, you are responsible for calling MatDestroy on this
+	 */
 	static Mat GetNewMatShell(std::shared_ptr<Operator<D>>        op,
 	                          std::shared_ptr<VectorGenerator<D>> vg)
 	{
