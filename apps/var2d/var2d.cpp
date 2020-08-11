@@ -32,7 +32,7 @@
 #include <ThunderEgg/GMG/DrctIntp.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
-#include <ThunderEgg/PetscShellCreator.h>
+#include <ThunderEgg/PETSc/PCShellCreator.h>
 #include <ThunderEgg/SchwarzPrec.h>
 #include <ThunderEgg/Timer.h>
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>
@@ -513,12 +513,13 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		shared_ptr<ValVector<2>>         u     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>         exact = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>         f     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>         au    = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>         h     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<PETSc::VecWrapper<1>> h_bc  = PETSc::VecWrapper<2>::GetNewBCVector(domain);
+		std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain));
+		shared_ptr<ValVector<2>>            u     = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>            exact = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>            f     = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>            au    = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>>            h     = ValVector<2>::GetNewVector(domain);
+		shared_ptr<PETSc::VecWrapper<1>>    h_bc  = PETSc::VecWrapper<2>::GetNewBCVector(domain);
 
 		DomainTools<2>::setValues(domain, f, ffun);
 		DomainTools<2>::setValues(domain, exact, gfun);
@@ -591,9 +592,8 @@ int main(int argc, char *argv[])
 			// KSPSetFromOptions(solver);
 			// KSPSetOperators(solver, A_petsc, A_petsc);
 			if (M != nullptr) {
-				PC M_petsc = nullptr;
+				PC M_petsc = PETSc::PCShellCreator<2>::GetNewPCShell(M, vg);
 				// KSPGetPC(solver, &M_petsc);
-				PetscShellCreator::getPCShell(M_petsc, M, domain);
 			}
 			// KSPSetUp(solver);
 			// KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
@@ -616,8 +616,6 @@ int main(int argc, char *argv[])
 			}
 			*/
 		} else {
-			std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain));
-
 			u->set(0);
 			int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000, 1e-12, timer);
 			if (my_global_rank == 0) {

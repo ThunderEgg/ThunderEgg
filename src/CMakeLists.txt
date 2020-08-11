@@ -55,15 +55,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/PatchOperator.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
 
-if(PETSC_FOUND)
-
-  list(APPEND ThunderEgg_HDRS ThunderEgg/PETSc/MatWrapper.h)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/PetscShellCreator.h)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/PETSc/VecWrapper.h)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/PETSc/VecLocalDataManager.h)
-
-endif(PETSC_FOUND)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/SchurDomainOp.h)
@@ -89,11 +80,12 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/Vector.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/VectorGenerator.h)
 
-include(ThunderEgg/Poisson/CMakeLists.txt)
-include(ThunderEgg/VarPoisson/CMakeLists.txt)
-include(ThunderEgg/GMG/CMakeLists.txt)
-include(ThunderEgg/Schur/CMakeLists.txt)
 include(ThunderEgg/Experimental/CMakeLists.txt)
+include(ThunderEgg/GMG/CMakeLists.txt)
+include(ThunderEgg/PETSc/CMakeLists.txt)
+include(ThunderEgg/Poisson/CMakeLists.txt)
+include(ThunderEgg/Schur/CMakeLists.txt)
+include(ThunderEgg/VarPoisson/CMakeLists.txt)
 
 add_library(ThunderEgg ${ThunderEgg_SRCS} ${ThunderEgg_HDRS})
 target_compile_features(ThunderEgg PUBLIC cxx_std_11)
