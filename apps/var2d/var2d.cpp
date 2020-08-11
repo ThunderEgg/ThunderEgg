@@ -592,7 +592,7 @@ int main(int argc, char *argv[])
 			// KSPSetFromOptions(solver);
 			// KSPSetOperators(solver, A_petsc, A_petsc);
 			if (M != nullptr) {
-				PC M_petsc = PETSc::PCShellCreator<2>::GetNewPCShell(M, vg);
+				PC M_petsc = PETSc::PCShellCreator<2>::GetNewPCShell(M, A, vg);
 				// KSPGetPC(solver, &M_petsc);
 			}
 			// KSPSetUp(solver);

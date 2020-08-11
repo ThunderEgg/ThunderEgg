@@ -63,7 +63,7 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")
 
 	// create an Identity matrix
 	auto TE_A = make_shared<HalfIdentity>();
-	PC   P    = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, vg);
+	PC   P    = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, TE_A, vg);
 
 	PCApply(P, x->getVec(), b->getVec());
 

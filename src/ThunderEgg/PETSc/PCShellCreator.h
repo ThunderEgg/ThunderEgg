@@ -21,8 +21,7 @@
 
 #ifndef THUNDEREGG_PETSC_PCSHELLCREATOR_H
 #define THUNDEREGG_PETSC_PCSHELLCREATOR_H
-#include <ThunderEgg/Operator.h>
-#include <ThunderEgg/VectorGenerator.h>
+#include <ThunderEgg/PETSc/MatShellCreator.h>
 #include <petscpc.h>
 namespace ThunderEgg
 {
@@ -33,10 +32,17 @@ template <size_t D> class PCShellCreator
 	private:
 	std::shared_ptr<Operator<D>>        op;
 	std::shared_ptr<VectorGenerator<D>> vg;
+	Mat                                 A;
 
-	PCShellCreator(std::shared_ptr<Operator<D>> op_in, std::shared_ptr<VectorGenerator<D>> vg_in)
-	: op(op_in), vg(vg_in)
+	PCShellCreator(std::shared_ptr<Operator<D>> op_in, std::shared_ptr<VectorGenerator<D>> vg_in,
+	               Mat A_in)
+	: op(op_in), vg(vg_in), A(A_in)
 	{
+	}
+	PCShellCreator(const PCShellCreator &) = delete;
+	~PCShellCreator()
+	{
+		MatDestroy(&A);
 	}
 	static int applyPC(PC A, Vec x, Vec b)
 	{
@@ -63,7 +69,7 @@ template <size_t D> class PCShellCreator
 		psc->op->apply(te_x, te_b);
 
 		double *b_view;
-		VecGetArray(x, &b_view);
+		VecGetArray(b, &b_view);
 		index = 0;
 		for (int p_index = 0; p_index < te_b->getNumLocalPatches(); p_index++) {
 			const LocalData<D> ld = te_b->getLocalData(p_index);
@@ -72,7 +78,7 @@ template <size_t D> class PCShellCreator
 				index++;
 			});
 		}
-		VecRestoreArray(x, &b_view);
+		VecRestoreArray(b, &b_view);
 
 		return 0;
 	}
@@ -85,16 +91,19 @@ template <size_t D> class PCShellCreator
 	}
 
 	public:
-	static PC GetNewPCShell(std::shared_ptr<Operator<D>> op, std::shared_ptr<VectorGenerator<D>> vg)
+	static PC GetNewPCShell(std::shared_ptr<Operator<D>> prec, std::shared_ptr<Operator<D>> op,
+	                        std::shared_ptr<VectorGenerator<D>> vg)
 	{
-		PCShellCreator<D> *psc = new PCShellCreator(op, vg);
-		PC                 A;
-		PCCreate(MPI_COMM_WORLD, &A);
-		PCSetType(A, PCSHELL);
-		PCShellSetContext(A, psc);
-		PCShellSetApply(A, applyPC);
-		PCShellSetDestroy(A, destroyPC);
-		return A;
+		Mat                A   = MatShellCreator<D>::GetNewMatShell(op, vg);
+		PCShellCreator<D> *psc = new PCShellCreator(prec, vg, A);
+		PC                 P;
+		PCCreate(MPI_COMM_WORLD, &P);
+		PCSetType(P, PCSHELL);
+		PCShellSetContext(P, psc);
+		PCShellSetApply(P, applyPC);
+		PCShellSetDestroy(P, destroyPC);
+		PCSetOperators(P, A, A);
+		return P;
 	}
 };
 } // namespace PETSc
