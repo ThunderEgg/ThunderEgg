@@ -2,6 +2,7 @@ ignore:
   - "test/**/*"
   - "test/*"
   - "apps/**/*"
+  - "tpl/*"
   - "tpl/**/*"
   - "src/ThunderEgg/Experimental/**/*"
   - "src/ThunderEgg/Experimental/*"
