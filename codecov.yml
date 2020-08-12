@@ -1,5 +1,5 @@
 ignore:
-  - "test/*"
-  - "apps/*"
-  - "tpl/*"
-  - "src/ThunderEgg/Experimental*"
+  - "test/**/*"
+  - "apps/**/*"
+  - "tpl/**/*"
+  - "src/ThunderEgg/Experimental/**/*"
