@@ -42,6 +42,10 @@ namespace GMG
  */
 template <size_t D> class CycleBuilder
 {
+	private:
+	bool has_finest   = false;
+	bool has_coarsest = false;
+
 	public:
 	/**
 	 * @brief Construct a new CycleBuilder object
@@ -61,6 +65,9 @@ template <size_t D> class CycleBuilder
 	                    std::shared_ptr<Restrictor<D>>      restrictor,
 	                    std::shared_ptr<VectorGenerator<D>> vg)
 	{
+		if (has_finest) {
+			throw RuntimeError("addFinestLevel was already called");
+		}
 		if (op == nullptr) {
 			throw RuntimeError("Operator is nullptr");
 		}
@@ -73,6 +80,7 @@ template <size_t D> class CycleBuilder
 		if (vg == nullptr) {
 			throw RuntimeError("VectorGenerator is nullptr");
 		}
+		has_finest = true;
 	}
 	/**
 	 * @brief Add the next intermediate level to the Cycle
@@ -89,6 +97,12 @@ template <size_t D> class CycleBuilder
 	                          std::shared_ptr<Interpolator<D>>    interpolator,
 	                          std::shared_ptr<VectorGenerator<D>> vg)
 	{
+		if (!has_finest) {
+			throw RuntimeError("addFinestLevel has not been called yet");
+		}
+		if (has_coarsest) {
+			throw RuntimeError("addCoarsestLevel has been called");
+		}
 		if (op == nullptr) {
 			throw RuntimeError("Operator is nullptr");
 		}
@@ -117,6 +131,12 @@ template <size_t D> class CycleBuilder
 	                      std::shared_ptr<Interpolator<D>>    interpolator,
 	                      std::shared_ptr<VectorGenerator<D>> vg)
 	{
+		if (!has_finest) {
+			throw RuntimeError("addFinestLevel has not been called yet");
+		}
+		if (has_coarsest) {
+			throw RuntimeError("addCoarsestLevel has already been called");
+		}
 		if (op == nullptr) {
 			throw RuntimeError("Operator is nullptr");
 		}
@@ -129,6 +149,7 @@ template <size_t D> class CycleBuilder
 		if (vg == nullptr) {
 			throw RuntimeError("VectorGenerator is nullptr");
 		}
+		has_coarsest = true;
 	}
 	/**
 	 * @brief Get the completed Cycle object
@@ -136,7 +157,12 @@ template <size_t D> class CycleBuilder
 	 * @return std::shared_ptr<Cycle<D>> the completed Cycle, will throw an exception if it is
 	 * incomplete
 	 */
-	std::shared_ptr<Cycle<D>> getCycle() const {}
+	std::shared_ptr<Cycle<D>> getCycle() const
+	{
+		if (!has_coarsest) {
+			throw RuntimeError("addCoarsestLevel has not been called");
+		}
+	}
 };
 } // namespace GMG
 } // namespace ThunderEgg
