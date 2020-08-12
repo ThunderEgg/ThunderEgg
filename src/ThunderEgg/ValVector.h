@@ -60,7 +60,6 @@ template <size_t D> class ValVector : public Vector<D>
 	 * @brief the underlying vector
 	 */
 	std::valarray<double> vec;
-	std::valarray<double> ghost_data;
 	ValVector(MPI_Comm comm_in, const std::array<int, D> &lengths, int num_ghost_cells,
 	          int num_patches)
 	: Vector<D>(comm_in)
@@ -105,10 +104,6 @@ template <size_t D> class ValVector : public Vector<D>
 	{
 		double *data = const_cast<double *>(&vec[patch_stride * local_patch_id + first_offset]);
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
-	}
-	void setNumGhostPatches(int num_ghost_patches)
-	{
-		ghost_data.resize(patch_stride * num_ghost_patches);
 	}
 };
 } // namespace ThunderEgg

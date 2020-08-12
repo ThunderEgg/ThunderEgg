@@ -171,8 +171,7 @@ template <size_t D> class VecWrapper : public Vector<D>
 		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset;
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
 	}
-	void setNumGhostPatches(int num_ghost_patches) {}
-	int  getNumGhostCells() const
+	int getNumGhostCells() const
 	{
 		return num_ghost_cells;
 	}

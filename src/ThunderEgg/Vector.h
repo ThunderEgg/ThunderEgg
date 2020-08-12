@@ -80,6 +80,11 @@ template <size_t D> class Vector
 	{
 		return num_local_patches;
 	}
+	/**
+	 * @brief Get the number of local cells int he vector (excluding ghost cells)
+	 *
+	 * @return int the number of local cells
+	 */
 	int getNumLocalCells() const
 	{
 		return num_local_cells;
@@ -98,7 +103,6 @@ template <size_t D> class Vector
 	 * @return LocalData<D> the LocalData object
 	 */
 	virtual const LocalData<D> getLocalData(int patch_local_index) const = 0;
-	virtual void               setNumGhostPatches(int num_ghost_patches) = 0;
 
 	/**
 	 * @brief set all value in the vector
