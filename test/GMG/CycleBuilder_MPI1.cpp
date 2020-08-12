@@ -87,7 +87,7 @@ TEST_CASE("CycleBuilder with two levels", "[GMG::CycleBuilder]")
 	CHECK(finest_level->getVectorGenerator() == vgs[0]);
 	CHECK(finest_level->finest());
 	CHECK_FALSE(finest_level->coarsest());
-	CHECK(finest_level->getFiner() == nullptr);
+	CHECK_THROWS_AS(finest_level->getFiner(), std::bad_weak_ptr);
 	CHECK(finest_level->getCoarser() != nullptr);
 
 	auto coarsest_level = finest_level->getCoarser();
@@ -134,7 +134,7 @@ TEST_CASE("CycleBuilder with three levels", "[GMG::CycleBuilder]")
 	CHECK(finest_level->getVectorGenerator() == vgs[0]);
 	CHECK(finest_level->finest());
 	CHECK_FALSE(finest_level->coarsest());
-	CHECK(finest_level->getFiner() == nullptr);
+	CHECK_THROWS_AS(finest_level->getFiner(), std::bad_weak_ptr);
 	CHECK(finest_level->getCoarser() != nullptr);
 
 	auto second_level = finest_level->getCoarser();
@@ -193,7 +193,7 @@ TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
 	CHECK(finest_level->getVectorGenerator() == vgs[0]);
 	CHECK(finest_level->finest());
 	CHECK_FALSE(finest_level->coarsest());
-	CHECK(finest_level->getFiner() == nullptr);
+	CHECK_THROWS_AS(finest_level->getFiner(), std::bad_weak_ptr);
 	CHECK(finest_level->getCoarser() != nullptr);
 
 	auto second_level = finest_level->getCoarser();
@@ -208,15 +208,15 @@ TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
 	CHECK(second_level->getCoarser() != nullptr);
 
 	auto third_level = second_level->getCoarser();
-	CHECK(second_level->getOperator() == ops[2]);
-	CHECK(second_level->getSmoother() == smoothers[2]);
-	CHECK(second_level->getRestrictor() == restrictors[2]);
-	CHECK(second_level->getInterpolator() == interpolators[1]);
-	CHECK(second_level->getVectorGenerator() == vgs[2]);
-	CHECK_FALSE(second_level->finest());
-	CHECK_FALSE(second_level->coarsest());
-	CHECK(second_level->getFiner() == second_level);
-	CHECK(second_level->getCoarser() != nullptr);
+	CHECK(third_level->getOperator() == ops[2]);
+	CHECK(third_level->getSmoother() == smoothers[2]);
+	CHECK(third_level->getRestrictor() == restrictors[2]);
+	CHECK(third_level->getInterpolator() == interpolators[1]);
+	CHECK(third_level->getVectorGenerator() == vgs[2]);
+	CHECK_FALSE(third_level->finest());
+	CHECK_FALSE(third_level->coarsest());
+	CHECK(third_level->getFiner() == second_level);
+	CHECK(third_level->getCoarser() != nullptr);
 
 	auto coarsest_level = third_level->getCoarser();
 	CHECK(coarsest_level->getOperator() == ops[3]);

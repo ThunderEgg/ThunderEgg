@@ -43,16 +43,35 @@ namespace GMG
 template <size_t D> class CycleBuilder
 {
 	private:
-	bool has_finest   = false;
+	/**
+	 * @brief has addFinestLevel been called
+	 */
+	bool has_finest = false;
+	/**
+	 * @brief has addCoarsestLevel been called
+	 */
 	bool has_coarsest = false;
+	/**
+	 * @brief The cycle options
+	 */
+	CycleOpts opts;
+
+	/**
+	 * @brief the finest level
+	 */
+	std::shared_ptr<Level<D>> finest_level;
+	/**
+	 * @brief the last level that was added
+	 */
+	std::shared_ptr<Level<D>> prev_level;
 
 	public:
 	/**
 	 * @brief Construct a new CycleBuilder object
 	 *
-	 * @param opts the options to use for the GMG cycle
+	 * @param opts_in the options to use for the GMG cycle
 	 */
-	CycleBuilder(const CycleOpts &opts) {}
+	explicit CycleBuilder(const CycleOpts &opts_in) : opts(opts_in) {}
 	/**
 	 * @brief Add the finest level to the Cycle
 	 *
@@ -81,6 +100,13 @@ template <size_t D> class CycleBuilder
 			throw RuntimeError("VectorGenerator is nullptr");
 		}
 		has_finest = true;
+
+		finest_level = std::make_shared<Level<D>>(nullptr, vg);
+		finest_level->setOperator(op);
+		finest_level->setSmoother(smoother);
+		finest_level->setRestrictor(restrictor);
+
+		prev_level = finest_level;
 	}
 	/**
 	 * @brief Add the next intermediate level to the Cycle
@@ -118,6 +144,17 @@ template <size_t D> class CycleBuilder
 		if (vg == nullptr) {
 			throw RuntimeError("VectorGenerator is nullptr");
 		}
+
+		auto new_level = std::make_shared<Level<D>>(nullptr, vg);
+		new_level->setOperator(op);
+		new_level->setSmoother(smoother);
+		new_level->setInterpolator(interpolator);
+		new_level->setRestrictor(restrictor);
+
+		new_level->setFiner(prev_level);
+		prev_level->setCoarser(new_level);
+
+		prev_level = new_level;
 	}
 	/**
 	 * @brief Add the next intermediate level to the Cycle
@@ -150,6 +187,14 @@ template <size_t D> class CycleBuilder
 			throw RuntimeError("VectorGenerator is nullptr");
 		}
 		has_coarsest = true;
+
+		auto new_level = std::make_shared<Level<D>>(nullptr, vg);
+		new_level->setOperator(op);
+		new_level->setSmoother(smoother);
+		new_level->setInterpolator(interpolator);
+
+		new_level->setFiner(prev_level);
+		prev_level->setCoarser(new_level);
 	}
 	/**
 	 * @brief Get the completed Cycle object
@@ -162,6 +207,15 @@ template <size_t D> class CycleBuilder
 		if (!has_coarsest) {
 			throw RuntimeError("addCoarsestLevel has not been called");
 		}
+		std::shared_ptr<Cycle<D>> cycle;
+		if (opts.cycle_type == "V") {
+			cycle.reset(new VCycle<D>(finest_level, opts));
+		} else if (opts.cycle_type == "W") {
+			cycle.reset(new WCycle<D>(finest_level, opts));
+		} else {
+			throw RuntimeError("Unsupported Cycle type: " + opts.cycle_type);
+		}
+		return cycle;
 	}
 };
 } // namespace GMG
