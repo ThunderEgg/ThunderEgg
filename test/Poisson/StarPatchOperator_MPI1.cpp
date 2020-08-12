@@ -317,5 +317,5 @@ TEST_CASE("Test Poisson::StarPatchOperator constructor throws exception with no 
 
 	auto gf = make_shared<BiLinearGhostFiller>(d_fine);
 	CHECK_THROWS_AS(make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf),
-	                ThunderEgg::Poisson::StarPatchOperatorException);
+	                ThunderEgg::RuntimeError);
 }

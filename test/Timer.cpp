@@ -92,7 +92,7 @@ TEST_CASE("Two Timings Sequential Stop second before started", "[Timer]")
 	Timer timer;
 	timer.start("A");
 	timer.stop("A");
-	REQUIRE_THROWS_AS(timer.stop("B"), TimerException);
+	REQUIRE_THROWS_AS(timer.stop("B"), RuntimeError);
 }
 TEST_CASE("Two Timings Nested", "[Timer]")
 {
@@ -133,5 +133,5 @@ TEST_CASE("Two Timings Nested Wrong Order", "[Timer]")
 	Timer timer;
 	timer.start("A");
 	timer.start("B");
-	REQUIRE_THROWS_AS(timer.stop("A"), TimerException);
+	REQUIRE_THROWS_AS(timer.stop("A"), RuntimeError);
 }

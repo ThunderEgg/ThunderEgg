@@ -26,18 +26,13 @@
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/PatchOperator.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/ValVector.h>
 
 namespace ThunderEgg
 {
 namespace Poisson
 {
-/**
- * @brief Exception that the StarPatchOperator class trows
- */
-struct StarPatchOperatorException : std::runtime_error {
-	StarPatchOperatorException(std::string message) : std::runtime_error(message){};
-};
 /**
  * @brief Implements 2nd order laplacian operator
  *
@@ -68,8 +63,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain_in, ghost_filler_in), neumann(neumann_in)
 	{
 		if (this->domain->getNumGhostCells() < 1) {
-			throw StarPatchOperatorException(
-			"StarPatchOperator needs at least one set of ghost cells");
+			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
 	}
 	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,

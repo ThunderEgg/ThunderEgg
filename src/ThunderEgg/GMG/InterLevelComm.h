@@ -23,18 +23,13 @@
 #define THUNDEREGG_GMG_INTERLEVELCOMM_H
 
 #include <ThunderEgg/Domain.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/ValVector.h>
 
 namespace ThunderEgg
 {
 namespace GMG
 {
-/**
- * @brief Exception that the InterLevelComm class trows
- */
-struct InterLevelCommException : std::runtime_error {
-	InterLevelCommException(std::string message) : std::runtime_error(message){};
-};
 /**
  * @brief A communicator between a finer domain and a coarser domain.
  *
@@ -274,10 +269,10 @@ template <size_t D> class InterLevelComm
 	{
 		if (communicating) {
 			if (sending) {
-				throw InterLevelCommException(
+				throw RuntimeError(
 				"InterLevelComm has a sendGhostPatches posted that is unfinished");
 			} else {
-				throw InterLevelCommException(
+				throw RuntimeError(
 				"InterLevelComm has a getGhostPatches posted that is unfinished");
 			}
 		}
@@ -344,18 +339,18 @@ template <size_t D> class InterLevelComm
 	                            std::shared_ptr<const Vector<D>> ghost_vector)
 	{
 		if (!communicating) {
-			throw InterLevelCommException(
+			throw RuntimeError(
 			"InterLevelComm cannot finish sendGhostPatches since communication was not started");
 		} else if (!sending) {
-			throw InterLevelCommException(
+			throw RuntimeError(
 			"InterLevelComm sendGhostPatchesFinish is being called after getGhostPatchesStart was called");
 		}
 		if (vector != current_vector) {
-			throw InterLevelCommException(
+			throw RuntimeError(
 			"InterLevelComm sendGhostPatchesFinish is being called with a different vector than when sendGhostPatchesStart was called");
 		}
 		if (ghost_vector != current_ghost_vector) {
-			throw InterLevelCommException(
+			throw RuntimeError(
 			"InterLevelComm senGhostPatchesFinish is being called with a different ghost vector than when sendGhostPatchesStart was called");
 		}
 
@@ -413,10 +408,10 @@ template <size_t D> class InterLevelComm
 	{
 		if (communicating) {
 			if (sending) {
-				throw InterLevelCommException(
+				throw RuntimeError(
 				"InterLevelComm has a sendGhostPatches posted that is unfinished");
 			} else {
-				throw InterLevelCommException(
+				throw RuntimeError(
 				"InterLevelComm has a getGhostPatches posted that is unfinished");
 			}
 		}
@@ -483,18 +478,18 @@ template <size_t D> class InterLevelComm
 	                           std::shared_ptr<Vector<D>>       ghost_vector)
 	{
 		if (!communicating) {
-			throw InterLevelCommException(
+			throw RuntimeError(
 			"InterLevelComm cannot finish sendGhostPatches since communication was not started");
 		} else if (sending) {
-			throw InterLevelCommException(
+			throw RuntimeError(
 			"InterLevelComm getGhostPatchesFinish is being called after sendGhostPatchesStart was called");
 		}
 		if (vector != current_vector) {
-			throw InterLevelCommException(
+			throw RuntimeError(
 			"InterLevelComm getGhostPatchesFinish is being called with a different vector than when getGhostPatchesStart was called");
 		}
 		if (ghost_vector != current_ghost_vector) {
-			throw InterLevelCommException(
+			throw RuntimeError(
 			"InterLevelComm getGhostPatchesFinish is being called with a different ghost vector than when getGhostPatchesStart was called");
 		}
 

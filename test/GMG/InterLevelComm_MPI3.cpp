@@ -146,8 +146,7 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec),
-	                GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "3-processor sendGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
@@ -167,8 +166,7 @@ TEST_CASE(
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec_2),
-	                GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "3-processor sendGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
@@ -188,8 +186,7 @@ TEST_CASE(
 	auto ghost_vec = ilc->getNewGhostVector();
 
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec),
-	                GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "3-processor sendGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
@@ -210,8 +207,7 @@ TEST_CASE(
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec_2),
-	                GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "3-processor sendGhostPatches throws exception when start is called twice on uniform quad",
@@ -230,8 +226,7 @@ TEST_CASE(
 	auto ghost_vec = ilc->getNewGhostVector();
 
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, ghost_vec),
-	                GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
@@ -286,8 +281,7 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec),
-	                GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "3-processor getGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
@@ -307,8 +301,7 @@ TEST_CASE(
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
 	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec_2),
-	                GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "3-processor getGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
@@ -328,8 +321,7 @@ TEST_CASE(
 	auto ghost_vec = ilc->getNewGhostVector();
 
 	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec),
-	                GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "3-processor getGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
@@ -350,8 +342,7 @@ TEST_CASE(
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
 	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec_2, ghost_vec_2),
-	                GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec_2, ghost_vec_2), RuntimeError);
 }
 TEST_CASE("3-processor getGhostPatches throws exception when start is called twice on uniform quad",
           "[GMG::InterLevelComm]")
@@ -369,5 +360,5 @@ TEST_CASE("3-processor getGhostPatches throws exception when start is called twi
 	auto ghost_vec = ilc->getNewGhostVector();
 
 	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesStart(coarse_vec, ghost_vec), GMG::InterLevelCommException);
+	CHECK_THROWS_AS(ilc->getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
 }

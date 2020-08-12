@@ -26,18 +26,13 @@
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/PatchOperator.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/ValVector.h>
 
 namespace ThunderEgg
 {
 namespace VarPoisson
 {
-/**
- * @brief Exception that the StarPatchOperator class trows
- */
-struct StarPatchOperatorException : std::runtime_error {
-	StarPatchOperatorException(std::string message) : std::runtime_error(message){};
-};
 /**
  * @brief Implements a variable coefficient Laplacian f=Div[h*Grad[u]]
  *
@@ -69,8 +64,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain_in, ghost_filler_in), coeffs(coeffs_in)
 	{
 		if (this->domain->getNumGhostCells() < 1) {
-			throw StarPatchOperatorException(
-			"StarPatchOperator needs at least one set of ghost cells");
+			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
 		this->ghost_filler->fillGhost(this->coeffs);
 	}

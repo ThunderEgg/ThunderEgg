@@ -268,5 +268,5 @@ TEST_CASE("Test VarPoisson::StarPatchOperator constructor throws exception with 
 
 	auto gf = make_shared<BiLinearGhostFiller>(d_fine);
 	CHECK_THROWS_AS(make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf),
-	                ThunderEgg::VarPoisson::StarPatchOperatorException);
+	                ThunderEgg::RuntimeError);
 }

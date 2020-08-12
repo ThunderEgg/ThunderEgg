@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_TIMER_H
 #define THUNDEREGG_TIMER_H
+#include <ThunderEgg/RuntimeError.h>
 #include <chrono>
 #include <deque>
 #include <functional>
@@ -30,12 +31,6 @@
 #include <vector>
 namespace ThunderEgg
 {
-/**
- * @brief Exception that the Timer class trows
- */
-struct TimerException : std::runtime_error {
-	TimerException(std::string message) : std::runtime_error(message){};
-};
 /**
  * @brief Class for keeping track of parallel timings
  *
@@ -199,8 +194,8 @@ class Timer
 			curr_timing.times.push_back(time.count());
 			stack.pop_back();
 		} else {
-			throw TimerException("Timer was expecting to end \"" + curr_timing.name
-			                     + "\", instead got \"" + name + "\"");
+			throw RuntimeError("Timer was expecting to end \"" + curr_timing.name
+			                   + "\", instead got \"" + name + "\"");
 		}
 	}
 	/**
