@@ -199,62 +199,6 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			}
 		}
 	}
-	/**
-	 * @brief Generator for GMG levels.
-	 *
-	 * Will use same interpolation scheme for coefficions as the
-	 * interpolator in GMG.
-	 */
-	class Generator
-	{
-		private:
-		/**
-		 * @brief generator for ghost fillers
-		 */
-		std::function<std::shared_ptr<const GhostFiller<D>>(
-		std::shared_ptr<const GMG::Level<D>> level)>
-		filler_gen;
-		/**
-		 * @brief Generated operators are stored here.
-		 */
-		std::map<std::shared_ptr<const Domain<D>>, std::shared_ptr<const StarPatchOperator<D>>>
-		generated_operators;
-
-		public:
-		/**
-		 * @brief Construct a new StarPatchOperator generator
-		 *
-		 * @param finest_op the finest star pach operator
-		 * @param filler_gen returns a GhostFiller for a given level
-		 */
-		Generator(std::shared_ptr<const StarPatchOperator<D>> finest_op,
-		          std::function<
-		          std::shared_ptr<const GhostFiller<D>>(std::shared_ptr<const GMG::Level<D>> level)>
-		          filler_gen_in)
-		: filler_gen(filler_gen_in)
-		{
-			generated_operators[finest_op->domain] = finest_op;
-		}
-		/**
-		 * @brief Return a StarPatchOperator for a given level
-		 *
-		 * @param level the level in GMG
-		 * @return std::shared_ptr<const StarPatchOperator<D>> the operator
-		 */
-		std::shared_ptr<const StarPatchOperator<D>>
-		operator()(std::shared_ptr<const GMG::Level<D>> level)
-		{
-			auto &coarser_op = generated_operators[level->getDomain()];
-			if (coarser_op != nullptr) {
-				return coarser_op;
-			}
-
-			std::shared_ptr<const Domain<D>> finer_domain = level->getFiner()->getDomain();
-			auto                             finer_op     = generated_operators[finer_domain];
-			coarser_op.reset(new StarPatchOperator<D>(level->getDomain(), filler_gen(level)));
-			return coarser_op;
-		}
-	};
 };
 extern template class StarPatchOperator<2>;
 extern template class StarPatchOperator<3>;

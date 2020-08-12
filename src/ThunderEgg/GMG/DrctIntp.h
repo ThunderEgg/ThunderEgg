@@ -80,18 +80,6 @@ template <size_t D> class DrctIntp : public MPIInterpolator<D>
 	 * @param ilc the communcation package for the two levels.
 	 */
 	DrctIntp(std::shared_ptr<InterLevelComm<D>> ilc_in) : MPIInterpolator<D>(ilc_in) {}
-
-	class Generator
-	{
-		public:
-		Generator() {}
-		std::shared_ptr<const DrctIntp<D>> operator()(std::shared_ptr<const Level<D>> level)
-		{
-			auto ilc = std::make_shared<InterLevelComm<D>>(level->getDomain(),
-			                                               level->getFiner()->getDomain());
-			return std::make_shared<DrctIntp<D>>(ilc);
-		}
-	};
 };
 
 } // namespace GMG

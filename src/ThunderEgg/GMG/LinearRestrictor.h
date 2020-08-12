@@ -99,25 +99,6 @@ template <size_t D> class LinearRestrictor : public MPIRestrictor<D>
 	 * @param ilc the communcation package for the two levels.
 	 */
 	LinearRestrictor(std::shared_ptr<InterLevelComm<D>> ilc_in) : MPIRestrictor<D>(ilc_in) {}
-	/**
-	 * @brief Generates LinearRestrictors for GMG levels
-	 */
-	class Generator
-	{
-		public:
-		/**
-		 * @brief Generate a LinearRestrictor from the finer level to the coarser level
-		 *
-		 * @param level the finer level
-		 * @return std::shared_ptr<const LinearRestrictor<D>> the restrictor
-		 */
-		std::shared_ptr<const LinearRestrictor<D>> operator()(std::shared_ptr<const Level<D>> level)
-		{
-			auto ilc = std::make_shared<InterLevelComm<D>>(level->getCoarser()->getDomain(),
-			                                               level->getDomain());
-			return std::make_shared<LinearRestrictor<D>>(ilc);
-		}
-	};
 };
 } // namespace GMG
 } // namespace ThunderEgg

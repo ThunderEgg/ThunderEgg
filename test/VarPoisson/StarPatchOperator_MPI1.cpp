@@ -270,35 +270,3 @@ TEST_CASE("Test VarPoisson::StarPatchOperator constructor throws exception with 
 	CHECK_THROWS_AS(make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf),
 	                ThunderEgg::VarPoisson::StarPatchOperatorException);
 }
-TEST_CASE("Test VarPoisson::StarPatchOperator::Generator", "[Poisson::StarPatchOperator]")
-{
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH FILE " << mesh_file);
-	int n         = 32;
-	int num_ghost = 1;
-
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-
-	auto                           gf = make_shared<BiLinearGhostFiller>(d_fine);
-	BiLinearGhostFiller::Generator gf_gen(gf);
-	auto                           h_vec = ValVector<2>::GetNewVector(d_fine);
-	h_vec->set(1);
-	auto op     = make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf);
-	auto op_gen = VarPoisson::StarPatchOperator<2>::Generator(op, gf_gen);
-
-	auto finer_level
-	= make_shared<GMG::Level<2>>(d_fine, make_shared<ValVectorGenerator<2>>(d_fine));
-	auto coarser_level
-	= make_shared<GMG::Level<2>>(d_coarse, make_shared<ValVectorGenerator<2>>(d_coarse));
-
-	finer_level->setCoarser(coarser_level);
-	finer_level->setOperator(op);
-	auto ilc  = make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
-	auto rstr = make_shared<GMG::LinearRestrictor<2>>(ilc);
-	finer_level->setRestrictor(rstr);
-	coarser_level->setFiner(finer_level);
-	auto coarser_op  = op_gen(coarser_level);
-	auto coarser_op2 = op_gen(coarser_level);
-}
