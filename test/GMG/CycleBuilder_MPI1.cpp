@@ -544,7 +544,7 @@ TEST_CASE("CycleBuilder addCoarsestLevel throws exception with nullptr for vecto
 	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
 	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
 	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
-	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2], vgs[3]),
+	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2], nullptr),
 	                RuntimeError);
 }
 TEST_CASE("CycleBuilder addFinestLevel throws exception if called twice", "[GMG::CycleBuilder]")

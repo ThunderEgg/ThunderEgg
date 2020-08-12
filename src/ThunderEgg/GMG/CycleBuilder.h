@@ -61,6 +61,18 @@ template <size_t D> class CycleBuilder
 	                    std::shared_ptr<Restrictor<D>>      restrictor,
 	                    std::shared_ptr<VectorGenerator<D>> vg)
 	{
+		if (op == nullptr) {
+			throw RuntimeError("Operator is nullptr");
+		}
+		if (smoother == nullptr) {
+			throw RuntimeError("Smoother is nullptr");
+		}
+		if (restrictor == nullptr) {
+			throw RuntimeError("Restrictor is nullptr");
+		}
+		if (vg == nullptr) {
+			throw RuntimeError("VectorGenerator is nullptr");
+		}
 	}
 	/**
 	 * @brief Add the next intermediate level to the Cycle
@@ -77,6 +89,21 @@ template <size_t D> class CycleBuilder
 	                          std::shared_ptr<Interpolator<D>>    interpolator,
 	                          std::shared_ptr<VectorGenerator<D>> vg)
 	{
+		if (op == nullptr) {
+			throw RuntimeError("Operator is nullptr");
+		}
+		if (smoother == nullptr) {
+			throw RuntimeError("Smoother is nullptr");
+		}
+		if (restrictor == nullptr) {
+			throw RuntimeError("Restrictor is nullptr");
+		}
+		if (interpolator == nullptr) {
+			throw RuntimeError("Interpolator is nullptr");
+		}
+		if (vg == nullptr) {
+			throw RuntimeError("VectorGenerator is nullptr");
+		}
 	}
 	/**
 	 * @brief Add the next intermediate level to the Cycle
@@ -90,6 +117,18 @@ template <size_t D> class CycleBuilder
 	                      std::shared_ptr<Interpolator<D>>    interpolator,
 	                      std::shared_ptr<VectorGenerator<D>> vg)
 	{
+		if (op == nullptr) {
+			throw RuntimeError("Operator is nullptr");
+		}
+		if (smoother == nullptr) {
+			throw RuntimeError("Smoother is nullptr");
+		}
+		if (interpolator == nullptr) {
+			throw RuntimeError("Interpolator is nullptr");
+		}
+		if (vg == nullptr) {
+			throw RuntimeError("VectorGenerator is nullptr");
+		}
 	}
 	/**
 	 * @brief Get the completed Cycle object
