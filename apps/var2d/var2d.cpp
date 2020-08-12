@@ -28,13 +28,14 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/DomainWrapOp.h>
 #include <ThunderEgg/Experimental/DomGen.h>
-#include <ThunderEgg/GMG/CycleFactory.h>
+#include <ThunderEgg/GMG/CycleBuilder.h>
 #include <ThunderEgg/GMG/DrctIntp.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
 #include <ThunderEgg/SchwarzPrec.h>
 #include <ThunderEgg/Timer.h>
+#include <ThunderEgg/ValVectorGenerator.h>
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>
 #ifdef HAVE_VTK
 #include "Writers/VtkWriter2d.h"
@@ -568,14 +569,55 @@ int main(int argc, char *argv[])
 		} else if (preconditioner == "GMG") {
 			timer->start("GMG Setup");
 
-			BiLinearGhostFiller::Generator  filler_gen(gf);
-			StarPatchOperator<2>::Generator op_gen(p_operator, filler_gen);
-			// fivePoint::Generator     op_gen(p_operator, filler_gen);
-			BiCGStabPatchSolver<2>::Generator   smooth_gen(p_solver, filler_gen, op_gen);
-			GMG::LinearRestrictor<2>::Generator restrictor_gen;
-			GMG::DrctIntp<2>::Generator         interpolator_gen;
-			M = GMG::CycleFactory<2>::getCycle(copts, dcg, restrictor_gen, interpolator_gen,
-			                                   smooth_gen, op_gen);
+			auto next_domain = dcg->getCoarserDomain();
+			auto ilc         = make_shared<GMG::InterLevelComm<2>>(next_domain, domain);
+			auto restrictor  = make_shared<GMG::LinearRestrictor<2>>(ilc);
+
+			GMG::CycleBuilder<2> builder(copts);
+			builder.addFinestLevel(p_operator, p_solver, restrictor, vg);
+
+			auto prev_coeffs = h;
+			auto prev_domain = next_domain;
+			while (dcg->hasCoarserDomain()) {
+				auto next_domain = dcg->getCoarserDomain();
+				auto new_vg      = make_shared<ValVectorGenerator<2>>(prev_domain);
+				auto new_gf      = make_shared<BiLinearGhostFiller>(prev_domain);
+				auto new_coeffs  = new_vg->getNewVector();
+
+				restrictor->restrict(new_coeffs, prev_coeffs);
+
+				auto new_p_operator
+				= make_shared<StarPatchOperator<2>>(new_coeffs, next_domain, new_gf);
+
+				auto new_p_solver
+				= make_shared<BiCGStabPatchSolver<2>>(new_p_operator, ps_tol, ps_max_it);
+				p_solver->setTimer(timer);
+
+				auto interpolator = make_shared<GMG::DrctIntp<2>>(ilc);
+				ilc               = make_shared<GMG::InterLevelComm<2>>(next_domain, prev_domain);
+				restrictor        = make_shared<GMG::LinearRestrictor<2>>(ilc);
+
+				builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator,
+				                             vg);
+				//
+				prev_domain = next_domain;
+			}
+			auto interpolator  = make_shared<GMG::DrctIntp<2>>(ilc);
+			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(prev_domain);
+			auto coarse_gf     = make_shared<BiLinearGhostFiller>(prev_domain);
+			auto coarse_coeffs = coarse_vg->getNewVector();
+
+			restrictor->restrict(coarse_coeffs, prev_coeffs);
+
+			auto coarse_p_operator
+			= make_shared<StarPatchOperator<2>>(coarse_coeffs, next_domain, coarse_gf);
+
+			auto coarse_p_solver
+			= make_shared<BiCGStabPatchSolver<2>>(coarse_p_operator, ps_tol, ps_max_it);
+			p_solver->setTimer(timer);
+			builder.addCoarsestLevel(coarse_p_operator, coarse_p_solver, interpolator, coarse_vg);
+
+			M = builder.getCycle();
 
 			timer->stop("GMG Setup");
 		} else if (preconditioner == "cheb") {

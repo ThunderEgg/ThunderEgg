@@ -41,11 +41,6 @@ class SevenPtPatchOperator : public ThunderEgg::Schur::PatchOperator<3>
 	                       std::shared_ptr<const Vector<2>> gamma, LocalData<3> f) override;
 	void apply(const ThunderEgg::Schur::SchurInfo<3> &sinfo, const LocalData<3> u,
 	           LocalData<3> f) override;
-	std::shared_ptr<ThunderEgg::Schur::PatchOperator<3>>
-	getNewPatchOperator(GMG::CycleFactoryCtx<3> ctx) override
-	{
-		return std::shared_ptr<PatchOperator<3>>(new SevenPtPatchOperator());
-	}
 };
 } // namespace Schur
 } // namespace Poisson

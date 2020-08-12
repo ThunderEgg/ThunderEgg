@@ -3,15 +3,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/AvgRstr.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Cycle.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/Cycle.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleFactory.h)
-
-if(PETSC_FOUND)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleFactory2d.h)
-  list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/CycleFactory2d.cpp)
-endif(PETSC_FOUND)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleFactoryCtx.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleBuilder.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleOpts.h)

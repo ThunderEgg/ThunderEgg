@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_SCHUR_TRILININTERP_H
 #define THUNDEREGG_SCHUR_TRILININTERP_H
 #include <ThunderEgg/Schur/IfaceInterp.h>
+#include <ThunderEgg/Schur/SchurHelper.h>
 namespace ThunderEgg
 {
 namespace Schur
@@ -42,10 +43,6 @@ class TriLinInterp : public IfaceInterp<3>
 	                 std::shared_ptr<Vector<2>> interp);
 	void interpolate(SchurInfo<3> &d, Side<3> s, int local_index, IfaceType<3> itype,
 	                 std::shared_ptr<const Vector<3>> u, std::shared_ptr<Vector<2>> interp);
-	std::shared_ptr<IfaceInterp<3>> getNewIfaceInterp(GMG::CycleFactoryCtx<3> ctx) override
-	{
-		return std::shared_ptr<IfaceInterp<3>>(new TriLinInterp(ctx.sh));
-	}
 };
 } // namespace Schur
 } // namespace ThunderEgg

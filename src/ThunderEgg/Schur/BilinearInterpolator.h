@@ -50,10 +50,6 @@ class BilinearInterpolator : public IfaceInterp<2>
 	                 std::shared_ptr<Vector<1>> interp);
 	void interpolate(SchurInfo<2> &d, Side<2> s, int local_index, IfaceType<2> itype,
 	                 std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector<1>> interp);
-	std::shared_ptr<IfaceInterp<2>> getNewIfaceInterp(GMG::CycleFactoryCtx<2> ctx) override
-	{
-		return std::shared_ptr<IfaceInterp<2>>(new BilinearInterpolator(ctx.sh));
-	}
 };
 } // namespace Schur
 } // namespace ThunderEgg

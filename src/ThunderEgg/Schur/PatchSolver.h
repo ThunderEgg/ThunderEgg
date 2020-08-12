@@ -22,7 +22,6 @@
 #ifndef THUNDEREGG_SCHUR_PATCHSOLVER_H
 #define THUNDEREGG_SCHUR_PATCHSOLVER_H
 
-#include <ThunderEgg/GMG/CycleFactoryCtx.h>
 #include <ThunderEgg/Schur/SchurInfo.h>
 #include <ThunderEgg/Vector.h>
 
@@ -61,7 +60,6 @@ template <size_t D> class PatchSolver
 	virtual void solve(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u,
 	                   std::shared_ptr<const Vector<D - 1>> gamma)
 	= 0;
-	virtual std::shared_ptr<PatchSolver<D>> getNewPatchSolver(GMG::CycleFactoryCtx<D> ctx) = 0;
 };
 } // namespace Schur
 } // namespace ThunderEgg

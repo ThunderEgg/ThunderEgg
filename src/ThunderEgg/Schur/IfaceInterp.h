@@ -21,7 +21,6 @@
 
 #ifndef THUNDEREGG_SCHUR_IFACEINTERP_H
 #define THUNDEREGG_SCHUR_IFACEINTERP_H
-#include <ThunderEgg/GMG/CycleFactoryCtx.h>
 #include <ThunderEgg/Schur/IfaceType.h>
 #include <ThunderEgg/Vector.h>
 namespace ThunderEgg
@@ -47,7 +46,6 @@ template <size_t D> class IfaceInterp
 	virtual void interpolateToInterface(std::shared_ptr<const Vector<D>> u,
 	                                    std::shared_ptr<Vector<D - 1>>   interp)
 	= 0;
-	virtual std::shared_ptr<IfaceInterp<D>> getNewIfaceInterp(GMG::CycleFactoryCtx<D> ctx) = 0;
 };
 } // namespace Schur
 } // namespace ThunderEgg

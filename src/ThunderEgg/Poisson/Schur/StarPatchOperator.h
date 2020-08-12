@@ -49,12 +49,6 @@ template <size_t D> class StarPatchOperator : public ThunderEgg::Schur::PatchOpe
 			                   f->getLocalData(sinfo->pinfo->local_index));
 		}
 	}
-	std::shared_ptr<ThunderEgg::Schur::PatchOperator<D>>
-	getNewPatchOperator(GMG::CycleFactoryCtx<D> ctx) override
-	{
-		return std::shared_ptr<StarPatchOperator<D>>(new StarPatchOperator<D>(ctx.sh));
-	}
-
 	void applyWithInterface(ThunderEgg::Schur::SchurInfo<D> &sinfo, const LocalData<D> u,
 	                        std::shared_ptr<const Vector<D - 1>> gamma, LocalData<D> f) override
 	{
