@@ -10,7 +10,6 @@ if(PETSC_FOUND)
     DomainTools.cpp
     SimpleGhostFiller.cpp
     Utils.cpp
-    GMG/CycleFactory.cpp
     utils/DomainReader.cpp
     Timer.cpp)
   target_include_directories(unit_tests_mpiany

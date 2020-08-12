@@ -24,6 +24,7 @@
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/VCycle.h>
 #include <ThunderEgg/GMG/WCycle.h>
+#include <ThunderEgg/RuntimeError.h>
 namespace ThunderEgg
 {
 namespace GMG

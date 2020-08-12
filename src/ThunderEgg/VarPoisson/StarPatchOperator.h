@@ -224,7 +224,7 @@ template <size_t D> class StarPatchOperator : public PatchOperator<D>
 			std::shared_ptr<const Domain<D>> finer_domain = level->getFiner()->getDomain();
 			auto                             finer_op     = generated_operators[finer_domain];
 			auto new_coeffs = ValVector<D>::GetNewVector(level->getDomain());
-			level->getFiner()->getRestrictor().restrict(new_coeffs, finer_op->coeffs);
+			level->getFiner()->getRestrictor()->restrict(new_coeffs, finer_op->coeffs);
 			new_coeffs->setWithGhost(1);
 			coarser_op.reset(
 			new StarPatchOperator<D>(new_coeffs, level->getDomain(), filler_gen(level)));

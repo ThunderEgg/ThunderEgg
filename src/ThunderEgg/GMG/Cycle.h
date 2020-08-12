@@ -47,12 +47,6 @@ template <size_t D> class Cycle : public Operator<D>
 	using VecList      = std::list<std::shared_ptr<Vector<D>>>;
 	using ConstVecList = std::list<std::shared_ptr<const Vector<D>>>;
 	/**
-	 * @brief stack of LHS vectors in use. Coarsest at beginning, finest at end.
-	 */
-	/**
-	 * @brief stack of RHS vectors in use. Coarsest at beginning, finest at end.
-	 */
-	/**
 	 * @brief Prepare vectors for coarser level.
 	 *
 	 * @param level the current level
@@ -61,12 +55,12 @@ template <size_t D> class Cycle : public Operator<D>
 	{
 		// calculate residual
 		std::shared_ptr<Vector<D>> r = level.getVectorGenerator()->getNewVector();
-		level.getOperator().apply(u_vectors.front(), r);
+		level.getOperator()->apply(u_vectors.front(), r);
 		r->scaleThenAdd(-1, f_vectors.front());
 		// create vectors for coarser levels
 		std::shared_ptr<Vector<D>> new_u = level.getCoarser()->getVectorGenerator()->getNewVector();
 		std::shared_ptr<Vector<D>> new_f = level.getCoarser()->getVectorGenerator()->getNewVector();
-		level.getRestrictor().restrict(new_f, r);
+		level.getRestrictor()->restrict(new_f, r);
 		u_vectors.push_front(new_u);
 		f_vectors.push_front(new_f);
 	}
@@ -80,7 +74,7 @@ template <size_t D> class Cycle : public Operator<D>
 		std::shared_ptr<Vector<D>> old_u = u_vectors.front();
 		u_vectors.pop_front();
 		f_vectors.pop_front();
-		level.getInterpolator().interpolate(old_u, u_vectors.front());
+		level.getInterpolator()->interpolate(old_u, u_vectors.front());
 	}
 
 	/**
@@ -90,7 +84,7 @@ template <size_t D> class Cycle : public Operator<D>
 	 */
 	void smooth(const Level<D> &level, VecList &u_vectors, ConstVecList &f_vectors) const
 	{
-		level.getSmoother().smooth(f_vectors.front(), u_vectors.front());
+		level.getSmoother()->smooth(f_vectors.front(), u_vectors.front());
 	}
 
 	/**
@@ -127,6 +121,15 @@ template <size_t D> class Cycle : public Operator<D>
 		visit(*finest_level, u_vectors, f_vectors);
 		f_vectors.pop_front();
 		u_vectors.pop_front();
+	}
+	/**
+	 * @brief Get the finest Level object
+	 *
+	 * @return std::shared_ptr<const Level<D>> the Level
+	 */
+	std::shared_ptr<const Level<D>> getFinestLevel() const
+	{
+		return finest_level;
 	}
 };
 } // namespace GMG

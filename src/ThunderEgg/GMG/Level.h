@@ -101,11 +101,11 @@ template <size_t D> class Level
 	/**
 	 * @brief Get the restriction operator for this level.
 	 *
-	 * @return reference to the restrictor
+	 * @return Pointer to the restrictor
 	 */
-	const Restrictor<D> &getRestrictor() const
+	std::shared_ptr<const Restrictor<D>> getRestrictor() const
 	{
-		return *restrictor;
+		return restrictor;
 	}
 	/**
 	 * @brief Set the interpolation operator for interpolating from this level to the finer level.
@@ -119,11 +119,11 @@ template <size_t D> class Level
 	/**
 	 * @brief Get the interpolation operator for this level.
 	 *
-	 * @return Reference to the interpolator.
+	 * @return Pointer to the interpolator.
 	 */
-	const Interpolator<D> &getInterpolator() const
+	std::shared_ptr<const Interpolator<D>> getInterpolator() const
 	{
-		return *interpolator;
+		return interpolator;
 	}
 	/**
 	 * @brief Set the operator (matrix) for this level.
@@ -137,11 +137,11 @@ template <size_t D> class Level
 	/**
 	 * @brief Get the operator for this level.
 	 *
-	 * @return Reference to the operator.
+	 * @return Pointer to the operator.
 	 */
-	const Operator<D> &getOperator() const
+	std::shared_ptr<const Operator<D>> getOperator() const
 	{
-		return *op;
+		return op;
 	}
 	/**
 	 * @brief Set the smoother for this level.
@@ -155,11 +155,11 @@ template <size_t D> class Level
 	/**
 	 * @brief Get smoother operator for this level.
 	 *
-	 * @return Reference to the smoother operator.
+	 * @return Pointer to the smoother operator.
 	 */
-	const Smoother<D> &getSmoother() const
+	std::shared_ptr<const Smoother<D>> getSmoother() const
 	{
-		return *smoother;
+		return smoother;
 	}
 	/**
 	 * @brief Get DomainCollection for this level.
