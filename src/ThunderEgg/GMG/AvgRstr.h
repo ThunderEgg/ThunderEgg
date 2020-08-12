@@ -78,18 +78,6 @@ template <size_t D> class AvgRstr : public MPIRestrictor<D>
 	 * @param ilc_in the InterLevelComm
 	 */
 	AvgRstr(std::shared_ptr<InterLevelComm<D>> ilc_in) : MPIRestrictor<D>(ilc_in) {}
-	class Generator
-	{
-		public:
-		Generator() {}
-		std::shared_ptr<const AvgRstr<D>> operator()(std::shared_ptr<const Level<D>> level)
-		{
-			auto ilc = std::make_shared<InterLevelComm<D>>(level->getCoarser()->getDomain(),
-			                                               level->getDomain());
-			return std::make_shared<AvgRstr<D>>(level->getCoarser()->getDomain(),
-			                                    level->getDomain(), ilc);
-		}
-	};
 };
 } // namespace GMG
 } // namespace ThunderEgg

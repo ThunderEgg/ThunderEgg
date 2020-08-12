@@ -119,46 +119,6 @@ class BiLinearGhostFiller : public MPIGhostFiller<2>
 	: MPIGhostFiller<2>(domain_in, 1)
 	{
 	}
-
-	/**
-	 * @brief Generates ghost fillers for a given GMG level
-	 */
-	class Generator
-	{
-		private:
-		/**
-		 * @brief Generated ghost fillers
-		 */
-		std::map<std::shared_ptr<const Domain<2>>, std::shared_ptr<const BiLinearGhostFiller>>
-		generated_fillers;
-
-		public:
-		/**
-		 * @brief Construct a new Generator object
-		 *
-		 * @param filler the finest ghost filler
-		 */
-		Generator(std::shared_ptr<const BiLinearGhostFiller> filler)
-		{
-			generated_fillers[filler->domain] = filler;
-		}
-		/**
-		 * @brief Get a new ghost filler for a given level
-		 *
-		 * @param level  the level
-		 * @return std::shared_ptr<const BiLinearGhostFiller<D>>
-		 */
-		std::shared_ptr<const BiLinearGhostFiller>
-		operator()(std::shared_ptr<const GMG::Level<2>> level)
-		{
-			auto filler = generated_fillers[level->getDomain()];
-			if (filler != nullptr) {
-				return filler;
-			}
-			filler.reset(new BiLinearGhostFiller(level->getDomain()));
-			return filler;
-		}
-	};
 };
 } // namespace ThunderEgg
 #endif
