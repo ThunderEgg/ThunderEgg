@@ -65,6 +65,44 @@ template <size_t D> class VecWrapper : public Vector<D>
 	 */
 	int first_offset;
 
+	/**
+	 * @brief Get the Num Local Patches in this vector
+	 *
+	 * @param vec the Petsc vector
+	 * @param lengths the number of cells in each direction
+	 * @param num_ghost_cells the number of ghost cells on each side of the patch
+	 * @return int the number of local patches
+	 */
+	static int GetNumLocalPatches(Vec vec_in, const std::array<int, D> &lengths_in,
+	                              int num_ghost_cells_in)
+	{
+		int patch_stride = 1;
+		for (size_t i = 1; i < D; i++) {
+			patch_stride *= (lengths_in[i] + 2 * num_ghost_cells_in);
+		}
+		int num_cells;
+		VecGetLocalSize(vec_in, &num_cells);
+		return num_cells / patch_stride;
+	}
+
+	/**
+	 * @brief Get the number of local cells in this vector
+	 *
+	 * @param vec the vector
+	 * @param lengths the number of cells in each direction
+	 * @param num_ghost_cells the number of ghost cells on each side of the patch
+	 * @return int the number of local cells
+	 */
+	static int GetNumLocalCells(Vec vec_in, const std::array<int, D> &lengths_in,
+	                            int num_ghost_cells_in)
+	{
+		int num_cells_in_patch = 1;
+		for (size_t i = 1; i < D; i++) {
+			num_cells_in_patch *= lengths_in[i];
+		}
+		return num_cells_in_patch * GetNumLocalPatches(vec_in, lengths_in, num_ghost_cells_in);
+	}
+
 	public:
 	/**
 	 * @brief Construct a new VecWrapper object
@@ -76,8 +114,9 @@ template <size_t D> class VecWrapper : public Vector<D>
 	 */
 	VecWrapper(Vec vec_in, const std::array<int, D> &lengths_in, int num_ghost_cells_in,
 	           bool own_in)
-	: Vector<D>(MPI_COMM_WORLD), vec(vec_in), num_ghost_cells(num_ghost_cells_in), own(own_in),
-	  lengths(lengths_in)
+	: Vector<D>(MPI_COMM_WORLD, GetNumLocalPatches(vec_in, lengths_in, num_ghost_cells_in),
+	            GetNumLocalCells(vec_in, lengths_in, num_ghost_cells_in)),
+	  vec(vec_in), num_ghost_cells(num_ghost_cells_in), own(own_in), lengths(lengths_in)
 	{
 		strides[0]   = 1;
 		first_offset = num_ghost_cells;
@@ -86,13 +125,6 @@ template <size_t D> class VecWrapper : public Vector<D>
 			first_offset += strides[i] * num_ghost_cells;
 		}
 		patch_stride = strides[D - 1] * (lengths[D - 1] + 2 * num_ghost_cells);
-		VecGetLocalSize(vec, &this->num_local_patches);
-		this->num_local_patches /= patch_stride;
-		int num_cells_in_patch = 1;
-		for (size_t i = 0; i < D; i++) {
-			num_cells_in_patch *= this->lengths[i];
-		}
-		this->num_local_cells = this->num_local_patches * num_cells_in_patch;
 	}
 	VecWrapper(const VecWrapper &) = delete;
 	VecWrapper &operator=(const VecWrapper &) = delete;

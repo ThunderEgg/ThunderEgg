@@ -38,7 +38,7 @@ namespace ThunderEgg
  */
 template <size_t D> class Vector
 {
-	protected:
+	private:
 	/**
 	 * @brief The number of local patches in the vector
 	 */
@@ -57,9 +57,12 @@ template <size_t D> class Vector
 	/**
 	 * @brief Construct a new Vector object
 	 *
-	 * @param comm_in the MPI_Comm to use
+	 * @param comm_in the MPI comm that is being used
+	 * @param num_local_patches_in the number of local patches in this vector
+	 * @param num_local_cells_in the number of local (non-ghost) cells in this vector
 	 */
-	explicit Vector(MPI_Comm comm_in) : comm(comm_in){};
+	explicit Vector(MPI_Comm comm_in, int num_local_patches_in, int num_local_cells_in)
+	: num_local_patches(num_local_patches_in), num_local_cells(num_local_cells_in), comm(comm_in){};
 	/**
 	 * @brief Destroy the Vector object
 	 */

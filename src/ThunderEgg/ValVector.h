@@ -55,20 +55,27 @@ template <size_t D> class ValVector : public Vector<D>
 	 */
 	int first_offset;
 
+	static int GetNumLocalCells(const std::array<int, D> &lengths, int num_patches)
+	{
+		int num_cells_in_patch = 1;
+		for (size_t i = 0; i < D; i++) {
+			num_cells_in_patch *= lengths[i];
+		}
+		return num_patches * num_cells_in_patch;
+	}
+
 	public:
 	/**
 	 * @brief the underlying vector
 	 */
 	std::valarray<double> vec;
-	ValVector(MPI_Comm comm_in, const std::array<int, D> &lengths, int num_ghost_cells,
+	ValVector(MPI_Comm comm_in, const std::array<int, D> &lengths_in, int num_ghost_cells_in,
 	          int num_patches)
-	: Vector<D>(comm_in)
+	: Vector<D>(comm_in, num_patches, GetNumLocalCells(lengths_in, num_patches)),
+	  lengths(lengths_in), num_ghost_cells(num_ghost_cells_in)
 	{
-		this->num_local_patches = num_patches;
-		this->num_ghost_cells   = num_ghost_cells;
-		int size                = 1;
-		this->lengths           = lengths;
-		first_offset            = 0;
+		int size     = 1;
+		first_offset = 0;
 		for (size_t i = 0; i < D; i++) {
 			strides[i] = size;
 			size *= (this->lengths[i] + 2 * num_ghost_cells);
@@ -77,12 +84,6 @@ template <size_t D> class ValVector : public Vector<D>
 		patch_stride = size;
 		size *= num_patches;
 		vec.resize(size);
-
-		int num_cells_in_patch = 1;
-		for (size_t i = 0; i < D; i++) {
-			num_cells_in_patch *= this->lengths[i];
-		}
-		this->num_local_cells = this->num_local_patches * num_cells_in_patch;
 	}
 	/**
 	 * @brief Get a new ValVector object for a given Domain

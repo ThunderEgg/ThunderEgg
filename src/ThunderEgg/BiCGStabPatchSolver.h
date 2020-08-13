@@ -89,17 +89,30 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		 */
 		LocalData<D> ld;
 
+		/**
+		 * @brief Get the number of local cells in the LocalData object
+		 *
+		 * @param ld the LocalData object
+		 * @return int the number of local cells
+		 */
+		static int GetNumLocalCells(const LocalData<D> &ld)
+		{
+			int patch_stride = 1;
+			for (size_t i = 0; i < D; i++) {
+				patch_stride *= ld.getLengths()[i];
+			}
+			return patch_stride;
+		}
+
 		public:
 		/**
 		 * @brief Construct a new SinglePatchVec object
 		 *
-		 * @param ld the localdata for the patch
+		 * @param ld_in the localdata for the patch
 		 */
-		SinglePatchVec(const LocalData<D> &ld) : Vector<D>(MPI_COMM_SELF)
+		SinglePatchVec(const LocalData<D> &ld)
+		: Vector<D>(MPI_COMM_SELF, 1, GetNumLocalCells(ld)), ld(ld)
 		{
-			this->comm              = MPI_COMM_SELF;
-			this->num_local_patches = 1;
-			this->ld                = ld;
 		}
 		LocalData<D> getLocalData(int local_patch_id)
 		{
