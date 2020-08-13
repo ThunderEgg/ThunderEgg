@@ -59,6 +59,13 @@ template <size_t D> class ValVector : public Vector<D>
 	 */
 	std::valarray<double> vec;
 
+	/**
+	 * @brief Calculate the number of local (non-ghost) cells
+	 *
+	 * @param lengths the number of cells in each direction
+	 * @param num_patches the number of patches in this vector
+	 * @return int the number of local (non-ghost) cells
+	 */
 	static int GetNumLocalCells(const std::array<int, D> &lengths, int num_patches)
 	{
 		int num_cells_in_patch = 1;
@@ -82,13 +89,14 @@ template <size_t D> class ValVector : public Vector<D>
 	: Vector<D>(comm, num_patches, GetNumLocalCells(lengths, num_patches)), lengths(lengths),
 	  num_ghost_cells(num_ghost_cells)
 	{
-		int size     = 1;
-		first_offset = 0;
+		int size            = 1;
+		int my_first_offset = 0;
 		for (size_t i = 0; i < D; i++) {
 			strides[i] = size;
 			size *= (this->lengths[i] + 2 * num_ghost_cells);
-			first_offset += strides[i] * num_ghost_cells;
+			my_first_offset += strides[i] * num_ghost_cells;
 		}
+		first_offset = my_first_offset;
 		patch_stride = size;
 		size *= num_patches;
 		vec.resize(size);
