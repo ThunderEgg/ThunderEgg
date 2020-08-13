@@ -73,15 +73,14 @@ template <size_t D> class VecWrapper : public Vector<D>
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
 	 * @return int the number of local patches
 	 */
-	static int GetNumLocalPatches(Vec vec_in, const std::array<int, D> &lengths_in,
-	                              int num_ghost_cells_in)
+	static int GetNumLocalPatches(Vec vec, const std::array<int, D> &lengths, int num_ghost_cells)
 	{
 		int patch_stride = 1;
-		for (size_t i = 1; i < D; i++) {
-			patch_stride *= (lengths_in[i] + 2 * num_ghost_cells_in);
+		for (size_t i = 0; i < D; i++) {
+			patch_stride *= (lengths[i] + 2 * num_ghost_cells);
 		}
 		int num_cells;
-		VecGetLocalSize(vec_in, &num_cells);
+		VecGetLocalSize(vec, &num_cells);
 		return num_cells / patch_stride;
 	}
 
@@ -93,14 +92,13 @@ template <size_t D> class VecWrapper : public Vector<D>
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
 	 * @return int the number of local cells
 	 */
-	static int GetNumLocalCells(Vec vec_in, const std::array<int, D> &lengths_in,
-	                            int num_ghost_cells_in)
+	static int GetNumLocalCells(Vec vec, const std::array<int, D> &lengths, int num_ghost_cells)
 	{
 		int num_cells_in_patch = 1;
-		for (size_t i = 1; i < D; i++) {
-			num_cells_in_patch *= lengths_in[i];
+		for (size_t i = 0; i < D; i++) {
+			num_cells_in_patch *= lengths[i];
 		}
-		return num_cells_in_patch * GetNumLocalPatches(vec_in, lengths_in, num_ghost_cells_in);
+		return num_cells_in_patch * GetNumLocalPatches(vec, lengths, num_ghost_cells);
 	}
 
 	public:
