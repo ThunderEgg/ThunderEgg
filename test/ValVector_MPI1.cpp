@@ -1,0 +1,476 @@
+/***************************************************************************
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
+ *  refined block-structured Cartesian grids
+ *
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
+ *  top-level directory.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ ***************************************************************************/
+
+#include "catch.hpp"
+#include "utils/DomainReader.h"
+#include <ThunderEgg/ValVector.h>
+using namespace std;
+using namespace ThunderEgg;
+#define MESHES                                                                                     \
+	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
+const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+TEST_CASE("ValVector<1> getNumGhostCells", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	array<int, 1> ns                = {nx};
+	int           num_local_patches = GENERATE(1, 13);
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getNumGhostCells() == num_ghost_cells);
+}
+TEST_CASE("ValVector<1> getMPIComm", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	array<int, 1> ns                = {nx};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
+}
+TEST_CASE("ValVector<1> getNumLocalPatches", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	array<int, 1> ns                = {nx};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getNumLocalPatches() == num_local_patches);
+}
+TEST_CASE("ValVector<1> getNumLocalCells", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	array<int, 1> ns                = {nx};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getNumLocalCells() == nx * num_local_patches);
+}
+TEST_CASE("ValVector<1> getValArray", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	array<int, 1> ns                = {nx};
+	int           num_local_patches = GENERATE(1, 13);
+	int           size              = (nx + 2 * num_ghost_cells) * num_local_patches;
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getValArray().size() == size);
+}
+TEST_CASE("ValVector<2> getNumGhostCells", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	array<int, 2> ns                = {nx, ny};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getNumGhostCells() == num_ghost_cells);
+}
+TEST_CASE("ValVector<2> getMPIComm", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	array<int, 2> ns                = {nx, ny};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
+}
+TEST_CASE("ValVector<2> getNumLocalPatches", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	array<int, 2> ns                = {nx, ny};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getNumLocalPatches() == num_local_patches);
+}
+TEST_CASE("ValVector<2> getNumLocalCells", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	array<int, 2> ns                = {nx, ny};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getNumLocalCells() == nx * ny * num_local_patches);
+}
+TEST_CASE("ValVector<2> getValArray", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	array<int, 2> ns                = {nx, ny};
+	int           num_local_patches = GENERATE(1, 13);
+	int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches;
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getValArray().size() == size);
+}
+TEST_CASE("ValVector<3> getNumGhostCells", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getNumGhostCells() == num_ghost_cells);
+}
+TEST_CASE("ValVector<3> getMPIComm", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
+}
+TEST_CASE("ValVector<3> getNumLocalPatches", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getNumLocalPatches() == num_local_patches);
+}
+TEST_CASE("ValVector<3> getNumLocalCells", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getNumLocalCells() == nx * ny * nz * num_local_patches);
+}
+TEST_CASE("ValVector<3> getValArray", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+	int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
+	           * num_local_patches;
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	CHECK(val_vector->getValArray().size() == size);
+}
+
+TEST_CASE("ValVector<1> getLocalData", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	array<int, 1> ns                = {nx};
+	int           num_local_patches = GENERATE(1, 13);
+	int           patch_stride      = (nx + 2 * num_ghost_cells);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	double *view = &val_vector->getValArray()[0];
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		LocalData<1> ld = val_vector->getLocalData(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+	}
+}
+TEST_CASE("ValVector<1> getLocalData const", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	array<int, 1> ns                = {nx};
+	int           num_local_patches = GENERATE(1, 13);
+	int           patch_stride      = (nx + 2 * num_ghost_cells);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	double *view = &val_vector->getValArray()[0];
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		const LocalData<1> ld = val_vector->getLocalData(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+	}
+}
+TEST_CASE("ValVector<2> getLocalData", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	array<int, 2> ns                = {nx, ny};
+	int           num_local_patches = GENERATE(1, 13);
+	int           patch_stride      = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	double *view = &val_vector->getValArray()[0];
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		LocalData<2> ld = val_vector->getLocalData(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+	}
+}
+TEST_CASE("ValVector<2> getLocalData const", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	array<int, 2> ns                = {nx, ny};
+	int           num_local_patches = GENERATE(1, 13);
+	int           patch_stride      = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	double *view = &val_vector->getValArray()[0];
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		const LocalData<2> ld = val_vector->getLocalData(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+	}
+}
+TEST_CASE("ValVector<3> getLocalData", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+	int           patch_stride
+	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	double *view = &val_vector->getValArray()[0];
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		LocalData<3> ld = val_vector->getLocalData(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+	}
+}
+TEST_CASE("ValVector<3> getLocalData const", "[ValVector]")
+{
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+	int           patch_stride
+	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+
+	auto val_vector
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+
+	double *view = &val_vector->getValArray()[0];
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		const LocalData<3> ld = val_vector->getLocalData(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+	}
+}
+TEST_CASE("ValVector getNewVector works", "[ValVector]")
+{
+	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+	INFO("MESH FILE " << mesh_file);
+	int nx = GENERATE(1, 4, 5);
+	int ny = GENERATE(1, 4, 5);
+	INFO("nx:       " << nx);
+	INFO("ny:       " << ny);
+	int                   num_ghost = 0;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+
+	auto val_vector = ValVector<2>::GetNewVector(d_fine);
+
+	CHECK(val_vector->getNumGhostCells() == 0);
+	CHECK(val_vector->getNumLocalCells() == d_fine->getNumLocalCells());
+	CHECK(val_vector->getNumLocalPatches() == d_fine->getNumLocalPatches());
+	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
+	CHECK(val_vector->getLocalData(0).getLengths()[0] == nx);
+	CHECK(val_vector->getLocalData(0).getLengths()[1] == ny);
+}

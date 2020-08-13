@@ -211,10 +211,12 @@ template <size_t D> class FFTWPatchSolver : public PatchSolver<D>
 			std::array<fftw_r2r_kind, D> transforms     = getTransformsForPatch(pinfo);
 			std::array<fftw_r2r_kind, D> transforms_inv = getInverseTransformsForPatch(pinfo);
 
-			plan1[pinfo] = fftw_plan_r2r(D, ns_reversed.data(), &f_copy->vec[0], &tmp->vec[0],
-			                             transforms.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
-			plan2[pinfo] = fftw_plan_r2r(D, ns_reversed.data(), &tmp->vec[0], &sol->vec[0],
-			                             transforms_inv.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
+			plan1[pinfo] = fftw_plan_r2r(D, ns_reversed.data(), &f_copy->getValArray()[0],
+			                             &tmp->getValArray()[0], transforms.data(),
+			                             FFTW_MEASURE | FFTW_DESTROY_INPUT);
+			plan2[pinfo]
+			= fftw_plan_r2r(D, ns_reversed.data(), &tmp->getValArray()[0], &sol->getValArray()[0],
+			                transforms_inv.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
 
 			eigen_vals[pinfo] = getEigenValues(pinfo);
 		}
@@ -249,10 +251,10 @@ template <size_t D> class FFTWPatchSolver : public PatchSolver<D>
 
 		fftw_execute(plan1.at(pinfo));
 
-		tmp->vec /= eigen_vals.at(pinfo);
+		tmp->getValArray() /= eigen_vals.at(pinfo);
 
 		if (pinfo->neumann.all()) {
-			tmp->vec[0] = 0;
+			tmp->getValArray()[0] = 0;
 		}
 
 		fftw_execute(plan2.at(pinfo));

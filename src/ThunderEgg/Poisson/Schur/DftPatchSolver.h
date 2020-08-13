@@ -219,10 +219,10 @@ DftPatchSolver<D>::solve(ThunderEgg::Schur::SchurInfo<D> &sinfo, std::shared_ptr
 
 	execute_plan(plan1[sinfo], f_copy_view, tmp_view, false);
 
-	tmp->vec /= eigen_vals[sinfo];
+	tmp->getValArray() /= eigen_vals[sinfo];
 
 	if (sinfo.pinfo->neumann.all()) {
-		tmp->vec[0] = 0;
+		tmp->getValArray()[0] = 0;
 	}
 
 	LocalData<D> u_view = u->getLocalData(sinfo.pinfo->local_index);

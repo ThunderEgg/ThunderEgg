@@ -141,10 +141,10 @@ template <size_t D> void FftwPatchSolver<D>::addPatch(ThunderEgg::Schur::SchurIn
 			}
 		}
 
-		plan1[sinfo] = fftw_plan_r2r(D, ns, &f_copy->vec[0], &tmp->vec[0], transforms,
-		                             FFTW_MEASURE | FFTW_DESTROY_INPUT);
-		plan2[sinfo] = fftw_plan_r2r(D, ns, &tmp->vec[0], &sol->vec[0], transforms_inv,
-		                             FFTW_MEASURE | FFTW_DESTROY_INPUT);
+		plan1[sinfo] = fftw_plan_r2r(D, ns, &f_copy->getValArray()[0], &tmp->getValArray()[0],
+		                             transforms, FFTW_MEASURE | FFTW_DESTROY_INPUT);
+		plan2[sinfo] = fftw_plan_r2r(D, ns, &tmp->getValArray()[0], &sol->getValArray()[0],
+		                             transforms_inv, FFTW_MEASURE | FFTW_DESTROY_INPUT);
 	}
 
 	if (!denoms.count(sinfo)) {
@@ -208,15 +208,15 @@ void FftwPatchSolver<D>::solve(ThunderEgg::Schur::SchurInfo<D> &sinfo,
 
 	fftw_execute(plan1[sinfo]);
 
-	tmp->vec /= denoms[sinfo];
+	tmp->getValArray() /= denoms[sinfo];
 
 	if (sinfo.pinfo->neumann.all()) {
-		tmp->vec[0] = 0;
+		tmp->getValArray()[0] = 0;
 	}
 
 	fftw_execute(plan2[sinfo]);
 
-	sol->vec /= pow(2.0 * n, D);
+	sol->getValArray() /= pow(2.0 * n, D);
 
 	LocalData<D> u_view   = u->getLocalData(sinfo.pinfo->local_index);
 	LocalData<D> sol_view = sol->getLocalData(0);

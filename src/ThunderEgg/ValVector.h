@@ -54,6 +54,10 @@ template <size_t D> class ValVector : public Vector<D>
 	 * @brief the offset of the first element in each patch
 	 */
 	int first_offset;
+	/**
+	 * @brief the underlying vector
+	 */
+	std::valarray<double> vec;
 
 	static int GetNumLocalCells(const std::array<int, D> &lengths, int num_patches)
 	{
@@ -66,13 +70,17 @@ template <size_t D> class ValVector : public Vector<D>
 
 	public:
 	/**
-	 * @brief the underlying vector
+	 * @brief Construct a new ValVector object
+	 *
+	 * @param comm the MPI_Comm to use
+	 * @param lengths the nubmer of (non-ghost) cells in each direction of a patch
+	 * @param num_ghost_cells the number of ghost cells padding each side of a patch
+	 * @param num_patches the number of patches in this vector
 	 */
-	std::valarray<double> vec;
-	ValVector(MPI_Comm comm_in, const std::array<int, D> &lengths_in, int num_ghost_cells_in,
+	ValVector(MPI_Comm comm, const std::array<int, D> &lengths, int num_ghost_cells,
 	          int num_patches)
-	: Vector<D>(comm_in, num_patches, GetNumLocalCells(lengths_in, num_patches)),
-	  lengths(lengths_in), num_ghost_cells(num_ghost_cells_in)
+	: Vector<D>(comm, num_patches, GetNumLocalCells(lengths, num_patches)), lengths(lengths),
+	  num_ghost_cells(num_ghost_cells)
 	{
 		int size     = 1;
 		first_offset = 0;
@@ -105,6 +113,25 @@ template <size_t D> class ValVector : public Vector<D>
 	{
 		double *data = const_cast<double *>(&vec[patch_stride * local_patch_id + first_offset]);
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
+	}
+
+	/**
+	 * @brief Get the number of ghost cells padding each side of the patches
+	 *
+	 * @return int the number of ghost cells padding each side of the patches
+	 */
+	int getNumGhostCells() const
+	{
+		return num_ghost_cells;
+	}
+	/**
+	 * @brief Get a reference to the underlying valarray
+	 *
+	 * @return std::valarray<int>& a reference to the underlying valarray
+	 */
+	std::valarray<double> &getValArray()
+	{
+		return vec;
 	}
 };
 } // namespace ThunderEgg

@@ -400,10 +400,10 @@ template <size_t D> class DFTPatchSolver : public PatchSolver<D>
 
 		executePlan(plan1.at(pinfo), f_copy_ld, tmp_ld);
 
-		tmp->vec /= eigen_vals.at(pinfo);
+		tmp->getValArray() /= eigen_vals.at(pinfo);
 
 		if (pinfo->neumann.all()) {
-			tmp->vec[0] = 0;
+			tmp->getValArray()[0] = 0;
 		}
 
 		executePlan(plan2.at(pinfo), tmp_ld, u);
