@@ -58,12 +58,12 @@ template <size_t D> class PatchSolver : public virtual Operator<D>, public virtu
 	 *
 	 * 	This sets the Domain and the GhostFiller that the object uses.
 	 *
-	 * @param domain_in the Domain
-	 * @param ghost_filler_in the GhostFiller
+	 * @param domain the Domain
+	 * @param ghost_filler the GhostFiller
 	 */
-	PatchSolver(std::shared_ptr<const Domain<D>>      domain_in,
-	            std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
-	: domain(domain_in), ghost_filler(ghost_filler_in)
+	PatchSolver(std::shared_ptr<const Domain<D>>      domain,
+	            std::shared_ptr<const GhostFiller<D>> ghost_filler)
+	: domain(domain), ghost_filler(ghost_filler)
 	{
 	}
 	/**
@@ -87,6 +87,24 @@ template <size_t D> class PatchSolver : public virtual Operator<D>, public virtu
 	std::shared_ptr<Timer> getTimer() const
 	{
 		return timer;
+	}
+	/**
+	 * @brief Get the Domain object
+	 *
+	 * @return std::shared_ptr<const Domain<D>> the Domain
+	 */
+	std::shared_ptr<const Domain<D>> getDomain() const
+	{
+		return domain;
+	}
+	/**
+	 * @brief Get the GhostFiller object
+	 *
+	 * @return std::shared_ptr<const GhostFiller<D>> the GhostFiller
+	 */
+	std::shared_ptr<const GhostFiller<D>> getGhostFiller() const
+	{
+		return ghost_filler;
 	}
 	/**
 	 * @brief Perform a single solve over a patch
