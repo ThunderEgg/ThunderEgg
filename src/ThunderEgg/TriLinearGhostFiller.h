@@ -27,6 +27,9 @@ namespace ThunderEgg
 {
 /**
  * @brief Performs trilinear interpolation on coarse-fine boundaries of patches
+ *
+ * It only uses the coarse cell, and the four cooresponding fine cells to interpolate on the
+ * coarse-fine boundary.
  */
 class TriLinearGhostFiller : public MPIGhostFiller<3>
 {
@@ -43,9 +46,11 @@ class TriLinearGhostFiller : public MPIGhostFiller<3>
 	/**
 	 * @brief Construct a new TriLinearGhostFiller object
 	 *
+	 * Currently, this only supports an even number of cells on each axis of the patch
+	 *
 	 * @param domain the domain on which ghosts will be filled
 	 */
-	TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain) : MPIGhostFiller<3>(domain, 1) {}
+	TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain);
 };
 } // namespace ThunderEgg
 #endif
