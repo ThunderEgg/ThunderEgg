@@ -299,14 +299,14 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 	{
 		// zero out ghost cells
 		for (auto pinfo : domain->getPatchInfoVector()) {
-			const LocalData<2> this_patch = u->getLocalData(pinfo->local_index);
-			for (Side<2> s : Side<2>::getValues()) {
+			const LocalData<D> this_patch = u->getLocalData(pinfo->local_index);
+			for (Side<D> s : Side<D>::getValues()) {
 				if (pinfo->hasNbr(s)) {
 					for (int i = 0; i < pinfo->num_ghost_cells; i++) {
 						auto this_ghost = this_patch.getGhostSliceOnSide(s, i + 1);
-						nested_loop<1>(
+						nested_loop<D - 1>(
 						this_ghost.getStart(), this_ghost.getEnd(),
-						[&](const std::array<int, 1> &coord) { this_ghost[coord] = 0; });
+						[&](const std::array<int, D - 1> &coord) { this_ghost[coord] = 0; });
 					}
 				}
 			}

@@ -78,6 +78,10 @@ template <size_t D> class DomainReader
 				side = ThunderEgg::Side<D>::south();
 			} else if (side_str == "NORTH") {
 				side = ThunderEgg::Side<D>::north();
+			} else if (side_str == "BOTTOM") {
+				side = ThunderEgg::Side<D>::bottom();
+			} else if (side_str == "TOP") {
+				side = ThunderEgg::Side<D>::top();
 			} else {
 				throw "parsing error";
 			}
@@ -86,16 +90,16 @@ template <size_t D> class DomainReader
 			switch (nbr_type) {
 				case ThunderEgg::NbrType::Normal: {
 					pinfo->nbr_info[side.getIndex()].reset(
-					new ThunderEgg::NormalNbrInfo<2>(nbr_j.at("ids").get<array1>()[0]));
+					new ThunderEgg::NormalNbrInfo<D>(nbr_j.at("ids").get<array1>()[0]));
 					pinfo->getNormalNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
 				} break;
 				case ThunderEgg::NbrType::Fine: {
 					pinfo->nbr_info[side.getIndex()].reset(
-					new ThunderEgg::FineNbrInfo<2>(nbr_j.at("ids").get<array>()));
+					new ThunderEgg::FineNbrInfo<D>(nbr_j.at("ids").get<array>()));
 					pinfo->getFineNbrInfo(side).ranks = nbr_j.at("ranks").get<array>();
 				} break;
 				case ThunderEgg::NbrType::Coarse: {
-					pinfo->nbr_info[side.getIndex()].reset(new ThunderEgg::CoarseNbrInfo<2>(
+					pinfo->nbr_info[side.getIndex()].reset(new ThunderEgg::CoarseNbrInfo<D>(
 					nbr_j.at("ids").get<array1>()[0],
 					GetOrthant(nbr_j.at("orth_on_coarse")).collapseOnAxis(side.getAxisIndex())));
 					pinfo->getCoarseNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
@@ -129,20 +133,20 @@ template <size_t D> class DomainReader
 		}
 		input_stream >> j;
 		input_stream.close();
-		std::map<int, std::shared_ptr<ThunderEgg::PatchInfo<2>>> finer_map;
+		std::map<int, std::shared_ptr<ThunderEgg::PatchInfo<D>>> finer_map;
 		for (nlohmann::json &patch_j : j.at("levels")[0]) {
 			auto patch = parsePatch(patch_j);
 			if (patch->rank == rank)
 				finer_map[patch->id] = patch;
 		}
-		finer_domain = std::make_shared<ThunderEgg::Domain<2>>(finer_map, ns, num_ghost);
-		std::map<int, std::shared_ptr<ThunderEgg::PatchInfo<2>>> coarser_map;
+		finer_domain = std::make_shared<ThunderEgg::Domain<D>>(finer_map, ns, num_ghost);
+		std::map<int, std::shared_ptr<ThunderEgg::PatchInfo<D>>> coarser_map;
 		for (nlohmann::json &patch_j : j.at("levels")[1]) {
 			auto patch = parsePatch(patch_j);
 			if (patch->rank == rank)
 				coarser_map[patch->id] = patch;
 		}
-		coarser_domain = std::make_shared<ThunderEgg::Domain<2>>(coarser_map, ns, num_ghost);
+		coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(coarser_map, ns, num_ghost);
 	}
 	std::shared_ptr<ThunderEgg::Domain<D>> getCoarserDomain()
 	{
@@ -154,4 +158,5 @@ template <size_t D> class DomainReader
 	}
 };
 template <> ThunderEgg::Orthant<2> DomainReader<2>::GetOrthant(nlohmann::json &orth_j);
+template <> ThunderEgg::Orthant<3> DomainReader<3>::GetOrthant(nlohmann::json &orth_j);
 extern template class DomainReader<2>;

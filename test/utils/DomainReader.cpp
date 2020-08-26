@@ -37,3 +37,28 @@ template <> ThunderEgg::Orthant<2> DomainReader<2>::GetOrthant(nlohmann::json &o
 	}
 	return orth;
 }
+template <> ThunderEgg::Orthant<3> DomainReader<3>::GetOrthant(nlohmann::json &orth_j)
+{
+	std::string            side_str = orth_j.get<std::string>();
+	ThunderEgg::Orthant<3> orth;
+	if (side_str == "BSW") {
+		orth = ThunderEgg::Orthant<3>::bsw();
+	} else if (side_str == "BSE") {
+		orth = ThunderEgg::Orthant<3>::bse();
+	} else if (side_str == "BNW") {
+		orth = ThunderEgg::Orthant<3>::bnw();
+	} else if (side_str == "BNE") {
+		orth = ThunderEgg::Orthant<3>::bne();
+	} else if (side_str == "TSW") {
+		orth = ThunderEgg::Orthant<3>::tsw();
+	} else if (side_str == "TSE") {
+		orth = ThunderEgg::Orthant<3>::tse();
+	} else if (side_str == "TNW") {
+		orth = ThunderEgg::Orthant<3>::tnw();
+	} else if (side_str == "TNE") {
+		orth = ThunderEgg::Orthant<3>::tne();
+	} else {
+		throw "parsing error";
+	}
+	return orth;
+}

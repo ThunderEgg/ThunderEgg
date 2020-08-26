@@ -69,6 +69,9 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/SimpleGhostFiller.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/TriLinearGhostFiller.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/TriLinearGhostFiller.cpp)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/TypeDefs.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/ValVector.h)
