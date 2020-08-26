@@ -90,7 +90,7 @@ Mat MatrixHelper2d::formCRSMatrix(double lambda)
 		}
 		// boundaries
 		for (Side<2> s : Side<2>::getValues()) {
-			StencilHelper *sh = getStencilHelper(*pinfo, s);
+			StencilHelper2d *sh = getStencilHelper(*pinfo, s);
 			for (int i = 0; i < sh->n; i++) {
 				int     row    = sh->row(i);
 				int     size   = sh->size(i);

@@ -27,17 +27,17 @@ namespace ThunderEgg
 {
 namespace Poisson
 {
-class StencilHelper
+class StencilHelper2d
 {
 	public:
 	int n;
-	virtual ~StencilHelper() {}
+	virtual ~StencilHelper2d() {}
 	virtual int     row(int i)    = 0;
 	virtual int     size(int i)   = 0;
 	virtual double *coeffs(int i) = 0;
 	virtual int *   cols(int i)   = 0;
 };
-class DirichletSH : public StencilHelper
+class DirichletSH2d : public StencilHelper2d
 {
 	private:
 	double coeff;
@@ -46,7 +46,7 @@ class DirichletSH : public StencilHelper
 	int    stride;
 
 	public:
-	DirichletSH(PatchInfo<2> &d, Side<2> s)
+	DirichletSH2d(PatchInfo<2> &d, Side<2> s)
 	{
 		double h   = 0;
 		int    idx = d.global_index * d.ns[0] * d.ns[1];
@@ -91,7 +91,7 @@ class DirichletSH : public StencilHelper
 		return &col;
 	}
 };
-class NeumannSH : public StencilHelper
+class NeumannSH2d : public StencilHelper2d
 {
 	private:
 	double coeff;
@@ -100,7 +100,7 @@ class NeumannSH : public StencilHelper
 	int    stride;
 
 	public:
-	NeumannSH(PatchInfo<2> &d, Side<2> s)
+	NeumannSH2d(PatchInfo<2> &d, Side<2> s)
 	{
 		double h   = 0;
 		int    idx = d.global_index * d.ns[0] * d.ns[1];
@@ -145,7 +145,7 @@ class NeumannSH : public StencilHelper
 		return &col;
 	}
 };
-class NormalSH : public StencilHelper
+class NormalSH2d : public StencilHelper2d
 {
 	private:
 	double coeff;
@@ -155,7 +155,7 @@ class NormalSH : public StencilHelper
 	int    stride;
 
 	public:
-	NormalSH(PatchInfo<2> &d, Side<2> s)
+	NormalSH2d(PatchInfo<2> &d, Side<2> s)
 	{
 		double h       = 0;
 		int    idx     = d.global_index * d.ns[0] * d.ns[1];
@@ -205,7 +205,7 @@ class NormalSH : public StencilHelper
 		return &col;
 	}
 };
-class CoarseSH : public StencilHelper
+class CoarseSH2d : public StencilHelper2d
 {
 	private:
 	std::valarray<double> mid_coeffs = {{-1.0 / 30, -1.0 / 30, 1.0 / 3, 1.0 / 3, 1.0 / 5, 1.0 / 5}};
@@ -220,7 +220,7 @@ class CoarseSH : public StencilHelper
 	int stride;
 
 	public:
-	CoarseSH(PatchInfo<2> &d, Side<2> s)
+	CoarseSH2d(PatchInfo<2> &d, Side<2> s)
 	{
 		double h             = 0;
 		int    idx           = d.global_index * d.ns[0] * d.ns[1];
@@ -323,7 +323,7 @@ class CoarseSH : public StencilHelper
 		return colz;
 	}
 };
-class FineSH : public StencilHelper
+class FineSH2d : public StencilHelper2d
 {
 	private:
 	std::valarray<double> end_coeffs = {{1.0 / 12, -3.0 / 10, 3.0 / 4, 2.0 / 3, -1.0 / 5}};
@@ -337,7 +337,7 @@ class FineSH : public StencilHelper
 	bool                  end;
 
 	public:
-	FineSH(PatchInfo<2> &d, Side<2> s)
+	FineSH2d(PatchInfo<2> &d, Side<2> s)
 	{
 		double h       = 0;
 		int    idx     = d.global_index * d.ns[0] * d.ns[1];
@@ -446,26 +446,26 @@ class FineSH : public StencilHelper
 	}
 };
 
-StencilHelper *getStencilHelper(PatchInfo<2> &d, Side<2> s)
+StencilHelper2d *getStencilHelper(PatchInfo<2> &d, Side<2> s)
 {
-	StencilHelper *retval = nullptr;
+	StencilHelper2d *retval = nullptr;
 	if (d.hasNbr(s)) {
 		switch (d.getNbrType(s)) {
 			case NbrType::Normal:
-				retval = new NormalSH(d, s);
+				retval = new NormalSH2d(d, s);
 				break;
 			case NbrType::Coarse:
-				retval = new FineSH(d, s);
+				retval = new FineSH2d(d, s);
 				break;
 			case NbrType::Fine:
-				retval = new CoarseSH(d, s);
+				retval = new CoarseSH2d(d, s);
 				break;
 		}
 	} else {
 		if (d.isNeumann(s)) {
-			retval = new NeumannSH(d, s);
+			retval = new NeumannSH2d(d, s);
 		} else {
-			retval = new DirichletSH(d, s);
+			retval = new DirichletSH2d(d, s);
 		}
 	}
 	return retval;
