@@ -20,3 +20,20 @@
  ***************************************************************************/
 #include "DomainReader.h"
 template class DomainReader<2>;
+template <> ThunderEgg::Orthant<2> DomainReader<2>::GetOrthant(nlohmann::json &orth_j)
+{
+	std::string            side_str = orth_j.get<std::string>();
+	ThunderEgg::Orthant<2> orth;
+	if (side_str == "SW") {
+		orth = ThunderEgg::Orthant<2>::sw();
+	} else if (side_str == "SE") {
+		orth = ThunderEgg::Orthant<2>::se();
+	} else if (side_str == "NW") {
+		orth = ThunderEgg::Orthant<2>::nw();
+	} else if (side_str == "NE") {
+		orth = ThunderEgg::Orthant<2>::ne();
+	} else {
+		throw "parsing error";
+	}
+	return orth;
+}

@@ -61,15 +61,15 @@ TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLe
 	CHECK(parents_to_children[1].count(19) == 1);
 	CHECK(parents_to_children[1].count(20) == 1);
 
-	CHECK(parents_to_children[2].count(9) == 1);
-	CHECK(parents_to_children[2].count(10) == 1);
-	CHECK(parents_to_children[2].count(11) == 1);
-	CHECK(parents_to_children[2].count(12) == 1);
+	CHECK(parents_to_children[2].count(5) == 1);
+	CHECK(parents_to_children[2].count(6) == 1);
+	CHECK(parents_to_children[2].count(7) == 1);
+	CHECK(parents_to_children[2].count(8) == 1);
 
-	CHECK(parents_to_children[3].count(5) == 1);
-	CHECK(parents_to_children[3].count(6) == 1);
-	CHECK(parents_to_children[3].count(7) == 1);
-	CHECK(parents_to_children[3].count(8) == 1);
+	CHECK(parents_to_children[3].count(9) == 1);
+	CHECK(parents_to_children[3].count(10) == 1);
+	CHECK(parents_to_children[3].count(11) == 1);
+	CHECK(parents_to_children[3].count(12) == 1);
 }
 TEST_CASE("1-processor getNewGhostVector on uniform 4x4", "[GMG::InterLevelComm]")
 {
