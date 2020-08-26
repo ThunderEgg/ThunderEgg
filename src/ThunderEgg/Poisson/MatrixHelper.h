@@ -31,6 +31,8 @@ namespace Poisson
 {
 /**
  * @brief Create a matrix for the 3D second-order Laplacian operator
+ *
+ * This is equivalent to using StarPatchOperator<3> with TriLinGhostFiller
  */
 class MatrixHelper
 {
@@ -46,14 +48,14 @@ class MatrixHelper
 	 *
 	 * @param domain the Domain
 	 */
-	MatrixHelper(std::shared_ptr<Domain<3>> domain);
+	explicit MatrixHelper(std::shared_ptr<Domain<3>> domain);
 
 	/**
 	 * @brief Form the matrix for the domain
 	 *
 	 * @return the formed matrix
 	 */
-	Mat formCRSMatrix(double lambda = 0);
+	Mat formCRSMatrix();
 };
 } // namespace Poisson
 } // namespace ThunderEgg
