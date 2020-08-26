@@ -38,8 +38,11 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 	std::tuple<std::shared_ptr<const PatchInfo<D>>, const Side<D>, const NbrType, const Orthant<D>>>
 	nbr_calls;
 
+	mutable std::list<std::shared_ptr<const PatchInfo<D>>> local_calls;
+
+	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                               const LocalData<D> local_data, const LocalData<D> nbr_data,
+	                               const LocalData<D> &local_data, const LocalData<D> &nbr_data,
 	                               const Side<D> side, const NbrType nbr_type,
 	                               const Orthant<D> orthant) const override
 	{
@@ -47,16 +50,13 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		nbr_calls.emplace_back(pinfo, side, nbr_type, orthant);
 	}
 
-	mutable std::list<std::shared_ptr<const PatchInfo<D>>> local_calls;
-
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                                 const LocalData<D>                  local_data) const override
+	                                 const LocalData<D> &                local_data) const override
 	{
 		called = true;
 		local_calls.push_back(pinfo);
 	}
 
-	public:
 	CallMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in)
 	: MPIGhostFiller<D>(domain_in, side_cases_in)
 	{
@@ -180,9 +180,9 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 };
 template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 {
-	private:
+	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                               const LocalData<D> local_data, const LocalData<D> nbr_data,
+	                               const LocalData<D> &local_data, const LocalData<D> &nbr_data,
 	                               const Side<D> side, const NbrType nbr_type,
 	                               const Orthant<D> orthant) const override
 	{
@@ -198,11 +198,10 @@ template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 	}
 
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                                 LocalData<D>                        local_data) const override
+	                                 const LocalData<D> &                local_data) const override
 	{
 	}
 
-	public:
 	ExchangeMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in)
 	: MPIGhostFiller<D>(domain_in, side_cases_in)
 	{

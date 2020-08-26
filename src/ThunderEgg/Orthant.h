@@ -344,9 +344,9 @@ template <size_t D> class Orthant
 	 * @param axis the axis
 	 * @return Orthant<D - 1> the resulting orthant
 	 */
-	Orthant<D - 1> collapseOnAxis(int axis) const
+	Orthant<D - 1> collapseOnAxis(size_t axis) const
 	{
-		unsigned int upper_mask = (~0x0U) << axis;
+		size_t upper_mask = (~0x0U) << axis;
 		return Orthant<D - 1>(((val >> 1) & upper_mask) | (val & ~upper_mask));
 	}
 	/**

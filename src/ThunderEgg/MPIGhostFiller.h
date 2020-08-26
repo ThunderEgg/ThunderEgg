@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_MPIGHOSTFILLER_H
 #define THUNDEREGG_MPIGHOSTFILLER_H
 
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <mpi.h>
 namespace ThunderEgg
@@ -75,35 +76,6 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 	 * @brief lengths of recv buffers for each rank
 	 */
 	std::vector<size_t> recv_buff_lengths;
-
-	/**
-	 * @brief Fill the ghost cells for the neighboring patch
-	 *
-	 * @param pinfo the patch that ghost cells are being filled from
-	 * @param local_data the local data for patch that ghost cells are being filled from
-	 * @param nbr_data  the local data for the neighboring patch, where ghost cells are being
-	 * filled.
-	 * @param side the sided that the neighboring patch is on
-	 * @param nbr_type the type of neighbor
-	 * @param orthant the orthant that the neighbors ghost cells lie on
-	 */
-	virtual void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                                       const LocalData<D>                  local_data,
-	                                       const LocalData<D> nbr_data, const Side<D> side,
-	                                       const NbrType    nbr_type,
-	                                       const Orthant<D> orthant) const = 0;
-
-	/**
-	 * @brief Perform any on this patches ghost cells.
-	 *
-	 * This may be necessary on some schemes because it needs data from the patch itself, not just
-	 * the neighboring patch
-	 *
-	 * @param pinfo the patch
-	 * @param local_data the LocalData for the patch
-	 */
-	virtual void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                                         const LocalData<D> local_data) const = 0;
 
 	/**
 	 * @brief Get the LocalData object for the buffer
@@ -291,6 +263,35 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 	/**
+	 * @brief Fill the ghost cells for the neighboring patch
+	 *
+	 * @param pinfo the patch that ghost cells are being filled from
+	 * @param local_data the local data for patch that ghost cells are being filled from
+	 * @param nbr_data  the local data for the neighboring patch, where ghost cells are being
+	 * filled.
+	 * @param side the sided that the neighboring patch is on
+	 * @param nbr_type the type of neighbor
+	 * @param orthant the orthant that the neighbors ghost cells lie on
+	 */
+	virtual void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                                       const LocalData<D> &                local_data,
+	                                       const LocalData<D> &nbr_data, const Side<D> side,
+	                                       const NbrType    nbr_type,
+	                                       const Orthant<D> orthant) const = 0;
+
+	/**
+	 * @brief Perform any on this patches ghost cells.
+	 *
+	 * This may be necessary on some schemes because it needs data from the patch itself, not just
+	 * the neighboring patch
+	 *
+	 * @param pinfo the patch
+	 * @param local_data the LocalData for the patch
+	 */
+	virtual void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                                         const LocalData<D> &local_data) const = 0;
+
+	/**
 	 * @brief Fill ghost cells on a vector
 	 *
 	 * @param u  the vector
@@ -391,5 +392,8 @@ template <size_t D> class MPIGhostFiller : public GhostFiller<D>
 		MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUS_IGNORE);
 	}
 };
+extern template class MPIGhostFiller<1>;
+extern template class MPIGhostFiller<2>;
+extern template class MPIGhostFiller<3>;
 } // namespace ThunderEgg
 #endif

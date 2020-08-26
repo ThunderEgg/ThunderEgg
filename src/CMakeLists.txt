@@ -33,6 +33,9 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/Loops.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/LocalData.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/LocalData.cpp)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/MPIGhostFiller.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/MPIGhostFiller.cpp)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/NormalNbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/NbrType.h)

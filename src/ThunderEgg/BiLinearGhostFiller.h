@@ -30,9 +30,9 @@ namespace ThunderEgg
  */
 class BiLinearGhostFiller : public MPIGhostFiller<2>
 {
-	private:
+	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                               const LocalData<2> local_data, const LocalData<2> nbr_data,
+	                               const LocalData<2> &local_data, const LocalData<2> &nbr_data,
 	                               const Side<2> side, const NbrType nbr_type,
 	                               const Orthant<2> orthant) const override
 	{
@@ -74,7 +74,7 @@ class BiLinearGhostFiller : public MPIGhostFiller<2>
 	}
 
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                                 const LocalData<2>                  local_data) const override
+	                                 const LocalData<2> &                local_data) const override
 	{
 		for (Side<2> side : Side<2>::getValues()) {
 			if (pinfo->hasNbr(side)) {
@@ -114,7 +114,6 @@ class BiLinearGhostFiller : public MPIGhostFiller<2>
 		}
 	}
 
-	public:
 	BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain_in)
 	: MPIGhostFiller<2>(domain_in, 1)
 	{

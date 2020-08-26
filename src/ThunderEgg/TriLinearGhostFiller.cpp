@@ -33,12 +33,12 @@ namespace ThunderEgg
 static std::array<int, 2> getOffset(const std::array<int, 3> ns, Side<3> s, Orthant<2> orth)
 {
 	std::array<int, 2> offset = {0, 0};
-	for (int i = 0; i < s.getAxisIndex(); i++) {
+	for (size_t i = 0; i < s.getAxisIndex(); i++) {
 		if (orth.isOnSide(Side<2>::HigherSideOnAxis(i))) {
 			offset[i] = ns[i];
 		}
 	}
-	for (int i = s.getAxisIndex() + 1; i < 3; i++) {
+	for (size_t i = s.getAxisIndex() + 1; i < 3; i++) {
 		if (orth.isOnSide(Side<2>::HigherSideOnAxis(i - 1))) {
 			offset[i - 1] = ns[i];
 		}
@@ -46,91 +46,82 @@ static std::array<int, 2> getOffset(const std::array<int, 3> ns, Side<3> s, Orth
 	return offset;
 }
 void TriLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-                                                     const LocalData<3>                  local_data,
-                                                     const LocalData<3>                  nbr_data,
+                                                     const LocalData<3> &                local_data,
+                                                     const LocalData<3> &                nbr_data,
                                                      const Side<3> side, const NbrType nbr_type,
                                                      const Orthant<3> orthant) const
 {
-	switch (nbr_type) {
-		case NbrType::Normal: {
-			auto local_slice = local_data.getSliceOnSide(side);
-			auto nbr_ghosts  = nbr_data.getGhostSliceOnSide(side.opposite(), 1);
-			nested_loop<2>(
-			nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
-			[&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
-		} break;
-		case NbrType::Coarse: {
-			auto               nbr_info    = pinfo->getCoarseNbrInfo(side);
-			auto               local_slice = local_data.getSliceOnSide(side);
-			auto               nbr_ghosts  = nbr_data.getGhostSliceOnSide(side.opposite(), 1);
-			std::array<int, 2> offset
-			= getOffset(pinfo->ns, side, orthant.collapseOnAxis(side.getAxisIndex()));
-			nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               std::array<int, 2> coarse_coord;
-				               for (int i = 0; i < 2; i++) {
-					               coarse_coord[i] = (coord[i] + offset[i]) / 2;
-				               }
-				               nbr_ghosts[coarse_coord] += 1.0 / 3.0 * local_slice[coord];
-			               });
-		} break;
-		case NbrType::Fine: {
-			auto               nbr_info    = pinfo->getFineNbrInfo(side);
-			auto               local_slice = local_data.getSliceOnSide(side);
-			auto               nbr_ghosts  = nbr_data.getGhostSliceOnSide(side.opposite(), 1);
-			std::array<int, 2> offset
-			= getOffset(pinfo->ns, side, orthant.collapseOnAxis(side.getAxisIndex()));
-			nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               std::array<int, 2> coarse_coord;
-				               for (int i = 0; i < 2; i++) {
-					               coarse_coord[i] = (coord[i] + offset[i]) / 2;
-				               }
-				               nbr_ghosts[coord] += 4.0 / 6.0 * local_slice[coarse_coord];
-			               });
-		} break;
+	if (nbr_type == NbrType::Normal) {
+		auto local_slice = local_data.getSliceOnSide(side);
+		auto nbr_ghosts  = nbr_data.getGhostSliceOnSide(side.opposite(), 1);
+		nested_loop<2>(
+		nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
+		[&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
+	} else if (nbr_type == NbrType::Coarse) {
+		auto               nbr_info    = pinfo->getCoarseNbrInfo(side);
+		auto               local_slice = local_data.getSliceOnSide(side);
+		auto               nbr_ghosts  = nbr_data.getGhostSliceOnSide(side.opposite(), 1);
+		std::array<int, 2> offset
+		= getOffset(pinfo->ns, side, orthant.collapseOnAxis(side.getAxisIndex()));
+		nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
+		               [&](const std::array<int, 2> &coord) {
+			               std::array<int, 2> coarse_coord;
+			               for (int i = 0; i < 2; i++) {
+				               coarse_coord[i] = (coord[i] + offset[i]) / 2;
+			               }
+			               nbr_ghosts[coarse_coord] += 1.0 / 3.0 * local_slice[coord];
+		               });
+	} else if (nbr_type == NbrType::Fine) {
+		auto               nbr_info    = pinfo->getFineNbrInfo(side);
+		auto               local_slice = local_data.getSliceOnSide(side);
+		auto               nbr_ghosts  = nbr_data.getGhostSliceOnSide(side.opposite(), 1);
+		std::array<int, 2> offset
+		= getOffset(pinfo->ns, side, orthant.collapseOnAxis(side.getAxisIndex()));
+		nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
+		               [&](const std::array<int, 2> &coord) {
+			               std::array<int, 2> coarse_coord;
+			               for (int i = 0; i < 2; i++) {
+				               coarse_coord[i] = (coord[i] + offset[i]) / 2;
+			               }
+			               nbr_ghosts[coord] += 4.0 / 6.0 * local_slice[coarse_coord];
+		               });
 	}
 }
 
 void TriLinearGhostFiller::fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-                                                       const LocalData<3> local_data) const
+                                                       const LocalData<3> &local_data) const
 {
 	for (Side<3> side : Side<3>::getValues()) {
 		if (pinfo->hasNbr(side)) {
-			switch (pinfo->getNbrType(side)) {
-				case NbrType::Normal:
-					// nothing needs to be done
-					break;
-				case NbrType::Coarse: {
-					auto               local_slice  = local_data.getSliceOnSide(side);
-					auto               local_ghosts = local_data.getGhostSliceOnSide(side, 1);
-					auto               nbr_info     = pinfo->getCoarseNbrInfo(side);
-					std::array<int, 2> offset = getOffset(pinfo->ns, side, nbr_info.orth_on_coarse);
-					nested_loop<2>(
-					local_ghosts.getStart(), local_ghosts.getEnd(),
-					[&](const std::array<int, 2> &coord) {
-						std::array<int, 2> offset_coord;
-						for (int i = 0; i < 2; i++) {
-							if ((coord[i] + offset[i]) % 2 == 0) {
-								offset_coord[i] = coord[i] + 1;
-							} else {
-								offset_coord[i] = coord[i] - 1;
-							}
+			NbrType nbr_type = pinfo->getNbrType(side);
+			if (nbr_type == NbrType::Coarse) {
+				auto               local_slice  = local_data.getSliceOnSide(side);
+				auto               local_ghosts = local_data.getGhostSliceOnSide(side, 1);
+				auto               nbr_info     = pinfo->getCoarseNbrInfo(side);
+				std::array<int, 2> offset = getOffset(pinfo->ns, side, nbr_info.orth_on_coarse);
+				nested_loop<2>(
+				local_ghosts.getStart(), local_ghosts.getEnd(),
+				[&](const std::array<int, 2> &coord) {
+					std::array<int, 2> offset_coord;
+					for (int i = 0; i < 2; i++) {
+						if ((coord[i] + offset[i]) % 2 == 0) {
+							offset_coord[i] = coord[i] + 1;
+						} else {
+							offset_coord[i] = coord[i] - 1;
 						}
-						local_ghosts[coord] += 5.0 / 6.0 * local_slice[coord];
-						local_ghosts[coord] -= 1.0 / 6.0 * local_slice[{offset_coord[0], coord[1]}];
-						local_ghosts[coord] -= 1.0 / 6.0 * local_slice[{coord[0], offset_coord[1]}];
-						local_ghosts[coord] -= 1.0 / 6.0 * local_slice[offset_coord];
-					});
-				} break;
-				case NbrType::Fine: {
-					auto local_slice  = local_data.getSliceOnSide(side);
-					auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
-					nested_loop<2>(local_ghosts.getStart(), local_ghosts.getEnd(),
-					               [&](const std::array<int, 2> &coord) {
-						               local_ghosts[coord] -= 1.0 / 3.0 * local_slice[coord];
-					               });
-				} break;
+					}
+					local_ghosts[coord] += 5.0 / 6.0 * local_slice[coord];
+					local_ghosts[coord] -= 1.0 / 6.0 * local_slice[{offset_coord[0], coord[1]}];
+					local_ghosts[coord] -= 1.0 / 6.0 * local_slice[{coord[0], offset_coord[1]}];
+					local_ghosts[coord] -= 1.0 / 6.0 * local_slice[offset_coord];
+				});
+			} else if (nbr_type == NbrType::Fine) {
+				auto local_slice  = local_data.getSliceOnSide(side);
+				auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
+				nested_loop<2>(local_ghosts.getStart(), local_ghosts.getEnd(),
+				               [&](const std::array<int, 2> &coord) {
+					               local_ghosts[coord] -= 1.0 / 3.0 * local_slice[coord];
+				               });
 			}
 		}
 	}

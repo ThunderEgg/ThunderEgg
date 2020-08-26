@@ -33,16 +33,14 @@ namespace ThunderEgg
  */
 class TriLinearGhostFiller : public MPIGhostFiller<3>
 {
-	private:
+	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-	                               const LocalData<3> local_data, const LocalData<3> nbr_data,
+	                               const LocalData<3> &local_data, const LocalData<3> &nbr_data,
 	                               const Side<3> side, const NbrType nbr_type,
 	                               const Orthant<3> orthant) const override;
 
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-	                                 const LocalData<3>                  local_data) const override;
-
-	public:
+	                                 const LocalData<3> &                local_data) const override;
 	/**
 	 * @brief Construct a new TriLinearGhostFiller object
 	 *

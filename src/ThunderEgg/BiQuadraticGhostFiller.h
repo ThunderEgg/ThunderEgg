@@ -94,8 +94,10 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 		ghost[{n - 2}] += 7 * slice[{n - 1}] / 20 + 7 * slice[{n - 2}] / 30 - slice[{n - 3}] / 20;
 		ghost[{n - 1}] += 3 * slice[{n - 1}] / 4 - 3 * slice[{n - 2}] / 10 + slice[{n - 3}] / 12;
 	}
+
+	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                               const LocalData<2> local_data, const LocalData<2> nbr_data,
+	                               const LocalData<2> &local_data, const LocalData<2> &nbr_data,
 	                               const Side<2> side, const NbrType nbr_type,
 	                               const Orthant<2> orthant) const override
 	{
@@ -131,7 +133,7 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	}
 
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                                 const LocalData<2>                  local_data) const override
+	                                 const LocalData<2> &                local_data) const override
 	{
 		for (Side<2> side : Side<2>::getValues()) {
 			if (pinfo->hasNbr(side)) {
@@ -156,7 +158,6 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 		}
 	}
 
-	public:
 	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain_in)
 	: MPIGhostFiller<2>(domain_in, 1)
 	{
