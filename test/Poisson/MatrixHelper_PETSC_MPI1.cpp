@@ -31,16 +31,19 @@
 using namespace std;
 using namespace ThunderEgg;
 #define MESHES                                                                                     \
-	"mesh_inputs/3d_uniform_2x2x2_mpi1.json", "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json"
+	"mesh_inputs/3d_uniform_2x2x2_mpi1.json", "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json",        \
+	"mesh_inputs/3d_mid_refine_4x4x4_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatchOperator",
           "[Poisson::MatrixHelper]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
+	auto                  nx        = GENERATE(8, 10);
+	auto                  ny        = GENERATE(8, 10);
+	auto                  nz        = GENERATE(8, 10);
 	int                   num_ghost = 1;
-	DomainReader<3>       domain_reader(mesh_file, {n, n, n}, num_ghost);
+	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 3> &coord) {
@@ -74,8 +77,10 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
+		INFO("nz:    " << pinfo->ns[1]);
 		INFO("dx:    " << pinfo->spacings[0]);
 		INFO("dy:    " << pinfo->spacings[1]);
+		INFO("dz:    " << pinfo->spacings[1]);
 		LocalData<3> f_vec_ld          = f_vec->getLocalData(pinfo->local_index);
 		LocalData<3> f_vec_expected_ld = f_vec_expected->getLocalData(pinfo->local_index);
 		nested_loop<3>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 3> &coord) {
@@ -93,9 +98,11 @@ TEST_CASE(
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
+	auto                  nx        = GENERATE(8, 10);
+	auto                  ny        = GENERATE(8, 10);
+	auto                  nz        = GENERATE(8, 10);
 	int                   num_ghost = 1;
-	DomainReader<3>       domain_reader(mesh_file, {n, n, n}, num_ghost, true);
+	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost, true);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 3> &coord) {
@@ -144,4 +151,23 @@ TEST_CASE(
 		});
 	}
 	MatDestroy(&A);
+}
+TEST_CASE("Poisson::MatrixHelper constructor throws error with odd number of cells",
+          "[Poisson::MatrixHelper]")
+{
+	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+	INFO("MESH: " << mesh_file);
+	auto axis = GENERATE(0, 1, 2);
+	INFO("axis: " << axis);
+	int n_even    = 10;
+	int n_odd     = 11;
+	int num_ghost = 1;
+
+	array<int, 3> ns;
+	ns.fill(n_even);
+	ns[axis] = n_odd;
+	DomainReader<3>       domain_reader(mesh_file, ns, num_ghost);
+	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+
+	CHECK_THROWS_AS(Poisson::MatrixHelper(d), RuntimeError);
 }

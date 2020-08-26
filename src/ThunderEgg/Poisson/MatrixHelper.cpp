@@ -41,8 +41,8 @@ MatrixHelper::MatrixHelper(std::shared_ptr<Domain<3>> domain) : domain(domain)
 static void addCenterCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
 {
 	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[0];
-	int    nz    = pinfo->ns[0];
+	int    ny    = pinfo->ns[1];
+	int    nz    = pinfo->ns[2];
 	double h_x   = pinfo->spacings[0];
 	double h_y   = pinfo->spacings[1];
 	double h_z   = pinfo->spacings[2];
@@ -68,11 +68,9 @@ static void addCenterCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pin
 static void addWestCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
 {
 	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[0];
-	int    nz    = pinfo->ns[0];
+	int    ny    = pinfo->ns[1];
+	int    nz    = pinfo->ns[2];
 	double h_x   = pinfo->spacings[0];
-	double h_y   = pinfo->spacings[1];
-	double h_z   = pinfo->spacings[2];
 	int    start = nx * ny * nz * pinfo->global_index;
 	// west coeffs
 	double coeff = 1.0 / (h_x * h_x);
@@ -96,8 +94,8 @@ static void addWestCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo
 static void addEastCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
 {
 	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[0];
-	int    nz    = pinfo->ns[0];
+	int    ny    = pinfo->ns[1];
+	int    nz    = pinfo->ns[2];
 	double h_x   = pinfo->spacings[0];
 	int    start = nx * ny * nz * pinfo->global_index;
 	// east coeffs
@@ -122,8 +120,8 @@ static void addEastCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo
 static void addNorthCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
 {
 	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[0];
-	int    nz    = pinfo->ns[0];
+	int    ny    = pinfo->ns[1];
+	int    nz    = pinfo->ns[2];
 	double h_y   = pinfo->spacings[1];
 	int    start = nx * ny * nz * pinfo->global_index;
 	// north coeffs
@@ -148,8 +146,8 @@ static void addNorthCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinf
 static void addSouthCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
 {
 	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[0];
-	int    nz    = pinfo->ns[0];
+	int    ny    = pinfo->ns[1];
+	int    nz    = pinfo->ns[2];
 	double h_y   = pinfo->spacings[1];
 	int    start = nx * ny * nz * pinfo->global_index;
 	// south coeffs
@@ -174,8 +172,8 @@ static void addSouthCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinf
 static void addTopCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
 {
 	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[0];
-	int    nz    = pinfo->ns[0];
+	int    ny    = pinfo->ns[1];
+	int    nz    = pinfo->ns[2];
 	double h_z   = pinfo->spacings[2];
 	int    start = nx * ny * nz * pinfo->global_index;
 	// top coeffs
@@ -200,8 +198,8 @@ static void addTopCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
 static void addBottomCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
 {
 	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[0];
-	int    nz    = pinfo->ns[0];
+	int    ny    = pinfo->ns[1];
+	int    nz    = pinfo->ns[2];
 	double h_z   = pinfo->spacings[2];
 	int    start = nx * ny * nz * pinfo->global_index;
 	// top coeffs
