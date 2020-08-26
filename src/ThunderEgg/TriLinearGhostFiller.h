@@ -48,7 +48,7 @@ class TriLinearGhostFiller : public MPIGhostFiller<3>
 	 *
 	 * @param domain the domain on which ghosts will be filled
 	 */
-	TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain);
+	explicit TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain);
 };
 } // namespace ThunderEgg
 #endif
