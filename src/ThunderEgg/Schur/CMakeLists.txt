@@ -1,6 +1,12 @@
+list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/CoarseIfaceInfo.h)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceInfo.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceSet.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceType.h)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/NormalIfaceInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/SchurHelper.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/SchurHelper.cpp)
