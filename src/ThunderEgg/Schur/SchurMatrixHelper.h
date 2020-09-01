@@ -22,7 +22,6 @@
 #ifndef THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #define THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #include <ThunderEgg/Experimental/PBMatrix.h>
-#include <ThunderEgg/Schur/IfaceInterp.h>
 #include <ThunderEgg/Schur/SchurHelper.h>
 #include <functional>
 #include <petscmat.h>
@@ -36,19 +35,16 @@ class SchurMatrixHelper
 {
 	private:
 	std::shared_ptr<SchurHelper<3>> sh;
-	std::shared_ptr<IfaceInterp<3>> interp;
 	int                             n;
 
 	typedef std::function<void(Block *, std::shared_ptr<std::valarray<double>>)> inserter;
 	void assembleMatrix(inserter insertBlock);
 
 	public:
-	SchurMatrixHelper(std::shared_ptr<SchurHelper<3>> sh, void *solver,
-	                  std::shared_ptr<IfaceInterp<3>> interp)
+	SchurMatrixHelper(std::shared_ptr<SchurHelper<3>> sh, void *solver)
 	{
-		this->sh     = sh;
-		this->interp = interp;
-		n            = sh->getLengths()[0];
+		this->sh = sh;
+		n        = sh->getLengths()[0];
 	}
 	Mat                     formCRSMatrix();
 	Experimental::PBMatrix *formPBMatrix();

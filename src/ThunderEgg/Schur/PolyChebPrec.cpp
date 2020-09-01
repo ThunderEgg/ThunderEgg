@@ -25,12 +25,10 @@
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Schur;
-PolyChebPrec::PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<SchurHelper<3>> sh,
-                           std::shared_ptr<IfaceInterp<3>> interp)
+PolyChebPrec::PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<SchurHelper<3>> sh)
 {
 	this->sh     = sh;
 	this->domain = domain;
-	this->interp = interp;
 }
 void PolyChebPrec::apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const
 {
@@ -43,7 +41,7 @@ void PolyChebPrec::apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vec
 
 	for (int i = coeffs.size() - 1; i > 0; i--) {
 		// solver->solve(f, u, bk1);
-		interp->interpolateToInterface(u, bk);
+		// interp->interpolateToInterface(u, bk);
 		bk->scaleThenAddScaled(4 / interval, -2, bk1);
 		bk->addScaled(coeffs[i], x, -1, bk2);
 		auto tmp = bk2;
@@ -52,7 +50,7 @@ void PolyChebPrec::apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vec
 		bk       = tmp;
 	}
 	// solver->solve(f, u, bk1);
-	interp->interpolateToInterface(u, b);
+	// interp->interpolateToInterface(u, b);
 	b->scaleThenAddScaled(2 / interval, -1, bk1);
 	b->addScaled(coeffs[0], x, -1, bk2);
 }

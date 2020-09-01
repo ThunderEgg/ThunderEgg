@@ -23,7 +23,6 @@
 #define THUNDEREGG_SCHUR_POLYCHEBPREC_H
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/Schur/IfaceInterp.h>
 #include <ThunderEgg/Schur/SchurHelper.h>
 #include <petscpc.h>
 namespace ThunderEgg
@@ -38,7 +37,6 @@ class PolyChebPrec : public Operator<2>
 	private:
 	std::shared_ptr<Schur::SchurHelper<3>> sh;
 	std::shared_ptr<Domain<3>>             domain;
-	std::shared_ptr<Schur::IfaceInterp<3>> interp;
 	double                                 interval = 0.95;
 	std::vector<double>                    coeffs
 	= {4.472135954953655e+00, 5.675247900481234e+00, 3.601012922685066e+00, 2.284885928634731e+00,
@@ -53,8 +51,7 @@ class PolyChebPrec : public Operator<2>
 	 * @param domain the Domain
 	 * @param sh the SchurHelper
 	 */
-	PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<SchurHelper<3>> sh,
-	             std::shared_ptr<IfaceInterp<3>> interp);
+	PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<SchurHelper<3>> sh);
 
 	void apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const;
 };

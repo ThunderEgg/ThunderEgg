@@ -1,10 +1,3 @@
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/BiCGStabSolver.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/BilinearInterpolator.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/BilinearInterpolator.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceInterp.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceSet.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceType.h)
@@ -27,6 +20,3 @@ if(PETSC_FOUND)
 endif(PETSC_FOUND)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/SchurWrapOp.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/TriLinInterp.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/TriLinInterp.cpp)
