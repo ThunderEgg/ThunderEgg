@@ -70,11 +70,11 @@ template <size_t D> class CoarseIfaceInfo : public IfaceInfo<D>
 	/**
 	 * @brief The local index of the coarser patch's inteface
 	 */
-	int coarse_local_index;
+	int coarse_local_index = -1;
 	/**
 	 * @brief The global index of the coarser patch's interface
 	 */
-	int coarse_global_index;
+	int coarse_global_index = -1;
 	/**
 	 * @brief Construct a new CoarseIfaceInfo object
 	 *
@@ -84,48 +84,19 @@ template <size_t D> class CoarseIfaceInfo : public IfaceInfo<D>
 	CoarseIfaceInfo(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
 	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s), -1, -1), nbr_info(pinfo->getCoarseNbrInfoPtr(s))
 	{
+		// fine and coarse interfaces always belong to their patches
 		orth_on_coarse = nbr_info->orth_on_coarse;
 		coarse_rank    = nbr_info->rank;
 		coarse_id      = nbr_info->id * Side<D>::num_sides + s.opposite().getIndex();
-		// fine and coarse interfaces always belong to their patches
-		coarse_local_index  = -1;
-		coarse_global_index = -1;
 	}
-	void getIds(std::deque<int> &ids)
-	{
-		ids.push_back(this->id);
-		ids.push_back(coarse_id);
-	}
-	void getLocalIndexes(std::deque<int> &idx)
-	{
-		idx.push_back(this->local_index);
-		idx.push_back(coarse_local_index);
-	}
-	void getGlobalIndexes(std::deque<int> &idx)
-	{
-		idx.push_back(this->global_index);
-		idx.push_back(coarse_global_index);
-	}
-	void getIfaceTypes(std::deque<IfaceType<D>> &types)
-	{
-		IfaceType<D> fine_type(IfaceType<D>::fine_to_fine, orth_on_coarse);
-		IfaceType<D> coarse_type(IfaceType<D>::fine_to_coarse, orth_on_coarse);
-		types.push_back(fine_type);
-		types.push_back(coarse_type);
-	}
-	void getRanks(std::deque<int> &ranks)
-	{
-		ranks.push_back(nbr_info->rank);
-		ranks.push_back(nbr_info->rank);
-	}
-	void setLocalIndexes(const std::map<int, int> &rev_map)
+	void setLocalIndexesFromId(const std::map<int, int> &rev_map) override
 	{
 		this->local_index = rev_map.at(this->id);
 		auto it           = rev_map.find(coarse_id);
 		if (it != rev_map.end())
 			coarse_local_index = it->second;
 	}
-	void setGlobalIndexes(const std::map<int, int> &rev_map)
+	void setGlobalIndexesFromLocalIndex(const std::map<int, int> &rev_map) override
 	{
 		this->global_index  = rev_map.at(this->local_index);
 		coarse_global_index = rev_map.at(coarse_local_index);

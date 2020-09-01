@@ -160,21 +160,11 @@ template <size_t D> struct SchurInfo : public Serializable {
 	 * @param incoming_procs
 	 */
 
-	std::deque<int> getIds()
-	{
-		std::deque<int> retval;
-		for (Side<D> s : Side<D>::getValues()) {
-			if (pinfo->hasNbr(s)) {
-				getIfaceInfoPtr(s)->getIds(retval);
-			}
-		}
-		return retval;
-	}
 	void setLocalIndexes(const std::map<int, int> &rev_map)
 	{
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo->hasNbr(s)) {
-				getIfaceInfoPtr(s)->setLocalIndexes(rev_map);
+				getIfaceInfoPtr(s)->setLocalIndexesFromId(rev_map);
 			}
 		}
 	}
@@ -182,7 +172,7 @@ template <size_t D> struct SchurInfo : public Serializable {
 	{
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo->hasNbr(s)) {
-				getIfaceInfoPtr(s)->setGlobalIndexes(rev_map);
+				getIfaceInfoPtr(s)->setGlobalIndexesFromLocalIndex(rev_map);
 			}
 		}
 	}

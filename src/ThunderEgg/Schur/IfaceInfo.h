@@ -73,47 +73,17 @@ template <size_t D> class IfaceInfo
 	 */
 	virtual ~IfaceInfo() {}
 	/**
-	 * @brief add to a deque of globally unique ids
-	 *
-	 * @param ids adds to the deque of ids
-	 */
-	virtual void getIds(std::deque<int> &ids) = 0;
-	/**
-	 * @brief add to a deque of local interface indexes
-	 *
-	 * @param idx adds to the deque of local interface indexes
-	 */
-	virtual void getLocalIndexes(std::deque<int> &idx) = 0;
-	/**
-	 * @brief add to a deque of global interface indexes
-	 *
-	 * @param idx adds to the deque of global interface indexes
-	 */
-	virtual void getGlobalIndexes(std::deque<int> &idx) = 0;
-	/**
-	 * @brief add to a deque of IfaceTypes
-	 *
-	 * @param types adds to the deque of IfaceTypes
-	 */
-	virtual void getIfaceTypes(std::deque<IfaceType<D>> &types) = 0;
-	/**
-	 * @brief add to a deque of interface ranks
-	 *
-	 * @param ranks adds to the deque of interface ranks
-	 */
-	virtual void getRanks(std::deque<int> &ranks) = 0;
-	/**
 	 * @brief Set the local indexes in the IfaceInfo objects
 	 *
 	 * @param rev_map map from id to local_index
 	 */
-	virtual void setLocalIndexes(const std::map<int, int> &rev_map) = 0;
+	virtual void setLocalIndexesFromId(const std::map<int, int> &rev_map) = 0;
 	/**
 	 * @brief Set the global indexes in the IfaceInfo objects
 	 *
 	 * @param rev_map map form local_index to global_index
 	 */
-	virtual void setGlobalIndexes(const std::map<int, int> &rev_map) = 0;
+	virtual void setGlobalIndexesFromLocalIndex(const std::map<int, int> &rev_map) = 0;
 };
 } // namespace Schur
 } // namespace ThunderEgg

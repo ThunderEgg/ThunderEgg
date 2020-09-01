@@ -87,53 +87,7 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 		fine_local_indexes.fill(-1);
 		fine_global_indexes.fill(-1);
 	}
-	void getIdxAndTypes(std::deque<int> &idx, std::deque<IfaceType<D>> &types)
-	{
-		idx.push_back(this->local_index);
-		types.push_back(IfaceType<D>::coarse_to_coarse);
-		for (size_t i = 0; i < fine_local_indexes.size(); i++) {
-			idx.push_back(fine_local_indexes[i]);
-			IfaceType<D> type(IfaceType<D>::coarse_to_fine, i);
-			types.push_back(type);
-		}
-	}
-	void getIds(std::deque<int> &ids)
-	{
-		ids.push_back(this->id);
-		for (size_t i = 0; i < fine_ids.size(); i++) {
-			ids.push_back(fine_ids[i]);
-		}
-	}
-	void getLocalIndexes(std::deque<int> &idx)
-	{
-		idx.push_back(this->local_index);
-		for (size_t i = 0; i < fine_ids.size(); i++) {
-			idx.push_back(fine_local_indexes[i]);
-		}
-	}
-	void getGlobalIndexes(std::deque<int> &idx)
-	{
-		idx.push_back(this->global_index);
-		for (size_t i = 0; i < fine_ids.size(); i++) {
-			idx.push_back(fine_global_indexes[i]);
-		}
-	}
-	void getIfaceTypes(std::deque<IfaceType<D>> &types)
-	{
-		types.push_back(IfaceType<D>::coarse_to_coarse);
-		for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
-			IfaceType<D> type(IfaceType<D>::coarse_to_fine, o);
-			types.push_back(type);
-		}
-	}
-	void getRanks(std::deque<int> &ranks)
-	{
-		ranks.push_back(-1);
-		for (size_t i = 0; i < fine_ids.size(); i++) {
-			ranks.push_back(nbr_info->ranks[i]);
-		}
-	}
-	void setLocalIndexes(const std::map<int, int> &rev_map)
+	void setLocalIndexesFromId(const std::map<int, int> &rev_map) override
 	{
 		this->local_index = rev_map.at(this->id);
 		for (size_t i = 0; i < fine_ids.size(); i++) {
@@ -142,7 +96,7 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 				fine_local_indexes[i] = it->second;
 		}
 	}
-	void setGlobalIndexes(const std::map<int, int> &rev_map)
+	void setGlobalIndexesFromLocalIndex(const std::map<int, int> &rev_map) override
 	{
 		this->global_index = rev_map.at(this->local_index);
 		for (size_t i = 0; i < fine_local_indexes.size(); i++) {

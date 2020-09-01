@@ -89,31 +89,11 @@ template <size_t D> class NormalIfaceInfo : public IfaceInfo<D>
 	  nbr_info(pinfo->getNormalNbrInfoPtr(s))
 	{
 	}
-	void getIds(std::deque<int> &ids)
-	{
-		ids.push_back(this->id);
-	}
-	void getLocalIndexes(std::deque<int> &idx)
-	{
-		idx.push_back(this->local_index);
-	}
-	void getGlobalIndexes(std::deque<int> &idx)
-	{
-		idx.push_back(this->global_index);
-	}
-	void getIfaceTypes(std::deque<IfaceType<D>> &types)
-	{
-		types.push_back(IfaceType<D>::normal);
-	}
-	void getRanks(std::deque<int> &ranks)
-	{
-		ranks.push_back(nbr_info->rank);
-	}
-	void setLocalIndexes(const std::map<int, int> &rev_map)
+	void setLocalIndexesFromId(const std::map<int, int> &rev_map) override
 	{
 		this->local_index = rev_map.at(this->id);
 	}
-	void setGlobalIndexes(const std::map<int, int> &rev_map)
+	void setGlobalIndexesFromLocalIndex(const std::map<int, int> &rev_map) override
 	{
 		this->global_index = rev_map.at(this->local_index);
 	}
