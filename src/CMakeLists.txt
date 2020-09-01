@@ -22,8 +22,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/DomainGenerator.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/DomainTools.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/DomainWrapOp.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/FineNbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GhostFiller.h)
@@ -61,8 +59,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/SchurDomainOp.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/SchwarzPrec.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
 

@@ -274,7 +274,7 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 		pinfo->spacings.fill(1.0 / n);
 		pinfo->neumann = curr_type.neumann;
 		sd->getIfaceInfoPtr(Side<3>::west()).reset(new NormalIfaceInfo<3>());
-		solver->addPatch(*sd);
+		// solver->addPatch(*sd);
 		std::vector<std::shared_ptr<SchurInfo<3>>> single_domain;
 		single_domain.push_back(sd);
 

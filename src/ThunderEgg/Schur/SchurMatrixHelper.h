@@ -23,7 +23,6 @@
 #define THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #include <ThunderEgg/Experimental/PBMatrix.h>
 #include <ThunderEgg/Schur/IfaceInterp.h>
-#include <ThunderEgg/Schur/PatchSolver.h>
 #include <ThunderEgg/Schur/SchurHelper.h>
 #include <functional>
 #include <petscmat.h>
@@ -37,7 +36,6 @@ class SchurMatrixHelper
 {
 	private:
 	std::shared_ptr<SchurHelper<3>> sh;
-	std::shared_ptr<PatchSolver<3>> solver;
 	std::shared_ptr<IfaceInterp<3>> interp;
 	int                             n;
 
@@ -45,11 +43,10 @@ class SchurMatrixHelper
 	void assembleMatrix(inserter insertBlock);
 
 	public:
-	SchurMatrixHelper(std::shared_ptr<SchurHelper<3>> sh, std::shared_ptr<PatchSolver<3>> solver,
+	SchurMatrixHelper(std::shared_ptr<SchurHelper<3>> sh, void *solver,
 	                  std::shared_ptr<IfaceInterp<3>> interp)
 	{
 		this->sh     = sh;
-		this->solver = solver;
 		this->interp = interp;
 		n            = sh->getLengths()[0];
 	}
