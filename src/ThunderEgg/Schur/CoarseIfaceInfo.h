@@ -37,6 +37,19 @@ namespace Schur
  */
 template <size_t D> class CoarseIfaceInfo : public IfaceInfo<D>
 {
+	private:
+	/**
+	 * @brief Get the id for the interface on a given side of the patch
+	 *
+	 * @param pinfo the patch
+	 * @param s the side
+	 * @return int the id
+	 */
+	static int GetId(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	{
+		return (int) (pinfo->id * Side<D>::num_sides + s.getIndex());
+	}
+
 	public:
 	/**
 	 * @brief convenience pointer to associated NbrInfo object
@@ -69,14 +82,14 @@ template <size_t D> class CoarseIfaceInfo : public IfaceInfo<D>
 	 * @param s the side that the interface is on
 	 */
 	CoarseIfaceInfo(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s), -1, -1), nbr_info(pinfo->getCoarseNbrInfoPtr(s))
 	{
-		nbr_info       = pinfo->getCoarseNbrInfoPtr(s);
-		this->id       = pinfo->id * Side<D>::num_sides + s.getIndex();
 		orth_on_coarse = nbr_info->orth_on_coarse;
+		coarse_rank    = nbr_info->rank;
 		coarse_id      = nbr_info->id * Side<D>::num_sides + s.opposite().getIndex();
 		// fine and coarse interfaces always belong to their patches
-		this->rank        = pinfo->rank;
-		this->coarse_rank = nbr_info->rank;
+		coarse_local_index  = -1;
+		coarse_global_index = -1;
 	}
 	void getIds(std::deque<int> &ids)
 	{

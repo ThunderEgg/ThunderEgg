@@ -34,20 +34,50 @@ namespace Schur
  */
 template <size_t D> class NormalIfaceInfo : public IfaceInfo<D>
 {
+	private:
+	/**
+	 * @brief Get the rank for the interface on a given side of the patch
+	 *
+	 * @param pinfo the patch
+	 * @param s the side
+	 * @return int the rank
+	 */
+	static int GetRank(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	{
+		if (s.isLowerOnAxis()) {
+			// lower axis interface belongs to neighboring rank
+			auto nbr_info = pinfo->getNormalNbrInfoPtr(s);
+			return nbr_info->rank;
+		} else {
+			// higher axis interafce belongs to this patch's rank
+			return pinfo->rank;
+		}
+	}
+
+	/**
+	 * @brief Get the id for the interface on a given side of the patch
+	 *
+	 * @param pinfo the patch
+	 * @param s the side
+	 * @return int the id
+	 */
+	static int GetId(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	{
+		if (s.isLowerOnAxis()) {
+			// lower axis interface belongs to neighboring rank
+			auto nbr_info = pinfo->getNormalNbrInfoPtr(s);
+			return (int) (nbr_info->id * Side<D>::num_sides + s.opposite().getIndex());
+		} else {
+			// higher axis interafce belongs to this patch's rank
+			return (int) (pinfo->id * Side<D>::num_sides + s.getIndex());
+		}
+	}
+
 	public:
 	/**
 	 * @brief convenience pointer to associated NbrInfo object
 	 */
 	std::shared_ptr<NormalNbrInfo<D>> nbr_info;
-	/**
-	 * @brief Construct a new NormalIfaceInfo object all values are set to zero
-	 */
-	NormalIfaceInfo()
-	{
-		this->id           = 0;
-		this->local_index  = 0;
-		this->global_index = 0;
-	}
 	/**
 	 * @brief Construct a new NormalIfaceInfo object
 	 *
@@ -55,17 +85,9 @@ template <size_t D> class NormalIfaceInfo : public IfaceInfo<D>
 	 * @param s the side of the patch that the interface is on
 	 */
 	NormalIfaceInfo(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	: IfaceInfo<D>(GetRank(pinfo, s), GetId(pinfo, s), -1, -1),
+	  nbr_info(pinfo->getNormalNbrInfoPtr(s))
 	{
-		nbr_info = pinfo->getNormalNbrInfoPtr(s);
-		if (s.isLowerOnAxis()) {
-			this->id = pinfo->id * Side<D>::num_sides + s.getIndex();
-			// lower axis interface belongs to neighboring rank
-			this->rank = nbr_info->rank;
-		} else {
-			this->id = nbr_info->id * Side<D>::num_sides + s.opposite().getIndex();
-			// higher axis interafce belongs to this patch's rank
-			this->rank = pinfo->rank;
-		}
 	}
 	void getIds(std::deque<int> &ids)
 	{

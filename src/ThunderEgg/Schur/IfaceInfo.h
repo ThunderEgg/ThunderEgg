@@ -41,10 +41,6 @@ template <size_t D> class IfaceInfo
 {
 	public:
 	/**
-	 * @brief Destroy the IfaceInfo object
-	 */
-	virtual ~IfaceInfo() {}
-	/**
 	 * @brief The rank that the interface resides on.
 	 */
 	int rank;
@@ -60,6 +56,22 @@ template <size_t D> class IfaceInfo
 	 * @brief the global index in the interface vector.
 	 */
 	int global_index;
+	/**
+	 * @brief Construct a new IfaceInfo object
+	 *
+	 * @param rank the rank of the interface
+	 * @param id the id of the interface
+	 * @param local_index the local index of the interface
+	 * @param global_index the global index of the interface
+	 */
+	IfaceInfo(int rank, int id, int local_index, int global_index)
+	: rank(rank), id(id), local_index(local_index), global_index(global_index)
+	{
+	}
+	/**
+	 * @brief Destroy the IfaceInfo object
+	 */
+	virtual ~IfaceInfo() {}
 	/**
 	 * @brief add to a deque of globally unique ids
 	 *

@@ -37,6 +37,19 @@ namespace Schur
  */
 template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 {
+	private:
+	/**
+	 * @brief Get the id for the interface on a given side of the patch
+	 *
+	 * @param pinfo the patch
+	 * @param s the side
+	 * @return int the id
+	 */
+	static int GetId(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	{
+		return (int) (pinfo->id * Side<D>::num_sides + s.getIndex());
+	}
+
 	public:
 	/**
 	 * @brief convenience pointer to associated NbrInfo object
@@ -65,14 +78,14 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 	 * @param s the side of the patch that the interface is on
 	 */
 	FineIfaceInfo(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s), -1, -1), nbr_info(pinfo->getFineNbrInfoPtr(s))
 	{
-		nbr_info   = pinfo->getFineNbrInfoPtr(s);
-		this->id   = pinfo->id * Side<D>::num_sides + s.getIndex();
-		this->rank = pinfo->rank;
 		for (size_t i = 0; i < fine_ids.size(); i++) {
 			fine_ids[i]   = nbr_info->ids[i] * Side<D>::num_sides + s.opposite().getIndex();
 			fine_ranks[i] = nbr_info->ranks[i];
 		}
+		fine_local_indexes.fill(-1);
+		fine_global_indexes.fill(-1);
 	}
 	void getIdxAndTypes(std::deque<int> &idx, std::deque<IfaceType<D>> &types)
 	{
