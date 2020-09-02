@@ -50,17 +50,22 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with NormalIfaceInfo", "[Schur::Pa
 		pinfo->getNormalNbrInfo(side_to_set).rank = 1;
 		auto iface_info = make_shared<Schur::NormalIfaceInfo<2>>(pinfo, side_to_set);
 
-		Schur::PatchIfaceInfo<2> piinfo;
+		Schur::PatchIfaceInfo<2>        piinfo;
+		const Schur::PatchIfaceInfo<2> &const_piinfo = piinfo;
+
 		piinfo.setIfaceInfo(side_to_set, iface_info);
+
 		CHECK(piinfo.pinfo == nullptr);
 		for (Side<2> s : Side<2>::getValues()) {
 			if (s == side_to_set) {
 				CHECK(piinfo.iface_info[s.getIndex()] == iface_info);
 				CHECK(piinfo.getIfaceInfo(s) == iface_info);
+				CHECK(const_piinfo.getIfaceInfo(s) == iface_info);
 				CHECK(piinfo.getNormalIfaceInfo(s) == iface_info);
 			} else {
 				CHECK(piinfo.iface_info[s.getIndex()] == nullptr);
 				CHECK(piinfo.getIfaceInfo(s) == nullptr);
+				CHECK(const_piinfo.getIfaceInfo(s) == nullptr);
 				CHECK(piinfo.getNormalIfaceInfo(s) == nullptr);
 			}
 			CHECK(piinfo.getCoarseIfaceInfo(s) == nullptr);
@@ -81,17 +86,22 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with FineIfaceInfo", "[Schur::Patc
 		pinfo->getFineNbrInfo(side_to_set).ranks[1] = 2;
 		auto iface_info = make_shared<Schur::FineIfaceInfo<2>>(pinfo, side_to_set);
 
-		Schur::PatchIfaceInfo<2> piinfo;
+		Schur::PatchIfaceInfo<2>        piinfo;
+		const Schur::PatchIfaceInfo<2> &const_piinfo = piinfo;
+
 		piinfo.setIfaceInfo(side_to_set, iface_info);
+
 		CHECK(piinfo.pinfo == nullptr);
 		for (Side<2> s : Side<2>::getValues()) {
 			if (s == side_to_set) {
 				CHECK(piinfo.iface_info[s.getIndex()] == iface_info);
 				CHECK(piinfo.getIfaceInfo(s) == iface_info);
+				CHECK(const_piinfo.getIfaceInfo(s) == iface_info);
 				CHECK(piinfo.getFineIfaceInfo(s) == iface_info);
 			} else {
 				CHECK(piinfo.iface_info[s.getIndex()] == nullptr);
 				CHECK(piinfo.getIfaceInfo(s) == nullptr);
+				CHECK(const_piinfo.getIfaceInfo(s) == nullptr);
 				CHECK(piinfo.getFineIfaceInfo(s) == nullptr);
 			}
 			CHECK(piinfo.getNormalIfaceInfo(s) == nullptr);
@@ -112,17 +122,22 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with CoarseIfaceInfo", "[Schur::Pa
 		pinfo->getCoarseNbrInfo(side_to_set).rank = 1;
 		auto iface_info = make_shared<Schur::CoarseIfaceInfo<2>>(pinfo, side_to_set);
 
-		Schur::PatchIfaceInfo<2> piinfo;
+		Schur::PatchIfaceInfo<2>        piinfo;
+		const Schur::PatchIfaceInfo<2> &const_piinfo = piinfo;
+
 		piinfo.setIfaceInfo(side_to_set, iface_info);
+
 		CHECK(piinfo.pinfo == nullptr);
 		for (Side<2> s : Side<2>::getValues()) {
 			if (s == side_to_set) {
 				CHECK(piinfo.iface_info[s.getIndex()] == iface_info);
 				CHECK(piinfo.getIfaceInfo(s) == iface_info);
+				CHECK(const_piinfo.getIfaceInfo(s) == iface_info);
 				CHECK(piinfo.getCoarseIfaceInfo(s) == iface_info);
 			} else {
 				CHECK(piinfo.iface_info[s.getIndex()] == nullptr);
 				CHECK(piinfo.getIfaceInfo(s) == nullptr);
+				CHECK(const_piinfo.getIfaceInfo(s) == nullptr);
 				CHECK(piinfo.getCoarseIfaceInfo(s) == nullptr);
 			}
 			CHECK(piinfo.getNormalIfaceInfo(s) == nullptr);
