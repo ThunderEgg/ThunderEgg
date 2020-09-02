@@ -47,11 +47,11 @@ struct Block {
 	   {Side<2>::south(), Side<2>::north(), Side<2>::east(), Side<2>::west()}};
 
 	Block(Side<2> main, int j, Side<2> aux, int i, bitset<4> neumann, IfaceType<2> type)
+	: type(type)
 	{
-		s          = rot_table[main.getIndex()][aux.getIndex()];
-		this->i    = i;
-		this->j    = j;
-		this->type = type;
+		s       = rot_table[main.getIndex()][aux.getIndex()];
+		this->i = i;
+		this->j = j;
 		for (int s = 0; s < 4; s++) {
 			this->neumann[rot_table[main.getIndex()][s].getIndex()] = neumann[s];
 		}
@@ -74,11 +74,9 @@ struct BlockKey {
 	IfaceType<2> type;
 	Side<2>      s;
 
-	BlockKey() {}
-	BlockKey(const Block &b)
+	BlockKey(const Block &b) : type(b.type)
 	{
-		s    = b.s;
-		type = b.type;
+		s = b.s;
 	}
 	friend bool operator<(const BlockKey &l, const BlockKey &r)
 	{
@@ -177,16 +175,10 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 					block[i * n + j] = -interp_view[i];
 				}
 				if (s == Side<2>::west()) {
-					switch (type.toInt()) {
-						case IfaceType<2>::normal:
-							block[n * j + j] += 0.5;
-							break;
-						case IfaceType<2>::coarse_to_coarse:
-						case IfaceType<2>::fine_to_fine:
-							block[n * j + j] += 1;
-							break;
-						default:
-							break;
+					if (type.isNormal()) {
+						block[n * j + j] += 0.5;
+					} else if (type.isFineToFine() || type.isCoarseToCoarse()) {
+						block[n * j + j] += 1;
 					}
 				}
 			}

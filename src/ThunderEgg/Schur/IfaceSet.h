@@ -106,17 +106,16 @@ template <size_t D> struct IfaceSet : public Serializable {
 		sinfos.push_back(sinfo);
 		switch (sinfo->pinfo->getNbrType(s)) {
 			case NbrType::Normal:
-				types.push_back(IfaceType<D>::normal);
+				types.push_back(IfaceType<D>::Normal());
 				break;
 			case NbrType::Fine: {
 				auto info = sinfo->getFineIfaceInfo(s);
 				if (info->id == id) {
-					types.push_back(IfaceType<D>::coarse_to_coarse);
+					types.push_back(IfaceType<D>::CoarseToCoarse());
 				} else {
 					for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
 						if (info->fine_ids[o.getIndex()] == id) {
-							types.push_back(IfaceType<D>::coarse_to_fine);
-							types.back().setOrthant(o);
+							types.push_back(IfaceType<D>::CoarseToFine(o));
 							break;
 						}
 					}
@@ -125,10 +124,9 @@ template <size_t D> struct IfaceSet : public Serializable {
 			case NbrType::Coarse: {
 				auto info = sinfo->getCoarseIfaceInfo(s);
 				if (info->id == id) {
-					types.push_back(IfaceType<D>::fine_to_fine);
+					types.push_back(IfaceType<D>::FineToFine(info->orth_on_coarse));
 				} else {
-					types.push_back(IfaceType<D>::fine_to_coarse);
-					types.back().setOrthant(info->orth_on_coarse);
+					types.push_back(IfaceType<D>::FineToCoarse(info->orth_on_coarse));
 				}
 			} break;
 		}

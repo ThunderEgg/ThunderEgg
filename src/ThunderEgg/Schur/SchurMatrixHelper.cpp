@@ -42,13 +42,13 @@ struct ThunderEgg::Schur::Block {
 	int                           i;
 	bitset<6>                     neumann;
 	Block(Side<3> main, int j, Side<3> aux, int i, bitset<6> neumann, IfaceType<3> type)
+	: type(type)
 	{
 		this->main    = main;
 		this->j       = j;
 		this->aux     = aux;
 		this->i       = i;
 		this->neumann = neumann;
-		this->type    = type;
 		data          = 0;
 		data |= main.isLowerOnAxis() << 7;
 		data |= aux.isLowerOnAxis() << 3;
@@ -100,16 +100,10 @@ struct ThunderEgg::Schur::Block {
 			}
 			return quad;
 		};
-		switch (type.toInt()) {
-			case IfaceType<3>::fine_to_coarse:
-			case IfaceType<3>::fine_to_fine:
-			case IfaceType<3>::coarse_to_fine: {
-				int quad = type.getOrthant().getIndex();
-				quad     = rotateQuad(quad);
-				type.setOrthant(Orthant<2>(quad));
-			} break;
-			default:
-				break;
+		if (type.isFineToCoarse() || type.isFineToFine() || type.isCoarseToFine()) {
+			int quad = type.getOrthant().getIndex();
+			quad     = rotateQuad(quad);
+			type.setOrthant(Orthant<2>(quad));
 		}
 	}
 	bool operator<(const Block &b) const
@@ -158,11 +152,9 @@ struct BlockKey {
 	IfaceType<3> type;
 	Side<3>      s;
 
-	BlockKey() {}
-	BlockKey(const Block &b)
+	BlockKey(const Block &b) : type(b.type)
 	{
-		type = b.type;
-		s    = b.aux;
+		s = b.aux;
 	}
 	friend bool operator<(const BlockKey &l, const BlockKey &r)
 	{
@@ -303,16 +295,10 @@ void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 					block[i * n * n + j] = -interp_view[i];
 				}
 				if (s == Side<3>::west()) {
-					switch (type.toInt()) {
-						case IfaceType<3>::normal:
-							block[n * n * j + j] += 0.5;
-							break;
-						case IfaceType<3>::coarse_to_coarse:
-						case IfaceType<3>::fine_to_fine:
-							block[n * n * j + j] += 1.0;
-							break;
-						default:
-							break;
+					if (type.isNormal()) {
+						block[n * n * j + j] += 0.5;
+					} else if (type.isCoarseToCoarse() || type.isFineToFine()) {
+						block[n * n * j + j] += 1.0;
 					}
 				}
 			}
