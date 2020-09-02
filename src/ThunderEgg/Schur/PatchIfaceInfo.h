@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_SCHUR_PATCHIFACEINFO_H
 #define THUNDEREGG_SCHUR_PATCHIFACEINFO_H
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Schur/CoarseIfaceInfo.h>
 #include <ThunderEgg/Schur/FineIfaceInfo.h>
 #include <ThunderEgg/Schur/NormalIfaceInfo.h>
@@ -68,6 +69,8 @@ template <size_t D> class PatchIfaceInfo : public Serializable
 					case NbrType::Coarse:
 						setIfaceInfo(s, std::make_shared<CoarseIfaceInfo<D>>(pinfo, s));
 						break;
+					default:
+						throw RuntimeError("Unsupported NbrType");
 				}
 			}
 		}
@@ -186,6 +189,8 @@ template <size_t D> class PatchIfaceInfo : public Serializable
 					case NbrType::Coarse:
 						setIfaceInfo(s, std::make_shared<CoarseIfaceInfo<D>>(pinfo, s));
 						break;
+					default:
+						throw RuntimeError("Unsupported NbrType");
 				}
 			}
 		}
