@@ -45,7 +45,7 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 	 * @param s the side
 	 * @return int the id
 	 */
-	static int GetId(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	static int GetId(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
 	{
 		return (int) (pinfo->id * Side<D>::num_sides + s.getIndex());
 	}
@@ -77,7 +77,7 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 	 * @param pinfo the associated PatchInfo object
 	 * @param s the side of the patch that the interface is on
 	 */
-	FineIfaceInfo(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	FineIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
 	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s), -1, -1), nbr_info(pinfo->getFineNbrInfoPtr(s))
 	{
 		for (size_t i = 0; i < fine_ids.size(); i++) {

@@ -2,7 +2,6 @@ if(PETSC_FOUND)
   add_executable(
     unit_tests_mpiany
     test.cpp
-    SchurInfo.cpp
     PatchInfo.cpp
     OctTree.cpp
     Domain.cpp

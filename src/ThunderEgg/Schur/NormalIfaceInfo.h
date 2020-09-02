@@ -42,7 +42,7 @@ template <size_t D> class NormalIfaceInfo : public IfaceInfo<D>
 	 * @param s the side
 	 * @return int the rank
 	 */
-	static int GetRank(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	static int GetRank(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
 	{
 		if (s.isLowerOnAxis()) {
 			// lower axis interface belongs to neighboring rank
@@ -61,7 +61,7 @@ template <size_t D> class NormalIfaceInfo : public IfaceInfo<D>
 	 * @param s the side
 	 * @return int the id
 	 */
-	static int GetId(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	static int GetId(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
 	{
 		if (s.isLowerOnAxis()) {
 			// lower axis interface belongs to neighboring rank
@@ -84,7 +84,7 @@ template <size_t D> class NormalIfaceInfo : public IfaceInfo<D>
 	 * @param pinfo the associated PatchInfo object
 	 * @param s the side of the patch that the interface is on
 	 */
-	NormalIfaceInfo(std::shared_ptr<PatchInfo<D>> pinfo, Side<D> s)
+	NormalIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
 	: IfaceInfo<D>(GetRank(pinfo, s), GetId(pinfo, s), -1, -1),
 	  nbr_info(pinfo->getNormalNbrInfoPtr(s))
 	{

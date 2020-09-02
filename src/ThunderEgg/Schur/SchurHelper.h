@@ -23,7 +23,7 @@
 #define THUNDEREGG_SCHUR_SCHURHELPER_H
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Schur/IfaceSet.h>
-#include <ThunderEgg/Schur/SchurInfo.h>
+#include <ThunderEgg/Schur/PatchIfaceInfo.h>
 #include <ThunderEgg/ValVector.h>
 #include <ThunderEgg/VectorGenerator.h>
 #include <deque>
@@ -48,12 +48,12 @@ template <size_t D> class SchurHelper
 	std::shared_ptr<Domain<D>> domain;
 
 	/**
-	 * @brief Vector of SchurInfo pointers where index in the vector corresponds to the patch's
+	 * @brief Vector of PatchIfaceInfo pointers where index in the vector corresponds to the patch's
 	 * local index
 	 */
-	std::vector<std::shared_ptr<SchurInfo<D>>>   sinfo_vector;
-	std::map<int, std::shared_ptr<SchurInfo<D>>> id_sinfo_map;
-	std::map<int, IfaceSet<D>>                   ifaces;
+	std::vector<std::shared_ptr<PatchIfaceInfo<D>>>   sinfo_vector;
+	std::map<int, std::shared_ptr<PatchIfaceInfo<D>>> id_sinfo_map;
+	std::map<int, IfaceSet<D>>                        ifaces;
 
 	std::vector<int>                       id_map_vec;
 	std::vector<int>                       global_map_vec;
@@ -177,7 +177,7 @@ template <size_t D> class SchurHelper
 	{
 		return lengths;
 	}
-	const std::vector<std::shared_ptr<SchurInfo<D>>> getSchurInfoVector()
+	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> getPatchIfaceInfoVector()
 	{
 		return sinfo_vector;
 	}
@@ -197,7 +197,7 @@ template <size_t D> inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>
 	}
 	sinfo_vector.reserve(domain->getNumLocalPatches());
 	for (auto &pinfo : domain->getPatchInfoVector()) {
-		sinfo_vector.emplace_back(new SchurInfo<D>(pinfo));
+		sinfo_vector.emplace_back(new PatchIfaceInfo<D>(pinfo));
 		id_sinfo_map[pinfo->id] = sinfo_vector.back();
 	}
 	ifaces = IfaceSet<D>::EnumerateIfaces(sinfo_vector.begin(), sinfo_vector.end());
@@ -241,40 +241,38 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 				for (size_t idx = 0; idx < ifs.sinfos.size(); idx++) {
 					Side<D> iface_side = ifs.sides[idx];
 					auto    sinfo      = ifs.sinfos[idx];
-					if (sinfo->getIfaceInfoPtr(iface_side)->id == id) {
+					if (sinfo->getIfaceInfo(iface_side)->id == id) {
 						// outgoing affects all ifaces
 						for (Side<D> s : Side<D>::getValues()) {
 							if (sinfo->pinfo->hasNbr(s)) {
 								switch (sinfo->pinfo->getNbrType(s)) {
 									case NbrType::Normal: {
-										const NormalIfaceInfo<D> &info
-										= sinfo->getNormalIfaceInfo(s);
-										if (info.rank != rank) {
-											in_matrix_offs.emplace(info.rank, info.id);
-											out_matrix_offs.emplace(info.rank, id);
+										auto info = sinfo->getNormalIfaceInfo(s);
+										if (info->rank != rank) {
+											in_matrix_offs.emplace(info->rank, info->id);
+											out_matrix_offs.emplace(info->rank, id);
 										}
 									} break;
 									case NbrType::Fine: {
-										const FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
-										if (info.rank != rank) {
-											in_matrix_offs.emplace(info.rank, info.id);
-											out_matrix_offs.emplace(info.rank, id);
+										auto info = sinfo->getFineIfaceInfo(s);
+										if (info->rank != rank) {
+											in_matrix_offs.emplace(info->rank, info->id);
+											out_matrix_offs.emplace(info->rank, id);
 										}
 										for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
-											if (info.fine_ranks[i] != rank) {
-												out_matrix_offs.emplace(info.fine_ranks[i], id);
+											if (info->fine_ranks[i] != rank) {
+												out_matrix_offs.emplace(info->fine_ranks[i], id);
 											}
 										}
 									} break;
 									case NbrType::Coarse: {
-										const CoarseIfaceInfo<D> &info
-										= sinfo->getCoarseIfaceInfo(s);
-										if (info.rank != rank) {
-											in_matrix_offs.emplace(info.rank, info.id);
-											out_matrix_offs.emplace(info.rank, id);
+										auto info = sinfo->getCoarseIfaceInfo(s);
+										if (info->rank != rank) {
+											in_matrix_offs.emplace(info->rank, info->id);
+											out_matrix_offs.emplace(info->rank, id);
 										}
-										if (info.coarse_rank != rank) {
-											out_matrix_offs.emplace(info.coarse_rank, id);
+										if (info->coarse_rank != rank) {
+											out_matrix_offs.emplace(info->coarse_rank, id);
 										}
 									} break;
 								}
@@ -285,34 +283,32 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 						// iface side has to handled specially
 						switch (sinfo->pinfo->getNbrType(iface_side)) {
 							case NbrType::Normal: {
-								const NormalIfaceInfo<D> &info
-								= sinfo->getNormalIfaceInfo(iface_side);
-								if (info.rank != rank) {
-									in_matrix_offs.emplace(info.rank, info.id);
-									out_matrix_offs.emplace(info.rank, id);
+								auto info = sinfo->getNormalIfaceInfo(iface_side);
+								if (info->rank != rank) {
+									in_matrix_offs.emplace(info->rank, info->id);
+									out_matrix_offs.emplace(info->rank, id);
 								}
 							} break;
 							case NbrType::Fine: {
-								const FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(iface_side);
-								if (info.rank != rank) {
-									in_matrix_offs.emplace(info.rank, info.id);
-									out_matrix_offs.emplace(info.rank, id);
+								auto info = sinfo->getFineIfaceInfo(iface_side);
+								if (info->rank != rank) {
+									in_matrix_offs.emplace(info->rank, info->id);
+									out_matrix_offs.emplace(info->rank, id);
 								}
 								for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
-									if (info.fine_ranks[i] != rank) {
-										out_matrix_offs.emplace(info.fine_ranks[i], id);
+									if (info->fine_ranks[i] != rank) {
+										out_matrix_offs.emplace(info->fine_ranks[i], id);
 									}
 								}
 							} break;
 							case NbrType::Coarse: {
-								const CoarseIfaceInfo<D> &info
-								= sinfo->getCoarseIfaceInfo(iface_side);
-								if (info.rank != rank) {
-									in_matrix_offs.emplace(info.rank, info.id);
-									out_matrix_offs.emplace(info.rank, id);
+								auto info = sinfo->getCoarseIfaceInfo(iface_side);
+								if (info->rank != rank) {
+									in_matrix_offs.emplace(info->rank, info->id);
+									out_matrix_offs.emplace(info->rank, id);
 								}
-								if (info.coarse_rank != rank) {
-									out_matrix_offs.emplace(info.coarse_rank, id);
+								if (info->coarse_rank != rank) {
+									out_matrix_offs.emplace(info->coarse_rank, id);
 								}
 							} break;
 						}
@@ -321,23 +317,21 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 							if (s != iface_side && sinfo->pinfo->hasNbr(s)) {
 								switch (sinfo->pinfo->getNbrType(s)) {
 									case NbrType::Normal: {
-										const NormalIfaceInfo<D> &info
-										= sinfo->getNormalIfaceInfo(s);
-										if (info.rank != rank) {
-											in_matrix_offs.emplace(info.rank, info.id);
+										auto info = sinfo->getNormalIfaceInfo(s);
+										if (info->rank != rank) {
+											in_matrix_offs.emplace(info->rank, info->id);
 										}
 									} break;
 									case NbrType::Fine: {
-										const FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
-										if (info.rank != rank) {
-											in_matrix_offs.emplace(info.rank, info.id);
+										auto info = sinfo->getFineIfaceInfo(s);
+										if (info->rank != rank) {
+											in_matrix_offs.emplace(info->rank, info->id);
 										}
 									} break;
 									case NbrType::Coarse: {
-										const CoarseIfaceInfo<D> &info
-										= sinfo->getCoarseIfaceInfo(s);
-										if (info.rank != rank) {
-											in_matrix_offs.emplace(info.rank, info.id);
+										auto info = sinfo->getCoarseIfaceInfo(s);
+										if (info->rank != rank) {
+											in_matrix_offs.emplace(info->rank, info->id);
 										}
 									} break;
 								}
@@ -357,10 +351,10 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 	set<pair<int, int>> out_patch_offs;
 	set<pair<int, int>> in_patch_offs;
 	ghost_start = curr_i;
-	for (shared_ptr<SchurInfo<D>> &sinfo : sinfo_vector) {
+	for (shared_ptr<PatchIfaceInfo<D>> &sinfo : sinfo_vector) {
 		for (Side<D> s : Side<D>::getValues()) {
 			if (sinfo->pinfo->hasNbr(s)) {
-				int id = sinfo->getIfaceInfoPtr(s)->id;
+				int id = sinfo->getIfaceInfo(s)->id;
 				if (!rev_map.count(id)) {
 					id_map_vec.push_back(id);
 					rev_map[id] = curr_i;
@@ -368,35 +362,35 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 				}
 				switch (sinfo->pinfo->getNbrType(s)) {
 					case NbrType::Normal: {
-						NormalIfaceInfo<D> &info = sinfo->getNormalIfaceInfo(s);
-						if (info.nbr_info->rank != rank) {
-							in_patch_offs.insert(make_pair(info.nbr_info->rank, id));
-							out_patch_offs.insert(make_pair(info.nbr_info->rank, id));
+						auto info = sinfo->getNormalIfaceInfo(s);
+						if (info->nbr_info->rank != rank) {
+							in_patch_offs.insert(make_pair(info->nbr_info->rank, id));
+							out_patch_offs.insert(make_pair(info->nbr_info->rank, id));
 						}
 					} break;
 					case NbrType::Coarse: {
-						CoarseIfaceInfo<D> &info = sinfo->getCoarseIfaceInfo(s);
-						if (info.nbr_info->rank != rank) {
-							in_patch_offs.insert(make_pair(info.nbr_info->rank, id));
-							out_patch_offs.insert(make_pair(info.nbr_info->rank, info.coarse_id));
-							if (!rev_map.count(info.coarse_id)) {
-								id_map_vec.push_back(info.coarse_id);
-								rev_map[info.coarse_id] = curr_i;
+						auto info = sinfo->getCoarseIfaceInfo(s);
+						if (info->nbr_info->rank != rank) {
+							in_patch_offs.insert(make_pair(info->nbr_info->rank, id));
+							out_patch_offs.insert(make_pair(info->nbr_info->rank, info->coarse_id));
+							if (!rev_map.count(info->coarse_id)) {
+								id_map_vec.push_back(info->coarse_id);
+								rev_map[info->coarse_id] = curr_i;
 								curr_i++;
 							}
 						}
 					} break;
 					case NbrType::Fine: {
-						FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
+						auto info = sinfo->getFineIfaceInfo(s);
 						for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
-							if (info.nbr_info->ranks[o.getIndex()] != rank) {
+							if (info->nbr_info->ranks[o.getIndex()] != rank) {
 								in_patch_offs.insert(
-								make_pair(info.nbr_info->ranks[o.getIndex()], id));
-								out_patch_offs.insert(make_pair(info.nbr_info->ranks[o.getIndex()],
-								                                info.fine_ids[o.getIndex()]));
-								if (!rev_map.count(info.fine_ids[o.getIndex()])) {
-									id_map_vec.push_back(info.fine_ids[o.getIndex()]);
-									rev_map[info.fine_ids[o.getIndex()]] = curr_i;
+								make_pair(info->nbr_info->ranks[o.getIndex()], id));
+								out_patch_offs.insert(make_pair(info->nbr_info->ranks[o.getIndex()],
+								                                info->fine_ids[o.getIndex()]));
+								if (!rev_map.count(info->fine_ids[o.getIndex()])) {
+									id_map_vec.push_back(info->fine_ids[o.getIndex()]);
+									rev_map[info->fine_ids[o.getIndex()]] = curr_i;
 									curr_i++;
 								}
 							}
@@ -438,7 +432,7 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 		p.second.setLocalIndexes(rev_map);
 	}
 	for (auto &sinfo : sinfo_vector) {
-		sinfo->setLocalIndexes(rev_map);
+		sinfo->setLocalIndexesFromId(rev_map);
 	}
 	indexIfacesGlobal();
 } // namespace ThunderEgg

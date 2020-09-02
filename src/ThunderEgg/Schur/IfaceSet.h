@@ -24,7 +24,7 @@
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/Schur/IfaceType.h>
-#include <ThunderEgg/Schur/SchurInfo.h>
+#include <ThunderEgg/Schur/PatchIfaceInfo.h>
 #include <bitset>
 #include <map>
 #include <mpi.h>
@@ -35,7 +35,7 @@ namespace ThunderEgg
 namespace Schur
 {
 /**
- * @brief This is a set of SchurInfo objects for an interface.
+ * @brief This is a set of PatchIfaceInfo objects for an interface.
  *
  * This will contain information from each patch that the interface is on.
  *
@@ -65,15 +65,15 @@ template <size_t D> struct IfaceSet : public Serializable {
 	/**
 	 * @brief the set of PatchInfo objects associated with this interface
 	 */
-	std::vector<std::shared_ptr<SchurInfo<D>>> sinfos;
+	std::vector<std::shared_ptr<PatchIfaceInfo<D>>> sinfos;
 	/**
-	 * @brief Create IfaceSet objects from a given collection of SchurInfo objects.
+	 * @brief Create IfaceSet objects from a given collection of PatchIfaceInfo objects.
 	 *
 	 * This method will communicate any necessary information over mpi
 	 *
 	 * @tparam Iter the iterator type
-	 * @param begin the begining of the collection of std::shared_ptr<SchurInfo<D>> objects
-	 * @param end the end of the collection of std::shared_ptr<SchurInfo<D>> objects
+	 * @param begin the begining of the collection of std::shared_ptr<PatchIfaceInfo<D>> objects
+	 * @param end the end of the collection of std::shared_ptr<PatchIfaceInfo<D>> objects
 	 * @return std::map<int, IfaceSet<D>> a map of interface id to IfaceSet oject
 	 */
 	template <class Iter> static std::map<int, IfaceSet<D>> EnumerateIfaces(Iter begin, Iter end);
@@ -99,7 +99,7 @@ template <size_t D> struct IfaceSet : public Serializable {
 	/**
 	 * @brief Add an Iface to this set.
 	 */
-	void insert(int id, Side<D> s, std::shared_ptr<SchurInfo<D>> sinfo)
+	void insert(int id, Side<D> s, std::shared_ptr<PatchIfaceInfo<D>> sinfo)
 	{
 		this->id = id;
 		sides.push_back(s);
@@ -109,12 +109,12 @@ template <size_t D> struct IfaceSet : public Serializable {
 				types.push_back(IfaceType<D>::normal);
 				break;
 			case NbrType::Fine: {
-				const FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
-				if (info.id == id) {
+				auto info = sinfo->getFineIfaceInfo(s);
+				if (info->id == id) {
 					types.push_back(IfaceType<D>::coarse_to_coarse);
 				} else {
 					for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
-						if (info.fine_ids[o.getIndex()] == id) {
+						if (info->fine_ids[o.getIndex()] == id) {
 							types.push_back(IfaceType<D>::coarse_to_fine);
 							types.back().setOrthant(o);
 							break;
@@ -123,12 +123,12 @@ template <size_t D> struct IfaceSet : public Serializable {
 				}
 			} break;
 			case NbrType::Coarse: {
-				const CoarseIfaceInfo<D> &info = sinfo->getCoarseIfaceInfo(s);
-				if (info.id == id) {
+				auto info = sinfo->getCoarseIfaceInfo(s);
+				if (info->id == id) {
 					types.push_back(IfaceType<D>::fine_to_fine);
 				} else {
 					types.push_back(IfaceType<D>::fine_to_coarse);
-					types.back().setOrthant(info.orth_on_coarse);
+					types.back().setOrthant(info->orth_on_coarse);
 				}
 			} break;
 		}
@@ -154,7 +154,7 @@ template <size_t D> struct IfaceSet : public Serializable {
 	{
 		id_local = rev_map.at(id);
 		for (auto &sinfo : sinfos) {
-			sinfo->setLocalIndexes(rev_map);
+			sinfo->setLocalIndexesFromId(rev_map);
 		}
 	}
 	/**
@@ -166,7 +166,7 @@ template <size_t D> struct IfaceSet : public Serializable {
 	{
 		id_global = rev_map.at(id_local);
 		for (auto &sinfo : sinfos) {
-			sinfo->setGlobalIndexes(rev_map);
+			sinfo->setGlobalIndexesFromLocalIndex(rev_map);
 		}
 	}
 	int serialize(char *buffer) const
@@ -197,9 +197,9 @@ template <size_t D> struct IfaceSet : public Serializable {
 			IfaceType<D> type;
 			reader >> type;
 			types.push_back(type);
-			std::shared_ptr<SchurInfo<D>> sinfo(new SchurInfo<D>());
-			reader >> *sinfo;
-			sinfos.push_back(sinfo);
+			std::shared_ptr<PatchIfaceInfo<D>> piinfo(new PatchIfaceInfo<D>());
+			reader >> *piinfo;
+			sinfos.push_back(piinfo);
 		}
 		return reader.getPos();
 	}
@@ -214,43 +214,43 @@ std::map<int, IfaceSet<D>> IfaceSet<D>::EnumerateIfaces(Iter begin, Iter end)
 	std::set<int>                             incoming_procs;
 	std::map<int, std::map<int, IfaceSet<D>>> off_proc_ifaces;
 	for (; begin != end; begin++) {
-		std::shared_ptr<SchurInfo<D>> sinfo = *begin;
+		std::shared_ptr<PatchIfaceInfo<D>> sinfo = *begin;
 		for (Side<D> s : Side<D>::getValues()) {
 			if (sinfo->pinfo->hasNbr(s)) {
 				switch (sinfo->pinfo->getNbrType(s)) {
 					case NbrType::Normal: {
-						const NormalIfaceInfo<D> &info = sinfo->getNormalIfaceInfo(s);
-						if (info.rank == rank) {
-							ifaces[info.id].insert(info.id, s, sinfo);
-							if (info.nbr_info->rank != rank) {
-								incoming_procs.insert(info.nbr_info->rank);
+						auto info = sinfo->getNormalIfaceInfo(s);
+						if (info->rank == rank) {
+							ifaces[info->id].insert(info->id, s, sinfo);
+							if (info->nbr_info->rank != rank) {
+								incoming_procs.insert(info->nbr_info->rank);
 							}
 						} else {
-							off_proc_ifaces[info.rank][info.id].insert(info.id, s, sinfo);
+							off_proc_ifaces[info->rank][info->id].insert(info->id, s, sinfo);
 						}
 					} break;
 					case NbrType::Fine: {
-						const FineIfaceInfo<D> &info = sinfo->getFineIfaceInfo(s);
-						ifaces[info.id].insert(info.id, s, sinfo);
+						auto info = sinfo->getFineIfaceInfo(s);
+						ifaces[info->id].insert(info->id, s, sinfo);
 						for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
-							if (info.fine_ranks[i] == rank) {
-								ifaces[info.fine_ids[i]].insert(info.fine_ids[i], s, sinfo);
+							if (info->fine_ranks[i] == rank) {
+								ifaces[info->fine_ids[i]].insert(info->fine_ids[i], s, sinfo);
 							} else {
-								off_proc_ifaces[info.fine_ranks[i]][info.fine_ids[i]].insert(
-								info.fine_ids[i], s, sinfo);
-								incoming_procs.insert(info.fine_ranks[i]);
+								off_proc_ifaces[info->fine_ranks[i]][info->fine_ids[i]].insert(
+								info->fine_ids[i], s, sinfo);
+								incoming_procs.insert(info->fine_ranks[i]);
 							}
 						}
 					} break;
 					case NbrType::Coarse: {
-						const CoarseIfaceInfo<D> &info = sinfo->getCoarseIfaceInfo(s);
-						ifaces[info.id].insert(info.id, s, sinfo);
-						if (info.coarse_rank == rank) {
-							ifaces[info.coarse_id].insert(info.coarse_id, s, sinfo);
+						auto info = sinfo->getCoarseIfaceInfo(s);
+						ifaces[info->id].insert(info->id, s, sinfo);
+						if (info->coarse_rank == rank) {
+							ifaces[info->coarse_id].insert(info->coarse_id, s, sinfo);
 						} else {
-							off_proc_ifaces[info.coarse_rank][info.coarse_id].insert(info.coarse_id,
-							                                                         s, sinfo);
-							incoming_procs.insert(info.coarse_rank);
+							off_proc_ifaces[info->coarse_rank][info->coarse_id].insert(
+							info->coarse_id, s, sinfo);
+							incoming_procs.insert(info->coarse_rank);
 						}
 					} break;
 				}

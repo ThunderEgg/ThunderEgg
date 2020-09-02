@@ -11,8 +11,8 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/NormalIfaceInfo.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/SchurHelper.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/SchurHelper.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/SchurInfo.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/SchurInfo.cpp)
+list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PatchIfaceInfo.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchIfaceInfo.cpp)
 
 if(PETSC_FOUND)
   list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PolyChebPrec.h)

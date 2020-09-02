@@ -92,9 +92,9 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 		const IfaceSet<2> &ifs = p.second;
 		int                i   = ifs.id_global;
 		for (size_t idx = 0; idx < ifs.sinfos.size(); i++) {
-			Side<2>       aux   = ifs.sides[idx];
-			SchurInfo<2> &sinfo = *ifs.sinfos[idx];
-			IfaceType<2>  type  = ifs.types[idx];
+			Side<2>            aux   = ifs.sides[idx];
+			PatchIfaceInfo<2> &sinfo = *ifs.sinfos[idx];
+			IfaceType<2>       type  = ifs.types[idx];
 			for (int s = 0; s < 4; s++) {
 				if (sinfo.iface_info[s] != nullptr) {
 					int     j    = sinfo.iface_info[s]->global_index;
@@ -142,14 +142,14 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 		// create domain representing curr_type
 		std::shared_ptr<PatchInfo<2>> pinfo(new PatchInfo<2>());
 		pinfo->nbr_info[0].reset(new NormalNbrInfo<2>());
-		std::shared_ptr<SchurInfo<2>> sd(new SchurInfo<2>());
+		std::shared_ptr<PatchIfaceInfo<2>> sd(new PatchIfaceInfo<2>(pinfo));
 		sd->pinfo = pinfo;
 		pinfo->ns.fill(n);
 		pinfo->spacings.fill(1.0 / n);
 		pinfo->neumann = curr_type.neumann;
 		// sd->getIfaceInfoPtr(Side<2>::west()).reset(new NormalIfaceInfo<2>());
 		// solver->addPatch(*sd);
-		std::vector<std::shared_ptr<SchurInfo<2>>> single_domain;
+		std::vector<std::shared_ptr<PatchIfaceInfo<2>>> single_domain;
 		single_domain.push_back(sd);
 
 		map<BlockKey, shared_ptr<valarray<double>>> coeffs;

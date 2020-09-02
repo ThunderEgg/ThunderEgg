@@ -19,6 +19,6 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "SchurInfo.h"
-template struct ThunderEgg::Schur::SchurInfo<2>;
-template struct ThunderEgg::Schur::SchurInfo<3>;
+#include "PatchIfaceInfo.h"
+template class ThunderEgg::Schur::PatchIfaceInfo<2>;
+template class ThunderEgg::Schur::PatchIfaceInfo<3>;
