@@ -84,9 +84,9 @@ template <size_t D> class IfaceType
 		return IfaceType<D>(1, Orthant<D - 1>::null());
 	}
 	/**
-	 * @brief Check if this type is Normal
+	 * @brief Check if this type is CoarseToCoarse
 	 *
-	 * @return if it is Normal
+	 * @return if it is CoarseToCoarse
 	 */
 	bool isCoarseToCoarse() const
 	{
@@ -105,9 +105,9 @@ template <size_t D> class IfaceType
 		return IfaceType<D>(2, orth_on_coarse);
 	}
 	/**
-	 * @brief Check if this type is Normal
+	 * @brief Check if this type is FineToCoarse
 	 *
-	 * @return if it is Normal
+	 * @return if it is FineToCoarse
 	 */
 	bool isFineToCoarse() const
 	{
@@ -128,9 +128,9 @@ template <size_t D> class IfaceType
 		return IfaceType<D>(3, orth_on_coarse);
 	}
 	/**
-	 * @brief Check if this type is Normal
+	 * @brief Check if this type is FineToFine
 	 *
-	 * @return if it is Normal
+	 * @return if it is FineToFine
 	 */
 	bool isFineToFine() const
 	{
@@ -151,9 +151,9 @@ template <size_t D> class IfaceType
 		return IfaceType<D>(4, orthant);
 	}
 	/**
-	 * @brief Check if this type is Normal
+	 * @brief Check if this type is CoarseToFine
 	 *
-	 * @return if it is Normal
+	 * @return if it is CoarseToFine
 	 */
 	bool isCoarseToFine() const
 	{
