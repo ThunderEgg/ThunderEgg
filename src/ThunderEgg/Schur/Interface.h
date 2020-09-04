@@ -43,7 +43,6 @@ namespace Schur
  */
 template <size_t D> class Interface : public Serializable
 {
-	private:
 	public:
 	/**
 	 * @brief The id of the interface
@@ -107,7 +106,7 @@ template <size_t D> class Interface : public Serializable
 	 *
 	 * @param id the id of the interface
 	 */
-	Interface(int id) : id(id) {}
+	explicit Interface(int id) : id(id) {}
 
 	/**
 	 * @brief Add an associated patch to this interface
@@ -186,127 +185,176 @@ template <size_t D> class Interface : public Serializable
 		}
 		return reader.getPos();
 	}
+
+	private:
 	/**
-	 * @brief Create Interface objects from a given collection of PatchIfaceInfo objects.
+	 * @brief Insert the given PatchIfaceInfo object into the Interface map
 	 *
-	 * This method will communicate any necessary information over mpi
+	 * @param rank_id_iface_map the map from rank to the interface's id to Interface
+	 * @param rank the rank of the interface
+	 * @param id the id of the interface
+	 * @param s the side of the patch that the interface is on
+	 * @param piinfo the PatchIfaceInfo object
+	 */
+	static void InsertPatchToInterface(
+	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map, int rank,
+	int id, Side<2> s, std::shared_ptr<const PatchIfaceInfo<D>> piinfo)
+	{
+		std::shared_ptr<Interface<D>> &iface_ptr = rank_id_iface_map[rank][id];
+		if (iface_ptr == nullptr) {
+			iface_ptr.reset(new Interface<D>(id));
+		}
+		iface_ptr->insert(s, piinfo);
+	}
+	/**
+	 * @brief Will insert the interface shared with a normal neighbor into rank_id_iface_map, and
+	 * will add any ranks that are sending messages to us into incoming_procs
 	 *
-	 * @tparam Iter the iterator type
-	 * @param begin the begining of the collection of std::shared_ptr<PatchIfaceInfo<D>> objects
-	 * @param end the end of the collection of std::shared_ptr<PatchIfaceInfo<D>> objects
-	 * @return std::map<int, Interface<D>> a map of interface id to Interface oject
+	 * @param rank_id_iface_map the map from rank to the interface's id to Interface
+	 * @param incoming_procs the set of ranks that are sending messages this rank
+	 * @param piinfo the PatchIfaceInfo object
+	 * @param s the side of the patch that the interface is on
+	 */
+	static void InsertInterfaceWithNormalNbr(
+	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
+	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<2> s)
+	{
+		int rank;
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		auto info = piinfo->getNormalIfaceInfo(s);
+		InsertPatchToInterface(rank_id_iface_map, info->rank, info->id, s, piinfo);
+		if (info->rank == piinfo->pinfo->rank && info->nbr_info->rank != piinfo->pinfo->rank) {
+			incoming_procs.insert(info->nbr_info->rank);
+		}
+	}
+	/**
+	 * @brief Will insert the interfaces shared with a finer neighbor into rank_id_iface_map, and
+	 * will add any ranks that are sending messages to us into incoming_procs
+	 *
+	 * @param rank_id_iface_map the map from rank to the interface's id to Interface
+	 * @param incoming_procs the set of ranks that are sending messages this rank
+	 * @param piinfo the PatchIfaceInfo object
+	 * @param s the side of the patch that the interface is on
+	 */
+	static void InsertInterfacesWithFineNbr(
+	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
+	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<2> s)
+	{
+		auto info = piinfo->getFineIfaceInfo(s);
+
+		InsertPatchToInterface(rank_id_iface_map, info->rank, info->id, s, piinfo);
+
+		for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
+			InsertPatchToInterface(rank_id_iface_map, info->fine_ranks[i], info->fine_ids[i], s,
+			                       piinfo);
+
+			if (info->fine_ranks[i] != piinfo->pinfo->rank) {
+				incoming_procs.insert(info->fine_ranks[i]);
+			}
+		}
+	}
+	/**
+	 * @brief Will insert the interfaces shared with a coarser neighbor into rank_id_iface_map, and
+	 * will add any ranks that are sending messages to us into incoming_procs
+	 *
+	 * @param rank_id_iface_map the map from rank to the interface's id to Interface
+	 * @param incoming_procs the set of ranks that are sending messages this rank
+	 * @param piinfo the PatchIfaceInfo object
+	 * @param s the side of the patch that the interface is on
+	 */
+	static void InsertInterfacesWithCoarseNbr(
+	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
+	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<2> s)
+	{
+		auto info = piinfo->getCoarseIfaceInfo(s);
+
+		InsertPatchToInterface(rank_id_iface_map, info->rank, info->id, s, piinfo);
+		InsertPatchToInterface(rank_id_iface_map, info->coarse_rank, info->coarse_id, s, piinfo);
+
+		if (info->coarse_rank != piinfo->pinfo->rank) {
+			incoming_procs.insert(info->coarse_rank);
+		}
+	}
+
+	public:
+	/**
+	 * @brief Will enumerate a map from interface id to this rank's interfaces, will also do any
+	 * neccesary communication to get additional information. This is collection on all processors.
+	 *
+	 * @param piinfos vector of this ranks piinfo objects
+	 * @return std::map<int, std::shared_ptr<Interface<D>>> the map from interface id to interface
 	 */
 	static std::map<int, std::shared_ptr<Interface<D>>>
 	EnumerateIfacesFromPiinfoVector(std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> piinfos)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		std::map<int, std::shared_ptr<Interface<D>>> ifaces;
-		auto                                         insert_patch
-		= [&](int id, Side<2> s, std::shared_ptr<const PatchIfaceInfo<D>> piinfo) {
-			  std::shared_ptr<Interface<D>> &iface_ptr = ifaces[id];
-			  if (iface_ptr == nullptr) {
-				  iface_ptr.reset(new Interface<D>(id));
-			  }
-			  iface_ptr->insert(s, piinfo);
-		  };
-		std::set<int>                              incoming_procs;
-		std::map<int, std::map<int, Interface<D>>> off_proc_ifaces;
-		auto                                       insert_off_proc_patch
-		= [&](int rank, int id, Side<2> s, std::shared_ptr<const PatchIfaceInfo<D>> piinfo) {
-			  off_proc_ifaces[rank].emplace(id, id);
-			  off_proc_ifaces[rank].at(id).insert(s, piinfo);
-		  };
+		std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> rank_id_iface_map;
+		std::set<int>                                               incoming_procs;
 		for (auto piinfo : piinfos) {
 			for (Side<D> s : Side<D>::getValues()) {
 				if (piinfo->pinfo->hasNbr(s)) {
 					switch (piinfo->pinfo->getNbrType(s)) {
-						case NbrType::Normal: {
-							auto info = piinfo->getNormalIfaceInfo(s);
-							if (info->rank == rank) {
-								insert_patch(info->id, s, piinfo);
-								if (info->nbr_info->rank != rank) {
-									incoming_procs.insert(info->nbr_info->rank);
-								}
-							} else {
-								insert_off_proc_patch(info->rank, info->id, s, piinfo);
-							}
-						} break;
-						case NbrType::Fine: {
-							auto info = piinfo->getFineIfaceInfo(s);
-							insert_patch(info->id, s, piinfo);
-							for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
-								if (info->fine_ranks[i] == rank) {
-									insert_patch(info->fine_ids[i], s, piinfo);
-								} else {
-									insert_off_proc_patch(info->fine_ranks[i], info->fine_ids[i], s,
-									                      piinfo);
-									incoming_procs.insert(info->fine_ranks[i]);
-								}
-							}
-						} break;
-						case NbrType::Coarse: {
-							auto info = piinfo->getCoarseIfaceInfo(s);
-							insert_patch(info->id, s, piinfo);
-							if (info->coarse_rank == rank) {
-								insert_patch(info->coarse_id, s, piinfo);
-							} else {
-								insert_off_proc_patch(info->coarse_rank, info->coarse_id, s,
-								                      piinfo);
-								incoming_procs.insert(info->coarse_rank);
-							}
-						} break;
+						case NbrType::Normal:
+							InsertInterfaceWithNormalNbr(rank_id_iface_map, incoming_procs, piinfo,
+							                             s);
+							break;
+						case NbrType::Fine:
+							InsertInterfacesWithFineNbr(rank_id_iface_map, incoming_procs, piinfo,
+							                            s);
+							break;
+						case NbrType::Coarse:
+							InsertInterfacesWithCoarseNbr(rank_id_iface_map, incoming_procs, piinfo,
+							                              s);
+							break;
+						default:
+							throw RuntimeError("Unsupported NbrType value");
 					}
 				}
 			}
 		}
 		// send info
-		std::deque<char *>       buffers;
-		std::vector<MPI_Request> send_requests;
-		for (auto &p : off_proc_ifaces) {
+		std::deque<std::vector<char>> buffers;
+		std::vector<MPI_Request>      send_requests;
+		for (auto &p : rank_id_iface_map) {
 			int dest = p.first;
-			int size = 0;
-			for (auto q : p.second) {
-				Interface<D> &iface = q.second;
-				size += iface.serialize(nullptr);
+			if (dest != rank) {
+				int size = 0;
+				for (auto q : p.second) {
+					auto &iface = q.second;
+					size += iface->serialize(nullptr);
+				}
+				buffers.emplace_back(size);
+				BufferWriter writer(buffers.back().data());
+				for (auto q : p.second) {
+					auto &iface = q.second;
+					writer << *iface;
+				}
+				MPI_Request request;
+				MPI_Isend(buffers.back().data(), size, MPI_BYTE, dest, 0, MPI_COMM_WORLD, &request);
+				send_requests.push_back(request);
 			}
-			char *buffer = new char[size];
-			buffers.push_back(buffer);
-			int pos = 0;
-			for (auto q : p.second) {
-				Interface<D> &iface = q.second;
-				pos += iface.serialize(buffer + pos);
-			}
-			MPI_Request request;
-			MPI_Isend(buffer, size, MPI_BYTE, dest, 0, MPI_COMM_WORLD, &request);
-			send_requests.push_back(request);
 		}
 		// recv info
-		for (int src : incoming_procs) {
+		for (size_t i = 0; i < incoming_procs.size(); i++) {
 			MPI_Status status;
-			MPI_Probe(src, 0, MPI_COMM_WORLD, &status);
+			MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 			int size;
 			MPI_Get_count(&status, MPI_BYTE, &size);
-			char *buffer = new char[size];
+			std::vector<char> buffer(size);
 
-			MPI_Recv(buffer, size, MPI_BYTE, src, 0, MPI_COMM_WORLD, &status);
+			MPI_Recv(buffer.data(), size, MPI_BYTE, status.MPI_SOURCE, 0, MPI_COMM_WORLD, &status);
 
-			BufferReader reader(buffer);
+			BufferReader reader(buffer.data());
 			while (reader.getPos() < size) {
 				Interface<D> ifs;
 				reader >> ifs;
-				ifaces.at(ifs.id)->merge(ifs);
+				rank_id_iface_map.at(rank).at(ifs.id)->merge(ifs);
 			}
-
-			delete[] buffer;
 		}
 		// wait for all
 		MPI_Waitall(send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
-		// delete send buffers
-		for (char *buffer : buffers) {
-			delete[] buffer;
-		}
-		return ifaces;
+		return rank_id_iface_map[rank];
 	}
 };
 } // namespace Schur
