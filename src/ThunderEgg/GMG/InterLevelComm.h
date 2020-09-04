@@ -111,7 +111,7 @@ template <size_t D> class InterLevelComm
 	: ns(finer_domain->getNs()), num_ghost_cells(finer_domain->getNumGhostCells())
 	{
 		patch_size = 1;
-		for (uint axis = 0; axis < D; axis++) {
+		for (size_t axis = 0; axis < D; axis++) {
 			patch_size *= ns[axis] + 2 * num_ghost_cells;
 		}
 
