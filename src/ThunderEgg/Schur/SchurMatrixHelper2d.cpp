@@ -87,12 +87,12 @@ void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 {
 	set<Block> blocks;
 	for (auto p : sh->getIfaces()) {
-		const IfaceSet<2> &ifs = p.second;
-		int                i   = ifs.id_global;
-		for (size_t idx = 0; idx < ifs.sinfos.size(); i++) {
-			Side<2>            aux   = ifs.sides[idx];
-			PatchIfaceInfo<2> &sinfo = *ifs.sinfos[idx];
-			IfaceType<2>       type  = ifs.types[idx];
+		const Interface<2> &ifs = p.second;
+		int                 i   = ifs.global_index;
+		for (auto patch : ifs.patches) {
+			Side<2>                  aux   = patch.side;
+			const PatchIfaceInfo<2> &sinfo = *patch.piinfo;
+			IfaceType<2>             type  = patch.type;
 			for (int s = 0; s < 4; s++) {
 				if (sinfo.iface_info[s] != nullptr) {
 					int     j    = sinfo.iface_info[s]->global_index;

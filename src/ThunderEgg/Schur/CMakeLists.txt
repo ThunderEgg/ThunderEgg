@@ -2,7 +2,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/CoarseIfaceInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceInfo.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceSet.h)
+list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/Interface.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceType.h)
 

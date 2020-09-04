@@ -134,7 +134,7 @@ template <size_t D> class PatchIfaceInfo : public Serializable
 	 * @return std::shared_ptr<const FineIfaceInfo<D>> the FineIfaceInfo object, nullptr if
 	 * there is not a FineIfaceInfo object on the given side
 	 */
-	std::shared_ptr<const FineIfaceInfo<D>> getFineIfaceInfo(Side<D> s)
+	std::shared_ptr<const FineIfaceInfo<D>> getFineIfaceInfo(Side<D> s) const
 	{
 		return std::dynamic_pointer_cast<const FineIfaceInfo<D>>(iface_info[s.getIndex()]);
 	}
