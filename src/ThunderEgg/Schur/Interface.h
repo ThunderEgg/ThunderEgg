@@ -336,7 +336,8 @@ template <size_t D> class Interface : public Serializable
 			}
 		}
 		// recv info
-		for (size_t i = 0; i < incoming_procs.size(); i++) {
+		size_t num_incoming = incoming_procs.size();
+		for (size_t i = 0; i < num_incoming; i++) {
 			MPI_Status status;
 			MPI_Probe(MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
 			int size;
