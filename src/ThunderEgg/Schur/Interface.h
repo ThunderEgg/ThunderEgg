@@ -198,7 +198,7 @@ template <size_t D> class Interface : public Serializable
 	 */
 	static void InsertPatchToInterface(
 	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map, int rank,
-	int id, Side<2> s, std::shared_ptr<const PatchIfaceInfo<D>> piinfo)
+	int id, Side<D> s, std::shared_ptr<const PatchIfaceInfo<D>> piinfo)
 	{
 		std::shared_ptr<Interface<D>> &iface_ptr = rank_id_iface_map[rank][id];
 		if (iface_ptr == nullptr) {
@@ -217,7 +217,7 @@ template <size_t D> class Interface : public Serializable
 	 */
 	static void InsertInterfaceWithNormalNbr(
 	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
-	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<2> s)
+	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<D> s)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -238,7 +238,7 @@ template <size_t D> class Interface : public Serializable
 	 */
 	static void InsertInterfacesWithFineNbr(
 	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
-	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<2> s)
+	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<D> s)
 	{
 		auto info = piinfo->getFineIfaceInfo(s);
 
@@ -264,7 +264,7 @@ template <size_t D> class Interface : public Serializable
 	 */
 	static void InsertInterfacesWithCoarseNbr(
 	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
-	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<2> s)
+	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<D> s)
 	{
 		auto info = piinfo->getCoarseIfaceInfo(s);
 
@@ -357,6 +357,8 @@ template <size_t D> class Interface : public Serializable
 		return rank_id_iface_map[rank];
 	}
 };
+extern template class Interface<2>;
+extern template class Interface<3>;
 } // namespace Schur
 } // namespace ThunderEgg
 #endif
