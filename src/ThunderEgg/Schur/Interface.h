@@ -158,7 +158,7 @@ template <size_t D> class Interface : public Serializable
 		BufferWriter writer(buffer);
 		writer << id;
 		writer << global_index;
-		int size = patches.size();
+		int size = (int) patches.size();
 		writer << size;
 		for (auto patch : patches) {
 			writer << patch.side;
@@ -354,7 +354,7 @@ template <size_t D> class Interface : public Serializable
 			}
 		}
 		// wait for all
-		MPI_Waitall(send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
+		MPI_Waitall((int) send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
 		return rank_id_iface_map[rank];
 	}
 };
