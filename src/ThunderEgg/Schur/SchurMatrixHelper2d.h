@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_SHUR_SCHURMATRIXHELPER2D_H
 #define THUNDEREGG_SHUR_SCHURMATRIXHELPER2D_H
-#include <ThunderEgg/Schur/SchurHelper.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <functional>
 #include <memory>
 #include <petscmat.h>
@@ -42,15 +42,15 @@ namespace Schur
 class SchurMatrixHelper2d
 {
 	private:
-	std::shared_ptr<SchurHelper<2>> sh;
-	int                             n;
+	std::shared_ptr<InterfaceDomain<2>> sh;
+	int                                 n;
 
 	typedef std::function<void(int, int, std::shared_ptr<std::valarray<double>>, bool, bool)>
 	     inserter;
 	void assembleMatrix(inserter insertBlock);
 
 	public:
-	SchurMatrixHelper2d(std::shared_ptr<SchurHelper<2>> sh)
+	SchurMatrixHelper2d(std::shared_ptr<InterfaceDomain<2>> sh)
 	{
 		this->sh = sh;
 		n        = sh->getLengths()[0];

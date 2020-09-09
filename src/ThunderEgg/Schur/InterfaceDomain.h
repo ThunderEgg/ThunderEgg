@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHUR_SCHURHELPER_H
-#define THUNDEREGG_SCHUR_SCHURHELPER_H
+#ifndef THUNDEREGG_SCHUR_InterfaceDomain_H
+#define THUNDEREGG_SCHUR_InterfaceDomain_H
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Schur/Interface.h>
 #include <ThunderEgg/Schur/PatchIfaceInfo.h>
@@ -42,7 +42,7 @@ namespace Schur
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class SchurHelper
+template <size_t D> class InterfaceDomain
 {
 	private:
 	std::shared_ptr<Domain<D>> domain;
@@ -73,14 +73,14 @@ template <size_t D> class SchurHelper
 	std::array<int, D - 1> lengths;
 
 	public:
-	SchurHelper() = default;
+	InterfaceDomain() = default;
 	/**
-	 * @brief Create a SchurHelper from a given DomainCollection
+	 * @brief Create a InterfaceDomain from a given DomainCollection
 	 *
 	 * @param domain the DomainCollection
 	 * @param comm the teuchos communicator
 	 */
-	SchurHelper(std::shared_ptr<Domain<D>> domain);
+	InterfaceDomain(std::shared_ptr<Domain<D>> domain);
 
 	void updateInterfaceDist(std::shared_ptr<Vector<D - 1>> gamma)
 	{
@@ -186,7 +186,7 @@ template <size_t D> class SchurHelper
 		return domain;
 	}
 };
-template <size_t D> inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>> domain)
+template <size_t D> inline InterfaceDomain<D>::InterfaceDomain(std::shared_ptr<Domain<D>> domain)
 {
 	this->domain = domain;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -206,8 +206,8 @@ template <size_t D> inline SchurHelper<D>::SchurHelper(std::shared_ptr<Domain<D>
 	int num_ifaces = ifaces.size();
 	MPI_Allreduce(&num_ifaces, &num_global_ifaces, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 }
-template <size_t D> inline void SchurHelper<D>::indexDomainIfacesLocal() {}
-template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
+template <size_t D> inline void InterfaceDomain<D>::indexDomainIfacesLocal() {}
+template <size_t D> inline void InterfaceDomain<D>::indexIfacesLocal()
 {
 	using namespace std;
 	int curr_i = 0;
@@ -436,7 +436,7 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesLocal()
 	}
 	indexIfacesGlobal();
 } // namespace ThunderEgg
-template <size_t D> inline void SchurHelper<D>::indexIfacesGlobal()
+template <size_t D> inline void InterfaceDomain<D>::indexIfacesGlobal()
 {
 	using namespace std;
 	// global indices are going to be sequentially increasing with rank
@@ -473,13 +473,13 @@ template <size_t D> inline void SchurHelper<D>::indexIfacesGlobal()
 	MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
 	global_map_vec = new_global;
 }
-template <size_t D> class SchurHelperVG : public VectorGenerator<D>
+template <size_t D> class InterfaceDomainVG : public VectorGenerator<D>
 {
 	private:
-	std::shared_ptr<SchurHelper<D + 1>> sh;
+	std::shared_ptr<InterfaceDomain<D + 1>> sh;
 
 	public:
-	SchurHelperVG(std::shared_ptr<SchurHelper<D + 1>> sh)
+	InterfaceDomainVG(std::shared_ptr<InterfaceDomain<D + 1>> sh)
 	{
 		this->sh = sh;
 	}
@@ -488,8 +488,8 @@ template <size_t D> class SchurHelperVG : public VectorGenerator<D>
 		return sh->getNewSchurVec();
 	}
 };
-extern template class SchurHelper<2>;
-extern template class SchurHelper<3>;
+extern template class InterfaceDomain<2>;
+extern template class InterfaceDomain<3>;
 } // namespace Schur
 } // namespace ThunderEgg
 #endif

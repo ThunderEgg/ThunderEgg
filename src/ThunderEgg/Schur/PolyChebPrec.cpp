@@ -25,7 +25,8 @@
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Schur;
-PolyChebPrec::PolyChebPrec(std::shared_ptr<Domain<3>> domain, std::shared_ptr<SchurHelper<3>> sh)
+PolyChebPrec::PolyChebPrec(std::shared_ptr<Domain<3>>          domain,
+                           std::shared_ptr<InterfaceDomain<3>> sh)
 {
 	this->sh     = sh;
 	this->domain = domain;

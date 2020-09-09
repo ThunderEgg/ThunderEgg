@@ -22,7 +22,7 @@
 #ifndef THUNDEREGG_GMG_BLOCKJACOBISMOOTHER_H
 #define THUNDEREGG_GMG_BLOCKJACOBISMOOTHER_H
 
-#include <ThunderEgg/Schur/SchurHelper.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 
 namespace ThunderEgg
 {
@@ -30,27 +30,27 @@ namespace GMG
 {
 /**
  * @brief A block Jacobi smoother that uses FFTW solves on each patch. Implemented using the
- * SchurHelper class.
+ * InterfaceDomain class.
  */
 template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
 {
 	private:
 	/**
-	 * @brief point to the SchurHelper object.
+	 * @brief point to the InterfaceDomain object.
 	 */
-	std::shared_ptr<Schur::SchurHelper<D>> sh;
-	std::shared_ptr<Schur::PatchSolver<D>> solver;
-	std::shared_ptr<Schur::IfaceInterp<D>> interp;
+	std::shared_ptr<Schur::InterfaceDomain<D>> sh;
+	std::shared_ptr<Schur::PatchSolver<D>>     solver;
+	std::shared_ptr<Schur::IfaceInterp<D>>     interp;
 
 	public:
 	/**
-	 * @brief Create new smoother with SchurHelper object
+	 * @brief Create new smoother with InterfaceDomain object
 	 *
-	 * @param sh pointer to the SchurHelper object
+	 * @param sh pointer to the InterfaceDomain object
 	 */
-	FFTBlockJacobiSmoother(std::shared_ptr<Schur::SchurHelper<D>> sh,
-	                       std::shared_ptr<Schur::PatchSolver<D>> solver,
-	                       std::shared_ptr<Schur::IfaceInterp<D>> interp)
+	FFTBlockJacobiSmoother(std::shared_ptr<Schur::InterfaceDomain<D>> sh,
+	                       std::shared_ptr<Schur::PatchSolver<D>>     solver,
+	                       std::shared_ptr<Schur::IfaceInterp<D>>     interp)
 	{
 		this->sh     = sh;
 		this->solver = solver;

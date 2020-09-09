@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively 
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
  *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
@@ -30,7 +30,7 @@ class IfaceMatrixHelper
 
 	public:
 	/**
-	 * @brief Create a SchurHelper from a given DomainCollection
+	 * @brief Create a InterfaceDomain from a given DomainCollection
 	 *
 	 * @param dc the DomainCollection
 	 * @param n number of cells in each direction for each domain

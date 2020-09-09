@@ -36,8 +36,8 @@
 #include <ThunderEgg/Poisson/Schur/FftwPatchSolver.h>
 #include <ThunderEgg/Poisson/Schur/SevenPtPatchOperator.h>
 #include <ThunderEgg/Poisson/Schur/StarPatchOperator.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <ThunderEgg/Schur/PolyChebPrec.h>
-#include <ThunderEgg/Schur/SchurHelper.h>
 #include <ThunderEgg/Schur/SchurMatrixHelper.h>
 #include <ThunderEgg/Schur/SchurWrapOp.h>
 #include <ThunderEgg/Schur/TriLinInterp.h>
@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 	shared_ptr<DomainGenerator<3>> dcg(new DomGen<3>(t, ns, neumann));
 
 	dc = dcg->getFinestDomain();
-	shared_ptr<SchurHelper<3>> sch(new SchurHelper<3>(dc));
+	shared_ptr<InterfaceDomain<3>> sch(new InterfaceDomain<3>(dc));
 
 	// set the patch solver
 	shared_ptr<PatchSolver<3>> p_solver;
@@ -434,7 +434,7 @@ int main(int argc, char *argv[])
 					cout << "Iterations: " << its << endl;
 				}
 			} else {
-				std::shared_ptr<VectorGenerator<2>> vg(new SchurHelperVG<2>(sch));
+				std::shared_ptr<VectorGenerator<2>> vg(new InterfaceDomainVG<2>(sch));
 
 				int its = BiCGStab<2>::solve(vg, A, gamma, b, M);
 				if (my_global_rank == 0) {

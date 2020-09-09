@@ -22,7 +22,7 @@
 #ifndef THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #define THUNDEREGG_SCHUR_SCHURMATRIXHELPER
 #include <ThunderEgg/Experimental/PBMatrix.h>
-#include <ThunderEgg/Schur/SchurHelper.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <functional>
 #include <petscmat.h>
 #include <valarray>
@@ -34,14 +34,14 @@ struct Block;
 class SchurMatrixHelper
 {
 	private:
-	std::shared_ptr<SchurHelper<3>> sh;
-	int                             n;
+	std::shared_ptr<InterfaceDomain<3>> sh;
+	int                                 n;
 
 	typedef std::function<void(Block *, std::shared_ptr<std::valarray<double>>)> inserter;
 	void assembleMatrix(inserter insertBlock);
 
 	public:
-	SchurMatrixHelper(std::shared_ptr<SchurHelper<3>> sh, void *solver)
+	SchurMatrixHelper(std::shared_ptr<InterfaceDomain<3>> sh, void *solver)
 	{
 		this->sh = sh;
 		n        = sh->getLengths()[0];

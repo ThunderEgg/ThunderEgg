@@ -24,8 +24,8 @@
 
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Schur/IfaceInterp.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <ThunderEgg/Schur/PatchSolver.h>
-#include <ThunderEgg/Schur/SchurHelper.h>
 
 namespace ThunderEgg
 {
@@ -37,13 +37,13 @@ namespace Schur
 template <size_t D> class SchurWrapOp : public Operator<D - 1>
 {
 	private:
-	std::shared_ptr<Domain<D>>      domain;
-	std::shared_ptr<SchurHelper<D>> sh;
-	std::shared_ptr<PatchSolver<D>> solver;
-	std::shared_ptr<IfaceInterp<D>> interp;
+	std::shared_ptr<Domain<D>>          domain;
+	std::shared_ptr<InterfaceDomain<D>> sh;
+	std::shared_ptr<PatchSolver<D>>     solver;
+	std::shared_ptr<IfaceInterp<D>>     interp;
 
 	public:
-	SchurWrapOp(std::shared_ptr<Domain<D>> domain, std::shared_ptr<SchurHelper<D>> sh,
+	SchurWrapOp(std::shared_ptr<Domain<D>> domain, std::shared_ptr<InterfaceDomain<D>> sh,
 	            std::shared_ptr<PatchSolver<D>> solver, std::shared_ptr<IfaceInterp<D>> interp)
 	{
 		this->domain = domain;

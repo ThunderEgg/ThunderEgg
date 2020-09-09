@@ -23,8 +23,8 @@
 #define THUNDEREGG_SCHURDOMAINOP_H
 
 #include <ThunderEgg/Operator.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <ThunderEgg/Schur/PatchOperator.h>
-#include <ThunderEgg/Schur/SchurHelper.h>
 
 namespace ThunderEgg
 {
@@ -34,9 +34,9 @@ template <size_t D> class SchurDomainOp : public Operator<D>
 	/**
 	 * @brief PETSc Matrix object
 	 */
-	std::shared_ptr<Schur::SchurHelper<D>>   helper;
-	std::shared_ptr<Schur::IfaceInterp<D>>   interp;
-	std::shared_ptr<Schur::PatchOperator<D>> op;
+	std::shared_ptr<Schur::InterfaceDomain<D>> helper;
+	std::shared_ptr<Schur::IfaceInterp<D>>     interp;
+	std::shared_ptr<Schur::PatchOperator<D>>   op;
 
 	public:
 	/**
@@ -44,9 +44,9 @@ template <size_t D> class SchurDomainOp : public Operator<D>
 	 *
 	 * @param matrix the PETSc matrix
 	 */
-	SchurDomainOp(std::shared_ptr<Schur::SchurHelper<D>>   helper,
-	              std::shared_ptr<Schur::IfaceInterp<D>>   interp,
-	              std::shared_ptr<Schur::PatchOperator<D>> op)
+	SchurDomainOp(std::shared_ptr<Schur::InterfaceDomain<D>> helper,
+	              std::shared_ptr<Schur::IfaceInterp<D>>     interp,
+	              std::shared_ptr<Schur::PatchOperator<D>>   op)
 	{
 		this->helper = helper;
 		this->interp = interp;

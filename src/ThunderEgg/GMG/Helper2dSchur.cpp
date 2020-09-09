@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively 
+ *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
  *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
@@ -34,7 +34,7 @@ using namespace std;
 using namespace GMG;
 using nlohmann::json;
 Helper2dSchur::Helper2dSchur(int n, std::vector<std::shared_ptr<DomainCollection<2>>> dcs,
-                   std::shared_ptr<SchurHelper<2>> sh, std::string config_file)
+                             std::shared_ptr<InterfaceDomain<2>> sh, std::string config_file)
 {
 	ifstream config_stream(config_file);
 	json     config_j;
@@ -54,18 +54,22 @@ Helper2dSchur::Helper2dSchur(int n, std::vector<std::shared_ptr<DomainCollection
 	} catch (nlohmann::detail::out_of_range oor) {
 		patches_per_proc = 0;
 	}
-	if (num_levels <= 0 || num_levels > (int) dcs.size()) { num_levels = dcs.size(); }
+	if (num_levels <= 0 || num_levels > (int) dcs.size()) {
+		num_levels = dcs.size();
+	}
 	// generate and balance domain collections
-	vector<shared_ptr<SchurHelper<2>>> helpers(num_levels);
+	vector<shared_ptr<InterfaceDomain<2>>> helpers(num_levels);
 	helpers[0] = sh;
 	for (int i = 1; i < num_levels; i++) {
 		if ((dcs[i]->getGlobalNumDomains() + 0.0) / size < patches_per_proc) {
 			num_levels = i;
 			break;
 		}
-		if (dcs[0]->neumann) { dcs[i]->setNeumann(); }
+		if (dcs[0]->neumann) {
+			dcs[i]->setNeumann();
+		}
 		helpers[i].reset(
-		new SchurHelper<2>(*dcs[i], sh->getSolver(), sh->getOp(), sh->getInterpolator()));
+		new InterfaceDomain<2>(*dcs[i], sh->getSolver(), sh->getOp(), sh->getInterpolator()));
 	}
 
 	// generate operators

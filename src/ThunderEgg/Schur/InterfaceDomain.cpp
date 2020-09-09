@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <ThunderEgg/Schur/SchurHelper.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 
-template class ThunderEgg::Schur::SchurHelper<2>;
-template class ThunderEgg::Schur::SchurHelper<3>;
+template class ThunderEgg::Schur::InterfaceDomain<2>;
+template class ThunderEgg::Schur::InterfaceDomain<3>;

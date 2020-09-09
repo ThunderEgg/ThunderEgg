@@ -159,7 +159,8 @@ template <size_t D> class VecWrapper : public Vector<D>
 		return std::make_shared<VecWrapper<D - 1>>(u, ns, 0, true);
 	}
 	/*
-	static std::shared_ptr<PetscVector<D>> GetNewSchurVector(std::shared_ptr<SchurHelper<D + 1>> sh)
+	static std::shared_ptr<PetscVector<D>> GetNewSchurVector(std::shared_ptr<InterfaceDomain<D + 1>>
+	sh)
 	{
 	    Vec u;
 	    VecCreateMPI(MPI_COMM_WORLD, sh->getSchurVecLocalSize(), PETSC_DETERMINE, &u);
