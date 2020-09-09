@@ -44,7 +44,7 @@ class SchurMatrixHelper
 	SchurMatrixHelper(std::shared_ptr<InterfaceDomain<3>> sh, void *solver)
 	{
 		this->sh = sh;
-		n        = sh->getLengths()[0];
+		n        = sh->getDomain()->getNs()[0];
 	}
 	Mat                     formCRSMatrix();
 	Experimental::PBMatrix *formPBMatrix();

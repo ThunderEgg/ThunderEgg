@@ -53,7 +53,7 @@ class SchurMatrixHelper2d
 	SchurMatrixHelper2d(std::shared_ptr<InterfaceDomain<2>> sh)
 	{
 		this->sh = sh;
-		n        = sh->getLengths()[0];
+		n        = sh->getDomain()->getNs()[0];
 	}
 	/**
 	 * @brief Form the Schur complement matrix

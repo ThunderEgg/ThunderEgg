@@ -60,7 +60,7 @@ template <size_t D> class SchurDomainOp : public Operator<D>
 	 */
 	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 	{
-		auto gamma = helper->getNewSchurDistVec();
+		auto gamma = helper->getNewPatchLocalInterfaceVector();
 		interp->interpolateToInterface(x, gamma);
 		op->apply(x, gamma, b);
 	}

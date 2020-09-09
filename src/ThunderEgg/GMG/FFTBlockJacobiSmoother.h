@@ -64,7 +64,7 @@ template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
 	 */
 	void smooth(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const
 	{
-		auto gamma = sh->getNewSchurDistVec();
+		auto gamma = sh->getNewPatchLocalInterfaceVector();
 		interp->interpolateToInterface(u, gamma);
 		solver->solve(f, u, gamma);
 	}

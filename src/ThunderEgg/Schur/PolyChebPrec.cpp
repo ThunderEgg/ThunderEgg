@@ -36,9 +36,9 @@ void PolyChebPrec::apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vec
 	std::shared_ptr<Vector<3>> f = ValVector<3>::GetNewVector(domain);
 	std::shared_ptr<Vector<3>> u = ValVector<3>::GetNewVector(domain);
 
-	std::shared_ptr<Vector<2>> bk  = sh->getNewSchurVec();
-	std::shared_ptr<Vector<2>> bk1 = sh->getNewSchurVec();
-	std::shared_ptr<Vector<2>> bk2 = sh->getNewSchurVec();
+	std::shared_ptr<Vector<2>> bk  = sh->getNewGlobalInterfaceVector();
+	std::shared_ptr<Vector<2>> bk1 = sh->getNewGlobalInterfaceVector();
+	std::shared_ptr<Vector<2>> bk2 = sh->getNewGlobalInterfaceVector();
 
 	for (int i = coeffs.size() - 1; i > 0; i--) {
 		// solver->solve(f, u, bk1);

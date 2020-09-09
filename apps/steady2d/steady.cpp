@@ -383,9 +383,9 @@ int main(int argc, char *argv[])
 		timer.stop("Domain Initialization");
 
 		// Create the gamma and diff vectors
-		shared_ptr<PetscVector<1>> gamma = sch->getNewSchurVec();
-		shared_ptr<PetscVector<1>> diff  = sch->getNewSchurVec();
-		shared_ptr<PetscVector<1>> b     = sch->getNewSchurVec();
+		shared_ptr<PetscVector<1>> gamma = sch->getNewGlobalInterfaceVector();
+		shared_ptr<PetscVector<1>> diff  = sch->getNewGlobalInterfaceVector();
+		shared_ptr<PetscVector<1>> b     = sch->getNewGlobalInterfaceVector();
 
 		// Create linear problem for the Belos solver
 		PW<KSP> solver;

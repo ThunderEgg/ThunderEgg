@@ -328,9 +328,9 @@ int main(int argc, char *argv[])
 
 		timer.stop("Domain Initialization");
 
-		shared_ptr<PetscVector<2>> gamma = sch->getNewSchurVec();
-		shared_ptr<PetscVector<2>> diff  = sch->getNewSchurVec();
-		shared_ptr<PetscVector<2>> b     = sch->getNewSchurVec();
+		shared_ptr<PetscVector<2>> gamma = sch->getNewGlobalInterfaceVector();
+		shared_ptr<PetscVector<2>> diff  = sch->getNewGlobalInterfaceVector();
+		shared_ptr<PetscVector<2>> b     = sch->getNewGlobalInterfaceVector();
 
 		if (neumann && !no_zero_rhs_avg) {
 			double fdiff = dc->integrate(f) / dc->volume();

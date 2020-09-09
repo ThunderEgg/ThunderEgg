@@ -348,7 +348,7 @@ template <size_t D> class InterfaceDomain
 	 * @param domain the DomainCollection
 	 * @param comm the teuchos communicator
 	 */
-	InterfaceDomain(std::shared_ptr<Domain<D>> domain)
+	explicit InterfaceDomain(std::shared_ptr<Domain<D>> domain)
 	{
 		this->domain = domain;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -436,38 +436,58 @@ template <size_t D> class InterfaceDomain
 		// wait for all
 		MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
 	}
-	std::shared_ptr<ValVector<D - 1>> getNewSchurVec()
+	std::shared_ptr<ValVector<D - 1>> getNewGlobalInterfaceVector()
 	{
 		return std::shared_ptr<ValVector<D - 1>>(
 		new ValVector<D - 1>(MPI_COMM_WORLD, lengths, 0, matrix_extra_ghost_start));
 	}
-	std::shared_ptr<ValVector<D - 1>> getNewSchurDistVec()
+	/**
+	 * @brief Get the number of local Interfaces on this rank
+	 *
+	 * @return int the number of local Interfaces
+	 */
+	int getNumLocalInterfaces() const
 	{
-		return std::shared_ptr<ValVector<D - 1>>(
-		new ValVector<D - 1>(MPI_COMM_SELF, lengths, 0, matrix_extra_ghost_start));
+		return 0;
 	}
-
-	int getSchurVecLocalSize() const
+	/**
+	 * @brief Get the number of Interfaces on all ranks
+	 *
+	 * @return int the number of Interfaces on all ranks
+	 */
+	int getNumGlobalInterfaces() const
 	{
-		return ghost_start * iface_stride;
+		return 0;
 	}
-	int getSchurVecGlobalSize() const
+	/**
+	 * @brief Get the vector Interfaces objects for this rank
+	 *
+	 * The location of each Interface in the vector will coorespond to the Interafce's local index
+	 *
+	 * @return const std::vector<std::shared_ptr<const Interface<D>>> the vector of Interface
+	 * objects
+	 */
+	const std::vector<std::shared_ptr<const Interface<D>>> getInterfaces() const
 	{
-		return num_global_ifaces * iface_stride;
+		return std::vector<std::shared_ptr<const Interface<D>>>();
 	}
-	// getters
-	const std::map<int, Interface<D>> getIfaces() const
+	/**
+	 * @brief Get the vector PatchIfaceInfo objects for this rank
+	 *
+	 * The location of each PatchIfaceInfo in the vector will coorespond to the patch's local index
+	 *
+	 * @return const std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> the vector of
+	 * PatchIfaceInfo objects
+	 */
+	const std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> getPatchIfaceInfos()
 	{
-		return ifaces;
+		return std::vector<std::shared_ptr<const PatchIfaceInfo<D>>>();
 	}
-	const std::array<int, D - 1> getLengths() const
-	{
-		return lengths;
-	}
-	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> getPatchIfaceInfoVector()
-	{
-		return sinfo_vector;
-	}
+	/**
+	 * @brief Get the Domain object that cooresponds to this InterfaceDomain
+	 *
+	 * @return std::shared_ptr<Domain<D>> the Domain object
+	 */
 	std::shared_ptr<Domain<D>> getDomain()
 	{
 		return domain;

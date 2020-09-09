@@ -86,10 +86,9 @@ struct BlockKey {
 void SchurMatrixHelper2d::assembleMatrix(inserter insertBlock)
 {
 	set<Block> blocks;
-	for (auto p : sh->getIfaces()) {
-		const Interface<2> &ifs = p.second;
-		int                 i   = ifs.global_index;
-		for (auto patch : ifs.patches) {
+	for (auto iface : sh->getInterfaces()) {
+		int i = iface->global_index;
+		for (auto patch : iface->patches) {
 			Side<2>                  aux   = patch.side;
 			const PatchIfaceInfo<2> &sinfo = *patch.piinfo;
 			IfaceType<2>             type  = patch.type;
@@ -196,8 +195,8 @@ Mat SchurMatrixHelper2d::formCRSMatrix()
 {
 	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
-	int local_size  = sh->getIfaces().size() * n;
-	int global_size = sh->getSchurVecGlobalSize();
+	int local_size  = sh->getInterfaces().size() * n;
+	int global_size = sh->getNumGlobalInterfaces() * n;
 	MatSetSizes(A, local_size, local_size, global_size, global_size);
 	MatSetType(A, MATMPIAIJ);
 	MatMPIAIJSetPreallocation(A, 19 * n, nullptr, 19 * n, nullptr);

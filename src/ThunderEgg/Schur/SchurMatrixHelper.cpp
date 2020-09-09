@@ -209,10 +209,9 @@ const char Block::quad_flip_lookup[4] = {1, 0, 3, 2};
 void SchurMatrixHelper::assembleMatrix(inserter insertBlock)
 {
 	set<Block> blocks;
-	for (auto &p : sh->getIfaces()) {
-		const Interface<3> &ifs = p.second;
-		int                 i   = ifs.global_index;
-		for (auto patch : ifs.patches) {
+	for (auto iface : sh->getInterfaces()) {
+		int i = iface->global_index;
+		for (auto patch : iface->patches) {
 			Side<3>                  aux   = patch.side;
 			const PatchIfaceInfo<3> &sinfo = *patch.piinfo;
 			IfaceType<3>             type  = patch.type;
@@ -322,8 +321,8 @@ Mat SchurMatrixHelper::formCRSMatrix()
 {
 	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
-	int local_size  = sh->getIfaces().size() * n * n;
-	int global_size = sh->getSchurVecGlobalSize();
+	int local_size  = sh->getInterfaces().size() * n * n;
+	int global_size = sh->getNumGlobalInterfaces() * n * n;
 	MatSetSizes(A, local_size, local_size, global_size, global_size);
 	MatSetType(A, MATMPIAIJ);
 	MatMPIAIJSetPreallocation(A, 10 * n * n, nullptr, 10 * n * n, nullptr);
@@ -438,8 +437,8 @@ Mat SchurMatrixHelper::formCRSMatrix()
 using ThunderEgg::Experimental::PBMatrix;
 PBMatrix *SchurMatrixHelper::formPBMatrix()
 {
-	int local_size  = sh->getIfaces().size() * n * n;
-	int global_size = sh->getSchurVecGlobalSize();
+	int local_size  = sh->getInterfaces().size() * n * n;
+	int global_size = sh->getNumGlobalInterfaces() * n;
 
 	PBMatrix *APB         = new PBMatrix(n, local_size, global_size);
 	auto      insertBlock = [&](Block *b, shared_ptr<valarray<double>> coeffs) {
