@@ -1052,7 +1052,10 @@ TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0 2d_uniform",
 			}
 		}
 	}
-	CHECK(min_local_index == 0);
+
+	if (interface_domain.getNumLocalInterfaces() > 0) {
+		CHECK(min_local_index == 0);
+	}
 }
 TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous 2d_uniform",
           "[Schur::InterfaceDomain]")
@@ -1151,7 +1154,9 @@ TEST_CASE(
 		}
 	}
 
-	REQUIRE(id_to_local_indexes.size() > 0);
+	if (interface_domain.getNumLocalInterfaces() > 0) {
+		REQUIRE(id_to_local_indexes.size() > 0);
+	}
 	for (auto pair : id_to_local_indexes) {
 		INFO("ID " << pair.first);
 		CHECK(pair.second.size() == 1);
@@ -1197,7 +1202,9 @@ TEST_CASE(
 		}
 	}
 
-	REQUIRE(local_index_to_ids.size() > 0);
+	if (interface_domain.getNumLocalInterfaces() > 0) {
+		REQUIRE(local_index_to_ids.size() > 0);
+	}
 	for (auto pair : local_index_to_ids) {
 		INFO("Local Index " << pair.first);
 		CHECK(pair.second.size() == 1);

@@ -112,6 +112,55 @@ template <size_t D> class InterfaceDomain
 
 			curr_local_index++;
 		}
+
+		// perform rest of necessary indexing
+		IndexRemainingColIfacesLocal(curr_local_index, id_to_iface_map, piinfos, off_proc_piinfos,
+		                             interfaces);
+	}
+	static void IndexRemainingColIfacesLocal(
+	int curr_local_index, const std::map<int, std::shared_ptr<Interface<D>>> &id_to_iface_map,
+	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
+	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &off_proc_piinfos,
+	std::vector<std::shared_ptr<Interface<D>>> &           interfaces)
+	{
+		for (auto iface : interfaces) {
+			for (auto patch : iface->patches) {
+				auto piinfo = patch.getNonConstPiinfo();
+
+				if (patch.type.isNormal() || patch.type.isFineToFine()
+				    || patch.type.isCoarseToCoarse()) {
+					for (Side<D> s : Side<D>::getValues()) {
+						if (piinfo->pinfo->hasNbr(s)) {
+							auto iface_info = piinfo->getIfaceInfo(s);
+							if (iface_info->col_local_index == -1) {
+								iface_info->col_local_index = curr_local_index;
+								curr_local_index++;
+							}
+
+							NbrType nbr_type = piinfo->pinfo->getNbrType(s);
+
+							if (nbr_type == NbrType::Coarse) {
+								auto coarse_iface_info = piinfo->getCoarseIfaceInfo(s);
+								if (coarse_iface_info->coarse_col_local_index == -1) {
+									coarse_iface_info->coarse_col_local_index = curr_local_index;
+									curr_local_index++;
+								}
+							} else if (nbr_type == NbrType::Fine) {
+								auto fine_iface_info = piinfo->getFineIfaceInfo(s);
+								for (size_t i = 0;
+								     i < fine_iface_info->fine_col_local_indexes.size(); i++) {
+									if (fine_iface_info->fine_col_local_indexes[i] == -1) {
+										fine_iface_info->fine_col_local_indexes[i]
+										= curr_local_index;
+										curr_local_index++;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	void indexIfacesGlobal()
 	{
@@ -289,7 +338,8 @@ template <size_t D> class InterfaceDomain
 	/**
 	 * @brief Get the vector Interfaces objects for this rank
 	 *
-	 * The location of each Interface in the vector will coorespond to the Interafce's local index
+	 * The location of each Interface in the vector will coorespond to the Interafce's local
+	 * index
 	 *
 	 * @return const std::vector<std::shared_ptr<const Interface<D>>> the vector of Interface
 	 * objects
@@ -301,7 +351,8 @@ template <size_t D> class InterfaceDomain
 	/**
 	 * @brief Get the vector PatchIfaceInfo objects for this rank
 	 *
-	 * The location of each PatchIfaceInfo in the vector will coorespond to the patch's local index
+	 * The location of each PatchIfaceInfo in the vector will coorespond to the patch's local
+	 * index
 	 *
 	 * @return const std::vector<std::shared_ptr<const PatchIfaceInfo<D>>>& the vector of
 	 * PatchIfaceInfo objects
