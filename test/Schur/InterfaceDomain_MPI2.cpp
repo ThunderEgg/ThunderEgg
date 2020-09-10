@@ -213,8 +213,10 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_refined_e
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				min_local_index
-				= min(min_local_index, patch.piinfo->getIfaceInfo(s)->row_local_index);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					min_local_index
+					= min(min_local_index, patch.piinfo->getIfaceInfo(s)->row_local_index);
+				}
 			}
 		}
 	}
@@ -236,7 +238,9 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_refined
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				local_indexes.insert(patch.piinfo->getIfaceInfo(s)->row_local_index);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					local_indexes.insert(patch.piinfo->getIfaceInfo(s)->row_local_index);
+				}
 			}
 		}
 	}
@@ -263,8 +267,10 @@ TEST_CASE(
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				auto iface_info = patch.piinfo->getIfaceInfo(s);
-				id_to_local_indexes[iface_info->id].insert(iface_info->row_local_index);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					auto iface_info = patch.piinfo->getIfaceInfo(s);
+					id_to_local_indexes[iface_info->id].insert(iface_info->row_local_index);
+				}
 			}
 		}
 	}
@@ -291,8 +297,10 @@ TEST_CASE(
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				auto iface_info = patch.piinfo->getIfaceInfo(s);
-				local_index_to_ids[iface_info->row_local_index].insert(iface_info->id);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					auto iface_info = patch.piinfo->getIfaceInfo(s);
+					local_index_to_ids[iface_info->row_local_index].insert(iface_info->id);
+				}
 			}
 		}
 	}
@@ -599,7 +607,9 @@ TEST_CASE(
 
 	vector<int> iface_ids_in(interface_domain.getNumGlobalInterfaces());
 	for (auto iface : interface_domain.getInterfaces()) {
-		iface_ids_in[iface->global_index] = iface->id;
+		if (iface->global_index >= 0) {
+			iface_ids_in[iface->global_index] = iface->id;
+		}
 	}
 
 	vector<int> iface_ids_out(interface_domain.getNumGlobalInterfaces());
@@ -667,7 +677,9 @@ TEST_CASE(
 
 	vector<int> iface_ids_in(interface_domain.getNumGlobalInterfaces());
 	for (auto iface : interface_domain.getInterfaces()) {
-		iface_ids_in[iface->global_index] = iface->id;
+		if (iface->global_index >= 0) {
+			iface_ids_in[iface->global_index] = iface->id;
+		}
 	}
 
 	vector<int> iface_ids_out(interface_domain.getNumGlobalInterfaces());
@@ -899,8 +911,10 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_uniform",
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				min_local_index
-				= min(min_local_index, patch.piinfo->getIfaceInfo(s)->row_local_index);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					min_local_index
+					= min(min_local_index, patch.piinfo->getIfaceInfo(s)->row_local_index);
+				}
 			}
 		}
 	}
@@ -921,7 +935,9 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_uniform
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				local_indexes.insert(patch.piinfo->getIfaceInfo(s)->row_local_index);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					local_indexes.insert(patch.piinfo->getIfaceInfo(s)->row_local_index);
+				}
 			}
 		}
 	}
@@ -947,8 +963,10 @@ TEST_CASE(
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				auto iface_info = patch.piinfo->getIfaceInfo(s);
-				id_to_local_indexes[iface_info->id].insert(iface_info->row_local_index);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					auto iface_info = patch.piinfo->getIfaceInfo(s);
+					id_to_local_indexes[iface_info->id].insert(iface_info->row_local_index);
+				}
 			}
 		}
 	}
@@ -974,8 +992,10 @@ TEST_CASE(
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				auto iface_info = patch.piinfo->getIfaceInfo(s);
-				local_index_to_ids[iface_info->row_local_index].insert(iface_info->id);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					auto iface_info = patch.piinfo->getIfaceInfo(s);
+					local_index_to_ids[iface_info->row_local_index].insert(iface_info->id);
+				}
 			}
 		}
 	}
@@ -1267,7 +1287,9 @@ TEST_CASE(
 
 	vector<int> iface_ids_in(interface_domain.getNumGlobalInterfaces());
 	for (auto iface : interface_domain.getInterfaces()) {
-		iface_ids_in[iface->global_index] = iface->id;
+		if (iface->global_index >= 0) {
+			iface_ids_in[iface->global_index] = iface->id;
+		}
 	}
 
 	vector<int> iface_ids_out(interface_domain.getNumGlobalInterfaces());
@@ -1334,7 +1356,9 @@ TEST_CASE(
 
 	vector<int> iface_ids_in(interface_domain.getNumGlobalInterfaces());
 	for (auto iface : interface_domain.getInterfaces()) {
-		iface_ids_in[iface->global_index] = iface->id;
+		if (iface->global_index >= 0) {
+			iface_ids_in[iface->global_index] = iface->id;
+		}
 	}
 
 	vector<int> iface_ids_out(interface_domain.getNumGlobalInterfaces());

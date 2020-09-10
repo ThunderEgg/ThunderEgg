@@ -67,8 +67,51 @@ template <size_t D> class InterfaceDomain
 	std::vector<std::tuple<int, int, int>> matrix_in_id_local_rank_vec;
 	std::vector<std::tuple<int, int, int>> patch_out_id_local_rank_vec;
 	std::vector<std::tuple<int, int, int>> patch_in_id_local_rank_vec;
-	void indexIfacesLocal(const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos_non_const)
+
+	static void
+	IndexIfacesLocal(const std::map<int, std::shared_ptr<Interface<D>>> &   id_to_iface_map,
+	                 const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
+	                 const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &off_proc_piinfos,
+	                 std::vector<std::shared_ptr<Interface<D>>> &           interfaces)
 	{
+		int curr_local_index = 0;
+
+		// index interface objects first
+		interfaces.clear();
+		interfaces.reserve(id_to_iface_map.size());
+		for (auto pair : id_to_iface_map) {
+			auto iface = pair.second;
+
+			iface->local_index = curr_local_index;
+			interfaces.push_back(iface);
+
+			for (auto patch : iface->patches) {
+				if (patch.type.isNormal() || patch.type.isFineToFine()
+				    || patch.type.isCoarseToCoarse()) {
+					patch.getNonConstPiinfo()->getIfaceInfo(patch.side)->patch_local_index
+					= curr_local_index;
+					patch.getNonConstPiinfo()->getIfaceInfo(patch.side)->col_local_index
+					= curr_local_index;
+					patch.getNonConstPiinfo()->getIfaceInfo(patch.side)->row_local_index
+					= curr_local_index;
+				} else if (patch.type.isFineToCoarse()) {
+					patch.getNonConstPiinfo()
+					->getCoarseIfaceInfo(patch.side)
+					->coarse_col_local_index
+					= curr_local_index;
+				} else if (patch.type.isCoarseToFine()) {
+					auto iface_info = patch.getNonConstPiinfo()->getFineIfaceInfo(patch.side);
+					for (size_t i = 0; i < iface_info->fine_col_local_indexes.size(); i++) {
+						if (iface_info->fine_ids[i] == iface->id) {
+							iface_info->fine_col_local_indexes[i] = curr_local_index;
+							break;
+						}
+					}
+				}
+			}
+
+			curr_local_index++;
+		}
 	}
 	void indexIfacesGlobal()
 	{
@@ -136,8 +179,19 @@ template <size_t D> class InterfaceDomain
 			piinfos_non_const.emplace_back(new PatchIfaceInfo<D>(pinfo));
 			piinfos.push_back(piinfos_non_const.back());
 		}
-		// ifaces = Interface<D>::EnumerateIfaces(sinfo_vector.begin(), sinfo_vector.end());
-		indexIfacesLocal(piinfos_non_const);
+		std::map<int, std::shared_ptr<Schur::Interface<D>>>    id_to_iface_map;
+		std::vector<std::shared_ptr<Schur::PatchIfaceInfo<D>>> off_proc_piinfos;
+		Interface<D>::EnumerateIfacesFromPiinfoVector(piinfos, id_to_iface_map, off_proc_piinfos);
+
+		std::vector<std::shared_ptr<Schur::Interface<D>>> interfaces_non_const;
+		IndexIfacesLocal(id_to_iface_map, piinfos_non_const, off_proc_piinfos,
+		                 interfaces_non_const);
+
+		interfaces.reserve(interfaces_non_const.size());
+		for (auto iface : interfaces_non_const) {
+			interfaces.push_back(iface);
+		}
+
 		int num_ifaces = interfaces.size();
 		MPI_Allreduce(&num_ifaces, &num_global_ifaces, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 	}
@@ -221,7 +275,7 @@ template <size_t D> class InterfaceDomain
 	 */
 	int getNumLocalInterfaces() const
 	{
-		return 0;
+		return interfaces.size();
 	}
 	/**
 	 * @brief Get the number of Interfaces on all ranks
@@ -230,7 +284,7 @@ template <size_t D> class InterfaceDomain
 	 */
 	int getNumGlobalInterfaces() const
 	{
-		return 0;
+		return num_global_ifaces;
 	}
 	/**
 	 * @brief Get the vector Interfaces objects for this rank
@@ -242,7 +296,7 @@ template <size_t D> class InterfaceDomain
 	 */
 	const std::vector<std::shared_ptr<const Interface<D>>> getInterfaces() const
 	{
-		return std::vector<std::shared_ptr<const Interface<D>>>();
+		return interfaces;
 	}
 	/**
 	 * @brief Get the vector PatchIfaceInfo objects for this rank

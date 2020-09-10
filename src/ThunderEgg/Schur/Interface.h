@@ -62,7 +62,9 @@ template <size_t D> class Interface : public Serializable
 	 * The struct contains the side of the patch that this interface lies on, the IfaceType of this
 	 * interface on that patch, and the patch.
 	 */
-	struct SideTypePiinfo {
+	class SideTypePiinfo
+	{
+		public:
 		/**
 		 * @brief the side of the PatchIfaceInfo object that this interface is on.
 		 */
@@ -75,6 +77,17 @@ template <size_t D> class Interface : public Serializable
 		 * @brief the PatchIfaceInfo object
 		 */
 		std::shared_ptr<const PatchIfaceInfo<D>> piinfo;
+
+		/**
+		 * @brief Get the Piinfo object without the const modifer
+		 *
+		 * @return std::shared_ptr<PatchIfaceInfo<D>> the piinfo object without the const modifer
+		 */
+		std::shared_ptr<PatchIfaceInfo<D>> getNonConstPiinfo()
+		{
+			return std::const_pointer_cast<PatchIfaceInfo<D>>(piinfo);
+		}
+
 		/**
 		 * @brief Construct a new Side Type Piinfo object
 		 *

@@ -178,8 +178,10 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0", "[Schur::I
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				min_local_index
-				= min(min_local_index, patch.piinfo->getIfaceInfo(s)->row_local_index);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					min_local_index
+					= min(min_local_index, patch.piinfo->getIfaceInfo(s)->row_local_index);
+				}
 			}
 		}
 	}
@@ -199,7 +201,9 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous", "[Schur:
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				local_indexes.insert(patch.piinfo->getIfaceInfo(s)->row_local_index);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					local_indexes.insert(patch.piinfo->getIfaceInfo(s)->row_local_index);
+				}
 			}
 		}
 	}
@@ -224,8 +228,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one row local index associ
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				auto iface_info = patch.piinfo->getIfaceInfo(s);
-				id_to_local_indexes[iface_info->id].insert(iface_info->row_local_index);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					auto iface_info = patch.piinfo->getIfaceInfo(s);
+					id_to_local_indexes[iface_info->id].insert(iface_info->row_local_index);
+				}
 			}
 		}
 	}
@@ -250,8 +256,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associ
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				auto iface_info = patch.piinfo->getIfaceInfo(s);
-				local_index_to_ids[iface_info->row_local_index].insert(iface_info->id);
+				if (patch.piinfo->pinfo->hasNbr(s)) {
+					auto iface_info = patch.piinfo->getIfaceInfo(s);
+					local_index_to_ids[iface_info->row_local_index].insert(iface_info->id);
+				}
 			}
 		}
 	}

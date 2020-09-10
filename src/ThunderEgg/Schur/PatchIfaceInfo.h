@@ -109,6 +109,17 @@ template <size_t D> class PatchIfaceInfo : public Serializable
 	 * @brief Get the NormalIfaceInfo object on a given side of the patch
 	 *
 	 * @param s the side of the object
+	 * @return std::shared_ptr<NormalIfaceInfo<D>> the NormalIfaceInfo object, nullptr if
+	 * there is not a NormalIfaceInfo object on the given side
+	 */
+	std::shared_ptr<NormalIfaceInfo<D>> getNormalIfaceInfo(Side<D> s)
+	{
+		return std::dynamic_pointer_cast<NormalIfaceInfo<D>>(iface_info[s.getIndex()]);
+	}
+	/**
+	 * @brief Get the NormalIfaceInfo object on a given side of the patch
+	 *
+	 * @param s the side of the object
 	 * @return std::shared_ptr<const NormalIfaceInfo<D>> the NormalIfaceInfo object, nullptr if
 	 * there is not a NormalIfaceInfo object on the given side
 	 */
@@ -120,12 +131,34 @@ template <size_t D> class PatchIfaceInfo : public Serializable
 	 * @brief Get the CoarseIfaceInfo object on a given side of the patch
 	 *
 	 * @param s the side of the object
+	 * @return std::shared_ptr<CoarseIfaceInfo<D>> the CoarseIfaceInfo object, nullptr if
+	 * there is not a CoarseIfaceInfo object on the given side
+	 */
+	std::shared_ptr<CoarseIfaceInfo<D>> getCoarseIfaceInfo(Side<D> s)
+	{
+		return std::dynamic_pointer_cast<CoarseIfaceInfo<D>>(iface_info[s.getIndex()]);
+	}
+	/**
+	 * @brief Get the CoarseIfaceInfo object on a given side of the patch
+	 *
+	 * @param s the side of the object
 	 * @return std::shared_ptr<const CoarseIfaceInfo<D>> the CoarseIfaceInfo object, nullptr if
 	 * there is not a CoarseIfaceInfo object on the given side
 	 */
 	std::shared_ptr<const CoarseIfaceInfo<D>> getCoarseIfaceInfo(Side<D> s) const
 	{
 		return std::dynamic_pointer_cast<const CoarseIfaceInfo<D>>(iface_info[s.getIndex()]);
+	}
+	/**
+	 * @brief Get the FineIfaceInfo object on a given side of the patch
+	 *
+	 * @param s the side of the object
+	 * @return std::shared_ptr<FineIfaceInfo<D>> the FineIfaceInfo object, nullptr if
+	 * there is not a FineIfaceInfo object on the given side
+	 */
+	std::shared_ptr<FineIfaceInfo<D>> getFineIfaceInfo(Side<D> s)
+	{
+		return std::dynamic_pointer_cast<FineIfaceInfo<D>>(iface_info[s.getIndex()]);
 	}
 	/**
 	 * @brief Get the FineIfaceInfo object on a given side of the patch
