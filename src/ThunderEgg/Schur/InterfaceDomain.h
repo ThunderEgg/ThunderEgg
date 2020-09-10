@@ -114,14 +114,41 @@ template <size_t D> class InterfaceDomain
 		}
 
 		// perform rest of necessary indexing
-		IndexRemainingColIfacesLocal(curr_local_index, id_to_iface_map, piinfos, off_proc_piinfos,
-		                             interfaces);
+		IndexRemainingColIfacesLocal(curr_local_index, interfaces);
 	}
-	static void IndexRemainingColIfacesLocal(
-	int curr_local_index, const std::map<int, std::shared_ptr<Interface<D>>> &id_to_iface_map,
-	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
-	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &off_proc_piinfos,
-	std::vector<std::shared_ptr<Interface<D>>> &           interfaces)
+	static void IndexRemainginColIfacesLocalForPatch(int &curr_local_index,
+	                                                 std::shared_ptr<PatchIfaceInfo<D>> piinfo)
+	{
+		for (Side<D> s : Side<D>::getValues()) {
+			if (piinfo->pinfo->hasNbr(s)) {
+				auto iface_info = piinfo->getIfaceInfo(s);
+				if (iface_info->col_local_index == -1) {
+					iface_info->col_local_index = curr_local_index;
+					curr_local_index++;
+				}
+
+				NbrType nbr_type = piinfo->pinfo->getNbrType(s);
+
+				if (nbr_type == NbrType::Coarse) {
+					auto coarse_iface_info = piinfo->getCoarseIfaceInfo(s);
+					if (coarse_iface_info->coarse_col_local_index == -1) {
+						coarse_iface_info->coarse_col_local_index = curr_local_index;
+						curr_local_index++;
+					}
+				} else if (nbr_type == NbrType::Fine) {
+					auto fine_iface_info = piinfo->getFineIfaceInfo(s);
+					for (size_t i = 0; i < fine_iface_info->fine_col_local_indexes.size(); i++) {
+						if (fine_iface_info->fine_col_local_indexes[i] == -1) {
+							fine_iface_info->fine_col_local_indexes[i] = curr_local_index;
+							curr_local_index++;
+						}
+					}
+				}
+			}
+		}
+	}
+	static void IndexRemainingColIfacesLocal(int curr_local_index,
+	                                         std::vector<std::shared_ptr<Interface<D>>> &interfaces)
 	{
 		for (auto iface : interfaces) {
 			for (auto patch : iface->patches) {
@@ -129,35 +156,7 @@ template <size_t D> class InterfaceDomain
 
 				if (patch.type.isNormal() || patch.type.isFineToFine()
 				    || patch.type.isCoarseToCoarse()) {
-					for (Side<D> s : Side<D>::getValues()) {
-						if (piinfo->pinfo->hasNbr(s)) {
-							auto iface_info = piinfo->getIfaceInfo(s);
-							if (iface_info->col_local_index == -1) {
-								iface_info->col_local_index = curr_local_index;
-								curr_local_index++;
-							}
-
-							NbrType nbr_type = piinfo->pinfo->getNbrType(s);
-
-							if (nbr_type == NbrType::Coarse) {
-								auto coarse_iface_info = piinfo->getCoarseIfaceInfo(s);
-								if (coarse_iface_info->coarse_col_local_index == -1) {
-									coarse_iface_info->coarse_col_local_index = curr_local_index;
-									curr_local_index++;
-								}
-							} else if (nbr_type == NbrType::Fine) {
-								auto fine_iface_info = piinfo->getFineIfaceInfo(s);
-								for (size_t i = 0;
-								     i < fine_iface_info->fine_col_local_indexes.size(); i++) {
-									if (fine_iface_info->fine_col_local_indexes[i] == -1) {
-										fine_iface_info->fine_col_local_indexes[i]
-										= curr_local_index;
-										curr_local_index++;
-									}
-								}
-							}
-						}
-					}
+					IndexRemainginColIfacesLocalForPatch(curr_local_index, piinfo);
 				}
 			}
 		}
