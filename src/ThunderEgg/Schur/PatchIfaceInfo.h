@@ -138,32 +138,6 @@ template <size_t D> class PatchIfaceInfo : public Serializable
 	{
 		return std::dynamic_pointer_cast<const FineIfaceInfo<D>>(iface_info[s.getIndex()]);
 	}
-	/**
-	 * @brief Set the local indexes from interface ids
-	 *
-	 * @param rev_map the map from id to local index
-	 */
-	void setLocalIndexesFromId(const std::map<int, int> &rev_map)
-	{
-		for (Side<D> s : Side<D>::getValues()) {
-			if (getIfaceInfo(s) != nullptr) {
-				getIfaceInfo(s)->setLocalIndexesFromId(rev_map);
-			}
-		}
-	}
-	/**
-	 * @brief Set the global indexes from the local indexes of the interafce
-	 *
-	 * @param rev_map map from local index to global index
-	 */
-	void setGlobalIndexesFromLocalIndex(const std::map<int, int> &rev_map)
-	{
-		for (Side<D> s : Side<D>::getValues()) {
-			if (getIfaceInfo(s) != nullptr) {
-				getIfaceInfo(s)->setGlobalIndexesFromLocalIndex(rev_map);
-			}
-		}
-	}
 	int serialize(char *buffer) const
 	{
 		BufferWriter writer(buffer);

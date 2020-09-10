@@ -187,59 +187,6 @@ TEST_CASE("Schur::PatchIfaceInfo PatchInfo constructor", "[Schur::PatchIfaceInfo
 	CHECK(piinfo.getCoarseIfaceInfo(Side<2>::north()) == nullptr);
 	CHECK(piinfo.getFineIfaceInfo(Side<2>::north()) == nullptr);
 }
-TEST_CASE("Schur::PatchIfaceInfo setLocalIndexesFromId", "[Schur::PatchIfaceInfo]")
-{
-	for (Side<2> side_to_set : Side<2>::getValues()) {
-		// setup
-		int  id                                   = 1;
-		int  nbr_id                               = 2;
-		auto pinfo                                = make_shared<PatchInfo<2>>();
-		pinfo->rank                               = 0;
-		pinfo->id                                 = id;
-		pinfo->nbr_info[side_to_set.getIndex()]   = make_shared<NormalNbrInfo<2>>(nbr_id);
-		pinfo->getNormalNbrInfo(side_to_set).rank = 1;
-		auto iface_info = make_shared<Schur::NormalIfaceInfo<2>>(pinfo, side_to_set);
-
-		Schur::PatchIfaceInfo<2> piinfo;
-		piinfo.setIfaceInfo(side_to_set, iface_info);
-
-		int           local_index = 1;
-		map<int, int> id_local_index_map;
-		id_local_index_map[piinfo.getIfaceInfo(side_to_set)->id] = local_index;
-
-		piinfo.setLocalIndexesFromId(id_local_index_map);
-
-		CHECK(piinfo.getIfaceInfo(side_to_set)->local_index == local_index);
-	}
-}
-TEST_CASE("Schur::PatchIfaceInfo setGlobalIndexesFormLocalIndex", "[Schur::PatchIfaceInfo]")
-{
-	for (Side<2> side_to_set : Side<2>::getValues()) {
-		// setup
-		int  id                                   = 1;
-		int  nbr_id                               = 2;
-		auto pinfo                                = make_shared<PatchInfo<2>>();
-		pinfo->rank                               = 0;
-		pinfo->id                                 = id;
-		pinfo->nbr_info[side_to_set.getIndex()]   = make_shared<NormalNbrInfo<2>>(nbr_id);
-		pinfo->getNormalNbrInfo(side_to_set).rank = 1;
-		auto iface_info = make_shared<Schur::NormalIfaceInfo<2>>(pinfo, side_to_set);
-
-		Schur::PatchIfaceInfo<2> piinfo;
-		piinfo.setIfaceInfo(side_to_set, iface_info);
-
-		int           local_index = 1;
-		map<int, int> id_local_index_map;
-		id_local_index_map[piinfo.getIfaceInfo(side_to_set)->id] = local_index;
-		piinfo.setLocalIndexesFromId(id_local_index_map);
-
-		map<int, int> local_global_index_map;
-		local_global_index_map[local_index] = 1;
-		piinfo.setGlobalIndexesFromLocalIndex(local_global_index_map);
-
-		CHECK(piinfo.getIfaceInfo(side_to_set)->global_index == 1);
-	}
-}
 TEST_CASE("Schur::PatchIfaceInfo serialization", "[Schur::PatchIfaceInfo]")
 {
 	// setup

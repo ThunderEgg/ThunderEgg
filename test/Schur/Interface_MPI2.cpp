@@ -37,7 +37,9 @@ TEST_CASE(
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 
-	auto ifaces = Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos);
+	map<int, std::shared_ptr<Schur::Interface<2>>>    ifaces;
+	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>> off_proc_piinfos;
+	Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos, ifaces, off_proc_piinfos);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -88,6 +90,13 @@ TEST_CASE(
 		REQUIRE(ref_ne_patch != nullptr);
 		CHECK(ref_ne_patch->type.isFineToCoarse());
 		CHECK(ref_ne_patch->side == Side<2>::west());
+
+		REQUIRE(off_proc_piinfos.size() == 2);
+
+		for (auto piinfo : off_proc_piinfos) {
+			CHECK((piinfo->pinfo->id == ref_ne_patch->piinfo->pinfo->id
+			       || piinfo->pinfo->id == ref_se_patch->piinfo->pinfo->id));
+		}
 	} else {
 		CHECK(ifaces.size() == 6);
 		std::shared_ptr<const Schur::PatchIfaceInfo<2>> ref_sw_piinfo;
@@ -226,6 +235,12 @@ TEST_CASE(
 			CHECK(ref_ne_patch->type.isNormal());
 			CHECK(ref_ne_patch->side == Side<2>::south());
 		}
+
+		REQUIRE(off_proc_piinfos.size() == 2);
+
+		for (auto piinfo : off_proc_piinfos) {
+			CHECK(piinfo->pinfo->id == ref_nw_piinfo->pinfo->getCoarseNbrInfo(Side<2>::west()).id);
+		}
 	}
 }
 TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on processor boundary",
@@ -238,7 +253,9 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 
-	auto ifaces = Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos);
+	map<int, std::shared_ptr<Schur::Interface<2>>>    ifaces;
+	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>> off_proc_piinfos;
+	Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos, ifaces, off_proc_piinfos);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -276,7 +293,11 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
 		REQUIRE(east_patch != nullptr);
 		CHECK(east_patch->type.isNormal());
 		CHECK(east_patch->side == Side<2>::west());
+		REQUIRE(off_proc_piinfos.size() == 1);
+		CHECK(off_proc_piinfos[0]->pinfo->id
+		      == west_piinfo->pinfo->getNormalNbrInfo(Side<2>::east()).id);
 	} else {
 		CHECK(ifaces.size() == 0);
+		CHECK(off_proc_piinfos.size() == 0);
 	}
 }

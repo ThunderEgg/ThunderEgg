@@ -68,9 +68,9 @@ template <size_t D> class CoarseIfaceInfo : public IfaceInfo<D>
 	 */
 	int coarse_id;
 	/**
-	 * @brief The local index of the coarser patch's inteface
+	 * @brief The local column index of the coarser patch's inteface
 	 */
-	int coarse_local_index = -1;
+	int coarse_col_local_index = -1;
 	/**
 	 * @brief The global index of the coarser patch's interface
 	 */
@@ -78,28 +78,18 @@ template <size_t D> class CoarseIfaceInfo : public IfaceInfo<D>
 	/**
 	 * @brief Construct a new CoarseIfaceInfo object
 	 *
+	 * indexes will be set to -1
+	 *
 	 * @param pinfo the cooresponding PatchInfo object
 	 * @param s the side that the interface is on
 	 */
 	CoarseIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
-	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s), -1, -1), nbr_info(pinfo->getCoarseNbrInfoPtr(s))
+	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s)), nbr_info(pinfo->getCoarseNbrInfoPtr(s))
 	{
 		// fine and coarse interfaces always belong to their patches
 		orth_on_coarse = nbr_info->orth_on_coarse;
 		coarse_rank    = nbr_info->rank;
 		coarse_id      = nbr_info->id * Side<D>::num_sides + s.opposite().getIndex();
-	}
-	void setLocalIndexesFromId(const std::map<int, int> &rev_map) override
-	{
-		this->local_index = rev_map.at(this->id);
-		auto it           = rev_map.find(coarse_id);
-		if (it != rev_map.end())
-			coarse_local_index = it->second;
-	}
-	void setGlobalIndexesFromLocalIndex(const std::map<int, int> &rev_map) override
-	{
-		this->global_index  = rev_map.at(this->local_index);
-		coarse_global_index = rev_map.at(coarse_local_index);
 	}
 };
 } // namespace Schur

@@ -279,13 +279,15 @@ template <size_t D> class Interface : public Serializable
 	public:
 	/**
 	 * @brief Will enumerate a map from interface id to this rank's interfaces, will also do any
-	 * neccesary communication to get additional information. This is collection on all processors.
+	 * neccesary communication to get additional information. This is collective on all processors.
 	 *
 	 * @param piinfos vector of this ranks piinfo objects
 	 * @return std::map<int, std::shared_ptr<Interface<D>>> the map from interface id to interface
 	 */
-	static std::map<int, std::shared_ptr<Interface<D>>>
-	EnumerateIfacesFromPiinfoVector(std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> piinfos)
+	static void EnumerateIfacesFromPiinfoVector(
+	std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> piinfos,
+	std::map<int, std::shared_ptr<Interface<D>>> &        id_to_iface_map,
+	std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &     off_proc_piinfos)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -336,6 +338,7 @@ template <size_t D> class Interface : public Serializable
 			}
 		}
 		// recv info
+		off_proc_piinfos.clear();
 		size_t num_incoming = incoming_procs.size();
 		for (size_t i = 0; i < num_incoming; i++) {
 			MPI_Status status;
@@ -351,11 +354,16 @@ template <size_t D> class Interface : public Serializable
 				Interface<D> ifs;
 				reader >> ifs;
 				rank_id_iface_map.at(rank).at(ifs.id)->merge(ifs);
+				for (auto patch : ifs.patches) {
+					// need to cast to remove const modifier
+					off_proc_piinfos.push_back(
+					std::const_pointer_cast<PatchIfaceInfo<D>>(patch.piinfo));
+				}
 			}
 		}
 		// wait for all
 		MPI_Waitall((int) send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
-		return rank_id_iface_map[rank];
+		id_to_iface_map = rank_id_iface_map[rank];
 	}
 };
 extern template class Interface<2>;

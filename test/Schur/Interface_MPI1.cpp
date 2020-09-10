@@ -162,8 +162,11 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 
-	auto ifaces = Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos);
+	map<int, std::shared_ptr<Schur::Interface<2>>>    ifaces;
+	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>> off_proc_piinfos;
+	Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos, ifaces, off_proc_piinfos);
 	CHECK(ifaces.size() == 7);
+	CHECK(off_proc_piinfos.size() == 0);
 
 	auto coarse_piinfo = piinfos[0];
 	auto ref_sw_piinfo

@@ -45,15 +45,18 @@ namespace Schur
 template <size_t D> class InterfaceDomain
 {
 	private:
-	std::shared_ptr<Domain<D>> domain;
+	std::shared_ptr<const Domain<D>> domain;
 
 	/**
 	 * @brief Vector of PatchIfaceInfo pointers where index in the vector corresponds to the patch's
 	 * local index
 	 */
-	std::vector<std::shared_ptr<PatchIfaceInfo<D>>>   sinfo_vector;
-	std::map<int, std::shared_ptr<PatchIfaceInfo<D>>> id_sinfo_map;
-	std::map<int, Interface<D>>                       ifaces;
+	std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> piinfos;
+	/**
+	 * @brief Vector of Interfaces pointers where index in the vector corresponds to the
+	 * interfaces's local index
+	 */
+	std::vector<std::shared_ptr<const Interface<D>>> interfaces;
 
 	std::vector<int>                       id_map_vec;
 	std::vector<int>                       global_map_vec;
@@ -64,245 +67,14 @@ template <size_t D> class InterfaceDomain
 	std::vector<std::tuple<int, int, int>> matrix_in_id_local_rank_vec;
 	std::vector<std::tuple<int, int, int>> patch_out_id_local_rank_vec;
 	std::vector<std::tuple<int, int, int>> patch_in_id_local_rank_vec;
-	void                                   indexIfacesLocal()
+	void indexIfacesLocal(const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos_non_const)
 	{
-		using namespace std;
-		int curr_i = 0;
-		id_map_vec.reserve(ifaces.size());
-		id_map_vec.resize(0);
-		map<int, int>       rev_map;
-		set<int>            enqueued;
-		set<pair<int, int>> out_matrix_offs;
-		set<pair<int, int>> in_matrix_offs;
-		// set local indexes in schur compliment matrix
-		if (!ifaces.empty()) {
-			set<int> todo;
-			for (auto &p : ifaces) {
-				todo.insert(p.first);
-			}
-			while (!todo.empty()) {
-				deque<int> queue;
-				queue.push_back(*todo.begin());
-				enqueued.insert(*todo.begin());
-				while (!queue.empty()) {
-					int id = queue.front();
-					todo.erase(id);
-					queue.pop_front();
-
-					// set local index for interface
-					id_map_vec.push_back(id);
-					Interface<D> &ifs = ifaces.at(id);
-					rev_map[id]       = curr_i;
-
-					curr_i++;
-					for (auto patch : ifs.patches) {
-						if (patch.piinfo->getIfaceInfo(patch.side)->id == id) {
-							// outgoing affects all ifaces
-							for (Side<D> s : Side<D>::getValues()) {
-								if (patch.piinfo->pinfo->hasNbr(s)) {
-									switch (patch.piinfo->pinfo->getNbrType(s)) {
-										case NbrType::Normal: {
-											auto info = patch.piinfo->getNormalIfaceInfo(s);
-											if (info->rank != rank) {
-												in_matrix_offs.emplace(info->rank, info->id);
-												out_matrix_offs.emplace(info->rank, id);
-											}
-										} break;
-										case NbrType::Fine: {
-											auto info = patch.piinfo->getFineIfaceInfo(s);
-											if (info->rank != rank) {
-												in_matrix_offs.emplace(info->rank, info->id);
-												out_matrix_offs.emplace(info->rank, id);
-											}
-											for (size_t i = 0; i < Orthant<D - 1>::num_orthants;
-											     i++) {
-												if (info->fine_ranks[i] != rank) {
-													out_matrix_offs.emplace(info->fine_ranks[i],
-													                        id);
-												}
-											}
-										} break;
-										case NbrType::Coarse: {
-											auto info = patch.piinfo->getCoarseIfaceInfo(s);
-											if (info->rank != rank) {
-												in_matrix_offs.emplace(info->rank, info->id);
-												out_matrix_offs.emplace(info->rank, id);
-											}
-											if (info->coarse_rank != rank) {
-												out_matrix_offs.emplace(info->coarse_rank, id);
-											}
-										} break;
-									}
-								}
-							}
-						} else {
-							// outgoing affects only ifaces on iface_side
-							// iface side has to handled specially
-							switch (patch.piinfo->pinfo->getNbrType(patch.side)) {
-								case NbrType::Normal: {
-									auto info = patch.piinfo->getNormalIfaceInfo(patch.side);
-									if (info->rank != rank) {
-										in_matrix_offs.emplace(info->rank, info->id);
-										out_matrix_offs.emplace(info->rank, id);
-									}
-								} break;
-								case NbrType::Fine: {
-									auto info = patch.piinfo->getFineIfaceInfo(patch.side);
-									if (info->rank != rank) {
-										in_matrix_offs.emplace(info->rank, info->id);
-										out_matrix_offs.emplace(info->rank, id);
-									}
-									for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
-										if (info->fine_ranks[i] != rank) {
-											out_matrix_offs.emplace(info->fine_ranks[i], id);
-										}
-									}
-								} break;
-								case NbrType::Coarse: {
-									auto info = patch.piinfo->getCoarseIfaceInfo(patch.side);
-									if (info->rank != rank) {
-										in_matrix_offs.emplace(info->rank, info->id);
-										out_matrix_offs.emplace(info->rank, id);
-									}
-									if (info->coarse_rank != rank) {
-										out_matrix_offs.emplace(info->coarse_rank, id);
-									}
-								} break;
-							}
-							// handle the rest of the cases
-							for (Side<D> s : Side<D>::getValues()) {
-								if (s != patch.side && patch.piinfo->pinfo->hasNbr(s)) {
-									switch (patch.piinfo->pinfo->getNbrType(s)) {
-										case NbrType::Normal: {
-											auto info = patch.piinfo->getNormalIfaceInfo(s);
-											if (info->rank != rank) {
-												in_matrix_offs.emplace(info->rank, info->id);
-											}
-										} break;
-										case NbrType::Fine: {
-											auto info = patch.piinfo->getFineIfaceInfo(s);
-											if (info->rank != rank) {
-												in_matrix_offs.emplace(info->rank, info->id);
-											}
-										} break;
-										case NbrType::Coarse: {
-											auto info = patch.piinfo->getCoarseIfaceInfo(s);
-											if (info->rank != rank) {
-												in_matrix_offs.emplace(info->rank, info->id);
-											}
-										} break;
-									}
-								}
-							}
-						}
-					}
-					/*
-					for (int nbr_id : ifs.getNbrs()) {
-					    if (ifaces.count(nbr_id) && !enqueued.count(nbr_id)) {
-					        enqueued.insert(nbr_id);
-					        queue.push_back(nbr_id);
-					    }
-					}
-					*/
-				}
-			}
-		}
-		set<pair<int, int>> out_patch_offs;
-		set<pair<int, int>> in_patch_offs;
-		ghost_start = curr_i;
-		for (shared_ptr<PatchIfaceInfo<D>> &sinfo : sinfo_vector) {
-			for (Side<D> s : Side<D>::getValues()) {
-				if (sinfo->pinfo->hasNbr(s)) {
-					int id = sinfo->getIfaceInfo(s)->id;
-					if (!rev_map.count(id)) {
-						id_map_vec.push_back(id);
-						rev_map[id] = curr_i;
-						curr_i++;
-					}
-					switch (sinfo->pinfo->getNbrType(s)) {
-						case NbrType::Normal: {
-							auto info = sinfo->getNormalIfaceInfo(s);
-							if (info->nbr_info->rank != rank) {
-								in_patch_offs.insert(make_pair(info->nbr_info->rank, id));
-								out_patch_offs.insert(make_pair(info->nbr_info->rank, id));
-							}
-						} break;
-						case NbrType::Coarse: {
-							auto info = sinfo->getCoarseIfaceInfo(s);
-							if (info->nbr_info->rank != rank) {
-								in_patch_offs.insert(make_pair(info->nbr_info->rank, id));
-								out_patch_offs.insert(
-								make_pair(info->nbr_info->rank, info->coarse_id));
-								if (!rev_map.count(info->coarse_id)) {
-									id_map_vec.push_back(info->coarse_id);
-									rev_map[info->coarse_id] = curr_i;
-									curr_i++;
-								}
-							}
-						} break;
-						case NbrType::Fine: {
-							auto info = sinfo->getFineIfaceInfo(s);
-							for (Orthant<D - 1> o : Orthant<D - 1>::getValues()) {
-								if (info->nbr_info->ranks[o.getIndex()] != rank) {
-									in_patch_offs.insert(
-									make_pair(info->nbr_info->ranks[o.getIndex()], id));
-									out_patch_offs.insert(
-									make_pair(info->nbr_info->ranks[o.getIndex()],
-									          info->fine_ids[o.getIndex()]));
-									if (!rev_map.count(info->fine_ids[o.getIndex()])) {
-										id_map_vec.push_back(info->fine_ids[o.getIndex()]);
-										rev_map[info->fine_ids[o.getIndex()]] = curr_i;
-										curr_i++;
-									}
-								}
-							}
-						} break;
-					}
-				}
-			}
-		}
-		matrix_extra_ghost_start = curr_i;
-		// get off proc data
-		for (auto pair : out_patch_offs) {
-			int rank = pair.first;
-			int id   = pair.second;
-			patch_out_id_local_rank_vec.emplace_back(id, rev_map[id], rank);
-		}
-		for (auto pair : in_patch_offs) {
-			int rank = pair.first;
-			int id   = pair.second;
-			patch_in_id_local_rank_vec.emplace_back(id, rev_map[id], rank);
-		}
-		for (auto pair : out_matrix_offs) {
-			int rank = pair.first;
-			int id   = pair.second;
-			matrix_out_id_local_rank_vec.emplace_back(id, rev_map[id], rank);
-		}
-		for (auto pair : in_matrix_offs) {
-			int rank = pair.first;
-			int id   = pair.second;
-			if (!rev_map.count(id)) {
-				id_map_vec.push_back(id);
-				rev_map[id] = curr_i;
-				curr_i++;
-			}
-			matrix_in_id_local_rank_vec.emplace_back(id, rev_map[id], rank);
-		}
-		// TODO rest of matrix
-		for (auto &p : ifaces) {
-			// p.second.setLocalIndexes(rev_map);
-		}
-		for (auto &sinfo : sinfo_vector) {
-			sinfo->setLocalIndexesFromId(rev_map);
-		}
-		indexIfacesGlobal();
 	}
-	void indexDomainIfacesLocal() {}
 	void indexIfacesGlobal()
 	{
 		using namespace std;
 		// global indices are going to be sequentially increasing with rank
-		int local_size = ifaces.size();
+		int local_size = interfaces.size();
 		int start_i;
 		MPI_Scan(&local_size, &start_i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 		start_i -= local_size;
@@ -348,7 +120,7 @@ template <size_t D> class InterfaceDomain
 	 * @param domain the DomainCollection
 	 * @param comm the teuchos communicator
 	 */
-	explicit InterfaceDomain(std::shared_ptr<Domain<D>> domain)
+	explicit InterfaceDomain(std::shared_ptr<const Domain<D>> domain)
 	{
 		this->domain = domain;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -357,15 +129,16 @@ template <size_t D> class InterfaceDomain
 			iface_stride *= domain->getNs()[i];
 			lengths[i] = domain->getNs()[i];
 		}
-		sinfo_vector.reserve(domain->getNumLocalPatches());
+		std::vector<std::shared_ptr<PatchIfaceInfo<D>>> piinfos_non_const;
+		piinfos.reserve(domain->getNumLocalPatches());
+		piinfos_non_const.reserve(domain->getNumLocalPatches());
 		for (auto &pinfo : domain->getPatchInfoVector()) {
-			sinfo_vector.emplace_back(new PatchIfaceInfo<D>(pinfo));
-			id_sinfo_map[pinfo->id] = sinfo_vector.back();
+			piinfos_non_const.emplace_back(new PatchIfaceInfo<D>(pinfo));
+			piinfos.push_back(piinfos_non_const.back());
 		}
 		// ifaces = Interface<D>::EnumerateIfaces(sinfo_vector.begin(), sinfo_vector.end());
-		indexDomainIfacesLocal();
-		indexIfacesLocal();
-		int num_ifaces = ifaces.size();
+		indexIfacesLocal(piinfos_non_const);
+		int num_ifaces = interfaces.size();
 		MPI_Allreduce(&num_ifaces, &num_global_ifaces, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 	}
 
@@ -476,19 +249,19 @@ template <size_t D> class InterfaceDomain
 	 *
 	 * The location of each PatchIfaceInfo in the vector will coorespond to the patch's local index
 	 *
-	 * @return const std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> the vector of
+	 * @return const std::vector<std::shared_ptr<const PatchIfaceInfo<D>>>& the vector of
 	 * PatchIfaceInfo objects
 	 */
-	const std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> getPatchIfaceInfos()
+	const std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> &getPatchIfaceInfos() const
 	{
-		return std::vector<std::shared_ptr<const PatchIfaceInfo<D>>>();
+		return piinfos;
 	}
 	/**
 	 * @brief Get the Domain object that cooresponds to this InterfaceDomain
 	 *
 	 * @return std::shared_ptr<Domain<D>> the Domain object
 	 */
-	std::shared_ptr<Domain<D>> getDomain()
+	std::shared_ptr<const Domain<D>> getDomain() const
 	{
 		return domain;
 	}

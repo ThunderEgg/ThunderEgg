@@ -59,51 +59,10 @@ TEST_CASE("Schur::NormalIfaceInfo constructor", "[Schur::NormalIfaceInfo]")
 			CHECK(iface_info.id % Side<2>::num_sides == s.opposite().getIndex());
 		}
 		// local and global index should be set to -1
-		CHECK(iface_info.local_index == -1);
+		CHECK(iface_info.patch_local_index == -1);
+		CHECK(iface_info.row_local_index == -1);
+		CHECK(iface_info.col_local_index == -1);
 		CHECK(iface_info.global_index == -1);
 		CHECK(iface_info.nbr_info == pinfo->nbr_info[s.getIndex()]);
-	}
-}
-TEST_CASE("Schur::NormalIfaceInfo setLocalIndexesFromId", "[Schur::NormalIfaceInfo]")
-{
-	for (Side<2> s : Side<2>::getValues()) {
-		int  id                         = 1;
-		int  nbr_id                     = 2;
-		int  local_index                = GENERATE(0, 1, 2);
-		auto pinfo                      = make_shared<PatchInfo<2>>();
-		pinfo->id                       = id;
-		pinfo->nbr_info[s.getIndex()]   = make_shared<NormalNbrInfo<2>>(nbr_id);
-		pinfo->getNormalNbrInfo(s).rank = 1;
-		Schur::NormalIfaceInfo<2> iface_info(pinfo, s);
-		// local and global index should be set to -1
-
-		map<int, int> id_local_index_map;
-		id_local_index_map[iface_info.id] = local_index;
-		iface_info.setLocalIndexesFromId(id_local_index_map);
-		CHECK(iface_info.local_index == local_index);
-	}
-}
-TEST_CASE("Schur::NormalIfaceInfo setGlobalIndexesFromLocalIndex", "[Schur::NormalIfaceInfo]")
-{
-	for (Side<2> s : Side<2>::getValues()) {
-		int  id                         = 1;
-		int  nbr_id                     = 2;
-		int  local_index                = 0;
-		int  global_index               = GENERATE(0, 1, 2);
-		auto pinfo                      = make_shared<PatchInfo<2>>();
-		pinfo->id                       = id;
-		pinfo->nbr_info[s.getIndex()]   = make_shared<NormalNbrInfo<2>>(nbr_id);
-		pinfo->getNormalNbrInfo(s).rank = 1;
-		Schur::NormalIfaceInfo<2> iface_info(pinfo, s);
-		// local and global index should be set to -1
-
-		map<int, int> id_local_index_map;
-		id_local_index_map[iface_info.id] = local_index;
-		iface_info.setLocalIndexesFromId(id_local_index_map);
-
-		map<int, int> local_global_index_map;
-		local_global_index_map[local_index] = global_index;
-		iface_info.setGlobalIndexesFromLocalIndex(local_global_index_map);
-		CHECK(iface_info.local_index == local_index);
 	}
 }

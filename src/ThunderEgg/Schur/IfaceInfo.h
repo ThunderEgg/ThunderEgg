@@ -49,41 +49,34 @@ template <size_t D> class IfaceInfo
 	 */
 	int id;
 	/**
-	 * @brief the local index in the interface vector.
+	 * @brief the local index in the interface for the local patch interface vector
 	 */
-	int local_index;
+	int patch_local_index = -1;
+	/**
+	 * @brief the local index in the interface for the local column interface vector
+	 */
+	int col_local_index = -1;
+	/**
+	 * @brief the local index in the interface for the local row interface vector
+	 */
+	int row_local_index = -1;
 	/**
 	 * @brief the global index in the interface vector.
 	 */
-	int global_index;
+	int global_index = -1;
 	/**
 	 * @brief Construct a new IfaceInfo object
 	 *
+	 * All indexes will be set to -1
+	 *
 	 * @param rank the rank of the interface
 	 * @param id the id of the interface
-	 * @param local_index the local index of the interface
-	 * @param global_index the global index of the interface
 	 */
-	IfaceInfo(int rank, int id, int local_index, int global_index)
-	: rank(rank), id(id), local_index(local_index), global_index(global_index)
-	{
-	}
+	IfaceInfo(int rank, int id) : rank(rank), id(id) {}
 	/**
 	 * @brief Destroy the IfaceInfo object
 	 */
 	virtual ~IfaceInfo() {}
-	/**
-	 * @brief Set the local indexes in the IfaceInfo objects
-	 *
-	 * @param rev_map map from id to local_index
-	 */
-	virtual void setLocalIndexesFromId(const std::map<int, int> &rev_map) = 0;
-	/**
-	 * @brief Set the global indexes in the IfaceInfo objects
-	 *
-	 * @param rev_map map form local_index to global_index
-	 */
-	virtual void setGlobalIndexesFromLocalIndex(const std::map<int, int> &rev_map) = 0;
 };
 } // namespace Schur
 } // namespace ThunderEgg

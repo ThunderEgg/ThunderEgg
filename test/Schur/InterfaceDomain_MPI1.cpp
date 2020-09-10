@@ -73,7 +73,99 @@ TEST_CASE("Schur::InterfaceDomain<2> getDomain", "[Schur::InterfaceDomain]")
 
 	CHECK(interface_domain.getDomain() == domain);
 }
-TEST_CASE("Schur::InterfaceDomain<2> local indexes start from 0", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0",
+          "[Schur::InterfaceDomain]")
+{
+	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto            domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> interface_domain(domain);
+
+	int min_local_index = numeric_limits<int>::max();
+
+	for (auto patch : interface_domain.getPatchIfaceInfos()) {
+		for (Side<2> s : Side<2>::getValues()) {
+			if (patch->pinfo->hasNbr(s)) {
+				min_local_index = min(min_local_index, patch->getIfaceInfo(s)->patch_local_index);
+			}
+		}
+	}
+
+	CHECK(min_local_index == 0);
+}
+TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguous",
+          "[Schur::InterfaceDomain]")
+{
+	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto            domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> interface_domain(domain);
+
+	set<int> local_indexes;
+
+	for (auto patch : interface_domain.getPatchIfaceInfos()) {
+		for (Side<2> s : Side<2>::getValues()) {
+			if (patch->pinfo->hasNbr(s)) {
+				local_indexes.insert(patch->getIfaceInfo(s)->patch_local_index);
+			}
+		}
+	}
+
+	int prev_local_index = -1;
+	for (int local_index : local_indexes) {
+		REQUIRE(local_index == prev_local_index + 1);
+		prev_local_index = local_index;
+	}
+}
+TEST_CASE(
+"Schur::InterfaceDomain<2> each id has only one patch interface local index associated with it",
+"[Schur::InterfaceDomain]")
+{
+	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto            domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> interface_domain(domain);
+
+	map<int, set<int>> id_to_local_indexes;
+
+	for (auto piinfo : interface_domain.getPatchIfaceInfos()) {
+		for (Side<2> s : Side<2>::getValues()) {
+			if (piinfo->pinfo->hasNbr(s)) {
+				id_to_local_indexes[piinfo->getIfaceInfo(s)->id].insert(
+				piinfo->getIfaceInfo(s)->patch_local_index);
+			}
+		}
+	}
+
+	REQUIRE(id_to_local_indexes.size() > 0);
+	for (auto pair : id_to_local_indexes) {
+		INFO("ID " << pair.first);
+		CHECK(pair.second.size() == 1);
+	}
+}
+TEST_CASE(
+"Schur::InterfaceDomain<2> each patch interface local index has only one id associated with it",
+"[Schur::InterfaceDomain]")
+{
+	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto            domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> interface_domain(domain);
+
+	map<int, set<int>> local_index_to_ids;
+
+	for (auto piinfo : interface_domain.getPatchIfaceInfos()) {
+		for (Side<2> s : Side<2>::getValues()) {
+			if (piinfo->pinfo->hasNbr(s)) {
+				local_index_to_ids[piinfo->getIfaceInfo(s)->patch_local_index].insert(
+				piinfo->getIfaceInfo(s)->id);
+			}
+		}
+	}
+
+	REQUIRE(local_index_to_ids.size() > 0);
+	for (auto pair : local_index_to_ids) {
+		INFO("Local Index " << pair.first);
+		CHECK(pair.second.size() == 1);
+	}
+}
+TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0", "[Schur::InterfaceDomain]")
 {
 	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
 	auto            domain = domain_reader.getFinerDomain();
@@ -86,58 +178,39 @@ TEST_CASE("Schur::InterfaceDomain<2> local indexes start from 0", "[Schur::Inter
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				if (patch.piinfo->pinfo->hasNbr(s)) {
-					min_local_index
-					= min(min_local_index, patch.piinfo->getIfaceInfo(s)->local_index);
-
-					switch (patch.piinfo->pinfo->getNbrType(s)) {
-						case NbrType::Coarse:
-							min_local_index
-							= min(min_local_index,
-							      patch.piinfo->getCoarseIfaceInfo(s)->coarse_local_index);
-							break;
-						case NbrType::Fine:
-							min_local_index
-							= min(min_local_index,
-							      patch.piinfo->getFineIfaceInfo(s)->fine_local_indexes[0]);
-							min_local_index
-							= min(min_local_index,
-							      patch.piinfo->getFineIfaceInfo(s)->fine_local_indexes[1]);
-							break;
-						default:
-							break;
-					}
-				}
-			}
-		}
-	}
-
-	for (auto patch : interface_domain.getPatchIfaceInfos()) {
-		for (Side<2> s : Side<2>::getValues()) {
-			if (patch->pinfo->hasNbr(s)) {
-				min_local_index = min(min_local_index, patch->getIfaceInfo(s)->local_index);
-
-				switch (patch->pinfo->getNbrType(s)) {
-					case NbrType::Coarse:
-						min_local_index
-						= min(min_local_index, patch->getCoarseIfaceInfo(s)->coarse_local_index);
-						break;
-					case NbrType::Fine:
-						min_local_index
-						= min(min_local_index, patch->getFineIfaceInfo(s)->fine_local_indexes[0]);
-						min_local_index
-						= min(min_local_index, patch->getFineIfaceInfo(s)->fine_local_indexes[1]);
-						break;
-					default:
-						break;
-				}
+				min_local_index
+				= min(min_local_index, patch.piinfo->getIfaceInfo(s)->row_local_index);
 			}
 		}
 	}
 
 	CHECK(min_local_index == 0);
 }
-TEST_CASE("Schur::InterfaceDomain<2> each id has only one local index associated with it",
+TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous", "[Schur::InterfaceDomain]")
+{
+	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto            domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> interface_domain(domain);
+
+	set<int> local_indexes;
+
+	for (auto iface : interface_domain.getInterfaces()) {
+		local_indexes.insert(iface->local_index);
+
+		for (auto patch : iface->patches) {
+			for (Side<2> s : Side<2>::getValues()) {
+				local_indexes.insert(patch.piinfo->getIfaceInfo(s)->row_local_index);
+			}
+		}
+	}
+
+	int prev_local_index = -1;
+	for (int local_index : local_indexes) {
+		REQUIRE(local_index == prev_local_index + 1);
+		prev_local_index = local_index;
+	}
+}
+TEST_CASE("Schur::InterfaceDomain<2> each id has only one row local index associated with it",
           "[Schur::InterfaceDomain]")
 {
 	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
@@ -151,49 +224,8 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one local index associated
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				if (patch.piinfo->pinfo->hasNbr(s)) {
-					id_to_local_indexes[patch.piinfo->getIfaceInfo(s)->id].insert(
-					patch.piinfo->getIfaceInfo(s)->local_index);
-
-					switch (patch.piinfo->pinfo->getNbrType(s)) {
-						case NbrType::Coarse:
-							id_to_local_indexes[patch.piinfo->getCoarseIfaceInfo(s)->coarse_id]
-							.insert(patch.piinfo->getCoarseIfaceInfo(s)->coarse_local_index);
-							break;
-						case NbrType::Fine:
-							id_to_local_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]]
-							.insert(patch.piinfo->getFineIfaceInfo(s)->fine_local_indexes[0]);
-							id_to_local_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]]
-							.insert(patch.piinfo->getFineIfaceInfo(s)->fine_local_indexes[1]);
-							break;
-						default:
-							break;
-					}
-				}
-			}
-		}
-	}
-
-	for (auto piinfo : interface_domain.getPatchIfaceInfos()) {
-		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo->hasNbr(s)) {
-				id_to_local_indexes[piinfo->getIfaceInfo(s)->id].insert(
-				piinfo->getIfaceInfo(s)->local_index);
-
-				switch (piinfo->pinfo->getNbrType(s)) {
-					case NbrType::Coarse:
-						id_to_local_indexes[piinfo->getCoarseIfaceInfo(s)->coarse_id].insert(
-						piinfo->getCoarseIfaceInfo(s)->coarse_local_index);
-						break;
-					case NbrType::Fine:
-						id_to_local_indexes[piinfo->getFineIfaceInfo(s)->fine_ids[0]].insert(
-						piinfo->getFineIfaceInfo(s)->fine_local_indexes[0]);
-						id_to_local_indexes[piinfo->getFineIfaceInfo(s)->fine_ids[1]].insert(
-						piinfo->getFineIfaceInfo(s)->fine_local_indexes[1]);
-						break;
-					default:
-						break;
-				}
+				auto iface_info = patch.piinfo->getIfaceInfo(s);
+				id_to_local_indexes[iface_info->id].insert(iface_info->row_local_index);
 			}
 		}
 	}
@@ -204,7 +236,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one local index associated
 		CHECK(pair.second.size() == 1);
 	}
 }
-TEST_CASE("Schur::InterfaceDomain<2> each local index has only one id associated with it",
+TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associated with it",
           "[Schur::InterfaceDomain]")
 {
 	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
@@ -218,52 +250,8 @@ TEST_CASE("Schur::InterfaceDomain<2> each local index has only one id associated
 
 		for (auto patch : iface->patches) {
 			for (Side<2> s : Side<2>::getValues()) {
-				if (patch.piinfo->pinfo->hasNbr(s)) {
-					local_index_to_ids[patch.piinfo->getIfaceInfo(s)->local_index].insert(
-					patch.piinfo->getIfaceInfo(s)->id);
-
-					switch (patch.piinfo->pinfo->getNbrType(s)) {
-						case NbrType::Coarse:
-							local_index_to_ids[patch.piinfo->getCoarseIfaceInfo(s)
-							                   ->coarse_local_index]
-							.insert(patch.piinfo->getCoarseIfaceInfo(s)->coarse_id);
-							break;
-						case NbrType::Fine:
-							local_index_to_ids[patch.piinfo->getFineIfaceInfo(s)
-							                   ->fine_local_indexes[0]]
-							.insert(patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]);
-							local_index_to_ids[patch.piinfo->getFineIfaceInfo(s)
-							                   ->fine_local_indexes[1]]
-							.insert(patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]);
-							break;
-						default:
-							break;
-					}
-				}
-			}
-		}
-	}
-
-	for (auto piinfo : interface_domain.getPatchIfaceInfos()) {
-		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo->hasNbr(s)) {
-				local_index_to_ids[piinfo->getIfaceInfo(s)->local_index].insert(
-				piinfo->getIfaceInfo(s)->id);
-
-				switch (piinfo->pinfo->getNbrType(s)) {
-					case NbrType::Coarse:
-						local_index_to_ids[piinfo->getCoarseIfaceInfo(s)->coarse_local_index]
-						.insert(piinfo->getCoarseIfaceInfo(s)->coarse_id);
-						break;
-					case NbrType::Fine:
-						local_index_to_ids[piinfo->getFineIfaceInfo(s)->fine_local_indexes[0]]
-						.insert(piinfo->getFineIfaceInfo(s)->fine_ids[0]);
-						local_index_to_ids[piinfo->getFineIfaceInfo(s)->fine_local_indexes[1]]
-						.insert(piinfo->getFineIfaceInfo(s)->fine_ids[1]);
-						break;
-					default:
-						break;
-				}
+				auto iface_info = patch.piinfo->getIfaceInfo(s);
+				local_index_to_ids[iface_info->row_local_index].insert(iface_info->id);
 			}
 		}
 	}
@@ -274,66 +262,197 @@ TEST_CASE("Schur::InterfaceDomain<2> each local index has only one id associated
 		CHECK(pair.second.size() == 1);
 	}
 }
-TEST_CASE("Schur::InterfaceDomain<2> local indexes are contiguous", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0", "[Schur::InterfaceDomain]")
 {
 	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
 	auto            domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
-	std::set<int> local_indexes;
+	int min_local_index = numeric_limits<int>::max();
+
+	for (auto iface : interface_domain.getInterfaces()) {
+		min_local_index = min(min_local_index, iface->local_index);
+
+		for (auto patch : iface->patches) {
+			if (patch.type.isNormal() || patch.type.isFineToFine()
+			    || patch.type.isCoarseToCoarse()) {
+				for (Side<2> s : Side<2>::getValues()) {
+					if (patch.piinfo->pinfo->hasNbr(s)) {
+						if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Normal) {
+							auto iface_info = patch.piinfo->getNormalIfaceInfo(s);
+
+							min_local_index = min(min_local_index, iface_info->col_local_index);
+
+						} else if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Fine) {
+							auto iface_info = patch.piinfo->getFineIfaceInfo(s);
+
+							min_local_index = min(min_local_index, iface_info->col_local_index);
+
+							min_local_index
+							= min(min_local_index, iface_info->fine_col_local_indexes[0]);
+
+							min_local_index
+							= min(min_local_index, iface_info->fine_col_local_indexes[1]);
+
+						} else if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Coarse) {
+							auto iface_info = patch.piinfo->getCoarseIfaceInfo(s);
+
+							min_local_index = min(min_local_index, iface_info->col_local_index);
+
+							min_local_index
+							= min(min_local_index, iface_info->coarse_col_local_index);
+						}
+					}
+				}
+			}
+		}
+	}
+	CHECK(min_local_index == 0);
+}
+TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous", "[Schur::InterfaceDomain]")
+{
+	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto            domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> interface_domain(domain);
+
+	set<int> local_indexes;
 
 	for (auto iface : interface_domain.getInterfaces()) {
 		local_indexes.insert(iface->local_index);
 
 		for (auto patch : iface->patches) {
-			for (Side<2> s : Side<2>::getValues()) {
-				if (patch.piinfo->pinfo->hasNbr(s)) {
-					local_indexes.insert(patch.piinfo->getIfaceInfo(s)->local_index);
+			if (patch.type.isNormal() || patch.type.isFineToFine()
+			    || patch.type.isCoarseToCoarse()) {
+				for (Side<2> s : Side<2>::getValues()) {
+					if (patch.piinfo->pinfo->hasNbr(s)) {
+						if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Normal) {
+							auto iface_info = patch.piinfo->getNormalIfaceInfo(s);
 
-					switch (patch.piinfo->pinfo->getNbrType(s)) {
-						case NbrType::Coarse:
-							local_indexes.insert(
-							patch.piinfo->getCoarseIfaceInfo(s)->coarse_local_index);
-							break;
-						case NbrType::Fine:
-							local_indexes.insert(
-							patch.piinfo->getFineIfaceInfo(s)->fine_local_indexes[0]);
-							local_indexes.insert(
-							patch.piinfo->getFineIfaceInfo(s)->fine_local_indexes[1]);
-							break;
-						default:
-							break;
+							local_indexes.insert(iface_info->col_local_index);
+
+						} else if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Fine) {
+							auto iface_info = patch.piinfo->getFineIfaceInfo(s);
+
+							local_indexes.insert(iface_info->col_local_index);
+
+							local_indexes.insert(iface_info->fine_col_local_indexes[0]);
+
+							local_indexes.insert(iface_info->fine_col_local_indexes[1]);
+
+						} else if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Coarse) {
+							auto iface_info = patch.piinfo->getCoarseIfaceInfo(s);
+
+							local_indexes.insert(iface_info->col_local_index);
+
+							local_indexes.insert(iface_info->coarse_col_local_index);
+						}
+					}
+				}
+			}
+		}
+	}
+	int prev_local_index = -1;
+	for (int local_index : local_indexes) {
+		REQUIRE(local_index == prev_local_index + 1);
+		prev_local_index = local_index;
+	}
+}
+TEST_CASE("Schur::InterfaceDomain<2> each id has only one col local index associated with it",
+          "[Schur::InterfaceDomain]")
+{
+	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto            domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> interface_domain(domain);
+
+	map<int, set<int>> id_to_local_indexes;
+
+	for (auto iface : interface_domain.getInterfaces()) {
+		id_to_local_indexes[iface->id].insert(iface->local_index);
+
+		for (auto patch : iface->patches) {
+			if (patch.type.isNormal() || patch.type.isFineToFine()
+			    || patch.type.isCoarseToCoarse()) {
+				for (Side<2> s : Side<2>::getValues()) {
+					if (patch.piinfo->pinfo->hasNbr(s)) {
+						if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Normal) {
+							auto iface_info = patch.piinfo->getNormalIfaceInfo(s);
+
+							id_to_local_indexes[iface_info->id].insert(iface_info->col_local_index);
+
+						} else if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Fine) {
+							auto iface_info = patch.piinfo->getFineIfaceInfo(s);
+
+							id_to_local_indexes[iface_info->id].insert(iface_info->col_local_index);
+
+							id_to_local_indexes[iface_info->fine_ids[0]].insert(
+							iface_info->fine_col_local_indexes[0]);
+
+							id_to_local_indexes[iface_info->fine_ids[1]].insert(
+							iface_info->fine_col_local_indexes[1]);
+
+						} else if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Coarse) {
+							auto iface_info = patch.piinfo->getCoarseIfaceInfo(s);
+
+							id_to_local_indexes[iface_info->id].insert(iface_info->col_local_index);
+
+							id_to_local_indexes[iface_info->coarse_id].insert(
+							iface_info->coarse_col_local_index);
+						}
 					}
 				}
 			}
 		}
 	}
 
-	for (auto patch : interface_domain.getPatchIfaceInfos()) {
-		for (Side<2> s : Side<2>::getValues()) {
-			if (patch->pinfo->hasNbr(s)) {
-				local_indexes.insert(patch->getIfaceInfo(s)->local_index);
+	REQUIRE(id_to_local_indexes.size() > 0);
+	for (auto pair : id_to_local_indexes) {
+		INFO("ID " << pair.first);
+		CHECK(pair.second.size() == 1);
+	}
+}
+TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associated with it",
+          "[Schur::InterfaceDomain]")
+{
+	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto            domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> interface_domain(domain);
 
-				switch (patch->pinfo->getNbrType(s)) {
-					case NbrType::Coarse:
-						local_indexes.insert(patch->getCoarseIfaceInfo(s)->coarse_local_index);
-						break;
-					case NbrType::Fine:
-						local_indexes.insert(patch->getFineIfaceInfo(s)->fine_local_indexes[0]);
-						local_indexes.insert(patch->getFineIfaceInfo(s)->fine_local_indexes[1]);
-						break;
-					default:
-						break;
+	map<int, set<int>> local_index_to_ids;
+
+	for (auto iface : interface_domain.getInterfaces()) {
+		local_index_to_ids[iface->local_index].insert(iface->id);
+
+		for (auto patch : iface->patches) {
+			if (patch.type.isNormal() || patch.type.isFineToFine()
+			    || patch.type.isCoarseToCoarse()) {
+				for (Side<2> s : Side<2>::getValues()) {
+					if (patch.piinfo->pinfo->hasNbr(s)) {
+						if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Normal) {
+							auto iface_info = patch.piinfo->getNormalIfaceInfo(s);
+							local_index_to_ids[iface_info->col_local_index].insert(iface_info->id);
+						} else if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Fine) {
+							auto iface_info = patch.piinfo->getFineIfaceInfo(s);
+							local_index_to_ids[iface_info->col_local_index].insert(iface_info->id);
+							local_index_to_ids[iface_info->fine_col_local_indexes[0]].insert(
+							iface_info->fine_ids[0]);
+							local_index_to_ids[iface_info->fine_col_local_indexes[1]].insert(
+							iface_info->fine_ids[1]);
+						} else if (patch.piinfo->pinfo->getNbrType(s) == NbrType::Coarse) {
+							auto iface_info = patch.piinfo->getCoarseIfaceInfo(s);
+							local_index_to_ids[iface_info->col_local_index].insert(iface_info->id);
+							local_index_to_ids[iface_info->coarse_col_local_index].insert(
+							iface_info->coarse_id);
+						}
+					}
 				}
 			}
 		}
 	}
 
-	REQUIRE(local_indexes.size() > 0);
-	int prev_local_index = -1;
-	for (int local_index : local_indexes) {
-		REQUIRE(local_index == prev_local_index + 1);
-		prev_local_index = local_index;
+	REQUIRE(local_index_to_ids.size() > 0);
+	for (auto pair : local_index_to_ids) {
+		INFO("Local Index " << pair.first);
+		CHECK(pair.second.size() == 1);
 	}
 }
 TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0", "[Schur::InterfaceDomain]")

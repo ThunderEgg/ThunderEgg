@@ -64,9 +64,9 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 	 */
 	std::array<int, Orthant<D - 1>::num_orthants> fine_ids;
 	/**
-	 * @brief the local indexes of the fine patches' interfaces
+	 * @brief the local column indexes of the fine patches' interfaces
 	 */
-	std::array<int, Orthant<D - 1>::num_orthants> fine_local_indexes;
+	std::array<int, Orthant<D - 1>::num_orthants> fine_col_local_indexes;
 	/**
 	 * @brief the global indexes of the fine patches' interfaces
 	 */
@@ -74,34 +74,20 @@ template <size_t D> class FineIfaceInfo : public IfaceInfo<D>
 	/**
 	 * @brief Construct a new FineIfaceInfo object
 	 *
+	 * indexes will be set to -1
+	 *
 	 * @param pinfo the associated PatchInfo object
 	 * @param s the side of the patch that the interface is on
 	 */
 	FineIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
-	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s), -1, -1), nbr_info(pinfo->getFineNbrInfoPtr(s))
+	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s)), nbr_info(pinfo->getFineNbrInfoPtr(s))
 	{
 		for (size_t i = 0; i < fine_ids.size(); i++) {
 			fine_ids[i]   = nbr_info->ids[i] * Side<D>::num_sides + s.opposite().getIndex();
 			fine_ranks[i] = nbr_info->ranks[i];
 		}
-		fine_local_indexes.fill(-1);
+		fine_col_local_indexes.fill(-1);
 		fine_global_indexes.fill(-1);
-	}
-	void setLocalIndexesFromId(const std::map<int, int> &rev_map) override
-	{
-		this->local_index = rev_map.at(this->id);
-		for (size_t i = 0; i < fine_ids.size(); i++) {
-			auto it = rev_map.find(this->fine_ids[i]);
-			if (it != rev_map.end())
-				fine_local_indexes[i] = it->second;
-		}
-	}
-	void setGlobalIndexesFromLocalIndex(const std::map<int, int> &rev_map) override
-	{
-		this->global_index = rev_map.at(this->local_index);
-		for (size_t i = 0; i < fine_local_indexes.size(); i++) {
-			fine_global_indexes[i] = rev_map.at(fine_local_indexes[i]);
-		}
 	}
 };
 } // namespace Schur

@@ -85,17 +85,8 @@ template <size_t D> class NormalIfaceInfo : public IfaceInfo<D>
 	 * @param s the side of the patch that the interface is on
 	 */
 	NormalIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
-	: IfaceInfo<D>(GetRank(pinfo, s), GetId(pinfo, s), -1, -1),
-	  nbr_info(pinfo->getNormalNbrInfoPtr(s))
+	: IfaceInfo<D>(GetRank(pinfo, s), GetId(pinfo, s)), nbr_info(pinfo->getNormalNbrInfoPtr(s))
 	{
-	}
-	void setLocalIndexesFromId(const std::map<int, int> &rev_map) override
-	{
-		this->local_index = rev_map.at(this->id);
-	}
-	void setGlobalIndexesFromLocalIndex(const std::map<int, int> &rev_map) override
-	{
-		this->global_index = rev_map.at(this->local_index);
 	}
 };
 } // namespace Schur
