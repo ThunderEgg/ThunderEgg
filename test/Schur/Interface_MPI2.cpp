@@ -236,7 +236,7 @@ TEST_CASE(
 			CHECK(ref_ne_patch->side == Side<2>::south());
 		}
 
-		REQUIRE(off_proc_piinfos.size() == 2);
+		REQUIRE(off_proc_piinfos.size() == 1);
 
 		for (auto piinfo : off_proc_piinfos) {
 			CHECK(piinfo->pinfo->id == ref_nw_piinfo->pinfo->getCoarseNbrInfo(Side<2>::west()).id);
