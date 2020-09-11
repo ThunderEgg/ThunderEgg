@@ -68,10 +68,17 @@ template <size_t D> class InterfaceDomain
 	std::vector<std::tuple<int, int, int>> patch_out_id_local_rank_vec;
 	std::vector<std::tuple<int, int, int>> patch_in_id_local_rank_vec;
 
+	/**
+	 * @brief Index all of column, row, and patch interface local indexes for the interface system
+	 *
+	 * @param id_to_iface_map map of Interface id to Interface objects
+	 * @param piinfos the vector PatchIfaceInfo objects for this processor
+	 * @param interfaces (output) this will be updated with a new vector of Interface objects, the
+	 * position in the vector cooresponds to the Interface's local index
+	 */
 	static void
 	IndexIfacesLocal(const std::map<int, std::shared_ptr<Interface<D>>> &   id_to_iface_map,
 	                 const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
-	                 const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &off_proc_piinfos,
 	                 std::vector<std::shared_ptr<Interface<D>>> &           interfaces)
 	{
 		int curr_local_index = 0;
@@ -116,7 +123,15 @@ template <size_t D> class InterfaceDomain
 		// perform rest of necessary indexing
 		IndexRemainingColIfacesLocal(curr_local_index, interfaces);
 		IndexRemainingRowIfacesLocal(curr_local_index, interfaces);
+		IndexRemainingPatchIfacesLocal(curr_local_index, piinfos);
 	}
+	/**
+	 * @brief Index the remaining unset column local indexes in the given PatchIfaceInfo object
+	 *
+	 * @param curr_local_index the current index, this passed by value so value in caller will be
+	 * updated
+	 * @param piinfo the PatchIfaceInfo object
+	 */
 	static void IndexRemainginColIfacesLocalForPatch(int &curr_local_index,
 	                                                 std::shared_ptr<PatchIfaceInfo<D>> piinfo)
 	{
@@ -148,8 +163,15 @@ template <size_t D> class InterfaceDomain
 			}
 		}
 	}
-	static void IndexRemainingColIfacesLocal(int curr_local_index,
-	                                         std::vector<std::shared_ptr<Interface<D>>> &interfaces)
+	/**
+	 * @brief Index the remaining unset column local indexes
+	 *
+	 * @param curr_local_index the current index
+	 * @param interfaces the vector Interface objects
+	 */
+	static void
+	IndexRemainingColIfacesLocal(int                                               curr_local_index,
+	                             const std::vector<std::shared_ptr<Interface<D>>> &interfaces)
 	{
 		for (auto iface : interfaces) {
 			for (auto patch : iface->patches) {
@@ -162,8 +184,15 @@ template <size_t D> class InterfaceDomain
 			}
 		}
 	}
-	static void IndexRemainingRowIfacesLocal(int curr_local_index,
-	                                         std::vector<std::shared_ptr<Interface<D>>> &interfaces)
+	/**
+	 * @brief Index the remaining unset row local indexes
+	 *
+	 * @param curr_local_index the current index
+	 * @param interfaces the vector Interface objects
+	 */
+	static void
+	IndexRemainingRowIfacesLocal(int                                               curr_local_index,
+	                             const std::vector<std::shared_ptr<Interface<D>>> &interfaces)
 	{
 		for (auto iface : interfaces) {
 			for (auto patch : iface->patches) {
@@ -177,6 +206,29 @@ template <size_t D> class InterfaceDomain
 							iface_info->row_local_index = curr_local_index;
 							curr_local_index++;
 						}
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * @brief Index the remaining unset patch interface local indexes
+	 *
+	 * @param curr_local_index the current index
+	 * @param interfaces the vector PatchIfaceInfo objects
+	 */
+	static void
+	IndexRemainingPatchIfacesLocal(int curr_local_index,
+	                               const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos)
+	{
+		for (auto piinfo : piinfos) {
+			for (Side<D> s : Side<D>::getValues()) {
+				if (piinfo->pinfo->hasNbr(s)) {
+					auto iface_info = piinfo->getIfaceInfo(s);
+
+					if (iface_info->patch_local_index == -1) {
+						iface_info->patch_local_index = curr_local_index;
+						curr_local_index++;
 					}
 				}
 			}
@@ -253,8 +305,7 @@ template <size_t D> class InterfaceDomain
 		Interface<D>::EnumerateIfacesFromPiinfoVector(piinfos, id_to_iface_map, off_proc_piinfos);
 
 		std::vector<std::shared_ptr<Schur::Interface<D>>> interfaces_non_const;
-		IndexIfacesLocal(id_to_iface_map, piinfos_non_const, off_proc_piinfos,
-		                 interfaces_non_const);
+		IndexIfacesLocal(id_to_iface_map, piinfos_non_const, interfaces_non_const);
 
 		interfaces.reserve(interfaces_non_const.size());
 		for (auto iface : interfaces_non_const) {
