@@ -616,7 +616,7 @@ TEST_CASE(
 	MPI_Allreduce(iface_ids_in.data(), iface_ids_out.data(), iface_ids_in.size(), MPI_INT, MPI_SUM,
 	              MPI_COMM_WORLD);
 
-	for (int global_index; global_index < interface_domain.getNumGlobalInterfaces();
+	for (int global_index = 0; global_index < interface_domain.getNumGlobalInterfaces();
 	     global_index++) {
 		id_to_global_indexes[iface_ids_out[global_index]].insert(global_index);
 	}
@@ -686,7 +686,7 @@ TEST_CASE(
 	MPI_Allreduce(iface_ids_in.data(), iface_ids_out.data(), iface_ids_in.size(), MPI_INT, MPI_SUM,
 	              MPI_COMM_WORLD);
 
-	for (int global_index; global_index < interface_domain.getNumGlobalInterfaces();
+	for (int global_index = 0; global_index < interface_domain.getNumGlobalInterfaces();
 	     global_index++) {
 		global_index_to_ids[global_index].insert(iface_ids_out[global_index]);
 	}
@@ -919,7 +919,9 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_uniform",
 		}
 	}
 
-	CHECK(min_local_index == 0);
+	if (interface_domain.getNumLocalInterfaces() > 0) {
+		CHECK(min_local_index == 0);
+	}
 }
 TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_uniform",
           "[Schur::InterfaceDomain]")
@@ -1307,7 +1309,7 @@ TEST_CASE(
 	MPI_Allreduce(iface_ids_in.data(), iface_ids_out.data(), iface_ids_in.size(), MPI_INT, MPI_SUM,
 	              MPI_COMM_WORLD);
 
-	for (int global_index; global_index < interface_domain.getNumGlobalInterfaces();
+	for (int global_index = 0; global_index < interface_domain.getNumGlobalInterfaces();
 	     global_index++) {
 		id_to_global_indexes[iface_ids_out[global_index]].insert(global_index);
 	}
@@ -1376,7 +1378,7 @@ TEST_CASE(
 	MPI_Allreduce(iface_ids_in.data(), iface_ids_out.data(), iface_ids_in.size(), MPI_INT, MPI_SUM,
 	              MPI_COMM_WORLD);
 
-	for (int global_index; global_index < interface_domain.getNumGlobalInterfaces();
+	for (int global_index = 0; global_index < interface_domain.getNumGlobalInterfaces();
 	     global_index++) {
 		global_index_to_ids[global_index].insert(iface_ids_out[global_index]);
 	}
