@@ -87,7 +87,7 @@ TEST_CASE("Schur::InterfaceDomain<2> getPatchIfaceInfos 2d_refined_east",
 	if (rank == 0) {
 		CHECK(piinfos.size() == 1);
 	} else {
-		CHECK(piinfos.size() == 6);
+		CHECK(piinfos.size() == 4);
 	}
 	for (size_t i = 0; i < piinfos.size(); i++) {
 		CHECK(piinfos[i]->pinfo->local_index == (int) i);
