@@ -115,6 +115,7 @@ template <size_t D> class InterfaceDomain
 
 		// perform rest of necessary indexing
 		IndexRemainingColIfacesLocal(curr_local_index, interfaces);
+		IndexRemainingRowIfacesLocal(curr_local_index, interfaces);
 	}
 	static void IndexRemainginColIfacesLocalForPatch(int &curr_local_index,
 	                                                 std::shared_ptr<PatchIfaceInfo<D>> piinfo)
@@ -157,6 +158,26 @@ template <size_t D> class InterfaceDomain
 				if (patch.type.isNormal() || patch.type.isFineToFine()
 				    || patch.type.isCoarseToCoarse()) {
 					IndexRemainginColIfacesLocalForPatch(curr_local_index, piinfo);
+				}
+			}
+		}
+	}
+	static void IndexRemainingRowIfacesLocal(int curr_local_index,
+	                                         std::vector<std::shared_ptr<Interface<D>>> &interfaces)
+	{
+		for (auto iface : interfaces) {
+			for (auto patch : iface->patches) {
+				auto piinfo = patch.getNonConstPiinfo();
+
+				for (Side<D> s : Side<D>::getValues()) {
+					if (piinfo->pinfo->hasNbr(s)) {
+						auto iface_info = piinfo->getIfaceInfo(s);
+
+						if (iface_info->row_local_index == -1) {
+							iface_info->row_local_index = curr_local_index;
+							curr_local_index++;
+						}
+					}
 				}
 			}
 		}
@@ -340,8 +361,8 @@ template <size_t D> class InterfaceDomain
 	 * The location of each Interface in the vector will coorespond to the Interafce's local
 	 * index
 	 *
-	 * @return const std::vector<std::shared_ptr<const Interface<D>>> the vector of Interface
-	 * objects
+	 * @return const std::vector<std::shared_ptr<const Interface<D>>> the vector of
+	 * Interface objects
 	 */
 	const std::vector<std::shared_ptr<const Interface<D>>> getInterfaces() const
 	{
@@ -350,8 +371,8 @@ template <size_t D> class InterfaceDomain
 	/**
 	 * @brief Get the vector PatchIfaceInfo objects for this rank
 	 *
-	 * The location of each PatchIfaceInfo in the vector will coorespond to the patch's local
-	 * index
+	 * The location of each PatchIfaceInfo in the vector will coorespond to the patch's
+	 * local index
 	 *
 	 * @return const std::vector<std::shared_ptr<const PatchIfaceInfo<D>>>& the vector of
 	 * PatchIfaceInfo objects
