@@ -67,7 +67,6 @@ template <size_t D> class InterfaceDomain
 	std::vector<std::tuple<int, int, int>> matrix_in_id_local_rank_vec;
 	std::vector<std::tuple<int, int, int>> patch_out_id_local_rank_vec;
 	std::vector<std::tuple<int, int, int>> patch_in_id_local_rank_vec;
-
 	/**
 	 * @brief Index all of column, row, and patch interface local indexes for the interface system
 	 *
@@ -234,6 +233,47 @@ template <size_t D> class InterfaceDomain
 			}
 		}
 	}
+	/**
+	 * @brief Set global indexes for all of the interfaces, local indexes should already be set
+	 *
+	 * @param interfaces this will be updated with a new vector of Interface objects, the
+	 * position in the vector cooresponds to the Interface's local index
+	 * @param piinfos the vector PatchIfaceInfo objects for this processor
+	 */
+	static void IndexIfacesGlobal(const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
+	                              const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos)
+	{
+		// get starting global index for this rank
+		int starting_global_index;
+		int num_local_interfaces = (int) interfaces.size();
+		MPI_Scan(&num_local_interfaces, &starting_global_index, 1, MPI_INT, MPI_SUM,
+		         MPI_COMM_WORLD);
+		starting_global_index -= num_local_interfaces;
+
+		// index local interfaces first
+		for (auto iface : interfaces) {
+			iface->global_index = starting_global_index + iface->local_index;
+
+			for (auto patch : iface->patches) {
+				if (patch.type.isNormal() || patch.type.isFineToFine()
+				    || patch.type.isCoarseToCoarse()) {
+					auto iface_info          = patch.getNonConstPiinfo()->getIfaceInfo(patch.side);
+					iface_info->global_index = iface->global_index;
+				} else if (patch.type.isFineToCoarse()) {
+					auto iface_info = patch.getNonConstPiinfo()->getCoarseIfaceInfo(patch.side);
+					iface_info->coarse_global_index = iface->global_index;
+				} else if (patch.type.isCoarseToFine()) {
+					auto iface_info = patch.getNonConstPiinfo()->getFineIfaceInfo(patch.side);
+					for (size_t i = 0; i < iface_info->fine_col_local_indexes.size(); i++) {
+						if (iface_info->fine_ids[i] == iface->id) {
+							iface_info->fine_global_indexes[i] = iface->global_index;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 	void indexIfacesGlobal()
 	{
 		using namespace std;
@@ -306,6 +346,7 @@ template <size_t D> class InterfaceDomain
 
 		std::vector<std::shared_ptr<Schur::Interface<D>>> interfaces_non_const;
 		IndexIfacesLocal(id_to_iface_map, piinfos_non_const, interfaces_non_const);
+		IndexIfacesGlobal(interfaces_non_const, piinfos_non_const);
 
 		interfaces.reserve(interfaces_non_const.size());
 		for (auto iface : interfaces_non_const) {
