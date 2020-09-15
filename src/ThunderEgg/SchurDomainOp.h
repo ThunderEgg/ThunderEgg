@@ -28,7 +28,7 @@
 
 namespace ThunderEgg
 {
-template <size_t D> class SchurDomainOp : public Operator<D>
+template <int D> class SchurDomainOp : public Operator<D>
 {
 	private:
 	/**

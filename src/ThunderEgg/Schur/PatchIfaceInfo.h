@@ -34,7 +34,7 @@ namespace Schur
  *
  * @tparam D the number of Cartesian dimensions in a patch
  */
-template <size_t D> class PatchIfaceInfo : public Serializable
+template <int D> class PatchIfaceInfo : public Serializable
 {
 	public:
 	/**

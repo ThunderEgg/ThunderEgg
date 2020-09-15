@@ -32,7 +32,7 @@ namespace PETSc
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class PCShellCreator
+template <int D> class PCShellCreator
 {
 	private:
 	/**

@@ -42,7 +42,7 @@ namespace Schur
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class InterfaceDomain
+template <int D> class InterfaceDomain
 {
 	private:
 	std::shared_ptr<const Domain<D>> domain;
@@ -702,7 +702,7 @@ template <size_t D> class InterfaceDomain
 		return domain;
 	}
 }; // namespace Schur
-template <size_t D> class InterfaceDomainVG : public VectorGenerator<D>
+template <int D> class InterfaceDomainVG : public VectorGenerator<D>
 {
 	private:
 	std::shared_ptr<InterfaceDomain<D + 1>> sh;

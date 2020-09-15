@@ -37,7 +37,7 @@ namespace Experimental
 /**
  * @brief Represents an oct-tree.
  */
-template <size_t D> struct Tree {
+template <int D> struct Tree {
 	/**
 	 * @brief Map of node id to node objects.
 	 */
@@ -80,7 +80,7 @@ template <size_t D> struct Tree {
 	void refineNode(Node<D> &n);
 	void zoltanBalanceDomains();
 };
-template <size_t D> inline Tree<D>::Tree()
+template <int D> inline Tree<D>::Tree()
 {
 	Node<D> new_root;
 	new_root.id = 0;
@@ -93,7 +93,7 @@ template <size_t D> inline Tree<D>::Tree()
 	max_id         = 0;
 	num_levels     = 1;
 }
-template <size_t D> inline Tree<D>::Tree(std::string file_name)
+template <int D> inline Tree<D>::Tree(std::string file_name)
 {
 	using namespace std;
 	ifstream input(file_name, ios_base::binary);
@@ -126,7 +126,7 @@ template <size_t D> inline Tree<D>::Tree(std::string file_name)
 		levels[n.level] = &nodes[n.id];
 	}
 }
-template <size_t D> inline void Tree<D>::refineLeaves()
+template <int D> inline void Tree<D>::refineLeaves()
 {
 	using namespace std;
 	Node<D> root_node = nodes[root];
@@ -187,7 +187,7 @@ template <size_t D> inline void Tree<D>::refineLeaves()
 	levels[num_levels + 1] = &nodes.at(levels[num_levels]->child_id[0]);
 	this->num_levels++;
 }
-template <size_t D> inline void Tree<D>::refineNode(Node<D> &n)
+template <int D> inline void Tree<D>::refineNode(Node<D> &n)
 {
 	std::array<Node<D>, Orthant<D>::num_orthants> new_children;
 	for (Orthant<D> o : Orthant<D>::getValues()) {

@@ -32,7 +32,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions.
  */
-template <size_t D> class CoarseNbrInfo : public NbrInfo<D>
+template <int D> class CoarseNbrInfo : public NbrInfo<D>
 {
 	public:
 	/**

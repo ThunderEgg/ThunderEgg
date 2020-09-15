@@ -35,7 +35,7 @@ namespace Schur
  *
  * @tparam D the number of Cartesian dimensions in a patch
  */
-template <size_t D> class CoarseIfaceInfo : public IfaceInfo<D>
+template <int D> class CoarseIfaceInfo : public IfaceInfo<D>
 {
 	private:
 	/**

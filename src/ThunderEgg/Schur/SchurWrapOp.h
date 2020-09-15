@@ -34,7 +34,7 @@ namespace Schur
 /**
  * @brief Base class for operators
  */
-template <size_t D> class SchurWrapOp : public Operator<D - 1>
+template <int D> class SchurWrapOp : public Operator<D - 1>
 {
 	private:
 	std::shared_ptr<Domain<D>>          domain;

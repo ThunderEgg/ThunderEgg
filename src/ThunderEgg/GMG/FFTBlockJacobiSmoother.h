@@ -32,7 +32,7 @@ namespace GMG
  * @brief A block Jacobi smoother that uses FFTW solves on each patch. Implemented using the
  * InterfaceDomain class.
  */
-template <size_t D> class FFTBlockJacobiSmoother : public Smoother<D>
+template <int D> class FFTBlockJacobiSmoother : public Smoother<D>
 {
 	private:
 	/**

@@ -37,7 +37,7 @@ namespace Schur
  *
  * @tparam D the number of Cartesian dimensions in the patches.
  */
-template <size_t D> class IfaceInfo
+template <int D> class IfaceInfo
 {
 	public:
 	/**

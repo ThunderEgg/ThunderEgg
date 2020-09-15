@@ -30,7 +30,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class ValVector : public Vector<D>
+template <int D> class ValVector : public Vector<D>
 
 {
 	private:

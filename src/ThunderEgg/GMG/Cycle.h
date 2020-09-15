@@ -35,7 +35,7 @@ namespace GMG
  * levels, and a function to run an iteration of smoothing on a level. Derived cycle classes
  * need to implement the visit function.
  */
-template <size_t D> class Cycle : public Operator<D>
+template <int D> class Cycle : public Operator<D>
 {
 	private:
 	/**

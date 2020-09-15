@@ -36,7 +36,7 @@ namespace Poisson
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class FFTWPatchSolver : public PatchSolver<D>
+template <int D> class FFTWPatchSolver : public PatchSolver<D>
 {
 	private:
 	/**

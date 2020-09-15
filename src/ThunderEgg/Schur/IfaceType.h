@@ -32,7 +32,7 @@ namespace Schur
  *
  * @tparam D the number of cartesian dimensions on a patch
  */
-template <size_t D> class IfaceType
+template <int D> class IfaceType
 {
 	private:
 	/**

@@ -38,7 +38,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of cartesian dimensions
  */
-template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
+template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 {
 	private:
 	/**

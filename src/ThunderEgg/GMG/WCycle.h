@@ -29,7 +29,7 @@ namespace GMG
 /**
  * @brief Implementation of a W-cycle
  */
-template <size_t D> class WCycle : public Cycle<D>
+template <int D> class WCycle : public Cycle<D>
 {
 	private:
 	int num_pre_sweeps    = 1;
@@ -66,7 +66,9 @@ template <size_t D> class WCycle : public Cycle<D>
 				this->smooth(level, u_vectors, f_vectors);
 			}
 		}
-		if (!level.finest()) { this->prepFiner(level, u_vectors, f_vectors); }
+		if (!level.finest()) {
+			this->prepFiner(level, u_vectors, f_vectors);
+		}
 	}
 
 	public:

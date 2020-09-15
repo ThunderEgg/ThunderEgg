@@ -33,7 +33,7 @@ namespace GMG
 /**
  * @brief Restrictor that averages the corresponding fine cells into each coarse cell.
  */
-template <size_t D> class AvgRstr : public MPIRestrictor<D>
+template <int D> class AvgRstr : public MPIRestrictor<D>
 {
 	private:
 	void

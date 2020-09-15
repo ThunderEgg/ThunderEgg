@@ -40,7 +40,7 @@ namespace GMG
  *
  * @tparam D the number of cartesian dimensions
  */
-template <size_t D> class CycleBuilder
+template <int D> class CycleBuilder
 {
 	private:
 	/**

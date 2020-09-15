@@ -32,7 +32,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class BiCGStab
+template <int D> class BiCGStab
 {
 	public:
 	/**

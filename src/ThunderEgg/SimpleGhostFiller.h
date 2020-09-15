@@ -31,7 +31,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions in the patches.
  */
-template <size_t D> class SimpleGhostFiller : public GhostFiller<D>
+template <int D> class SimpleGhostFiller : public GhostFiller<D>
 {
 	protected:
 	std::shared_ptr<const Domain<D>> domain;

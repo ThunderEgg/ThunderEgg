@@ -29,7 +29,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions in the patches.
  */
-template <size_t D> class GhostFiller
+template <int D> class GhostFiller
 {
 	public:
 	virtual ~GhostFiller() {}

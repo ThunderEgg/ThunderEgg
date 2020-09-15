@@ -35,7 +35,7 @@ namespace ThunderEgg
  *
  * @tparam D number of cartesian dimensions
  */
-template <size_t D> class LocalData
+template <int D> class LocalData
 {
 	private:
 	/**

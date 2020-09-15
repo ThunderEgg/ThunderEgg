@@ -36,7 +36,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of cartesian dimensions
  */
-template <size_t D> class Vector
+template <int D> class Vector
 {
 	private:
 	/**

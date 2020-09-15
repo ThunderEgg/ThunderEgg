@@ -35,7 +35,7 @@ namespace GMG
  * @brief Simple class that directly places values from coarse cell into the corresponding fine
  * cells.
  */
-template <size_t D> class DrctIntp : public MPIInterpolator<D>
+template <int D> class DrctIntp : public MPIInterpolator<D>
 {
 	private:
 	void interpolatePatches(

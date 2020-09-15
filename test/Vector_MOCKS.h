@@ -42,7 +42,7 @@ bool isGhost(const std::array<int, D> &coord, const std::array<int, D> &ns, int 
 	}
 	return false;
 }
-template <size_t D> class MockVector : public Vector<D>
+template <int D> class MockVector : public Vector<D>
 {
 	public:
 	int GetNumLocalCells(int num_local_patches, std::array<int, D> ns)

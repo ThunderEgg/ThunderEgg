@@ -31,7 +31,7 @@ namespace GMG
 /**
  * @brief Base class for multi-grid restriction operators.
  */
-template <size_t D> class Restrictor
+template <int D> class Restrictor
 {
 	public:
 	/**

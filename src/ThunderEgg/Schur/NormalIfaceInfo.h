@@ -32,7 +32,7 @@ namespace Schur
  *
  * @tparam D the number of Cartesian dimensions in a patch
  */
-template <size_t D> class NormalIfaceInfo : public IfaceInfo<D>
+template <int D> class NormalIfaceInfo : public IfaceInfo<D>
 {
 	private:
 	/**

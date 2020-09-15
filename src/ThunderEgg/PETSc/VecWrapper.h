@@ -32,7 +32,7 @@ namespace PETSc
  *
  * @tparam D the number of Cartesian dimensions on a patch.
  */
-template <size_t D> class VecWrapper : public Vector<D>
+template <int D> class VecWrapper : public Vector<D>
 
 {
 	private:

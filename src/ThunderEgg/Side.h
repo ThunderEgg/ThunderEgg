@@ -40,7 +40,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of cartesian dimensions
  */
-template <size_t D> class Side
+template <int D> class Side
 {
 	private:
 	/**

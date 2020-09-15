@@ -33,7 +33,7 @@ namespace PETSc
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class MatShellCreator
+template <int D> class MatShellCreator
 {
 	private:
 	/**

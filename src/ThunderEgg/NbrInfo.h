@@ -34,7 +34,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions in a patch
  */
-template <size_t D> class NbrInfo : public Serializable
+template <int D> class NbrInfo : public Serializable
 {
 	public:
 	/**
