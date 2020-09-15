@@ -140,6 +140,8 @@ TEST_CASE(
 		}
 		REQUIRE(ref_ne_piinfo != nullptr);
 
+		std::shared_ptr<const Schur::PatchIfaceInfo<2>> sw_coarse_piinfo;
+		std::shared_ptr<const Schur::PatchIfaceInfo<2>> nw_coarse_piinfo;
 		// check sw fine interface
 		{
 			int  id    = ref_sw_piinfo->getCoarseIfaceInfo(Side<2>::west())->id;
@@ -159,6 +161,7 @@ TEST_CASE(
 			REQUIRE(coarse_patch != nullptr);
 			CHECK(coarse_patch->type.isCoarseToFine());
 			CHECK(coarse_patch->side == Side<2>::east());
+			sw_coarse_piinfo = coarse_patch->piinfo;
 
 			Schur::Interface<2>::SideTypePiinfo *ref_se_patch = nullptr;
 			for (auto &patch : iface->patches) {
@@ -191,6 +194,7 @@ TEST_CASE(
 			REQUIRE(coarse_patch != nullptr);
 			CHECK(coarse_patch->type.isCoarseToFine());
 			CHECK(coarse_patch->side == Side<2>::east());
+			nw_coarse_piinfo = coarse_patch->piinfo;
 
 			Schur::Interface<2>::SideTypePiinfo *ref_ne_patch = nullptr;
 			for (auto &patch : iface->patches) {
@@ -237,6 +241,8 @@ TEST_CASE(
 		}
 
 		REQUIRE(off_proc_piinfos.size() == 1);
+		CHECK(off_proc_piinfos[0] == nw_coarse_piinfo);
+		CHECK(off_proc_piinfos[0] == sw_coarse_piinfo);
 
 		for (auto piinfo : off_proc_piinfos) {
 			CHECK(piinfo->pinfo->id == ref_nw_piinfo->pinfo->getCoarseNbrInfo(Side<2>::west()).id);

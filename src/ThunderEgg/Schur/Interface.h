@@ -368,8 +368,7 @@ template <size_t D> class Interface : public Serializable
 			while (reader.getPos() < size) {
 				Interface<D> ifs;
 				reader >> ifs;
-				rank_id_iface_map.at(rank).at(ifs.id)->merge(ifs);
-				for (auto patch : ifs.patches) {
+				for (auto &patch : ifs.patches) {
 					auto &ptr = id_to_off_proc_piinfo_map[patch.piinfo->pinfo->id];
 					if (ptr == nullptr) {
 						// need to cast to remove const modifier
@@ -378,6 +377,7 @@ template <size_t D> class Interface : public Serializable
 						patch.piinfo = ptr;
 					}
 				}
+				rank_id_iface_map.at(rank).at(ifs.id)->merge(ifs);
 			}
 			off_proc_piinfos.clear();
 			for (auto pair : id_to_off_proc_piinfo_map) {
