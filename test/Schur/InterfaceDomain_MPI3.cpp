@@ -494,12 +494,12 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous 2d_refined_co
 		global_indexes.insert(iface->global_index);
 	}
 
+	int num_ifaces = interface_domain.getNumLocalInterfaces();
 	int prev_global_index;
-	if (rank == 0) {
-		prev_global_index = -1;
-	} else {
-		prev_global_index = 1;
-	}
+	MPI_Scan(&num_ifaces, &prev_global_index, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+	prev_global_index -= num_ifaces;
+	prev_global_index -= 1;
+
 	for (int global_index : global_indexes) {
 		REQUIRE(global_index == prev_global_index + 1);
 		prev_global_index = global_index;
@@ -571,6 +571,11 @@ TEST_CASE(
 	REQUIRE(id_to_global_indexes.size() > 0);
 	for (auto pair : id_to_global_indexes) {
 		INFO("ID " << pair.first);
+		string global_indexes;
+		for (int global_index : pair.second) {
+			global_indexes += to_string(global_index) + ", ";
+		}
+		INFO("GLOBAL_INDEXES: " << global_indexes);
 		CHECK(pair.second.size() == 1);
 	}
 }

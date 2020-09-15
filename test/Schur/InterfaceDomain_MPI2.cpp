@@ -587,7 +587,7 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous 2d_refined_ea
 	if (rank == 0) {
 		prev_global_index = -1;
 	} else {
-		prev_global_index = 1;
+		prev_global_index = 0;
 	}
 	for (int global_index : global_indexes) {
 		REQUIRE(global_index == prev_global_index + 1);
@@ -661,6 +661,11 @@ TEST_CASE(
 	REQUIRE(id_to_global_indexes.size() > 0);
 	for (auto pair : id_to_global_indexes) {
 		INFO("ID " << pair.first);
+		string global_indexes;
+		for (int global_index : pair.second) {
+			global_indexes += to_string(global_index) + ", ";
+		}
+		INFO("GLOBAL_INDEXES: " << global_indexes);
 		CHECK(pair.second.size() == 1);
 	}
 }
@@ -733,6 +738,11 @@ TEST_CASE(
 	REQUIRE(global_index_to_ids.size() > 0);
 	for (auto pair : global_index_to_ids) {
 		INFO("Global Index " << pair.first);
+		string ids;
+		for (int id : pair.second) {
+			ids += to_string(id) + ", ";
+		}
+		INFO("IDS " << ids);
 		CHECK(pair.second.size() == 1);
 	}
 }
@@ -1354,6 +1364,11 @@ TEST_CASE(
 	REQUIRE(id_to_global_indexes.size() > 0);
 	for (auto pair : id_to_global_indexes) {
 		INFO("ID " << pair.first);
+		string global_indexes;
+		for (int global_index : pair.second) {
+			global_indexes += to_string(global_index) + ", ";
+		}
+		INFO("GLOBAL_INDEXES: " << global_indexes);
 		CHECK(pair.second.size() == 1);
 	}
 }
