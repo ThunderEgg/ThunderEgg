@@ -37,19 +37,21 @@ TEST_CASE(
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 
-	map<int, std::shared_ptr<Schur::Interface<2>>>    ifaces;
-	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>> off_proc_piinfos;
+	map<int, map<int, std::shared_ptr<Schur::Interface<2>>>> ifaces;
+	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>>        off_proc_piinfos;
 	Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos, ifaces, off_proc_piinfos);
+
+	CHECK(ifaces.size() == 2);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
-		CHECK(ifaces.size() == 1);
+		CHECK(ifaces[0].size() == 1);
 		auto coarse_piinfo = piinfos[0];
 
 		// check coarse interface
 		int  id    = coarse_piinfo->getFineIfaceInfo(Side<2>::east())->id;
-		auto iface = ifaces.at(id);
+		auto iface = ifaces[0].at(id);
 		CHECK(iface->id == id);
 		CHECK(iface->patches.size() == 3);
 
@@ -97,8 +99,27 @@ TEST_CASE(
 			CHECK((piinfo->pinfo->id == ref_ne_patch->piinfo->pinfo->id
 			       || piinfo->pinfo->id == ref_se_patch->piinfo->pinfo->id));
 		}
+
+		// CHECK off proc ifaces
+		CHECK(ifaces[1].size() == 2);
+
+		CHECK(ifaces[1].count(8) == 1);
+		CHECK(ifaces[1].at(8)->id == 8);
+		CHECK(ifaces[1].at(8)->patches.size() == 1);
+		CHECK(ifaces[1].at(8)->patches[0].type.isCoarseToFine());
+		CHECK(ifaces[1].at(8)->patches[0].type.getOrthant() == Orthant<1>::lower());
+		CHECK(ifaces[1].at(8)->patches[0].piinfo->pinfo->id == 0);
+		CHECK(ifaces[1].at(8)->patches[0].side == Side<2>::east());
+
+		CHECK(ifaces[1].count(16) == 1);
+		CHECK(ifaces[1].at(16)->id == 16);
+		CHECK(ifaces[1].at(16)->patches.size() == 1);
+		CHECK(ifaces[1].at(16)->patches[0].type.isCoarseToFine());
+		CHECK(ifaces[1].at(16)->patches[0].type.getOrthant() == Orthant<1>::upper());
+		CHECK(ifaces[1].at(16)->patches[0].piinfo->pinfo->id == 0);
+		CHECK(ifaces[1].at(16)->patches[0].side == Side<2>::east());
 	} else {
-		CHECK(ifaces.size() == 6);
+		CHECK(ifaces[1].size() == 6);
 		std::shared_ptr<const Schur::PatchIfaceInfo<2>> ref_sw_piinfo;
 		for (auto piinfo : piinfos) {
 			double x = piinfo->pinfo->starts[0];
@@ -145,7 +166,7 @@ TEST_CASE(
 		// check sw fine interface
 		{
 			int  id    = ref_sw_piinfo->getCoarseIfaceInfo(Side<2>::west())->id;
-			auto iface = ifaces.at(id);
+			auto iface = ifaces[1].at(id);
 			CHECK(iface->id == id);
 			CHECK(iface->patches.size() == 2);
 
@@ -178,7 +199,7 @@ TEST_CASE(
 		// check ne fine interface
 		{
 			int  id    = ref_nw_piinfo->getCoarseIfaceInfo(Side<2>::west())->id;
-			auto iface = ifaces.at(id);
+			auto iface = ifaces[1].at(id);
 			CHECK(iface->id == id);
 			CHECK(iface->patches.size() == 2);
 
@@ -211,7 +232,7 @@ TEST_CASE(
 		// check interface between se and ne
 		{
 			int  id    = ref_se_piinfo->getNormalIfaceInfo(Side<2>::north())->id;
-			auto iface = ifaces.at(id);
+			auto iface = ifaces[1].at(id);
 			CHECK(iface->id == id);
 			CHECK(iface->patches.size() == 2);
 
@@ -247,6 +268,33 @@ TEST_CASE(
 		for (auto piinfo : off_proc_piinfos) {
 			CHECK(piinfo->pinfo->id == ref_nw_piinfo->pinfo->getCoarseNbrInfo(Side<2>::west()).id);
 		}
+
+		// CHECK off proc ifaces
+		CHECK(ifaces[0].size() == 1);
+
+		CHECK(ifaces[0].count(1) == 1);
+		CHECK(ifaces[0].at(1)->id == 1);
+		CHECK(ifaces[0].at(1)->patches.size() == 2);
+
+		const Schur::Interface<2>::SideTypePiinfo *lower_patch = nullptr;
+		const Schur::Interface<2>::SideTypePiinfo *upper_patch = nullptr;
+		for (auto &patch : ifaces[0].at(1)->patches) {
+			if (patch.type.getOrthant() == Orthant<1>::lower()) {
+				lower_patch = &patch;
+			} else {
+				upper_patch = &patch;
+			}
+		}
+
+		REQUIRE(lower_patch != nullptr);
+		CHECK(lower_patch->type.isFineToCoarse());
+		CHECK(lower_patch->piinfo->pinfo->id == 2);
+		CHECK(lower_patch->side == Side<2>::west());
+
+		REQUIRE(upper_patch != nullptr);
+		CHECK(upper_patch->type.isFineToCoarse());
+		CHECK(upper_patch->piinfo->pinfo->id == 4);
+		CHECK(upper_patch->side == Side<2>::west());
 	}
 }
 TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on processor boundary",
@@ -259,19 +307,20 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 
-	map<int, std::shared_ptr<Schur::Interface<2>>>    ifaces;
-	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>> off_proc_piinfos;
+	map<int, map<int, std::shared_ptr<Schur::Interface<2>>>> ifaces;
+	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>>        off_proc_piinfos;
 	Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos, ifaces, off_proc_piinfos);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
 		CHECK(ifaces.size() == 1);
+		CHECK(ifaces[0].size() == 1);
 		auto west_piinfo = piinfos[0];
 
 		// check coarse interface
 		int  id    = west_piinfo->getNormalIfaceInfo(Side<2>::east())->id;
-		auto iface = ifaces.at(id);
+		auto iface = ifaces[0].at(id);
 		CHECK(iface->id == id);
 		CHECK(iface->patches.size() == 2);
 
@@ -303,8 +352,16 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
 		CHECK(off_proc_piinfos[0]->pinfo->id
 		      == west_piinfo->pinfo->getNormalNbrInfo(Side<2>::east()).id);
 	} else {
-		CHECK(ifaces.size() == 0);
-		CHECK(off_proc_piinfos.size() == 0);
+		CHECK(ifaces.size() == 1);
+		CHECK(ifaces[0].size() == 1);
+
+		CHECK(ifaces[0].count(1) == 1);
+		CHECK(ifaces[0].at(1)->id == 1);
+		CHECK(ifaces[0].at(1)->patches.size() == 1);
+
+		CHECK(ifaces[0].at(1)->patches[0].type.isNormal());
+		CHECK(ifaces[0].at(1)->patches[0].piinfo->pinfo->id == 1);
+		CHECK(ifaces[0].at(1)->patches[0].side == Side<2>::west());
 	}
 }
 TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh", "[Schur::Interface]")
@@ -316,14 +373,16 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh", "
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 
-	map<int, std::shared_ptr<Schur::Interface<2>>>    ifaces;
-	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>> off_proc_piinfos;
+	map<int, map<int, std::shared_ptr<Schur::Interface<2>>>> ifaces;
+	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>>        off_proc_piinfos;
 	Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos, ifaces, off_proc_piinfos);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
-		CHECK(ifaces.size() == 48);
+		CHECK(ifaces.size() == 2);
+		CHECK(ifaces[0].size() == 48);
+		CHECK(ifaces[1].size() == 7);
 		CHECK(off_proc_piinfos.size() == 4);
 		set<int> off_proc_patch_ids;
 		for (auto piinfo : off_proc_piinfos) {
@@ -334,7 +393,9 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh", "
 		CHECK(off_proc_patch_ids.count(17) == 1);
 		CHECK(off_proc_patch_ids.count(20) == 1);
 	} else {
-		CHECK(ifaces.size() == 12);
+		CHECK(ifaces.size() == 2);
+		CHECK(ifaces[1].size() == 12);
+		CHECK(ifaces[0].size() == 6);
 		REQUIRE(off_proc_piinfos.size() == 7);
 		set<int> off_proc_patch_ids;
 		for (auto piinfo : off_proc_piinfos) {

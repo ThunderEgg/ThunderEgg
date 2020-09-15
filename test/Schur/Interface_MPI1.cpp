@@ -162,10 +162,11 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 
-	map<int, std::shared_ptr<Schur::Interface<2>>>    ifaces;
-	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>> off_proc_piinfos;
+	map<int, map<int, std::shared_ptr<Schur::Interface<2>>>> ifaces;
+	vector<std::shared_ptr<Schur::PatchIfaceInfo<2>>>        off_proc_piinfos;
 	Schur::Interface<2>::EnumerateIfacesFromPiinfoVector(piinfos, ifaces, off_proc_piinfos);
-	CHECK(ifaces.size() == 7);
+	CHECK(ifaces.size() == 1);
+	CHECK(ifaces[0].size() == 7);
 	CHECK(off_proc_piinfos.size() == 0);
 
 	auto coarse_piinfo = piinfos[0];
@@ -181,7 +182,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 	// check coarse interface
 	{
 		int  id    = coarse_piinfo->getFineIfaceInfo(Side<2>::east())->id;
-		auto iface = ifaces.at(id);
+		auto iface = ifaces[0].at(id);
 		CHECK(iface->id == id);
 		CHECK(iface->patches.size() == 3);
 
@@ -224,7 +225,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 	// check sw fine interface
 	{
 		int  id    = coarse_piinfo->getFineIfaceInfo(Side<2>::east())->fine_ids[0];
-		auto iface = ifaces.at(id);
+		auto iface = ifaces[0].at(id);
 		CHECK(iface->id == id);
 		CHECK(iface->patches.size() == 2);
 
@@ -255,7 +256,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 	// check nw fine interface
 	{
 		int  id    = coarse_piinfo->getFineIfaceInfo(Side<2>::east())->fine_ids[1];
-		auto iface = ifaces.at(id);
+		auto iface = ifaces[0].at(id);
 		CHECK(iface->id == id);
 		CHECK(iface->patches.size() == 2);
 
@@ -286,7 +287,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 	// check interface between se and ne
 	{
 		int  id    = ref_se_piinfo->getNormalIfaceInfo(Side<2>::north())->id;
-		auto iface = ifaces.at(id);
+		auto iface = ifaces[0].at(id);
 		CHECK(iface->id == id);
 		CHECK(iface->patches.size() == 2);
 
@@ -332,7 +333,7 @@ TEST_CASE("Schur::Interface serialize Normal interface", "[Schur::Interface]")
 	iface_in.serialize(buff);
 	Schur::Interface<2> iface;
 	iface.deserialize(buff);
-	delete buff;
+	delete[] buff;
 
 	REQUIRE(iface.patches.size() == 2);
 
@@ -365,7 +366,7 @@ TEST_CASE("Schur::Interface serialize Coarse interface", "[Schur::Interface]")
 	iface_in.serialize(buff);
 	Schur::Interface<2> iface;
 	iface.deserialize(buff);
-	delete buff;
+	delete[] buff;
 
 	REQUIRE(iface.patches.size() == 3);
 	CHECK(iface.patches[0].side == Side<2>::east());
@@ -403,7 +404,7 @@ TEST_CASE("Schur::Interface serialize Fine interface", "[Schur::Interface]")
 	iface_in.serialize(buff);
 	Schur::Interface<2> iface;
 	iface.deserialize(buff);
-	delete buff;
+	delete[] buff;
 
 	REQUIRE(iface.patches.size() == 2);
 

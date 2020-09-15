@@ -559,12 +559,12 @@ template <int D> class InterfaceDomain
 			piinfos_non_const.emplace_back(new PatchIfaceInfo<D>(pinfo));
 			piinfos.push_back(piinfos_non_const.back());
 		}
-		std::map<int, std::shared_ptr<Schur::Interface<D>>>    id_to_iface_map;
-		std::vector<std::shared_ptr<Schur::PatchIfaceInfo<D>>> off_proc_piinfos;
-		Interface<D>::EnumerateIfacesFromPiinfoVector(piinfos, id_to_iface_map, off_proc_piinfos);
+		std::map<int, std::map<int, std::shared_ptr<Schur::Interface<D>>>> rank_id_iface_map;
+		std::vector<std::shared_ptr<Schur::PatchIfaceInfo<D>>>             off_proc_piinfos;
+		Interface<D>::EnumerateIfacesFromPiinfoVector(piinfos, rank_id_iface_map, off_proc_piinfos);
 
 		std::vector<std::shared_ptr<Schur::Interface<D>>> interfaces_non_const;
-		IndexIfacesLocal(id_to_iface_map, piinfos_non_const, interfaces_non_const);
+		IndexIfacesLocal(rank_id_iface_map[rank], piinfos_non_const, interfaces_non_const);
 		IndexIfacesGlobal(interfaces_non_const, piinfos_non_const);
 
 		interfaces.reserve(interfaces_non_const.size());

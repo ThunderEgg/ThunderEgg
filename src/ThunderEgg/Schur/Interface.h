@@ -295,18 +295,20 @@ template <int D> class Interface : public Serializable
 	 * neccesary communication to get additional information. This is collective on all processors.
 	 *
 	 * @param piinfos vector of this ranks piinfo objects
-	 * @param id_to_iface_map the map from interface id to interface
+	 * @param rank_id_iface_map the map from rank to interface id to interface. The interfaces on
+	 * this rank will contain PatchIfaceInfo objects from other processors. The interfaces for other
+	 * ranks will only contain the PatchIfaceInfo objects from this rank.
 	 * @param off_proc_piinfos a vector of piinfo objects received from other processors.
 	 */
 	static void EnumerateIfacesFromPiinfoVector(
-	std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> piinfos,
-	std::map<int, std::shared_ptr<Interface<D>>> &        id_to_iface_map,
-	std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &     off_proc_piinfos)
+	std::vector<std::shared_ptr<const PatchIfaceInfo<D>>>        piinfos,
+	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
+	std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &            off_proc_piinfos)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> rank_id_iface_map;
-		std::set<int>                                               incoming_procs;
+		rank_id_iface_map.clear();
+		std::set<int> incoming_procs;
 		for (auto piinfo : piinfos) {
 			for (Side<D> s : Side<D>::getValues()) {
 				if (piinfo->pinfo->hasNbr(s)) {
@@ -386,7 +388,6 @@ template <int D> class Interface : public Serializable
 		}
 		// wait for all
 		MPI_Waitall((int) send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
-		id_to_iface_map = rank_id_iface_map[rank];
 	}
 };
 extern template class Interface<2>;
