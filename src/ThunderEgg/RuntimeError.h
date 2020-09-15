@@ -23,6 +23,7 @@
 #define THUNDEREGG_RUNTIMEERROR_H
 
 #include <stdexcept>
+#include <string>
 
 namespace ThunderEgg
 {
