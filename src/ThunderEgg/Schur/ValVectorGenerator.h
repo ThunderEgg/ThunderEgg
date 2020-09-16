@@ -38,7 +38,13 @@ namespace Schur
 template <int D> class ValVectorGenerator : public VectorGenerator<D>
 {
 	private:
-	std::array<int, D>                      iface_ns;
+	/**
+	 * @brief The dimensions of an interface
+	 */
+	std::array<int, D> iface_ns;
+	/**
+	 * @brief The InterfaceDomain
+	 */
 	std::shared_ptr<InterfaceDomain<D + 1>> iface_domain;
 
 	public:
