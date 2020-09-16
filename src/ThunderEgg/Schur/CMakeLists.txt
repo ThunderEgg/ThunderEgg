@@ -15,6 +15,9 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/InterfaceDomain.cpp)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PatchIfaceInfo.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchIfaceInfo.cpp)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PatchIfaceScatter.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchIfaceScatter.cpp)
+
 if(PETSC_FOUND)
   list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PolyChebPrec.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PolyChebPrec.cpp)
@@ -27,3 +30,5 @@ if(PETSC_FOUND)
 endif(PETSC_FOUND)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/SchurWrapOp.h)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/ValVectorGenerator.h)

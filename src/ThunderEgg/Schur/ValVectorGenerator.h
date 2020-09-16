@@ -25,7 +25,6 @@
 #include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <ThunderEgg/ValVector.h>
 #include <ThunderEgg/VectorGenerator.h>
-#include <valarray>
 namespace ThunderEgg
 {
 namespace Schur
