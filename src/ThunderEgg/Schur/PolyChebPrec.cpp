@@ -36,22 +36,22 @@ void PolyChebPrec::apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vec
 	std::shared_ptr<Vector<3>> f = ValVector<3>::GetNewVector(domain);
 	std::shared_ptr<Vector<3>> u = ValVector<3>::GetNewVector(domain);
 
-	std::shared_ptr<Vector<2>> bk  = sh->getNewGlobalInterfaceVector();
-	std::shared_ptr<Vector<2>> bk1 = sh->getNewGlobalInterfaceVector();
-	std::shared_ptr<Vector<2>> bk2 = sh->getNewGlobalInterfaceVector();
+	// std::shared_ptr<Vector<2>> bk  = sh->getNewGlobalInterfaceVector();
+	// std::shared_ptr<Vector<2>> bk1 = sh->getNewGlobalInterfaceVector();
+	// std::shared_ptr<Vector<2>> bk2 = sh->getNewGlobalInterfaceVector();
 
 	for (int i = coeffs.size() - 1; i > 0; i--) {
 		// solver->solve(f, u, bk1);
 		// interp->interpolateToInterface(u, bk);
-		bk->scaleThenAddScaled(4 / interval, -2, bk1);
-		bk->addScaled(coeffs[i], x, -1, bk2);
-		auto tmp = bk2;
-		bk2      = bk1;
-		bk1      = bk;
-		bk       = tmp;
+		// bk->scaleThenAddScaled(4 / interval, -2, bk1);
+		// bk->addScaled(coeffs[i], x, -1, bk2);
+		// auto tmp = bk2;
+		// bk2      = bk1;
+		// bk1      = bk;
+		// bk       = tmp;
 	}
 	// solver->solve(f, u, bk1);
 	// interp->interpolateToInterface(u, b);
-	b->scaleThenAddScaled(2 / interval, -1, bk1);
-	b->addScaled(coeffs[0], x, -1, bk2);
+	// b->scaleThenAddScaled(2 / interval, -1, bk1);
+	// b->addScaled(coeffs[0], x, -1, bk2);
 }

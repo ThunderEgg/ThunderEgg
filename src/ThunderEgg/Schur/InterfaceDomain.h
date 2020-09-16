@@ -66,6 +66,10 @@ template <int D> class InterfaceDomain
 	 * interfaces's local index
 	 */
 	std::vector<std::shared_ptr<const Interface<D>>> interfaces;
+	/**
+	 * @brief The global number of interfaces
+	 */
+	int num_global_ifaces = 0;
 
 	/**
 	 * @brief Index all of column, row, and patch interface local indexes for the interface system
@@ -287,6 +291,12 @@ template <int D> class InterfaceDomain
 		}
 		SendAndReceiveGlobalIndexes(interfaces, piinfos);
 	}
+	/**
+	 * @brief Do the necessary communication to get the global indexes from other processors
+	 *
+	 * @param interfaces the set of Interface objects
+	 * @param piinfos  the set of PatchIfaceInfo objects
+	 */
 	static void
 	SendAndReceiveGlobalIndexes(const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
 	                            const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos)
@@ -400,18 +410,8 @@ template <int D> class InterfaceDomain
 	std::map<int, std::map<int, std::set<int *>>> &        rank_to_id_to_global_indexes_to_set)
 	{
 		// patch interfaces
-		for (auto piinfo : piinfos) {
-			for (Side<D> s : Side<D>::getValues()) {
-				if (piinfo->pinfo->hasNbr(s)) {
-					auto iface_info = piinfo->getIfaceInfo(s);
+		GetGlobalIndexesToSetForPatchInterfaces(piinfos, rank_to_id_to_global_indexes_to_set);
 
-					if (iface_info->global_index == -1) {
-						rank_to_id_to_global_indexes_to_set[iface_info->rank][iface_info->id]
-						.insert(&iface_info->global_index);
-					}
-				}
-			}
-		}
 		// rows and columns
 		for (auto iface : interfaces) {
 			for (auto patch : iface->patches) {
@@ -435,6 +435,30 @@ template <int D> class InterfaceDomain
 					// this interface will affect the values of the outer interfaces
 					GetGlobalIndexesToSetForOuterInterfaces(piinfo,
 					                                        rank_to_id_to_global_indexes_to_set);
+				}
+			}
+		}
+	}
+	/**
+	 * @brief Get the global indexes to set For PatchInterfacesInfo objects
+	 *
+	 * @param piinfos the vector of PatchIfaceInfo objects
+	 * @param rank_to_id_to_global_indexes_to_set (output) Map from rank of incoming process to
+	 * id of interface to pointers to global index values that have to be set
+	 */
+	static void GetGlobalIndexesToSetForPatchInterfaces(
+	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
+	std::map<int, std::map<int, std::set<int *>>> &        rank_to_id_to_global_indexes_to_set)
+	{
+		for (auto piinfo : piinfos) {
+			for (Side<D> s : Side<D>::getValues()) {
+				if (piinfo->pinfo->hasNbr(s)) {
+					auto iface_info = piinfo->getIfaceInfo(s);
+
+					if (iface_info->global_index == -1) {
+						rank_to_id_to_global_indexes_to_set[iface_info->rank][iface_info->id]
+						.insert(&iface_info->global_index);
+					}
 				}
 			}
 		}
@@ -550,10 +574,6 @@ template <int D> class InterfaceDomain
 		}
 	}
 
-	int                    num_global_ifaces = 0;
-	int                    iface_stride;
-	std::array<int, D - 1> lengths;
-
 	public:
 	InterfaceDomain() = default;
 	/**
@@ -565,12 +585,6 @@ template <int D> class InterfaceDomain
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		int stride = 1;
-		for (size_t i = 0; i < D - 1; i++) {
-			stride *= domain->getNs()[i];
-			lengths[i] = domain->getNs()[i];
-		}
-		iface_stride = stride;
 
 		std::vector<std::shared_ptr<PatchIfaceInfo<D>>> piinfos_non_const;
 		piinfos.reserve(domain->getNumLocalPatches());
@@ -597,11 +611,6 @@ template <int D> class InterfaceDomain
 		MPI_Allreduce(&num_ifaces, &num_global_ifaces, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 	}
 
-	std::shared_ptr<ValVector<D - 1>> getNewGlobalInterfaceVector()
-	{
-		return std::shared_ptr<ValVector<D - 1>>(
-		new ValVector<D - 1>(MPI_COMM_WORLD, lengths, 0, interfaces.size()));
-	}
 	/**
 	 * @brief Get the number of local Interfaces on this rank
 	 *
@@ -654,21 +663,6 @@ template <int D> class InterfaceDomain
 	std::shared_ptr<const Domain<D>> getDomain() const
 	{
 		return domain;
-	}
-};
-template <int D> class InterfaceDomainVG : public VectorGenerator<D>
-{
-	private:
-	std::shared_ptr<InterfaceDomain<D + 1>> sh;
-
-	public:
-	InterfaceDomainVG(std::shared_ptr<InterfaceDomain<D + 1>> sh)
-	{
-		this->sh = sh;
-	}
-	std::shared_ptr<Vector<D>> getNewVector()
-	{
-		return sh->getNewSchurVec();
 	}
 };
 extern template class InterfaceDomain<2>;
