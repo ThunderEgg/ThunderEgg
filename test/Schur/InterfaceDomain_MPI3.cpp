@@ -443,22 +443,25 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0 2d_refined_comp
 					min_global_index
 					= min(min_global_index, patch.piinfo->getIfaceInfo(s)->global_index);
 
-					switch (patch.piinfo->pinfo->getNbrType(s)) {
-						case NbrType::Coarse:
-							min_global_index
-							= min(min_global_index,
-							      patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
-							break;
-						case NbrType::Fine:
-							min_global_index
-							= min(min_global_index,
-							      patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
-							min_global_index
-							= min(min_global_index,
-							      patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
-							break;
-						default:
-							break;
+					if (patch.type.isNormal() || patch.type.isCoarseToCoarse()
+					    || patch.type.isFineToFine()) {
+						switch (patch.piinfo->pinfo->getNbrType(s)) {
+							case NbrType::Coarse:
+								min_global_index
+								= min(min_global_index,
+								      patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
+								break;
+							case NbrType::Fine:
+								min_global_index
+								= min(min_global_index,
+								      patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
+								min_global_index
+								= min(min_global_index,
+								      patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
+								break;
+							default:
+								break;
+						}
 					}
 				}
 			}
@@ -540,19 +543,22 @@ TEST_CASE(
 					id_to_global_indexes[patch.piinfo->getIfaceInfo(s)->id].insert(
 					patch.piinfo->getIfaceInfo(s)->global_index);
 
-					switch (patch.piinfo->pinfo->getNbrType(s)) {
-						case NbrType::Coarse:
-							id_to_global_indexes[patch.piinfo->getCoarseIfaceInfo(s)->coarse_id]
-							.insert(patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
-							break;
-						case NbrType::Fine:
-							id_to_global_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]]
-							.insert(patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
-							id_to_global_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]]
-							.insert(patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
-							break;
-						default:
-							break;
+					if (patch.type.isNormal() || patch.type.isCoarseToCoarse()
+					    || patch.type.isFineToFine()) {
+						switch (patch.piinfo->pinfo->getNbrType(s)) {
+							case NbrType::Coarse:
+								id_to_global_indexes[patch.piinfo->getCoarseIfaceInfo(s)->coarse_id]
+								.insert(patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
+								break;
+							case NbrType::Fine:
+								id_to_global_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]]
+								.insert(patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
+								id_to_global_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]]
+								.insert(patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
+								break;
+							default:
+								break;
+						}
 					}
 				}
 			}
@@ -613,22 +619,25 @@ TEST_CASE(
 					global_index_to_ids[patch.piinfo->getIfaceInfo(s)->global_index].insert(
 					patch.piinfo->getIfaceInfo(s)->id);
 
-					switch (patch.piinfo->pinfo->getNbrType(s)) {
-						case NbrType::Coarse:
-							global_index_to_ids[patch.piinfo->getCoarseIfaceInfo(s)
-							                    ->coarse_global_index]
-							.insert(patch.piinfo->getCoarseIfaceInfo(s)->coarse_id);
-							break;
-						case NbrType::Fine:
-							global_index_to_ids[patch.piinfo->getFineIfaceInfo(s)
-							                    ->fine_global_indexes[0]]
-							.insert(patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]);
-							global_index_to_ids[patch.piinfo->getFineIfaceInfo(s)
-							                    ->fine_global_indexes[1]]
-							.insert(patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]);
-							break;
-						default:
-							break;
+					if (patch.type.isNormal() || patch.type.isCoarseToCoarse()
+					    || patch.type.isFineToFine()) {
+						switch (patch.piinfo->pinfo->getNbrType(s)) {
+							case NbrType::Coarse:
+								global_index_to_ids[patch.piinfo->getCoarseIfaceInfo(s)
+								                    ->coarse_global_index]
+								.insert(patch.piinfo->getCoarseIfaceInfo(s)->coarse_id);
+								break;
+							case NbrType::Fine:
+								global_index_to_ids[patch.piinfo->getFineIfaceInfo(s)
+								                    ->fine_global_indexes[0]]
+								.insert(patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]);
+								global_index_to_ids[patch.piinfo->getFineIfaceInfo(s)
+								                    ->fine_global_indexes[1]]
+								.insert(patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]);
+								break;
+							default:
+								break;
+						}
 					}
 				}
 			}
