@@ -27,8 +27,6 @@
 #include <ThunderEgg/ValVector.h>
 #include <ThunderEgg/VectorGenerator.h>
 #include <deque>
-#include <memory>
-#include <valarray>
 namespace ThunderEgg
 {
 namespace Schur
@@ -36,9 +34,20 @@ namespace Schur
 /**
  * @brief Represents the Schur compliment domain of the problem.
  *
- * This class mainly manages a set of interface that makes up the Schur compliment system. It is
+ * This class mainly manages a set of interfaces that makes up the Schur compliment system. It is
  * responsible for setting up the indexing of the interfaces, which is used in the rest of the
  * ThunderEgg library.
+ *
+ * This class will set a global index for each interface, and will provide three sets of local
+ * indexes.
+ *
+ * The patch_iface set of indexes are the local indexes for a vector of interfaces that line up with
+ * each piinfo object.
+ *
+ * The row set of indexes are for a row distributed parallel matrix (where a rank contains the
+ * entire row of the matrix)
+ *
+ * The column set of indexes are for a column distributed parallel matrix.
  *
  * @tparam D the number of Cartesian dimensions
  */
@@ -58,15 +67,6 @@ template <int D> class InterfaceDomain
 	 */
 	std::vector<std::shared_ptr<const Interface<D>>> interfaces;
 
-	std::vector<int>                       id_map_vec;
-	std::vector<int>                       global_map_vec;
-	int                                    ghost_start;
-	int                                    matrix_extra_ghost_start;
-	int                                    rank;
-	std::vector<std::tuple<int, int, int>> matrix_out_id_local_rank_vec;
-	std::vector<std::tuple<int, int, int>> matrix_in_id_local_rank_vec;
-	std::vector<std::tuple<int, int, int>> patch_out_id_local_rank_vec;
-	std::vector<std::tuple<int, int, int>> patch_in_id_local_rank_vec;
 	/**
 	 * @brief Index all of column, row, and patch interface local indexes for the interface system
 	 *
@@ -252,10 +252,8 @@ template <int D> class InterfaceDomain
 	 * @param interfaces the vector of Interface objects for this processor
 	 * @param piinfos the vector PatchIfaceInfo objects for this processor
 	 */
-	static void IndexIfacesGlobal(
-	const std::map<int, std::map<int, std::shared_ptr<Schur::Interface<D>>>> &rank_id_iface_map,
-	const std::vector<std::shared_ptr<Interface<D>>> &                        interfaces,
-	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &                   piinfos)
+	static void IndexIfacesGlobal(const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
+	                              const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos)
 	{
 		// get starting global index for this rank
 		int starting_global_index;
@@ -287,12 +285,11 @@ template <int D> class InterfaceDomain
 				}
 			}
 		}
-		SendAndReceiveGlobalIndexes(rank_id_iface_map, interfaces, piinfos);
+		SendAndReceiveGlobalIndexes(interfaces, piinfos);
 	}
-	static void SendAndReceiveGlobalIndexes(
-	const std::map<int, std::map<int, std::shared_ptr<Schur::Interface<D>>>> &rank_id_iface_map,
-	const std::vector<std::shared_ptr<Interface<D>>> &                        interfaces,
-	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &                   piinfos)
+	static void
+	SendAndReceiveGlobalIndexes(const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
+	                            const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos)
 	{
 		std::map<int, std::map<int, std::set<int *>>> rank_to_id_to_global_indexes_to_set;
 		std::deque<std::vector<int>>                  recv_buffers;
@@ -302,8 +299,7 @@ template <int D> class InterfaceDomain
 
 		std::deque<std::vector<int>> send_buffers;
 		std::vector<MPI_Request>     send_requests;
-		SetupGlobalIndexSendRequests(rank_id_iface_map, interfaces, piinfos, send_buffers,
-		                             send_requests);
+		SetupGlobalIndexSendRequests(interfaces, send_buffers, send_requests);
 
 		size_t num_recvs = recv_requests.size();
 		for (size_t i = 0; i < num_recvs; i++) {
@@ -447,19 +443,17 @@ template <int D> class InterfaceDomain
 	 * @brief Setup the MPI_Isend calls
 	 *
 	 * @param interfaces the vector of Interface objects
-	 * @param piinfos the vector of PatchIfaceInfo objects
 	 * @param send_buffers (output) the buffers for the send requests. Should not be deallocated
 	 * until sends are done.
 	 * @param send_requests (output) MPI_Isend request status, one for each outgoing rank
 	 */
-	static void SetupGlobalIndexSendRequests(
-	const std::map<int, std::map<int, std::shared_ptr<Schur::Interface<D>>>> &rank_id_iface_map,
-	const std::vector<std::shared_ptr<Interface<D>>> &                        interfaces,
-	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &                   piinfos,
-	std::deque<std::vector<int>> &send_buffers, std::vector<MPI_Request> &send_requests)
+	static void
+	SetupGlobalIndexSendRequests(const std::vector<std::shared_ptr<Interface<D>>> &interfaces,
+	                             std::deque<std::vector<int>> &                    send_buffers,
+	                             std::vector<MPI_Request> &                        send_requests)
 	{
 		std::map<int, std::set<std::pair<int, int>>> rank_to_id_and_global_index_pairs;
-		GetGlobalIndexesToSend(rank_id_iface_map, interfaces, rank_to_id_and_global_index_pairs);
+		GetGlobalIndexesToSend(interfaces, rank_to_id_and_global_index_pairs);
 
 		for (auto pair : rank_to_id_and_global_index_pairs) {
 			send_buffers.emplace_back();
@@ -480,13 +474,12 @@ template <int D> class InterfaceDomain
 	 * @brief Get the global indexes that have to be sent
 	 *
 	 * @param interfaces the vector of Interface objects
-	 * @param rank_to_id_and_global_index_pair (output) Map from rank of incoming process to set
+	 * @param rank_to_id_and_global_index_pairs (output) Map from rank of incoming process to set
 	 * of pairs of ids and global indexes
 	 */
 	static void GetGlobalIndexesToSend(
-	const std::map<int, std::map<int, std::shared_ptr<Schur::Interface<D>>>> &rank_id_iface_map,
-	const std::vector<std::shared_ptr<Interface<D>>> &                        interfaces,
-	std::map<int, std::set<std::pair<int, int>>> &rank_to_id_and_global_index_pairs)
+	const std::vector<std::shared_ptr<Interface<D>>> &interfaces,
+	std::map<int, std::set<std::pair<int, int>>> &    rank_to_id_and_global_index_pairs)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -564,20 +557,21 @@ template <int D> class InterfaceDomain
 	public:
 	InterfaceDomain() = default;
 	/**
-	 * @brief Create a InterfaceDomain from a given DomainCollection
+	 * @brief Create a InterfaceDomain from a given Domain
 	 *
-	 * @param domain the DomainCollection
-	 * @param comm the teuchos communicator
+	 * @param domain the Domain
 	 */
-	explicit InterfaceDomain(std::shared_ptr<const Domain<D>> domain)
+	explicit InterfaceDomain(std::shared_ptr<const Domain<D>> domain) : domain(domain)
 	{
-		this->domain = domain;
+		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		iface_stride = 1;
+		int stride = 1;
 		for (size_t i = 0; i < D - 1; i++) {
-			iface_stride *= domain->getNs()[i];
+			stride *= domain->getNs()[i];
 			lengths[i] = domain->getNs()[i];
 		}
+		iface_stride = stride;
+
 		std::vector<std::shared_ptr<PatchIfaceInfo<D>>> piinfos_non_const;
 		piinfos.reserve(domain->getNumLocalPatches());
 		piinfos_non_const.reserve(domain->getNumLocalPatches());
@@ -585,13 +579,14 @@ template <int D> class InterfaceDomain
 			piinfos_non_const.emplace_back(new PatchIfaceInfo<D>(pinfo));
 			piinfos.push_back(piinfos_non_const.back());
 		}
+
 		std::map<int, std::map<int, std::shared_ptr<Schur::Interface<D>>>> rank_id_iface_map;
 		std::vector<std::shared_ptr<Schur::PatchIfaceInfo<D>>>             off_proc_piinfos;
 		Interface<D>::EnumerateIfacesFromPiinfoVector(piinfos, rank_id_iface_map, off_proc_piinfos);
 
 		std::vector<std::shared_ptr<Schur::Interface<D>>> interfaces_non_const;
 		IndexIfacesLocal(rank_id_iface_map[rank], piinfos_non_const, interfaces_non_const);
-		IndexIfacesGlobal(rank_id_iface_map, interfaces_non_const, piinfos_non_const);
+		IndexIfacesGlobal(interfaces_non_const, piinfos_non_const);
 
 		interfaces.reserve(interfaces_non_const.size());
 		for (auto iface : interfaces_non_const) {
@@ -602,77 +597,10 @@ template <int D> class InterfaceDomain
 		MPI_Allreduce(&num_ifaces, &num_global_ifaces, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 	}
 
-	void updateInterfaceDist(std::shared_ptr<Vector<D - 1>> gamma)
-	{
-		// send outgoing messages
-		std::vector<MPI_Request> requests;
-		requests.reserve(patch_in_id_local_rank_vec.size() + patch_out_id_local_rank_vec.size());
-
-		// send info
-		for (const auto &tuple : patch_out_id_local_rank_vec) {
-			int         id          = std::get<0>(tuple);
-			int         local_index = std::get<1>(tuple);
-			int         dest        = std::get<2>(tuple);
-			MPI_Request request;
-			MPI_Isend(gamma->getLocalData(local_index).getPtr(), iface_stride, MPI_DOUBLE, dest, id,
-			          MPI_COMM_WORLD, &request);
-			requests.push_back(request);
-		}
-		// recv info
-		for (const auto &tuple : patch_in_id_local_rank_vec) {
-			int id          = std::get<0>(tuple);
-			int local_index = std::get<1>(tuple);
-			int source      = std::get<2>(tuple);
-
-			double buffer[iface_stride];
-			MPI_Recv(buffer, iface_stride, MPI_DOUBLE, source, id, MPI_COMM_WORLD,
-			         MPI_STATUS_IGNORE);
-			double *data = gamma->getLocalData(local_index).getPtr();
-			for (int i = 0; i < iface_stride; i++) {
-				data[i] += buffer[i];
-			}
-		}
-
-		// wait for all
-		MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
-	}
-	void scatterInterfaceDist(std::shared_ptr<const Vector<D - 1>> gamma)
-	{
-		// send outgoing messages
-		std::vector<MPI_Request> requests;
-		requests.reserve(patch_in_id_local_rank_vec.size() + patch_out_id_local_rank_vec.size());
-
-		// send info
-		for (const auto &tuple : patch_out_id_local_rank_vec) {
-			int id          = std::get<0>(tuple);
-			int local_index = std::get<1>(tuple);
-			int dest        = std::get<2>(tuple);
-			if (local_index < ghost_start) {
-				MPI_Request request;
-				MPI_Isend(gamma->getLocalData(local_index).getPtr(), iface_stride, MPI_DOUBLE, dest,
-				          id, MPI_COMM_WORLD, &request);
-				requests.push_back(request);
-			}
-		}
-		// recv info
-		for (const auto &tuple : patch_in_id_local_rank_vec) {
-			int id          = std::get<0>(tuple);
-			int local_index = std::get<1>(tuple);
-			int source      = std::get<2>(tuple);
-
-			if (local_index >= ghost_start) {
-				MPI_Recv(gamma->getLocalData(local_index).getPtr(), iface_stride, MPI_DOUBLE,
-				         source, id, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			}
-		}
-
-		// wait for all
-		MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
-	}
 	std::shared_ptr<ValVector<D - 1>> getNewGlobalInterfaceVector()
 	{
 		return std::shared_ptr<ValVector<D - 1>>(
-		new ValVector<D - 1>(MPI_COMM_WORLD, lengths, 0, matrix_extra_ghost_start));
+		new ValVector<D - 1>(MPI_COMM_WORLD, lengths, 0, interfaces.size()));
 	}
 	/**
 	 * @brief Get the number of local Interfaces on this rank
@@ -727,7 +655,7 @@ template <int D> class InterfaceDomain
 	{
 		return domain;
 	}
-}; // namespace Schur
+};
 template <int D> class InterfaceDomainVG : public VectorGenerator<D>
 {
 	private:
