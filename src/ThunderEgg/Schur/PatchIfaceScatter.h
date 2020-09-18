@@ -143,7 +143,7 @@ template <int D> class PatchIfaceScatter
 		recv_buffers.resize(num_recvs);
 
 		int recv_index = 0;
-		for (auto &rank_to_id_local_index_pairs : incoming_ranks_to_id_local_index_pairs) {
+		for (const auto &rank_to_id_local_index_pairs : incoming_ranks_to_id_local_index_pairs) {
 			recv_ranks[recv_index]               = rank_to_id_local_index_pairs.first;
 			std::vector<int> &local_index_vector = recv_local_indexes[recv_index];
 
@@ -168,12 +168,11 @@ template <int D> class PatchIfaceScatter
 		std::map<int, std::set<std::pair<int, int>>> outgoing_ranks_to_id_local_index_pairs;
 		for (auto iface : iface_domain->getInterfaces()) {
 			for (auto patch : iface->patches) {
-				if (patch.type.isNormal() || patch.type.isFineToFine()
-				    || patch.type.isCoarseToCoarse()) {
-					if (patch.piinfo->pinfo->rank != rank) {
-						outgoing_ranks_to_id_local_index_pairs[patch.piinfo->pinfo->rank].emplace(
-						iface->id, iface->local_index);
-					}
+				if ((patch.type.isNormal() || patch.type.isFineToFine()
+				     || patch.type.isCoarseToCoarse())
+				    && patch.piinfo->pinfo->rank != rank) {
+					outgoing_ranks_to_id_local_index_pairs[patch.piinfo->pinfo->rank].emplace(
+					iface->id, iface->local_index);
 				}
 			}
 		}
@@ -185,7 +184,7 @@ template <int D> class PatchIfaceScatter
 		send_buffers.resize(num_sends);
 
 		int send_index = 0;
-		for (auto &rank_to_id_local_index_pairs : outgoing_ranks_to_id_local_index_pairs) {
+		for (const auto &rank_to_id_local_index_pairs : outgoing_ranks_to_id_local_index_pairs) {
 			send_ranks[send_index]               = rank_to_id_local_index_pairs.first;
 			std::vector<int> &local_index_vector = send_local_indexes[send_index];
 
@@ -293,12 +292,12 @@ template <int D> class PatchIfaceScatter
 
 		initializeMPIBuffers();
 
-		for (int recv_index = 0; recv_index < recv_ranks.size(); recv_index++) {
+		for (int recv_index = 0; recv_index < num_recvs; recv_index++) {
 			MPI_Irecv(recv_buffers[recv_index].data(), recv_buffers[recv_index].size(), MPI_DOUBLE,
 			          recv_ranks[recv_index], 0, MPI_COMM_WORLD, &recv_requests[recv_index]);
 		}
 
-		for (int send_index = 0; send_index < send_ranks.size(); send_index++) {
+		for (int send_index = 0; send_index < num_sends; send_index++) {
 			std::vector<double> &buffer = send_buffers[send_index];
 
 			int buffer_index = 0;
