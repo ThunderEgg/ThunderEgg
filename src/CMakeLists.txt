@@ -58,8 +58,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/SchurDomainOp.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Side.h)

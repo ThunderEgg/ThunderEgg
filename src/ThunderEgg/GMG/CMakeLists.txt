@@ -9,8 +9,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleOpts.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/DrctIntp.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/FFTBlockJacobiSmoother.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/InterLevelComm.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Interpolator.h)
