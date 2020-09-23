@@ -356,6 +356,8 @@ template <int D> class Interface : public Serializable
 		// recv info
 		std::map<int, std::shared_ptr<PatchIfaceInfo<D>>> id_to_off_proc_piinfo_map;
 
+		MPI_Barrier(MPI_COMM_WORLD);
+
 		size_t num_incoming = incoming_procs.size();
 		for (size_t i = 0; i < num_incoming; i++) {
 			MPI_Status status;
@@ -364,7 +366,8 @@ template <int D> class Interface : public Serializable
 			MPI_Get_count(&status, MPI_BYTE, &size);
 			std::vector<char> buffer(size);
 
-			MPI_Recv(buffer.data(), size, MPI_BYTE, status.MPI_SOURCE, 0, MPI_COMM_WORLD, &status);
+			MPI_Recv(buffer.data(), size, MPI_BYTE, status.MPI_SOURCE, 0, MPI_COMM_WORLD,
+			         MPI_STATUS_IGNORE);
 
 			BufferReader reader(buffer.data());
 			while (reader.getPos() < size) {
