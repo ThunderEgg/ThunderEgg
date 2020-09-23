@@ -19,37 +19,28 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHUR_SCHURWRAPOP_H
-#define THUNDEREGG_SCHUR_SCHURWRAPOP_H
+#ifndef THUNDEREGG_SCHUR_PATCHSOLVERWRAPPER_H
+#define THUNDEREGG_SCHUR_PATCHSOLVERWRAPPER_H
 
-#include <ThunderEgg/Operator.h>
-#include <ThunderEgg/Schur/IfaceInterp.h>
+#include <ThunderEgg/PatchSolver.h>
 #include <ThunderEgg/Schur/InterfaceDomain.h>
-#include <ThunderEgg/Schur/PatchSolver.h>
 
 namespace ThunderEgg
 {
 namespace Schur
 {
-/**
- * @brief Base class for operators
- */
-template <int D> class SchurWrapOp : public Operator<D - 1>
+template <int D> class PatchSolverWrapper : public Operator<D - 1>
 {
 	private:
-	std::shared_ptr<Domain<D>>          domain;
-	std::shared_ptr<InterfaceDomain<D>> sh;
+	std::shared_ptr<InterfaceDomain<D>> iface_domain;
 	std::shared_ptr<PatchSolver<D>>     solver;
-	std::shared_ptr<IfaceInterp<D>>     interp;
 
 	public:
-	SchurWrapOp(std::shared_ptr<Domain<D>> domain, std::shared_ptr<InterfaceDomain<D>> sh,
-	            std::shared_ptr<PatchSolver<D>> solver, std::shared_ptr<IfaceInterp<D>> interp)
+	PatchSolverWrapper(std::shared_ptr<InterfaceDomain<D>> iface_domain,
+	                   std::shared_ptr<PatchSolver<D>>     solver)
 	{
-		this->domain = domain;
-		this->sh     = sh;
-		this->solver = solver;
-		this->interp = interp;
+		this->iface_domain = iface_domain;
+		this->solver       = solver;
 	}
 	/**
 	 * @brief Apply Schur matrix
@@ -57,13 +48,19 @@ template <int D> class SchurWrapOp : public Operator<D - 1>
 	 * @param x the input vector.
 	 * @param b the output vector.
 	 */
-	void apply(std::shared_ptr<const Vector<D - 1>> x, std::shared_ptr<Vector<D - 1>> b) const
+	void apply(std::shared_ptr<const Vector<D - 1>> x,
+	           std::shared_ptr<Vector<D - 1>>       b) const override
 	{
-		auto f = PetscVector<D>::GetNewVector(domain);
-		auto u = PetscVector<D>::GetNewVector(domain);
-		solver->solve(f, u, x);
-		interp->interpolateToInterface(u, b);
-		b->addScaled(-1, x);
+	}
+	/**
+	 * @brief Get the RHS for the Schur system from a given RHS for the domain system
+	 *
+	 * @param domain_b the domain rhs
+	 * @param schur_b the Schur rhs
+	 */
+	void getSchurRHSFromDomainRHS(std::shared_ptr<const Vector<D>> domain_b,
+	                              std::shared_ptr<Vector<D - 1>>   schur_b) const
+	{
 	}
 };
 } // namespace Schur
