@@ -45,7 +45,7 @@ template <int D> class ValVectorGenerator : public VectorGenerator<D>
 	 *
 	 * @param domain_in the Domain to generate ValVector objects for
 	 */
-	ValVectorGenerator(std::shared_ptr<const Domain<D>> domain_in) : domain(domain_in) {}
+	explicit ValVectorGenerator(std::shared_ptr<const Domain<D>> domain_in) : domain(domain_in) {}
 	std::shared_ptr<Vector<D>> getNewVector() const override
 	{
 		return ValVector<D>::GetNewVector(domain);

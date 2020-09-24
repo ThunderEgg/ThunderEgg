@@ -52,7 +52,7 @@ template <int D> class ValVectorGenerator : public VectorGenerator<D>
 	 *
 	 * @param iface_domain the InterfaceDomain to generate ValVector objects for
 	 */
-	ValVectorGenerator(std::shared_ptr<InterfaceDomain<D + 1>> iface_domain)
+	explicit ValVectorGenerator(std::shared_ptr<InterfaceDomain<D + 1>> iface_domain)
 	: iface_domain(iface_domain)
 	{
 		std::array<int, D + 1> ns = iface_domain->getDomain()->getNs();
