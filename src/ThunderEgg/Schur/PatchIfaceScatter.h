@@ -258,7 +258,7 @@ template <int D> class PatchIfaceScatter
 	 *
 	 * @return std::shared_ptr<Vector<D - 1>> the new vector
 	 */
-	std::shared_ptr<Vector<D - 1>> getNewLocalPatchIfaceVector()
+	std::shared_ptr<Vector<D - 1>> getNewLocalPatchIfaceVector() const
 	{
 		return std::make_shared<ValVector<D - 1>>(MPI_COMM_SELF, lengths, 0,
 		                                          num_local_patch_ifaces);

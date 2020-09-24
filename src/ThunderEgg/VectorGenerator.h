@@ -50,7 +50,7 @@ template <int D> class VectorGenerator
 	 *
 	 * @return std::shared_ptr<Vector<D>> the Vector
 	 */
-	virtual std::shared_ptr<Vector<D>> getNewVector() = 0;
+	virtual std::shared_ptr<Vector<D>> getNewVector() const = 0;
 };
 } // namespace ThunderEgg
 #endif

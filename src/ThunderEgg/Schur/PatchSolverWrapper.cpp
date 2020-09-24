@@ -19,37 +19,6 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_VALVECTORGENERATOR_H
-#define THUNDEREGG_VALVECTORGENERATOR_H
-#include <ThunderEgg/ValVector.h>
-#include <ThunderEgg/VectorGenerator.h>
-#include <valarray>
-namespace ThunderEgg
-{
-/**
- * @brief Generates new ValVector objects for a given Domain
- *
- * @tparam D the number of Cartesian dimensions
- */
-template <int D> class ValVectorGenerator : public VectorGenerator<D>
-{
-	private:
-	/**
-	 * @brief the Domain to generate ValVector objects for
-	 */
-	std::shared_ptr<const Domain<D>> domain;
-
-	public:
-	/**
-	 * @brief Construct a new ValVectorGenerator object
-	 *
-	 * @param domain_in the Domain to generate ValVector objects for
-	 */
-	ValVectorGenerator(std::shared_ptr<const Domain<D>> domain_in) : domain(domain_in) {}
-	std::shared_ptr<Vector<D>> getNewVector() const override
-	{
-		return ValVector<D>::GetNewVector(domain);
-	}
-};
-} // namespace ThunderEgg
-#endif
+#include <ThunderEgg/Schur/PatchSolverWrapper.h>
+template class ThunderEgg::Schur::PatchSolverWrapper<2>;
+template class ThunderEgg::Schur::PatchSolverWrapper<3>;

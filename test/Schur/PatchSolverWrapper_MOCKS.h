@@ -27,6 +27,8 @@
 
 namespace ThunderEgg
 {
+namespace
+{
 template <int D> class MockGhostFiller : public GhostFiller<D>
 {
 	private:
@@ -106,8 +108,8 @@ template <int D> class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 		was_called = true;
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo->hasNbr(s)) {
-				auto ghosts = f.getGhostSliceOnSide(s, 1);
-				auto inner  = f.getSliceOnSide(s);
+				auto ghosts = u.getGhostSliceOnSide(s, 1);
+				auto inner  = u.getSliceOnSide(s);
 				nested_loop<D - 1>(
 				ghosts.getStart(), ghosts.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					CHECK((ghosts[coord] + inner[coord]) / 2 == Approx(schur_fill_value));
@@ -120,4 +122,5 @@ template <int D> class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 		return was_called;
 	}
 };
+} // namespace
 } // namespace ThunderEgg
