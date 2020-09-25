@@ -71,10 +71,8 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws with unsupported ghost fill
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   nx        = GENERATE(5, 8);
-	int                   ny        = GENERATE(7, 10);
 	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	DomainReader<2>       domain_reader(mesh_file, {10, 10}, num_ghost);
 	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
 

@@ -33,37 +33,72 @@ namespace
 /**
  * @brief Given The interface side, and an auxilary side,
  */
-Side<2> rot_table[4][4] = {{Side<2>::west(), Side<2>::east(), Side<2>::south(), Side<2>::north()},
-                           {Side<2>::east(), Side<2>::west(), Side<2>::north(), Side<2>::south()},
-                           {Side<2>::north(), Side<2>::south(), Side<2>::west(), Side<2>::east()},
-                           {Side<2>::south(), Side<2>::north(), Side<2>::east(), Side<2>::west()}};
+const Side<2> rot_table[4][4]
+= {{Side<2>::west(), Side<2>::east(), Side<2>::south(), Side<2>::north()},
+   {Side<2>::east(), Side<2>::west(), Side<2>::north(), Side<2>::south()},
+   {Side<2>::north(), Side<2>::south(), Side<2>::west(), Side<2>::east()},
+   {Side<2>::south(), Side<2>::north(), Side<2>::east(), Side<2>::west()}};
+/**
+ * @brief true of the the j indexes have to be flipped for an interfaces side
+ */
+const bitset<4> flip_j_table = 0b0110;
+/**
+ * @brief true of the the i indexes have to be flipped for an interfaces side and auxilary side;
+ */
+const array<bitset<4>, 4> flip_i_table = {{0b0000, 0b1111, 0b0011, 0b1100}};
 /**
  * @brief Represents a block in the Schur compliment matrix
  */
-struct Block {
-	IfaceType<2> type;
-	Side<2>      s;
+class Block
+{
+	public:
 	/**
-	 * @brief True if boundary on a given side is not dirichlet
+	 * @brief The interface type
 	 */
-	bitset<4>           non_dirichlet_boundary;
-	int                 i;
-	int                 j;
-	bool                flip_i;
-	bool                flip_j;
-	bitset<4>           flip_j_table = 0b0110;
-	array<bitset<4>, 4> flip_i_table = {{0b0000, 0b1111, 0b0011, 0b1100}};
+	IfaceType<2> type;
+	/**
+	 * @brief The side of the patch that the block is on
+	 */
+	Side<2> s;
+	/**
+	 * @brief True if boundary on a given side is not Dirichlet
+	 */
+	bitset<4> non_dirichlet_boundary;
+	/**
+	 * @brief i block index in matrix
+	 */
+	int i;
+	/**
+	 * @brief j block index in matrix
+	 */
+	int j;
+	/**
+	 * @brief true if j indexes are flipped
+	 */
+	bool flip_i;
+	/**
+	 * @brief true if j indexes are flipped
+	 */
+	bool flip_j;
 
+	/**
+	 * @brief Construct a new Block object
+	 *
+	 * @param main the side of the patch that the interface being set is on
+	 * @param j the block j index in the matrix
+	 * @param aux the side of the patch that the interface being affected is on
+	 * @param i the block i index in the matrix
+	 * @param non_dirichlet_boundary true if side of patch has non dirichlet boundary conditions
+	 * @param type the type of interface
+	 */
 	Block(Side<2> main, int j, Side<2> aux, int i, bitset<4> non_dirichlet_boundary,
 	      IfaceType<2> type)
-	: type(type)
+	: type(type), i(i), j(j)
 	{
-		s       = rot_table[main.getIndex()][aux.getIndex()];
-		this->i = i;
-		this->j = j;
-		for (int s = 0; s < 4; s++) {
-			this->non_dirichlet_boundary[rot_table[main.getIndex()][s].getIndex()]
-			= non_dirichlet_boundary[s];
+		s = rot_table[main.getIndex()][aux.getIndex()];
+		for (int side_index = 0; side_index < 4; side_index++) {
+			this->non_dirichlet_boundary[rot_table[main.getIndex()][side_index].getIndex()]
+			= non_dirichlet_boundary[side_index];
 		}
 		flip_j = flip_j_table[main.getIndex()];
 		flip_i = flip_i_table[main.getIndex()][s.getIndex()];
@@ -78,19 +113,6 @@ struct Block {
 	bool operator<(const Block &b) const
 	{
 		return std::tie(type, i, j, flip_j) < std::tie(b.type, b.i, b.j, b.flip_j);
-	}
-};
-struct BlockKey {
-	IfaceType<2> type;
-	Side<2>      s;
-
-	BlockKey(const Block &b) : type(b.type)
-	{
-		s = b.s;
-	}
-	friend bool operator<(const BlockKey &l, const BlockKey &r)
-	{
-		return std::tie(l.s, l.type) < std::tie(r.s, r.type);
 	}
 };
 /**
@@ -128,10 +150,18 @@ LocalData<2> getLocalDataForBuffer(double *buffer_ptr, shared_ptr<const PatchInf
 	LocalData<2> buffer_data(transformed_buffer_ptr, strides, ns, num_ghost_cells);
 	return buffer_data;
 }
-void assembleMatrix(
-std::shared_ptr<const InterfaceDomain<2>>                                       iface_domain,
-std::shared_ptr<Poisson::FFTWPatchSolver<2>>                                    solver,
-std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> insertBlock)
+/**
+ * @brief Assemble the matrix
+ *
+ * @tparam Inserter has the follow arguments
+ *  (int block_i, int block_j, shared_ptr<vector<double>> block, bool flip_i, bool flip_j)
+ * @param iface_domain the InterfaceDomain
+ * @param solver the PatchSolver
+ * @param insertBlock the Inserter
+ */
+template <class Inserter>
+void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
+                    std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver, Inserter insertBlock)
 {
 	auto ns = iface_domain->getDomain()->getNs();
 	int  n  = ns[0];
@@ -146,11 +176,10 @@ std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> 
 			Side<2>                  aux   = patch.side;
 			const PatchIfaceInfo<2> &sinfo = *patch.piinfo;
 			IfaceType<2>             type  = patch.type;
-			for (int s = 0; s < 4; s++) {
-				if (sinfo.iface_info[s] != nullptr) {
-					int     j    = sinfo.iface_info[s]->global_index;
-					Side<2> main = static_cast<Side<2>>(s);
-					blocks.insert(Block(main, j, aux, i, sinfo.pinfo->neumann, type));
+			for (Side<2> s : Side<2>::getValues()) {
+				if (sinfo.pinfo->hasNbr(s)) {
+					int j = sinfo.getIfaceInfo(s)->global_index;
+					blocks.insert(Block(s, j, aux, i, sinfo.pinfo->neumann, type));
 				}
 			}
 		}
@@ -196,7 +225,12 @@ std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> 
 		std::vector<std::shared_ptr<PatchIfaceInfo<2>>> single_domain;
 		single_domain.push_back(piinfo);
 
-		map<BlockKey, shared_ptr<vector<double>>> coeffs;
+		// coefficients are grouped by block's side and type
+		map<Block, shared_ptr<vector<double>>, std::function<bool(const Block &a, const Block &b)>>
+		coeffs([](const Block &a, const Block &b) {
+			return std::tie(a.s, a.type) < std::tie(b.s, b.type);
+		});
+
 		// allocate blocks of coefficients
 		for (const Block &b : todo) {
 			shared_ptr<vector<double>> ptr = coeffs[b];
@@ -212,11 +246,11 @@ std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> 
 			u_west_ghosts[{j}] = 0;
 
 			// fill the blocks
-			for (auto &p : coeffs) {
-				Side<2>         s    = p.first.s;
-				IfaceType<2>    type = p.first.type;
+			for (const auto &pair : coeffs) {
+				Side<2>         s    = pair.first.s;
+				IfaceType<2>    type = pair.first.type;
 				vector<double>  filled_ghosts(n);
-				vector<double> &block = *p.second;
+				vector<double> &block = *pair.second;
 				if (type.isNormal()) {
 					auto slice = u_local_data.getSliceOnSide(s);
 					for (int i = 0; i < n; i++) {
@@ -273,7 +307,6 @@ std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> 
 						block[i * n + j] = -ghosts[i] / 2;
 					}
 				}
-				// interpolator->interpolate(*piinfo, s, 0, type, u_vec, interp_vec);
 
 				if (s == Side<2>::west()) {
 					if (type.isNormal()) {
@@ -316,9 +349,9 @@ std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver)
 	MatMPIAIJSetPreallocation(A, 19 * n, nullptr, 19 * n, nullptr);
 
 	auto insertBlock
-	= [&](int i, int j, shared_ptr<vector<double>> block, bool flip_i, bool flip_j) {
-		  int local_i = i * n;
-		  int local_j = j * n;
+	= [&](int block_i, int block_j, shared_ptr<vector<double>> block, bool flip_i, bool flip_j) {
+		  int matrix_i = block_i * n;
+		  int matrix_j = block_j * n;
 
 		  vector<double> &orig = *block;
 		  vector<double>  copy(n * n);
@@ -336,9 +369,9 @@ std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver)
 			  }
 		  }
 		  vector<int> inds_i(n);
-		  iota(inds_i.begin(), inds_i.end(), local_i);
+		  iota(inds_i.begin(), inds_i.end(), matrix_i);
 		  vector<int> inds_j(n);
-		  iota(inds_j.begin(), inds_j.end(), local_j);
+		  iota(inds_j.begin(), inds_j.end(), matrix_j);
 
 		  MatSetValues(A, n, &inds_i[0], n, &inds_j[0], &copy[0], ADD_VALUES);
 	  };
