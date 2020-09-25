@@ -311,6 +311,67 @@ vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<2>> iface_domain)
 	return blocks_vector;
 }
 /**
+ * @brief Fill the coefficients for the blocks
+ *
+ * @tparam CoeffMap The map from block to coefficients
+ * @param coeffs The map from block to coefficients
+ * @param pinfo the patchinfo that has to be solved on
+ * @param solver the patch solver
+ */
+template <class CoeffMap>
+void FillBlockCoeffs(CoeffMap coeffs, std::shared_ptr<const PatchInfo<2>> pinfo,
+                     std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver)
+{
+	auto ns           = solver->getDomain()->getNs();
+	int  n            = ns[0];
+	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<2>>(solver->getGhostFiller());
+	for (int j = 0; j < n; j++) {
+		// create some work vectors
+		auto         u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
+		auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
+		LocalData<2> u_local_data  = u_vec->getLocalData(0);
+		LocalData<1> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<2>::west(), 1);
+		LocalData<2> f_local_data  = f_vec->getLocalData(0);
+
+		u_west_ghosts[{j}] = 2;
+
+		solver->solveSinglePatch(pinfo, u_local_data, f_local_data);
+
+		for (const auto &pair : coeffs) {
+			Side<2>         s    = pair.first.s;
+			IfaceType<2>    type = pair.first.type;
+			vector<double>  filled_ghosts(n);
+			vector<double> &block = *pair.second;
+			if (type.isNormal()) {
+				FillBlockColumnForNormalInterface(j, u_local_data, s, block);
+			} else if (type.isCoarseToCoarse()) {
+				FillBlockColumnForCoarseToCoarseInterface(j, u_local_data, s, ghost_filler, pinfo,
+				                                          block);
+
+			} else if (type.isFineToFine()) {
+				FillBlockColumnForFineToFineInterface(j, u_local_data, s, ghost_filler, pinfo, type,
+				                                      block);
+
+			} else if (type.isCoarseToFine()) {
+				FillBlockColumnForCoarseToFineInterface(j, u_local_data, s, ghost_filler, pinfo,
+				                                        type, block);
+
+			} else if (type.isFineToCoarse()) {
+				FillBlockColumnForFineToCoarseInterface(j, u_local_data, s, ghost_filler, pinfo,
+				                                        type, block);
+			}
+
+			if (s == Side<2>::west()) {
+				if (type.isNormal()) {
+					block[n * j + j] += 0.5;
+				} else if (type.isFineToFine() || type.isCoarseToCoarse()) {
+					block[n * j + j] += 1;
+				}
+			}
+		}
+	}
+}
+/**
  * @brief Assemble the matrix
  *
  * @tparam Inserter has the follow arguments
@@ -325,15 +386,6 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 {
 	auto ns = iface_domain->getDomain()->getNs();
 	int  n  = ns[0];
-
-	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<2>>(solver->getGhostFiller());
-
-	// create some work vectors
-	auto         u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
-	auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
-	LocalData<2> u_local_data  = u_vec->getLocalData(0);
-	LocalData<1> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<2>::west(), 1);
-	LocalData<2> f_local_data  = f_vec->getLocalData(0);
 
 	for (const set<Block> &blocks : GetBlocks(iface_domain)) {
 		// create domain representing curr_type
@@ -367,46 +419,7 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 			}
 		}
 
-		for (int j = 0; j < n; j++) {
-			u_vec->set(0);
-			u_west_ghosts[{j}] = 2;
-			solver->solveSinglePatch(pinfo, u_local_data, f_local_data);
-			u_west_ghosts[{j}] = 0;
-
-			// fill the blocks
-			for (const auto &pair : coeffs) {
-				Side<2>         s    = pair.first.s;
-				IfaceType<2>    type = pair.first.type;
-				vector<double>  filled_ghosts(n);
-				vector<double> &block = *pair.second;
-				if (type.isNormal()) {
-					FillBlockColumnForNormalInterface(j, u_local_data, s, block);
-				} else if (type.isCoarseToCoarse()) {
-					FillBlockColumnForCoarseToCoarseInterface(j, u_local_data, s, ghost_filler,
-					                                          pinfo, block);
-
-				} else if (type.isFineToFine()) {
-					FillBlockColumnForFineToFineInterface(j, u_local_data, s, ghost_filler, pinfo,
-					                                      type, block);
-
-				} else if (type.isCoarseToFine()) {
-					FillBlockColumnForCoarseToFineInterface(j, u_local_data, s, ghost_filler, pinfo,
-					                                        type, block);
-
-				} else if (type.isFineToCoarse()) {
-					FillBlockColumnForFineToCoarseInterface(j, u_local_data, s, ghost_filler, pinfo,
-					                                        type, block);
-				}
-
-				if (s == Side<2>::west()) {
-					if (type.isNormal()) {
-						block[n * j + j] += 0.5;
-					} else if (type.isFineToFine() || type.isCoarseToCoarse()) {
-						block[n * j + j] += 1;
-					}
-				}
-			}
-		}
+		FillBlockCoeffs(coeffs, pinfo, solver);
 
 		// now insert these results into the matrix for each interface
 		for (Block block : blocks) {

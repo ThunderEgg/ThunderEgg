@@ -28,6 +28,16 @@ namespace ThunderEgg
 {
 namespace Poisson
 {
+/**
+ * @brief A fast algorithm for forming the Schur compliment matrix
+ *
+ * Currently this algorithm only supports the FFTWPatchSovler and it has to use either
+ * BiLinearGhostFiller or BiQuadraticGhostFiller
+ *
+ * @param iface_domain the interface domain that we are forming the schur compliment matrix for
+ * @param solver the patch solver to use for the formation
+ * @return Mat the PETSc matrix, user is responsible for destroying
+ */
 Mat FastSchurMatrixAssemble2D(std::shared_ptr<const Schur::InterfaceDomain<2>> iface_domain,
                               std::shared_ptr<Poisson::FFTWPatchSolver<2>>     solver);
 } // namespace Poisson
