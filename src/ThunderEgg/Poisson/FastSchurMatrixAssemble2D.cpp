@@ -323,12 +323,13 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 		// the first in the set is the type of interface that we are going to solve for
 		set<Block> todo;
 		Block      curr_type = *blocks.begin();
-		blocks.erase(0);
+		blocks.erase(blocks.begin());
 		todo.insert(curr_type);
-		while (blocks.begin()->non_dirichlet_boundary.to_ulong()
-		       == curr_type.non_dirichlet_boundary.to_ulong()) {
+		while (!blocks.empty()
+		       && blocks.begin()->non_dirichlet_boundary.to_ulong()
+		          == curr_type.non_dirichlet_boundary.to_ulong()) {
 			todo.insert(*blocks.begin());
-			blocks.erase(0);
+			blocks.erase(blocks.begin());
 		}
 
 		// create domain representing curr_type
