@@ -193,34 +193,6 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 		}
 		return retval;
 	}
-	/**
-	 * @brief add a patch to the solver
-	 *
-	 * This will calculate the necessary coefficients needed for the patch
-	 *
-	 * @param pinfo the patch
-	 */
-	void addPatch(std::shared_ptr<const PatchInfo<D>> pinfo)
-	{
-		if (plan1.count(pinfo) == 0) {
-			// revers ns because FFTW is row major
-			std::array<int, D> ns_reversed;
-			for (size_t i = 0; i < D; i++) {
-				ns_reversed[D - 1 - i] = pinfo->ns[i];
-			}
-			std::array<fftw_r2r_kind, D> transforms     = getTransformsForPatch(pinfo);
-			std::array<fftw_r2r_kind, D> transforms_inv = getInverseTransformsForPatch(pinfo);
-
-			plan1[pinfo] = fftw_plan_r2r(D, ns_reversed.data(), &f_copy->getValArray()[0],
-			                             &tmp->getValArray()[0], transforms.data(),
-			                             FFTW_MEASURE | FFTW_DESTROY_INPUT);
-			plan2[pinfo]
-			= fftw_plan_r2r(D, ns_reversed.data(), &tmp->getValArray()[0], &sol->getValArray()[0],
-			                transforms_inv.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
-
-			eigen_vals[pinfo] = getEigenValues(pinfo);
-		}
-	}
 
 	public:
 	/**
@@ -267,6 +239,34 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 		}
 		nested_loop<D>(u.getStart(), u.getEnd(),
 		               [&](std::array<int, D> coord) { u[coord] = sol_ld[coord] / scale; });
+	}
+	/**
+	 * @brief add a patch to the solver
+	 *
+	 * This will calculate the necessary coefficients needed for the patch
+	 *
+	 * @param pinfo the patch
+	 */
+	void addPatch(std::shared_ptr<const PatchInfo<D>> pinfo)
+	{
+		if (plan1.count(pinfo) == 0) {
+			// revers ns because FFTW is row major
+			std::array<int, D> ns_reversed;
+			for (size_t i = 0; i < D; i++) {
+				ns_reversed[D - 1 - i] = pinfo->ns[i];
+			}
+			std::array<fftw_r2r_kind, D> transforms     = getTransformsForPatch(pinfo);
+			std::array<fftw_r2r_kind, D> transforms_inv = getInverseTransformsForPatch(pinfo);
+
+			plan1[pinfo] = fftw_plan_r2r(D, ns_reversed.data(), &f_copy->getValArray()[0],
+			                             &tmp->getValArray()[0], transforms.data(),
+			                             FFTW_MEASURE | FFTW_DESTROY_INPUT);
+			plan2[pinfo]
+			= fftw_plan_r2r(D, ns_reversed.data(), &tmp->getValArray()[0], &sol->getValArray()[0],
+			                transforms_inv.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
+
+			eigen_vals[pinfo] = getEigenValues(pinfo);
+		}
 	}
 };
 extern template class FFTWPatchSolver<2>;

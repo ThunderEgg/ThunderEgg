@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_PETSC_VECWRAPPER_H
 #define THUNDEREGG_PETSC_VECWRAPPER_H
 #include <ThunderEgg/PETSc/VecLocalDataManager.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 
 namespace ThunderEgg
 {
@@ -158,16 +159,6 @@ template <int D> class VecWrapper : public Vector<D>
 		}
 		return std::make_shared<VecWrapper<D - 1>>(u, ns, 0, true);
 	}
-	/*
-	static std::shared_ptr<PetscVector<D>> GetNewSchurVector(std::shared_ptr<InterfaceDomain<D + 1>>
-	sh)
-	{
-	    Vec u;
-	    VecCreateMPI(MPI_COMM_WORLD, sh->getSchurVecLocalSize(), PETSC_DETERMINE, &u);
-	    return std::shared_ptr<PetscVector<D>>(new PetscVector<D>(u, sh->getLengths()));
-	}
-	*/
-
 	/**
 	 * @brief Destroy the VecWrapper object
 	 */

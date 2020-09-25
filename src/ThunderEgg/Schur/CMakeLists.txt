@@ -27,9 +27,10 @@ if(PETSC_FOUND)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/SchurMatrixHelper.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/SchurMatrixHelper.cpp)
-
-  list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/SchurMatrixHelper2d.h)
-  list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/SchurMatrixHelper2d.cpp)
 endif(PETSC_FOUND)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/ValVectorGenerator.h)
+
+if(PETSC_FOUND)
+  list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/VecWrapperGenerator.h)
+endif(PETSC_FOUND)
