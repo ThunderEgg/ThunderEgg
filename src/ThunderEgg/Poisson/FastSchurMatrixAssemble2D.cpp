@@ -153,15 +153,15 @@ LocalData<2> getLocalDataForBuffer(double *buffer_ptr, shared_ptr<const PatchInf
 /**
  * @brief Fill a block column for a normal interface
  *
- * @param n block dimension
  * @param j the column of the block to fill
  * @param u the patch data
  * @param s the side of the patch that the block is on
  * @param block
  */
-void FillBlockColumnForNormalInterface(int n, int j, const LocalData<2> &u, Side<2> s,
+void FillBlockColumnForNormalInterface(int j, const LocalData<2> &u, Side<2> s,
                                        std::vector<double> &block)
 {
+	int  n     = u.getLengths()[0];
 	auto slice = u.getSliceOnSide(s);
 	for (int i = 0; i < n; i++) {
 		block[i * n + j] = -slice[{i}] / 2;
@@ -170,7 +170,6 @@ void FillBlockColumnForNormalInterface(int n, int j, const LocalData<2> &u, Side
 /**
  * @brief Fill a block column for a coarse to coarse interface
  *
- * @param n block dimension
  * @param j the column of the block to fill
  * @param u the patch data
  * @param s the side of the patch that the block is on
@@ -179,10 +178,10 @@ void FillBlockColumnForNormalInterface(int n, int j, const LocalData<2> &u, Side
  * @param block
  */
 void FillBlockColumnForCoarseToCoarseInterface(
-int n, int j, const LocalData<2> &u, Side<2> s,
-std::shared_ptr<const MPIGhostFiller<2>> ghost_filler, std::shared_ptr<const PatchInfo<2>> pinfo,
-std::vector<double> &block)
+int j, const LocalData<2> &u, Side<2> s, std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
+std::shared_ptr<const PatchInfo<2>> pinfo, std::vector<double> &block)
 {
+	int  n                            = pinfo->ns[0];
 	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<2>>();
@@ -197,7 +196,6 @@ std::vector<double> &block)
 /**
  * @brief Fill a block column for a fine to fine interface
  *
- * @param n block dimension
  * @param j the column of the block to fill
  * @param u the patch data
  * @param s the side of the patch that the block is on
@@ -206,11 +204,12 @@ std::vector<double> &block)
  * @param type the IfaceType
  * @param block
  */
-void FillBlockColumnForFineToFineInterface(int n, int j, const LocalData<2> &u, Side<2> s,
+void FillBlockColumnForFineToFineInterface(int j, const LocalData<2> &u, Side<2> s,
                                            std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
                                            std::shared_ptr<const PatchInfo<2>>      pinfo,
                                            IfaceType<2> type, std::vector<double> &block)
 {
+	int  n                            = pinfo->ns[0];
 	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<CoarseNbrInfo<2>>(100, type.getOrthant());
@@ -225,7 +224,6 @@ void FillBlockColumnForFineToFineInterface(int n, int j, const LocalData<2> &u, 
 /**
  * @brief Fill a block column for a coarse to fine interface
  *
- * @param n block dimension
  * @param j the column of the block to fill
  * @param u the patch data
  * @param s the side of the patch that the block is on
@@ -234,11 +232,12 @@ void FillBlockColumnForFineToFineInterface(int n, int j, const LocalData<2> &u, 
  * @param type the IfaceType
  * @param block
  */
-void FillBlockColumnForCoarseToFineInterface(int n, int j, const LocalData<2> &u, Side<2> s,
+void FillBlockColumnForCoarseToFineInterface(int j, const LocalData<2> &u, Side<2> s,
                                              std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
                                              std::shared_ptr<const PatchInfo<2>>      pinfo,
                                              IfaceType<2> type, std::vector<double> &block)
 {
+	int  n                            = pinfo->ns[0];
 	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<2>>();
@@ -254,7 +253,6 @@ void FillBlockColumnForCoarseToFineInterface(int n, int j, const LocalData<2> &u
 /**
  * @brief Fill a block column for a fine to coarse interface
  *
- * @param n block dimension
  * @param j the column of the block to fill
  * @param u the patch data
  * @param s the side of the patch that the block is on
@@ -263,11 +261,12 @@ void FillBlockColumnForCoarseToFineInterface(int n, int j, const LocalData<2> &u
  * @param type the IfaceType
  * @param block
  */
-void FillBlockColumnForFineToCoarseInterface(int n, int j, const LocalData<2> &u, Side<2> s,
+void FillBlockColumnForFineToCoarseInterface(int j, const LocalData<2> &u, Side<2> s,
                                              std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
                                              std::shared_ptr<const PatchInfo<2>>      pinfo,
                                              IfaceType<2> type, std::vector<double> &block)
 {
+	int  n                            = pinfo->ns[0];
 	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<CoarseNbrInfo<2>>(100, type.getOrthant());
@@ -336,8 +335,7 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 	LocalData<1> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<2>::west(), 1);
 	LocalData<2> f_local_data  = f_vec->getLocalData(0);
 
-	vector<set<Block>> blocks_vector = GetBlocks(iface_domain);
-	for (const set<Block> &blocks : blocks_vector) {
+	for (const set<Block> &blocks : GetBlocks(iface_domain)) {
 		// create domain representing curr_type
 		auto pinfo             = make_shared<PatchInfo<2>>();
 		pinfo->nbr_info[0]     = make_shared<NormalNbrInfo<2>>();
@@ -382,22 +380,22 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 				vector<double>  filled_ghosts(n);
 				vector<double> &block = *pair.second;
 				if (type.isNormal()) {
-					FillBlockColumnForNormalInterface(n, j, u_local_data, s, block);
+					FillBlockColumnForNormalInterface(j, u_local_data, s, block);
 				} else if (type.isCoarseToCoarse()) {
-					FillBlockColumnForCoarseToCoarseInterface(n, j, u_local_data, s, ghost_filler,
+					FillBlockColumnForCoarseToCoarseInterface(j, u_local_data, s, ghost_filler,
 					                                          pinfo, block);
 
 				} else if (type.isFineToFine()) {
-					FillBlockColumnForFineToFineInterface(n, j, u_local_data, s, ghost_filler,
-					                                      pinfo, type, block);
+					FillBlockColumnForFineToFineInterface(j, u_local_data, s, ghost_filler, pinfo,
+					                                      type, block);
 
 				} else if (type.isCoarseToFine()) {
-					FillBlockColumnForCoarseToFineInterface(n, j, u_local_data, s, ghost_filler,
-					                                        pinfo, type, block);
+					FillBlockColumnForCoarseToFineInterface(j, u_local_data, s, ghost_filler, pinfo,
+					                                        type, block);
 
 				} else if (type.isFineToCoarse()) {
-					FillBlockColumnForFineToCoarseInterface(n, j, u_local_data, s, ghost_filler,
-					                                        pinfo, type, block);
+					FillBlockColumnForFineToCoarseInterface(j, u_local_data, s, ghost_filler, pinfo,
+					                                        type, block);
 				}
 
 				if (s == Side<2>::west()) {
@@ -448,16 +446,16 @@ std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver)
 		  vector<double> &orig = *block;
 		  vector<double>  copy(n * n);
 		  for (int i = 0; i < n; i++) {
-			  int block_i = i;
+			  int orig_i = i;
 			  if (flip_i) {
-				  block_i = n - i - 1;
+				  orig_i = n - i - 1;
 			  }
 			  for (int j = 0; j < n; j++) {
-				  int block_j = j;
+				  int orig_j = j;
 				  if (flip_j) {
-					  block_j = n - j - 1;
+					  orig_j = n - j - 1;
 				  }
-				  copy[i * n + j] = orig[block_i * n + block_j];
+				  copy[i * n + j] = orig[orig_i * n + orig_j];
 			  }
 		  }
 		  vector<int> inds_i(n);
