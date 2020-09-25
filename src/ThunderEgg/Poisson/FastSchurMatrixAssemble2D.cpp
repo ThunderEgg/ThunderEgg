@@ -43,7 +43,7 @@ const Side<2> rot_table[4][4]
  */
 const bitset<4> flip_j_table = 0b0110;
 /**
- * @brief true of the the i indexes have to be flipped for an interfaces side and auxilary side;
+ * @brief true of the the i indexes have to be flipped for an interfaces side and auxilary side
  */
 const array<bitset<4>, 4> flip_i_table = {{0b0000, 0b1111, 0b0011, 0b1100}};
 /**
@@ -151,6 +151,136 @@ LocalData<2> getLocalDataForBuffer(double *buffer_ptr, shared_ptr<const PatchInf
 	return buffer_data;
 }
 /**
+ * @brief Fill a block column for a normal interface
+ *
+ * @param n block dimension
+ * @param j the column of the block to fill
+ * @param u the patch data
+ * @param s the side of the patch that the block is on
+ * @param block
+ */
+void FillBlockColumnForNormalInterface(int n, int j, const LocalData<2> &u, Side<2> s,
+                                       std::vector<double> &block)
+{
+	auto slice = u.getSliceOnSide(s);
+	for (int i = 0; i < n; i++) {
+		block[i * n + j] = -slice[{i}] / 2;
+	}
+}
+/**
+ * @brief Fill a block column for a coarse to coarse interface
+ *
+ * @param n block dimension
+ * @param j the column of the block to fill
+ * @param u the patch data
+ * @param s the side of the patch that the block is on
+ * @param ghost_filler the GhostFiller
+ * @param pinfo the PatchInfo
+ * @param block
+ */
+void FillBlockColumnForCoarseToCoarseInterface(
+int n, int j, const LocalData<2> &u, Side<2> s,
+std::shared_ptr<const MPIGhostFiller<2>> ghost_filler, std::shared_ptr<const PatchInfo<2>> pinfo,
+std::vector<double> &block)
+{
+	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
+	new_pinfo->nbr_info[0]            = nullptr;
+	new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<2>>();
+	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u);
+	auto slice       = u.getSliceOnSide(s);
+	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
+	for (int i = 0; i < n; i++) {
+		block[i * n + j] = -(slice[{i}] + ghost_slice[{i}]) / 2;
+		ghost_slice[{i}] = 0;
+	}
+}
+/**
+ * @brief Fill a block column for a fine to fine interface
+ *
+ * @param n block dimension
+ * @param j the column of the block to fill
+ * @param u the patch data
+ * @param s the side of the patch that the block is on
+ * @param ghost_filler the GhostFiller
+ * @param pinfo the PatchInfo
+ * @param type the IfaceType
+ * @param block
+ */
+void FillBlockColumnForFineToFineInterface(int n, int j, const LocalData<2> &u, Side<2> s,
+                                           std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
+                                           std::shared_ptr<const PatchInfo<2>>      pinfo,
+                                           IfaceType<2> type, std::vector<double> &block)
+{
+	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
+	new_pinfo->nbr_info[0]            = nullptr;
+	new_pinfo->nbr_info[s.getIndex()] = make_shared<CoarseNbrInfo<2>>(100, type.getOrthant());
+	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u);
+	auto slice       = u.getSliceOnSide(s);
+	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
+	for (int i = 0; i < n; i++) {
+		block[i * n + j] = -(slice[{i}] + ghost_slice[{i}]) / 2;
+		ghost_slice[{i}] = 0;
+	}
+}
+/**
+ * @brief Fill a block column for a coarse to fine interface
+ *
+ * @param n block dimension
+ * @param j the column of the block to fill
+ * @param u the patch data
+ * @param s the side of the patch that the block is on
+ * @param ghost_filler the GhostFiller
+ * @param pinfo the PatchInfo
+ * @param type the IfaceType
+ * @param block
+ */
+void FillBlockColumnForCoarseToFineInterface(int n, int j, const LocalData<2> &u, Side<2> s,
+                                             std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
+                                             std::shared_ptr<const PatchInfo<2>>      pinfo,
+                                             IfaceType<2> type, std::vector<double> &block)
+{
+	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
+	new_pinfo->nbr_info[0]            = nullptr;
+	new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<2>>();
+	vector<double> ghosts(n);
+	LocalData<2>   nbr_data = getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite());
+	ghost_filler->fillGhostCellsForNbrPatch(
+	new_pinfo, u, nbr_data, s, NbrType::Fine,
+	Orthant<2>::getValuesOnSide(s)[type.getOrthant().getIndex()]);
+	for (int i = 0; i < n; i++) {
+		block[i * n + j] = -ghosts[i] / 2;
+	}
+}
+/**
+ * @brief Fill a block column for a fine to coarse interface
+ *
+ * @param n block dimension
+ * @param j the column of the block to fill
+ * @param u the patch data
+ * @param s the side of the patch that the block is on
+ * @param ghost_filler the GhostFiller
+ * @param pinfo the PatchInfo
+ * @param type the IfaceType
+ * @param block
+ */
+void FillBlockColumnForFineToCoarseInterface(int n, int j, const LocalData<2> &u, Side<2> s,
+                                             std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
+                                             std::shared_ptr<const PatchInfo<2>>      pinfo,
+                                             IfaceType<2> type, std::vector<double> &block)
+{
+	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
+	new_pinfo->nbr_info[0]            = nullptr;
+	new_pinfo->nbr_info[s.getIndex()] = make_shared<CoarseNbrInfo<2>>(100, type.getOrthant());
+	vector<double> ghosts(n);
+	LocalData<2>   nbr_data = getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite());
+	ghost_filler->fillGhostCellsForNbrPatch(
+	new_pinfo, u, nbr_data, s, NbrType::Coarse,
+	Orthant<2>::getValuesOnSide(s.opposite())[type.getOrthant().getIndex()]);
+	for (int i = 0; i < n; i++) {
+		block[i * n + j] = -ghosts[i] / 2;
+	}
+}
+/**
  * @brief Assemble the matrix
  *
  * @tparam Inserter has the follow arguments
@@ -184,14 +314,12 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 			}
 		}
 	}
-	int          num_types     = 0;
 	auto         u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
 	auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
 	LocalData<2> u_local_data  = u_vec->getLocalData(0);
 	LocalData<1> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<2>::west(), 1);
 	LocalData<2> f_local_data  = f_vec->getLocalData(0);
 	while (!blocks.empty()) {
-		num_types++;
 		// the first in the set is the type of interface that we are going to solve for
 		set<Block> todo;
 		Block      curr_type = *blocks.begin();
@@ -252,60 +380,22 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 				vector<double>  filled_ghosts(n);
 				vector<double> &block = *pair.second;
 				if (type.isNormal()) {
-					auto slice = u_local_data.getSliceOnSide(s);
-					for (int i = 0; i < n; i++) {
-						block[i * n + j] = -slice[{i}] / 2;
-					}
+					FillBlockColumnForNormalInterface(n, j, u_local_data, s, block);
 				} else if (type.isCoarseToCoarse()) {
-					auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
-					new_pinfo->nbr_info[0]            = nullptr;
-					new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<2>>();
-					ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u_local_data);
-					auto slice       = u_local_data.getSliceOnSide(s);
-					auto ghost_slice = u_local_data.getGhostSliceOnSide(s, 1);
-					for (int i = 0; i < n; i++) {
-						block[i * n + j] = -(slice[{i}] + ghost_slice[{i}]) / 2;
-						ghost_slice[{i}] = 0;
-					}
+					FillBlockColumnForCoarseToCoarseInterface(n, j, u_local_data, s, ghost_filler,
+					                                          pinfo, block);
+
 				} else if (type.isFineToFine()) {
-					auto new_pinfo         = make_shared<PatchInfo<2>>(*pinfo);
-					new_pinfo->nbr_info[0] = nullptr;
-					new_pinfo->nbr_info[s.getIndex()]
-					= make_shared<CoarseNbrInfo<2>>(100, type.getOrthant());
-					ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u_local_data);
-					auto slice       = u_local_data.getSliceOnSide(s);
-					auto ghost_slice = u_local_data.getGhostSliceOnSide(s, 1);
-					for (int i = 0; i < n; i++) {
-						block[i * n + j] = -(slice[{i}] + ghost_slice[{i}]) / 2;
-						ghost_slice[{i}] = 0;
-					}
+					FillBlockColumnForFineToFineInterface(n, j, u_local_data, s, ghost_filler,
+					                                      pinfo, type, block);
+
 				} else if (type.isCoarseToFine()) {
-					auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
-					new_pinfo->nbr_info[0]            = nullptr;
-					new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<2>>();
-					vector<double> ghosts(n);
-					LocalData<2>   nbr_data
-					= getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite());
-					ghost_filler->fillGhostCellsForNbrPatch(
-					new_pinfo, u_local_data, nbr_data, s, NbrType::Fine,
-					Orthant<2>::getValuesOnSide(s)[type.getOrthant().getIndex()]);
-					for (int i = 0; i < n; i++) {
-						block[i * n + j] = -ghosts[i] / 2;
-					}
+					FillBlockColumnForCoarseToFineInterface(n, j, u_local_data, s, ghost_filler,
+					                                        pinfo, type, block);
+
 				} else if (type.isFineToCoarse()) {
-					auto new_pinfo         = make_shared<PatchInfo<2>>(*pinfo);
-					new_pinfo->nbr_info[0] = nullptr;
-					new_pinfo->nbr_info[s.getIndex()]
-					= make_shared<CoarseNbrInfo<2>>(100, type.getOrthant());
-					vector<double> ghosts(n);
-					LocalData<2>   nbr_data
-					= getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite());
-					ghost_filler->fillGhostCellsForNbrPatch(
-					new_pinfo, u_local_data, nbr_data, s, NbrType::Coarse,
-					Orthant<2>::getValuesOnSide(s.opposite())[type.getOrthant().getIndex()]);
-					for (int i = 0; i < n; i++) {
-						block[i * n + j] = -ghosts[i] / 2;
-					}
+					FillBlockColumnForFineToCoarseInterface(n, j, u_local_data, s, ghost_filler,
+					                                        pinfo, type, block);
 				}
 
 				if (s == Side<2>::west()) {
@@ -342,7 +432,7 @@ std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver)
 	int n = ns[0];
 	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
-	int local_size  = iface_domain->getInterfaces().size() * n;
+	int local_size  = iface_domain->getNumLocalInterfaces() * n;
 	int global_size = iface_domain->getNumGlobalInterfaces() * n;
 	MatSetSizes(A, local_size, local_size, global_size, global_size);
 	MatSetType(A, MATMPIAIJ);
