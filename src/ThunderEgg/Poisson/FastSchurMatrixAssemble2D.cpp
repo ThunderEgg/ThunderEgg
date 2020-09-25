@@ -220,7 +220,7 @@ std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> 
 				if (type.isNormal()) {
 					auto slice = u_local_data.getSliceOnSide(s);
 					for (int i = 0; i < n; i++) {
-						block[i * n + j] = slice[{i}] / 2;
+						block[i * n + j] = -slice[{i}] / 2;
 					}
 				} else if (type.isCoarseToCoarse()) {
 					auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
@@ -230,7 +230,7 @@ std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> 
 					auto slice       = u_local_data.getSliceOnSide(s);
 					auto ghost_slice = u_local_data.getGhostSliceOnSide(s, 1);
 					for (int i = 0; i < n; i++) {
-						block[i * n + j] = (slice[{i}] + ghost_slice[{i}]) / 2;
+						block[i * n + j] = -(slice[{i}] + ghost_slice[{i}]) / 2;
 						ghost_slice[{i}] = 0;
 					}
 				} else if (type.isFineToFine()) {
@@ -242,7 +242,7 @@ std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> 
 					auto slice       = u_local_data.getSliceOnSide(s);
 					auto ghost_slice = u_local_data.getGhostSliceOnSide(s, 1);
 					for (int i = 0; i < n; i++) {
-						block[i * n + j] = (slice[{i}] + ghost_slice[{i}]) / 2;
+						block[i * n + j] = -(slice[{i}] + ghost_slice[{i}]) / 2;
 						ghost_slice[{i}] = 0;
 					}
 				} else if (type.isCoarseToFine()) {
@@ -256,7 +256,7 @@ std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> 
 					new_pinfo, u_local_data, nbr_data, s, NbrType::Fine,
 					Orthant<2>::getValuesOnSide(s)[type.getOrthant().getIndex()]);
 					for (int i = 0; i < n; i++) {
-						block[i * n + j] = ghosts[i] / 2;
+						block[i * n + j] = -ghosts[i] / 2;
 					}
 				} else if (type.isFineToCoarse()) {
 					auto new_pinfo         = make_shared<PatchInfo<2>>(*pinfo);
@@ -270,16 +270,16 @@ std::function<void(int, int, std::shared_ptr<std::vector<double>>, bool, bool)> 
 					new_pinfo, u_local_data, nbr_data, s, NbrType::Coarse,
 					Orthant<2>::getValuesOnSide(s.opposite())[type.getOrthant().getIndex()]);
 					for (int i = 0; i < n; i++) {
-						block[i * n + j] = ghosts[i] / 2;
+						block[i * n + j] = -ghosts[i] / 2;
 					}
 				}
 				// interpolator->interpolate(*piinfo, s, 0, type, u_vec, interp_vec);
 
 				if (s == Side<2>::west()) {
 					if (type.isNormal()) {
-						block[n * j + j] -= 0.5;
+						block[n * j + j] += 0.5;
 					} else if (type.isFineToFine() || type.isCoarseToCoarse()) {
-						block[n * j + j] -= 1;
+						block[n * j + j] += 1;
 					}
 				}
 			}

@@ -173,7 +173,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 				}
 			}
 		}
-		b->addScaled(-1, x);
+		b->scaleThenAdd(-1, x);
 	}
 	/**
 	 * @brief Get the RHS for the Schur system from a given RHS for the domain system
@@ -220,7 +220,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
                     patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
 					nested_loop<D - 1>(interface.getStart(), interface.getEnd(),
 					                   [&](const std::array<int, D - 1> &coord) {
-						                   interface[coord] = -(ghosts[coord] + inner[coord]) / 2;
+						                   interface[coord] = (ghosts[coord] + inner[coord]) / 2;
 					                   });
 					break;
 				}

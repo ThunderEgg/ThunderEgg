@@ -158,7 +158,7 @@ TEST_CASE(
 	Vec     g = g_vec->getVec();
 	VecGetArray(g, &g_view);
 	for (int i = 0; i < g_vec->getNumLocalCells(); i++) {
-		int x     = (i + 0.5) / g_vec->getNumLocalCells();
+		double x  = (i + 0.5) / g_vec->getNumLocalCells();
 		g_view[i] = sin(M_PI * x);
 	}
 	VecRestoreArray(g, &g_view);
@@ -174,6 +174,8 @@ TEST_CASE(
 	auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
 	m_operator->apply(g_vec, f_vec);
 
+	CHECK(f_vec->infNorm() == Approx(f_vec_expected->infNorm()));
+	CHECK(f_vec->twoNorm() == Approx(f_vec_expected->twoNorm()));
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
@@ -207,7 +209,7 @@ TEST_CASE(
 	Vec     g = g_vec->getVec();
 	VecGetArray(g, &g_view);
 	for (int i = 0; i < g_vec->getNumLocalCells(); i++) {
-		int x     = (i + 0.5) / g_vec->getNumLocalCells();
+		double x  = (i + 0.5) / g_vec->getNumLocalCells();
 		g_view[i] = sin(M_PI * x);
 	}
 	VecRestoreArray(g, &g_view);
@@ -223,6 +225,8 @@ TEST_CASE(
 	auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
 	m_operator->apply(g_vec, f_vec);
 
+	CHECK(f_vec->infNorm() == Approx(f_vec_expected->infNorm()));
+	CHECK(f_vec->twoNorm() == Approx(f_vec_expected->twoNorm()));
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
@@ -256,7 +260,7 @@ TEST_CASE(
 	Vec     g = g_vec->getVec();
 	VecGetArray(g, &g_view);
 	for (int i = 0; i < g_vec->getNumLocalCells(); i++) {
-		int x     = (i + 0.5) / g_vec->getNumLocalCells();
+		double x  = (i + 0.5) / g_vec->getNumLocalCells();
 		g_view[i] = sin(M_PI * x);
 	}
 	VecRestoreArray(g, &g_view);
@@ -272,6 +276,8 @@ TEST_CASE(
 	auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
 	m_operator->apply(g_vec, f_vec);
 
+	CHECK(f_vec->infNorm() == Approx(f_vec_expected->infNorm()));
+	CHECK(f_vec->twoNorm() == Approx(f_vec_expected->twoNorm()));
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
