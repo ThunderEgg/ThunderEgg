@@ -281,6 +281,37 @@ void FillBlockColumnForFineToCoarseInterface(int n, int j, const LocalData<2> &u
 	}
 }
 /**
+ * @brief Get a vector of set<Block>, each set of blocks have the same boundary conditions
+ *
+ * @param iface_domain the InterfaceDomain
+ * @return vector<set<Block>> the vector of blocks
+ */
+vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<2>> iface_domain)
+{
+	map<unsigned long, set<Block>> bc_to_blocks;
+	for (auto iface : iface_domain->getInterfaces()) {
+		int i = iface->global_index;
+		for (auto patch : iface->patches) {
+			Side<2>                  aux   = patch.side;
+			const PatchIfaceInfo<2> &sinfo = *patch.piinfo;
+			IfaceType<2>             type  = patch.type;
+			for (Side<2> s : Side<2>::getValues()) {
+				if (sinfo.pinfo->hasNbr(s)) {
+					int   j = sinfo.getIfaceInfo(s)->global_index;
+					Block block(s, j, aux, i, sinfo.pinfo->neumann, type);
+					bc_to_blocks[block.non_dirichlet_boundary.to_ulong()].insert(block);
+				}
+			}
+		}
+	}
+	vector<set<Block>> blocks_vector;
+	blocks_vector.reserve(bc_to_blocks.size());
+	for (auto &pair : bc_to_blocks) {
+		blocks_vector.push_back(std::move(pair.second));
+	}
+	return blocks_vector;
+}
+/**
  * @brief Assemble the matrix
  *
  * @tparam Inserter has the follow arguments
@@ -298,40 +329,15 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 
 	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<2>>(solver->getGhostFiller());
 
-	// get block type
-	set<Block> blocks;
-	for (auto iface : iface_domain->getInterfaces()) {
-		int i = iface->global_index;
-		for (auto patch : iface->patches) {
-			Side<2>                  aux   = patch.side;
-			const PatchIfaceInfo<2> &sinfo = *patch.piinfo;
-			IfaceType<2>             type  = patch.type;
-			for (Side<2> s : Side<2>::getValues()) {
-				if (sinfo.pinfo->hasNbr(s)) {
-					int j = sinfo.getIfaceInfo(s)->global_index;
-					blocks.insert(Block(s, j, aux, i, sinfo.pinfo->neumann, type));
-				}
-			}
-		}
-	}
+	// create some work vectors
 	auto         u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
 	auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
 	LocalData<2> u_local_data  = u_vec->getLocalData(0);
 	LocalData<1> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<2>::west(), 1);
 	LocalData<2> f_local_data  = f_vec->getLocalData(0);
-	while (!blocks.empty()) {
-		// the first in the set is the type of interface that we are going to solve for
-		set<Block> todo;
-		Block      curr_type = *blocks.begin();
-		blocks.erase(blocks.begin());
-		todo.insert(curr_type);
-		while (!blocks.empty()
-		       && blocks.begin()->non_dirichlet_boundary.to_ulong()
-		          == curr_type.non_dirichlet_boundary.to_ulong()) {
-			todo.insert(*blocks.begin());
-			blocks.erase(blocks.begin());
-		}
 
+	vector<set<Block>> blocks_vector = GetBlocks(iface_domain);
+	for (const set<Block> &blocks : blocks_vector) {
 		// create domain representing curr_type
 		auto pinfo             = make_shared<PatchInfo<2>>();
 		pinfo->nbr_info[0]     = make_shared<NormalNbrInfo<2>>();
@@ -340,7 +346,7 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 		piinfo->pinfo          = pinfo;
 		pinfo->ns.fill(n);
 		pinfo->spacings.fill(1.0 / n);
-		pinfo->neumann = curr_type.non_dirichlet_boundary;
+		pinfo->neumann = blocks.begin()->non_dirichlet_boundary;
 		piinfo->setIfaceInfo(Side<2>::west(),
 		                     make_shared<NormalIfaceInfo<2>>(pinfo, Side<2>::west()));
 
@@ -356,7 +362,7 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 		});
 
 		// allocate blocks of coefficients
-		for (const Block &b : todo) {
+		for (const Block &b : blocks) {
 			shared_ptr<vector<double>> ptr = coeffs[b];
 			if (ptr.get() == nullptr) {
 				coeffs[b] = shared_ptr<vector<double>>(new vector<double>(n * n));
@@ -405,7 +411,7 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
 		}
 
 		// now insert these results into the matrix for each interface
-		for (Block block : todo) {
+		for (Block block : blocks) {
 			insertBlock(block.i, block.j, coeffs[block], block.flip_i, block.flip_j);
 		}
 	}
