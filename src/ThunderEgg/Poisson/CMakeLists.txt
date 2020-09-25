@@ -16,6 +16,10 @@ if(PETSC_FOUND)
     list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/FastSchurMatrixAssemble2D.h)
     list(APPEND ThunderEgg_SRCS
                 ThunderEgg/Poisson/FastSchurMatrixAssemble2D.cpp)
+
+    list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/FastSchurMatrixAssemble3D.h)
+    list(APPEND ThunderEgg_SRCS
+                ThunderEgg/Poisson/FastSchurMatrixAssemble3D.cpp)
   endif(FFTW_FOUND)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/MatrixHelper.h)

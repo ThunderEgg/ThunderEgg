@@ -24,9 +24,6 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchSolverWrapper.cpp)
 if(PETSC_FOUND)
   list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PolyChebPrec.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PolyChebPrec.cpp)
-
-  list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/SchurMatrixHelper.h)
-  list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/SchurMatrixHelper.cpp)
 endif(PETSC_FOUND)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/ValVectorGenerator.h)

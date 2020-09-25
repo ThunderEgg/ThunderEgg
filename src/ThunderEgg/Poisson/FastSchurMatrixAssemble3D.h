@@ -19,39 +19,27 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHUR_SCHURMATRIXHELPER
-#define THUNDEREGG_SCHUR_SCHURMATRIXHELPER
-#include <ThunderEgg/Experimental/PBMatrix.h>
+#ifndef THUNDEREGG_POISSON_FASTSCHURMATRIXASSEMBLE3D_H
+#define THUNDEREGG_POISSON_FASTSCHURMATRIXASSEMBLE3D_H
+#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/Schur/InterfaceDomain.h>
-#include <functional>
 #include <petscmat.h>
-#include <valarray>
 namespace ThunderEgg
 {
-namespace Schur
+namespace Poisson
 {
-struct Block;
-class SchurMatrixHelper
-{
-	private:
-	std::shared_ptr<InterfaceDomain<3>> sh;
-	int                                 n;
-
-	typedef std::function<void(Block *, std::shared_ptr<std::valarray<double>>)> inserter;
-	void assembleMatrix(inserter insertBlock);
-
-	public:
-	SchurMatrixHelper(std::shared_ptr<InterfaceDomain<3>> sh, void *solver)
-	{
-		this->sh = sh;
-		n        = sh->getDomain()->getNs()[0];
-	}
-	Mat                     formCRSMatrix();
-	Experimental::PBMatrix *formPBMatrix();
-	void                    getPBDiagInv(PC p);
-	Mat                     getPBMatrix();
-	Mat                     getPBDiagInv();
-};
-} // namespace Schur
+/**
+ * @brief A fast algorithm for forming the Schur compliment matrix
+ *
+ * Currently this algorithm only supports the FFTWPatchSovler and it has to use
+ * TriLinearGhostFiller
+ *
+ * @param iface_domain the interface domain that we are forming the schur compliment matrix for
+ * @param solver the patch solver to use for the formation
+ * @return Mat the PETSc matrix, user is responsible for destroying
+ */
+Mat FastSchurMatrixAssemble3D(std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domain,
+                              std::shared_ptr<Poisson::FFTWPatchSolver<3>>     solver);
+} // namespace Poisson
 } // namespace ThunderEgg
 #endif
