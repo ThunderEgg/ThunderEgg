@@ -45,7 +45,7 @@ namespace GMG
  * 	- getNewGhostVector() will allocate a new vector for these ghost values.
  *
  */
-template <size_t D> class InterLevelComm
+template <int D> class InterLevelComm
 {
 	private:
 	/**

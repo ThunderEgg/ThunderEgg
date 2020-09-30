@@ -22,8 +22,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/DomainGenerator.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/DomainTools.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/DomainWrapOp.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/FineNbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GhostFiller.h)
@@ -59,10 +57,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/PatchOperator.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/SchurDomainOp.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/SchwarzPrec.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
 
@@ -103,7 +97,7 @@ target_compile_features(ThunderEgg PUBLIC cxx_std_11)
 target_include_directories(
   ThunderEgg PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-list(APPEND ThunderEgg_Includes ${MPI_CXX_INCLUDE_PATH})
+list(APPEND ThunderEgg_Includes ${MPI_C_INCLUDE_PATH})
 list(APPEND ThunderEgg_Includes ${PETSC_INCLUDES})
 list(APPEND ThunderEgg_Includes ${Zoltan_INCLUDES})
 if(p4est_FOUND)
@@ -126,7 +120,7 @@ if(p4est_FOUND)
   list(APPEND ThunderEgg_Libs ${sc_LIBRARIES})
 endif()
 target_link_libraries(ThunderEgg PUBLIC ${ThunderEgg_Libs})
-target_link_libraries(ThunderEgg PUBLIC ${MPI_CXX_LIBRARIES})
+target_link_libraries(ThunderEgg PUBLIC ${MPI_C_LIBRARIES})
 target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
 
 install(

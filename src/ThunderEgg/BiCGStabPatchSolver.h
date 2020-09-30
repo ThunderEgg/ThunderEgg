@@ -38,7 +38,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of cartesian dimensions
  */
-template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
+template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 {
 	private:
 	/**
@@ -72,7 +72,7 @@ template <size_t D> class BiCGStabPatchSolver : public PatchSolver<D>
 		 *
 		 * @return std::shared_ptr<Vector<D>> the vector
 		 */
-		std::shared_ptr<Vector<D>> getNewVector()
+		std::shared_ptr<Vector<D>> getNewVector() const override
 		{
 			return std::shared_ptr<Vector<D>>(
 			new ValVector<D>(MPI_COMM_SELF, lengths, 1, num_ghost_cells));

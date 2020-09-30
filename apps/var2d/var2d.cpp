@@ -26,14 +26,12 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/DomainWrapOp.h>
 #include <ThunderEgg/Experimental/DomGen.h>
 #include <ThunderEgg/GMG/CycleBuilder.h>
 #include <ThunderEgg/GMG/DrctIntp.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
-#include <ThunderEgg/SchwarzPrec.h>
 #include <ThunderEgg/Timer.h>
 #include <ThunderEgg/ValVectorGenerator.h>
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>

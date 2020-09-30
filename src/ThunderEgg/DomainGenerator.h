@@ -32,7 +32,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class DomainGenerator
+template <int D> class DomainGenerator
 {
 	public:
 	/**

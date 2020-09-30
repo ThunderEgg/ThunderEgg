@@ -1,0 +1,508 @@
+{
+  "levels": [
+    [
+      {
+        "id": 0,
+        "parent_id": 0,
+        "parent_rank": 0,
+        "rank": 0,
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ranks": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          0.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "nbrs": [
+          {
+            "side": "EAST",
+            "type": "FINE",
+            "ids": [
+              2,
+              4
+            ],
+            "ranks": [
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "parent_id": 1,
+        "parent_rank": 0,
+        "orth_on_parent": "SW",
+        "rank": 1,
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ranks": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          1.0,
+          0.0
+        ],
+        "lengths": [
+          0.5,
+          0.5
+        ],
+        "nbrs": [
+          {
+            "side": "WEST",
+            "type": "COARSE",
+            "ids": [
+              0
+            ],
+            "ranks": [
+              0
+            ],
+            "orth_on_coarse": "SE"
+          },
+          {
+            "side": "EAST",
+            "type": "NORMAL",
+            "ids": [
+              3
+            ],
+            "ranks": [
+              1
+            ]
+          },
+          {
+            "side": "NORTH",
+            "type": "NORMAL",
+            "ids": [
+              4
+            ],
+            "ranks": [
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "parent_id": 1,
+        "parent_rank": 0,
+        "orth_on_parent": "SE",
+        "rank": 1,
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ranks": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          1.5,
+          0.0
+        ],
+        "lengths": [
+          0.5,
+          0.5
+        ],
+        "nbrs": [
+          {
+            "side": "WEST",
+            "type": "NORMAL",
+            "ids": [
+              2
+            ],
+            "ranks": [
+              1
+            ]
+          },
+          {
+            "side": "NORTH",
+            "type": "NORMAL",
+            "ids": [
+              5
+            ],
+            "ranks": [
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "parent_id": 1,
+        "parent_rank": 0,
+        "orth_on_parent": "NW",
+        "rank": 1,
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ranks": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          1.0,
+          0.5
+        ],
+        "lengths": [
+          0.5,
+          0.5
+        ],
+        "nbrs": [
+          {
+            "side": "WEST",
+            "type": "COARSE",
+            "ids": [
+              0
+            ],
+            "ranks": [
+              0
+            ],
+            "orth_on_coarse": "NE"
+          },
+          {
+            "side": "EAST",
+            "type": "NORMAL",
+            "ids": [
+              5
+            ],
+            "ranks": [
+              1
+            ]
+          },
+          {
+            "side": "SOUTH",
+            "type": "NORMAL",
+            "ids": [
+              2
+            ],
+            "ranks": [
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "parent_id": 1,
+        "parent_rank": 0,
+        "orth_on_parent": "NE",
+        "rank": 1,
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ranks": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          1.5,
+          0.5
+        ],
+        "lengths": [
+          0.5,
+          0.5
+        ],
+        "nbrs": [
+          {
+            "side": "WEST",
+            "type": "NORMAL",
+            "ids": [
+              4
+            ],
+            "ranks": [
+              1
+            ]
+          },
+          {
+            "side": "SOUTH",
+            "type": "NORMAL",
+            "ids": [
+              3
+            ],
+            "ranks": [
+              1
+            ]
+          }
+        ]
+      }
+    ],
+    [
+      {
+        "id": 0,
+        "parent_id": -1,
+        "parent_rank": -1,
+        "rank": 0,
+        "child_ids": [
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ranks": [
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          0.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "nbrs": [
+          {
+            "side": "EAST",
+            "type": "NORMAL",
+            "ids": [
+              1
+            ],
+            "ranks": [
+              0
+            ]
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "parent_id": -1,
+        "parent_rank": -1,
+        "rank": 0,
+        "child_ids": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "child_ranks": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "starts": [
+          1.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "nbrs": [
+          {
+            "side": "WEST",
+            "type": "NORMAL",
+            "ids": [
+              0
+            ],
+            "ranks": [
+              0
+            ]
+          }
+        ]
+      }
+    ]
+  ],
+  "forest": {
+    "dimension": 2,
+    "curr_id": 6,
+    "nodes": {
+      "0": {
+        "dimension": 2,
+        "level": 0,
+        "starts": [
+          0.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "id": 0,
+        "parent_id": -1,
+        "nbr_ids": [
+          -1,
+          1,
+          -1,
+          -1
+        ],
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "1": {
+        "dimension": 2,
+        "level": 0,
+        "starts": [
+          1.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "id": 1,
+        "parent_id": -1,
+        "nbr_ids": [
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ids": [
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "2": {
+        "dimension": 2,
+        "level": 1,
+        "starts": [
+          1.0,
+          0.0
+        ],
+        "lengths": [
+          0.5,
+          0.5
+        ],
+        "id": 2,
+        "parent_id": 1,
+        "nbr_ids": [
+          -1,
+          3,
+          -1,
+          4
+        ],
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "3": {
+        "dimension": 2,
+        "level": 1,
+        "starts": [
+          1.5,
+          0.0
+        ],
+        "lengths": [
+          0.5,
+          0.5
+        ],
+        "id": 3,
+        "parent_id": 1,
+        "nbr_ids": [
+          2,
+          -1,
+          -1,
+          5
+        ],
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "4": {
+        "dimension": 2,
+        "level": 1,
+        "starts": [
+          1.0,
+          0.5
+        ],
+        "lengths": [
+          0.5,
+          0.5
+        ],
+        "id": 4,
+        "parent_id": 1,
+        "nbr_ids": [
+          -1,
+          5,
+          2,
+          -1
+        ],
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "5": {
+        "dimension": 2,
+        "level": 1,
+        "starts": [
+          1.5,
+          0.5
+        ],
+        "lengths": [
+          0.5,
+          0.5
+        ],
+        "id": 5,
+        "parent_id": 1,
+        "nbr_ids": [
+          4,
+          -1,
+          3,
+          -1
+        ],
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    "root_ids": [
+      0,
+      1
+    ]
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "levels": [
+    [
+      {
+        "id": 0,
+        "parent_id": -1,
+        "parent_rank": -1,
+        "rank": 0,
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ranks": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          0.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "nbrs": [
+          {
+            "side": "EAST",
+            "type": "NORMAL",
+            "ids": [
+              1
+            ],
+            "ranks": [
+              1
+            ]
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "parent_id": -1,
+        "parent_rank": -1,
+        "rank": 1,
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ranks": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          1.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "nbrs": [
+          {
+            "side": "WEST",
+            "type": "NORMAL",
+            "ids": [
+              0
+            ],
+            "ranks": [
+              0
+            ]
+          }
+        ]
+      }
+    ]
+  ],
+  "forest": {
+    "dimension": 2,
+    "curr_id": 2,
+    "nodes": {
+      "0": {
+        "dimension": 2,
+        "level": 0,
+        "starts": [
+          0.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "id": 0,
+        "parent_id": -1,
+        "nbr_ids": [
+          -1,
+          1,
+          -1,
+          -1
+        ],
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "1": {
+        "dimension": 2,
+        "level": 0,
+        "starts": [
+          1.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "id": 1,
+        "parent_id": -1,
+        "nbr_ids": [
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      }
+    },
+    "root_ids": [
+      0,
+      1
+    ]
+  }
+}

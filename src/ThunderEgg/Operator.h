@@ -29,7 +29,7 @@ namespace ThunderEgg
 /**
  * @brief Base class for operators
  */
-template <size_t D> class Operator
+template <int D> class Operator
 {
 	public:
 	/**

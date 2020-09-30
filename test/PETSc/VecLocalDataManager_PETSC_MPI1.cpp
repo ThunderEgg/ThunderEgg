@@ -31,28 +31,30 @@ TEST_CASE("PETSc::VecLocalDataManager getVecView", "[PETSc::VecLocalDataManager]
 {
 	Vec vec;
 	VecCreateMPI(MPI_COMM_WORLD, 100, PETSC_DETERMINE, &vec);
-	PETSc::VecLocalDataManager vldm(vec, false);
+	PETSc::VecLocalDataManager *vldm = new PETSc::VecLocalDataManager(vec, false);
 
 	double *view;
 	VecGetArray(vec, &view);
 
-	CHECK(vldm.getVecView() == view);
+	CHECK(vldm->getVecView() == view);
 
 	VecRestoreArray(vec, &view);
+	delete vldm;
 	VecDestroy(&vec);
 }
 TEST_CASE("PETSc::VecLocalDataManager getVecView read only", "[PETSc::VecLocalDataManager]")
 {
 	Vec vec;
 	VecCreateMPI(MPI_COMM_WORLD, 100, PETSC_DETERMINE, &vec);
-	PETSc::VecLocalDataManager vldm(vec, true);
+	PETSc::VecLocalDataManager *vldm = new PETSc::VecLocalDataManager(vec, true);
 
 	double *view;
 	VecGetArray(vec, &view);
 
-	CHECK(vldm.getVecView() == view);
+	CHECK(vldm->getVecView() == view);
 
 	VecRestoreArray(vec, &view);
+	delete vldm;
 	VecDestroy(&vec);
 }
 TEST_CASE("PETSc::VecLocalDataManager throws exception when Vec is read only",

@@ -27,7 +27,7 @@
 
 namespace ThunderEgg
 {
-template <size_t D> class MockGhostFiller : public GhostFiller<D>
+template <int D> class MockGhostFiller : public GhostFiller<D>
 {
 	private:
 	mutable bool called = false;
@@ -42,7 +42,7 @@ template <size_t D> class MockGhostFiller : public GhostFiller<D>
 		return called;
 	}
 };
-template <size_t D> class MockPatchSolver : public PatchSolver<D>
+template <int D> class MockPatchSolver : public PatchSolver<D>
 {
 	private:
 	std::shared_ptr<Vector<D>>                            u_vec;

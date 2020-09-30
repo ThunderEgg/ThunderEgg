@@ -34,7 +34,7 @@ namespace GMG
  * @brief Restrictor that implements the necessary mpi calls, derived classes only have to
  * implement restrictorPatches method
  */
-template <size_t D> class MPIRestrictor : public Restrictor<D>
+template <int D> class MPIRestrictor : public Restrictor<D>
 {
 	private:
 	/**

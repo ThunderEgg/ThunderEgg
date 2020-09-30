@@ -34,7 +34,7 @@ namespace Experimental
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class DomGen : public DomainGenerator<D>
+template <int D> class DomGen : public DomainGenerator<D>
 {
 	private:
 	/**
@@ -107,7 +107,7 @@ template <size_t D> class DomGen : public DomainGenerator<D>
 	bool                       hasCoarserDomain();
 	std::shared_ptr<Domain<D>> getCoarserDomain();
 };
-template <size_t D>
+template <int D>
 DomGen<D>::DomGen(Tree<D> t, std::array<int, D> ns, int num_ghost_cells, bool neumann)
 {
 	this->t               = t;
@@ -120,11 +120,11 @@ DomGen<D>::DomGen(Tree<D> t, std::array<int, D> ns, int num_ghost_cells, bool ne
 	// generate finest DC
 	extractLevel();
 }
-template <size_t D> std::shared_ptr<Domain<D>> DomGen<D>::getFinestDomain()
+template <int D> std::shared_ptr<Domain<D>> DomGen<D>::getFinestDomain()
 {
 	return domain_list.front();
 }
-template <size_t D> std::shared_ptr<Domain<D>> DomGen<D>::getCoarserDomain()
+template <int D> std::shared_ptr<Domain<D>> DomGen<D>::getCoarserDomain()
 {
 	if (curr_level > 0) {
 		extractLevel();
@@ -133,11 +133,11 @@ template <size_t D> std::shared_ptr<Domain<D>> DomGen<D>::getCoarserDomain()
 		return nullptr;
 	}
 }
-template <size_t D> bool DomGen<D>::hasCoarserDomain()
+template <int D> bool DomGen<D>::hasCoarserDomain()
 {
 	return curr_level > 0;
 }
-template <size_t D> inline void DomGen<D>::extractLevel()
+template <int D> inline void DomGen<D>::extractLevel()
 {
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -304,7 +304,7 @@ template <size_t D> inline void DomGen<D>::extractLevel()
 	}
 	curr_level--;
 }
-template <size_t D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
+template <int D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
 {
 	struct Zoltan_Struct *zz = Zoltan_Create(MPI_COMM_WORLD);
 
@@ -490,7 +490,7 @@ template <size_t D> inline void DomGen<D>::balanceLevel(PInfoMap &level)
 	std::cout << std::endl;
 #endif
 }
-template <size_t D>
+template <int D>
 inline void DomGen<D>::balanceLevelWithLower(PInfoMap &level, PInfoMap &lower_level)
 {
 	struct Zoltan_Struct *zz = Zoltan_Create(MPI_COMM_WORLD);

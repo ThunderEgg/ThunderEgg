@@ -34,7 +34,7 @@ namespace GMG
  * @brief Interpolator that implements the necessary mpi calls, derived classes only have to
  * implement interpolatePatches method
  */
-template <size_t D> class MPIInterpolator : public Interpolator<D>
+template <int D> class MPIInterpolator : public Interpolator<D>
 {
 	private:
 	/**

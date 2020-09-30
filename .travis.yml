@@ -54,7 +54,7 @@ jobs:
     deploy:
       skip_cleanup: true
       provider: script
-      script: bash TravisScripts/DeployDocs.sh
+      script: bash TravisScripts/DeployDocs.sh || true
       on:
         all_branches: true
         condition: $TRAVIS_BRANCH == "develop-wip" || $TRAVIS_BRANCH == "develop"

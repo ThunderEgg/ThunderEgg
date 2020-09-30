@@ -31,13 +31,13 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class ValVectorGenerator : public VectorGenerator<D>
+template <int D> class ValVectorGenerator : public VectorGenerator<D>
 {
 	private:
 	/**
 	 * @brief the Domain to generate ValVector objects for
 	 */
-	std::shared_ptr<Domain<D>> domain;
+	std::shared_ptr<const Domain<D>> domain;
 
 	public:
 	/**
@@ -45,8 +45,8 @@ template <size_t D> class ValVectorGenerator : public VectorGenerator<D>
 	 *
 	 * @param domain_in the Domain to generate ValVector objects for
 	 */
-	ValVectorGenerator(std::shared_ptr<Domain<D>> domain_in) : domain(domain_in) {}
-	std::shared_ptr<Vector<D>> getNewVector()
+	explicit ValVectorGenerator(std::shared_ptr<const Domain<D>> domain_in) : domain(domain_in) {}
+	std::shared_ptr<Vector<D>> getNewVector() const override
 	{
 		return ValVector<D>::GetNewVector(domain);
 	}

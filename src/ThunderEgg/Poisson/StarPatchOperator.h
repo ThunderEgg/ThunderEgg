@@ -40,7 +40,7 @@ namespace Poisson
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class StarPatchOperator : public PatchOperator<D>
+template <int D> class StarPatchOperator : public PatchOperator<D>
 {
 	private:
 	constexpr int addValue(int axis) const

@@ -54,7 +54,7 @@ class MockRestrictor : public GMG::Restrictor<2>
 class MockVectorGenerator : public VectorGenerator<2>
 {
 	public:
-	std::shared_ptr<Vector<2>> getNewVector()
+	std::shared_ptr<Vector<2>> getNewVector() const override
 	{
 		return nullptr;
 	}

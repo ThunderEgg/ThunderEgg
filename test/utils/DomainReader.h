@@ -22,7 +22,7 @@
 #include <ThunderEgg/Domain.h>
 #include <fstream>
 #include <string>
-template <size_t D> class DomainReader
+template <int D> class DomainReader
 {
 	private:
 	bool                                      neumann;

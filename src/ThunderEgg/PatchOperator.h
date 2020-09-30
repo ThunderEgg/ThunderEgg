@@ -33,7 +33,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions.
  */
-template <size_t D> class PatchOperator : public Operator<D>
+template <int D> class PatchOperator : public Operator<D>
 {
 	protected:
 	/**

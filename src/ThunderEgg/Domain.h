@@ -41,7 +41,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class Domain
+template <int D> class Domain
 {
 	public:
 	std::vector<int> patch_id_bc_map_vec;
@@ -359,7 +359,7 @@ template <size_t D> class Domain
 	}
 }; // namespace ThunderEgg
 
-template <size_t D> void Domain<D>::indexDomainsLocal(bool local_id_set)
+template <int D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 {
 	std::vector<int>               map_vec;
 	std::vector<int>               in_off_proc_map_vec;
@@ -484,7 +484,7 @@ template <size_t D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 	this->out_off_proc_map_vec          = out_off_proc_map_vec;
 	patch_global_index_map_vec_off_proc = in_off_proc_map_vec;
 }
-template <size_t D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
+template <int D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 {
 	// global indices are going to be sequentially increasing with rank
 	int local_size = pinfo_id_map.size();
@@ -542,7 +542,7 @@ template <size_t D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 		p.second->setGlobalNeighborIndexes(rev_map);
 	}
 }
-template <size_t D> void Domain<D>::indexBCLocal()
+template <int D> void Domain<D>::indexBCLocal()
 {
 	int curr_i = 0;
 	for (auto pinfo : pinfo_vector) {
@@ -556,7 +556,7 @@ template <size_t D> void Domain<D>::indexBCLocal()
 	}
 	local_num_bc = curr_i;
 }
-template <size_t D> void Domain<D>::indexBCGlobal()
+template <int D> void Domain<D>::indexBCGlobal()
 {
 	int curr_i;
 	MPI_Scan(&local_num_bc, &curr_i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);

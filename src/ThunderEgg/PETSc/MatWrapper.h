@@ -33,7 +33,7 @@ namespace PETSc
 /**
  * @brief Wraps a PETSc Mat object for use as a ThunderEgg Operator
  */
-template <size_t D> class MatWrapper : public Operator<D>
+template <int D> class MatWrapper : public Operator<D>
 {
 	private:
 	/**

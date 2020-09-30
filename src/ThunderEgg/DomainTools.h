@@ -32,7 +32,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of cartesian dimensions
  */
-template <size_t D> struct DomainTools {
+template <int D> struct DomainTools {
 	/**
 	 * @brief Given a path info object, get the coordinate from a given index into the patch.
 	 *

@@ -47,7 +47,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of cartesian dimensions in the patch
  */
-template <size_t D> struct PatchInfo : public Serializable {
+template <int D> struct PatchInfo : public Serializable {
 	/**
 	 * @brief The globally unique ID of the patch
 	 * This ID only needs to be unique within a Domain.

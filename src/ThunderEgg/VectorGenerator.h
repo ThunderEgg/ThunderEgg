@@ -38,7 +38,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class VectorGenerator
+template <int D> class VectorGenerator
 {
 	public:
 	/**
@@ -50,7 +50,7 @@ template <size_t D> class VectorGenerator
 	 *
 	 * @return std::shared_ptr<Vector<D>> the Vector
 	 */
-	virtual std::shared_ptr<Vector<D>> getNewVector() = 0;
+	virtual std::shared_ptr<Vector<D>> getNewVector() const = 0;
 };
 } // namespace ThunderEgg
 #endif

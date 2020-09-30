@@ -35,7 +35,7 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class MPIGhostFiller : public GhostFiller<D>
+template <int D> class MPIGhostFiller : public GhostFiller<D>
 {
 	private:
 	/**

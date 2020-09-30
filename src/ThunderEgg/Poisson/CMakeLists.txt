@@ -12,6 +12,16 @@ if(FFTW_FOUND)
 endif(FFTW_FOUND)
 
 if(PETSC_FOUND)
+  if(FFTW_FOUND)
+    list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/FastSchurMatrixAssemble2D.h)
+    list(APPEND ThunderEgg_SRCS
+                ThunderEgg/Poisson/FastSchurMatrixAssemble2D.cpp)
+
+    list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/FastSchurMatrixAssemble3D.h)
+    list(APPEND ThunderEgg_SRCS
+                ThunderEgg/Poisson/FastSchurMatrixAssemble3D.cpp)
+  endif(FFTW_FOUND)
+
   list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/MatrixHelper.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/MatrixHelper.cpp)
 
@@ -21,19 +31,3 @@ if(PETSC_FOUND)
   list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/StencilHelper.h)
   list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/StencilHelper2d.h)
 endif(PETSC_FOUND)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/Schur/DftPatchSolver.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/Schur/DftPatchSolver.cpp)
-
-if(FFTW_FOUND)
-
-  list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/Schur/FftwPatchSolver.h)
-  list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/Schur/FftwPatchSolver.cpp)
-
-endif(FFTW_FOUND)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/Schur/SevenPtPatchOperator.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/Schur/SevenPtPatchOperator.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/Schur/StarPatchOperator.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/Schur/StarPatchOperator.cpp)

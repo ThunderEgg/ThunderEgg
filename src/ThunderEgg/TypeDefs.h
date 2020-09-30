@@ -42,7 +42,7 @@ namespace ThunderEgg
  *
  * @return wether the boundary is a neumann boundary
  */
-template <size_t D>
+template <int D>
 using IsNeumannFunc = std::function<bool(Side<D> s, const std::array<double, D> &lower,
                                          const std::array<double, D> &upper)>;
 } // namespace ThunderEgg

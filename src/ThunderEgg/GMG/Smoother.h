@@ -29,7 +29,7 @@ namespace GMG
 /**
  * @brief Base class for multi-grid smoothing operators.
  */
-template <size_t D> class Smoother
+template <int D> class Smoother
 {
 	public:
 	/**

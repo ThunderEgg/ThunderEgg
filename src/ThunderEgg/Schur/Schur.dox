@@ -1,0 +1,4 @@
+/**
+ * @namespace ThunderEgg::Schur
+ * @brief Implements a Schur compliment system using the interfaces between patches.
+ */

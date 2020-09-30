@@ -35,7 +35,7 @@ namespace GMG
 /**
  * @brief Represents a level in geometric multi-grid.
  */
-template <size_t D> class Level
+template <int D> class Level
 {
 	private:
 	/**

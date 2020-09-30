@@ -32,95 +32,148 @@ namespace Schur
  *
  * @tparam D the number of cartesian dimensions on a patch
  */
-template <size_t D> class IfaceType
+template <int D> class IfaceType
 {
 	private:
 	/**
 	 * @brief the value of the enum
 	 */
-	char val = -1;
+	unsigned char val = 10;
 	/**
 	 * @brief Orthant that the interface lies on
 	 */
 	Orthant<D - 1> orthant = Orthant<D - 1>::null();
 
-	public:
-	// enum definitions
 	/**
-	 * @brief An interface on a side of a patch with a neighbor at the same refinement level.
-	 */
-	static constexpr char normal = 0b000;
-	/**
-	 * @brief An interface on a side of a patch with neighbors at a finer refinement level.
-	 *
-	 * This interface lines up with the cells on the coarser patch.
-	 */
-	static constexpr char coarse_to_coarse = 0b001;
-	/**
-	 * @brief An interface on a side of a patch with a neighbor at a coarser refinement level.
-	 *
-	 * This interface lines up with the cells on the coarser patch.
-	 */
-	static constexpr char fine_to_coarse = 0b010;
-	/**
-	 * @brief An interface on a side of a patch with a neighbor at a coarser refinement level.
-	 *
-	 * This interface lines up with the cells on the finer patch.
-	 * The orthant value should be set to the orthant on the coarser patch's side that the finer
-	 * patch lies on.
-	 */
-	static constexpr char fine_to_fine = 0b011;
-	/**
-	 * @brief An interface on a side of a patch with neighbors at a finer refinement level.
-	 *
-	 * This interface lines up with the cells on the finer patch.
-	 * The orthant value should be set to the orthant on the coarser patch's side that the finer
-	 * patch lies on.
-	 */
-	static constexpr char coarse_to_fine = 0b100;
-	/**
-	 * @brief Construct a new Iface Type object with the value set to -1
-	 */
-	IfaceType() = default;
-	/**
-	 * @brief Construct a new Iface Type object with the specified value
-	 *
-	 * @param val the value
-	 */
-	IfaceType(const char val)
-	{
-		this->val = val;
-	}
-	/**
-	 * @brief Construct a new Iface Type object with the specified value and orthant.
+	 * @brief Construct a new IfaceType object
 	 *
 	 * @param val the value
 	 * @param orthant orthant on the coarser patch's side that the finer
 	 * patch lies on.
 	 */
-	IfaceType(const char val, const Orthant<D - 1> orthant)
+	IfaceType(unsigned char val, Orthant<D - 1> orthant) : val(val), orthant(orthant) {}
+
+	public:
+	/**
+	 * @brief An interface on a side of a patch with a neighbor at the same refinement level.
+	 *
+	 * @return IfaceType<D> the new IfaceType
+	 */
+	static IfaceType<D> Normal()
 	{
-		this->val     = val;
-		this->orthant = orthant;
+		return IfaceType<D>(0, Orthant<D - 1>::null());
 	}
 	/**
-	 * @brief Return the integer value of this ifacetype
+	 * @brief Check if this type is Normal
+	 *
+	 * @return if it is Normal
 	 */
-	char toInt()
+	bool isNormal() const
 	{
-		return val;
+		return val == 0;
 	}
+	/**
+	 * @brief An interface on a side of a patch with neighbors at a finer refinement level.
+	 *
+	 * This interface lines up with the cells on the coarser patch.
+	 *
+	 * @return IfaceType<D> the new IfaceType
+	 */
+	static IfaceType<D> CoarseToCoarse()
+	{
+		return IfaceType<D>(1, Orthant<D - 1>::null());
+	}
+	/**
+	 * @brief Check if this type is CoarseToCoarse
+	 *
+	 * @return if it is CoarseToCoarse
+	 */
+	bool isCoarseToCoarse() const
+	{
+		return val == 1;
+	}
+	/**
+	 * @brief An interface on a side of a patch with a neighbor at a coarser refinement level.
+	 *
+	 * This interface lines up with the cells on the coarser patch.
+	 *
+	 * @param orthant the orthant of the fine patch
+	 * @return IfaceType<D> the new IfaceType
+	 */
+	static IfaceType<D> FineToCoarse(Orthant<D - 1> orth_on_coarse)
+	{
+		return IfaceType<D>(2, orth_on_coarse);
+	}
+	/**
+	 * @brief Check if this type is FineToCoarse
+	 *
+	 * @return if it is FineToCoarse
+	 */
+	bool isFineToCoarse() const
+	{
+		return val == 2;
+	}
+	/**
+	 * @brief An interface on a side of a patch with a neighbor at a coarser refinement level.
+	 *
+	 * This interface lines up with the cells on the finer patch.
+	 * The orthant value should be set to the orthant on the coarser patch's side that the finer
+	 * patch lies on.
+	 *
+	 * @param orthant the orthant of the fine patch
+	 * @return IfaceType<D> the new IfaceType
+	 */
+	static IfaceType<D> FineToFine(Orthant<D - 1> orth_on_coarse)
+	{
+		return IfaceType<D>(3, orth_on_coarse);
+	}
+	/**
+	 * @brief Check if this type is FineToFine
+	 *
+	 * @return if it is FineToFine
+	 */
+	bool isFineToFine() const
+	{
+		return val == 3;
+	}
+	/**
+	 * @brief An interface on a side of a patch with neighbors at a finer refinement level.
+	 *
+	 * This interface lines up with the cells on the finer patch.
+	 * The orthant value should be set to the orthant on the coarser patch's side that the finer
+	 * patch lies on.
+	 *
+	 * @param orthant the orthant of the fine patch
+	 * @return IfaceType<D> the new IfaceType
+	 */
+	static IfaceType<D> CoarseToFine(Orthant<D - 1> orthant)
+	{
+		return IfaceType<D>(4, orthant);
+	}
+	/**
+	 * @brief Check if this type is CoarseToFine
+	 *
+	 * @return if it is CoarseToFine
+	 */
+	bool isCoarseToFine() const
+	{
+		return val == 4;
+	}
+	/**
+	 * @brief Construct a new Iface Type object with the value set to 10 and the orthant set to null
+	 */
+	IfaceType() = default;
 	/**
 	 * @brief Get the Orthant that the finer patch lies on
 	 */
-	Orthant<D - 1> getOrthant()
+	Orthant<D - 1> getOrthant() const
 	{
 		return orthant;
 	}
 	/**
 	 * @brief Set the Orthant that the finer patch lies on
 	 */
-	void setOrthant(const Orthant<D - 1> orthant)
+	void setOrthant(Orthant<D - 1> orthant)
 	{
 		this->orthant = orthant;
 	}
@@ -129,9 +182,7 @@ template <size_t D> class IfaceType
 	 */
 	bool operator<(const IfaceType &b) const
 	{
-		int orth   = orthant.getIndex();
-		int b_orth = b.orthant.getIndex();
-		return std::tie(val, orth) < std::tie(b.val, b_orth);
+		return std::forward_as_tuple(val, orthant) < std::forward_as_tuple(b.val, b.orthant);
 	}
 };
 } // namespace Schur

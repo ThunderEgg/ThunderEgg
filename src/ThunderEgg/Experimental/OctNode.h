@@ -32,7 +32,7 @@ namespace Experimental
 /**
  * @brief Represents a node in an OctTree
  */
-template <size_t D> struct Node {
+template <int D> struct Node {
 	/**
 	 * @brief The id of the node.
 	 */

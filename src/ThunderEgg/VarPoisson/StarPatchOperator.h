@@ -40,7 +40,7 @@ namespace VarPoisson
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <size_t D> class StarPatchOperator : public PatchOperator<D>
+template <int D> class StarPatchOperator : public PatchOperator<D>
 {
 	protected:
 	std::shared_ptr<const Vector<D>> coeffs;

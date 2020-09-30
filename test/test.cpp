@@ -9,6 +9,11 @@ int main(int argc, char *argv[])
 
 	int result = Catch::Session().run(argc, argv);
 
+	// abort if failure, some tests can hang otherwise
+	if (result > 0) {
+		MPI_Abort(MPI_COMM_WORLD, result);
+	}
+
 	// global clean-up...
 	MPI_Finalize();
 

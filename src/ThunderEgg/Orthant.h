@@ -36,7 +36,7 @@ namespace ThunderEgg
  * bse means Bottom-South-West, which is in the corner of where the bottom, south, and west sides
  * meet.
  */
-template <size_t D> class Orthant
+template <int D> class Orthant
 {
 	private:
 	/**

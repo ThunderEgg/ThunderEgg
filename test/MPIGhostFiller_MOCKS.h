@@ -31,7 +31,7 @@
 
 namespace ThunderEgg
 {
-template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
+template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 {
 	private:
 	mutable std::list<
@@ -178,7 +178,7 @@ template <size_t D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		}
 	}
 };
-template <size_t D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
+template <int D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 {
 	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,

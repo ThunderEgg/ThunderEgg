@@ -2,7 +2,6 @@ if(PETSC_FOUND)
   add_executable(
     unit_tests_mpiany
     test.cpp
-    SchurInfo.cpp
     PatchInfo.cpp
     OctTree.cpp
     Domain.cpp
@@ -26,7 +25,7 @@ if(PETSC_FOUND)
 
   foreach(ARG1 RANGE 1 1)
     set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
-    set(AdditionalCatchParameters -x 10 WORKING_DIRECTORY
+    set(AdditionalCatchParameters -a WORKING_DIRECTORY
                                   ${CMAKE_CURRENT_SOURCE_DIR})
     parseandaddcatchtests(
       unit_tests_mpiany
@@ -59,7 +58,7 @@ if(PETSC_FOUND)
     list(FILTER TEST_MPI${ARG1}_PETSC_SRC INCLUDE REGEX ".*_PETSC_.*")
 
     set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
-    set(AdditionalCatchParameters -x 10 WORKING_DIRECTORY
+    set(AdditionalCatchParameters -a WORKING_DIRECTORY
                                   ${CMAKE_CURRENT_SOURCE_DIR})
 
     if(TEST_MPI${ARG1}_SRC)

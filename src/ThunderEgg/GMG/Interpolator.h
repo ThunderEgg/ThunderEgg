@@ -31,7 +31,7 @@ namespace GMG
 /**
  * @brief base class for interpolation operators from finer levels to coarser levels.
  */
-template <size_t D> class Interpolator
+template <int D> class Interpolator
 {
 	public:
 	/**

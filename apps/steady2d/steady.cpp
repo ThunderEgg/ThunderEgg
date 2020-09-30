@@ -35,8 +35,8 @@
 #include <ThunderEgg/Poisson/Schur/StarPatchOperator.h>
 #include <ThunderEgg/Schur/BiCGStabSolver.h>
 #include <ThunderEgg/Schur/BilinearInterpolator.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <ThunderEgg/Schur/PolyChebPrec.h>
-#include <ThunderEgg/Schur/SchurHelper.h>
 #include <ThunderEgg/Schur/SchurMatrixHelper2d.h>
 #include <ThunderEgg/Schur/SchurWrapOp.h>
 #include <ThunderEgg/SchwarzPrec.h>
@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
 		nfuny = [](double x, double y) { return M_PI * cosl(M_PI * y) * cosl(2 * M_PI * x); };
 	}
 
-	shared_ptr<SchurHelper<2>> sch(new SchurHelper<2>(domain));
+	shared_ptr<InterfaceDomain<2>> sch(new InterfaceDomain<2>(domain));
 	// patch operator
 	shared_ptr<PatchOperator<2>> p_operator(new StarPatchOperator<2>(sch));
 
@@ -383,9 +383,9 @@ int main(int argc, char *argv[])
 		timer.stop("Domain Initialization");
 
 		// Create the gamma and diff vectors
-		shared_ptr<PetscVector<1>> gamma = sch->getNewSchurVec();
-		shared_ptr<PetscVector<1>> diff  = sch->getNewSchurVec();
-		shared_ptr<PetscVector<1>> b     = sch->getNewSchurVec();
+		shared_ptr<PetscVector<1>> gamma = sch->getNewGlobalInterfaceVector();
+		shared_ptr<PetscVector<1>> diff  = sch->getNewGlobalInterfaceVector();
+		shared_ptr<PetscVector<1>> b     = sch->getNewGlobalInterfaceVector();
 
 		// Create linear problem for the Belos solver
 		PW<KSP> solver;
@@ -488,7 +488,7 @@ int main(int argc, char *argv[])
 					cout << "Iterations: " << its << endl;
 				}
 			} else {
-				std::shared_ptr<VectorGenerator<1>> vg(new SchurHelperVG<1>(sch));
+				std::shared_ptr<VectorGenerator<1>> vg(new InterfaceDomainVG<1>(sch));
 
 				int its = BiCGStab<1>::solve(vg, A, gamma, b, M);
 				if (my_global_rank == 0) {
