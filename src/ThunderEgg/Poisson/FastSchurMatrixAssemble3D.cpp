@@ -517,6 +517,53 @@ const function<int(int, int, int)> transforms_right_inv[4]
 	   return n - yi - 1 + xi * n;
    }};
 
+vector<double> FlipBlock(int n, const Block &b, const vector<double> &orig)
+{
+	vector<double>               copy(n * n * n * n);
+	function<int(int, int, int)> col_trans;
+	if (sideIsLeftOriented(b.main)) {
+		if (b.mainFlipped()) {
+			col_trans = transforms_left_inv[b.main_rotation];
+		} else {
+			col_trans = transforms_left[b.main_rotation];
+		}
+	} else {
+		if (b.mainFlipped()) {
+			col_trans = transforms_right_inv[b.main_rotation];
+		} else {
+			col_trans = transforms_right[b.main_rotation];
+		}
+	}
+	function<int(int, int, int)> row_trans;
+	if (sideIsLeftOriented(b.aux)) {
+		if (b.auxFlipped()) {
+			row_trans = transforms_left_inv[b.aux_rotation];
+		} else {
+			row_trans = transforms_left[b.aux_rotation];
+		}
+	} else {
+		if (b.auxFlipped()) {
+			row_trans = transforms_right_inv[b.aux_rotation];
+		} else {
+			row_trans = transforms_right[b.aux_rotation];
+		}
+	}
+	for (int row_yi = 0; row_yi < n; row_yi++) {
+		for (int row_xi = 0; row_xi < n; row_xi++) {
+			int i_dest = row_xi + row_yi * n;
+			int i_orig = row_trans(n, row_xi, row_yi);
+			for (int col_yi = 0; col_yi < n; col_yi++) {
+				for (int col_xi = 0; col_xi < n; col_xi++) {
+					int j_dest = col_xi + col_yi * n;
+					int j_orig = col_trans(n, col_xi, col_yi);
+
+					copy[i_dest * n * n + j_dest] = orig[i_orig * n * n + j_orig];
+				}
+			}
+		}
+	}
+	return copy;
+}
 } // namespace
 Mat ThunderEgg::Poisson::FastSchurMatrixAssemble3D(
 std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domain,
@@ -542,51 +589,8 @@ std::shared_ptr<Poisson::FFTWPatchSolver<3>>     solver)
 		int global_i = b.i * n * n;
 		int global_j = b.j * n * n;
 
-		vector<double> &orig = *coeffs;
+		vector<double> copy = FlipBlock(n, b, *coeffs);
 
-		vector<double>               copy(n * n * n * n);
-		function<int(int, int, int)> col_trans;
-		if (sideIsLeftOriented(b.main)) {
-			if (b.mainFlipped()) {
-				col_trans = transforms_left_inv[b.main_rotation];
-			} else {
-				col_trans = transforms_left[b.main_rotation];
-			}
-		} else {
-			if (b.mainFlipped()) {
-				col_trans = transforms_right_inv[b.main_rotation];
-			} else {
-				col_trans = transforms_right[b.main_rotation];
-			}
-		}
-		function<int(int, int, int)> row_trans;
-		if (sideIsLeftOriented(b.aux)) {
-			if (b.auxFlipped()) {
-				row_trans = transforms_left_inv[b.aux_rotation];
-			} else {
-				row_trans = transforms_left[b.aux_rotation];
-			}
-		} else {
-			if (b.auxFlipped()) {
-				row_trans = transforms_right_inv[b.aux_rotation];
-			} else {
-				row_trans = transforms_right[b.aux_rotation];
-			}
-		}
-		for (int row_yi = 0; row_yi < n; row_yi++) {
-			for (int row_xi = 0; row_xi < n; row_xi++) {
-				int i_dest = row_xi + row_yi * n;
-				int i_orig = row_trans(n, row_xi, row_yi);
-				for (int col_yi = 0; col_yi < n; col_yi++) {
-					for (int col_xi = 0; col_xi < n; col_xi++) {
-						int j_dest = col_xi + col_yi * n;
-						int j_orig = col_trans(n, col_xi, col_yi);
-
-						copy[i_dest * n * n + j_dest] = orig[i_orig * n * n + j_orig];
-					}
-				}
-			}
-		}
 		vector<int> inds_i(n * n);
 		iota(inds_i.begin(), inds_i.end(), global_i);
 		vector<int> inds_j(n * n);
