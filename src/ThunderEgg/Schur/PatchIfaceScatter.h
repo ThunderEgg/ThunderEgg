@@ -243,6 +243,10 @@ template <int D> class PatchIfaceScatter
 		setIncomingBufferMapsAndDetermineLocalVectorSize(iface_domain);
 		setOutgoingBufferMaps(iface_domain);
 	}
+	PatchIfaceScatter(const PatchIfaceScatter &) = delete;
+	PatchIfaceScatter &operator=(const PatchIfaceScatter &) = delete;
+	PatchIfaceScatter(PatchIfaceScatter &&) noexcept        = delete;
+	PatchIfaceScatter &operator=(PatchIfaceScatter &&) noexcept = delete;
 	/**
 	 * @brief Destroy the PatchIfaceScatter object
 	 */
