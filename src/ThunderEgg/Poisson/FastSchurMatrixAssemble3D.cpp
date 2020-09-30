@@ -29,11 +29,13 @@ using namespace ThunderEgg::Schur;
 namespace
 {
 enum class Rotation : char { x_cw, x_ccw, y_cw, y_ccw, z_cw, z_ccw };
-bool sideIsLeft(const Side<3> s)
+bool sideIsLeftOriented(const Side<3> s)
 {
 	return (s == Side<3>::north() || s == Side<3>::west() || s == Side<3>::bottom());
 }
-struct Block {
+class Block
+{
+	public:
 	static const Side<3>          side_table[6][6];
 	static const char             rots_table[6][6];
 	static const vector<Rotation> main_rot_plan[6];
@@ -42,45 +44,36 @@ struct Block {
 	static const char             rot_quad_lookup_left[4][4];
 	static const char             rot_quad_lookup_right[4][4];
 	static const char             quad_flip_lookup[4];
-	char                          data = 0;
 	IfaceType<3>                  type;
 	Side<3>                       main;
 	Side<3>                       aux;
 	int                           j;
 	int                           i;
 	bitset<6>                     non_dirichlet_boundary;
+	bool                          orig_main_is_left_oriented;
+	bool                          orig_aux_is_left_oriented;
+	unsigned char                 main_rotation = 0;
+	unsigned char                 aux_rotation  = 0;
 	Block(Side<3> main, int j, Side<3> aux, int i, bitset<6> non_dirichlet_boundary,
 	      IfaceType<3> type)
-	: type(type)
+	: type(type), main(main), aux(aux), j(j), i(i), non_dirichlet_boundary(non_dirichlet_boundary),
+	  orig_main_is_left_oriented(sideIsLeftOriented(main)),
+	  orig_aux_is_left_oriented(sideIsLeftOriented(aux))
 	{
-		this->main                   = main;
-		this->j                      = j;
-		this->aux                    = aux;
-		this->i                      = i;
-		this->non_dirichlet_boundary = non_dirichlet_boundary;
-		data                         = 0;
-		data |= sideIsLeft(main) << 7;
-		data |= sideIsLeft(aux) << 3;
 		rotate();
 	}
 	void applyRotation(const Rotation rot)
 	{
-		char r;
 		// main rotation
-		r = (data & ~(~0u << 2) << 4) >> 4;
-		r = (r + rots_table[static_cast<int>(rot)][main.getIndex()]) & 0b11;
-		data &= ~(~(~0u << 2) << 4);
-		data |= r << 4;
+		main_rotation = (main_rotation + rots_table[static_cast<int>(rot)][main.getIndex()]) % 4;
 		// aux rotation
-		r = data & ~(~0u << 2);
-		r = (r + rots_table[static_cast<int>(rot)][aux.getIndex()]) & 0b11;
-		data &= ~0u << 2;
-		data |= r;
-		main                  = side_table[static_cast<int>(rot)][main.getIndex()];
-		aux                   = side_table[static_cast<int>(rot)][aux.getIndex()];
+		aux_rotation = (aux_rotation + rots_table[static_cast<int>(rot)][aux.getIndex()]) % 4;
+		main         = side_table[static_cast<int>(rot)][main.getIndex()];
+		aux          = side_table[static_cast<int>(rot)][aux.getIndex()];
 		bitset<6> old_neumann = non_dirichlet_boundary;
 		for (int i = 0; i < 6; i++) {
-			non_dirichlet_boundary[side_table[(int) rot][i].getIndex()] = old_neumann[i];
+			non_dirichlet_boundary[side_table[static_cast<int>(rot)][i].getIndex()]
+			= old_neumann[i];
 		}
 	}
 	void rotate()
@@ -99,10 +92,10 @@ struct Block {
 		}
 		// updated iface type
 		auto rotateQuad = [&](int quad) {
-			if (auxOrigLeft()) {
-				quad = rot_quad_lookup_left[auxRot()][quad];
+			if (orig_aux_is_left_oriented) {
+				quad = rot_quad_lookup_left[aux_rotation][quad];
 			} else {
-				quad = rot_quad_lookup_right[auxRot()][quad];
+				quad = rot_quad_lookup_right[aux_rotation][quad];
 			}
 			if (auxFlipped()) {
 				quad = quad_flip_lookup[quad];
@@ -117,57 +110,20 @@ struct Block {
 	}
 	bool operator<(const Block &b) const
 	{
-		return std::tie(i, j, data) < std::tie(b.i, b.j, b.data);
+		return std::tie(i, j, main_rotation, orig_main_is_left_oriented, aux_rotation)
+		       < std::tie(b.i, b.j, b.main_rotation, b.orig_main_is_left_oriented, b.aux_rotation);
 	}
 	bool operator==(const Block &b) const
 	{
 		return non_dirichlet_boundary.to_ulong() == b.non_dirichlet_boundary.to_ulong();
 	}
-	//
-	bool mainLeft()
+	bool mainFlipped() const
 	{
-		return sideIsLeft(main);
+		return sideIsLeftOriented(main) != orig_main_is_left_oriented;
 	}
-	bool mainFlipped()
+	bool auxFlipped() const
 	{
-		bool left      = sideIsLeft(main);
-		bool orig_left = (data >> 7) & 0b1;
-		return left != orig_left;
-	}
-	int mainRot()
-	{
-		return (data >> 4) & 0b11;
-	}
-	bool auxOrigLeft()
-	{
-		return (data >> 3) & 0b1;
-	}
-	bool auxLeft()
-	{
-		return sideIsLeft(aux);
-	}
-	bool auxFlipped()
-	{
-		bool left      = sideIsLeft(aux);
-		bool orig_left = (data >> 3) & 0b1;
-		return left != orig_left;
-	}
-	int auxRot()
-	{
-		return data & 0b11;
-	}
-};
-struct BlockKey {
-	IfaceType<3> type;
-	Side<3>      s;
-
-	BlockKey(const Block &b) : type(b.type)
-	{
-		s = b.aux;
-	}
-	friend bool operator<(const BlockKey &l, const BlockKey &r)
-	{
-		return tie(l.s, l.type) < tie(r.s, r.type);
+		return sideIsLeftOriented(aux) != orig_aux_is_left_oriented;
 	}
 };
 
@@ -450,7 +406,7 @@ void FillBlockCoeffs(CoeffMap coeffs, std::shared_ptr<const PatchInfo<3>> pinfo,
 			solver->solveSinglePatch(pinfo, u_local_data, f_local_data);
 
 			for (const auto &pair : coeffs) {
-				Side<3>         s     = pair.first.s;
+				Side<3>         s     = pair.first.aux;
 				IfaceType<3>    type  = pair.first.type;
 				vector<double> &block = *pair.second;
 				if (type.isNormal()) {
@@ -500,7 +456,10 @@ void AssembleMatrix(std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domai
 		pinfo->num_ghost_cells = 1;
 		solver->addPatch(pinfo);
 
-		map<BlockKey, shared_ptr<vector<double>>> coeffs;
+		map<Block, shared_ptr<vector<double>>, std::function<bool(const Block &a, const Block &b)>>
+		coeffs([](const Block &a, const Block &b) {
+			return std::tie(a.aux, a.type) < std::tie(b.aux, b.type);
+		});
 		// allocate blocks of coefficients
 		for (const Block &b : blocks) {
 			shared_ptr<vector<double>> ptr = coeffs[b];
@@ -592,30 +551,30 @@ std::shared_ptr<Poisson::FFTWPatchSolver<3>>     solver)
 
 		vector<double>          copy(n * n * n * n);
 		function<int(int, int)> col_trans, row_trans;
-		if (b->mainLeft()) {
+		if (sideIsLeftOriented(b->main)) {
 			if (b->mainFlipped()) {
-				col_trans = transforms_left_inv[b->mainRot()];
+				col_trans = transforms_left_inv[b->main_rotation];
 			} else {
-				col_trans = transforms_left[b->mainRot()];
+				col_trans = transforms_left[b->main_rotation];
 			}
 		} else {
 			if (b->mainFlipped()) {
-				col_trans = transforms_right_inv[b->mainRot()];
+				col_trans = transforms_right_inv[b->main_rotation];
 			} else {
-				col_trans = transforms_right[b->mainRot()];
+				col_trans = transforms_right[b->main_rotation];
 			}
 		}
-		if (b->auxLeft()) {
+		if (sideIsLeftOriented(b->aux)) {
 			if (b->auxFlipped()) {
-				row_trans = transforms_left_inv[b->auxRot()];
+				row_trans = transforms_left_inv[b->aux_rotation];
 			} else {
-				row_trans = transforms_left[b->auxRot()];
+				row_trans = transforms_left[b->aux_rotation];
 			}
 		} else {
 			if (b->auxFlipped()) {
-				row_trans = transforms_right_inv[b->auxRot()];
+				row_trans = transforms_right_inv[b->aux_rotation];
 			} else {
-				row_trans = transforms_right[b->auxRot()];
+				row_trans = transforms_right[b->aux_rotation];
 			}
 		}
 		for (int row_yi = 0; row_yi < n; row_yi++) {
