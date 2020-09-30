@@ -71,9 +71,9 @@ class Block
 		main         = side_table[static_cast<int>(rot)][main.getIndex()];
 		aux          = side_table[static_cast<int>(rot)][aux.getIndex()];
 		bitset<6> old_neumann = non_dirichlet_boundary;
-		for (int i = 0; i < 6; i++) {
-			non_dirichlet_boundary[side_table[static_cast<int>(rot)][i].getIndex()]
-			= old_neumann[i];
+		for (int idx = 0; idx < 6; idx++) {
+			non_dirichlet_boundary[side_table[static_cast<int>(rot)][idx].getIndex()]
+			= old_neumann[idx];
 		}
 	}
 	void rotate()
@@ -103,19 +103,15 @@ class Block
 			return quad;
 		};
 		if (type.isFineToCoarse() || type.isFineToFine() || type.isCoarseToFine()) {
-			int quad = type.getOrthant().getIndex();
+			int quad = (int) type.getOrthant().getIndex();
 			quad     = rotateQuad(quad);
-			type.setOrthant(Orthant<2>(quad));
+			type.setOrthant(Orthant<2>((unsigned char) quad));
 		}
 	}
 	bool operator<(const Block &b) const
 	{
 		return std::tie(i, j, main_rotation, orig_main_is_left_oriented, aux_rotation)
 		       < std::tie(b.i, b.j, b.main_rotation, b.orig_main_is_left_oriented, b.aux_rotation);
-	}
-	bool operator==(const Block &b) const
-	{
-		return non_dirichlet_boundary.to_ulong() == b.non_dirichlet_boundary.to_ulong();
 	}
 	bool mainFlipped() const
 	{
@@ -472,10 +468,55 @@ void AssembleMatrix(std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domai
 
 		// now insert these results into the matrix for each interface
 		for (Block block : blocks) {
-			insertBlock(&block, coeffs[block]);
+			insertBlock(block, coeffs[block]);
 		}
 	}
 }
+const function<int(int, int, int)> transforms_left[4]
+= {[](int n, int xi, int yi) { return xi + yi * n; },
+   [](int n, int xi, int yi) { return n - yi - 1 + xi * n; },
+   [](int n, int xi, int yi) { return n - xi - 1 + (n - yi - 1) * n; },
+   [](int n, int xi, int yi) { return yi + (n - xi - 1) * n; }};
+const function<int(int, int, int)> transforms_right[4]
+= {[](int n, int xi, int yi) { return xi + yi * n; },
+   [](int n, int xi, int yi) { return yi + (n - xi - 1) * n; },
+   [](int n, int xi, int yi) { return n - xi - 1 + (n - yi - 1) * n; },
+   [](int n, int xi, int yi) { return n - yi - 1 + xi * n; }};
+const function<int(int, int, int)> transforms_left_inv[4]
+= {[](int n, int xi, int yi) {
+	   xi = n - xi - 1;
+	   return xi + yi * n;
+   },
+   [](int n, int xi, int yi) {
+	   xi = n - xi - 1;
+	   return n - yi - 1 + xi * n;
+   },
+   [](int n, int xi, int yi) {
+	   xi = n - xi - 1;
+	   return n - xi - 1 + (n - yi - 1) * n;
+   },
+   [](int n, int xi, int yi) {
+	   xi = n - xi - 1;
+	   return yi + (n - xi - 1) * n;
+   }};
+const function<int(int, int, int)> transforms_right_inv[4]
+= {[](int n, int xi, int yi) {
+	   xi = n - xi - 1;
+	   return xi + yi * n;
+   },
+   [](int n, int xi, int yi) {
+	   xi = n - xi - 1;
+	   return yi + (n - xi - 1) * n;
+   },
+   [](int n, int xi, int yi) {
+	   xi = n - xi - 1;
+	   return n - xi - 1 + (n - yi - 1) * n;
+   },
+   [](int n, int xi, int yi) {
+	   xi = n - xi - 1;
+	   return n - yi - 1 + xi * n;
+   }};
+
 } // namespace
 Mat ThunderEgg::Poisson::FastSchurMatrixAssemble3D(
 std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domain,
@@ -497,94 +538,49 @@ std::shared_ptr<Poisson::FFTWPatchSolver<3>>     solver)
 	MatSetType(A, MATMPIAIJ);
 	MatMPIAIJSetPreallocation(A, 26 * n * n, nullptr, 26 * n * n, nullptr);
 
-	auto insertBlock = [&](Block *b, shared_ptr<vector<double>> coeffs) {
-		int global_i = b->i * n * n;
-		int global_j = b->j * n * n;
+	auto insertBlock = [&](const Block &b, shared_ptr<vector<double>> coeffs) {
+		int global_i = b.i * n * n;
+		int global_j = b.j * n * n;
 
-		vector<double> &              orig = *coeffs;
-		const function<int(int, int)> transforms_left[4]
-		= {[&](int xi, int yi) { return xi + yi * n; },
-		   [&](int xi, int yi) { return n - yi - 1 + xi * n; },
-		   [&](int xi, int yi) { return n - xi - 1 + (n - yi - 1) * n; },
-		   [&](int xi, int yi) { return yi + (n - xi - 1) * n; }};
+		vector<double> &orig = *coeffs;
 
-		const function<int(int, int)> transforms_right[4]
-		= {[&](int xi, int yi) { return xi + yi * n; },
-		   [&](int xi, int yi) { return yi + (n - xi - 1) * n; },
-		   [&](int xi, int yi) { return n - xi - 1 + (n - yi - 1) * n; },
-		   [&](int xi, int yi) { return n - yi - 1 + xi * n; }};
-
-		const function<int(int, int)> transforms_left_inv[4]
-		= {[&](int xi, int yi) {
-			   xi = n - xi - 1;
-			   return xi + yi * n;
-		   },
-		   [&](int xi, int yi) {
-			   xi = n - xi - 1;
-			   return n - yi - 1 + xi * n;
-		   },
-		   [&](int xi, int yi) {
-			   xi = n - xi - 1;
-			   return n - xi - 1 + (n - yi - 1) * n;
-		   },
-		   [&](int xi, int yi) {
-			   xi = n - xi - 1;
-			   return yi + (n - xi - 1) * n;
-		   }};
-		const function<int(int, int)> transforms_right_inv[4]
-		= {[&](int xi, int yi) {
-			   xi = n - xi - 1;
-			   return xi + yi * n;
-		   },
-		   [&](int xi, int yi) {
-			   xi = n - xi - 1;
-			   return yi + (n - xi - 1) * n;
-		   },
-		   [&](int xi, int yi) {
-			   xi = n - xi - 1;
-			   return n - xi - 1 + (n - yi - 1) * n;
-		   },
-		   [&](int xi, int yi) {
-			   xi = n - xi - 1;
-			   return n - yi - 1 + xi * n;
-		   }};
-
-		vector<double>          copy(n * n * n * n);
-		function<int(int, int)> col_trans, row_trans;
-		if (sideIsLeftOriented(b->main)) {
-			if (b->mainFlipped()) {
-				col_trans = transforms_left_inv[b->main_rotation];
+		vector<double>               copy(n * n * n * n);
+		function<int(int, int, int)> col_trans;
+		if (sideIsLeftOriented(b.main)) {
+			if (b.mainFlipped()) {
+				col_trans = transforms_left_inv[b.main_rotation];
 			} else {
-				col_trans = transforms_left[b->main_rotation];
+				col_trans = transforms_left[b.main_rotation];
 			}
 		} else {
-			if (b->mainFlipped()) {
-				col_trans = transforms_right_inv[b->main_rotation];
+			if (b.mainFlipped()) {
+				col_trans = transforms_right_inv[b.main_rotation];
 			} else {
-				col_trans = transforms_right[b->main_rotation];
+				col_trans = transforms_right[b.main_rotation];
 			}
 		}
-		if (sideIsLeftOriented(b->aux)) {
-			if (b->auxFlipped()) {
-				row_trans = transforms_left_inv[b->aux_rotation];
+		function<int(int, int, int)> row_trans;
+		if (sideIsLeftOriented(b.aux)) {
+			if (b.auxFlipped()) {
+				row_trans = transforms_left_inv[b.aux_rotation];
 			} else {
-				row_trans = transforms_left[b->aux_rotation];
+				row_trans = transforms_left[b.aux_rotation];
 			}
 		} else {
-			if (b->auxFlipped()) {
-				row_trans = transforms_right_inv[b->aux_rotation];
+			if (b.auxFlipped()) {
+				row_trans = transforms_right_inv[b.aux_rotation];
 			} else {
-				row_trans = transforms_right[b->aux_rotation];
+				row_trans = transforms_right[b.aux_rotation];
 			}
 		}
 		for (int row_yi = 0; row_yi < n; row_yi++) {
 			for (int row_xi = 0; row_xi < n; row_xi++) {
 				int i_dest = row_xi + row_yi * n;
-				int i_orig = row_trans(row_xi, row_yi);
+				int i_orig = row_trans(n, row_xi, row_yi);
 				for (int col_yi = 0; col_yi < n; col_yi++) {
 					for (int col_xi = 0; col_xi < n; col_xi++) {
 						int j_dest = col_xi + col_yi * n;
-						int j_orig = col_trans(col_xi, col_yi);
+						int j_orig = col_trans(n, col_xi, col_yi);
 
 						copy[i_dest * n * n + j_dest] = orig[i_orig * n * n + j_orig];
 					}
