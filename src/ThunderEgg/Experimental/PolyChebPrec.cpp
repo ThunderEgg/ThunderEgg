@@ -24,7 +24,7 @@
 #include <iostream>
 using namespace std;
 using namespace ThunderEgg;
-using namespace ThunderEgg::Schur;
+using namespace ThunderEgg::Experimental;
 PolyChebPrec::PolyChebPrec(std::shared_ptr<Domain<3>>          domain,
                            std::shared_ptr<InterfaceDomain<3>> sh)
 {

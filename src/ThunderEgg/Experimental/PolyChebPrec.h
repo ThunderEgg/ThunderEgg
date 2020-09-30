@@ -27,7 +27,7 @@
 #include <petscpc.h>
 namespace ThunderEgg
 {
-namespace Schur
+namespace Experimental
 {
 /**
  * @brief Approximate inverse of Schur-compliment system using Chebyschev polynomials
@@ -55,6 +55,6 @@ class PolyChebPrec : public Operator<2>
 
 	void apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const;
 };
-} // namespace Schur
+} // namespace Experimental
 } // namespace ThunderEgg
 #endif

@@ -21,11 +21,6 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchIfaceScatter.cpp)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PatchSolverWrapper.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchSolverWrapper.cpp)
 
-if(PETSC_FOUND)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PolyChebPrec.h)
-  list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PolyChebPrec.cpp)
-endif(PETSC_FOUND)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/ValVectorGenerator.h)
 
 if(PETSC_FOUND)
