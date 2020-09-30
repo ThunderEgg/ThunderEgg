@@ -516,10 +516,8 @@ const function<int(int, int, int)> transforms_right_inv[4]
 	   xi = n - xi - 1;
 	   return n - yi - 1 + xi * n;
    }};
-
-vector<double> FlipBlock(int n, const Block &b, const vector<double> &orig)
+std::function<int(int, int, int)> GetColTransform(const Block &b)
 {
-	vector<double>               copy(n * n * n * n);
 	function<int(int, int, int)> col_trans;
 	if (sideIsLeftOriented(b.main)) {
 		if (b.mainFlipped()) {
@@ -534,6 +532,10 @@ vector<double> FlipBlock(int n, const Block &b, const vector<double> &orig)
 			col_trans = transforms_right[b.main_rotation];
 		}
 	}
+	return col_trans;
+}
+std::function<int(int, int, int)> GetRowTransform(const Block &b)
+{
 	function<int(int, int, int)> row_trans;
 	if (sideIsLeftOriented(b.aux)) {
 		if (b.auxFlipped()) {
@@ -548,6 +550,14 @@ vector<double> FlipBlock(int n, const Block &b, const vector<double> &orig)
 			row_trans = transforms_right[b.aux_rotation];
 		}
 	}
+	return row_trans;
+}
+vector<double> FlipBlock(int n, const Block &b, const vector<double> &orig)
+{
+	vector<double>               copy(n * n * n * n);
+	function<int(int, int, int)> col_trans = GetColTransform(b);
+	function<int(int, int, int)> row_trans = GetRowTransform(b);
+
 	for (int row_yi = 0; row_yi < n; row_yi++) {
 		for (int row_xi = 0; row_xi < n; row_xi++) {
 			int i_dest = row_xi + row_yi * n;
