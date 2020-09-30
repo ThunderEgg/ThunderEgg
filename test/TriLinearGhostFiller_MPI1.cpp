@@ -46,8 +46,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
 		INFO("nz:    " << pinfo->ns[2]);
-		LocalData<3> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<3> expected_ld = expected->getLocalData(pinfo->local_index);
+		LocalData<3> vec_ld      = vec->getLocalData(0, pinfo->local_index);
+		LocalData<3> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -103,8 +103,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
 		INFO("nz:    " << pinfo->ns[2]);
-		LocalData<3> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<3> expected_ld = expected->getLocalData(pinfo->local_index);
+		LocalData<3> vec_ld      = vec->getLocalData(0, pinfo->local_index);
+		LocalData<3> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});

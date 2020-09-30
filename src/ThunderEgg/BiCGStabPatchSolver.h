@@ -75,7 +75,7 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		std::shared_ptr<Vector<D>> getNewVector() const override
 		{
 			return std::shared_ptr<Vector<D>>(
-			new ValVector<D>(MPI_COMM_SELF, lengths, 1, num_ghost_cells));
+			new ValVector<D>(MPI_COMM_SELF, lengths, 1, 1, num_ghost_cells));
 		}
 	};
 	/**
@@ -111,14 +111,14 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		 * @param ld_in the localdata for the patch
 		 */
 		SinglePatchVec(const LocalData<D> &ld)
-		: Vector<D>(MPI_COMM_SELF, 1, GetNumLocalCells(ld)), ld(ld)
+		: Vector<D>(MPI_COMM_SELF, 1, 1, GetNumLocalCells(ld)), ld(ld)
 		{
 		}
-		LocalData<D> getLocalData(int local_patch_id)
+		LocalData<D> getLocalData(int component_index, int local_patch_id) override
 		{
 			return ld;
 		}
-		const LocalData<D> getLocalData(int local_patch_id) const
+		const LocalData<D> getLocalData(int component_index, int local_patch_id) const override
 		{
 			return ld;
 		}
@@ -156,7 +156,7 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		}
 		void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 		{
-			op->applySinglePatch(pinfo, x->getLocalData(0), b->getLocalData(0));
+			op->applySinglePatch(pinfo, x->getLocalData(0, 0), b->getLocalData(0, 0));
 		}
 	};
 
@@ -199,7 +199,7 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 
 		auto f_copy = vg->getNewVector();
 		f_copy->copy(f_single);
-		op->addGhostToRHS(pinfo, u, f_copy->getLocalData(0));
+		op->addGhostToRHS(pinfo, u, f_copy->getLocalData(0, 0));
 		// u_single->set(0);
 
 		// printf("Calling BiCG patch solver\n");

@@ -115,7 +115,7 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	// fill vectors with rank+1
 	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_vec, f);
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_data = ghost_vec->getLocalData(i);
+		auto local_data = ghost_vec->getLocalData(0, i);
 		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) { local_data[coord] = rank + 1; });
 	}
@@ -124,7 +124,7 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 5
-		auto local_data = coarse_vec->getLocalData(0);
+		auto local_data = coarse_vec->getLocalData(0, 0);
 		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) { CHECK(local_data[coord] == 6); });
 	} else {
@@ -250,7 +250,7 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	// fill vectors with rank+1
 	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_vec, f);
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_data = ghost_vec->getLocalData(i);
+		auto local_data = ghost_vec->getLocalData(0, i);
 		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) { local_data[coord] = rank + 1; });
 	}
@@ -260,7 +260,7 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1
-		auto local_data = ghost_vec->getLocalData(0);
+		auto local_data = ghost_vec->getLocalData(0, 0);
 		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) { CHECK(local_data[coord] == 1); });
 	}

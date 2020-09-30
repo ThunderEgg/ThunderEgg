@@ -300,7 +300,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	{
 		// zero out ghost cells
 		for (auto pinfo : domain->getPatchInfoVector()) {
-			const LocalData<D> this_patch = u->getLocalData(pinfo->local_index);
+			const LocalData<D> this_patch = u->getLocalData(0, pinfo->local_index);
 			for (Side<D> s : Side<D>::getValues()) {
 				if (pinfo->hasNbr(s)) {
 					for (int i = 0; i < pinfo->num_ghost_cells; i++) {
@@ -337,7 +337,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				auto    side          = std::get<1>(call);
 				auto    nbr_type      = std::get<2>(call);
 				auto    orthant       = std::get<3>(call);
-				auto    local_data    = u->getLocalData(std::get<4>(call));
+				auto    local_data    = u->getLocalData(0, std::get<4>(call));
 				size_t  buffer_offset = std::get<5>(call);
 				double *buffer_ptr    = out_buffers[i].data() + buffer_offset;
 
@@ -352,7 +352,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 		// perform local operations
 		for (auto pinfo : domain->getPatchInfoVector()) {
-			auto data = u->getLocalData(pinfo->local_index);
+			auto data = u->getLocalData(0, pinfo->local_index);
 			fillGhostCellsForLocalPatch(pinfo, data);
 		}
 		for (const LocalCall &call : local_calls) {
@@ -360,8 +360,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			auto side       = std::get<1>(call);
 			auto nbr_type   = std::get<2>(call);
 			auto orthant    = std::get<3>(call);
-			auto local_data = u->getLocalData(std::get<4>(call));
-			auto nbr_data   = u->getLocalData(std::get<5>(call));
+			auto local_data = u->getLocalData(0, std::get<4>(call));
+			auto nbr_data   = u->getLocalData(0, std::get<5>(call));
 			fillGhostCellsForNbrPatch(pinfo, local_data, nbr_data, side, nbr_type, orthant);
 		}
 		// add in remote values as they come in
@@ -374,7 +374,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				Side<D> side          = std::get<1>(t);
 				size_t  buffer_offset = std::get<2>(t);
 
-				const LocalData<D> local_data = u->getLocalData(local_index);
+				const LocalData<D> local_data = u->getLocalData(0, local_index);
 				double *           buffer_ptr = recv_buffers[finished_index].data() + buffer_offset;
 				LocalData<D>       buffer_data = getLocalDataForBuffer(buffer_ptr, side);
 				for (int ig = 0; ig < domain->getNumGhostCells(); ig++) {

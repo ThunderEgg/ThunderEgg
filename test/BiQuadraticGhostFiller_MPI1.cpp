@@ -71,7 +71,8 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 
 	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
-	shared_ptr<ValVector<2>> vec(new ValVector<2>(MPI_COMM_WORLD, pinfo_map[1]->ns, num_ghost, 4));
+	shared_ptr<ValVector<2>> vec(
+	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[1]->ns, num_ghost, 1, 4));
 
 	DomainTools<2>::setValues(d, vec, f);
 
@@ -81,7 +82,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	// patch 1
 	{
 		// check that center values weren't modified
-		auto patch_1 = vec->getLocalData(d->getPatchInfoMap()[1]->local_index);
+		auto patch_1 = vec->getLocalData(0, d->getPatchInfoMap()[1]->local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools<2>::getRealCoord(pinfo_map[1], coord, real_coord);
@@ -123,7 +124,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	// patch 2
 	{
 		// check that center values weren't modified
-		auto patch_2 = vec->getLocalData(d->getPatchInfoMap()[2]->local_index);
+		auto patch_2 = vec->getLocalData(0, d->getPatchInfoMap()[2]->local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools<2>::getRealCoord(pinfo_map[2], coord, real_coord);
@@ -165,7 +166,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	// patch 3
 	{
 		// check that center values weren't modified
-		auto patch_1 = vec->getLocalData(d->getPatchInfoMap()[3]->local_index);
+		auto patch_1 = vec->getLocalData(0, d->getPatchInfoMap()[3]->local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools<2>::getRealCoord(pinfo_map[3], coord, real_coord);
@@ -207,7 +208,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	// patch 4
 	{
 		// check that center values weren't modified
-		auto patch_2 = vec->getLocalData(d->getPatchInfoMap()[4]->local_index);
+		auto patch_2 = vec->getLocalData(0, d->getPatchInfoMap()[4]->local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools<2>::getRealCoord(pinfo_map[4], coord, real_coord);
@@ -280,8 +281,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller", "[BiQuadraticGhos
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
@@ -336,8 +337,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set",
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));

@@ -100,8 +100,8 @@ template <int D> class PatchOperator : public Operator<D>
 	{
 		ghost_filler->fillGhost(u);
 		for (auto pinfo : domain->getPatchInfoVector()) {
-			applySinglePatch(pinfo, u->getLocalData(pinfo->local_index),
-			                 f->getLocalData(pinfo->local_index));
+			applySinglePatch(pinfo, u->getLocalData(0, pinfo->local_index),
+			                 f->getLocalData(0, pinfo->local_index));
 		}
 	}
 	/**

@@ -45,7 +45,7 @@ TEST_CASE("Test DrctIntp on uniform 4x4", "[GMG::DrctIntp]")
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		auto ld = coarse_vec->getLocalData(pinfo->local_index);
+		auto ld = coarse_vec->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(ld.getStart(), ld.getEnd(), [&](const array<int, 2> &coord) {
 			ld[coord] = 1 + pinfo->id * nx * ny + coord[0] + coord[1] * nx;
 		});
@@ -53,7 +53,7 @@ TEST_CASE("Test DrctIntp on uniform 4x4", "[GMG::DrctIntp]")
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto ld = fine_expected->getLocalData(pinfo->local_index);
+		auto ld = fine_expected->getLocalData(0, pinfo->local_index);
 
 		Orthant<2>         orth = pinfo->orth_on_parent;
 		std::array<int, 2> starts;
@@ -78,8 +78,8 @@ TEST_CASE("Test DrctIntp on uniform 4x4", "[GMG::DrctIntp]")
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = fine_vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = fine_expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = fine_vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = fine_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -100,7 +100,7 @@ TEST_CASE("Linear Test DrctIntp with values already set on uniform 4x4", "[GMG::
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		auto ld = coarse_vec->getLocalData(pinfo->local_index);
+		auto ld = coarse_vec->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(ld.getStart(), ld.getEnd(), [&](const array<int, 2> &coord) {
 			ld[coord] = 1 + pinfo->id * nx * ny + coord[0] + coord[1] * nx;
 		});
@@ -108,7 +108,7 @@ TEST_CASE("Linear Test DrctIntp with values already set on uniform 4x4", "[GMG::
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto ld = fine_expected->getLocalData(pinfo->local_index);
+		auto ld = fine_expected->getLocalData(0, pinfo->local_index);
 
 		Orthant<2>         orth = pinfo->orth_on_parent;
 		std::array<int, 2> starts;
@@ -135,8 +135,8 @@ TEST_CASE("Linear Test DrctIntp with values already set on uniform 4x4", "[GMG::
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = fine_vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = fine_expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = fine_vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = fine_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});

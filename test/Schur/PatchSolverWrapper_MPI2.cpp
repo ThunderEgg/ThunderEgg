@@ -102,7 +102,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < b->getNumLocalPatches(); i++) {
-		auto local_data = b->getLocalData(i);
+		auto local_data = b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Approx(schur_fill_value - domain_fill_value));
@@ -138,7 +138,7 @@ TEST_CASE(
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < b->getNumLocalPatches(); i++) {
-		auto local_data = b->getLocalData(i);
+		auto local_data = b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Approx(schur_fill_value - domain_fill_value));
@@ -198,7 +198,7 @@ TEST_CASE(
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < schur_b->getNumLocalPatches(); i++) {
-		auto local_data = schur_b->getLocalData(i);
+		auto local_data = schur_b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Approx(domain_fill_value));
@@ -233,7 +233,7 @@ TEST_CASE(
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < schur_b->getNumLocalPatches(); i++) {
-		auto local_data = schur_b->getLocalData(i);
+		auto local_data = schur_b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Approx(domain_fill_value));

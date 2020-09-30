@@ -341,23 +341,25 @@ template <int D> class Domain
 		double sum = 0;
 
 		for (auto &p : pinfo_id_map) {
-			PatchInfo<D> &     d      = *p.second;
-			const LocalData<D> u_data = u->getLocalData(d.local_index);
+			PatchInfo<D> &d = *p.second;
+			for (int c = 0; c < u->getNumComponents(); c++) {
+				const LocalData<D> u_data = u->getLocalData(c, d.local_index);
 
-			double patch_sum = 0;
-			nested_loop<D>(u_data.getStart(), u_data.getEnd(),
-			               [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
+				double patch_sum = 0;
+				nested_loop<D>(u_data.getStart(), u_data.getEnd(),
+				               [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
 
-			for (size_t i = 0; i < D; i++) {
-				patch_sum *= d.spacings[i];
+				for (size_t i = 0; i < D; i++) {
+					patch_sum *= d.spacings[i];
+				}
+				sum += patch_sum;
 			}
-			sum += patch_sum;
 		}
 		double retval;
 		MPI_Allreduce(&sum, &retval, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		return retval;
 	}
-}; // namespace ThunderEgg
+};
 
 template <int D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 {

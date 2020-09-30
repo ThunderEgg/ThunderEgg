@@ -85,8 +85,8 @@ template <int D> class ValVector : public Vector<D>
 	 * @param num_patches the number of patches in this vector
 	 */
 	ValVector(MPI_Comm comm, const std::array<int, D> &lengths, int num_ghost_cells,
-	          int num_patches)
-	: Vector<D>(comm, num_patches, GetNumLocalCells(lengths, num_patches)), lengths(lengths),
+	          int num_components, int num_patches)
+	: Vector<D>(comm, 1, num_patches, GetNumLocalCells(lengths, num_patches)), lengths(lengths),
 	  num_ghost_cells(num_ghost_cells)
 	{
 		int size            = 1;
@@ -109,17 +109,19 @@ template <int D> class ValVector : public Vector<D>
 	 */
 	static std::shared_ptr<ValVector<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain)
 	{
-		return std::shared_ptr<ValVector<D>>(new ValVector<D>(
-		MPI_COMM_WORLD, domain->getNs(), domain->getNumGhostCells(), domain->getNumLocalPatches()));
+		return std::shared_ptr<ValVector<D>>(new ValVector<D>(MPI_COMM_WORLD, domain->getNs(),
+		                                                      domain->getNumGhostCells(), 1,
+		                                                      domain->getNumLocalPatches()));
 	}
-	LocalData<D> getLocalData(int local_patch_id)
+	LocalData<D> getLocalData(int component_index, int local_patch_index) override
 	{
-		double *data = &vec[patch_stride * local_patch_id + first_offset];
+		double *data = &vec[patch_stride * local_patch_index + first_offset];
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
-	const LocalData<D> getLocalData(int local_patch_id) const
+	const LocalData<D> getLocalData(int component_index, int local_patch_index) const override
 	{
-		double *data = const_cast<double *>(&vec[patch_stride * local_patch_id + first_offset]);
+		double *data = const_cast<double *>(
+		&vec[patch_stride * local_patch_index + component_index + first_offset]);
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 

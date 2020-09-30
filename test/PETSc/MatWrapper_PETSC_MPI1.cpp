@@ -70,8 +70,8 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 		INFO("ny:    " << pinfo->ns[1]);
 		INFO("dx:    " << pinfo->spacings[0]);
 		INFO("dy:    " << pinfo->spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(pinfo->local_index);
-		LocalData<2> b_ld = b->getLocalData(pinfo->local_index);
+		LocalData<2> x_ld = x->getLocalData(0, pinfo->local_index);
+		LocalData<2> b_ld = b->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -120,8 +120,8 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper with ghost and 0.5I",
 		INFO("ny:    " << pinfo->ns[1]);
 		INFO("dx:    " << pinfo->spacings[0]);
 		INFO("dy:    " << pinfo->spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(pinfo->local_index);
-		LocalData<2> b_ld = b->getLocalData(pinfo->local_index);
+		LocalData<2> x_ld = x->getLocalData(0, pinfo->local_index);
+		LocalData<2> b_ld = b->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -170,8 +170,8 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper without ghost and 0.5I
 		INFO("ny:    " << pinfo->ns[1]);
 		INFO("dx:    " << pinfo->spacings[0]);
 		INFO("dy:    " << pinfo->spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(pinfo->local_index);
-		LocalData<2> b_ld = b->getLocalData(pinfo->local_index);
+		LocalData<2> x_ld = x->getLocalData(0, pinfo->local_index);
+		LocalData<2> b_ld = b->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

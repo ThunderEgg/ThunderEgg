@@ -34,7 +34,7 @@ TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
 	mps.apply(f, u);
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
-		auto ld = u->getLocalData(i);
+		auto ld = u->getLocalData(0, i);
 		nested_loop<2>(ld.getStart(), ld.getEnd(),
 		               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 	}
@@ -63,7 +63,7 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 	mps.apply(f, u);
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
-		auto ld = u->getLocalData(i);
+		auto ld = u->getLocalData(0, i);
 		nested_loop<2>(ld.getStart(), ld.getEnd(),
 		               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 	}
@@ -96,7 +96,7 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 	mps.smooth(f, u);
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
-		auto ld = u->getLocalData(i);
+		auto ld = u->getLocalData(0, i);
 		nested_loop<2>(ld.getStart(), ld.getEnd(),
 		               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 	}
@@ -128,7 +128,7 @@ TEST_CASE("PatchSolver smooth for various domains with timer", "[PatchSolver]")
 	mps.smooth(f, u);
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
-		auto ld = u->getLocalData(i);
+		auto ld = u->getLocalData(0, i);
 		nested_loop<2>(ld.getStart(), ld.getEnd(),
 		               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 	}

@@ -75,8 +75,8 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 		INFO("ny:    " << pinfo->ns[1]);
 		INFO("dx:    " << pinfo->spacings[0]);
 		INFO("dy:    " << pinfo->spacings[1]);
-		LocalData<2> f_vec_ld          = f_vec->getLocalData(pinfo->local_index);
-		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(pinfo->local_index);
+		LocalData<2> f_vec_ld          = f_vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -128,8 +128,8 @@ TEST_CASE(
 		INFO("ny:    " << pinfo->ns[1]);
 		INFO("dx:    " << pinfo->spacings[0]);
 		INFO("dy:    " << pinfo->spacings[1]);
-		LocalData<2> f_vec_ld          = f_vec->getLocalData(pinfo->local_index);
-		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(pinfo->local_index);
+		LocalData<2> f_vec_ld          = f_vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

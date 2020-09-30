@@ -75,8 +75,8 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 	auto f_expected = ValVector<2>::GetNewVector(d_fine);
 	f_expected->copy(f_vec);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto u = g_vec->getLocalData(pinfo->local_index);
-		auto f = f_expected->getLocalData(pinfo->local_index);
+		auto u = g_vec->getLocalData(0, pinfo->local_index);
+		auto f = f_expected->getLocalData(0, pinfo->local_index);
 		for (Side<2> s : Side<2>::getValues()) {
 			if (pinfo->hasNbr(s)) {
 				double h2      = std::pow(pinfo->spacings[s.getAxisIndex()], 2);
@@ -91,8 +91,8 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		p_operator->addGhostToRHS(pinfo, g_vec->getLocalData(pinfo->local_index),
-		                          f_vec->getLocalData(pinfo->local_index));
+		p_operator->addGhostToRHS(pinfo, g_vec->getLocalData(0, pinfo->local_index),
+		                          f_vec->getLocalData(0, pinfo->local_index));
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
@@ -101,8 +101,8 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = f_vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = f_expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = f_vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = f_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -147,8 +147,8 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld          = f_vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_vec_ld = f_vec_expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld          = f_vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_vec_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -195,8 +195,8 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld           = f_vec->getLocalData(pinfo->local_index);
-		LocalData<2> exptected_vec_ld = f_vec_expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld           = f_vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> exptected_vec_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

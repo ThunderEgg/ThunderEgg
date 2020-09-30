@@ -225,7 +225,7 @@ template <int D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 			INFO(ns);
 			INFO("num_ghost_cells: " << pinfo->num_ghost_cells);
 
-			auto data = vec->getLocalData(pinfo->local_index);
+			auto data = vec->getLocalData(0, pinfo->local_index);
 			// check that vector was not modified on the interior
 			nested_loop<D>(data.getStart(), data.getEnd(), [&](const std::array<int, D> &coord) {
 				std::string coord_str = "coord: ";

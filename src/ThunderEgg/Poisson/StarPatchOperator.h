@@ -140,7 +140,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	                        std::function<double(const std::array<double, D> &)> gfunc)
 	{
 		for (int i = 0; i < f->getNumLocalPatches(); i++) {
-			LocalData<D> f_ld  = f->getLocalData(i);
+			LocalData<D> f_ld  = f->getLocalData(0, i);
 			auto         pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo->hasNbr(s)) {
@@ -168,7 +168,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	std::array<std::function<double(const std::array<double, D> &)>, D> gfunc_grad)
 	{
 		for (int i = 0; i < f->getNumLocalPatches(); i++) {
-			LocalData<D> f_ld  = f->getLocalData(i);
+			LocalData<D> f_ld  = f->getLocalData(0, i);
 			auto         pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo->hasNbr(s)) {

@@ -316,10 +316,11 @@ TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
-	shared_ptr<ValVector<1>> vec(new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1));
+	shared_ptr<ValVector<1>> vec(
+	new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
 
 	DomainTools<1>::setValues(d, vec, f);
-	auto ld = vec->getLocalData(0);
+	auto ld = vec->getLocalData(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		if (coord[0] < 0 || coord[0] >= nx) {
 			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
@@ -349,10 +350,11 @@ TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
-	shared_ptr<ValVector<1>> vec(new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1));
+	shared_ptr<ValVector<1>> vec(
+	new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
 
 	DomainTools<1>::setValues(d, vec, f);
-	auto ld = vec->getLocalData(0);
+	auto ld = vec->getLocalData(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		if (coord[0] < 0 || coord[0] >= nx) {
 			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
@@ -385,10 +387,11 @@ TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
-	shared_ptr<ValVector<2>> vec(new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1));
+	shared_ptr<ValVector<2>> vec(
+	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
 
 	DomainTools<2>::setValues(d, vec, f);
-	auto ld = vec->getLocalData(0);
+	auto ld = vec->getLocalData(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
 			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
@@ -421,10 +424,11 @@ TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
-	shared_ptr<ValVector<2>> vec(new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1));
+	shared_ptr<ValVector<2>> vec(
+	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
 
 	DomainTools<2>::setValues(d, vec, f);
-	auto ld = vec->getLocalData(0);
+	auto ld = vec->getLocalData(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
 			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
@@ -454,10 +458,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x", "[DomainTools]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
-	shared_ptr<ValVector<1>> vec(new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1));
+	shared_ptr<ValVector<1>> vec(
+	new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
 
 	DomainTools<1>::setValuesWithGhost(d, vec, f);
-	auto ld = vec->getLocalData(0);
+	auto ld = vec->getLocalData(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		std::array<double, 1> real_coord;
 		DomainTools<1>::getRealCoordGhost(pinfo_map[0], coord, real_coord);
@@ -483,10 +488,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2", "[DomainTools]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
-	shared_ptr<ValVector<1>> vec(new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1));
+	shared_ptr<ValVector<1>> vec(
+	new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
 
 	DomainTools<1>::setValuesWithGhost(d, vec, f);
-	auto ld = vec->getLocalData(0);
+	auto ld = vec->getLocalData(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		std::array<double, 1> real_coord;
 		DomainTools<1>::getRealCoordGhost(pinfo_map[0], coord, real_coord);
@@ -515,10 +521,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
-	shared_ptr<ValVector<2>> vec(new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1));
+	shared_ptr<ValVector<2>> vec(
+	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
 
 	DomainTools<2>::setValuesWithGhost(d, vec, f);
-	auto ld = vec->getLocalData(0);
+	auto ld = vec->getLocalData(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		std::array<double, 2> real_coord;
 		DomainTools<2>::getRealCoordGhost(pinfo_map[0], coord, real_coord);
@@ -547,10 +554,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
-	shared_ptr<ValVector<2>> vec(new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1));
+	shared_ptr<ValVector<2>> vec(
+	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
 
 	DomainTools<2>::setValuesWithGhost(d, vec, f);
-	auto ld = vec->getLocalData(0);
+	auto ld = vec->getLocalData(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		std::array<double, 2> real_coord;
 		DomainTools<2>::getRealCoordGhost(pinfo_map[0], coord, real_coord);

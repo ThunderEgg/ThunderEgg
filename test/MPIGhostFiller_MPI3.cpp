@@ -43,7 +43,7 @@ TEST_CASE("Exchange for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 
 	auto vec = ValVector<2>::GetNewVector(d_fine);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto data = vec->getLocalData(pinfo->local_index);
+		auto data = vec->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(data.getStart(), data.getEnd(),
 		               [&](const std::array<int, 2> &coord) { data[coord] = pinfo->id; });
 	}
@@ -66,7 +66,7 @@ TEST_CASE("Two Exchanges for various domains 1-side cases MPI3", "[MPIGhostFille
 
 	auto vec = ValVector<2>::GetNewVector(d_fine);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto data = vec->getLocalData(pinfo->local_index);
+		auto data = vec->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(data.getStart(), data.getEnd(),
 		               [&](const std::array<int, 2> &coord) { data[coord] = pinfo->id; });
 	}

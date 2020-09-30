@@ -41,8 +41,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
@@ -96,8 +96,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));

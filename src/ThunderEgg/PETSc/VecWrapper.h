@@ -113,7 +113,7 @@ template <int D> class VecWrapper : public Vector<D>
 	 */
 	VecWrapper(Vec vec_in, const std::array<int, D> &lengths_in, int num_ghost_cells_in,
 	           bool own_in)
-	: Vector<D>(MPI_COMM_WORLD, GetNumLocalPatches(vec_in, lengths_in, num_ghost_cells_in),
+	: Vector<D>(MPI_COMM_WORLD, 1, GetNumLocalPatches(vec_in, lengths_in, num_ghost_cells_in),
 	            GetNumLocalCells(vec_in, lengths_in, num_ghost_cells_in)),
 	  vec(vec_in), num_ghost_cells(num_ghost_cells_in), own(own_in), lengths(lengths_in)
 	{
@@ -174,7 +174,7 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param patch_local_index the local index of the patch
 	 * @return LocalData<D> the local data object
 	 */
-	LocalData<D> getLocalData(int patch_local_index)
+	LocalData<D> getLocalData(int component_index, int patch_local_index) override
 	{
 		std::shared_ptr<VecLocalDataManager> ldm(new VecLocalDataManager(vec, false));
 		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset;
@@ -187,7 +187,7 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param patch_local_index the local index of the patch
 	 * @return LocalData<D> the local data object
 	 */
-	const LocalData<D> getLocalData(int patch_local_index) const
+	const LocalData<D> getLocalData(int component_index, int patch_local_index) const override
 	{
 		std::shared_ptr<VecLocalDataManager> ldm(new VecLocalDataManager(vec, true));
 		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset;

@@ -38,7 +38,7 @@ TEST_CASE("ValVector<1> getNumGhostCells", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getNumGhostCells() == num_ghost_cells);
 }
@@ -54,7 +54,7 @@ TEST_CASE("ValVector<1> getMPIComm", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
 }
@@ -70,7 +70,7 @@ TEST_CASE("ValVector<1> getNumLocalPatches", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getNumLocalPatches() == num_local_patches);
 }
@@ -86,7 +86,7 @@ TEST_CASE("ValVector<1> getNumLocalCells", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getNumLocalCells() == nx * num_local_patches);
 }
@@ -103,7 +103,7 @@ TEST_CASE("ValVector<1> getValArray", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getValArray().size() == size);
 }
@@ -121,7 +121,7 @@ TEST_CASE("ValVector<2> getNumGhostCells", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getNumGhostCells() == num_ghost_cells);
 }
@@ -139,7 +139,7 @@ TEST_CASE("ValVector<2> getMPIComm", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
 }
@@ -157,7 +157,7 @@ TEST_CASE("ValVector<2> getNumLocalPatches", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getNumLocalPatches() == num_local_patches);
 }
@@ -175,7 +175,7 @@ TEST_CASE("ValVector<2> getNumLocalCells", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getNumLocalCells() == nx * ny * num_local_patches);
 }
@@ -194,7 +194,7 @@ TEST_CASE("ValVector<2> getValArray", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getValArray().size() == size);
 }
@@ -214,7 +214,7 @@ TEST_CASE("ValVector<3> getNumGhostCells", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getNumGhostCells() == num_ghost_cells);
 }
@@ -234,7 +234,7 @@ TEST_CASE("ValVector<3> getMPIComm", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
 }
@@ -254,7 +254,7 @@ TEST_CASE("ValVector<3> getNumLocalPatches", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getNumLocalPatches() == num_local_patches);
 }
@@ -274,7 +274,7 @@ TEST_CASE("ValVector<3> getNumLocalCells", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getNumLocalCells() == nx * ny * nz * num_local_patches);
 }
@@ -296,7 +296,7 @@ TEST_CASE("ValVector<3> getValArray", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	CHECK(val_vector->getValArray().size() == size);
 }
@@ -314,12 +314,12 @@ TEST_CASE("ValVector<1> getLocalData", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	double *view = &val_vector->getValArray()[0];
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		LocalData<1> ld = val_vector->getLocalData(i);
+		LocalData<1> ld = val_vector->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -337,12 +337,12 @@ TEST_CASE("ValVector<1> getLocalData const", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	double *view = &val_vector->getValArray()[0];
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		const LocalData<1> ld = val_vector->getLocalData(i);
+		const LocalData<1> ld = val_vector->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -362,12 +362,12 @@ TEST_CASE("ValVector<2> getLocalData", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	double *view = &val_vector->getValArray()[0];
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		LocalData<2> ld = val_vector->getLocalData(i);
+		LocalData<2> ld = val_vector->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -387,12 +387,12 @@ TEST_CASE("ValVector<2> getLocalData const", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	double *view = &val_vector->getValArray()[0];
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		const LocalData<2> ld = val_vector->getLocalData(i);
+		const LocalData<2> ld = val_vector->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -415,12 +415,12 @@ TEST_CASE("ValVector<3> getLocalData", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	double *view = &val_vector->getValArray()[0];
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		LocalData<3> ld = val_vector->getLocalData(i);
+		LocalData<3> ld = val_vector->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -443,12 +443,12 @@ TEST_CASE("ValVector<3> getLocalData const", "[ValVector]")
 	INFO("num_local_patches: " << num_local_patches);
 
 	auto val_vector
-	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_local_patches);
+	= make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, 1, num_local_patches);
 
 	double *view = &val_vector->getValArray()[0];
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		const LocalData<3> ld = val_vector->getLocalData(i);
+		const LocalData<3> ld = val_vector->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -471,6 +471,6 @@ TEST_CASE("ValVector getNewVector works", "[ValVector]")
 	CHECK(val_vector->getNumLocalCells() == d_fine->getNumLocalCells());
 	CHECK(val_vector->getNumLocalPatches() == d_fine->getNumLocalPatches());
 	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
-	CHECK(val_vector->getLocalData(0).getLengths()[0] == nx);
-	CHECK(val_vector->getLocalData(0).getLengths()[1] == ny);
+	CHECK(val_vector->getLocalData(0, 0).getLengths()[0] == nx);
+	CHECK(val_vector->getLocalData(0, 0).getLengths()[1] == ny);
 }

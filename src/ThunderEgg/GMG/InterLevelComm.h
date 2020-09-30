@@ -61,6 +61,10 @@ template <int D> class InterLevelComm
 	 */
 	int num_ghost_patches;
 	/**
+	 * @brief The number of components per patch
+	 */
+	int num_components = 1;
+	/**
 	 * @brief Number of values in a patch. (including ghost values)
 	 */
 	int patch_size;
@@ -218,7 +222,7 @@ template <int D> class InterLevelComm
 	 */
 	std::shared_ptr<Vector<D>> getNewGhostVector() const
 	{
-		return std::make_shared<ValVector<D>>(MPI_COMM_SELF, ns, num_ghost_cells,
+		return std::make_shared<ValVector<D>>(MPI_COMM_SELF, ns, num_ghost_cells, num_components,
 		                                      num_ghost_patches);
 	}
 
@@ -304,7 +308,7 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				auto local_data = ghost_vector->getLocalData(local_index);
+				auto local_data = ghost_vector->getLocalData(0, local_index);
 				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
 				               [&](const std::array<int, D> &coord) {
 					               send_buffers.back()[buffer_idx] = local_data[coord];
@@ -368,7 +372,7 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				auto local_data = vector->getLocalData(local_index);
+				auto local_data = vector->getLocalData(0, local_index);
 				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
 				               [&](const std::array<int, D> &coord) {
 					               local_data[coord] += buffer[buffer_idx];
@@ -443,7 +447,7 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				auto local_data = vector->getLocalData(local_index);
+				auto local_data = vector->getLocalData(0, local_index);
 				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
 				               [&](const std::array<int, D> &coord) {
 					               send_buffers.back()[buffer_idx] = local_data[coord];
@@ -507,7 +511,7 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				auto local_data = ghost_vector->getLocalData(local_index);
+				auto local_data = ghost_vector->getLocalData(0, local_index);
 				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
 				               [&](const std::array<int, D> &coord) {
 					               local_data[coord] = buffer[buffer_idx];

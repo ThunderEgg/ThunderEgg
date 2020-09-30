@@ -53,8 +53,8 @@ template <int D> class SimpleGhostFiller : public GhostFiller<D>
 			for (Side<D> s : Side<D>::getValues()) {
 				if (pinfo->hasNbr(s)) {
 					auto               nbr_info    = pinfo->getNormalNbrInfo(s);
-					const LocalData<D> this_patch  = u->getLocalData(pinfo->local_index);
-					const LocalData<D> other_patch = u->getLocalData(nbr_info.local_index);
+					const LocalData<D> this_patch  = u->getLocalData(0, pinfo->local_index);
+					const LocalData<D> other_patch = u->getLocalData(0, nbr_info.local_index);
 					auto               this_side   = this_patch.getSliceOnSide(s);
 					auto other_side = other_patch.getGhostSliceOnSide(s.opposite(), 1);
 					nested_loop<D - 1>(this_side.getStart(), this_side.getEnd(),

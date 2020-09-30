@@ -37,13 +37,14 @@ TEST_CASE("exchange uniform 1D east-west", "[SimpleGhostFiller]")
 	pinfo_map[1]->nbr_info[0].reset(new NormalNbrInfo<1>(0));
 	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
 
-	shared_ptr<ValVector<1>> vec(new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 2));
+	shared_ptr<ValVector<1>> vec(
+	new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 2));
 
 	DomainTools<1>::setValues(d, vec, f);
 	SimpleGhostFiller<1> sgf(d);
 	sgf.fillGhost(vec);
 
-	auto left_data = vec->getLocalData(d->getIdMapVec()[0]);
+	auto left_data = vec->getLocalData(0, d->getIdMapVec()[0]);
 	nested_loop<1>(left_data.getGhostStart(), left_data.getGhostEnd(),
 	               [&](const std::array<int, 1> coord) {
 		               if (coord[0] < 0) {
@@ -54,7 +55,7 @@ TEST_CASE("exchange uniform 1D east-west", "[SimpleGhostFiller]")
 			               CHECK(left_data[coord] == 1);
 		               }
 	               });
-	auto right_data = vec->getLocalData(d->getIdMapVec()[1]);
+	auto right_data = vec->getLocalData(0, d->getIdMapVec()[1]);
 	nested_loop<1>(right_data.getGhostStart(), right_data.getGhostEnd(),
 	               [&](const std::array<int, 1> coord) {
 		               if (coord[0] < 0) {
@@ -127,7 +128,8 @@ TEST_CASE("exchange uniform 2D quad", "[SimpleGhostFiller]")
 
 	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
 
-	shared_ptr<ValVector<2>> vec(new ValVector<2>(MPI_COMM_WORLD, pinfo_map[1]->ns, num_ghost, 4));
+	shared_ptr<ValVector<2>> vec(
+	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[1]->ns, num_ghost, 1, 4));
 
 	DomainTools<2>::setValues(d, vec, f);
 
@@ -137,7 +139,7 @@ TEST_CASE("exchange uniform 2D quad", "[SimpleGhostFiller]")
 	// patch 1
 	{
 		// check that center values weren't modified
-		auto patch_1 = vec->getLocalData(d->getPatchInfoMap()[1]->local_index);
+		auto patch_1 = vec->getLocalData(0, d->getPatchInfoMap()[1]->local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools<2>::getRealCoord(pinfo_map[1], coord, real_coord);
@@ -179,7 +181,7 @@ TEST_CASE("exchange uniform 2D quad", "[SimpleGhostFiller]")
 	// patch 2
 	{
 		// check that center values weren't modified
-		auto patch_2 = vec->getLocalData(d->getPatchInfoMap()[2]->local_index);
+		auto patch_2 = vec->getLocalData(0, d->getPatchInfoMap()[2]->local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools<2>::getRealCoord(pinfo_map[2], coord, real_coord);
@@ -221,7 +223,7 @@ TEST_CASE("exchange uniform 2D quad", "[SimpleGhostFiller]")
 	// patch 3
 	{
 		// check that center values weren't modified
-		auto patch_1 = vec->getLocalData(d->getPatchInfoMap()[3]->local_index);
+		auto patch_1 = vec->getLocalData(0, d->getPatchInfoMap()[3]->local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools<2>::getRealCoord(pinfo_map[3], coord, real_coord);
@@ -263,7 +265,7 @@ TEST_CASE("exchange uniform 2D quad", "[SimpleGhostFiller]")
 	// patch 4
 	{
 		// check that center values weren't modified
-		auto patch_2 = vec->getLocalData(d->getPatchInfoMap()[4]->local_index);
+		auto patch_2 = vec->getLocalData(0, d->getPatchInfoMap()[4]->local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools<2>::getRealCoord(pinfo_map[4], coord, real_coord);

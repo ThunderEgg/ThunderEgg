@@ -132,8 +132,8 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			if (timer) {
 				timer->start("Single Patch Solve");
 			}
-			solveSinglePatch(pinfo, u->getLocalData(pinfo->local_index),
-			                 f->getLocalData(pinfo->local_index));
+			solveSinglePatch(pinfo, u->getLocalData(0, pinfo->local_index),
+			                 f->getLocalData(0, pinfo->local_index));
 			if (timer) {
 				timer->stop("Single Patch Solve");
 			}
@@ -159,8 +159,8 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			if (timer) {
 				timer->start("Single Patch Solve");
 			}
-			solveSinglePatch(pinfo, u->getLocalData(pinfo->local_index),
-			                 f->getLocalData(pinfo->local_index));
+			solveSinglePatch(pinfo, u->getLocalData(0, pinfo->local_index),
+			                 f->getLocalData(0, pinfo->local_index));
 			if (timer) {
 				timer->stop("Single Patch Solve");
 			}

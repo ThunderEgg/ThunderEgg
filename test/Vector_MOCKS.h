@@ -70,7 +70,7 @@ template <int D> class MockVector : public Vector<D>
 	 * @param ns the number of cells in each direction of a patch
 	 */
 	MockVector(MPI_Comm comm, int num_local_patches, int num_ghost_cells, std::array<int, D> ns)
-	: Vector<D>(comm, num_local_patches, GetNumLocalCells(num_local_patches, ns))
+	: Vector<D>(comm, 1, num_local_patches, GetNumLocalCells(num_local_patches, ns))
 	{
 		std::array<int, 3> strides;
 		int                patch_stride = 1;
@@ -91,11 +91,11 @@ template <int D> class MockVector : public Vector<D>
 			local_data.emplace_back(data_ptr, strides, ns, num_ghost_cells);
 		}
 	}
-	LocalData<D> getLocalData(int patch_local_index) override
+	LocalData<D> getLocalData(int component_index, int patch_local_index) override
 	{
 		return local_data[patch_local_index];
 	}
-	const LocalData<D> getLocalData(int patch_local_index) const override
+	const LocalData<D> getLocalData(int component_index, int patch_local_index) const override
 	{
 		return local_data[patch_local_index];
 	}

@@ -327,11 +327,11 @@ void FillBlockCoeffs(CoeffMap coeffs, std::shared_ptr<const PatchInfo<2>> pinfo,
 	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<2>>(solver->getGhostFiller());
 	for (int j = 0; j < n; j++) {
 		// create some work vectors
-		auto         u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
-		auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
-		LocalData<2> u_local_data  = u_vec->getLocalData(0);
+		auto         u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1, 1);
+		auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1, 1);
+		LocalData<2> u_local_data  = u_vec->getLocalData(0, 0);
 		LocalData<1> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<2>::west(), 1);
-		LocalData<2> f_local_data  = f_vec->getLocalData(0);
+		LocalData<2> f_local_data  = f_vec->getLocalData(0, 0);
 
 		u_west_ghosts[{j}] = 2;
 

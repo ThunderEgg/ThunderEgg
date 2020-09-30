@@ -71,7 +71,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
 	                      LocalData<D> f) const override
 	{
-		const LocalData<D>    c  = coeffs->getLocalData(pinfo->local_index);
+		const LocalData<D>    c  = coeffs->getLocalData(0, pinfo->local_index);
 		std::array<double, D> h2 = pinfo->spacings;
 		for (size_t i = 0; i < D; i++) {
 			h2[i] *= h2[i];
@@ -113,7 +113,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
 	                   LocalData<D> f) const override
 	{
-		const LocalData<D> c = coeffs->getLocalData(pinfo->local_index);
+		const LocalData<D> c = coeffs->getLocalData(0, pinfo->local_index);
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo->hasNbr(s)) {
 				double                 h2      = pow(pinfo->spacings[s.getAxisIndex()], 2);
@@ -143,7 +143,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	                        std::function<double(const std::array<double, D> &)> hfunc)
 	{
 		for (int i = 0; i < f->getNumLocalPatches(); i++) {
-			LocalData<D> f_ld  = f->getLocalData(i);
+			LocalData<D> f_ld  = f->getLocalData(0, i);
 			auto         pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo->hasNbr(s)) {

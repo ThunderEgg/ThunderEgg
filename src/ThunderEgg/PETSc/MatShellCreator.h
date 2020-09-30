@@ -76,7 +76,7 @@ template <int D> class MatShellCreator
 		VecGetArrayRead(x, &x_view);
 		int index = 0;
 		for (int p_index = 0; p_index < te_x->getNumLocalPatches(); p_index++) {
-			LocalData<D> ld = te_x->getLocalData(p_index);
+			LocalData<D> ld = te_x->getLocalData(0, p_index);
 			nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 				ld[coord] = x_view[index];
 				index++;
@@ -91,7 +91,7 @@ template <int D> class MatShellCreator
 		VecGetArray(b, &b_view);
 		index = 0;
 		for (int p_index = 0; p_index < te_b->getNumLocalPatches(); p_index++) {
-			const LocalData<D> ld = te_b->getLocalData(p_index);
+			const LocalData<D> ld = te_b->getLocalData(0, p_index);
 			nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 				b_view[index] = ld[coord];
 				index++;

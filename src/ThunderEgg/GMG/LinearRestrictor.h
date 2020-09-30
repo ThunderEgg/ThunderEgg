@@ -40,8 +40,8 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	{
 		for (const auto &pair : patches) {
 			std::shared_ptr<const PatchInfo<D>> pinfo = pair.second;
-			LocalData<D> coarse_local_data            = coarser_vector->getLocalData(pair.first);
-			LocalData<D> fine_data = finer_vector->getLocalData(pinfo->local_index);
+			LocalData<D> coarse_local_data            = coarser_vector->getLocalData(0, pair.first);
+			LocalData<D> fine_data = finer_vector->getLocalData(0, pinfo->local_index);
 
 			if (pinfo->hasCoarseParent()) {
 				Orthant<D> orth = pinfo->orth_on_parent;

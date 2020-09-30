@@ -74,7 +74,7 @@ template <int D> class MatWrapper : public Operator<D>
 			size_t  curr_index = 0;
 			VecGetArray(petsc_vec, &petsc_vec_view);
 			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-				const LocalData<D> ld = vec->getLocalData(i);
+				const LocalData<D> ld = vec->getLocalData(0, i);
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					petsc_vec_view[curr_index] = ld[coord];
 					curr_index++;
@@ -98,7 +98,7 @@ template <int D> class MatWrapper : public Operator<D>
 			size_t        curr_index = 0;
 			VecGetArrayRead(petsc_vec, &petsc_vec_view);
 			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-				LocalData<D> ld = vec->getLocalData(i);
+				LocalData<D> ld = vec->getLocalData(0, i);
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					ld[coord] = petsc_vec_view[curr_index];
 					curr_index++;

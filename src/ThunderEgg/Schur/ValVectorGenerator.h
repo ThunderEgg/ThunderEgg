@@ -67,7 +67,7 @@ template <int D> class ValVectorGenerator : public VectorGenerator<D>
 	}
 	std::shared_ptr<Vector<D>> getNewVector() const override
 	{
-		return std::make_shared<ValVector<D>>(MPI_COMM_WORLD, iface_ns, 0,
+		return std::make_shared<ValVector<D>>(MPI_COMM_WORLD, iface_ns, 0, 1,
 		                                      iface_domain->getNumLocalInterfaces());
 	}
 };

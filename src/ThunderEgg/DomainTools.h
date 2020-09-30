@@ -109,7 +109,7 @@ template <int D> struct DomainTools {
 	{
 		std::array<double, D> real_coord;
 		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			LocalData<D> ld    = vec->getLocalData(i);
+			LocalData<D> ld    = vec->getLocalData(0, i);
 			auto         pinfo = domain->getPatchInfoVector()[i];
 			nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 				getRealCoord(pinfo, coord, real_coord);
@@ -126,7 +126,7 @@ template <int D> struct DomainTools {
 	{
 		std::array<double, D> real_coord;
 		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			LocalData<D> ld    = vec->getLocalData(i);
+			LocalData<D> ld    = vec->getLocalData(0, i);
 			auto         pinfo = domain->getPatchInfoVector()[i];
 			nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(),
 			               [&](const std::array<int, D> &coord) {
@@ -146,7 +146,7 @@ template <int D> struct DomainTools {
 			auto pinfo = domain->getPatchInfoMap()[domain->patch_id_bc_map_vec[i]];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo->hasNbr(s)) {
-					LocalData<D - 1> ld = vec->getLocalData(pinfo->getBCLocalIndex(s));
+					LocalData<D - 1> ld = vec->getLocalData(0, pinfo->getBCLocalIndex(s));
 					nested_loop<D - 1>(ld.getStart(), ld.getEnd(),
 					                   [&](const std::array<int, D - 1> &coord) {
 						                   getRealCoordBound(pinfo, coord, s, real_coord);

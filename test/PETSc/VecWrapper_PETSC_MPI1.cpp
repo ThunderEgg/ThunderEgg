@@ -350,7 +350,7 @@ TEST_CASE("PETSc::VecWrapper<1> getLocalData", "[PETSc::VecWrapper]")
 	VecGetArray(vec, &view);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		LocalData<1> ld = vec_wrapper->getLocalData(i);
+		LocalData<1> ld = vec_wrapper->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -380,7 +380,7 @@ TEST_CASE("PETSc::VecWrapper<1> getLocalData const", "[PETSc::VecWrapper]")
 	VecGetArray(vec, &view);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		const LocalData<1> ld = vec_wrapper->getLocalData(i);
+		const LocalData<1> ld = vec_wrapper->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -412,7 +412,7 @@ TEST_CASE("PETSc::VecWrapper<2> getLocalData", "[PETSc::VecWrapper]")
 	VecGetArray(vec, &view);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		LocalData<2> ld = vec_wrapper->getLocalData(i);
+		LocalData<2> ld = vec_wrapper->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -444,7 +444,7 @@ TEST_CASE("PETSc::VecWrapper<2> getLocalData const", "[PETSc::VecWrapper]")
 	VecGetArray(vec, &view);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		const LocalData<2> ld = vec_wrapper->getLocalData(i);
+		const LocalData<2> ld = vec_wrapper->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -480,7 +480,7 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData", "[PETSc::VecWrapper]")
 	VecGetArray(vec, &view);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		LocalData<3> ld = vec_wrapper->getLocalData(i);
+		LocalData<3> ld = vec_wrapper->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -516,7 +516,7 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData const", "[PETSc::VecWrapper]")
 	VecGetArray(vec, &view);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
-		const LocalData<3> ld = vec_wrapper->getLocalData(i);
+		const LocalData<3> ld = vec_wrapper->getLocalData(0, i);
 		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
 		CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
 	}
@@ -542,6 +542,6 @@ TEST_CASE("PETSc::VecWrapper getNewVector works", "[PETSc::VecWrapper]")
 	CHECK(vec_wrapper->getNumLocalCells() == d_fine->getNumLocalCells());
 	CHECK(vec_wrapper->getNumLocalPatches() == d_fine->getNumLocalPatches());
 	CHECK(vec_wrapper->getMPIComm() == MPI_COMM_WORLD);
-	CHECK(vec_wrapper->getLocalData(0).getLengths()[0] == nx);
-	CHECK(vec_wrapper->getLocalData(0).getLengths()[1] == ny);
+	CHECK(vec_wrapper->getLocalData(0, 0).getLengths()[0] == nx);
+	CHECK(vec_wrapper->getLocalData(0, 0).getLengths()[1] == ny);
 }
