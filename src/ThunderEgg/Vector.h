@@ -105,7 +105,7 @@ template <int D> class Vector
 		return num_local_cells;
 	}
 	/**
-	 * @brief Get the LocalData object for the specified path
+	 * @brief Get the LocalData object for the specified patch and component
 	 *
 	 * @param component_index the index of the component access
 	 * @param patch_local_index the local index of the patch
@@ -113,13 +113,45 @@ template <int D> class Vector
 	 */
 	virtual LocalData<D> getLocalData(int component_index, int patch_local_index) = 0;
 	/**
-	 * @brief Get the LocalData object for the specified path
+	 * @brief Get the LocalData object for the specified patch and component
 	 *
 	 * @param component_index the index of the component access
 	 * @param patch_local_index the local index of the patch
 	 * @return LocalData<D> the LocalData object
 	 */
 	virtual const LocalData<D> getLocalData(int component_index, int patch_local_index) const = 0;
+	/**
+	 * @brief Get the LocalData objects for the specified patch
+	 * index of LocalData object will correspond to component index
+	 *
+	 * @param patch_local_index the local index of the patch
+	 * @return LocalData<D> the LocalData object
+	 */
+	std::vector<LocalData<D>> getLocalDatas(int patch_local_index)
+	{
+		std::vector<LocalData<D>> local_datas;
+		local_datas.reserve(num_components);
+		for (int c = 0; c < num_components; c++) {
+			local_datas.emplace_back(std::move(getLocalData(c, patch_local_index)));
+		}
+		return local_datas;
+	}
+	/**
+	 * @brief Get the LocalData objects for the specified patch
+	 * index of LocalData object will correspond to component index
+	 *
+	 * @param patch_local_index the local index of the patch
+	 * @return LocalData<D> the LocalData object
+	 */
+	const std::vector<LocalData<D>> getLocalDatas(int patch_local_index) const
+	{
+		std::vector<LocalData<D>> local_datas;
+		local_datas.reserve(num_components);
+		for (int c = 0; c < num_components; c++) {
+			local_datas.emplace_back(std::move(getLocalData(c, patch_local_index)));
+		}
+		return local_datas;
+	}
 
 	/**
 	 * @brief set all value in the vector
@@ -331,8 +363,8 @@ template <int D> class Vector
 	virtual double dot(std::shared_ptr<const Vector<D>> b) const
 	{
 		double retval = 0;
-		for (int c = 0; c < num_components; c++) {
-			for (int i = 0; i < num_local_patches; i++) {
+		for (int i = 0; i < num_local_patches; i++) {
+			for (int c = 0; c < num_components; c++) {
 				const LocalData<D> ld   = getLocalData(c, i);
 				const LocalData<D> ld_b = b->getLocalData(c, i);
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) {

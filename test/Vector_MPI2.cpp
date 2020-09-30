@@ -26,6 +26,7 @@ using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("Vector<3> twoNorm", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -33,13 +34,14 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < vec.data.size(); i++) {
 		double x    = (i + 0.5) / vec.data.size();
@@ -50,9 +52,12 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 
 	double expected_norm = 0;
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto ld = vec.getLocalData(0, i);
-		nested_loop<3>(ld.getStart(), ld.getEnd(),
-		               [&](std::array<int, 3> &coord) { expected_norm += ld[coord] * ld[coord]; });
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
+				expected_norm += ld[coord] * ld[coord];
+			});
+		}
 	}
 	double global_expected_norm;
 	MPI_Allreduce(&expected_norm, &global_expected_norm, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
@@ -62,6 +67,7 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 }
 TEST_CASE("Vector<3> infNorm", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -69,13 +75,14 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < vec.data.size(); i++) {
 		double x    = (i + 0.5) / vec.data.size();
@@ -86,10 +93,12 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
 
 	double expected_norm = 0;
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto ld = vec.getLocalData(0, i);
-		nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
-			expected_norm = max(abs(ld[coord]), expected_norm);
-		});
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
+				expected_norm = max(abs(ld[coord]), expected_norm);
+			});
+		}
 	}
 	double global_expected_norm;
 	MPI_Allreduce(&expected_norm, &global_expected_norm, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
@@ -98,6 +107,7 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
 }
 TEST_CASE("Vector<3> dot", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -105,14 +115,17 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                    num_ghost_cells, ns);
+	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                    num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
@@ -126,11 +139,13 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 
 	double expected_value = 0;
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		auto a_ld = a->getLocalData(0, i);
-		auto b_ld = b->getLocalData(0, i);
-		nested_loop<3>(b_ld.getStart(), b_ld.getEnd(), [&](std::array<int, 3> &coord) {
-			expected_value += b_ld[coord] * a_ld[coord];
-		});
+		for (int c = 0; c < a->getNumComponents(); c++) {
+			auto a_ld = a->getLocalData(c, i);
+			auto b_ld = b->getLocalData(c, i);
+			nested_loop<3>(b_ld.getStart(), b_ld.getEnd(), [&](std::array<int, 3> &coord) {
+				expected_value += b_ld[coord] * a_ld[coord];
+			});
+		}
 	}
 	double global_expected_value;
 	MPI_Allreduce(&expected_value, &global_expected_value, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
