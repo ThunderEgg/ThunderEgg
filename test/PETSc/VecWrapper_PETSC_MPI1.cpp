@@ -547,6 +547,7 @@ TEST_CASE("PETSc::VecWrapper<1> getLocalData const", "[PETSc::VecWrapper]")
 
 	auto vec_wrapper
 	= make_shared<PETSc::VecWrapper<1>>(vec, ns, num_components, num_ghost_cells, false);
+	auto const_vec_wrapper = std::const_pointer_cast<const PETSc::VecWrapper<1>>(vec_wrapper);
 
 	double *view;
 	VecGetArray(vec, &view);
@@ -554,7 +555,7 @@ TEST_CASE("PETSc::VecWrapper<1> getLocalData const", "[PETSc::VecWrapper]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const LocalData<1> ld = vec_wrapper->getLocalData(c, i);
+			const LocalData<1> ld = const_vec_wrapper->getLocalData(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
 			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
 		}
@@ -623,6 +624,7 @@ TEST_CASE("PETSc::VecWrapper<2> getLocalData const", "[PETSc::VecWrapper]")
 
 	auto vec_wrapper
 	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	auto const_vec_wrapper = std::const_pointer_cast<const PETSc::VecWrapper<2>>(vec_wrapper);
 
 	double *view;
 	VecGetArray(vec, &view);
@@ -630,7 +632,7 @@ TEST_CASE("PETSc::VecWrapper<2> getLocalData const", "[PETSc::VecWrapper]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const LocalData<2> ld = vec_wrapper->getLocalData(c, i);
+			const LocalData<2> ld = const_vec_wrapper->getLocalData(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
 			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
 		}
@@ -705,6 +707,7 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData const", "[PETSc::VecWrapper]")
 
 	auto vec_wrapper
 	= make_shared<PETSc::VecWrapper<3>>(vec, ns, num_components, num_ghost_cells, false);
+	auto const_vec_wrapper = std::const_pointer_cast<const PETSc::VecWrapper<3>>(vec_wrapper);
 
 	double *view;
 	VecGetArray(vec, &view);
@@ -712,7 +715,7 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData const", "[PETSc::VecWrapper]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const LocalData<3> ld = vec_wrapper->getLocalData(c, i);
+			const LocalData<3> ld = const_vec_wrapper->getLocalData(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
 			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
 		}

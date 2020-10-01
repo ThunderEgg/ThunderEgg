@@ -416,13 +416,14 @@ TEST_CASE("ValVector<1> getLocalData const", "[ValVector]")
 
 	auto val_vector = make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_components,
 	                                            num_local_patches);
+	auto const_val_vector = std::const_pointer_cast<const ValVector<1>>(val_vector);
 
 	double *view = &val_vector->getValArray()[0];
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const LocalData<1> ld = val_vector->getLocalData(c, i);
+			const LocalData<1> ld = const_val_vector->getLocalData(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
 			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
 		}
@@ -474,13 +475,14 @@ TEST_CASE("ValVector<2> getLocalData const", "[ValVector]")
 
 	auto val_vector = make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_components,
 	                                            num_local_patches);
+	auto const_val_vector = std::const_pointer_cast<const ValVector<2>>(val_vector);
 
 	double *view = &val_vector->getValArray()[0];
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const LocalData<2> ld = val_vector->getLocalData(c, i);
+			const LocalData<2> ld = const_val_vector->getLocalData(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
 			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
 		}
@@ -537,13 +539,14 @@ TEST_CASE("ValVector<3> getLocalData const", "[ValVector]")
 
 	auto val_vector = make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_components,
 	                                            num_local_patches);
+	auto const_val_vector = std::const_pointer_cast<const ValVector<3>>(val_vector);
 
 	double *view = &val_vector->getValArray()[0];
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const LocalData<3> ld = val_vector->getLocalData(c, i);
+			const LocalData<3> ld = const_val_vector->getLocalData(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
 			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
 		}
