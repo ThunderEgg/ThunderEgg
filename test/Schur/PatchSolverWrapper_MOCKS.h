@@ -78,8 +78,9 @@ template <int D> class MockPatchSolver : public PatchSolver<D>
 			}
 		}
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                      const LocalData<D> f) const override
+	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                      const std::vector<LocalData<D>> &   fs,
+	                      std::vector<LocalData<D>> &         us) const override
 	{
 		CHECK(patches_to_be_called.count(pinfo) == 1);
 		patches_to_be_called.erase(pinfo);
@@ -102,14 +103,15 @@ template <int D> class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 	: PatchSolver<D>(domain_in, ghost_filler_in), schur_fill_value(schur_fill_value)
 	{
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                      const LocalData<D> f) const override
+	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                      const std::vector<LocalData<D>> &   fs,
+	                      std::vector<LocalData<D>> &         us) const override
 	{
 		was_called = true;
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo->hasNbr(s)) {
-				auto ghosts = u.getGhostSliceOnSide(s, 1);
-				auto inner  = u.getSliceOnSide(s);
+				auto ghosts = us[0].getGhostSliceOnSide(s, 1);
+				auto inner  = us[0].getSliceOnSide(s);
 				nested_loop<D - 1>(
 				ghosts.getStart(), ghosts.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					CHECK((ghosts[coord] + inner[coord]) / 2 == Approx(schur_fill_value));

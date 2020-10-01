@@ -330,12 +330,14 @@ void FillBlockCoeffs(CoeffMap coeffs, std::shared_ptr<const PatchInfo<2>> pinfo,
 		auto         u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1, 1);
 		auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1, 1);
 		LocalData<2> u_local_data  = u_vec->getLocalData(0, 0);
+		auto         u_local_datas = u_vec->getLocalDatas(0);
 		LocalData<1> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<2>::west(), 1);
 		LocalData<2> f_local_data  = f_vec->getLocalData(0, 0);
+		auto         f_local_datas = f_vec->getLocalDatas(0);
 
 		u_west_ghosts[{j}] = 2;
 
-		solver->solveSinglePatch(pinfo, u_local_data, f_local_data);
+		solver->solveSinglePatch(pinfo, f_local_datas, u_local_datas);
 
 		for (const auto &pair : coeffs) {
 			Side<2>         s    = pair.first.s;

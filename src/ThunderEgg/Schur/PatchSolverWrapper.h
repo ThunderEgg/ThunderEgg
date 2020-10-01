@@ -126,8 +126,9 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		}
 		// go ahead and solve for patches with only local interfaces
 		for (auto piinfo : patches_with_only_local_ifaces) {
-			solver->solveSinglePatch(piinfo->pinfo, u->getLocalData(0, piinfo->pinfo->local_index),
-			                         f->getLocalData(0, piinfo->pinfo->local_index));
+			auto us = u->getLocalDatas(piinfo->pinfo->local_index);
+			auto fs = f->getLocalDatas(piinfo->pinfo->local_index);
+			solver->solveSinglePatch(piinfo->pinfo, fs, us);
 		}
 
 		scatter.scatterFinish(x, local_x);
@@ -149,8 +150,9 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		}
 		// solve the remaining patches
 		for (auto piinfo : patches_with_ifaces_on_neighbor_rank) {
-			solver->solveSinglePatch(piinfo->pinfo, u->getLocalData(0, piinfo->pinfo->local_index),
-			                         f->getLocalData(0, piinfo->pinfo->local_index));
+			auto us = u->getLocalDatas(piinfo->pinfo->local_index);
+			auto fs = f->getLocalDatas(piinfo->pinfo->local_index);
+			solver->solveSinglePatch(piinfo->pinfo, fs, us);
 		}
 
 		solver->getGhostFiller()->fillGhost(u);
@@ -202,8 +204,9 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 			}
 		}
 		for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
-			solver->solveSinglePatch(piinfo->pinfo, u->getLocalData(0, piinfo->pinfo->local_index),
-			                         domain_b->getLocalData(0, piinfo->pinfo->local_index));
+			auto us = u->getLocalDatas(piinfo->pinfo->local_index);
+			auto fs = domain_b->getLocalDatas(piinfo->pinfo->local_index);
+			solver->solveSinglePatch(piinfo->pinfo, fs, us);
 		}
 
 		solver->getGhostFiller()->fillGhost(u);

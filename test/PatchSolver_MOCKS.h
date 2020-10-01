@@ -59,13 +59,14 @@ template <int D> class MockPatchSolver : public PatchSolver<D>
 			patches_to_be_called.insert(pinfo);
 		}
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                      const LocalData<D> f) const override
+	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                      const std::vector<LocalData<D>> &   fs,
+	                      std::vector<LocalData<D>> &         us) const override
 	{
 		CHECK(patches_to_be_called.count(pinfo) == 1);
 		patches_to_be_called.erase(pinfo);
-		CHECK(u_vec->getLocalData(0, pinfo->local_index).getPtr() == u.getPtr());
-		CHECK(f_vec->getLocalData(0, pinfo->local_index).getPtr() == f.getPtr());
+		CHECK(u_vec->getLocalData(0, pinfo->local_index).getPtr() == us[0].getPtr());
+		CHECK(f_vec->getLocalData(0, pinfo->local_index).getPtr() == fs[0].getPtr());
 	}
 	bool allPatchesCalled()
 	{

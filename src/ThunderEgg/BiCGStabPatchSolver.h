@@ -190,20 +190,20 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 	  tol(tol_in)
 	{
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                      const LocalData<D> f) const override
+	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                      const std::vector<LocalData<D>> &   fs,
+	                      std::vector<LocalData<D>> &         us) const override
 	{
 		std::shared_ptr<SinglePatchOp>      single_op(new SinglePatchOp(pinfo, op));
 		std::shared_ptr<VectorGenerator<D>> vg(new SingleVG(pinfo));
 
-		std::shared_ptr<Vector<D>> f_single(new SinglePatchVec(f));
-		std::shared_ptr<Vector<D>> u_single(new SinglePatchVec(u));
+		std::shared_ptr<Vector<D>> f_single(new SinglePatchVec(fs[0]));
+		std::shared_ptr<Vector<D>> u_single(new SinglePatchVec(us[0]));
 
 		auto f_copy = vg->getNewVector();
 		f_copy->copy(f_single);
-		const std::vector<LocalData<D>> us = {u};
-		std::vector<LocalData<D>>       fs = {f_copy->getLocalData(0, 0)};
-		op->addGhostToRHS(pinfo, us, fs);
+		auto f_copy_lds = f_copy->getLocalDatas(0);
+		op->addGhostToRHS(pinfo, us, f_copy_lds);
 		// u_single->set(0);
 
 		// printf("Calling BiCG patch solver\n");
