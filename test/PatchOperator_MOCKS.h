@@ -53,10 +53,10 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 	mutable std::set<std::shared_ptr<const PatchInfo<D>>> patches_to_be_called;
 
 	public:
-	MockPatchOperator(std::shared_ptr<const Domain<D>>      domain_in,
-	                  std::shared_ptr<const GhostFiller<D>> ghost_filler_in,
-	                  std::shared_ptr<Vector<D>> u_in, std::shared_ptr<Vector<D>> f_in)
-	: PatchOperator<D>(domain_in, ghost_filler_in), u_vec(u_in), f_vec(f_in)
+	MockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
+	                  std::shared_ptr<const GhostFiller<D>> ghost_filler,
+	                  std::shared_ptr<Vector<D>> u, std::shared_ptr<Vector<D>> f)
+	: PatchOperator<D>(domain, ghost_filler), u_vec(u), f_vec(f)
 	{
 		for (auto pinfo : this->domain->getPatchInfoVector()) {
 			patches_to_be_called.insert(pinfo);
@@ -68,8 +68,15 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 	{
 		CHECK(patches_to_be_called.count(pinfo) == 1);
 		patches_to_be_called.erase(pinfo);
-		CHECK(u_vec->getLocalData(0, pinfo->local_index).getPtr() == us[0].getPtr());
-		CHECK(f_vec->getLocalData(0, pinfo->local_index).getPtr() == fs[0].getPtr());
+		INFO("LOCAL_INDEX: " << pinfo->local_index);
+		for (int c = 0; c < u_vec->getNumComponents(); c++) {
+			INFO("c: " << c);
+			CHECK(u_vec->getLocalData(c, pinfo->local_index).getPtr() == us[c].getPtr());
+		}
+		for (int c = 0; c < f_vec->getNumComponents(); c++) {
+			INFO("c: " << c);
+			CHECK(f_vec->getLocalData(c, pinfo->local_index).getPtr() == fs[c].getPtr());
+		}
 	}
 	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
 	                   const std::vector<LocalData<D>> &   us,
