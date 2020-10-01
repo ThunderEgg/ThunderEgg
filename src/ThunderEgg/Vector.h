@@ -161,11 +161,12 @@ template <int D> class Vector
 	virtual void set(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D> ld = getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] = alpha; });
-			}
+			std::vector<LocalData<D>> lds = getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					lds[c][coord] = alpha;
+				}
+			});
 		}
 	}
 	/**
@@ -176,11 +177,13 @@ template <int D> class Vector
 	virtual void setWithGhost(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D> ld = getLocalData(c, i);
-				nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] = alpha; });
-			}
+			std::vector<LocalData<D>> lds = getLocalDatas(i);
+			nested_loop<D>(lds[0].getGhostStart(), lds[0].getGhostEnd(),
+			               [&](std::array<int, D> coord) {
+				               for (int c = 0; c < num_components; c++) {
+					               lds[c][coord] = alpha;
+				               }
+			               });
 		}
 	}
 	/**
@@ -191,11 +194,12 @@ template <int D> class Vector
 	virtual void scale(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D> ld = getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] *= alpha; });
-			}
+			std::vector<LocalData<D>> lds = getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					lds[c][coord] *= alpha;
+				}
+			});
 		}
 	}
 	/**
@@ -206,11 +210,12 @@ template <int D> class Vector
 	virtual void shift(double delta)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D> ld = getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] += delta; });
-			}
+			std::vector<LocalData<D>> lds = getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					lds[c][coord] += delta;
+				}
+			});
 		}
 	}
 	/**
@@ -221,12 +226,13 @@ template <int D> class Vector
 	virtual void copy(std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D>       ld   = getLocalData(c, i);
-				const LocalData<D> ld_b = b->getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] = ld_b[coord]; });
-			}
+			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					lds[c][coord] = lds_b[c][coord];
+				}
+			});
 		}
 	}
 	/**
@@ -237,12 +243,13 @@ template <int D> class Vector
 	virtual void add(std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D>       ld   = getLocalData(c, i);
-				const LocalData<D> ld_b = b->getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] += ld_b[coord]; });
-			}
+			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					lds[c][coord] += lds_b[c][coord];
+				}
+			});
 		}
 	}
 	/**
@@ -251,12 +258,13 @@ template <int D> class Vector
 	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D>       ld   = getLocalData(c, i);
-				const LocalData<D> ld_b = b->getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] += ld_b[coord] * alpha; });
-			}
+			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					lds[c][coord] += lds_b[c][coord] * alpha;
+				}
+			});
 		}
 	}
 	/**
@@ -266,14 +274,14 @@ template <int D> class Vector
 	                       std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D>       ld   = getLocalData(c, i);
-				const LocalData<D> ld_a = a->getLocalData(c, i);
-				const LocalData<D> ld_b = b->getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) {
-					ld[coord] += ld_a[coord] * alpha + ld_b[coord] * beta;
-				});
-			}
+			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_a = a->getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					lds[c][coord] += lds_a[c][coord] * alpha + lds_b[c][coord] * beta;
+				}
+			});
 		}
 	}
 	/**
@@ -282,13 +290,13 @@ template <int D> class Vector
 	virtual void scaleThenAdd(double alpha, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D>       ld   = getLocalData(c, i);
-				const LocalData<D> ld_b = b->getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) {
-					ld[coord] = alpha * ld[coord] + ld_b[coord];
-				});
-			}
+			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					lds[c][coord] = alpha * lds[c][coord] + lds_b[c][coord];
+				}
+			});
 		}
 	}
 	/**
@@ -297,13 +305,13 @@ template <int D> class Vector
 	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				LocalData<D>       ld   = getLocalData(c, i);
-				const LocalData<D> ld_b = b->getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) {
-					ld[coord] = alpha * ld[coord] + beta * ld_b[coord];
-				});
-			}
+			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					lds[c][coord] = alpha * lds[c][coord] + beta * lds_b[c][coord];
+				}
+			});
 		}
 	}
 	/**
@@ -313,14 +321,15 @@ template <int D> class Vector
 	                                double gamma, std::shared_ptr<const Vector<D>> c)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int comp = 0; comp < num_components; comp++) {
-				LocalData<D>       ld   = getLocalData(comp, i);
-				const LocalData<D> ld_b = b->getLocalData(comp, i);
-				const LocalData<D> ld_c = c->getLocalData(comp, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) {
-					ld[coord] = alpha * ld[coord] + beta * ld_b[coord] + gamma * ld_c[coord];
-				});
-			}
+			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_c = c->getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int comp = 0; comp < num_components; comp++) {
+					lds[comp][coord] = alpha * lds[comp][coord] + beta * lds_b[comp][coord]
+					                   + gamma * lds_c[comp][coord];
+				}
+			});
 		}
 	}
 	/**
@@ -330,11 +339,12 @@ template <int D> class Vector
 	{
 		double sum = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				const LocalData<D> ld = getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { sum += ld[coord] * ld[coord]; });
-			}
+			std::vector<LocalData<D>> lds = getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					sum += lds[c][coord] * lds[c][coord];
+				}
+			});
 		}
 		double global_sum;
 		MPI_Allreduce(&sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, comm);
@@ -347,11 +357,12 @@ template <int D> class Vector
 	{
 		double max = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				const LocalData<D> ld = getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { max = fmax(fabs(ld[coord]), max); });
-			}
+			std::vector<LocalData<D>> lds = getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					max = fmax(fabs(lds[c][coord]), max);
+				}
+			});
 		}
 		double global_max;
 		MPI_Allreduce(&max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm);
@@ -364,13 +375,13 @@ template <int D> class Vector
 	{
 		double retval = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				const LocalData<D> ld   = getLocalData(c, i);
-				const LocalData<D> ld_b = b->getLocalData(c, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) {
-					retval += ld[coord] * ld_b[coord];
-				});
-			}
+			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
+			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
+			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
+				for (int c = 0; c < num_components; c++) {
+					retval += lds[c][coord] * lds_b[c][coord];
+				}
+			});
 		}
 		double global_retval;
 		MPI_Allreduce(&retval, &global_retval, 1, MPI_DOUBLE, MPI_SUM, comm);

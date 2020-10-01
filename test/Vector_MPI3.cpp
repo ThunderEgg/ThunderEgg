@@ -63,7 +63,7 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 	MPI_Allreduce(&expected_norm, &global_expected_norm, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 	global_expected_norm = sqrt(global_expected_norm);
 
-	CHECK(vec.twoNorm() == global_expected_norm);
+	CHECK(vec.twoNorm() == Approx(global_expected_norm));
 }
 TEST_CASE("Vector<3> infNorm", "[Vector]")
 {
@@ -150,5 +150,5 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	double global_expected_value;
 	MPI_Allreduce(&expected_value, &global_expected_value, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
-	CHECK(a->dot(b) == global_expected_value);
+	CHECK(a->dot(b) == Approx(global_expected_value));
 }

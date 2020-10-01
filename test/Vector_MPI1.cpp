@@ -682,7 +682,7 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 	}
 	expected_norm = sqrt(expected_norm);
 
-	CHECK(vec.twoNorm() == expected_norm);
+	CHECK(vec.twoNorm() == Approx(expected_norm));
 }
 TEST_CASE("Vector<3> infNorm", "[Vector]")
 {
@@ -765,5 +765,5 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 		}
 	}
 
-	CHECK(a->dot(b) == expected_value);
+	CHECK(a->dot(b) == Approx(expected_value));
 }
