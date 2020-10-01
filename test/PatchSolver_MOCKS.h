@@ -65,8 +65,12 @@ template <int D> class MockPatchSolver : public PatchSolver<D>
 	{
 		CHECK(patches_to_be_called.count(pinfo) == 1);
 		patches_to_be_called.erase(pinfo);
-		CHECK(u_vec->getLocalData(0, pinfo->local_index).getPtr() == us[0].getPtr());
-		CHECK(f_vec->getLocalData(0, pinfo->local_index).getPtr() == fs[0].getPtr());
+		for (int c = 0; c < u_vec->getNumComponents(); c++) {
+			CHECK(u_vec->getLocalData(c, pinfo->local_index).getPtr() == us[c].getPtr());
+		}
+		for (int c = 0; c < f_vec->getNumComponents(); c++) {
+			CHECK(f_vec->getLocalData(c, pinfo->local_index).getPtr() == fs[c].getPtr());
+		}
 	}
 	bool allPatchesCalled()
 	{
