@@ -124,7 +124,7 @@ template <int D> class ValVector : public Vector<D>
 	const LocalData<D> getLocalData(int component_index, int local_patch_index) const override
 	{
 		double *data = const_cast<double *>(
-		&vec[patch_stride * local_patch_index + component_index + first_offset + component_index]);
+		&vec[patch_stride * local_patch_index + first_offset + component_index]);
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 
