@@ -80,7 +80,7 @@ template <int D> class VecWrapperGenerator : public VectorGenerator<D>
 		Vec u;
 		VecCreateMPI(MPI_COMM_WORLD, iface_domain->getNumLocalInterfaces() * size, PETSC_DETERMINE,
 		             &u);
-		return std::make_shared<PETSc::VecWrapper<D>>(u, iface_ns, 0, true);
+		return std::make_shared<PETSc::VecWrapper<D>>(u, iface_ns, 1, 0, true);
 	}
 };
 } // namespace Schur

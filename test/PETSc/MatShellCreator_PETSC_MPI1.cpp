@@ -57,9 +57,9 @@ TEST_CASE("PETSc::MatShellCreator works with 0.5I", "[PETSc::MatShellCreator]")
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 	DomainTools<2>::setValues(d_fine, x, gfun);
-	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 
 	// create an Identity matrix
 	auto TE_A = make_shared<HalfIdentity>();

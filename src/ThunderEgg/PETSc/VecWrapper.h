@@ -106,16 +106,17 @@ template <int D> class VecWrapper : public Vector<D>
 	/**
 	 * @brief Construct a new VecWrapper object
 	 *
-	 * @param vec_in the allocated PETSc vector
-	 * @param lengths_in the number of (non-ghost) cells in each direction of the patch
-	 * @param num_ghost_cells_in the number of ghost cells on each side of the patch
-	 * @param own_in whether or not to deallocate the PETSc vector when this object is destroyed.
+	 * @param vec the allocated PETSc vector
+	 * @param lengths the number of (non-ghost) cells in each direction of the patch
+	 * @param num_ghost_cells the number of ghost cells on each side of the patch
+	 * @param num_components the number of components for each cell
+	 * @param own whether or not to deallocate the PETSc vector when this object is destroyed.
 	 */
-	VecWrapper(Vec vec_in, const std::array<int, D> &lengths_in, int num_ghost_cells_in,
-	           bool own_in)
-	: Vector<D>(MPI_COMM_WORLD, 1, GetNumLocalPatches(vec_in, lengths_in, num_ghost_cells_in),
-	            GetNumLocalCells(vec_in, lengths_in, num_ghost_cells_in)),
-	  vec(vec_in), num_ghost_cells(num_ghost_cells_in), own(own_in), lengths(lengths_in)
+	VecWrapper(Vec vec, const std::array<int, D> &lengths, int num_components, int num_ghost_cells,
+	           bool own)
+	: Vector<D>(MPI_COMM_WORLD, 1, GetNumLocalPatches(vec, lengths, num_ghost_cells),
+	            GetNumLocalCells(vec, lengths, num_ghost_cells)),
+	  vec(vec), num_ghost_cells(num_ghost_cells), own(own), lengths(lengths)
 	{
 		strides[0]   = 1;
 		first_offset = num_ghost_cells;
@@ -136,12 +137,13 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param domain the Domain
 	 * @return std::shared_ptr<VecWrapper<D>> the resulting VecWrapper
 	 */
-	static std::shared_ptr<VecWrapper<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain)
+	static std::shared_ptr<VecWrapper<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain,
+	                                                   int num_components)
 	{
 		Vec u;
 		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCellsWithGhost(), PETSC_DETERMINE, &u);
-		return std::make_shared<VecWrapper<D>>(u, domain->getNs(), domain->getNumGhostCells(),
-		                                       true);
+		return std::make_shared<VecWrapper<D>>(u, domain->getNs(), num_components,
+		                                       domain->getNumGhostCells(), true);
 	}
 	/**
 	 * @brief Get a new boundary condition vector for a given Domain
@@ -157,7 +159,7 @@ template <int D> class VecWrapper : public Vector<D>
 		for (size_t i = 0; i < ns.size(); i++) {
 			ns[i] = domain->getNs()[i];
 		}
-		return std::make_shared<VecWrapper<D - 1>>(u, ns, 0, true);
+		return std::make_shared<VecWrapper<D - 1>>(u, ns, 1, 0, true);
 	}
 	/**
 	 * @brief Destroy the VecWrapper object

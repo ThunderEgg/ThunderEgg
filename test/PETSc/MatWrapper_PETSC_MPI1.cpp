@@ -96,9 +96,9 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper with ghost and 0.5I",
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 	DomainTools<2>::setValues(d_fine, x, gfun);
-	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 
 	// create an Identity matrix
 	Mat A;
@@ -146,9 +146,9 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper without ghost and 0.5I
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 	DomainTools<2>::setValues(d_fine, x, gfun);
-	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 
 	// create an Identity matrix
 	Mat A;

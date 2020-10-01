@@ -49,10 +49,10 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto f_vec          = PETSc::VecWrapper<2>::GetNewVector(d_fine);
-	auto f_vec_expected = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto f_vec          = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
+	auto f_vec_expected = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 
-	auto g_vec = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto g_vec = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 	DomainTools<2>::setValues(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine);
@@ -102,10 +102,10 @@ TEST_CASE(
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto f_vec          = PETSc::VecWrapper<2>::GetNewVector(d_fine);
-	auto f_vec_expected = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto f_vec          = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
+	auto f_vec_expected = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 
-	auto g_vec = PETSc::VecWrapper<2>::GetNewVector(d_fine);
+	auto g_vec = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 	DomainTools<2>::setValues(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine);

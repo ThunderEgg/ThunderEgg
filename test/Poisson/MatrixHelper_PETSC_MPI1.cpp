@@ -53,10 +53,10 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 		return sin(M_PI * y) * cos(2 * M_PI * x) * cos(M_PI * z);
 	};
 
-	auto f_vec          = PETSc::VecWrapper<3>::GetNewVector(d_fine);
-	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine);
+	auto f_vec          = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
+	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
 
-	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine);
+	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
 	DomainTools<3>::setValues(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<TriLinearGhostFiller>(d_fine);
@@ -112,10 +112,10 @@ TEST_CASE(
 		return sin(M_PI * y) * cos(2 * M_PI * x) * cos(M_PI * z);
 	};
 
-	auto f_vec          = PETSc::VecWrapper<3>::GetNewVector(d_fine);
-	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine);
+	auto f_vec          = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
+	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
 
-	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine);
+	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
 	DomainTools<3>::setValues(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<TriLinearGhostFiller>(d_fine);
