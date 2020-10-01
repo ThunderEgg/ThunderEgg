@@ -648,8 +648,8 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData", "[PETSc::VecWrapper]")
 	int           nz                = GENERATE(1, 4, 5);
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride
-	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+	int           patch_stride      = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)
+	                   * (nz + 2 * num_ghost_cells) * num_components;
 	int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
 
@@ -689,8 +689,8 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData const", "[PETSc::VecWrapper]")
 	int           nz                = GENERATE(1, 4, 5);
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride
-	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+	int           patch_stride      = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)
+	                   * (nz + 2 * num_ghost_cells) * num_components;
 	int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
 
@@ -737,7 +737,7 @@ TEST_CASE("PETSc::VecWrapper getNewVector works", "[PETSc::VecWrapper]")
 	auto vec_wrapper = PETSc::VecWrapper<2>::GetNewVector(d_fine, num_components);
 
 	CHECK(vec_wrapper->getNumComponents() == num_components);
-	CHECK(vec_wrapper->getNumGhostCells() == 0);
+	CHECK(vec_wrapper->getNumGhostCells() == num_ghost);
 	CHECK(vec_wrapper->getNumLocalCells() == d_fine->getNumLocalCells());
 	CHECK(vec_wrapper->getNumLocalPatches() == d_fine->getNumLocalPatches());
 	CHECK(vec_wrapper->getMPIComm() == MPI_COMM_WORLD);
