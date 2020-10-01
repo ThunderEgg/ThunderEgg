@@ -103,7 +103,7 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -142,7 +142,7 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -160,7 +160,7 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
@@ -180,8 +180,8 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -200,8 +200,8 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
@@ -221,7 +221,7 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -238,7 +238,7 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -277,7 +277,7 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -295,7 +295,7 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
@@ -315,8 +315,8 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -335,8 +335,8 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
@@ -355,7 +355,7 @@ TEST_CASE("3-processor getGhostPatches throws exception when start is called twi
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 

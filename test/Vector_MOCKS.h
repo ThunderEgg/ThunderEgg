@@ -72,8 +72,7 @@ template <int D> class MockVector : public Vector<D>
 	 */
 	MockVector(MPI_Comm comm, int num_components, int num_local_patches, int num_ghost_cells,
 	           std::array<int, D> ns)
-	: Vector<D>(comm, num_components, num_local_patches,
-	            num_components * GetNumLocalCells(num_local_patches, ns))
+	: Vector<D>(comm, num_components, num_local_patches, GetNumLocalCells(num_local_patches, ns))
 	{
 		std::array<int, 3> strides;
 		int                patch_stride = num_components;

@@ -38,17 +38,25 @@ template <int D> class ValVectorGenerator : public VectorGenerator<D>
 	 * @brief the Domain to generate ValVector objects for
 	 */
 	std::shared_ptr<const Domain<D>> domain;
+	/**
+	 * @brief The number of components in each cell
+	 */
+	int num_components;
 
 	public:
 	/**
 	 * @brief Construct a new ValVectorGenerator object
 	 *
-	 * @param domain_in the Domain to generate ValVector objects for
+	 * @param domain the Domain to generate ValVector objects for
+	 * @param num_components the number of components for each cell
 	 */
-	explicit ValVectorGenerator(std::shared_ptr<const Domain<D>> domain_in) : domain(domain_in) {}
+	explicit ValVectorGenerator(std::shared_ptr<const Domain<D>> domain, int num_components)
+	: domain(domain), num_components(num_components)
+	{
+	}
 	std::shared_ptr<Vector<D>> getNewVector() const override
 	{
-		return ValVector<D>::GetNewVector(domain);
+		return ValVector<D>::GetNewVector(domain, num_components);
 	}
 };
 } // namespace ThunderEgg

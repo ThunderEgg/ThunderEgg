@@ -95,8 +95,8 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
 
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse);
+	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 

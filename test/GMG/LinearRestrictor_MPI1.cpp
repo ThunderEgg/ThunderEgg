@@ -39,9 +39,9 @@ TEST_CASE("Linear Test LinearRestrictor on uniform 4x4", "[GMG::LinearRestrictor
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse);
+	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 1);
+	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];

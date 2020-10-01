@@ -49,7 +49,7 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")
 	int                   num_ghost = 0;
 	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
-	auto                  vg     = make_shared<ValVectorGenerator<2>>(d_fine);
+	auto                  vg     = make_shared<ValVectorGenerator<2>>(d_fine, 1);
 
 	auto gfun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];

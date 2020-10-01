@@ -109,7 +109,7 @@ TEST_CASE("Vector<3> getNumLocalCells", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	CHECK(vec.getNumLocalCells() == nx * ny * nz * num_local_patches * num_components);
+	CHECK(vec.getNumLocalCells() == nx * ny * nz * num_local_patches);
 }
 TEST_CASE("Vector<3> getLocalDatas", "[Vector]")
 {

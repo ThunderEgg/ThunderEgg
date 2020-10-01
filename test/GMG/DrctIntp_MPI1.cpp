@@ -39,9 +39,9 @@ TEST_CASE("Test DrctIntp on uniform 4x4", "[GMG::DrctIntp]")
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto coarse_vec    = ValVector<2>::GetNewVector(d_coarse);
-	auto fine_vec      = ValVector<2>::GetNewVector(d_fine);
-	auto fine_expected = ValVector<2>::GetNewVector(d_fine);
+	auto coarse_vec    = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto fine_vec      = ValVector<2>::GetNewVector(d_fine, 1);
+	auto fine_expected = ValVector<2>::GetNewVector(d_fine, 1);
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
@@ -94,9 +94,9 @@ TEST_CASE("Linear Test DrctIntp with values already set on uniform 4x4", "[GMG::
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto coarse_vec    = ValVector<2>::GetNewVector(d_coarse);
-	auto fine_vec      = ValVector<2>::GetNewVector(d_fine);
-	auto fine_expected = ValVector<2>::GetNewVector(d_fine);
+	auto coarse_vec    = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto fine_vec      = ValVector<2>::GetNewVector(d_fine, 1);
+	auto fine_expected = ValVector<2>::GetNewVector(d_fine, 1);
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {

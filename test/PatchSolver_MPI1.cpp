@@ -24,8 +24,8 @@ TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
@@ -52,8 +52,8 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
@@ -85,8 +85,8 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
@@ -118,8 +118,8 @@ TEST_CASE("PatchSolver smooth for various domains with timer", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
@@ -146,8 +146,8 @@ TEST_CASE("PatchSolver getTimer default is nullptr", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
@@ -165,8 +165,8 @@ TEST_CASE("PatchSolver getTimer", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
@@ -187,8 +187,8 @@ TEST_CASE("PatchSolver getDomain", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
@@ -206,8 +206,8 @@ TEST_CASE("PatchSolver getGhostFiller", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);

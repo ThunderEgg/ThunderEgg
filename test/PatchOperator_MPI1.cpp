@@ -23,8 +23,8 @@ TEST_CASE("Check PatchOperator calls for various domains", "[PatchOperator]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto                 mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchOperator<2> mpo(d_fine, mgf, u, f);
@@ -45,8 +45,8 @@ TEST_CASE("PatchOperator check getDomain", "[PatchOperator]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto                 mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchOperator<2> mpo(d_fine, mgf, u, f);
@@ -64,8 +64,8 @@ TEST_CASE("PatchOperator check getGhostFiller", "[PatchOperator]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto                 mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchOperator<2> mpo(d_fine, mgf, u, f);

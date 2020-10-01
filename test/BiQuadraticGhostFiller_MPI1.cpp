@@ -260,8 +260,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller", "[BiQuadraticGhos
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d);
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -316,8 +316,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set",
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d);
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];

@@ -22,8 +22,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d);
+	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 1);
+	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -79,8 +79,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d);
+	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 1);
+	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];

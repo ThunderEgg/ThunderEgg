@@ -21,7 +21,7 @@ TEST_CASE("Calls for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine);
+	auto vec = ValVector<2>::GetNewVector(d_fine, 1);
 
 	CallMockMPIGhostFiller<2> mgf(d_fine, 1);
 
@@ -41,7 +41,7 @@ TEST_CASE("Exchange for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine);
+	auto vec = ValVector<2>::GetNewVector(d_fine, 1);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		auto data = vec->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(data.getStart(), data.getEnd(),
@@ -64,7 +64,7 @@ TEST_CASE("Two Exchanges for various domains 1-side cases MPI3", "[MPIGhostFille
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine);
+	auto vec = ValVector<2>::GetNewVector(d_fine, 1);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		auto data = vec->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(data.getStart(), data.getEnd(),

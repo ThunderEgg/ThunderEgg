@@ -512,12 +512,12 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain));
-		shared_ptr<ValVector<2>>            u     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>            exact = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>            f     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>            au    = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>            h     = ValVector<2>::GetNewVector(domain);
+		std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain, 1));
+		shared_ptr<ValVector<2>>            u     = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<ValVector<2>>            exact = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<ValVector<2>>            f     = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<ValVector<2>>            au    = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<ValVector<2>>            h     = ValVector<2>::GetNewVector(domain, 1);
 		shared_ptr<PETSc::VecWrapper<1>>    h_bc  = PETSc::VecWrapper<2>::GetNewBCVector(domain);
 
 		DomainTools<2>::setValues(domain, f, ffun);
@@ -578,7 +578,7 @@ int main(int argc, char *argv[])
 			auto prev_domain = next_domain;
 			while (dcg->hasCoarserDomain()) {
 				auto next_domain = dcg->getCoarserDomain();
-				auto new_vg      = make_shared<ValVectorGenerator<2>>(prev_domain);
+				auto new_vg      = make_shared<ValVectorGenerator<2>>(prev_domain, 1);
 				auto new_gf      = make_shared<BiLinearGhostFiller>(prev_domain);
 				auto new_coeffs  = new_vg->getNewVector();
 
@@ -601,7 +601,7 @@ int main(int argc, char *argv[])
 				prev_domain = next_domain;
 			}
 			auto interpolator  = make_shared<GMG::DrctIntp<2>>(ilc);
-			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(prev_domain);
+			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(prev_domain, 1);
 			auto coarse_gf     = make_shared<BiLinearGhostFiller>(prev_domain);
 			auto coarse_coeffs = coarse_vg->getNewVector();
 
@@ -667,13 +667,13 @@ int main(int argc, char *argv[])
 		A->apply(u, au);
 
 		// residual
-		shared_ptr<ValVector<2>> resid = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>> resid = ValVector<2>::GetNewVector(domain, 1);
 		// VecAXPBYPCZ(resid->vec, -1.0, 1.0, 0.0, au->vec, f->vec);
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
-		shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain, 1);
 		// VecAXPBYPCZ(error->vec, -1.0, 1.0, 0.0, exact->vec, u->vec);
 		if (neumann) {
 			double uavg = domain->integrate(u) / domain->volume();

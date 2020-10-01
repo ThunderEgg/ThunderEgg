@@ -158,7 +158,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in 
 	auto            solver = make_shared<RHSGhostCheckingPatchSolver<2>>(domain, ghost_filler, 0);
 
 	Schur::ValVectorGenerator<1> vg(iface_domain);
-	ValVectorGenerator<2>        domain_vg(domain);
+	ValVectorGenerator<2>        domain_vg(domain, 1);
 
 	auto schur_b  = vg.getNewVector();
 	auto domain_b = domain_vg.getNewVector();
@@ -186,7 +186,7 @@ TEST_CASE(
 	auto            solver       = make_shared<MockPatchSolver<2>>(domain, ghost_filler);
 
 	Schur::ValVectorGenerator<1> vg(iface_domain);
-	ValVectorGenerator<2>        domain_vg(domain);
+	ValVectorGenerator<2>        domain_vg(domain, 1);
 
 	auto schur_b  = vg.getNewVector();
 	auto domain_b = domain_vg.getNewVector();
@@ -219,7 +219,7 @@ TEST_CASE(
 	auto            solver       = make_shared<MockPatchSolver<2>>(domain, ghost_filler);
 
 	Schur::ValVectorGenerator<1> vg(iface_domain);
-	ValVectorGenerator<2>        domain_vg(domain);
+	ValVectorGenerator<2>        domain_vg(domain, 1);
 
 	auto schur_b  = vg.getNewVector();
 	auto domain_b = domain_vg.getNewVector();

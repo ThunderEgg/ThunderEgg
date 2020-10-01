@@ -73,7 +73,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 	 */
 	PatchSolverWrapper(std::shared_ptr<const InterfaceDomain<D>> iface_domain,
 	                   std::shared_ptr<const PatchSolver<D>>     solver)
-	: iface_domain(iface_domain), solver(solver), scatter(iface_domain), vg(solver->getDomain())
+	: iface_domain(iface_domain), solver(solver), scatter(iface_domain), vg(solver->getDomain(), 1)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);

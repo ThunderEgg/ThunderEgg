@@ -46,9 +46,9 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto x = ValVector<2>::GetNewVector(d_fine);
+	auto x = ValVector<2>::GetNewVector(d_fine, 1);
 	DomainTools<2>::setValues(d_fine, x, gfun);
-	auto b = ValVector<2>::GetNewVector(d_fine);
+	auto b = ValVector<2>::GetNewVector(d_fine, 1);
 
 	// create an Identity matrix
 	Mat A;
