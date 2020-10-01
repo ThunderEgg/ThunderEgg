@@ -156,7 +156,9 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		}
 		void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 		{
-			op->applySinglePatch(pinfo, x->getLocalData(0, 0), b->getLocalData(0, 0));
+			auto xs = x->getLocalDatas(0);
+			auto bs = b->getLocalDatas(0);
+			op->applySinglePatch(pinfo, xs, bs);
 		}
 	};
 
@@ -199,7 +201,9 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 
 		auto f_copy = vg->getNewVector();
 		f_copy->copy(f_single);
-		op->addGhostToRHS(pinfo, u, f_copy->getLocalData(0, 0));
+		const std::vector<LocalData<D>> us = {u};
+		std::vector<LocalData<D>>       fs = {f_copy->getLocalData(0, 0)};
+		op->addGhostToRHS(pinfo, us, fs);
 		// u_single->set(0);
 
 		// printf("Calling BiCG patch solver\n");

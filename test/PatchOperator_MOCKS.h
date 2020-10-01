@@ -62,16 +62,18 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 			patches_to_be_called.insert(pinfo);
 		}
 	}
-	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                      LocalData<D> f) const override
+	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                      const std::vector<LocalData<D>> &   us,
+	                      std::vector<LocalData<D>> &         fs) const override
 	{
 		CHECK(patches_to_be_called.count(pinfo) == 1);
 		patches_to_be_called.erase(pinfo);
-		CHECK(u_vec->getLocalData(0, pinfo->local_index).getPtr() == u.getPtr());
-		CHECK(f_vec->getLocalData(0, pinfo->local_index).getPtr() == f.getPtr());
+		CHECK(u_vec->getLocalData(0, pinfo->local_index).getPtr() == us[0].getPtr());
+		CHECK(f_vec->getLocalData(0, pinfo->local_index).getPtr() == fs[0].getPtr());
 	}
-	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                   LocalData<D> f) const override
+	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                   const std::vector<LocalData<D>> &   us,
+	                   std::vector<LocalData<D>> &         fs) const override
 	{
 	}
 	bool allPatchesCalled()

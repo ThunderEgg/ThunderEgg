@@ -89,8 +89,9 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		p_operator->addGhostToRHS(pinfo, g_vec->getLocalData(0, pinfo->local_index),
-		                          f_vec->getLocalData(0, pinfo->local_index));
+		auto gs = g_vec->getLocalDatas(pinfo->local_index);
+		auto fs = f_vec->getLocalDatas(pinfo->local_index);
+		p_operator->addGhostToRHS(pinfo, gs, fs);
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {

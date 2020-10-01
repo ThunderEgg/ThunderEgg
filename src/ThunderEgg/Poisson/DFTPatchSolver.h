@@ -397,7 +397,9 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		nested_loop<D>(f_copy_ld.getStart(), f_copy_ld.getEnd(),
 		               [&](std::array<int, D> coord) { f_copy_ld[coord] = f[coord]; });
 
-		op->addGhostToRHS(pinfo, u, f_copy_ld);
+		const std::vector<LocalData<D>> us = {u};
+		std::vector<LocalData<D>>       fs = {f_copy_ld};
+		op->addGhostToRHS(pinfo, us, fs);
 
 		executePlan(plan1.at(pinfo), f_copy_ld, tmp_ld);
 

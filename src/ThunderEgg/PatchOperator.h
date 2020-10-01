@@ -70,11 +70,12 @@ template <int D> class PatchOperator : public Operator<D>
 	 * The ghost values in u will be updated to the latest values
 	 *
 	 * @param pinfo  the patch
-	 * @param u the right hand side
-	 * @param f the left hand side
+	 * @param us the right hand side
+	 * @param fs the left hand side
 	 */
-	virtual void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                              LocalData<D> f) const = 0;
+	virtual void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                              const std::vector<LocalData<D>> &   us,
+	                              std::vector<LocalData<D>> &         fs) const = 0;
 	/**
 	 * @brief Treat the internal patch boundaries as an dirichlet boundary condition, and modify the
 	 * RHS accordingly.
@@ -82,11 +83,12 @@ template <int D> class PatchOperator : public Operator<D>
 	 * This will be used in patch solvers to formulate a RHS for the individual patch to solve for.
 	 *
 	 * @param pinfo the patch
-	 * @param u the left hand side
-	 * @param f the right hand side
+	 * @param us the left hand side
+	 * @param fs the right hand side
 	 */
-	virtual void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                           LocalData<D> f) const = 0;
+	virtual void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                           const std::vector<LocalData<D>> &   us,
+	                           std::vector<LocalData<D>> &         fs) const = 0;
 
 	/**
 	 * @brief Apply the operator
@@ -100,8 +102,9 @@ template <int D> class PatchOperator : public Operator<D>
 	{
 		ghost_filler->fillGhost(u);
 		for (auto pinfo : domain->getPatchInfoVector()) {
-			applySinglePatch(pinfo, u->getLocalData(0, pinfo->local_index),
-			                 f->getLocalData(0, pinfo->local_index));
+			auto us = u->getLocalDatas(pinfo->local_index);
+			auto fs = f->getLocalDatas(pinfo->local_index);
+			applySinglePatch(pinfo, us, fs);
 		}
 	}
 	/**
