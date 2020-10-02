@@ -37,6 +37,7 @@ TEST_CASE("BiCGStabPatchSolver smooth", "[BiCGStabPatchSolver]")
 	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
 
 	auto mgf = make_shared<MockGhostFiller<2>>();
+	// the patch operator is just a 0.5I operator
 	auto mpo = make_shared<MockPatchOperator<2>>(d_fine, mgf);
 
 	mpo->apply(u_expected, f);
@@ -56,6 +57,6 @@ TEST_CASE("BiCGStabPatchSolver smooth", "[BiCGStabPatchSolver]")
 			});
 		}
 	}
-	CHECK_FALSE(mgf->wasCalled());
+	CHECK(mgf->numCalls() == 2);
 	CHECK(mpo->rhsWasModified());
 }

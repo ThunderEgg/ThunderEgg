@@ -32,16 +32,16 @@ namespace
 template <int D> class MockGhostFiller : public GhostFiller<D>
 {
 	private:
-	mutable bool called = false;
+	mutable int num_calls = 0;
 
 	public:
 	void fillGhost(std::shared_ptr<const Vector<D>> u) const override
 	{
-		called = true;
+		num_calls++;
 	}
-	bool wasCalled()
+	int numCalls()
 	{
-		return called;
+		return num_calls;
 	}
 };
 template <int D> class MockPatchOperator : public PatchOperator<D>

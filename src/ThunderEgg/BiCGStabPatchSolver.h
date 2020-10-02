@@ -55,17 +55,22 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		 * @brief number of ghost cells
 		 */
 		int num_ghost_cells;
+		/**
+		 * @brief The number of components for each cell
+		 */
+		int num_components;
 
 		public:
 		/**
 		 * @brief Construct a new SingleVG object for a given patch
 		 *
 		 * @param pinfo the PatchInfo object for the patch
+		 * @param num_components the number of components for each cell
 		 */
-		SingleVG(std::shared_ptr<const PatchInfo<D>> pinfo)
+		SingleVG(std::shared_ptr<const PatchInfo<D>> pinfo, int num_components)
+		: lengths(pinfo->ns), num_ghost_cells(pinfo->num_ghost_cells),
+		  num_components(num_components)
 		{
-			lengths         = pinfo->ns;
-			num_ghost_cells = pinfo->num_ghost_cells;
 		}
 		/**
 		 * @brief Get a newly allocated vector
@@ -75,7 +80,7 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		std::shared_ptr<Vector<D>> getNewVector() const override
 		{
 			return std::shared_ptr<Vector<D>>(
-			new ValVector<D>(MPI_COMM_SELF, lengths, 1, 1, num_ghost_cells));
+			new ValVector<D>(MPI_COMM_SELF, lengths, num_ghost_cells, num_components, 1));
 		}
 	};
 	/**
@@ -87,7 +92,7 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		/**
 		 * @brief The LocalData for the patch
 		 */
-		LocalData<D> ld;
+		std::vector<LocalData<D>> lds;
 
 		/**
 		 * @brief Get the number of local cells in the LocalData object
@@ -110,19 +115,18 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		 *
 		 * @param ld_in the localdata for the patch
 		 */
-		SinglePatchVec(const LocalData<D> &ld)
-		: Vector<D>(MPI_COMM_SELF, 1, 1, GetNumLocalCells(ld)), ld(ld)
+		SinglePatchVec(const std::vector<LocalData<D>> &lds)
+		: Vector<D>(MPI_COMM_SELF, lds.size(), 1, GetNumLocalCells(lds[0])), lds(lds)
 		{
 		}
 		LocalData<D> getLocalData(int component_index, int local_patch_id) override
 		{
-			return ld;
+			return lds[component_index];
 		}
 		const LocalData<D> getLocalData(int component_index, int local_patch_id) const override
 		{
-			return ld;
+			return lds[component_index];
 		}
-		void setNumGhostPatches(int) {}
 	};
 	/**
 	 * @brief This wraps a PatchOperator object so that it only applies the operator on a specified
@@ -195,10 +199,10 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 	                      std::vector<LocalData<D>> &         us) const override
 	{
 		std::shared_ptr<SinglePatchOp>      single_op(new SinglePatchOp(pinfo, op));
-		std::shared_ptr<VectorGenerator<D>> vg(new SingleVG(pinfo));
+		std::shared_ptr<VectorGenerator<D>> vg(new SingleVG(pinfo, fs.size()));
 
-		std::shared_ptr<Vector<D>> f_single(new SinglePatchVec(fs[0]));
-		std::shared_ptr<Vector<D>> u_single(new SinglePatchVec(us[0]));
+		std::shared_ptr<Vector<D>> f_single(new SinglePatchVec(fs));
+		std::shared_ptr<Vector<D>> u_single(new SinglePatchVec(us));
 
 		auto f_copy = vg->getNewVector();
 		f_copy->copy(f_single);
