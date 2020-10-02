@@ -35,9 +35,13 @@ template <int D> class ValVector : public Vector<D>
 {
 	private:
 	/**
-	 * @brief the number of cells in each patch
+	 * @brief striding to next patch
 	 */
 	int patch_stride;
+	/**
+	 * @brief striding to next component
+	 */
+	int component_stride;
 	/**
 	 * @brief the number of non-ghost cells in each direction of the patch
 	 */
@@ -90,14 +94,16 @@ template <int D> class ValVector : public Vector<D>
 	: Vector<D>(comm, num_components, num_patches, GetNumLocalCells(lengths, num_patches)),
 	  lengths(lengths), num_ghost_cells(num_ghost_cells)
 	{
-		int size            = num_components;
+		int size            = 1;
 		int my_first_offset = 0;
 		for (size_t i = 0; i < D; i++) {
 			strides[i] = size;
 			size *= (this->lengths[i] + 2 * num_ghost_cells);
 			my_first_offset += strides[i] * num_ghost_cells;
 		}
-		first_offset = my_first_offset;
+		first_offset     = my_first_offset;
+		component_stride = size;
+		size *= num_components;
 		patch_stride = size;
 		size *= num_patches;
 		vec.resize(size);
@@ -118,13 +124,14 @@ template <int D> class ValVector : public Vector<D>
 	}
 	LocalData<D> getLocalData(int component_index, int local_patch_index) override
 	{
-		double *data = &vec[patch_stride * local_patch_index + first_offset + component_index];
+		double *data = &vec[patch_stride * local_patch_index + first_offset
+		                    + component_stride * component_index];
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 	const LocalData<D> getLocalData(int component_index, int local_patch_index) const override
 	{
 		double *data = const_cast<double *>(
-		&vec[patch_stride * local_patch_index + first_offset + component_index]);
+		&vec[patch_stride * local_patch_index + first_offset + component_stride * component_index]);
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 

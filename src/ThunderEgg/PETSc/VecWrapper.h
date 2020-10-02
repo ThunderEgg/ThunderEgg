@@ -42,9 +42,13 @@ template <int D> class VecWrapper : public Vector<D>
 	 */
 	Vec vec;
 	/**
-	 * @brief The number of cells (including ghost) in each patch
+	 * @brief striding to next patch
 	 */
 	int patch_stride;
+	/**
+	 * @brief striding to next component
+	 */
+	int component_stride;
 	/**
 	 * @brief The number of ghost cell rows on each side of the patch
 	 */
@@ -78,13 +82,13 @@ template <int D> class VecWrapper : public Vector<D>
 	static int GetNumLocalPatches(Vec vec, const std::array<int, D> &lengths, int num_ghost_cells,
 	                              int num_components)
 	{
-		int patch_stride = 1;
+		int patch_stride = num_components;
 		for (size_t i = 0; i < D; i++) {
 			patch_stride *= (lengths[i] + 2 * num_ghost_cells);
 		}
 		int vec_size;
 		VecGetLocalSize(vec, &vec_size);
-		return vec_size / patch_stride / num_components;
+		return vec_size / patch_stride;
 	}
 
 	/**
@@ -124,13 +128,15 @@ template <int D> class VecWrapper : public Vector<D>
 	            GetNumLocalCells(vec, lengths, num_ghost_cells, num_components)),
 	  vec(vec), num_ghost_cells(num_ghost_cells), own(own), lengths(lengths)
 	{
-		strides[0]   = num_components;
-		first_offset = num_ghost_cells * num_components;
+		strides[0]          = 1;
+		int my_first_offset = num_ghost_cells;
 		for (size_t i = 1; i < D; i++) {
 			strides[i] = (this->lengths[i - 1] + 2 * num_ghost_cells) * strides[i - 1];
-			first_offset += strides[i] * num_ghost_cells;
+			my_first_offset += strides[i] * num_ghost_cells;
 		}
-		patch_stride = strides[D - 1] * (lengths[D - 1] + 2 * num_ghost_cells);
+		first_offset     = my_first_offset;
+		component_stride = strides[D - 1] * (lengths[D - 1] + 2 * num_ghost_cells);
+		patch_stride     = component_stride * num_components;
 	}
 	VecWrapper(const VecWrapper &) = delete;
 	VecWrapper &operator=(const VecWrapper &) = delete;
@@ -180,16 +186,16 @@ template <int D> class VecWrapper : public Vector<D>
 	LocalData<D> getLocalData(int component_index, int patch_local_index) override
 	{
 		std::shared_ptr<VecLocalDataManager> ldm(new VecLocalDataManager(vec, false));
-		double *                             data
-		= ldm->getVecView() + patch_stride * patch_local_index + first_offset + component_index;
+		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset
+		               + component_index * component_stride;
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, ldm);
 	}
 
 	const LocalData<D> getLocalData(int component_index, int patch_local_index) const override
 	{
 		std::shared_ptr<VecLocalDataManager> ldm(new VecLocalDataManager(vec, true));
-		double *                             data
-		= ldm->getVecView() + patch_stride * patch_local_index + first_offset + component_index;
+		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset
+		               + component_index * component_stride;
 		return LocalData<D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
 	}
 	int getNumGhostCells() const

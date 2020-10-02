@@ -312,13 +312,13 @@ template <int D> class InterLevelComm
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
 				auto local_datas = ghost_vector->getLocalDatas(local_index);
-				nested_loop<D>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               for (int c = 0; c < num_components; c++) {
-						               send_buffers.back()[buffer_idx] = local_datas[c][coord];
+				for (const auto &local_data : local_datas) {
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               send_buffers.back()[buffer_idx] = local_data[coord];
 						               buffer_idx++;
-					               }
-				               });
+					               });
+				}
 			}
 
 			// post the send
@@ -335,8 +335,8 @@ template <int D> class InterLevelComm
 	/**
 	 * @brief Finish the communication for sending ghost values.
 	 *
-	 * This will send the values in the ghost vector and will add them to the values in the vector.
-	 * This is essentially a reverse scatter.
+	 * This will send the values in the ghost vector and will add them to the values in the
+	 * vector. This is essentially a reverse scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
 	 * computations to happen while the communication is happening.
@@ -378,13 +378,13 @@ template <int D> class InterLevelComm
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
 				auto local_datas = vector->getLocalDatas(local_index);
-				nested_loop<D>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               for (int c = 0; c < num_components; c++) {
-						               local_datas[c][coord] += buffer[buffer_idx];
+				for (auto &local_data : local_datas) {
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               local_data[coord] += buffer[buffer_idx];
 						               buffer_idx++;
-					               }
-				               });
+					               });
+				}
 			}
 		}
 
@@ -405,8 +405,8 @@ template <int D> class InterLevelComm
 	/**
 	 * @brief Start the communication for getting ghost values.
 	 *
-	 * This will send the values in the vector to the ghost vector, and will overwrite the values in
-	 * the ghost vector. This is essentially a forward scatter.
+	 * This will send the values in the vector to the ghost vector, and will overwrite the
+	 * values in the ghost vector. This is essentially a forward scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
 	 * computations to happen while the communication is happening.
@@ -455,13 +455,13 @@ template <int D> class InterLevelComm
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
 				auto local_datas = vector->getLocalDatas(local_index);
-				nested_loop<D>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               for (int c = 0; c < num_components; c++) {
-						               send_buffers.back()[buffer_idx] = local_datas[c][coord];
+				for (const auto &local_data : local_datas) {
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               send_buffers.back()[buffer_idx] = local_data[coord];
 						               buffer_idx++;
-					               }
-				               });
+					               });
+				}
 			}
 
 			// post the send
@@ -478,8 +478,8 @@ template <int D> class InterLevelComm
 	/**
 	 * @brief Finish the communication for getting ghost values.
 	 *
-	 * This will send the values in the vector to the ghost vector, and will overwrite the values in
-	 * the ghost vector. This is essentially a forward scatter.
+	 * This will send the values in the vector to the ghost vector, and will overwrite the
+	 * values in the ghost vector. This is essentially a forward scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
 	 * computations to happen while the communication is happening.
@@ -521,13 +521,13 @@ template <int D> class InterLevelComm
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
 				auto local_datas = ghost_vector->getLocalDatas(local_index);
-				nested_loop<D>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               for (int c = 0; c < num_components; c++) {
-						               local_datas[c][coord] = buffer[buffer_idx];
+				for (auto &local_data : local_datas) {
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               local_data[coord] = buffer[buffer_idx];
 						               buffer_idx++;
-					               }
-				               });
+					               });
+				}
 			}
 		}
 

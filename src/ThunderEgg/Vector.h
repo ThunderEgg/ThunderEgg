@@ -162,11 +162,10 @@ template <int D> class Vector
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
-					lds[c][coord] = alpha;
-				}
-			});
+			for (auto &ld : lds) {
+				nested_loop<D>(ld.getStart(), ld.getEnd(),
+				               [&](std::array<int, D> coord) { ld[coord] = alpha; });
+			}
 		}
 	}
 	/**
@@ -178,12 +177,10 @@ template <int D> class Vector
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			nested_loop<D>(lds[0].getGhostStart(), lds[0].getGhostEnd(),
-			               [&](std::array<int, D> coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               lds[c][coord] = alpha;
-				               }
-			               });
+			for (auto &ld : lds) {
+				nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(),
+				               [&](std::array<int, D> coord) { ld[coord] = alpha; });
+			}
 		}
 	}
 	/**
@@ -195,11 +192,10 @@ template <int D> class Vector
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
-					lds[c][coord] *= alpha;
-				}
-			});
+			for (auto &ld : lds) {
+				nested_loop<D>(ld.getStart(), ld.getEnd(),
+				               [&](std::array<int, D> coord) { ld[coord] *= alpha; });
+			}
 		}
 	}
 	/**
@@ -211,11 +207,10 @@ template <int D> class Vector
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
-					lds[c][coord] += delta;
-				}
-			});
+			for (auto &ld : lds) {
+				nested_loop<D>(ld.getStart(), ld.getEnd(),
+				               [&](std::array<int, D> coord) { ld[coord] += delta; });
+			}
 		}
 	}
 	/**
@@ -228,11 +223,10 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
-					lds[c][coord] = lds_b[c][coord];
-				}
-			});
+			for (int c = 0; c < num_components; c++) {
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(),
+				               [&](std::array<int, D> coord) { lds[c][coord] = lds_b[c][coord]; });
+			}
 		}
 	}
 	/**
@@ -245,11 +239,10 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
-					lds[c][coord] += lds_b[c][coord];
-				}
-			});
+			for (int c = 0; c < num_components; c++) {
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(),
+				               [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord]; });
+			}
 		}
 	}
 	/**
@@ -260,11 +253,11 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
+			for (int c = 0; c < num_components; c++) {
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
 					lds[c][coord] += lds_b[c][coord] * alpha;
-				}
-			});
+				});
+			}
 		}
 	}
 	/**
@@ -277,11 +270,11 @@ template <int D> class Vector
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_a = a->getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
+			for (int c = 0; c < num_components; c++) {
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
 					lds[c][coord] += lds_a[c][coord] * alpha + lds_b[c][coord] * beta;
-				}
-			});
+				});
+			}
 		}
 	}
 	/**
@@ -292,11 +285,11 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
+			for (int c = 0; c < num_components; c++) {
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
 					lds[c][coord] = alpha * lds[c][coord] + lds_b[c][coord];
-				}
-			});
+				});
+			}
 		}
 	}
 	/**
@@ -307,11 +300,11 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
+			for (int c = 0; c < num_components; c++) {
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
 					lds[c][coord] = alpha * lds[c][coord] + beta * lds_b[c][coord];
-				}
-			});
+				});
+			}
 		}
 	}
 	/**
@@ -324,12 +317,13 @@ template <int D> class Vector
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_c = c->getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int comp = 0; comp < num_components; comp++) {
+			for (int comp = 0; comp < num_components; comp++) {
+				nested_loop<D>(
+				lds[comp].getStart(), lds[comp].getEnd(), [&](std::array<int, D> coord) {
 					lds[comp][coord] = alpha * lds[comp][coord] + beta * lds_b[comp][coord]
 					                   + gamma * lds_c[comp][coord];
-				}
-			});
+				});
+			}
 		}
 	}
 	/**
@@ -339,12 +333,11 @@ template <int D> class Vector
 	{
 		double sum = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
-					sum += lds[c][coord] * lds[c][coord];
-				}
-			});
+			const std::vector<LocalData<D>> lds = getLocalDatas(i);
+			for (const auto &ld : lds) {
+				nested_loop<D>(ld.getStart(), ld.getEnd(),
+				               [&](std::array<int, D> coord) { sum += ld[coord] * ld[coord]; });
+			}
 		}
 		double global_sum;
 		MPI_Allreduce(&sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, comm);
@@ -358,11 +351,10 @@ template <int D> class Vector
 		double max = 0;
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
-					max = fmax(fabs(lds[c][coord]), max);
-				}
-			});
+			for (const auto &ld : lds) {
+				nested_loop<D>(ld.getStart(), ld.getEnd(),
+				               [&](std::array<int, D> coord) { max = fmax(fabs(ld[coord]), max); });
+			}
 		}
 		double global_max;
 		MPI_Allreduce(&max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm);
@@ -377,11 +369,11 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			nested_loop<D>(lds[0].getStart(), lds[0].getEnd(), [&](std::array<int, D> coord) {
-				for (int c = 0; c < num_components; c++) {
+			for (int c = 0; c < num_components; c++) {
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
 					retval += lds[c][coord] * lds_b[c][coord];
-				}
-			});
+				});
+			}
 		}
 		double global_retval;
 		MPI_Allreduce(&retval, &global_retval, 1, MPI_DOUBLE, MPI_SUM, comm);

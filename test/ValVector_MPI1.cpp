@@ -381,7 +381,8 @@ TEST_CASE("ValVector<1> getLocalData", "[ValVector]")
 	int           nx                = GENERATE(1, 4, 5);
 	array<int, 1> ns                = {nx};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride      = (nx + 2 * num_ghost_cells) * num_components;
+	int           component_stride  = (nx + 2 * num_ghost_cells);
+	int           patch_stride      = component_stride * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -396,8 +397,9 @@ TEST_CASE("ValVector<1> getLocalData", "[ValVector]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			LocalData<1> ld = val_vector->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + (patch_stride * i + c));
-			CHECK(&ld[ld.getGhostEnd()] == view + (patch_stride * (i + 1) + c) - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + (patch_stride * i + c * component_stride));
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + (patch_stride * i + (c + 1) * component_stride) - 1);
 		}
 	}
 }
@@ -408,7 +410,8 @@ TEST_CASE("ValVector<1> getLocalData const", "[ValVector]")
 	int           nx                = GENERATE(1, 4, 5);
 	array<int, 1> ns                = {nx};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride      = (nx + 2 * num_ghost_cells) * num_components;
+	int           component_stride  = (nx + 2 * num_ghost_cells);
+	int           patch_stride      = component_stride * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -424,8 +427,9 @@ TEST_CASE("ValVector<1> getLocalData const", "[ValVector]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			const LocalData<1> ld = const_val_vector->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 }
@@ -437,7 +441,8 @@ TEST_CASE("ValVector<2> getLocalData", "[ValVector]")
 	int           ny                = GENERATE(1, 4, 5);
 	array<int, 2> ns                = {nx, ny};
 	int           num_local_patches = GENERATE(1, 13);
-	int patch_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components;
+	int           component_stride  = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+	int           patch_stride      = component_stride * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -453,8 +458,9 @@ TEST_CASE("ValVector<2> getLocalData", "[ValVector]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			LocalData<2> ld = val_vector->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 }
@@ -466,7 +472,8 @@ TEST_CASE("ValVector<2> getLocalData const", "[ValVector]")
 	int           ny                = GENERATE(1, 4, 5);
 	array<int, 2> ns                = {nx, ny};
 	int           num_local_patches = GENERATE(1, 13);
-	int patch_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components;
+	int           component_stride  = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+	int           patch_stride      = component_stride * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -483,8 +490,9 @@ TEST_CASE("ValVector<2> getLocalData const", "[ValVector]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			const LocalData<2> ld = const_val_vector->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 }
@@ -497,8 +505,9 @@ TEST_CASE("ValVector<3> getLocalData", "[ValVector]")
 	int           nz                = GENERATE(1, 4, 5);
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride      = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)
-	                   * (nz + 2 * num_ghost_cells) * num_components;
+	int           component_stride
+	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+	int patch_stride = component_stride * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -514,8 +523,9 @@ TEST_CASE("ValVector<3> getLocalData", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			LocalData<3> ld = val_vector->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 }
@@ -528,8 +538,9 @@ TEST_CASE("ValVector<3> getLocalData const", "[ValVector]")
 	int           nz                = GENERATE(1, 4, 5);
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride      = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)
-	                   * (nz + 2 * num_ghost_cells) * num_components;
+	int           component_stride
+	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+	int patch_stride = component_stride * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -547,8 +558,9 @@ TEST_CASE("ValVector<3> getLocalData const", "[ValVector]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			const LocalData<3> ld = const_val_vector->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 }

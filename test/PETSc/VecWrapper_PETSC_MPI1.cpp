@@ -500,7 +500,8 @@ TEST_CASE("PETSc::VecWrapper<1> getLocalData", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	array<int, 1> ns                = {nx};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride      = (nx + 2 * num_ghost_cells) * num_components;
+	int           component_stride  = (nx + 2 * num_ghost_cells);
+	int           patch_stride      = component_stride * num_components;
 	int           size = (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
@@ -520,8 +521,9 @@ TEST_CASE("PETSc::VecWrapper<1> getLocalData", "[PETSc::VecWrapper]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			LocalData<1> ld = vec_wrapper->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 	VecRestoreArray(vec, &view);
@@ -535,7 +537,8 @@ TEST_CASE("PETSc::VecWrapper<1> getLocalData const", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	array<int, 1> ns                = {nx};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride      = (nx + 2 * num_ghost_cells) * num_components;
+	int           component_stride  = (nx + 2 * num_ghost_cells);
+	int           patch_stride      = component_stride * num_components;
 	int           size = (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
@@ -556,8 +559,9 @@ TEST_CASE("PETSc::VecWrapper<1> getLocalData const", "[PETSc::VecWrapper]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			const LocalData<1> ld = const_vec_wrapper->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 	VecRestoreArray(vec, &view);
@@ -572,8 +576,9 @@ TEST_CASE("PETSc::VecWrapper<2> getLocalData", "[PETSc::VecWrapper]")
 	int           ny                = GENERATE(1, 4, 5);
 	array<int, 2> ns                = {nx, ny};
 	int           num_local_patches = GENERATE(1, 13);
-	int patch_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components;
-	int size
+	int           component_stride  = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+	int           patch_stride      = component_stride * num_components;
+	int           size
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
@@ -594,8 +599,9 @@ TEST_CASE("PETSc::VecWrapper<2> getLocalData", "[PETSc::VecWrapper]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			LocalData<2> ld = vec_wrapper->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 	VecRestoreArray(vec, &view);
@@ -610,8 +616,9 @@ TEST_CASE("PETSc::VecWrapper<2> getLocalData const", "[PETSc::VecWrapper]")
 	int           ny                = GENERATE(1, 4, 5);
 	array<int, 2> ns                = {nx, ny};
 	int           num_local_patches = GENERATE(1, 13);
-	int patch_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components;
-	int size
+	int           component_stride  = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+	int           patch_stride      = component_stride * num_components;
+	int           size
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
@@ -633,8 +640,9 @@ TEST_CASE("PETSc::VecWrapper<2> getLocalData const", "[PETSc::VecWrapper]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			const LocalData<2> ld = const_vec_wrapper->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 	VecRestoreArray(vec, &view);
@@ -650,8 +658,9 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData", "[PETSc::VecWrapper]")
 	int           nz                = GENERATE(1, 4, 5);
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride      = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)
-	                   * (nz + 2 * num_ghost_cells) * num_components;
+	int           component_stride
+	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+	int patch_stride = component_stride * num_components;
 	int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
 
@@ -674,8 +683,9 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData", "[PETSc::VecWrapper]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			LocalData<3> ld = vec_wrapper->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 	VecRestoreArray(vec, &view);
@@ -691,8 +701,9 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData const", "[PETSc::VecWrapper]")
 	int           nz                = GENERATE(1, 4, 5);
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
-	int           patch_stride      = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)
-	                   * (nz + 2 * num_ghost_cells) * num_components;
+	int           component_stride
+	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+	int patch_stride = component_stride * num_components;
 	int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
 
@@ -716,8 +727,9 @@ TEST_CASE("PETSc::VecWrapper<3> getLocalData const", "[PETSc::VecWrapper]")
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
 			const LocalData<3> ld = const_vec_wrapper->getLocalData(c, i);
-			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c);
-			CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) + c - num_components);
+			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
+			CHECK(&ld[ld.getGhostEnd()]
+			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 	VecRestoreArray(vec, &view);
