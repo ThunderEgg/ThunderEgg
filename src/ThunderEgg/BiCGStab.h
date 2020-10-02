@@ -93,6 +93,10 @@ template <int D> class BiCGStab
 			double alpha = rho / rhat->dot(ap);
 			s->copy(resid);
 			s->addScaled(-alpha, ap);
+			if (s->twoNorm() / r0_norm <= tolerance) {
+				x->addScaled(alpha, p);
+				break;
+			}
 			if (Mr != nullptr) {
 				Mr->apply(s, ms);
 				A->apply(ms, as);

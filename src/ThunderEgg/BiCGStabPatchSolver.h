@@ -204,9 +204,7 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		f_copy->copy(f_single);
 		auto f_copy_lds = f_copy->getLocalDatas(0);
 		op->addGhostToRHS(pinfo, us, f_copy_lds);
-		// u_single->set(0);
 
-		// printf("Calling BiCG patch solver\n");
 		BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
 	}
 };

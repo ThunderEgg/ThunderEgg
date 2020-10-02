@@ -30,6 +30,8 @@
 
 namespace ThunderEgg
 {
+namespace
+{
 template <int D> class MockGhostFiller : public GhostFiller<D>
 {
 	private:
@@ -88,5 +90,6 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 		return patches_to_be_called.empty();
 	}
 };
+} // namespace
 } // namespace ThunderEgg
 #endif
