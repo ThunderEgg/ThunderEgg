@@ -42,6 +42,13 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	 */
 	std::shared_ptr<InterLevelComm<D>> ilc;
 
+	public:
+	/**
+	 * @brief Create new MPIInterpolator object.
+	 *
+	 * @param ilc the communcation package for the two levels.
+	 */
+	MPIInterpolator(std::shared_ptr<InterLevelComm<D>> ilc) : ilc(ilc) {}
 	/**
 	 * @brief Interpolate values from coarse vector to the finer vector
 	 *
@@ -60,16 +67,6 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	std::shared_ptr<const Vector<D>>                                        coarser_vector,
 	std::shared_ptr<Vector<D>>                                              finer_vector) const = 0;
 
-	public:
-	/**
-	 * @brief Create new MPIInterpolator object.
-	 *
-	 * @param ilc the communcation package for the two levels.
-	 */
-	MPIInterpolator(std::shared_ptr<InterLevelComm<D>> ilc_in)
-	{
-		this->ilc = ilc_in;
-	}
 	/**
 	 * @brief interpolation function
 	 *

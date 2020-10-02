@@ -67,7 +67,7 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 2 + pinfo->parent_id * nx * ny + (coord[0] + starts[0]) / 2
+				lds[c][coord] = 1 + pinfo->parent_id * nx * ny + (coord[0] + starts[0]) / 2
 				                + (coord[1] + starts[1]) / 2 * nx + c;
 			});
 		}
@@ -83,10 +83,11 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 		INFO("x:     " << pinfo->starts[0]);
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
+		INFO("c:     " << pinfo->ns[1]);
 		auto vec_lds      = fine_vec->getLocalDatas(pinfo->local_index);
 		auto expected_lds = fine_expected->getLocalDatas(pinfo->local_index);
 		for (int c = 0; c < num_components; c++) {
+			INFO("c:     " << c);
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {
 				               REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));
@@ -153,6 +154,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 		auto vec_lds      = fine_vec->getLocalDatas(pinfo->local_index);
 		auto expected_lds = fine_expected->getLocalDatas(pinfo->local_index);
 		for (int c = 0; c < num_components; c++) {
+			INFO("c:     " << c);
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {
 				               REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));
@@ -197,7 +199,7 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-					lds[c][coord] = 2 + pinfo->parent_id * nx * ny + (coord[0] + starts[0]) / 2
+					lds[c][coord] = 1 + pinfo->parent_id * nx * ny + (coord[0] + starts[0]) / 2
 					                + (coord[1] + starts[1]) / 2 * nx + c;
 				});
 			}
@@ -224,6 +226,7 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 		auto vec_lds      = fine_vec->getLocalDatas(pinfo->local_index);
 		auto expected_lds = fine_expected->getLocalDatas(pinfo->local_index);
 		for (int c = 0; c < num_components; c++) {
+			INFO("c:     " << c);
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {
 				               REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));

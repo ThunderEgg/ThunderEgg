@@ -64,7 +64,7 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 2 + pinfo->parent_id * nx * ny + (coord[0] + starts[0]) / 2
+				lds[c][coord] = 1 + pinfo->parent_id * nx * ny + (coord[0] + starts[0]) / 2
 				                + (coord[1] + starts[1]) / 2 * nx + c;
 			});
 		}

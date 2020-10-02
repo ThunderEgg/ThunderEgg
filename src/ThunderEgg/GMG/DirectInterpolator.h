@@ -37,52 +37,57 @@ namespace GMG
  */
 template <int D> class DirectInterpolator : public MPIInterpolator<D>
 {
-	private:
+	public:
+	/**
+	 * @brief Create new DirectInterpolator object.
+	 *
+	 * @param coarse_domain the coarser Domain
+	 * @param fine_domain the finer Domain
+	 * @param num_components the number of components in each cell
+	 */
+	DirectInterpolator(std::shared_ptr<Domain<D>> coarse_domain,
+	                   std::shared_ptr<Domain<D>> fine_domain, int num_components)
+	: MPIInterpolator<D>(
+	  std::make_shared<InterLevelComm<D>>(coarse_domain, num_components, fine_domain))
+	{
+	}
 	void interpolatePatches(
 	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
 	std::shared_ptr<const Vector<D>>                                        coarser_vector,
 	std::shared_ptr<Vector<D>> finer_vector) const override
 	{
 		for (auto pair : patches) {
-			auto         pinfo             = pair.second;
-			LocalData<D> coarse_local_data = coarser_vector->getLocalData(0, pair.first);
-			LocalData<D> fine_data         = finer_vector->getLocalData(0, pinfo->local_index);
+			auto pinfo              = pair.second;
+			auto coarse_local_datas = coarser_vector->getLocalDatas(pair.first);
+			auto fine_datas         = finer_vector->getLocalDatas(pinfo->local_index);
 
 			if (pinfo->hasCoarseParent()) {
 				Orthant<D>         orth = pinfo->orth_on_parent;
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
 					starts[i]
-					= orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_data.getLengths()[i];
+					= orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_datas[0].getLengths()[i];
 				}
 
-				nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               std::array<int, D> coarse_coord;
-					               for (size_t x = 0; x < D; x++) {
-						               coarse_coord[x] = (coord[x] + starts[x]) / 2;
-					               }
-					               fine_data[coord] += coarse_local_data[coarse_coord];
-				               });
+				for (int c = 0; c < fine_datas.size(); c++) {
+					nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               std::array<int, D> coarse_coord;
+						               for (size_t x = 0; x < D; x++) {
+							               coarse_coord[x] = (coord[x] + starts[x]) / 2;
+						               }
+						               fine_datas[c][coord] += coarse_local_datas[c][coarse_coord];
+					               });
+				}
 			} else {
-				nested_loop<D>(fine_data.getStart(), fine_data.getEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               fine_data[coord] += coarse_local_data[coord];
-				               });
+				for (int c = 0; c < fine_datas.size(); c++) {
+					nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               fine_datas[c][coord] += coarse_local_datas[c][coord];
+					               });
+				}
 			}
 		}
-	}
-
-	public:
-	/**
-	 * @brief Create new DirectInterpolator object.
-	 *
-	 * @param ilc the communcation package for the two levels.
-	 */
-	DirectInterpolator(std::shared_ptr<Domain<D>> coarse_domain,
-	                   std::shared_ptr<Domain<D>> fine_domian, int num_components)
-	: MPIInterpolator<D>(nullptr)
-	{
 	}
 };
 extern template class DirectInterpolator<2>;
