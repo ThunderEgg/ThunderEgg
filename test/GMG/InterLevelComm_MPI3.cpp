@@ -36,7 +36,7 @@ TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterL
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	INFO("d_fine: " << d_fine->getNumLocalPatches());
 	INFO("d_coarse: " << d_coarse->getNumLocalPatches());
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -75,16 +75,18 @@ TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterL
 }
 TEST_CASE("3-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm]")
 {
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
+	auto                  num_components = GENERATE(1, 2, 3);
+	auto                  nx             = GENERATE(2, 10);
+	auto                  ny             = GENERATE(2, 10);
+	int                   num_ghost      = 1;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
+	CHECK(ghost_vec->getNumComponents() == num_components);
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
@@ -95,38 +97,56 @@ TEST_CASE("3-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm
 }
 TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
+	auto                  num_components = GENERATE(1, 2, 3);
+	auto                  nx             = GENERATE(2, 10);
+	auto                  ny             = GENERATE(2, 10);
+	int                   num_ghost      = 1;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
-
-	// fill vectors with rank+1
-	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_vec, f);
+	// fill vectors with rank+c+1
+	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
+		auto local_datas = coarse_vec->getLocalDatas(i);
+		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
+		               [&](const std::array<int, 2> &coord) {
+			               for (int c = 0; c < num_components; c++) {
+				               local_datas[c][coord] = rank + c + 1;
+			               }
+		               });
+	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_data = ghost_vec->getLocalData(0, i);
-		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) { local_data[coord] = rank + 1; });
+		auto local_datas = ghost_vec->getLocalDatas(i);
+		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
+		               [&](const std::array<int, 2> &coord) {
+			               for (int c = 0; c < num_components; c++) {
+				               local_datas[c][coord] = rank + c + 1;
+			               }
+		               });
 	}
 
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
-		// the coarse vec should be filled with 5
-		auto local_data = coarse_vec->getLocalData(0, 0);
-		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) { CHECK(local_data[coord] == 6); });
+		// the coarse vec should be filled with 6+2*c
+		auto local_datas = coarse_vec->getLocalDatas(0);
+		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
+		               [&](const std::array<int, 2> &coord) {
+			               for (int c = 0; c < num_components; c++) {
+				               INFO("c " << c);
+				               INFO("xi: " << coord[0]);
+				               INFO("yi: " << coord[1]);
+				               CHECK(local_datas[c][coord] == 1 + 2 + 3 + 3 * c);
+			               }
+		               });
 	} else {
 	}
 }
@@ -140,7 +160,7 @@ TEST_CASE(
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
@@ -158,7 +178,7 @@ TEST_CASE(
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
@@ -178,7 +198,7 @@ TEST_CASE(
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
 	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
@@ -198,7 +218,7 @@ TEST_CASE(
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
 	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
@@ -219,7 +239,7 @@ TEST_CASE(
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
@@ -230,39 +250,54 @@ TEST_CASE(
 }
 TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
+	auto                  num_components = GENERATE(1, 2, 3);
+	auto                  nx             = GENERATE(2, 10);
+	auto                  ny             = GENERATE(2, 10);
+	int                   num_ghost      = 1;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto f = [&](const std::array<double, 2> coord) -> double { return rank + 1; };
-
-	// fill vectors with rank+1
-	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_vec, f);
+	// fill vectors with rank+c+1
+	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
+		auto local_datas = coarse_vec->getLocalDatas(i);
+		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
+		               [&](const std::array<int, 2> &coord) {
+			               for (int c = 0; c < num_components; c++) {
+				               local_datas[c][coord] = rank + c + 1;
+			               }
+		               });
+	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_data = ghost_vec->getLocalData(0, i);
-		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) { local_data[coord] = rank + 1; });
+		auto local_datas = ghost_vec->getLocalDatas(i);
+		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
+		               [&](const std::array<int, 2> &coord) {
+			               for (int c = 0; c < num_components; c++) {
+				               local_datas[c][coord] = rank + c + 1;
+			               }
+		               });
 	}
 
 	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
 	ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 	} else {
-		// the coarse vec should be filled with 1
-		auto local_data = ghost_vec->getLocalData(0, 0);
-		nested_loop<2>(local_data.getGhostStart(), local_data.getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) { CHECK(local_data[coord] == 1); });
+		// the coarse vec should be filled with 1+c
+		auto local_datas = ghost_vec->getLocalDatas(0);
+		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
+		               [&](const std::array<int, 2> &coord) {
+			               for (int c = 0; c < num_components; c++) {
+				               CHECK(local_datas[c][coord] == 1 + c);
+			               }
+		               });
 	}
 }
 TEST_CASE(
@@ -275,7 +310,7 @@ TEST_CASE(
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
@@ -293,7 +328,7 @@ TEST_CASE(
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 
@@ -313,7 +348,7 @@ TEST_CASE(
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
 	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
@@ -333,7 +368,7 @@ TEST_CASE(
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
 	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
@@ -353,7 +388,7 @@ TEST_CASE("3-processor getGhostPatches throws exception when start is called twi
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
 

@@ -63,7 +63,7 @@ template <int D> class InterLevelComm
 	/**
 	 * @brief The number of components per patch
 	 */
-	int num_components = 1;
+	int num_components;
 	/**
 	 * @brief Number of values in a patch. (including ghost values)
 	 */
@@ -108,16 +108,19 @@ template <int D> class InterLevelComm
 	 * @brief Create a new InterLevelComm object.
 	 *
 	 * @param coarse_domain the coarser DomainCollection.
+	 * @param num_coarser_components the number of components for eac cell of the coarser domain
 	 * @param fine_domain the finer DomainCollection.
 	 */
-	InterLevelComm(std::shared_ptr<const Domain<D>> coarser_domain,
+	InterLevelComm(std::shared_ptr<const Domain<D>> coarser_domain, int num_coarser_components,
 	               std::shared_ptr<const Domain<D>> finer_domain)
-	: ns(finer_domain->getNs()), num_ghost_cells(finer_domain->getNumGhostCells())
+	: ns(finer_domain->getNs()), num_ghost_cells(finer_domain->getNumGhostCells()),
+	  num_components(num_coarser_components)
 	{
-		patch_size = 1;
+		int my_patch_size = num_components;
 		for (size_t axis = 0; axis < D; axis++) {
-			patch_size *= ns[axis] + 2 * num_ghost_cells;
+			my_patch_size *= ns[axis] + 2 * num_ghost_cells;
 		}
+		patch_size = my_patch_size;
 
 		// sort into patches with local parents and patches with ghost parents
 		std::deque<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> local_parents;
@@ -308,11 +311,13 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				auto local_data = ghost_vector->getLocalData(0, local_index);
-				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+				auto local_datas = ghost_vector->getLocalDatas(local_index);
+				nested_loop<D>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 				               [&](const std::array<int, D> &coord) {
-					               send_buffers.back()[buffer_idx] = local_data[coord];
-					               buffer_idx++;
+					               for (int c = 0; c < num_components; c++) {
+						               send_buffers.back()[buffer_idx] = local_datas[c][coord];
+						               buffer_idx++;
+					               }
 				               });
 			}
 
@@ -372,11 +377,13 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				auto local_data = vector->getLocalData(0, local_index);
-				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+				auto local_datas = vector->getLocalDatas(local_index);
+				nested_loop<D>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 				               [&](const std::array<int, D> &coord) {
-					               local_data[coord] += buffer[buffer_idx];
-					               buffer_idx++;
+					               for (int c = 0; c < num_components; c++) {
+						               local_datas[c][coord] += buffer[buffer_idx];
+						               buffer_idx++;
+					               }
 				               });
 			}
 		}
@@ -447,11 +454,13 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				auto local_data = vector->getLocalData(0, local_index);
-				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+				auto local_datas = vector->getLocalDatas(local_index);
+				nested_loop<D>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 				               [&](const std::array<int, D> &coord) {
-					               send_buffers.back()[buffer_idx] = local_data[coord];
-					               buffer_idx++;
+					               for (int c = 0; c < num_components; c++) {
+						               send_buffers.back()[buffer_idx] = local_datas[c][coord];
+						               buffer_idx++;
+					               }
 				               });
 			}
 
@@ -511,11 +520,13 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				auto local_data = ghost_vector->getLocalData(0, local_index);
-				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+				auto local_datas = ghost_vector->getLocalDatas(local_index);
+				nested_loop<D>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 				               [&](const std::array<int, D> &coord) {
-					               local_data[coord] = buffer[buffer_idx];
-					               buffer_idx++;
+					               for (int c = 0; c < num_components; c++) {
+						               local_datas[c][coord] = buffer[buffer_idx];
+						               buffer_idx++;
+					               }
 				               });
 			}
 		}
@@ -534,7 +545,9 @@ template <int D> class InterLevelComm
 		current_ghost_vector = nullptr;
 		current_vector       = nullptr;
 	}
-}; // namespace GMG
+};
+extern template class InterLevelComm<2>;
+extern template class InterLevelComm<3>;
 } // namespace GMG
 } // namespace ThunderEgg
 #endif

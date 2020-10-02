@@ -10,6 +10,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleOpts.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/DrctIntp.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/InterLevelComm.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/InterLevelComm.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Interpolator.h)
 

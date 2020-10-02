@@ -67,7 +67,7 @@ TEST_CASE("Test DrctIntp on uniform 4x4", "[GMG::DrctIntp]")
 		});
 	}
 
-	auto ilc          = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto ilc          = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 	auto interpolator = std::make_shared<GMG::DrctIntp<2>>(ilc);
 
 	interpolator->interpolate(coarse_vec, fine_vec);
@@ -124,7 +124,7 @@ TEST_CASE("Linear Test DrctIntp with values already set on uniform 4x4", "[GMG::
 
 	fine_vec->set(1.0);
 
-	auto ilc          = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto ilc          = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 	auto interpolator = std::make_shared<GMG::DrctIntp<2>>(ilc);
 
 	interpolator->interpolate(coarse_vec, fine_vec);

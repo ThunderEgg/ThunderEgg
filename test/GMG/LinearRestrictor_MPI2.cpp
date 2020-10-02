@@ -52,7 +52,7 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 	DomainTools<2>::setValuesWithGhost(d_fine, fine_vec, f);
 	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_expected, f);
 
-	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(ilc);
 
 	restrictor->restrict(coarse_vec, fine_vec);
@@ -107,7 +107,7 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 
 	coarse_vec->setWithGhost(1.0);
 
-	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
+	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(ilc);
 
 	restrictor->restrict(coarse_vec, fine_vec);
