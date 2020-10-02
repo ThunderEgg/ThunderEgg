@@ -35,7 +35,7 @@ namespace GMG
  * @brief Simple class that directly places values from coarse cell into the corresponding fine
  * cells.
  */
-template <int D> class DrctIntp : public MPIInterpolator<D>
+template <int D> class DirectInterpolator : public MPIInterpolator<D>
 {
 	private:
 	void interpolatePatches(
@@ -75,13 +75,18 @@ template <int D> class DrctIntp : public MPIInterpolator<D>
 
 	public:
 	/**
-	 * @brief Create new DrctIntp object.
+	 * @brief Create new DirectInterpolator object.
 	 *
 	 * @param ilc the communcation package for the two levels.
 	 */
-	DrctIntp(std::shared_ptr<InterLevelComm<D>> ilc_in) : MPIInterpolator<D>(ilc_in) {}
+	DirectInterpolator(std::shared_ptr<Domain<D>> coarse_domain,
+	                   std::shared_ptr<Domain<D>> fine_domian, int num_components)
+	: MPIInterpolator<D>(nullptr)
+	{
+	}
 };
-
+extern template class DirectInterpolator<2>;
+extern template class DirectInterpolator<3>;
 } // namespace GMG
 } // namespace ThunderEgg
 #endif
