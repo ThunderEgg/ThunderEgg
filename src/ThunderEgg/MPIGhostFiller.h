@@ -266,17 +266,17 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @brief Fill the ghost cells for the neighboring patch
 	 *
 	 * @param pinfo the patch that ghost cells are being filled from
-	 * @param local_data the local data for patch that ghost cells are being filled from
-	 * @param nbr_data  the local data for the neighboring patch, where ghost cells are being
+	 * @param local_datas the local data for patch that ghost cells are being filled from
+	 * @param nbr_datas  the local data for the neighboring patch, where ghost cells are being
 	 * filled.
 	 * @param side the sided that the neighboring patch is on
 	 * @param nbr_type the type of neighbor
 	 * @param orthant the orthant that the neighbors ghost cells lie on
 	 */
 	virtual void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                                       const LocalData<D> &                local_data,
-	                                       const LocalData<D> &nbr_data, const Side<D> side,
-	                                       const NbrType    nbr_type,
+	                                       const std::vector<LocalData<D>> &   local_datas,
+	                                       const std::vector<LocalData<D>> &   nbr_datas,
+	                                       const Side<D> side, const NbrType nbr_type,
 	                                       const Orthant<D> orthant) const = 0;
 
 	/**
@@ -286,10 +286,11 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * the neighboring patch
 	 *
 	 * @param pinfo the patch
-	 * @param local_data the LocalData for the patch
+	 * @param local_datas the LocalData for the patch
 	 */
-	virtual void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                                         const LocalData<D> &local_data) const = 0;
+	virtual void
+	fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                            const std::vector<LocalData<D>> &   local_datas) const = 0;
 
 	/**
 	 * @brief Fill ghost cells on a vector
@@ -300,14 +301,15 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	{
 		// zero out ghost cells
 		for (auto pinfo : domain->getPatchInfoVector()) {
-			const LocalData<D> this_patch = u->getLocalData(0, pinfo->local_index);
-			for (Side<D> s : Side<D>::getValues()) {
-				if (pinfo->hasNbr(s)) {
-					for (int i = 0; i < pinfo->num_ghost_cells; i++) {
-						auto this_ghost = this_patch.getGhostSliceOnSide(s, i + 1);
-						nested_loop<D - 1>(
-						this_ghost.getStart(), this_ghost.getEnd(),
-						[&](const std::array<int, D - 1> &coord) { this_ghost[coord] = 0; });
+			for (auto &this_patch : u->getLocalDatas(pinfo->local_index)) {
+				for (Side<D> s : Side<D>::getValues()) {
+					if (pinfo->hasNbr(s)) {
+						for (int i = 0; i < pinfo->num_ghost_cells; i++) {
+							auto this_ghost = this_patch.getGhostSliceOnSide(s, i + 1);
+							nested_loop<D - 1>(
+							this_ghost.getStart(), this_ghost.getEnd(),
+							[&](const std::array<int, D - 1> &coord) { this_ghost[coord] = 0; });
+						}
 					}
 				}
 			}
@@ -337,32 +339,34 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				auto    side          = std::get<1>(call);
 				auto    nbr_type      = std::get<2>(call);
 				auto    orthant       = std::get<3>(call);
-				auto    local_data    = u->getLocalData(0, std::get<4>(call));
+				auto    local_datas   = u->getLocalDatas(std::get<4>(call));
 				size_t  buffer_offset = std::get<5>(call);
 				double *buffer_ptr    = out_buffers[i].data() + buffer_offset;
 
 				// create a LocalData object for the buffer
 				LocalData<D> buffer_data = getLocalDataForBuffer(buffer_ptr, side.opposite());
+				std::vector<LocalData<D>> buffer_datas = {buffer_data};
 
 				// make the call
-				fillGhostCellsForNbrPatch(pinfo, local_data, buffer_data, side, nbr_type, orthant);
+				fillGhostCellsForNbrPatch(pinfo, local_datas, buffer_datas, side, nbr_type,
+				                          orthant);
 			}
 			MPI_Isend(out_buffers[i].data(), out_buffers[i].size(), MPI_DOUBLE, index_rank_map[i],
 			          0, MPI_COMM_WORLD, &send_requests[i]);
 		}
 		// perform local operations
 		for (auto pinfo : domain->getPatchInfoVector()) {
-			auto data = u->getLocalData(0, pinfo->local_index);
-			fillGhostCellsForLocalPatch(pinfo, data);
+			auto datas = u->getLocalDatas(pinfo->local_index);
+			fillGhostCellsForLocalPatch(pinfo, datas);
 		}
 		for (const LocalCall &call : local_calls) {
-			auto pinfo      = std::get<0>(call);
-			auto side       = std::get<1>(call);
-			auto nbr_type   = std::get<2>(call);
-			auto orthant    = std::get<3>(call);
-			auto local_data = u->getLocalData(0, std::get<4>(call));
-			auto nbr_data   = u->getLocalData(0, std::get<5>(call));
-			fillGhostCellsForNbrPatch(pinfo, local_data, nbr_data, side, nbr_type, orthant);
+			auto pinfo       = std::get<0>(call);
+			auto side        = std::get<1>(call);
+			auto nbr_type    = std::get<2>(call);
+			auto orthant     = std::get<3>(call);
+			auto local_datas = u->getLocalDatas(std::get<4>(call));
+			auto nbr_datas   = u->getLocalDatas(std::get<5>(call));
+			fillGhostCellsForNbrPatch(pinfo, local_datas, nbr_datas, side, nbr_type, orthant);
 		}
 		// add in remote values as they come in
 		for (size_t i = 0; i < recv_requests.size(); i++) {

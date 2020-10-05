@@ -35,12 +35,12 @@ class TriLinearGhostFiller : public MPIGhostFiller<3>
 {
 	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-	                               const LocalData<3> &local_data, const LocalData<3> &nbr_data,
-	                               const Side<3> side, const NbrType nbr_type,
-	                               const Orthant<3> orthant) const override;
+	                               const std::vector<LocalData<3>> &   local_datas,
+	                               const std::vector<LocalData<3>> &nbr_datas, const Side<3> side,
+	                               const NbrType nbr_type, const Orthant<3> orthant) const override;
 
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-	                                 const LocalData<3> &                local_data) const override;
+	                                 const std::vector<LocalData<3>> &local_datas) const override;
 	/**
 	 * @brief Construct a new TriLinearGhostFiller object
 	 *

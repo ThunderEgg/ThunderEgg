@@ -46,11 +46,13 @@ static std::array<int, 2> getOffset(const std::array<int, 3> ns, Side<3> s, Orth
 	return offset;
 }
 void TriLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-                                                     const LocalData<3> &                local_data,
-                                                     const LocalData<3> &                nbr_data,
+                                                     const std::vector<LocalData<3>> &local_datas,
+                                                     const std::vector<LocalData<3>> &nbr_datas,
                                                      const Side<3> side, const NbrType nbr_type,
                                                      const Orthant<3> orthant) const
 {
+	auto &local_data = local_datas[0];
+	auto &nbr_data   = nbr_datas[0];
 	if (nbr_type == NbrType::Normal) {
 		auto local_slice = local_data.getSliceOnSide(side);
 		auto nbr_ghosts  = nbr_data.getGhostSliceOnSide(side.opposite(), 1);
@@ -88,9 +90,10 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const Patch
 	}
 }
 
-void TriLinearGhostFiller::fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-                                                       const LocalData<3> &local_data) const
+void TriLinearGhostFiller::fillGhostCellsForLocalPatch(
+std::shared_ptr<const PatchInfo<3>> pinfo, const std::vector<LocalData<3>> &local_datas) const
 {
+	auto &local_data = local_datas[0];
 	for (Side<3> side : Side<3>::getValues()) {
 		if (pinfo->hasNbr(side)) {
 			NbrType nbr_type = pinfo->getNbrType(side);

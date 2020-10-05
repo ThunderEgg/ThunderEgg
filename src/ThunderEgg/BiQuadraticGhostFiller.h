@@ -97,10 +97,12 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 
 	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                               const LocalData<2> &local_data, const LocalData<2> &nbr_data,
-	                               const Side<2> side, const NbrType nbr_type,
-	                               const Orthant<2> orthant) const override
+	                               const std::vector<LocalData<2>> &   local_datas,
+	                               const std::vector<LocalData<2>> &nbr_datas, const Side<2> side,
+	                               const NbrType nbr_type, const Orthant<2> orthant) const override
 	{
+		auto &local_data = local_datas[0];
+		auto &nbr_data   = nbr_datas[0];
 		switch (nbr_type) {
 			case NbrType::Normal: {
 				auto local_slice = local_data.getSliceOnSide(side);
@@ -133,7 +135,7 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	}
 
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                                 const LocalData<2> &                local_data) const override
+	                                 const std::vector<LocalData<2>> &   local_datas) const override
 	{
 		for (Side<2> side : Side<2>::getValues()) {
 			if (pinfo->hasNbr(side)) {
@@ -142,15 +144,15 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 						// nothing need to be done
 						break;
 					case NbrType::Coarse: {
-						auto inner_local_slice = local_data.getSliceOnSide(side, 1);
-						auto local_slice       = local_data.getSliceOnSide(side);
-						auto local_ghosts      = local_data.getGhostSliceOnSide(side, 1);
+						auto inner_local_slice = local_datas[0].getSliceOnSide(side, 1);
+						auto local_slice       = local_datas[0].getSliceOnSide(side);
+						auto local_ghosts      = local_datas[0].getGhostSliceOnSide(side, 1);
 						fillGhostForLocalWithCoarseNbr(inner_local_slice, local_slice,
 						                               local_ghosts);
 					} break;
 					case NbrType::Fine: {
-						auto local_slice  = local_data.getSliceOnSide(side);
-						auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
+						auto local_slice  = local_datas[0].getSliceOnSide(side);
+						auto local_ghosts = local_datas[0].getGhostSliceOnSide(side, 1);
 						fillGhostForLocalWithFineNbr(local_slice, local_ghosts);
 					} break;
 				}
