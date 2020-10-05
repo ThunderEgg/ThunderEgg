@@ -52,10 +52,9 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
 	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
 
-	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
-	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(ilc);
+	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(coarse_vec, fine_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo->id);
@@ -71,9 +70,8 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (!pinfo->hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               INFO("coord:  " << coord[0]);
@@ -107,10 +105,9 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 
 	coarse_vec->setWithGhost(1.0);
 
-	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
-	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(ilc);
+	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(coarse_vec, fine_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo->id);
@@ -126,9 +123,8 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (!pinfo->hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               INFO("coord:  " << coord[0]);

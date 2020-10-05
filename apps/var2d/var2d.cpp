@@ -359,8 +359,7 @@ int main(int argc, char *argv[])
 
 			auto curr_domain = domain;
 			auto next_domain = dcg->getCoarserDomain();
-			auto ilc         = make_shared<GMG::InterLevelComm<2>>(next_domain, 1, curr_domain);
-			auto restrictor  = make_shared<GMG::LinearRestrictor<2>>(ilc);
+			auto restrictor  = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
 
 			GMG::CycleBuilder<2> builder(copts);
 			builder.addFinestLevel(p_operator, p_solver, restrictor, vg);
@@ -385,8 +384,7 @@ int main(int argc, char *argv[])
 
 				auto interpolator
 				= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
-				ilc        = make_shared<GMG::InterLevelComm<2>>(next_domain, 1, curr_domain);
-				restrictor = make_shared<GMG::LinearRestrictor<2>>(ilc);
+				restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
 
 				builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator,
 				                             vg);

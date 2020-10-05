@@ -96,9 +96,19 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	/**
 	 * @brief Create new LinearRestrictor object.
 	 *
-	 * @param ilc the communcation package for the two levels.
+	 * @param fine_domain the finer Domain
+	 * @param coarse_domain the coarser Domain
+	 * @param num_components the number of components in each cell
+	 * @param extrapolate_boundary_ghosts set to true if ghost values at the boundaries should be
+	 * extrapolated
 	 */
-	LinearRestrictor(std::shared_ptr<InterLevelComm<D>> ilc_in) : MPIRestrictor<D>(ilc_in) {}
+	LinearRestrictor(std::shared_ptr<Domain<D>> fine_domain,
+	                 std::shared_ptr<Domain<D>> coarse_domain, int num_components,
+	                 bool extrapolate_boundary_ghosts = false)
+	: MPIRestrictor<D>(
+	  std::make_shared<InterLevelComm<D>>(coarse_domain, num_components, fine_domain))
+	{
+	}
 };
 } // namespace GMG
 } // namespace ThunderEgg
