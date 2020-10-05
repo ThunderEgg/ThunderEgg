@@ -39,6 +39,9 @@ namespace DomainTools
  * interface
  *
  * @tparam D the number of cartesian dimensions
+ * @param pinfo the patch to get the coordinate for
+ * @param coord the index in the patch
+ * @param real_coord (output) the coordnitate of the index
  */
 template <int D>
 void GetRealCoord(std::shared_ptr<const PatchInfo<D>> pinfo, const std::array<int, D> &coord,
@@ -59,6 +62,9 @@ void GetRealCoord(std::shared_ptr<const PatchInfo<D>> pinfo, const std::array<in
  * @brief Given a path info object, get the coordinate from a given index into the patch.
  *
  * @tparam D the number of cartesian dimensions
+ * @param pinfo the patch to get the coordinate for
+ * @param coord the index in the patch
+ * @param real_coord (output) the coordnitate of the index
  */
 template <int D>
 void GetRealCoordGhost(std::shared_ptr<const PatchInfo<D>> pinfo, const std::array<int, D> &coord,
@@ -74,6 +80,10 @@ void GetRealCoordGhost(std::shared_ptr<const PatchInfo<D>> pinfo, const std::arr
  * index into the interface of the patch.
  *
  * @tparam D the number of cartesian dimensions
+ * @param pinfo the patch to get the coordinate for
+ * @param coord the index in the patch
+ * @param s the side of the patch that the boundary is on
+ * @param real_coord (output) the coordnitate of the index
  */
 template <int D>
 void GetRealCoordBound(std::shared_ptr<const PatchInfo<D>> pinfo,
@@ -112,6 +122,11 @@ void GetRealCoordBound(std::shared_ptr<const PatchInfo<D>> pinfo,
  * @brief Set the values for a vector with the given function.
  *
  * @tparam D the number of cartesian dimensions
+ * @tparam T function type
+ * @param domain the domain that we are setting values for
+ * @param vec the vector to set values in
+ * @param component_index the component to set
+ * @param func the function
  */
 template <int D, typename T>
 void SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
@@ -130,12 +145,36 @@ void SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec
 		});
 	}
 }
-template <int D, typename T, typename... Args>
+/**
+ * @brief This is not intended to be called directly. Set the values for a vector with the given
+ * function.
+ *
+ * @tparam D the number of cartesian dimensions
+ * @tparam T function type
+ * @param domain the domain that we are setting values for
+ * @param vec the vector to set values in
+ * @param component_index the component to set
+ * @param func the function
+ */
+template <int D, typename T>
 void _SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
                 int component_index, T func)
 {
 	SetValues(domain, vec, component_index, func);
 }
+/**
+ * @brief This is not intended to be called directly. Set the values for a vector with the given
+ * function.
+ *
+ * @tparam D the number of cartesian dimensions
+ * @tparam T function type
+ * @tparam Args additional functions
+ * @param domain the domain that we are setting values for
+ * @param vec the vector to set values in
+ * @param component_index the component to set
+ * @param func the function
+ * @param args additional functions for additional components
+ */
 template <int D, typename T, typename... Args>
 void _SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
                 int component_index, T func, Args... args)
@@ -143,6 +182,18 @@ void _SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> ve
 	SetValues(domain, vec, component_index, func);
 	_SetValues(domain, vec, component_index + 1, args...);
 }
+/**
+ * @brief Set the values for a vector with the given functions
+ *
+ * @tparam D the number of cartesian dimensions
+ * @tparam T function type
+ * @tparam Args additional functions
+ * @param domain the domain that we are setting values for
+ * @param vec the vector to set values in
+ * @param component_index the component to set
+ * @param func the function
+ * @param args additional functions for additional components
+ */
 template <int D, typename T, typename... Args>
 void SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, T func,
                Args... args)
@@ -153,10 +204,15 @@ void SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec
  * @brief Set the values (including ghost values) for a vector with the given function.
  *
  * @tparam D the number of cartesian dimensions
+ * @tparam T function type
+ * @param domain the domain that we are setting values for
+ * @param vec the vector to set values in
+ * @param component_index the component to set
+ * @param func the function
  */
 template <int D, typename T>
-void SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, T func,
-                        int component_index = 0)
+void SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
+                        int component_index, T func)
 {
 	if (component_index >= vec->getNumComponents()) {
 		throw RuntimeError("Invalid component to set");
@@ -170,6 +226,61 @@ void SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vecto
 			ld[coord] = func(real_coord);
 		});
 	}
+}
+/**
+ * @brief This is not intended to be called directly. Set the values (including ghost values) for a
+ * vector with the given function.
+ *
+ * @tparam D the number of cartesian dimensions
+ * @tparam T function type
+ * @param domain the domain that we are setting values for
+ * @param vec the vector to set values in
+ * @param component_index the component to set
+ * @param func the function
+ */
+template <int D, typename T>
+void _SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
+                         int component_index, T func)
+{
+	SetValuesWithGhost(domain, vec, component_index, func);
+}
+/**
+ * @brief This is not intended to be called directly. Set the values (including ghost values) for a
+ * vector with the given function.
+ *
+ * @tparam D the number of cartesian dimensions
+ * @tparam T function type
+ * @tparam Args additional functions
+ * @param domain the domain that we are setting values for
+ * @param vec the vector to set values in
+ * @param component_index the component to set
+ * @param func the function
+ * @param args additional functions for additional components
+ */
+template <int D, typename T, typename... Args>
+void _SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
+                         int component_index, T func, Args... args)
+{
+	SetValuesWithGhost(domain, vec, component_index, func);
+	_SetValuesWithGhost(domain, vec, component_index + 1, args...);
+}
+/**
+ * @brief Set the values (including ghost values) for a vector with the given functions
+ *
+ * @tparam D the number of cartesian dimensions
+ * @tparam T function type
+ * @tparam Args additional functions
+ * @param domain the domain that we are setting values for
+ * @param vec the vector to set values in
+ * @param component_index the component to set
+ * @param func the function
+ * @param args additional functions for additional components
+ */
+template <int D, typename T, typename... Args>
+void SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, T func,
+                        Args... args)
+{
+	_SetValuesWithGhost(domain, vec, 0, func, args...);
 }
 /**
  * @brief Set the value of a boundary vector using a given function.
