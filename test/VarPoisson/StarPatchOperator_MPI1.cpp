@@ -53,17 +53,17 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 	auto hfun = [](const std::array<double, 2> &coord) { return 1; };
 
 	auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValuesWithGhost(d_fine, f_vec, ffun);
+	DomainTools::SetValuesWithGhost<2>(d_fine, f_vec, ffun);
 
 	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
+	DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
 
 	auto g_zero = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValuesWithGhost(d_fine, g_zero, gfun);
+	DomainTools::SetValuesWithGhost<2>(d_fine, g_zero, gfun);
 	g_zero->set(0);
 
 	auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValuesWithGhost(d_fine, h_vec, hfun);
+	DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
 	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine));
 	shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
@@ -126,10 +126,10 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff",
 	auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
 
 	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
+	DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
 
 	auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValuesWithGhost(d_fine, h_vec, hfun);
+	DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
 	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine));
 	shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
@@ -176,13 +176,13 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff",
 
 		auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
 		auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, f_vec_expected, ffun);
+		DomainTools::SetValues<2>(d_fine, f_vec_expected, ffun);
 
 		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, g_vec, gfun);
+		DomainTools::SetValues<2>(d_fine, g_vec, gfun);
 
 		auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValuesWithGhost(d_fine, h_vec, hfun);
+		DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
 		auto gf = make_shared<BiLinearGhostFiller>(d_fine);
 
@@ -231,13 +231,13 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff",
 
 		auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
 		auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, f_vec_expected, ffun);
+		DomainTools::SetValues<2>(d_fine, f_vec_expected, ffun);
 
 		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, g_vec, gfun);
+		DomainTools::SetValues<2>(d_fine, g_vec, gfun);
 
 		auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValuesWithGhost(d_fine, h_vec, hfun);
+		DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
 		auto gf = make_shared<BiLinearGhostFiller>(d_fine);
 

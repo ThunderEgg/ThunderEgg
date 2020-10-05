@@ -49,8 +49,8 @@ TEST_CASE("Linear Test LinearRestrictor on uniform 4x4", "[GMG::LinearRestrictor
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValuesWithGhost(d_fine, fine_vec, f);
-	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_expected, f);
+	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
+	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
 
 	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(ilc);

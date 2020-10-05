@@ -62,8 +62,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Side.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/SimpleGhostFiller.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/TriLinearGhostFiller.h)

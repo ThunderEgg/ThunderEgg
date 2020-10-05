@@ -110,7 +110,7 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	auto f
 	= [&](const std::array<double, 2> coord) -> double { return 1 + coord[0] + 2 * coord[1]; };
 
-	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_vec, f);
+	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_vec, f);
 	int idx = 0;
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
 		auto vec_lds = coarse_vec->getLocalDatas(i);

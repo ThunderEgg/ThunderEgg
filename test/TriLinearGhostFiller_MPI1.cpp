@@ -32,8 +32,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools<3>::setValues(d, vec, f);
-	DomainTools<3>::setValuesWithGhost(d, expected, f);
+	DomainTools::SetValues<3>(d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d);
 	tlgf.fillGhost(vec);
@@ -89,8 +89,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools<3>::setValuesWithGhost(d, vec, f);
-	DomainTools<3>::setValuesWithGhost(d, expected, f);
+	DomainTools::SetValuesWithGhost<3>(d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d);
 	tlgf.fillGhost(vec);

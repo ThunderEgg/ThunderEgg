@@ -47,7 +47,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 	};
 
 	auto x = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValues(d_fine, x, gfun);
+	DomainTools::SetValues<2>(d_fine, x, gfun);
 	auto b = ValVector<2>::GetNewVector(d_fine, 1);
 
 	// create an Identity matrix
@@ -97,7 +97,7 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper with ghost and 0.5I",
 	};
 
 	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValues(d_fine, x, gfun);
+	DomainTools::SetValues<2>(d_fine, x, gfun);
 	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 
 	// create an Identity matrix
@@ -147,7 +147,7 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper without ghost and 0.5I
 	};
 
 	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValues(d_fine, x, gfun);
+	DomainTools::SetValues<2>(d_fine, x, gfun);
 	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 
 	// create an Identity matrix

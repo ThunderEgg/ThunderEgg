@@ -57,7 +57,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
 
 	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
-	DomainTools<3>::setValues(d_fine, g_vec, gfun);
+	DomainTools::SetValues<3>(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<TriLinearGhostFiller>(d_fine);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
@@ -116,7 +116,7 @@ TEST_CASE(
 	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
 
 	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
-	DomainTools<3>::setValues(d_fine, g_vec, gfun);
+	DomainTools::SetValues<3>(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<TriLinearGhostFiller>(d_fine);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf, true);

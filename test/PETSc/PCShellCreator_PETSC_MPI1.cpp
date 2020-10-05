@@ -58,7 +58,7 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")
 	};
 
 	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
-	DomainTools<2>::setValues(d_fine, x, gfun);
+	DomainTools::SetValues<2>(d_fine, x, gfun);
 	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 
 	// create an Identity matrix

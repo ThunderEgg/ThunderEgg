@@ -151,7 +151,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 					nested_loop<D - 1>(
 					ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 						std::array<double, D> real_coord;
-						DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
+						DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 						ld[coord] += -2.0 * gfunc(real_coord) / h2;
 					});
 				}
@@ -180,14 +180,14 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 						nested_loop<D - 1>(
 						ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 							std::array<double, D> real_coord;
-							DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
+							DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 							ld[coord] += gfunc_grad[s.getAxisIndex()](real_coord) / h;
 						});
 					} else {
 						nested_loop<D - 1>(
 						ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 							std::array<double, D> real_coord;
-							DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
+							DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 							ld[coord] -= gfunc_grad[s.getAxisIndex()](real_coord) / h;
 						});
 					}

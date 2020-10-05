@@ -59,12 +59,12 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::
 		};
 
 		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
+		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
 		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, g_vec_expected, gfun);
+		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
 
 		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, f_vec, ffun);
+		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
@@ -118,12 +118,12 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann 
 		};
 
 		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
+		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
 		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, g_vec_expected, gfun);
+		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
 
 		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, f_vec, ffun);
+		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
@@ -180,12 +180,12 @@ TEST_CASE(
 		};
 
 		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
+		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
 		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, g_vec_expected, gfun);
+		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
 
 		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools<2>::setValues(d_fine, f_vec, ffun);
+		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);

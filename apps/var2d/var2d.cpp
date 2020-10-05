@@ -310,10 +310,10 @@ int main(int argc, char *argv[])
 		shared_ptr<ValVector<2>>            h     = ValVector<2>::GetNewVector(domain, 1);
 		shared_ptr<PETSc::VecWrapper<1>>    h_bc  = PETSc::VecWrapper<2>::GetNewBCVector(domain);
 
-		DomainTools<2>::setValues(domain, f, ffun);
-		DomainTools<2>::setValues(domain, exact, gfun);
-		DomainTools<2>::setValuesWithGhost(domain, h, hfun);
-		DomainTools<2>::setBCValues(domain, h_bc, hfun);
+		DomainTools::SetValues<2>(domain, f, ffun);
+		DomainTools::SetValues<2>(domain, exact, gfun);
+		DomainTools::SetValuesWithGhost<2>(domain, h, hfun);
+		DomainTools::SetBCValues<2>(domain, h_bc, hfun);
 		if (neumann) {
 			// Init::initNeumann2d(*domain, f->vec, exact->vec, ffun, gfun, nfunx, nfuny);
 		} else {

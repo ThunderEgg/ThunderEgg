@@ -155,7 +155,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 					nested_loop<D - 1>(
 					ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 						std::array<double, D> real_coord;
-						DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
+						DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 						std::array<double, D> other_real_coord = real_coord;
 						if (s.isLowerOnAxis()) {
 							other_real_coord[s.getAxisIndex()] -= pinfo->spacings[s.getAxisIndex()];

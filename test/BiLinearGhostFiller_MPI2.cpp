@@ -29,8 +29,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValues(d, vec, f);
-	DomainTools<2>::setValuesWithGhost(d, expected, f);
+	DomainTools::SetValues<2>(d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d);
 	blgf.fillGhost(vec);
@@ -84,8 +84,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValuesWithGhost(d, vec, f);
-	DomainTools<2>::setValuesWithGhost(d, expected, f);
+	DomainTools::SetValuesWithGhost<2>(d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d);
 	blgf.fillGhost(vec);

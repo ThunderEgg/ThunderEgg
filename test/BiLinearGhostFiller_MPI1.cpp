@@ -74,7 +74,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[1]->ns, num_ghost, 1, 4));
 
-	DomainTools<2>::setValues(d, vec, f);
+	DomainTools::SetValues<2>(d, vec, f);
 
 	BiLinearGhostFiller blgf(d);
 	blgf.fillGhost(vec);
@@ -85,7 +85,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		auto patch_1 = vec->getLocalData(0, d->getPatchInfoMap()[1]->local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
-			DomainTools<2>::getRealCoord(pinfo_map[1], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfo_map[1], coord, real_coord);
 			CHECK(patch_1[coord] == f(real_coord));
 		});
 		// check that west values are not modified
@@ -100,7 +100,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools<2>::getRealCoordGhost(pinfo_map[1], {nx, coord[0]}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfo_map[1], {nx, coord[0]}, real_coord);
 				CHECK(east_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -116,7 +116,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools<2>::getRealCoordGhost(pinfo_map[1], {coord[0], ny}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfo_map[1], {coord[0], ny}, real_coord);
 				CHECK(north_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -127,7 +127,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		auto patch_2 = vec->getLocalData(0, d->getPatchInfoMap()[2]->local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
-			DomainTools<2>::getRealCoord(pinfo_map[2], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfo_map[2], coord, real_coord);
 			CHECK(patch_2[coord] == f(real_coord));
 		});
 		// check that west values correct
@@ -136,7 +136,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools<2>::getRealCoordGhost(pinfo_map[2], {-1, coord[0]}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfo_map[2], {-1, coord[0]}, real_coord);
 				CHECK(west_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -158,7 +158,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools<2>::getRealCoordGhost(pinfo_map[2], {coord[0], ny}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfo_map[2], {coord[0], ny}, real_coord);
 				CHECK(north_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -169,7 +169,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		auto patch_1 = vec->getLocalData(0, d->getPatchInfoMap()[3]->local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
-			DomainTools<2>::getRealCoord(pinfo_map[3], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfo_map[3], coord, real_coord);
 			CHECK(patch_1[coord] == f(real_coord));
 		});
 		// check that west values are not modified
@@ -184,7 +184,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools<2>::getRealCoordGhost(pinfo_map[3], {nx, coord[0]}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfo_map[3], {nx, coord[0]}, real_coord);
 				CHECK(east_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -194,7 +194,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools<2>::getRealCoordGhost(pinfo_map[3], {coord[0], -1}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfo_map[3], {coord[0], -1}, real_coord);
 				CHECK(south_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -211,7 +211,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 		auto patch_2 = vec->getLocalData(0, d->getPatchInfoMap()[4]->local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
-			DomainTools<2>::getRealCoord(pinfo_map[4], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfo_map[4], coord, real_coord);
 			CHECK(patch_2[coord] == f(real_coord));
 		});
 		// check that west values correct
@@ -220,7 +220,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools<2>::getRealCoordGhost(pinfo_map[4], {-1, coord[0]}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfo_map[4], {-1, coord[0]}, real_coord);
 				CHECK(west_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -236,7 +236,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools<2>::getRealCoordGhost(pinfo_map[4], {coord[0], -1}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfo_map[4], {coord[0], -1}, real_coord);
 				CHECK(south_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -269,8 +269,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValues(d, vec, f);
-	DomainTools<2>::setValuesWithGhost(d, expected, f);
+	DomainTools::SetValues<2>(d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d);
 	blgf.fillGhost(vec);
@@ -325,8 +325,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValuesWithGhost(d, vec, f);
-	DomainTools<2>::setValuesWithGhost(d, expected, f);
+	DomainTools::SetValuesWithGhost<2>(d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d);
 	blgf.fillGhost(vec);
