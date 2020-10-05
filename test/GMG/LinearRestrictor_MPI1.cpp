@@ -33,11 +33,12 @@ const string uniform_mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 const string refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
 TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 {
-	auto            mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
-	auto            nx        = GENERATE(2, 10);
-	auto            ny        = GENERATE(2, 10);
-	int             num_ghost = 1;
-	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	auto mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto                  nx        = GENERATE(2, 10);
+	auto                  ny        = GENERATE(2, 10);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
@@ -92,11 +93,12 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 }
 TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor]")
 {
-	auto            mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
-	auto            nx        = GENERATE(2, 10);
-	auto            ny        = GENERATE(2, 10);
-	int             num_ghost = 1;
-	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	auto mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto                  nx        = GENERATE(2, 10);
+	auto                  ny        = GENERATE(2, 10);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
@@ -163,11 +165,12 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 }
 TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::LinearRestrictor]")
 {
-	auto            mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
-	auto            nx        = GENERATE(2, 10);
-	auto            ny        = GENERATE(2, 10);
-	int             num_ghost = 1;
-	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	auto mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto                  nx        = GENERATE(2, 10);
+	auto                  ny        = GENERATE(2, 10);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
@@ -204,7 +207,6 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
 			INFO("side:      " << s);
-			INFO("nbr-type:  " << pinfo->getNbrType(s));
 			nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 			               [&](const array<int, 1> &coord) {
 				               INFO("coord:  " << coord[0]);
@@ -216,11 +218,12 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary ghosts",
           "[GMG::LinearRestrictor]")
 {
-	auto            mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
-	auto            nx        = GENERATE(2, 10);
-	auto            ny        = GENERATE(2, 10);
-	int             num_ghost = 1;
-	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	auto mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto                  nx        = GENERATE(2, 10);
+	auto                  ny        = GENERATE(2, 10);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 

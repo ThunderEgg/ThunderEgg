@@ -41,11 +41,11 @@ template <int D> class Restrictor
 	/**
 	 * @brief Virtual function that base classes have to implement.
 	 *
-	 * @param coarse the output vector that is restricted to.
 	 * @param fine the input vector that is restricted.
+	 * @param coarse the output vector that is restricted to.
 	 */
-	virtual void restrict(std::shared_ptr<Vector<D>>       coarse,
-	                      std::shared_ptr<const Vector<D>> fine) const = 0;
+	virtual void restrict(std::shared_ptr<const Vector<D>> fine,
+	                      std::shared_ptr<Vector<D>>       coarse) const = 0;
 };
 } // namespace GMG
 } // namespace ThunderEgg

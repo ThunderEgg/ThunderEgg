@@ -47,7 +47,7 @@ class MockRestrictor : public GMG::Restrictor<2>
 {
 	public:
 	mutable int num_calls = 0;
-	void restrict(std::shared_ptr<Vector<2>> x, std::shared_ptr<const Vector<2>> b) const override
+	void restrict(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const override
 	{
 	}
 };

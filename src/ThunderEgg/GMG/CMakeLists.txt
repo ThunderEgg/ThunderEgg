@@ -1,5 +1,3 @@
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/AvgRstr.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Cycle.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/Cycle.cpp)
 
