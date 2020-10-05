@@ -23,7 +23,7 @@
 #define THUNDEREGG_DOMAIN_TOOLS_H
 
 #include <ThunderEgg/Domain.h>
-#include <functional>
+#include <ThunderEgg/RuntimeError.h>
 
 namespace ThunderEgg
 {
@@ -113,13 +113,16 @@ void GetRealCoordBound(std::shared_ptr<const PatchInfo<D>> pinfo,
  *
  * @tparam D the number of cartesian dimensions
  */
-template <int D>
+template <int D, typename T>
 void SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
-               std::function<double(const std::array<double, D> &)> func)
+               int component_index, T func)
 {
+	if (component_index >= vec->getNumComponents()) {
+		throw RuntimeError("Invalid component to set");
+	}
 	std::array<double, D> real_coord;
 	for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-		LocalData<D> ld    = vec->getLocalData(0, i);
+		LocalData<D> ld    = vec->getLocalData(component_index, i);
 		auto         pinfo = domain->getPatchInfoVector()[i];
 		nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 			GetRealCoord<D>(pinfo, coord, real_coord);
@@ -127,18 +130,40 @@ void SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec
 		});
 	}
 }
+template <int D, typename T, typename... Args>
+void _SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
+                int component_index, T func)
+{
+	SetValues(domain, vec, component_index, func);
+}
+template <int D, typename T, typename... Args>
+void _SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
+                int component_index, T func, Args... args)
+{
+	SetValues(domain, vec, component_index, func);
+	_SetValues(domain, vec, component_index + 1, args...);
+}
+template <int D, typename T, typename... Args>
+void SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, T func,
+               Args... args)
+{
+	_SetValues(domain, vec, 0, func, args...);
+}
 /**
  * @brief Set the values (including ghost values) for a vector with the given function.
  *
  * @tparam D the number of cartesian dimensions
  */
-template <int D>
-void SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec,
-                        std::function<double(const std::array<double, D> &)> func)
+template <int D, typename T>
+void SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, T func,
+                        int component_index = 0)
 {
+	if (component_index >= vec->getNumComponents()) {
+		throw RuntimeError("Invalid component to set");
+	}
 	std::array<double, D> real_coord;
 	for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-		LocalData<D> ld    = vec->getLocalData(0, i);
+		LocalData<D> ld    = vec->getLocalData(component_index, i);
 		auto         pinfo = domain->getPatchInfoVector()[i];
 		nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, D> &coord) {
 			GetRealCoordGhost<D>(pinfo, coord, real_coord);
@@ -151,16 +176,19 @@ void SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vecto
  *
  * @tparam D the number of cartesian dimensions
  */
-template <int D>
-void SetBCValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D - 1>> vec,
-                 std::function<double(const std::array<double, D> &)> func)
+template <int D, typename T>
+void SetBCValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D - 1>> vec, T func,
+                 int component_index = 0)
 {
+	if (component_index >= vec->getNumComponents()) {
+		throw RuntimeError("More functions given than available components");
+	}
 	std::array<double, D> real_coord;
 	for (int i = 0; i < vec->getNumLocalPatches(); i++) {
 		auto pinfo = domain->getPatchInfoMap()[domain->patch_id_bc_map_vec[i]];
 		for (Side<D> s : Side<D>::getValues()) {
 			if (!pinfo->hasNbr(s)) {
-				LocalData<D - 1> ld = vec->getLocalData(0, pinfo->getBCLocalIndex(s));
+				LocalData<D - 1> ld = vec->getLocalData(component_index, pinfo->getBCLocalIndex(s));
 				nested_loop<D - 1>(ld.getStart(), ld.getEnd(),
 				                   [&](const std::array<int, D - 1> &coord) {
 					                   GetRealCoordBound<D>(pinfo, coord, s, real_coord);

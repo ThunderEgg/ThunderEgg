@@ -402,6 +402,54 @@ TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 		}
 	});
 }
+TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
+{
+	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
+	auto g = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
+
+	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+
+	int    nx        = 3;
+	auto   ny        = GENERATE(1, 2, 10, 13);
+	double startx    = 0.0;
+	auto   starty    = GENERATE(0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0);
+	double spacingx  = 0.1;
+	auto   spacingy  = GENERATE(0.01, 1.0, 3.14);
+	auto   num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+
+	pinfo_map[0].reset(new PatchInfo<2>());
+	pinfo_map[0]->id              = 0;
+	pinfo_map[0]->ns              = {nx, ny};
+	pinfo_map[0]->spacings        = {spacingx, spacingy};
+	pinfo_map[0]->starts          = {startx, starty};
+	pinfo_map[0]->num_ghost_cells = num_ghost;
+	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+
+	shared_ptr<ValVector<2>> vec(
+	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 2, 1));
+
+	DomainTools::SetValues<2>(d, vec, f, g);
+	auto ld = vec->getLocalData(0, 0);
+	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
+		if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
+			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
+		} else {
+			std::array<double, 2> real_coord;
+			DomainTools::GetRealCoord<2>(pinfo_map[0], coord, real_coord);
+			CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+		}
+	});
+	auto ld2 = vec->getLocalData(1, 0);
+	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
+		if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
+			CHECK(ld2[coord] + 100 == Approx(0.0 + 100));
+		} else {
+			std::array<double, 2> real_coord;
+			DomainTools::GetRealCoord<2>(pinfo_map[0], coord, real_coord);
+			CHECK(ld2[coord] + 100 == Approx(g(real_coord) + 100));
+		}
+	});
+}
 TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
