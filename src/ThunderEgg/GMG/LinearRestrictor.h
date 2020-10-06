@@ -37,6 +37,44 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	 * @brief true if ghost values at boundaries should be extrapolated
 	 */
 	bool extrapolate_boundary_ghosts;
+
+	/**
+	 * @brief Extrapolate to the ghosts on the parent patch
+	 *
+	 * @param pinfo the patch
+	 * @param fine_data the finer patch
+	 * @param coarse_data the coarser patch
+	 */
+	void extrapolateBoundaries(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                           const LocalData<D> &fine_data, LocalData<D> &coarse_data) const
+	{
+		Orthant<D>         orth = pinfo->orth_on_parent;
+		std::array<int, D> starts;
+		for (size_t i = 0; i < D; i++) {
+			starts[i]
+			= orth.isOnSide(Side<D>::LowerSideOnAxis(i)) ? 0 : coarse_data.getLengths()[i];
+		}
+		// extrapolate ghost values
+		for (Side<D> s : pinfo->orth_on_parent.getExteriorSides()) {
+			if (!pinfo->hasNbr(s)) {
+				auto fine_ghost    = fine_data.getGhostSliceOnSide(s, 1);
+				auto fine_interior = fine_data.getSliceOnSide(s);
+				auto coarse_ghost  = coarse_data.getGhostSliceOnSide(s, 1);
+				nested_loop<D - 1>(fine_ghost.getStart(), fine_ghost.getEnd(),
+				                   [&](const std::array<int, D - 1> &coord) {
+					                   std::array<int, D - 1> coarse_coord;
+					                   for (size_t x = 0; x < s.getAxisIndex(); x++) {
+						                   coarse_coord[x] = (coord[x] + starts[x]) / 2;
+					                   }
+					                   for (size_t x = s.getAxisIndex() + 1; x < D; x++) {
+						                   coarse_coord[x - 1] = (coord[x - 1] + starts[x]) / 2;
+					                   }
+					                   coarse_ghost[coarse_coord]
+					                   += (3 * fine_ghost[coord] - fine_interior[coord]) / (1 << D);
+				                   });
+			}
+		}
+	}
 	/**
 	 * @brief Restrict to a coarser patch
 	 *
@@ -72,27 +110,7 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 			});
 
 			if (extrapolate_boundary_ghosts) {
-				// extrapolate ghost values
-				for (Side<D> s : orth.getExteriorSides()) {
-					if (!pinfo->hasNbr(s)) {
-						auto fine_ghost    = fine_datas[c].getGhostSliceOnSide(s, 1);
-						auto fine_interior = fine_datas[c].getSliceOnSide(s);
-						auto coarse_ghost  = coarse_local_datas[c].getGhostSliceOnSide(s, 1);
-						nested_loop<D - 1>(
-						fine_ghost.getStart(), fine_ghost.getEnd(),
-						[&](const std::array<int, D - 1> &coord) {
-							std::array<int, D - 1> coarse_coord;
-							for (size_t x = 0; x < s.getAxisIndex(); x++) {
-								coarse_coord[x] = (coord[x] + starts[x]) / 2;
-							}
-							for (size_t x = s.getAxisIndex() + 1; x < D; x++) {
-								coarse_coord[x - 1] = (coord[x - 1] + starts[x]) / 2;
-							}
-							coarse_ghost[coarse_coord]
-							+= (3 * fine_ghost[coord] - fine_interior[coord]) / (1 << D);
-						});
-					}
-				}
+				extrapolateBoundaries(pinfo, fine_datas[c], coarse_local_datas[c]);
 			}
 		}
 	}
