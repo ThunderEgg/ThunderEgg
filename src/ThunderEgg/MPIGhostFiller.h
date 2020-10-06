@@ -82,9 +82,11 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 *
 	 * @param buffer_ptr pointer to the ghost cells position in the buffer
 	 * @param side  the side that the ghost cells are on
+	 * @param component_index  the component index;
 	 * @return LocalData<D> the LocalData object
 	 */
-	LocalData<D> getLocalDataForBuffer(double *buffer_ptr, const Side<D> side) const
+	LocalData<D> getLocalDataForBuffer(double *buffer_ptr, const Side<D> side,
+	                                   int component_index) const
 	{
 		auto ns              = domain->getNs();
 		int  num_ghost_cells = domain->getNumGhostCells();
@@ -92,19 +94,20 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		std::array<int, D> strides;
 		strides[0] = 1;
 		for (size_t i = 1; i < D; i++) {
-			if (i == side.getAxisIndex() + 1) {
+			if (i - 1 == side.getAxisIndex()) {
 				strides[i] = num_ghost_cells * strides[i - 1];
 			} else {
 				strides[i] = ns[i - 1] * strides[i - 1];
 			}
 		}
+		int size = D - 1 == side.getAxisIndex() ? (num_ghost_cells * strides[D - 1])
+		                                        : (ns[D - 1] * strides[D - 1]);
 		// transform buffer ptr so that it points to first non-ghost cell
-		double *transformed_buffer_ptr;
+		double *transformed_buffer_ptr = buffer_ptr + size * component_index;
 		if (side.isLowerOnAxis()) {
-			transformed_buffer_ptr = buffer_ptr - (-num_ghost_cells) * strides[side.getAxisIndex()];
+			transformed_buffer_ptr -= (-num_ghost_cells) * strides[side.getAxisIndex()];
 		} else {
-			transformed_buffer_ptr
-			= buffer_ptr - ns[side.getAxisIndex()] * strides[side.getAxisIndex()];
+			transformed_buffer_ptr -= ns[side.getAxisIndex()] * strides[side.getAxisIndex()];
 		}
 
 		LocalData<D> buffer_data(transformed_buffer_ptr, strides, ns, num_ghost_cells);
@@ -318,7 +321,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		// allocate recv buffers and post recvs
 		std::vector<std::vector<double>> recv_buffers(recv_buff_lengths.size());
 		for (size_t i = 0; i < recv_buff_lengths.size(); i++) {
-			recv_buffers[i].resize(recv_buff_lengths[i]);
+			recv_buffers[i].resize(recv_buff_lengths[i] * u->getNumComponents());
 		}
 		std::vector<MPI_Request> recv_requests(recv_buff_lengths.size());
 		for (size_t i = 0; i < recv_requests.size(); i++) {
@@ -329,7 +332,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		// allocate send buffers
 		std::vector<std::vector<double>> out_buffers(send_buff_lengths.size());
 		for (size_t i = 0; i < send_buff_lengths.size(); i++) {
-			out_buffers[i].resize(send_buff_lengths[i]);
+			out_buffers[i].resize(send_buff_lengths[i] * u->getNumComponents());
 		}
 		// perform fill operations for mpi buffers
 		std::vector<MPI_Request> send_requests(send_buff_lengths.size());
@@ -341,11 +344,13 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				auto    orthant       = std::get<3>(call);
 				auto    local_datas   = u->getLocalDatas(std::get<4>(call));
 				size_t  buffer_offset = std::get<5>(call);
-				double *buffer_ptr    = out_buffers[i].data() + buffer_offset;
+				double *buffer_ptr = out_buffers[i].data() + buffer_offset * u->getNumComponents();
 
-				// create a LocalData object for the buffer
-				LocalData<D> buffer_data = getLocalDataForBuffer(buffer_ptr, side.opposite());
-				std::vector<LocalData<D>> buffer_datas = {buffer_data};
+				// create LocalData objects for the buffer
+				std::vector<LocalData<D>> buffer_datas(u->getNumComponents());
+				for (int c = 0; c < u->getNumComponents(); c++) {
+					buffer_datas[c] = getLocalDataForBuffer(buffer_ptr, side.opposite(), c);
+				}
 
 				// make the call
 				fillGhostCellsForNbrPatch(pinfo, local_datas, buffer_datas, side, nbr_type,
@@ -378,16 +383,20 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				Side<D> side          = std::get<1>(t);
 				size_t  buffer_offset = std::get<2>(t);
 
-				const LocalData<D> local_data = u->getLocalData(0, local_index);
-				double *           buffer_ptr = recv_buffers[finished_index].data() + buffer_offset;
-				LocalData<D>       buffer_data = getLocalDataForBuffer(buffer_ptr, side);
-				for (int ig = 0; ig < domain->getNumGhostCells(); ig++) {
-					LocalData<D - 1> local_slice  = local_data.getGhostSliceOnSide(side, ig + 1);
-					LocalData<D - 1> buffer_slice = buffer_data.getGhostSliceOnSide(side, ig + 1);
-					nested_loop<D - 1>(local_slice.getStart(), local_slice.getEnd(),
-					                   [&](const std::array<int, D - 1> &coord) {
-						                   local_slice[coord] += buffer_slice[coord];
-					                   });
+				for (int c = 0; c < u->getNumComponents(); c++) {
+					const LocalData<D> local_data = u->getLocalData(c, local_index);
+					double *           buffer_ptr
+					= recv_buffers[finished_index].data() + buffer_offset * u->getNumComponents();
+					LocalData<D> buffer_data = getLocalDataForBuffer(buffer_ptr, side, c);
+					for (int ig = 0; ig < domain->getNumGhostCells(); ig++) {
+						LocalData<D - 1> local_slice = local_data.getGhostSliceOnSide(side, ig + 1);
+						LocalData<D - 1> buffer_slice
+						= buffer_data.getGhostSliceOnSide(side, ig + 1);
+						nested_loop<D - 1>(local_slice.getStart(), local_slice.getEnd(),
+						                   [&](const std::array<int, D - 1> &coord) {
+							                   local_slice[coord] += buffer_slice[coord];
+						                   });
+					}
 				}
 			}
 		}

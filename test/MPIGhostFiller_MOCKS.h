@@ -232,6 +232,7 @@ template <int D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 			INFO(ns);
 			INFO("num_ghost_cells: " << pinfo->num_ghost_cells);
 			for (int c = 0; c < vec->getNumComponents(); c++) {
+				INFO("c: " << c);
 				auto data = vec->getLocalData(c, pinfo->local_index);
 				// check that vector was not modified on the interior
 				nested_loop<D>(data.getStart(), data.getEnd(),
@@ -252,7 +253,7 @@ template <int D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 							case NbrType::Normal: {
 								INFO("NbrType: Normal");
 
-								// value should be id of neighbor + index
+								// value should be id of neighbor + index +c
 								int  index   = 0;
 								auto nbrinfo = pinfo->getNormalNbrInfo(s);
 								for (int i = 0; i < pinfo->num_ghost_cells; i++) {
