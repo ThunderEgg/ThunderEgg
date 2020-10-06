@@ -82,7 +82,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 *
 	 * @param buffer_ptr pointer to the ghost cells position in the buffer
 	 * @param side  the side that the ghost cells are on
-	 * @param component_index  the component index;
+	 * @param component_index  the component index
 	 * @return LocalData<D> the LocalData object
 	 */
 	LocalData<D> getLocalDataForBuffer(double *buffer_ptr, const Side<D> side,
@@ -112,6 +112,93 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 
 		LocalData<D> buffer_data(transformed_buffer_ptr, strides, ns, num_ghost_cells);
 		return buffer_data;
+	}
+	/**
+	 * @brief Post send requests
+	 *
+	 * @param buffers the allocated buffers
+	 * @return std::vector<MPI_Request> the send requests
+	 */
+	std::vector<MPI_Request> postRecvs(std::vector<std::vector<double>> &buffers) const
+	{
+		std::vector<MPI_Request> recv_requests(buffers.size());
+		for (size_t i = 0; i < recv_requests.size(); i++) {
+			MPI_Irecv(buffers[i].data(), buffers[i].size(), MPI_DOUBLE, index_rank_map[i], 0,
+			          MPI_COMM_WORLD, &recv_requests[i]);
+		}
+		return recv_requests;
+	}
+	/**
+	 * @brief process recv requests as they are ready
+	 *
+	 * @param requests the recv requests
+	 * @param buffers the recv buffers
+	 * @param u the vector to fill ghost values in
+	 */
+	void processRecvs(std::vector<MPI_Request> &requests, std::vector<std::vector<double>> &buffers,
+	                  std::shared_ptr<const Vector<D>> u) const
+	{
+		for (size_t i = 0; i < requests.size(); i++) {
+			int finished_index;
+			MPI_Waitany(requests.size(), requests.data(), &finished_index, MPI_STATUS_IGNORE);
+			for (auto t : incoming_ghosts[finished_index]) {
+				int     local_index   = std::get<0>(t);
+				Side<D> side          = std::get<1>(t);
+				size_t  buffer_offset = std::get<2>(t);
+
+				for (int c = 0; c < u->getNumComponents(); c++) {
+					const LocalData<D> local_data = u->getLocalData(c, local_index);
+					double *           buffer_ptr
+					= buffers[finished_index].data() + buffer_offset * u->getNumComponents();
+					LocalData<D> buffer_data = getLocalDataForBuffer(buffer_ptr, side, c);
+					for (int ig = 0; ig < domain->getNumGhostCells(); ig++) {
+						LocalData<D - 1> local_slice = local_data.getGhostSliceOnSide(side, ig + 1);
+						LocalData<D - 1> buffer_slice
+						= buffer_data.getGhostSliceOnSide(side, ig + 1);
+						nested_loop<D - 1>(local_slice.getStart(), local_slice.getEnd(),
+						                   [&](const std::array<int, D - 1> &coord) {
+							                   local_slice[coord] += buffer_slice[coord];
+						                   });
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * @brief fill buffers and post send requests
+	 *
+	 * @param buffers the allocated buffers
+	 * @param u the vector to fill buffers from
+	 * @return std::vector<MPI_Request> the requests
+	 */
+	std::vector<MPI_Request> postSends(std::vector<std::vector<double>> &buffers,
+	                                   std::shared_ptr<const Vector<D>>  u) const
+	{
+		std::vector<MPI_Request> send_requests(send_buff_lengths.size());
+		for (size_t i = 0; i < remote_calls.size(); i++) {
+			for (const RemoteCall &call : remote_calls[i]) {
+				auto    pinfo         = std::get<0>(call);
+				auto    side          = std::get<1>(call);
+				auto    nbr_type      = std::get<2>(call);
+				auto    orthant       = std::get<3>(call);
+				auto    local_datas   = u->getLocalDatas(std::get<4>(call));
+				size_t  buffer_offset = std::get<5>(call);
+				double *buffer_ptr    = buffers[i].data() + buffer_offset * u->getNumComponents();
+
+				// create LocalData objects for the buffer
+				std::vector<LocalData<D>> buffer_datas(u->getNumComponents());
+				for (int c = 0; c < u->getNumComponents(); c++) {
+					buffer_datas[c] = getLocalDataForBuffer(buffer_ptr, side.opposite(), c);
+				}
+
+				// make the call
+				fillGhostCellsForNbrPatch(pinfo, local_datas, buffer_datas, side, nbr_type,
+				                          orthant);
+			}
+			MPI_Isend(buffers[i].data(), buffers[i].size(), MPI_DOUBLE, index_rank_map[i], 0,
+			          MPI_COMM_WORLD, &send_requests[i]);
+		}
+		return send_requests;
 	}
 
 	protected:
@@ -323,42 +410,15 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		for (size_t i = 0; i < recv_buff_lengths.size(); i++) {
 			recv_buffers[i].resize(recv_buff_lengths[i] * u->getNumComponents());
 		}
-		std::vector<MPI_Request> recv_requests(recv_buff_lengths.size());
-		for (size_t i = 0; i < recv_requests.size(); i++) {
-			MPI_Irecv(recv_buffers[i].data(), recv_buffers[i].size(), MPI_DOUBLE, index_rank_map[i],
-			          0, MPI_COMM_WORLD, &recv_requests[i]);
-		}
+		std::vector<MPI_Request> recv_requests = postRecvs(recv_buffers);
 
 		// allocate send buffers
 		std::vector<std::vector<double>> out_buffers(send_buff_lengths.size());
 		for (size_t i = 0; i < send_buff_lengths.size(); i++) {
 			out_buffers[i].resize(send_buff_lengths[i] * u->getNumComponents());
 		}
-		// perform fill operations for mpi buffers
-		std::vector<MPI_Request> send_requests(send_buff_lengths.size());
-		for (size_t i = 0; i < remote_calls.size(); i++) {
-			for (const RemoteCall &call : remote_calls[i]) {
-				auto    pinfo         = std::get<0>(call);
-				auto    side          = std::get<1>(call);
-				auto    nbr_type      = std::get<2>(call);
-				auto    orthant       = std::get<3>(call);
-				auto    local_datas   = u->getLocalDatas(std::get<4>(call));
-				size_t  buffer_offset = std::get<5>(call);
-				double *buffer_ptr = out_buffers[i].data() + buffer_offset * u->getNumComponents();
+		std::vector<MPI_Request> send_requests = postSends(out_buffers, u);
 
-				// create LocalData objects for the buffer
-				std::vector<LocalData<D>> buffer_datas(u->getNumComponents());
-				for (int c = 0; c < u->getNumComponents(); c++) {
-					buffer_datas[c] = getLocalDataForBuffer(buffer_ptr, side.opposite(), c);
-				}
-
-				// make the call
-				fillGhostCellsForNbrPatch(pinfo, local_datas, buffer_datas, side, nbr_type,
-				                          orthant);
-			}
-			MPI_Isend(out_buffers[i].data(), out_buffers[i].size(), MPI_DOUBLE, index_rank_map[i],
-			          0, MPI_COMM_WORLD, &send_requests[i]);
-		}
 		// perform local operations
 		for (auto pinfo : domain->getPatchInfoVector()) {
 			auto datas = u->getLocalDatas(pinfo->local_index);
@@ -373,33 +433,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			auto nbr_datas   = u->getLocalDatas(std::get<5>(call));
 			fillGhostCellsForNbrPatch(pinfo, local_datas, nbr_datas, side, nbr_type, orthant);
 		}
-		// add in remote values as they come in
-		for (size_t i = 0; i < recv_requests.size(); i++) {
-			int finished_index;
-			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_index,
-			            MPI_STATUS_IGNORE);
-			for (auto t : incoming_ghosts[finished_index]) {
-				int     local_index   = std::get<0>(t);
-				Side<D> side          = std::get<1>(t);
-				size_t  buffer_offset = std::get<2>(t);
 
-				for (int c = 0; c < u->getNumComponents(); c++) {
-					const LocalData<D> local_data = u->getLocalData(c, local_index);
-					double *           buffer_ptr
-					= recv_buffers[finished_index].data() + buffer_offset * u->getNumComponents();
-					LocalData<D> buffer_data = getLocalDataForBuffer(buffer_ptr, side, c);
-					for (int ig = 0; ig < domain->getNumGhostCells(); ig++) {
-						LocalData<D - 1> local_slice = local_data.getGhostSliceOnSide(side, ig + 1);
-						LocalData<D - 1> buffer_slice
-						= buffer_data.getGhostSliceOnSide(side, ig + 1);
-						nested_loop<D - 1>(local_slice.getStart(), local_slice.getEnd(),
-						                   [&](const std::array<int, D - 1> &coord) {
-							                   local_slice[coord] += buffer_slice[coord];
-						                   });
-					}
-				}
-			}
-		}
+		processRecvs(recv_requests, recv_buffers, u);
 
 		// wait for sends for finish
 		MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUS_IGNORE);
