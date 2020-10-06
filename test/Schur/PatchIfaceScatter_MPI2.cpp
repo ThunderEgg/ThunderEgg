@@ -224,7 +224,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied",
 
 	for (int i = 0; i < global_vector->getNumLocalPatches(); i++) {
 		auto iface      = iface_domain->getInterfaces()[i];
-		auto local_data = global_vector->getLocalData(i);
+		auto local_data = global_vector->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               local_data[coord] = iface->global_index + 1 + coord[0];
@@ -233,7 +233,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied",
 	scatter.scatterStart(global_vector, local_vector);
 	for (auto iface : iface_domain->getInterfaces()) {
 		INFO("IFACE_ID: " << iface->id);
-		auto local_data = local_vector->getLocalData(iface->local_index);
+		auto local_data = local_vector->getLocalData(0, iface->local_index);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Approx(iface->global_index + 1 + coord[0]));
@@ -259,7 +259,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
 
 	for (int i = 0; i < global_vector->getNumLocalPatches(); i++) {
 		auto iface      = iface_domain->getInterfaces()[i];
-		auto local_data = global_vector->getLocalData(i);
+		auto local_data = global_vector->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               local_data[coord] = iface->global_index + 1 + coord[0];
@@ -273,7 +273,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
 			if (piinfo->pinfo->hasNbr(s)) {
 				INFO("Side: " << s);
 				auto iface_info = piinfo->getIfaceInfo(s);
-				auto local_data = local_vector->getLocalData(iface_info->patch_local_index);
+				auto local_data = local_vector->getLocalData(0, iface_info->patch_local_index);
 				nested_loop<1>(
 				local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1> &coord) {
 					CHECK(local_data[coord] == Approx(iface_info->global_index + 1 + coord[0]));
@@ -301,7 +301,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice", "[Schur::PatchIfaceScatte
 
 	for (int i = 0; i < global_vector->getNumLocalPatches(); i++) {
 		auto iface      = iface_domain->getInterfaces()[i];
-		auto local_data = global_vector->getLocalData(i);
+		auto local_data = global_vector->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               local_data[coord] = iface->global_index + 1 + coord[0];
@@ -317,7 +317,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice", "[Schur::PatchIfaceScatte
 			if (piinfo->pinfo->hasNbr(s)) {
 				INFO("Side: " << s);
 				auto iface_info = piinfo->getIfaceInfo(s);
-				auto local_data = local_vector->getLocalData(iface_info->patch_local_index);
+				auto local_data = local_vector->getLocalData(0, iface_info->patch_local_index);
 				nested_loop<1>(
 				local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1> &coord) {
 					CHECK(local_data[coord] == Approx(iface_info->global_index + 1 + coord[0]));
@@ -347,7 +347,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled"
 
 	for (int i = 0; i < global_vector->getNumLocalPatches(); i++) {
 		auto iface      = iface_domain->getInterfaces()[i];
-		auto local_data = global_vector->getLocalData(i);
+		auto local_data = global_vector->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               local_data[coord] = iface->global_index + 1 + coord[0];
@@ -361,7 +361,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled"
 			if (piinfo->pinfo->hasNbr(s)) {
 				INFO("Side: " << s);
 				auto iface_info = piinfo->getIfaceInfo(s);
-				auto local_data = local_vector->getLocalData(iface_info->patch_local_index);
+				auto local_data = local_vector->getLocalData(0, iface_info->patch_local_index);
 				nested_loop<1>(
 				local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1> &coord) {
 					CHECK(local_data[coord] == Approx(iface_info->global_index + 1 + coord[0]));

@@ -42,23 +42,6 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	 */
 	std::shared_ptr<InterLevelComm<D>> ilc;
 
-	/**
-	 * @brief Restrict values into coarse vector
-	 *
-	 * The idea behind this is that this function will be called twice. Once to fill in the ghost
-	 * values, and once to fill in the local values. The ghost values will be filled first and the
-	 * local values will be fill while MPI communication is happening.
-	 *
-	 * @param patches pairs where the first value is the index in the coarse vector and the second
-	 * value is a pointer to the PatchInfo object
-	 * @param finer_vector the finer vector
-	 * @param coarser_vector the coaser vector
-	 */
-	virtual void
-	restrictPatches(const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
-	                std::shared_ptr<const Vector<D>> finer_vector,
-	                std::shared_ptr<Vector<D>>       coarser_vector) const = 0;
-
 	public:
 	/**
 	 * @brief Create new LinearRestrictor object.
@@ -72,10 +55,11 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	/**
 	 * @brief restriction function
 	 *
-	 * @param coarse the output vector that is restricted to.
 	 * @param fine the input vector that is restricted.
+	 * @param coarse the output vector that is restricted to.
 	 */
-	void restrict(std::shared_ptr<Vector<D>> coarse, std::shared_ptr<const Vector<D>> fine) const
+	void restrict(std::shared_ptr<const Vector<D>> fine,
+	              std::shared_ptr<Vector<D>>       coarse) const override
 	{
 		std::shared_ptr<Vector<D>> coarse_ghost = ilc->getNewGhostVector();
 
@@ -94,6 +78,22 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 		// finish scatter for ghost values
 		ilc->sendGhostPatchesFinish(coarse, coarse_ghost);
 	}
+	/**
+	 * @brief Restrict values into coarse vector
+	 *
+	 * The idea behind this is that this function will be called twice. Once to fill in the ghost
+	 * values, and once to fill in the local values. The ghost values will be filled first and the
+	 * local values will be fill while MPI communication is happening.
+	 *
+	 * @param patches pairs where the first value is the index in the coarse vector and the second
+	 * value is a pointer to the PatchInfo object
+	 * @param finer_vector the finer vector
+	 * @param coarser_vector the coaser vector
+	 */
+	virtual void
+	restrictPatches(const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
+	                std::shared_ptr<const Vector<D>> finer_vector,
+	                std::shared_ptr<Vector<D>>       coarser_vector) const = 0;
 };
 } // namespace GMG
 } // namespace ThunderEgg

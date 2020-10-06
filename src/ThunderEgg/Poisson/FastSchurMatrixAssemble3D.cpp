@@ -239,7 +239,8 @@ std::shared_ptr<const PatchInfo<3>> pinfo, std::vector<double> &block)
 	auto new_pinfo                    = make_shared<PatchInfo<3>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<3>>();
-	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u);
+	std::vector<LocalData<3>> us      = {u};
+	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
 	auto slice       = u.getSliceOnSide(s);
 	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
 	for (int yi = 0; yi < n; yi++) {
@@ -269,7 +270,8 @@ void FillBlockColumnForFineToFineInterface(int j, const LocalData<3> &u, Side<3>
 	auto new_pinfo                    = make_shared<PatchInfo<3>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<CoarseNbrInfo<3>>(100, type.getOrthant());
-	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u);
+	std::vector<LocalData<3>> us      = {u};
+	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
 	auto slice       = u.getSliceOnSide(s);
 	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
 	for (int yi = 0; yi < n; yi++) {
@@ -299,10 +301,12 @@ void FillBlockColumnForCoarseToFineInterface(int j, const LocalData<3> &u, Side<
 	auto new_pinfo                    = make_shared<PatchInfo<3>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<3>>();
-	vector<double> ghosts(n * n);
-	LocalData<3>   nbr_data = getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite());
+	vector<double>            ghosts(n * n);
+	std::vector<LocalData<3>> us = {u};
+	std::vector<LocalData<3>> nbr_datas
+	= {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
 	ghost_filler->fillGhostCellsForNbrPatch(
-	new_pinfo, u, nbr_data, s, NbrType::Fine,
+	new_pinfo, us, nbr_datas, s, NbrType::Fine,
 	Orthant<3>::getValuesOnSide(s)[type.getOrthant().getIndex()]);
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
@@ -330,10 +334,12 @@ void FillBlockColumnForFineToCoarseInterface(int j, const LocalData<3> &u, Side<
 	auto new_pinfo                    = make_shared<PatchInfo<3>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<CoarseNbrInfo<3>>(100, type.getOrthant());
-	vector<double> ghosts(n * n);
-	LocalData<3>   nbr_data = getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite());
+	vector<double>            ghosts(n * n);
+	std::vector<LocalData<3>> us = {u};
+	std::vector<LocalData<3>> nbr_datas
+	= {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
 	ghost_filler->fillGhostCellsForNbrPatch(
-	new_pinfo, u, nbr_data, s, NbrType::Coarse,
+	new_pinfo, us, nbr_datas, s, NbrType::Coarse,
 	Orthant<3>::getValuesOnSide(s.opposite())[type.getOrthant().getIndex()]);
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
@@ -391,15 +397,17 @@ void FillBlockCoeffs(CoeffMap coeffs, std::shared_ptr<const PatchInfo<3>> pinfo,
 		for (int xi = 0; xi < n; xi++) {
 			int j = xi + yi * n;
 			// create some work vectors
-			auto         u_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1);
-			auto         f_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1);
-			LocalData<3> u_local_data  = u_vec->getLocalData(0);
+			auto         u_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1, 1);
+			auto         f_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1, 1);
+			LocalData<3> u_local_data  = u_vec->getLocalData(0, 0);
+			auto         u_local_datas = u_vec->getLocalDatas(0);
 			LocalData<2> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<3>::west(), 1);
-			LocalData<3> f_local_data  = f_vec->getLocalData(0);
+			LocalData<3> f_local_data  = f_vec->getLocalData(0, 0);
+			auto         f_local_datas = f_vec->getLocalDatas(0);
 
 			u_west_ghosts[{xi, yi}] = 2;
 
-			solver->solveSinglePatch(pinfo, u_local_data, f_local_data);
+			solver->solveSinglePatch(pinfo, f_local_datas, u_local_datas);
 
 			for (const auto &pair : coeffs) {
 				Side<3>         s     = pair.first.aux;

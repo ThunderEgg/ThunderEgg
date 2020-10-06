@@ -29,25 +29,28 @@ using namespace ThunderEgg;
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 TEST_CASE("MockVector<3> getMPIComm", "[MockVector]")
 {
-	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           num_components    = GENERATE(1, 2, 3);
+	int           num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
 	int           nz                = GENERATE(1, 4, 5);
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	CHECK(vec.getMPIComm() == MPI_COMM_WORLD);
 }
-TEST_CASE("Vector<3> getNumLocalPatches", "[Vector]")
+TEST_CASE("Vector<3> getNumComponents", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -55,18 +58,41 @@ TEST_CASE("Vector<3> getNumLocalPatches", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
+
+	CHECK(vec.getNumComponents() == num_components);
+}
+TEST_CASE("Vector<3> getNumLocalPatches", "[Vector]")
+{
+	int           num_components    = GENERATE(1, 2, 3);
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	CHECK(vec.getNumLocalPatches() == num_local_patches);
 }
 TEST_CASE("Vector<3> getNumLocalCells", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -74,18 +100,20 @@ TEST_CASE("Vector<3> getNumLocalCells", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	CHECK(vec.getNumLocalCells() == nx * ny * nz * num_local_patches);
 }
-TEST_CASE("Vector<3> set", "[Vector]")
+TEST_CASE("Vector<3> getLocalDatas", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -93,29 +121,87 @@ TEST_CASE("Vector<3> set", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
+
+	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+		auto lds = vec.getLocalDatas(i);
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			CHECK(ld.getPtr() == lds[c].getPtr());
+		}
+	}
+}
+TEST_CASE("Vector<3> getLocalDatas const", "[Vector]")
+{
+	int           num_components    = GENERATE(1, 2, 3);
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+
+	const MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
+
+	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+		auto lds = vec.getLocalDatas(i);
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			CHECK(ld.getPtr() == lds[c].getPtr());
+		}
+	}
+}
+TEST_CASE("Vector<3> set", "[Vector]")
+{
+	int           num_components    = GENERATE(1, 2, 3);
+	auto          num_ghost_cells   = GENERATE(0, 1, 5);
+	int           nx                = GENERATE(1, 4, 5);
+	int           ny                = GENERATE(1, 4, 5);
+	int           nz                = GENERATE(1, 4, 5);
+	array<int, 3> ns                = {nx, ny, nz};
+	int           num_local_patches = GENERATE(1, 13);
+
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	vec.set(28);
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto ld = vec.getLocalData(i);
-		nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
-			if (isGhost(coord, ns, num_ghost_cells)) {
-				CHECK(ld[coord] == 0);
-			} else {
-				CHECK(ld[coord] == 28);
-			}
-		});
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
+				if (isGhost(coord, ns, num_ghost_cells)) {
+					CHECK(ld[coord] == 0);
+				} else {
+					CHECK(ld[coord] == 28);
+				}
+			});
+		}
 	}
 }
 TEST_CASE("Vector<3> setWithGhost", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -123,24 +209,28 @@ TEST_CASE("Vector<3> setWithGhost", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	vec.setWithGhost(28);
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto ld = vec.getLocalData(i);
-		nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(),
-		               [&](std::array<int, 3> &coord) { CHECK(ld[coord] == 28); });
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(),
+			               [&](std::array<int, 3> &coord) { CHECK(ld[coord] == 28); });
+		}
 	}
 }
 TEST_CASE("Vector<3> scale", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -148,30 +238,34 @@ TEST_CASE("Vector<3> scale", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	vec.setWithGhost(28);
 	vec.scale(0.25);
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto ld = vec.getLocalData(i);
-		nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
-			if (isGhost(coord, ns, num_ghost_cells)) {
-				CHECK(ld[coord] == 28);
-			} else {
-				CHECK(ld[coord] == Approx(7));
-			}
-		});
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
+				if (isGhost(coord, ns, num_ghost_cells)) {
+					CHECK(ld[coord] == 28);
+				} else {
+					CHECK(ld[coord] == Approx(7));
+				}
+			});
+		}
 	}
 }
 TEST_CASE("Vector<3> shift", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -179,30 +273,34 @@ TEST_CASE("Vector<3> shift", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	vec.setWithGhost(1);
 	vec.shift(28);
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto ld = vec.getLocalData(i);
-		nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
-			if (isGhost(coord, ns, num_ghost_cells)) {
-				CHECK(ld[coord] == 1);
-			} else {
-				CHECK(ld[coord] == Approx(29));
-			}
-		});
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
+				if (isGhost(coord, ns, num_ghost_cells)) {
+					CHECK(ld[coord] == 1);
+				} else {
+					CHECK(ld[coord] == Approx(29));
+				}
+			});
+		}
 	}
 }
 TEST_CASE("Vector<3> copy", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -210,14 +308,17 @@ TEST_CASE("Vector<3> copy", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                    num_ghost_cells, ns);
+	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                    num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
@@ -227,19 +328,23 @@ TEST_CASE("Vector<3> copy", "[Vector]")
 	b->copy(a);
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		auto a_ld = a->getLocalData(i);
-		auto b_ld = b->getLocalData(i);
-		nested_loop<3>(a_ld.getGhostStart(), a_ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
-			if (isGhost(coord, ns, num_ghost_cells)) {
-				CHECK(b_ld[coord] == 0);
-			} else {
-				CHECK(b_ld[coord] == a_ld[coord]);
-			}
-		});
+		for (int c = 0; c < a->getNumComponents(); c++) {
+			auto a_ld = a->getLocalData(c, i);
+			auto b_ld = b->getLocalData(c, i);
+			nested_loop<3>(a_ld.getGhostStart(), a_ld.getGhostEnd(),
+			               [&](std::array<int, 3> &coord) {
+				               if (isGhost(coord, ns, num_ghost_cells)) {
+					               CHECK(b_ld[coord] == 0);
+				               } else {
+					               CHECK(b_ld[coord] == a_ld[coord]);
+				               }
+			               });
+		}
 	}
 }
 TEST_CASE("Vector<3> add", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -247,18 +352,21 @@ TEST_CASE("Vector<3> add", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b_copy
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto expected
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                             num_ghost_cells, ns);
+	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                           num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
@@ -278,20 +386,24 @@ TEST_CASE("Vector<3> add", "[Vector]")
 	b->add(a);
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		auto expected_ld = expected->getLocalData(i);
-		auto b_ld        = b->getLocalData(i);
-		auto b_copy_ld   = b_copy->getLocalData(i);
-		nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
-			if (isGhost(coord, ns, num_ghost_cells)) {
-				CHECK(b_ld[coord] == b_copy_ld[coord]);
-			} else {
-				CHECK(b_ld[coord] == Approx(expected_ld[coord]));
-			}
-		});
+		for (int c = 0; c < a->getNumComponents(); c++) {
+			auto expected_ld = expected->getLocalData(c, i);
+			auto b_ld        = b->getLocalData(c, i);
+			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
+			               [&](std::array<int, 3> &coord) {
+				               if (isGhost(coord, ns, num_ghost_cells)) {
+					               CHECK(b_ld[coord] == b_copy_ld[coord]);
+				               } else {
+					               CHECK(b_ld[coord] == Approx(expected_ld[coord]));
+				               }
+			               });
+		}
 	}
 }
 TEST_CASE("Vector<3> addScaled", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -299,18 +411,21 @@ TEST_CASE("Vector<3> addScaled", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b_copy
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto expected
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                             num_ghost_cells, ns);
+	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                           num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
@@ -330,20 +445,24 @@ TEST_CASE("Vector<3> addScaled", "[Vector]")
 	b->addScaled(0.7, a);
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		auto expected_ld = expected->getLocalData(i);
-		auto b_ld        = b->getLocalData(i);
-		auto b_copy_ld   = b_copy->getLocalData(i);
-		nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
-			if (isGhost(coord, ns, num_ghost_cells)) {
-				CHECK(b_ld[coord] == b_copy_ld[coord]);
-			} else {
-				CHECK(b_ld[coord] == Approx(expected_ld[coord]));
-			}
-		});
+		for (int c = 0; c < a->getNumComponents(); c++) {
+			auto expected_ld = expected->getLocalData(c, i);
+			auto b_ld        = b->getLocalData(c, i);
+			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
+			               [&](std::array<int, 3> &coord) {
+				               if (isGhost(coord, ns, num_ghost_cells)) {
+					               CHECK(b_ld[coord] == b_copy_ld[coord]);
+				               } else {
+					               CHECK(b_ld[coord] == Approx(expected_ld[coord]));
+				               }
+			               });
+		}
 	}
 }
 TEST_CASE("Vector<3> scaleThenAdd", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -351,18 +470,21 @@ TEST_CASE("Vector<3> scaleThenAdd", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b_copy
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto expected
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                             num_ghost_cells, ns);
+	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                           num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
@@ -382,20 +504,24 @@ TEST_CASE("Vector<3> scaleThenAdd", "[Vector]")
 	b->scaleThenAdd(0.7, a);
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		auto expected_ld = expected->getLocalData(i);
-		auto b_ld        = b->getLocalData(i);
-		auto b_copy_ld   = b_copy->getLocalData(i);
-		nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
-			if (isGhost(coord, ns, num_ghost_cells)) {
-				CHECK(b_ld[coord] == b_copy_ld[coord]);
-			} else {
-				CHECK(b_ld[coord] == Approx(expected_ld[coord]));
-			}
-		});
+		for (int c = 0; c < a->getNumComponents(); c++) {
+			auto expected_ld = expected->getLocalData(c, i);
+			auto b_ld        = b->getLocalData(c, i);
+			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
+			               [&](std::array<int, 3> &coord) {
+				               if (isGhost(coord, ns, num_ghost_cells)) {
+					               CHECK(b_ld[coord] == b_copy_ld[coord]);
+				               } else {
+					               CHECK(b_ld[coord] == Approx(expected_ld[coord]));
+				               }
+			               });
+		}
 	}
 }
 TEST_CASE("Vector<3> scaleThenAddScaled", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -403,18 +529,21 @@ TEST_CASE("Vector<3> scaleThenAddScaled", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b_copy
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto expected
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                             num_ghost_cells, ns);
+	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                           num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
@@ -434,20 +563,24 @@ TEST_CASE("Vector<3> scaleThenAddScaled", "[Vector]")
 	b->scaleThenAddScaled(0.7, -2, a);
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		auto expected_ld = expected->getLocalData(i);
-		auto b_ld        = b->getLocalData(i);
-		auto b_copy_ld   = b_copy->getLocalData(i);
-		nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
-			if (isGhost(coord, ns, num_ghost_cells)) {
-				CHECK(b_ld[coord] == b_copy_ld[coord]);
-			} else {
-				CHECK(b_ld[coord] == Approx(expected_ld[coord]));
-			}
-		});
+		for (int c = 0; c < a->getNumComponents(); c++) {
+			auto expected_ld = expected->getLocalData(c, i);
+			auto b_ld        = b->getLocalData(c, i);
+			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
+			               [&](std::array<int, 3> &coord) {
+				               if (isGhost(coord, ns, num_ghost_cells)) {
+					               CHECK(b_ld[coord] == b_copy_ld[coord]);
+				               } else {
+					               CHECK(b_ld[coord] == Approx(expected_ld[coord]));
+				               }
+			               });
+		}
 	}
 }
 TEST_CASE("Vector<3> scaleThenAddScaled two vectors", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -455,19 +588,23 @@ TEST_CASE("Vector<3> scaleThenAddScaled two vectors", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto c = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b_copy
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto expected
-	= make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto c        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                        num_ghost_cells, ns);
+	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+                                             num_ghost_cells, ns);
+	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                           num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
@@ -493,20 +630,24 @@ TEST_CASE("Vector<3> scaleThenAddScaled two vectors", "[Vector]")
 	b->scaleThenAddScaled(0.7, -2, a, 9, c);
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		auto expected_ld = expected->getLocalData(i);
-		auto b_ld        = b->getLocalData(i);
-		auto b_copy_ld   = b_copy->getLocalData(i);
-		nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
-			if (isGhost(coord, ns, num_ghost_cells)) {
-				CHECK(b_ld[coord] == b_copy_ld[coord]);
-			} else {
-				CHECK(b_ld[coord] == Approx(expected_ld[coord]));
-			}
-		});
+		for (int c = 0; c < a->getNumComponents(); c++) {
+			auto expected_ld = expected->getLocalData(c, i);
+			auto b_ld        = b->getLocalData(c, i);
+			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
+			               [&](std::array<int, 3> &coord) {
+				               if (isGhost(coord, ns, num_ghost_cells)) {
+					               CHECK(b_ld[coord] == b_copy_ld[coord]);
+				               } else {
+					               CHECK(b_ld[coord] == Approx(expected_ld[coord]));
+				               }
+			               });
+		}
 	}
 }
 TEST_CASE("Vector<3> twoNorm", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -514,13 +655,14 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < vec.data.size(); i++) {
 		double x    = (i + 0.5) / vec.data.size();
@@ -531,16 +673,20 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 
 	double expected_norm = 0;
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto ld = vec.getLocalData(i);
-		nested_loop<3>(ld.getStart(), ld.getEnd(),
-		               [&](std::array<int, 3> &coord) { expected_norm += ld[coord] * ld[coord]; });
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
+				expected_norm += ld[coord] * ld[coord];
+			});
+		}
 	}
 	expected_norm = sqrt(expected_norm);
 
-	CHECK(vec.twoNorm() == expected_norm);
+	CHECK(vec.twoNorm() == Approx(expected_norm));
 }
 TEST_CASE("Vector<3> infNorm", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -548,13 +694,14 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	MockVector<3> vec(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	MockVector<3> vec(MPI_COMM_WORLD, num_components, num_local_patches, num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < vec.data.size(); i++) {
 		double x    = (i + 0.5) / vec.data.size();
@@ -565,16 +712,19 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
 
 	double expected_norm = 0;
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto ld = vec.getLocalData(i);
-		nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
-			expected_norm = max(abs(ld[coord]), expected_norm);
-		});
+		for (int c = 0; c < vec.getNumComponents(); c++) {
+			auto ld = vec.getLocalData(c, i);
+			nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
+				expected_norm = max(abs(ld[coord]), expected_norm);
+			});
+		}
 	}
 
 	CHECK(vec.infNorm() == expected_norm);
 }
 TEST_CASE("Vector<3> dot", "[Vector]")
 {
+	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
@@ -582,14 +732,17 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_local_patches, num_ghost_cells, ns);
+	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                    num_ghost_cells, ns);
+	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
+	                                    num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
+	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
@@ -603,12 +756,14 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 
 	double expected_value = 0;
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		auto a_ld = a->getLocalData(i);
-		auto b_ld = b->getLocalData(i);
-		nested_loop<3>(b_ld.getStart(), b_ld.getEnd(), [&](std::array<int, 3> &coord) {
-			expected_value += b_ld[coord] * a_ld[coord];
-		});
+		for (int c = 0; c < a->getNumComponents(); c++) {
+			auto a_ld = a->getLocalData(c, i);
+			auto b_ld = b->getLocalData(c, i);
+			nested_loop<3>(b_ld.getStart(), b_ld.getEnd(), [&](std::array<int, 3> &coord) {
+				expected_value += b_ld[coord] * a_ld[coord];
+			});
+		}
 	}
 
-	CHECK(a->dot(b) == expected_value);
+	CHECK(a->dot(b) == Approx(expected_value));
 }

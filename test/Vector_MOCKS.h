@@ -65,15 +65,17 @@ template <int D> class MockVector : public Vector<D>
 	 * @brief Construct a new MockVector object
 	 *
 	 * @param comm the MPI_Comm
+	 * @param num_components number of components for each cell
 	 * @param num_local_patches number of local patches
 	 * @param num_ghost_cells number of ghost cells
 	 * @param ns the number of cells in each direction of a patch
 	 */
-	MockVector(MPI_Comm comm, int num_local_patches, int num_ghost_cells, std::array<int, D> ns)
-	: Vector<D>(comm, num_local_patches, GetNumLocalCells(num_local_patches, ns))
+	MockVector(MPI_Comm comm, int num_components, int num_local_patches, int num_ghost_cells,
+	           std::array<int, D> ns)
+	: Vector<D>(comm, num_components, num_local_patches, GetNumLocalCells(num_local_patches, ns))
 	{
 		std::array<int, 3> strides;
-		int                patch_stride = 1;
+		int                patch_stride = num_components;
 		int                first_offset = 0;
 		for (size_t i = 0; i < 3; i++) {
 			strides[i] = patch_stride;
@@ -87,17 +89,19 @@ template <int D> class MockVector : public Vector<D>
 		local_data.reserve(num_local_patches);
 
 		for (int i = 0; i < num_local_patches; i++) {
-			double *data_ptr = data.data() + i * patch_stride + first_offset;
-			local_data.emplace_back(data_ptr, strides, ns, num_ghost_cells);
+			for (int c = 0; c < num_components; c++) {
+				double *data_ptr = data.data() + i * patch_stride + first_offset + c;
+				local_data.emplace_back(data_ptr, strides, ns, num_ghost_cells);
+			}
 		}
 	}
-	LocalData<D> getLocalData(int patch_local_index) override
+	LocalData<D> getLocalData(int component_index, int patch_local_index) override
 	{
-		return local_data[patch_local_index];
+		return local_data[patch_local_index * this->getNumComponents() + component_index];
 	}
-	const LocalData<D> getLocalData(int patch_local_index) const override
+	const LocalData<D> getLocalData(int component_index, int patch_local_index) const override
 	{
-		return local_data[patch_local_index];
+		return local_data[patch_local_index * this->getNumComponents() + component_index];
 	}
 };
 } // namespace ThunderEgg

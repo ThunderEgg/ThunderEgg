@@ -76,11 +76,13 @@ template <int D> class MatShellCreator
 		VecGetArrayRead(x, &x_view);
 		int index = 0;
 		for (int p_index = 0; p_index < te_x->getNumLocalPatches(); p_index++) {
-			LocalData<D> ld = te_x->getLocalData(p_index);
-			nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
-				ld[coord] = x_view[index];
-				index++;
-			});
+			for (int c = 0; c < te_x->getNumComponents(); c++) {
+				LocalData<D> ld = te_x->getLocalData(c, p_index);
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+					ld[coord] = x_view[index];
+					index++;
+				});
+			}
 		}
 
 		VecRestoreArrayRead(x, &x_view);
@@ -91,11 +93,13 @@ template <int D> class MatShellCreator
 		VecGetArray(b, &b_view);
 		index = 0;
 		for (int p_index = 0; p_index < te_b->getNumLocalPatches(); p_index++) {
-			const LocalData<D> ld = te_b->getLocalData(p_index);
-			nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
-				b_view[index] = ld[coord];
-				index++;
-			});
+			for (int c = 0; c < te_b->getNumComponents(); c++) {
+				const LocalData<D> ld = te_b->getLocalData(c, p_index);
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+					b_view[index] = ld[coord];
+					index++;
+				});
+			}
 		}
 		VecRestoreArray(b, &b_view);
 
@@ -127,7 +131,8 @@ template <int D> class MatShellCreator
 	                          std::shared_ptr<VectorGenerator<D>> vg)
 	{
 		MatShellCreator<D> *msc = new MatShellCreator(op, vg);
-		int                 m   = vg->getNewVector()->getNumLocalCells();
+		auto                vec = vg->getNewVector();
+		int                 m   = vec->getNumLocalCells() * vec->getNumComponents();
 		Mat                 A;
 		MatCreateShell(MPI_COMM_WORLD, m, m, PETSC_DETERMINE, PETSC_DETERMINE, msc, &A);
 		MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) applyMat);

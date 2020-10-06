@@ -6,8 +6,10 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/BiCGStab.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiCGStabPatchSolver.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiLinearGhostFiller.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/BiLinearGhostFiller.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiQuadraticGhostFiller.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/BiQuadraticGhostFiller.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/BufferReader.h)
 
@@ -61,8 +63,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Side.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/SimpleGhostFiller.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
 

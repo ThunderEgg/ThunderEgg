@@ -27,6 +27,8 @@
 
 namespace ThunderEgg
 {
+namespace
+{
 template <int D> class MockGhostFiller : public GhostFiller<D>
 {
 	private:
@@ -59,17 +61,23 @@ template <int D> class MockPatchSolver : public PatchSolver<D>
 			patches_to_be_called.insert(pinfo);
 		}
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                      const LocalData<D> f) const override
+	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                      const std::vector<LocalData<D>> &   fs,
+	                      std::vector<LocalData<D>> &         us) const override
 	{
 		CHECK(patches_to_be_called.count(pinfo) == 1);
 		patches_to_be_called.erase(pinfo);
-		CHECK(u_vec->getLocalData(pinfo->local_index).getPtr() == u.getPtr());
-		CHECK(f_vec->getLocalData(pinfo->local_index).getPtr() == f.getPtr());
+		for (int c = 0; c < u_vec->getNumComponents(); c++) {
+			CHECK(u_vec->getLocalData(c, pinfo->local_index).getPtr() == us[c].getPtr());
+		}
+		for (int c = 0; c < f_vec->getNumComponents(); c++) {
+			CHECK(f_vec->getLocalData(c, pinfo->local_index).getPtr() == fs[c].getPtr());
+		}
 	}
 	bool allPatchesCalled()
 	{
 		return patches_to_be_called.empty();
 	}
 };
+} // namespace
 } // namespace ThunderEgg

@@ -19,34 +19,6 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_GMG_RESTRICTOR_H
-#define THUNDEREGG_GMG_RESTRICTOR_H
-
-#include <ThunderEgg/Vector.h>
-
-namespace ThunderEgg
-{
-namespace GMG
-{
-/**
- * @brief Base class for multi-grid restriction operators.
- */
-template <int D> class Restrictor
-{
-	public:
-	/**
-	 * @brief Destroy the Restrictor object
-	 */
-	virtual ~Restrictor() {}
-	/**
-	 * @brief Virtual function that base classes have to implement.
-	 *
-	 * @param fine the input vector that is restricted.
-	 * @param coarse the output vector that is restricted to.
-	 */
-	virtual void restrict(std::shared_ptr<const Vector<D>> fine,
-	                      std::shared_ptr<Vector<D>>       coarse) const = 0;
-};
-} // namespace GMG
-} // namespace ThunderEgg
-#endif
+#include <ThunderEgg/GMG/DirectInterpolator.h>
+template class ThunderEgg::GMG::DirectInterpolator<2>;
+template class ThunderEgg::GMG::DirectInterpolator<3>;

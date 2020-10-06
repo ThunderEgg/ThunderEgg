@@ -20,8 +20,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d);
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -29,8 +29,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValues(d, vec, f);
-	DomainTools<2>::setValuesWithGhost(d, expected, f);
+	DomainTools::SetValues<2>(d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d);
 	blgf.fillGhost(vec);
@@ -41,8 +41,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
@@ -75,8 +75,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d);
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -84,8 +84,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValuesWithGhost(d, vec, f);
-	DomainTools<2>::setValuesWithGhost(d, expected, f);
+	DomainTools::SetValuesWithGhost<2>(d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d);
 	blgf.fillGhost(vec);
@@ -96,8 +96,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));

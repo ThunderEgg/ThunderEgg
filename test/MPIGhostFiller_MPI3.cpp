@@ -13,7 +13,8 @@ constexpr auto refined = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi3.json";
 
 TEST_CASE("Calls for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, uniform, refined);
+	auto num_components = GENERATE(1, 2, 3);
+	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
 	auto                  nx        = GENERATE(2, 5);
 	auto                  ny        = GENERATE(2, 5);
@@ -21,9 +22,9 @@ TEST_CASE("Calls for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine);
+	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
 
-	CallMockMPIGhostFiller<2> mgf(d_fine, 1);
+	CallMockMPIGhostFiller<2> mgf(d_fine, num_components, 1);
 
 	mgf.fillGhost(vec);
 
@@ -33,7 +34,8 @@ TEST_CASE("Calls for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 }
 TEST_CASE("Exchange for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, uniform, refined);
+	auto num_components = GENERATE(1, 2, 3);
+	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
 	auto                  nx        = GENERATE(2, 5);
 	auto                  ny        = GENERATE(2, 5);
@@ -41,11 +43,13 @@ TEST_CASE("Exchange for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine);
+	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto data = vec->getLocalData(pinfo->local_index);
-		nested_loop<2>(data.getStart(), data.getEnd(),
-		               [&](const std::array<int, 2> &coord) { data[coord] = pinfo->id; });
+		for (int c = 0; c < num_components; c++) {
+			auto data = vec->getLocalData(c, pinfo->local_index);
+			nested_loop<2>(data.getStart(), data.getEnd(),
+			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo->id; });
+		}
 	}
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, 1);
@@ -56,7 +60,8 @@ TEST_CASE("Exchange for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 }
 TEST_CASE("Two Exchanges for various domains 1-side cases MPI3", "[MPIGhostFiller]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, uniform, refined);
+	auto num_components = GENERATE(1, 2, 3);
+	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
 	auto                  nx        = GENERATE(2, 5);
 	auto                  ny        = GENERATE(2, 5);
@@ -64,11 +69,13 @@ TEST_CASE("Two Exchanges for various domains 1-side cases MPI3", "[MPIGhostFille
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine);
+	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto data = vec->getLocalData(pinfo->local_index);
-		nested_loop<2>(data.getStart(), data.getEnd(),
-		               [&](const std::array<int, 2> &coord) { data[coord] = pinfo->id; });
+		for (int c = 0; c < num_components; c++) {
+			auto data = vec->getLocalData(c, pinfo->local_index);
+			nested_loop<2>(data.getStart(), data.getEnd(),
+			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo->id; });
+		}
 	}
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, 1);

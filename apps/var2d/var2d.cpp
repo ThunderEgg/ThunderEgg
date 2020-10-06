@@ -28,7 +28,7 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/Experimental/DomGen.h>
 #include <ThunderEgg/GMG/CycleBuilder.h>
-#include <ThunderEgg/GMG/DrctIntp.h>
+#include <ThunderEgg/GMG/DirectInterpolator.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
@@ -58,216 +58,6 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Experimental;
 using namespace ThunderEgg::VarPoisson;
-class fivePoint : public PatchOperator<2>
-{
-	public:
-	fivePoint(std::shared_ptr<const Domain<2>>      domain,
-	          std::shared_ptr<const GhostFiller<2>> ghost_filler);
-
-	void applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, const LocalData<2> u,
-	                      LocalData<2> f) const;
-	void addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
-	                   LocalData<2> f) const;
-
-	class Generator
-	{
-		private:
-		/**
-		 * @brief generator for ghost fillers
-		 */
-		std::function<std::shared_ptr<const GhostFiller<2>>(
-		std::shared_ptr<const GMG::Level<2>> level)>
-		filler_gen;
-		/**
-		 * @brief Generated operators are stored here.
-		 */
-		std::map<std::shared_ptr<const Domain<2>>, std::shared_ptr<const fivePoint>>
-		generated_operators;
-
-		public:
-		/**
-		 * @brief Construct a new fivePoint 2enerator
-		 *
-		 * @param finest_op the finest star pach operator
-		 * @param filler_gen returns a GhostFiller for a given level
-		 */
-		Generator(std::shared_ptr<const fivePoint> finest_op,
-		          std::function<
-		          std::shared_ptr<const GhostFiller<2>>(std::shared_ptr<const GMG::Level<2>> level)>
-		          filler_gen)
-		{
-			generated_operators[finest_op->domain] = finest_op;
-			this->filler_gen                       = filler_gen;
-		}
-		/**
-		 * @brief Return a fivePoint 2or a given level
-		 *
-		 * @param level the level in GMG
-		 * @return std::shared_ptr<const fivePoint> the operator
-		 */
-		std::shared_ptr<const fivePoint> operator()(std::shared_ptr<const GMG::Level<2>> level)
-		{
-			auto &coarser_op = generated_operators[level->getDomain()];
-			if (coarser_op != nullptr) {
-				return coarser_op;
-			}
-
-			std::shared_ptr<const Domain<2>> finer_domain = level->getFiner()->getDomain();
-			auto                             finer_op     = generated_operators[finer_domain];
-			// auto new_coeffs = PETSc::VecWrapper<2>::GetNewVector(level->getDomain());
-			// level->getFiner()->getRestrictor().restrict(new_coeffs, finer_op->coeffs);
-			coarser_op.reset(new fivePoint(level->getDomain(), filler_gen(level)));
-			return coarser_op;
-		}
-	};
-};
-
-#if 0
-/* Store beta as member in fivePoint */
-void fivePoint::fivePoint>(beta_vec,te_domain,ghost_filler);
-#endif
-
-fivePoint::fivePoint(std::shared_ptr<const Domain<2>>      domain_in,
-                     std::shared_ptr<const GhostFiller<2>> ghost_filler_in)
-: PatchOperator<2>(domain_in, ghost_filler_in)
-{
-	if (this->domain->getNumGhostCells() < 1) {
-		throw 88;
-	}
-}
-
-void fivePoint::applySinglePatch(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
-                                 LocalData<2> f) const
-{
-	int mx = pinfo->ns[0];
-	int my = pinfo->ns[1];
-
-#if 0    
-    int mbc = pinfo->num_ghost_cells;
-    double xlower = pinfo->starts[0];
-    double ylower = pinfo->starts[1];
-    double dy = pinfo->spacings[1];
-#endif
-	double dx = pinfo->spacings[0];
-
-	/* Apply homogeneous physical boundary conditions */
-	for (int j = 0; j < my; j++) {
-		/* bool hasNbr(Side<D> s) */
-		if (!pinfo->hasNbr(Side<2>::west())) {
-			u[{-1, j}] = -u[{0, j}];
-		}
-		// u[{-1,j}] = -u[{0,j}];
-
-		if (!pinfo->hasNbr(Side<2>::east())) {
-			u[{mx, j}] = -u[{mx - 1, j}];
-			;
-		}
-		// u[{mx,j}] = -u[{mx-1,j}];;
-	}
-
-	for (int i = 0; i < mx; i++) {
-		if (!pinfo->hasNbr(Side<2>::south())) {
-			u[{i, -1}] = -u[{i, 0}];
-		}
-		// u[{i,-1}] = -u[{i,0}];
-		if (!pinfo->hasNbr(Side<2>::north())) {
-			u[{i, my}] = -u[{i, my - 1}];
-		}
-		// u[{i,my}] = -u[{i,my-1}];
-	}
-
-#if 1
-	// if physical boundary
-	if (!pinfo->hasNbr(Side<2>::west())) {
-		auto ghosts = u.getGhostSliceOnSide(Side<2>::west(), 1);
-		for (int j = 0; j < my; j++) {
-			ghosts[{j}] = -u[{0, j}];
-		}
-	}
-	if (!pinfo->hasNbr(Side<2>::east())) {
-		auto ghosts = u.getGhostSliceOnSide(Side<2>::east(), 1);
-		for (int j = 0; j < my; j++) {
-			ghosts[{j}] = -u[{mx - 1, j}];
-		}
-	}
-
-	if (!pinfo->hasNbr(Side<2>::south())) {
-		auto ghosts = u.getGhostSliceOnSide(Side<2>::south(), 1);
-		for (int i = 0; i < mx; i++) {
-			ghosts[{i}] = -u[{i, 0}];
-		}
-	}
-	if (!pinfo->hasNbr(Side<2>::north())) {
-		auto ghosts = u.getGhostSliceOnSide(Side<2>::north(), 1);
-		for (int i = 0; i < mx; i++) {
-			ghosts[{i}] = -u[{i, my - 1}];
-		}
-	}
-#endif
-
-	for (int i = 0; i < mx; i++) {
-		for (int j = 0; j < my; j++) {
-			f[{i, j}]
-			= (u[{i + 1, j}] + u[{i - 1, j}] + u[{i, j + 1}] + u[{i, j - 1}] - 4 * u[{i, j}])
-			  / (dx * dx);
-		}
-	}
-}
-
-#if 0
-void fivePoint::apply(std::shared_ptr<const Vector<2>> u, std::shared_ptr<Vector<2>> f) const 
-{
-    //ghost_filler->fillGhost(u);
-    for (auto pinfo : domain->getPatchInfoVector()) {
-        applySinglePatch(pinfo, u->getLocalData(pinfo->local_index),
-                         f->getLocalData(pinfo->local_index));
-    }
-}
-#endif
-
-void fivePoint::addGhostToRHS(std::shared_ptr<const PatchInfo<2>> pinfo, LocalData<2> u,
-                              LocalData<2> f) const
-{
-	int mx = pinfo->ns[0];
-	int my = pinfo->ns[1];
-#if 0    
-    int mbc = pinfo->num_ghost_cells;
-    double xlower = pinfo->starts[0];
-    double ylower = pinfo->starts[1];
-#endif
-	double dx  = pinfo->spacings[0];
-	double dx2 = dx * dx;
-
-	double dy  = pinfo->spacings[1];
-	double dy2 = dy * dy;
-
-	// return;
-
-	for (int j = 0; j < my; j++) {
-		/* bool hasNbr(Side<D> s) */
-		if (pinfo->hasNbr(Side<2>::west())) {
-			f[{0, j}] += -u[{-1, j}] / dx2;
-			u[{-1, j}] = 0;
-		}
-
-		if (pinfo->hasNbr(Side<2>::east())) {
-			f[{mx - 1, j}] += -u[{mx, j}] / dx2;
-			u[{mx, j}] = 0;
-		}
-	}
-
-	for (int i = 0; i < mx; i++) {
-		if (pinfo->hasNbr(Side<2>::south())) {
-			f[{i, 0}] += -u[{i, -1}] / dy2;
-			u[{i, -1}] = 0;
-		}
-
-		if (pinfo->hasNbr(Side<2>::north())) {
-			f[{i, my - 1}] += -u[{i, my}] / dy2;
-			u[{i, my}] = 0;
-		}
-	}
-}
 int main(int argc, char *argv[])
 {
 	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
@@ -512,18 +302,18 @@ int main(int argc, char *argv[])
 		}
 		*/
 
-		std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain));
-		shared_ptr<ValVector<2>>            u     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>            exact = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>            f     = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>            au    = ValVector<2>::GetNewVector(domain);
-		shared_ptr<ValVector<2>>            h     = ValVector<2>::GetNewVector(domain);
+		std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain, 1));
+		shared_ptr<ValVector<2>>            u     = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<ValVector<2>>            exact = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<ValVector<2>>            f     = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<ValVector<2>>            au    = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<ValVector<2>>            h     = ValVector<2>::GetNewVector(domain, 1);
 		shared_ptr<PETSc::VecWrapper<1>>    h_bc  = PETSc::VecWrapper<2>::GetNewBCVector(domain);
 
-		DomainTools<2>::setValues(domain, f, ffun);
-		DomainTools<2>::setValues(domain, exact, gfun);
-		DomainTools<2>::setValuesWithGhost(domain, h, hfun);
-		DomainTools<2>::setBCValues(domain, h_bc, hfun);
+		DomainTools::SetValues<2>(domain, f, ffun);
+		DomainTools::SetValues<2>(domain, exact, gfun);
+		DomainTools::SetValuesWithGhost<2>(domain, h, hfun);
+		DomainTools::SetBCValues<2>(domain, h_bc, hfun);
 		if (neumann) {
 			// Init::initNeumann2d(*domain, f->vec, exact->vec, ffun, gfun, nfunx, nfuny);
 		} else {
@@ -567,48 +357,51 @@ int main(int argc, char *argv[])
 		} else if (preconditioner == "GMG") {
 			timer->start("GMG Setup");
 
+			auto curr_domain = domain;
 			auto next_domain = dcg->getCoarserDomain();
-			auto ilc         = make_shared<GMG::InterLevelComm<2>>(next_domain, domain);
-			auto restrictor  = make_shared<GMG::LinearRestrictor<2>>(ilc);
+			auto restrictor  = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
 
 			GMG::CycleBuilder<2> builder(copts);
 			builder.addFinestLevel(p_operator, p_solver, restrictor, vg);
 
 			auto prev_coeffs = h;
-			auto prev_domain = next_domain;
+			auto prev_domain = curr_domain;
+			curr_domain      = next_domain;
 			while (dcg->hasCoarserDomain()) {
 				auto next_domain = dcg->getCoarserDomain();
-				auto new_vg      = make_shared<ValVectorGenerator<2>>(prev_domain);
-				auto new_gf      = make_shared<BiLinearGhostFiller>(prev_domain);
+				auto new_vg      = make_shared<ValVectorGenerator<2>>(curr_domain, 1);
+				auto new_gf      = make_shared<BiLinearGhostFiller>(curr_domain);
 				auto new_coeffs  = new_vg->getNewVector();
 
 				restrictor->restrict(new_coeffs, prev_coeffs);
 
 				auto new_p_operator
-				= make_shared<StarPatchOperator<2>>(new_coeffs, next_domain, new_gf);
+				= make_shared<StarPatchOperator<2>>(new_coeffs, curr_domain, new_gf);
 
 				auto new_p_solver
 				= make_shared<BiCGStabPatchSolver<2>>(new_p_operator, ps_tol, ps_max_it);
 				p_solver->setTimer(timer);
 
-				auto interpolator = make_shared<GMG::DrctIntp<2>>(ilc);
-				ilc               = make_shared<GMG::InterLevelComm<2>>(next_domain, prev_domain);
-				restrictor        = make_shared<GMG::LinearRestrictor<2>>(ilc);
+				auto interpolator
+				= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
+				restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
 
 				builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator,
 				                             vg);
 				//
-				prev_domain = next_domain;
+				prev_domain = curr_domain;
+				curr_domain = next_domain;
 			}
-			auto interpolator  = make_shared<GMG::DrctIntp<2>>(ilc);
-			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(prev_domain);
-			auto coarse_gf     = make_shared<BiLinearGhostFiller>(prev_domain);
+			auto interpolator
+			= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
+			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(curr_domain, 1);
+			auto coarse_gf     = make_shared<BiLinearGhostFiller>(curr_domain);
 			auto coarse_coeffs = coarse_vg->getNewVector();
 
 			restrictor->restrict(coarse_coeffs, prev_coeffs);
 
 			auto coarse_p_operator
-			= make_shared<StarPatchOperator<2>>(coarse_coeffs, next_domain, coarse_gf);
+			= make_shared<StarPatchOperator<2>>(coarse_coeffs, curr_domain, coarse_gf);
 
 			auto coarse_p_solver
 			= make_shared<BiCGStabPatchSolver<2>>(coarse_p_operator, ps_tol, ps_max_it);
@@ -667,13 +460,13 @@ int main(int argc, char *argv[])
 		A->apply(u, au);
 
 		// residual
-		shared_ptr<ValVector<2>> resid = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>> resid = ValVector<2>::GetNewVector(domain, 1);
 		// VecAXPBYPCZ(resid->vec, -1.0, 1.0, 0.0, au->vec, f->vec);
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
-		shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain);
+		shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain, 1);
 		// VecAXPBYPCZ(error->vec, -1.0, 1.0, 0.0, exact->vec, u->vec);
 		if (neumann) {
 			double uavg = domain->integrate(u) / domain->volume();

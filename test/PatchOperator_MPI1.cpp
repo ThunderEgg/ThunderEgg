@@ -23,8 +23,10 @@ TEST_CASE("Check PatchOperator calls for various domains", "[PatchOperator]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u_num_components = GENERATE(1, 2, 3);
+	auto u                = ValVector<2>::GetNewVector(d_fine, u_num_components);
+	auto f_num_components = GENERATE(1, 2, 3);
+	auto f                = ValVector<2>::GetNewVector(d_fine, f_num_components);
 
 	auto                 mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchOperator<2> mpo(d_fine, mgf, u, f);
@@ -39,14 +41,15 @@ TEST_CASE("PatchOperator check getDomain", "[PatchOperator]")
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
+	auto                  num_components = GENERATE(1, 2, 3);
+	auto                  nx             = GENERATE(2, 5);
+	auto                  ny             = GENERATE(2, 5);
+	int                   num_ghost      = 1;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
+	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
 
 	auto                 mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchOperator<2> mpo(d_fine, mgf, u, f);
@@ -58,14 +61,15 @@ TEST_CASE("PatchOperator check getGhostFiller", "[PatchOperator]")
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
+	auto                  num_components = GENERATE(1, 2, 3);
+	auto                  nx             = GENERATE(2, 5);
+	auto                  ny             = GENERATE(2, 5);
+	int                   num_ghost      = 1;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine);
-	auto f = ValVector<2>::GetNewVector(d_fine);
+	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
+	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
 
 	auto                 mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchOperator<2> mpo(d_fine, mgf, u, f);

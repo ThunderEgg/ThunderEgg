@@ -185,7 +185,8 @@ std::shared_ptr<const PatchInfo<2>> pinfo, std::vector<double> &block)
 	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<2>>();
-	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u);
+	std::vector<LocalData<2>> us      = {u};
+	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
 	auto slice       = u.getSliceOnSide(s);
 	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
 	for (int i = 0; i < n; i++) {
@@ -213,7 +214,8 @@ void FillBlockColumnForFineToFineInterface(int j, const LocalData<2> &u, Side<2>
 	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<CoarseNbrInfo<2>>(100, type.getOrthant());
-	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u);
+	std::vector<LocalData<2>> us      = {u};
+	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
 	auto slice       = u.getSliceOnSide(s);
 	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
 	for (int i = 0; i < n; i++) {
@@ -241,10 +243,12 @@ void FillBlockColumnForCoarseToFineInterface(int j, const LocalData<2> &u, Side<
 	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<FineNbrInfo<2>>();
-	vector<double> ghosts(n);
-	LocalData<2>   nbr_data = getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite());
+	vector<double>            ghosts(n);
+	std::vector<LocalData<2>> us = {u};
+	std::vector<LocalData<2>> nbr_datas
+	= {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
 	ghost_filler->fillGhostCellsForNbrPatch(
-	new_pinfo, u, nbr_data, s, NbrType::Fine,
+	new_pinfo, us, nbr_datas, s, NbrType::Fine,
 	Orthant<2>::getValuesOnSide(s)[type.getOrthant().getIndex()]);
 	for (int i = 0; i < n; i++) {
 		block[i * n + j] = -ghosts[i] / 2;
@@ -270,10 +274,12 @@ void FillBlockColumnForFineToCoarseInterface(int j, const LocalData<2> &u, Side<
 	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
 	new_pinfo->nbr_info[0]            = nullptr;
 	new_pinfo->nbr_info[s.getIndex()] = make_shared<CoarseNbrInfo<2>>(100, type.getOrthant());
-	vector<double> ghosts(n);
-	LocalData<2>   nbr_data = getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite());
+	vector<double>            ghosts(n);
+	std::vector<LocalData<2>> us = {u};
+	std::vector<LocalData<2>> nbr_datas
+	= {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
 	ghost_filler->fillGhostCellsForNbrPatch(
-	new_pinfo, u, nbr_data, s, NbrType::Coarse,
+	new_pinfo, us, nbr_datas, s, NbrType::Coarse,
 	Orthant<2>::getValuesOnSide(s.opposite())[type.getOrthant().getIndex()]);
 	for (int i = 0; i < n; i++) {
 		block[i * n + j] = -ghosts[i] / 2;
@@ -327,15 +333,17 @@ void FillBlockCoeffs(CoeffMap coeffs, std::shared_ptr<const PatchInfo<2>> pinfo,
 	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<2>>(solver->getGhostFiller());
 	for (int j = 0; j < n; j++) {
 		// create some work vectors
-		auto         u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
-		auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1);
-		LocalData<2> u_local_data  = u_vec->getLocalData(0);
+		auto         u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1, 1);
+		auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1, 1);
+		LocalData<2> u_local_data  = u_vec->getLocalData(0, 0);
+		auto         u_local_datas = u_vec->getLocalDatas(0);
 		LocalData<1> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<2>::west(), 1);
-		LocalData<2> f_local_data  = f_vec->getLocalData(0);
+		LocalData<2> f_local_data  = f_vec->getLocalData(0, 0);
+		auto         f_local_datas = f_vec->getLocalDatas(0);
 
 		u_west_ghosts[{j}] = 2;
 
-		solver->solveSinglePatch(pinfo, u_local_data, f_local_data);
+		solver->solveSinglePatch(pinfo, f_local_datas, u_local_datas);
 
 		for (const auto &pair : coeffs) {
 			Side<2>         s    = pair.first.s;

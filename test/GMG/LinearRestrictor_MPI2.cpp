@@ -39,9 +39,9 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse);
+	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 1);
+	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -49,13 +49,12 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValuesWithGhost(d_fine, fine_vec, f);
-	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_expected, f);
+	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
+	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
 
-	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
-	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(ilc);
+	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(coarse_vec, fine_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo->id);
@@ -63,17 +62,16 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = coarse_vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = coarse_expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (!pinfo->hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               INFO("coord:  " << coord[0]);
@@ -92,9 +90,9 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse);
+	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 1);
+	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
+	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -102,15 +100,14 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools<2>::setValuesWithGhost(d_fine, fine_vec, f);
-	DomainTools<2>::setValuesWithGhost(d_coarse, coarse_expected, f);
+	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
+	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
 
 	coarse_vec->setWithGhost(1.0);
 
-	auto ilc        = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, d_fine);
-	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(ilc);
+	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(coarse_vec, fine_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo->id);
@@ -118,17 +115,16 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 		INFO("y:     " << pinfo->starts[1]);
 		INFO("nx:    " << pinfo->ns[0]);
 		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = coarse_vec->getLocalData(pinfo->local_index);
-		LocalData<2> expected_ld = coarse_expected->getLocalData(pinfo->local_index);
+		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo->local_index);
+		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (!pinfo->hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               INFO("coord:  " << coord[0]);

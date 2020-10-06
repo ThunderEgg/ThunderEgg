@@ -110,11 +110,12 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @brief Perform a single solve over a patch
 	 *
 	 * @param pinfo the PatchInfo for the patch
-	 * @param u the left hand side
-	 * @param f the right hand side
+	 * @param us the left hand side
+	 * @param fs the right hand side
 	 */
-	virtual void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                              const LocalData<D> f) const = 0;
+	virtual void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                              const std::vector<LocalData<D>> &   fs,
+	                              std::vector<LocalData<D>> &         us) const = 0;
 	/**
 	 * @brief Solve all the patches in the domain, assuming zero boundary conditions for the patches
 	 *
@@ -132,8 +133,9 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			if (timer) {
 				timer->start("Single Patch Solve");
 			}
-			solveSinglePatch(pinfo, u->getLocalData(pinfo->local_index),
-			                 f->getLocalData(pinfo->local_index));
+			auto fs = f->getLocalDatas(pinfo->local_index);
+			auto us = u->getLocalDatas(pinfo->local_index);
+			solveSinglePatch(pinfo, fs, us);
 			if (timer) {
 				timer->stop("Single Patch Solve");
 			}
@@ -159,8 +161,9 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			if (timer) {
 				timer->start("Single Patch Solve");
 			}
-			solveSinglePatch(pinfo, u->getLocalData(pinfo->local_index),
-			                 f->getLocalData(pinfo->local_index));
+			auto fs = f->getLocalDatas(pinfo->local_index);
+			auto us = u->getLocalDatas(pinfo->local_index);
+			solveSinglePatch(pinfo, fs, us);
 			if (timer) {
 				timer->stop("Single Patch Solve");
 			}

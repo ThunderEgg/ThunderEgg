@@ -66,8 +66,9 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
 	}
-	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const LocalData<D> u,
-	                      LocalData<D> f) const override
+	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                      const std::vector<LocalData<D>> &   us,
+	                      std::vector<LocalData<D>> &         fs) const override
 	{
 		std::array<double, D> h2 = pinfo->spacings;
 		for (size_t i = 0; i < D; i++) {
@@ -78,8 +79,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			Side<D> lower_side = Side<D>::LowerSideOnAxis(axis);
 			Side<D> upper_side = Side<D>::HigherSideOnAxis(axis);
 			if (!pinfo->hasNbr(lower_side)) {
-				LocalData<D - 1>       lower = u.getGhostSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> mid   = u.getSliceOnSide(lower_side);
+				LocalData<D - 1>       lower = us[0].getGhostSliceOnSide(lower_side, 1);
+				const LocalData<D - 1> mid   = us[0].getSliceOnSide(lower_side);
 				if (neumann) {
 					nested_loop<D - 1>(
 					mid.getStart(), mid.getEnd(),
@@ -91,8 +92,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 				}
 			}
 			if (!pinfo->hasNbr(upper_side)) {
-				LocalData<D - 1>       upper = u.getGhostSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid   = u.getSliceOnSide(upper_side);
+				LocalData<D - 1>       upper = us[0].getGhostSliceOnSide(upper_side, 1);
+				const LocalData<D - 1> mid   = us[0].getSliceOnSide(upper_side);
 				if (neumann) {
 					nested_loop<D - 1>(
 					mid.getStart(), mid.getEnd(),
@@ -103,25 +104,26 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 					[&](std::array<int, D - 1> coord) { upper[coord] = -mid[coord]; });
 				}
 			}
-			int stride = u.getStrides()[axis];
-			nested_loop<D>(u.getStart(), u.getEnd(), [&](std::array<int, D> coord) {
-				const double *ptr   = u.getPtr(coord);
+			int stride = us[0].getStrides()[axis];
+			nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) {
+				const double *ptr   = us[0].getPtr(coord);
 				double        lower = *(ptr - stride);
 				double        mid   = *ptr;
 				double        upper = *(ptr + stride);
-				f[coord] = addValue(axis) * f[coord] + (upper - 2 * mid + lower) / h2[axis];
+				fs[0][coord] = addValue(axis) * fs[0][coord] + (upper - 2 * mid + lower) / h2[axis];
 			});
 		});
 	}
-	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                   LocalData<D> f) const override
+	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                   const std::vector<LocalData<D>> &   us,
+	                   std::vector<LocalData<D>> &         fs) const override
 	{
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo->hasNbr(s)) {
-				double           h2      = pow(pinfo->spacings[s.getAxisIndex()], 2);
-				LocalData<D - 1> f_inner = f.getSliceOnSide(s);
-				LocalData<D - 1> u_ghost = u.getSliceOnSide(s, -1);
-				LocalData<D - 1> u_inner = u.getSliceOnSide(s);
+				double                 h2      = pow(pinfo->spacings[s.getAxisIndex()], 2);
+				LocalData<D - 1>       f_inner = fs[0].getSliceOnSide(s);
+				LocalData<D - 1>       u_ghost = us[0].getSliceOnSide(s, -1);
+				const LocalData<D - 1> u_inner = us[0].getSliceOnSide(s);
 				nested_loop<D - 1>(f_inner.getStart(), f_inner.getEnd(),
 				                   [&](const std::array<int, D - 1> &coord) {
 					                   f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2;
@@ -140,7 +142,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	                        std::function<double(const std::array<double, D> &)> gfunc)
 	{
 		for (int i = 0; i < f->getNumLocalPatches(); i++) {
-			LocalData<D> f_ld  = f->getLocalData(i);
+			LocalData<D> f_ld  = f->getLocalData(0, i);
 			auto         pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo->hasNbr(s)) {
@@ -149,7 +151,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 					nested_loop<D - 1>(
 					ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 						std::array<double, D> real_coord;
-						DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
+						DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 						ld[coord] += -2.0 * gfunc(real_coord) / h2;
 					});
 				}
@@ -168,7 +170,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	std::array<std::function<double(const std::array<double, D> &)>, D> gfunc_grad)
 	{
 		for (int i = 0; i < f->getNumLocalPatches(); i++) {
-			LocalData<D> f_ld  = f->getLocalData(i);
+			LocalData<D> f_ld  = f->getLocalData(0, i);
 			auto         pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo->hasNbr(s)) {
@@ -178,14 +180,14 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 						nested_loop<D - 1>(
 						ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 							std::array<double, D> real_coord;
-							DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
+							DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 							ld[coord] += gfunc_grad[s.getAxisIndex()](real_coord) / h;
 						});
 					} else {
 						nested_loop<D - 1>(
 						ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 							std::array<double, D> real_coord;
-							DomainTools<D>::getRealCoordBound(pinfo, coord, s, real_coord);
+							DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 							ld[coord] -= gfunc_grad[s.getAxisIndex()](real_coord) / h;
 						});
 					}

@@ -58,13 +58,13 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::
 			return sinl(M_PI * y) * cosl(2 * M_PI * x);
 		};
 
-		auto g_vec = ValVector<2>::GetNewVector(d_fine);
-		DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
-		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine);
-		DomainTools<2>::setValues(d_fine, g_vec_expected, gfun);
+		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
+		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
 
-		auto f_vec = ValVector<2>::GetNewVector(d_fine);
-		DomainTools<2>::setValues(d_fine, f_vec, ffun);
+		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
@@ -73,7 +73,7 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::
 
 		p_solver->smooth(f_vec, g_vec);
 
-		auto error_vec = ValVector<2>::GetNewVector(d_fine);
+		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		error_vec->addScaled(1.0, g_vec, -1.0, g_vec_expected);
 		errors[i - 1] = error_vec->twoNorm() / g_vec_expected->twoNorm();
 	}
@@ -117,13 +117,13 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann 
 			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 
-		auto g_vec = ValVector<2>::GetNewVector(d_fine);
-		DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
-		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine);
-		DomainTools<2>::setValues(d_fine, g_vec_expected, gfun);
+		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
+		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
 
-		auto f_vec = ValVector<2>::GetNewVector(d_fine);
-		DomainTools<2>::setValues(d_fine, f_vec, ffun);
+		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
@@ -132,7 +132,7 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann 
 
 		p_solver->smooth(f_vec, g_vec);
 
-		auto error_vec = ValVector<2>::GetNewVector(d_fine);
+		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		g_vec->shift(-d_fine->integrate(g_vec) / d_fine->volume());
 		g_vec_expected->shift(-d_fine->integrate(g_vec_expected) / d_fine->volume());
 		error_vec->addScaled(1.0, g_vec, -1.0, g_vec_expected);
@@ -179,13 +179,13 @@ TEST_CASE(
 			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 
-		auto g_vec = ValVector<2>::GetNewVector(d_fine);
-		DomainTools<2>::setValuesWithGhost(d_fine, g_vec, gfun);
-		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine);
-		DomainTools<2>::setValues(d_fine, g_vec_expected, gfun);
+		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
+		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
 
-		auto f_vec = ValVector<2>::GetNewVector(d_fine);
-		DomainTools<2>::setValues(d_fine, f_vec, ffun);
+		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
@@ -194,7 +194,7 @@ TEST_CASE(
 
 		p_solver->smooth(f_vec, g_vec);
 
-		auto error_vec = ValVector<2>::GetNewVector(d_fine);
+		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		g_vec->shift(-d_fine->integrate(g_vec) / d_fine->volume());
 		g_vec_expected->shift(-d_fine->integrate(g_vec_expected) / d_fine->volume());
 		error_vec->addScaled(1.0, g_vec, -1.0, g_vec_expected);

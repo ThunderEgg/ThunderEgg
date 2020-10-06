@@ -53,11 +53,11 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 		return sin(M_PI * y) * cos(2 * M_PI * x) * cos(M_PI * z);
 	};
 
-	auto f_vec          = PETSc::VecWrapper<3>::GetNewVector(d_fine);
-	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine);
+	auto f_vec          = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
+	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
 
-	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine);
-	DomainTools<3>::setValues(d_fine, g_vec, gfun);
+	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
+	DomainTools::SetValues<3>(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<TriLinearGhostFiller>(d_fine);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
@@ -81,8 +81,8 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 		INFO("dx:    " << pinfo->spacings[0]);
 		INFO("dy:    " << pinfo->spacings[1]);
 		INFO("dz:    " << pinfo->spacings[1]);
-		LocalData<3> f_vec_ld          = f_vec->getLocalData(pinfo->local_index);
-		LocalData<3> f_vec_expected_ld = f_vec_expected->getLocalData(pinfo->local_index);
+		LocalData<3> f_vec_ld          = f_vec->getLocalData(0, pinfo->local_index);
+		LocalData<3> f_vec_expected_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<3>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -112,11 +112,11 @@ TEST_CASE(
 		return sin(M_PI * y) * cos(2 * M_PI * x) * cos(M_PI * z);
 	};
 
-	auto f_vec          = PETSc::VecWrapper<3>::GetNewVector(d_fine);
-	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine);
+	auto f_vec          = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
+	auto f_vec_expected = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
 
-	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine);
-	DomainTools<3>::setValues(d_fine, g_vec, gfun);
+	auto g_vec = PETSc::VecWrapper<3>::GetNewVector(d_fine, 1);
+	DomainTools::SetValues<3>(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<TriLinearGhostFiller>(d_fine);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf, true);
@@ -141,8 +141,8 @@ TEST_CASE(
 		INFO("dx:    " << pinfo->spacings[0]);
 		INFO("dy:    " << pinfo->spacings[1]);
 		INFO("dz:    " << pinfo->spacings[2]);
-		LocalData<3> f_vec_ld          = f_vec->getLocalData(pinfo->local_index);
-		LocalData<3> f_vec_expected_ld = f_vec_expected->getLocalData(pinfo->local_index);
+		LocalData<3> f_vec_ld          = f_vec->getLocalData(0, pinfo->local_index);
+		LocalData<3> f_vec_expected_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<3>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

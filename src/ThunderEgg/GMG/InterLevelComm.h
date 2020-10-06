@@ -61,6 +61,10 @@ template <int D> class InterLevelComm
 	 */
 	int num_ghost_patches;
 	/**
+	 * @brief The number of components per patch
+	 */
+	int num_components;
+	/**
 	 * @brief Number of values in a patch. (including ghost values)
 	 */
 	int patch_size;
@@ -104,16 +108,19 @@ template <int D> class InterLevelComm
 	 * @brief Create a new InterLevelComm object.
 	 *
 	 * @param coarse_domain the coarser DomainCollection.
+	 * @param num_coarser_components the number of components for eac cell of the coarser domain
 	 * @param fine_domain the finer DomainCollection.
 	 */
-	InterLevelComm(std::shared_ptr<const Domain<D>> coarser_domain,
+	InterLevelComm(std::shared_ptr<const Domain<D>> coarser_domain, int num_coarser_components,
 	               std::shared_ptr<const Domain<D>> finer_domain)
-	: ns(finer_domain->getNs()), num_ghost_cells(finer_domain->getNumGhostCells())
+	: ns(finer_domain->getNs()), num_ghost_cells(finer_domain->getNumGhostCells()),
+	  num_components(num_coarser_components)
 	{
-		patch_size = 1;
+		int my_patch_size = num_components;
 		for (size_t axis = 0; axis < D; axis++) {
-			patch_size *= ns[axis] + 2 * num_ghost_cells;
+			my_patch_size *= ns[axis] + 2 * num_ghost_cells;
 		}
+		patch_size = my_patch_size;
 
 		// sort into patches with local parents and patches with ghost parents
 		std::deque<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> local_parents;
@@ -218,7 +225,7 @@ template <int D> class InterLevelComm
 	 */
 	std::shared_ptr<Vector<D>> getNewGhostVector() const
 	{
-		return std::make_shared<ValVector<D>>(MPI_COMM_SELF, ns, num_ghost_cells,
+		return std::make_shared<ValVector<D>>(MPI_COMM_SELF, ns, num_ghost_cells, num_components,
 		                                      num_ghost_patches);
 	}
 
@@ -304,12 +311,14 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				auto local_data = ghost_vector->getLocalData(local_index);
-				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               send_buffers.back()[buffer_idx] = local_data[coord];
-					               buffer_idx++;
-				               });
+				auto local_datas = ghost_vector->getLocalDatas(local_index);
+				for (const auto &local_data : local_datas) {
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               send_buffers.back()[buffer_idx] = local_data[coord];
+						               buffer_idx++;
+					               });
+				}
 			}
 
 			// post the send
@@ -326,8 +335,8 @@ template <int D> class InterLevelComm
 	/**
 	 * @brief Finish the communication for sending ghost values.
 	 *
-	 * This will send the values in the ghost vector and will add them to the values in the vector.
-	 * This is essentially a reverse scatter.
+	 * This will send the values in the ghost vector and will add them to the values in the
+	 * vector. This is essentially a reverse scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
 	 * computations to happen while the communication is happening.
@@ -368,12 +377,14 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				auto local_data = vector->getLocalData(local_index);
-				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               local_data[coord] += buffer[buffer_idx];
-					               buffer_idx++;
-				               });
+				auto local_datas = vector->getLocalDatas(local_index);
+				for (auto &local_data : local_datas) {
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               local_data[coord] += buffer[buffer_idx];
+						               buffer_idx++;
+					               });
+				}
 			}
 		}
 
@@ -394,8 +405,8 @@ template <int D> class InterLevelComm
 	/**
 	 * @brief Start the communication for getting ghost values.
 	 *
-	 * This will send the values in the vector to the ghost vector, and will overwrite the values in
-	 * the ghost vector. This is essentially a forward scatter.
+	 * This will send the values in the vector to the ghost vector, and will overwrite the
+	 * values in the ghost vector. This is essentially a forward scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
 	 * computations to happen while the communication is happening.
@@ -443,12 +454,14 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				auto local_data = vector->getLocalData(local_index);
-				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               send_buffers.back()[buffer_idx] = local_data[coord];
-					               buffer_idx++;
-				               });
+				auto local_datas = vector->getLocalDatas(local_index);
+				for (const auto &local_data : local_datas) {
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               send_buffers.back()[buffer_idx] = local_data[coord];
+						               buffer_idx++;
+					               });
+				}
 			}
 
 			// post the send
@@ -465,8 +478,8 @@ template <int D> class InterLevelComm
 	/**
 	 * @brief Finish the communication for getting ghost values.
 	 *
-	 * This will send the values in the vector to the ghost vector, and will overwrite the values in
-	 * the ghost vector. This is essentially a forward scatter.
+	 * This will send the values in the vector to the ghost vector, and will overwrite the
+	 * values in the ghost vector. This is essentially a forward scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
 	 * computations to happen while the communication is happening.
@@ -507,12 +520,14 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				auto local_data = ghost_vector->getLocalData(local_index);
-				nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
-				               [&](const std::array<int, D> &coord) {
-					               local_data[coord] = buffer[buffer_idx];
-					               buffer_idx++;
-				               });
+				auto local_datas = ghost_vector->getLocalDatas(local_index);
+				for (auto &local_data : local_datas) {
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               local_data[coord] = buffer[buffer_idx];
+						               buffer_idx++;
+					               });
+				}
 			}
 		}
 
@@ -530,7 +545,9 @@ template <int D> class InterLevelComm
 		current_ghost_vector = nullptr;
 		current_vector       = nullptr;
 	}
-}; // namespace GMG
+};
+extern template class InterLevelComm<2>;
+extern template class InterLevelComm<3>;
 } // namespace GMG
 } // namespace ThunderEgg
 #endif

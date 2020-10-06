@@ -102,7 +102,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < b->getNumLocalPatches(); i++) {
-		auto local_data = b->getLocalData(i);
+		auto local_data = b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Approx(schur_fill_value - domain_fill_value));
@@ -138,7 +138,7 @@ TEST_CASE(
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < b->getNumLocalPatches(); i++) {
-		auto local_data = b->getLocalData(i);
+		auto local_data = b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Approx(schur_fill_value - domain_fill_value));
@@ -160,7 +160,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in 
 	auto            solver = make_shared<RHSGhostCheckingPatchSolver<2>>(domain, ghost_filler, 0);
 
 	Schur::ValVectorGenerator<1> vg(iface_domain);
-	ValVectorGenerator<2>        domain_vg(domain);
+	ValVectorGenerator<2>        domain_vg(domain, 1);
 
 	auto schur_b  = vg.getNewVector();
 	auto domain_b = domain_vg.getNewVector();
@@ -188,7 +188,7 @@ TEST_CASE(
 	auto            solver       = make_shared<MockPatchSolver<2>>(domain, ghost_filler);
 
 	Schur::ValVectorGenerator<1> vg(iface_domain);
-	ValVectorGenerator<2>        domain_vg(domain);
+	ValVectorGenerator<2>        domain_vg(domain, 1);
 
 	auto schur_b  = vg.getNewVector();
 	auto domain_b = domain_vg.getNewVector();
@@ -198,7 +198,7 @@ TEST_CASE(
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < schur_b->getNumLocalPatches(); i++) {
-		auto local_data = schur_b->getLocalData(i);
+		auto local_data = schur_b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Approx(domain_fill_value));
@@ -221,7 +221,7 @@ TEST_CASE(
 	auto            solver       = make_shared<MockPatchSolver<2>>(domain, ghost_filler);
 
 	Schur::ValVectorGenerator<1> vg(iface_domain);
-	ValVectorGenerator<2>        domain_vg(domain);
+	ValVectorGenerator<2>        domain_vg(domain, 1);
 
 	auto schur_b  = vg.getNewVector();
 	auto domain_b = domain_vg.getNewVector();
@@ -233,7 +233,7 @@ TEST_CASE(
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < schur_b->getNumLocalPatches(); i++) {
-		auto local_data = schur_b->getLocalData(i);
+		auto local_data = schur_b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Approx(domain_fill_value));

@@ -220,7 +220,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 				if (axis == D - 1) {
 					new_result = out;
 				} else if (axis == D - 2) {
-					new_result = local_tmp->getLocalData(0);
+					new_result = local_tmp->getLocalData(0, 0);
 				} else if (axis % 2) {
 					new_result = in;
 				} else {
@@ -377,26 +377,29 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	explicit DFTPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in)
 	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), op(op_in)
 	{
-		f_copy = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1);
-		tmp    = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1);
+		f_copy = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1, 1);
+		tmp    = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1, 1);
 		if (!(D % 2)) {
-			local_tmp = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1);
+			local_tmp
+			= std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1, 1);
 		}
 		// process patches
 		for (auto pinfo : this->domain->getPatchInfoVector()) {
 			addPatch(pinfo);
 		}
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, LocalData<D> u,
-	                      const LocalData<D> f) const override
+	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                      const std::vector<LocalData<D>> &   fs,
+	                      std::vector<LocalData<D>> &         us) const override
 	{
-		LocalData<D> f_copy_ld = f_copy->getLocalData(0);
-		LocalData<D> tmp_ld    = tmp->getLocalData(0);
+		LocalData<D> f_copy_ld = f_copy->getLocalData(0, 0);
+		LocalData<D> tmp_ld    = tmp->getLocalData(0, 0);
 
 		nested_loop<D>(f_copy_ld.getStart(), f_copy_ld.getEnd(),
-		               [&](std::array<int, D> coord) { f_copy_ld[coord] = f[coord]; });
+		               [&](std::array<int, D> coord) { f_copy_ld[coord] = fs[0][coord]; });
 
-		op->addGhostToRHS(pinfo, u, f_copy_ld);
+		std::vector<LocalData<D>> f_copy_lds = {f_copy_ld};
+		op->addGhostToRHS(pinfo, us, f_copy_lds);
 
 		executePlan(plan1.at(pinfo), f_copy_ld, tmp_ld);
 
@@ -406,14 +409,14 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 			tmp->getValArray()[0] = 0;
 		}
 
-		executePlan(plan2.at(pinfo), tmp_ld, u);
+		executePlan(plan2.at(pinfo), tmp_ld, us[0]);
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {
 			scale *= 2.0 / this->domain->getNs()[axis];
 		}
-		nested_loop<D>(u.getStart(), u.getEnd(),
-		               [&](std::array<int, D> coord) { u[coord] *= scale; });
+		nested_loop<D>(us[0].getStart(), us[0].getEnd(),
+		               [&](std::array<int, D> coord) { us[0][coord] *= scale; });
 	}
 };
 

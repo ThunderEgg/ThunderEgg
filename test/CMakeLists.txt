@@ -6,8 +6,6 @@ if(PETSC_FOUND)
     OctTree.cpp
     Domain.cpp
     LocalData.cpp
-    DomainTools.cpp
-    SimpleGhostFiller.cpp
     Utils.cpp
     utils/DomainReader.cpp
     Timer.cpp)

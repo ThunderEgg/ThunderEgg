@@ -34,31 +34,34 @@ namespace ThunderEgg
 template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 {
 	private:
-	mutable std::list<
-	std::tuple<std::shared_ptr<const PatchInfo<D>>, const Side<D>, const NbrType, const Orthant<D>>>
+	int num_components;
+	mutable std::list<std::tuple<std::shared_ptr<const PatchInfo<D>>, const Side<D>, const NbrType,
+	                             const Orthant<D>, int, int>>
 	nbr_calls;
 
-	mutable std::list<std::shared_ptr<const PatchInfo<D>>> local_calls;
+	mutable std::list<std::tuple<std::shared_ptr<const PatchInfo<D>>, int>> local_calls;
 
 	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                               const LocalData<D> &local_data, const LocalData<D> &nbr_data,
-	                               const Side<D> side, const NbrType nbr_type,
-	                               const Orthant<D> orthant) const override
+	                               const std::vector<LocalData<D>> &   local_datas,
+	                               const std::vector<LocalData<D>> &nbr_datas, const Side<D> side,
+	                               const NbrType nbr_type, const Orthant<D> orthant) const override
 	{
 		called = true;
-		nbr_calls.emplace_back(pinfo, side, nbr_type, orthant);
+		nbr_calls.emplace_back(pinfo, side, nbr_type, orthant, local_datas.size(),
+		                       nbr_datas.size());
 	}
 
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                                 const LocalData<D> &                local_data) const override
+	                                 const std::vector<LocalData<D>> &   local_datas) const override
 	{
 		called = true;
-		local_calls.push_back(pinfo);
+		local_calls.emplace_back(pinfo, local_datas.size());
 	}
 
-	CallMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in)
-	: MPIGhostFiller<D>(domain_in, side_cases_in)
+	CallMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int num_components,
+	                       int side_cases_in)
+	: MPIGhostFiller<D>(domain_in, side_cases_in), num_components(num_components)
 	{
 	}
 	/**
@@ -77,7 +80,7 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 		auto check_for_nbr_call
 		= [&](const std::tuple<std::shared_ptr<const PatchInfo<D>>, const Side<D>, const NbrType,
-		                       const Orthant<D>> &call) {
+		                       const Orthant<D>, int, int> &call) {
 			  // check if call was made for neighbor
 			  auto found_call
 			  = std::find(remaining_nbr_calls.begin(), remaining_nbr_calls.end(), call);
@@ -97,8 +100,8 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 			INFO(starts);
 
 			// check for local call
-			auto found_call
-			= std::find(remaining_local_calls.begin(), remaining_local_calls.end(), patch);
+			auto found_call = std::find(remaining_local_calls.begin(), remaining_local_calls.end(),
+			                            std::make_tuple(patch, num_components));
 
 			CHECK(found_call != remaining_local_calls.end());
 
@@ -113,8 +116,8 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 						case NbrType::Normal: {
 							INFO("NbrType: Normal");
 
-							auto call
-							= make_tuple(patch, side, NbrType::Normal, Orthant<D>::null());
+							auto call = make_tuple(patch, side, NbrType::Normal, Orthant<D>::null(),
+							                       num_components, num_components);
 							check_for_nbr_call(call);
 
 						} break;
@@ -123,7 +126,8 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 							for (auto orthant : Orthant<D>::getValuesOnSide(side)) {
 								INFO("Orthant: " << orthant.getIndex());
-								auto call = make_tuple(patch, side, NbrType::Fine, orthant);
+								auto call = make_tuple(patch, side, NbrType::Fine, orthant,
+								                       num_components, num_components);
 								check_for_nbr_call(call);
 							}
 						} break;
@@ -136,7 +140,8 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 							INFO("Orthant: " << orthant.getIndex());
 
-							auto call = make_tuple(patch, side, NbrType::Coarse, orthant);
+							auto call = make_tuple(patch, side, NbrType::Coarse, orthant,
+							                       num_components, num_components);
 							check_for_nbr_call(call);
 
 						} break;
@@ -182,23 +187,25 @@ template <int D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 {
 	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                               const LocalData<D> &local_data, const LocalData<D> &nbr_data,
-	                               const Side<D> side, const NbrType nbr_type,
-	                               const Orthant<D> orthant) const override
+	                               const std::vector<LocalData<D>> &   local_datas,
+	                               const std::vector<LocalData<D>> &nbr_datas, const Side<D> side,
+	                               const NbrType nbr_type, const Orthant<D> orthant) const override
 	{
-		int index = 0;
-		for (int i = 0; i < pinfo->num_ghost_cells; i++) {
-			LocalData<D - 1> slice = nbr_data.getGhostSliceOnSide(side.opposite(), i + 1);
-			nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
-			                   [&](const std::array<int, D - 1> &coord) {
-				                   slice[coord] += pinfo->id + index;
-				                   index++;
-			                   });
+		for (int c = 0; c < nbr_datas.size(); c++) {
+			int index = 0;
+			for (int i = 0; i < pinfo->num_ghost_cells; i++) {
+				LocalData<D - 1> slice = nbr_datas[c].getGhostSliceOnSide(side.opposite(), i + 1);
+				nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
+				                   [&](const std::array<int, D - 1> &coord) {
+					                   slice[coord] += pinfo->id + index + c;
+					                   index++;
+				                   });
+			}
 		}
 	}
 
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                                 const LocalData<D> &                local_data) const override
+	                                 const std::vector<LocalData<D>> &   local_data) const override
 	{
 	}
 
@@ -224,112 +231,115 @@ template <int D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 			}
 			INFO(ns);
 			INFO("num_ghost_cells: " << pinfo->num_ghost_cells);
+			for (int c = 0; c < vec->getNumComponents(); c++) {
+				INFO("c: " << c);
+				auto data = vec->getLocalData(c, pinfo->local_index);
+				// check that vector was not modified on the interior
+				nested_loop<D>(data.getStart(), data.getEnd(),
+				               [&](const std::array<int, D> &coord) {
+					               std::string coord_str = "coord: ";
+					               for (size_t i = 0; i < D; i++) {
+						               coord_str += " " + std::to_string(coord[i]);
+					               }
+					               INFO(coord_str);
+					               CHECK(data[coord] == pinfo->id);
+				               });
+				// check the ghost cells
+				for (Side<D> s : Side<D>::getValues()) {
+					INFO("Side: " << s);
 
-			auto data = vec->getLocalData(pinfo->local_index);
-			// check that vector was not modified on the interior
-			nested_loop<D>(data.getStart(), data.getEnd(), [&](const std::array<int, D> &coord) {
-				std::string coord_str = "coord: ";
-				for (size_t i = 0; i < D; i++) {
-					coord_str += " " + std::to_string(coord[i]);
-				}
-				INFO(coord_str);
-				CHECK(data[coord] == pinfo->id);
-			});
-			// check the ghost cells
-			for (Side<D> s : Side<D>::getValues()) {
-				INFO("Side: " << s);
+					if (pinfo->hasNbr(s)) {
+						switch (pinfo->getNbrType(s)) {
+							case NbrType::Normal: {
+								INFO("NbrType: Normal");
 
-				if (pinfo->hasNbr(s)) {
-					switch (pinfo->getNbrType(s)) {
-						case NbrType::Normal: {
-							INFO("NbrType: Normal");
+								// value should be id of neighbor + index +c
+								int  index   = 0;
+								auto nbrinfo = pinfo->getNormalNbrInfo(s);
+								for (int i = 0; i < pinfo->num_ghost_cells; i++) {
+									auto slice = data.getGhostSliceOnSide(s, i + 1);
 
-							// value should be id of neighbor + index
-							int  index   = 0;
-							auto nbrinfo = pinfo->getNormalNbrInfo(s);
-							for (int i = 0; i < pinfo->num_ghost_cells; i++) {
-								auto slice = data.getGhostSliceOnSide(s, i + 1);
+									nested_loop<D - 1>(
+									slice.getStart(), slice.getEnd(),
+									[&](std::array<int, D - 1> &coord) {
+										std::string coord_str = "coord: ";
+										for (size_t i = 0; i < D - 1; i++) {
+											coord_str += " " + std::to_string(coord[i]);
+										}
+										INFO(coord_str);
+										CHECK(slice[coord] == nbrinfo.id + index + c);
+										index++;
+									});
+								}
 
-								nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
-								                   [&](std::array<int, D - 1> &coord) {
-									                   std::string coord_str = "coord: ";
-									                   for (size_t i = 0; i < D - 1; i++) {
-										                   coord_str
-										                   += " " + std::to_string(coord[i]);
-									                   }
-									                   INFO(coord_str);
-									                   CHECK(slice[coord] == nbrinfo.id + index);
-									                   index++;
-								                   });
-							}
+							} break;
+							case NbrType::Fine: {
+								INFO("NbrType: Fine");
 
-						} break;
-						case NbrType::Fine: {
-							INFO("NbrType: Fine");
+								int  ids     = 0;
+								auto nbrinfo = pinfo->getFineNbrInfo(s);
+								for (size_t i = 0; i < nbrinfo.ids.size(); i++) {
+									ids += nbrinfo.ids[i];
+								}
 
-							int  ids     = 0;
-							auto nbrinfo = pinfo->getFineNbrInfo(s);
-							for (size_t i = 0; i < nbrinfo.ids.size(); i++) {
-								ids += nbrinfo.ids[i];
-							}
+								// value should be id of neighbors + index
+								int index = 0;
+								for (int i = 0; i < pinfo->num_ghost_cells; i++) {
+									auto slice = data.getGhostSliceOnSide(s, i + 1);
 
-							// value should be id of neighbors + index
-							int index = 0;
-							for (int i = 0; i < pinfo->num_ghost_cells; i++) {
-								auto slice = data.getGhostSliceOnSide(s, i + 1);
+									nested_loop<D - 1>(
+									slice.getStart(), slice.getEnd(),
+									[&](std::array<int, D - 1> &coord) {
+										std::string coord_str = "coord: ";
+										for (size_t i = 0; i < D - 1; i++) {
+											coord_str += " " + std::to_string(coord[i]);
+										}
+										INFO(coord_str);
+										CHECK(slice[coord] == ids + (1 << (D - 1)) * (index + c));
+										index++;
+									});
+								}
+							} break;
+							case NbrType::Coarse: {
+								INFO("NbrType: Coarse");
 
-								nested_loop<D - 1>(
-								slice.getStart(), slice.getEnd(),
-								[&](std::array<int, D - 1> &coord) {
-									std::string coord_str = "coord: ";
-									for (size_t i = 0; i < D - 1; i++) {
-										coord_str += " " + std::to_string(coord[i]);
-									}
-									INFO(coord_str);
-									CHECK(slice[coord] == ids + (1 << (D - 1)) * index);
-									index++;
-								});
-							}
-						} break;
-						case NbrType::Coarse: {
-							INFO("NbrType: Coarse");
+								// value should be id of neighbor + index
+								int  index   = 0;
+								auto nbrinfo = pinfo->getCoarseNbrInfo(s);
+								for (int i = 0; i < pinfo->num_ghost_cells; i++) {
+									auto slice = data.getGhostSliceOnSide(s, i + 1);
 
-							// value should be id of neighbor + index
-							int  index   = 0;
-							auto nbrinfo = pinfo->getCoarseNbrInfo(s);
-							for (int i = 0; i < pinfo->num_ghost_cells; i++) {
-								auto slice = data.getGhostSliceOnSide(s, i + 1);
+									nested_loop<D - 1>(
+									slice.getStart(), slice.getEnd(),
+									[&](std::array<int, D - 1> &coord) {
+										std::string coord_str = "coord: ";
+										for (size_t i = 0; i < D - 1; i++) {
+											coord_str += " " + std::to_string(coord[i]);
+										}
+										INFO(coord_str);
+										CHECK(slice[coord] == nbrinfo.id + index + c);
+										index++;
+									});
+								}
 
-								nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
-								                   [&](std::array<int, D - 1> &coord) {
-									                   std::string coord_str = "coord: ";
-									                   for (size_t i = 0; i < D - 1; i++) {
-										                   coord_str
-										                   += " " + std::to_string(coord[i]);
-									                   }
-									                   INFO(coord_str);
-									                   CHECK(slice[coord] == nbrinfo.id + index);
-									                   index++;
-								                   });
-							}
+							} break;
+						}
+					} else {
+						// values should be zero on ghost cells
+						INFO("Physical Boundary")
 
-						} break;
-					}
-				} else {
-					// values should be zero on ghost cells
-					INFO("Physical Boundary")
+						for (int i = 0; i < pinfo->num_ghost_cells; i++) {
+							auto slice = data.getGhostSliceOnSide(s, i + 1);
 
-					for (int i = 0; i < pinfo->num_ghost_cells; i++) {
-						auto slice = data.getGhostSliceOnSide(s, i + 1);
-
-						nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
-						                   [&](std::array<int, D - 1> &coord) {
-							                   INFO("coord: ");
-							                   for (size_t i = 0; i < D - 1; i++) {
-								                   INFO(coord[i]);
-							                   }
-							                   CHECK(slice[coord] == 0);
-						                   });
+							nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
+							                   [&](std::array<int, D - 1> &coord) {
+								                   INFO("coord: ");
+								                   for (size_t i = 0; i < D - 1; i++) {
+									                   INFO(coord[i]);
+								                   }
+								                   CHECK(slice[coord] == 0);
+							                   });
+						}
 					}
 				}
 			}

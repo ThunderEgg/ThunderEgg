@@ -47,7 +47,9 @@ VtkWriter2d::VtkWriter2d(shared_ptr<Domain<2>> dc, string file_name)
 	writer->SetNumberOfPieces(1);
 	writer->SetStartPiece(0);
 	writer->SetInputData(block);
-	if (rank == 0) { writer->SetWriteMetaFile(1); }
+	if (rank == 0) {
+		writer->SetWriteMetaFile(1);
+	}
 }
 void VtkWriter2d::add(std::shared_ptr<const Vector<2>> u, string name)
 {
@@ -56,7 +58,7 @@ void VtkWriter2d::add(std::shared_ptr<const Vector<2>> u, string name)
 		PatchInfo<2> &     d   = *d_ptr;
 		double             h_x = d.spacings[0];
 		double             h_y = d.spacings[1];
-		const LocalData<2> ld  = u->getLocalData(d.local_index);
+		const LocalData<2> ld  = u->getLocalData(0, d.local_index);
 
 		// create image object
 		vtkSmartPointer<vtkImageData> image = images[d.id];
