@@ -6,6 +6,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/BiCGStab.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiCGStabPatchSolver.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiLinearGhostFiller.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/BiLinearGhostFiller.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiQuadraticGhostFiller.h)
 
