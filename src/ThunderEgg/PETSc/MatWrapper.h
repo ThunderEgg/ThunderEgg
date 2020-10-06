@@ -55,7 +55,8 @@ template <int D> class MatWrapper : public Operator<D>
 			petsc_vec = petsc_vec_ptr->getVec();
 		} else {
 			// have to create a new petsc vector without ghostcells for petsc call
-			VecCreateMPI(vec->getMPIComm(), vec->getNumLocalCells(), PETSC_DETERMINE, &petsc_vec);
+			VecCreateMPI(vec->getMPIComm(), vec->getNumLocalCells() * vec->getNumComponents(),
+			             PETSC_DETERMINE, &petsc_vec);
 		}
 		return petsc_vec;
 	}
@@ -74,11 +75,14 @@ template <int D> class MatWrapper : public Operator<D>
 			size_t  curr_index = 0;
 			VecGetArray(petsc_vec, &petsc_vec_view);
 			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-				const LocalData<D> ld = vec->getLocalData(0, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
-					petsc_vec_view[curr_index] = ld[coord];
-					curr_index++;
-				});
+				for (int c = 0; c < vec->getNumComponents(); c++) {
+					const LocalData<D> ld = vec->getLocalData(c, i);
+					nested_loop<D>(ld.getStart(), ld.getEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               petsc_vec_view[curr_index] = ld[coord];
+						               curr_index++;
+					               });
+				}
 			}
 			VecRestoreArray(petsc_vec, &petsc_vec_view);
 		}
@@ -98,11 +102,14 @@ template <int D> class MatWrapper : public Operator<D>
 			size_t        curr_index = 0;
 			VecGetArrayRead(petsc_vec, &petsc_vec_view);
 			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-				LocalData<D> ld = vec->getLocalData(0, i);
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
-					ld[coord] = petsc_vec_view[curr_index];
-					curr_index++;
-				});
+				for (int c = 0; c < vec->getNumComponents(); c++) {
+					LocalData<D> ld = vec->getLocalData(c, i);
+					nested_loop<D>(ld.getStart(), ld.getEnd(),
+					               [&](const std::array<int, D> &coord) {
+						               ld[coord] = petsc_vec_view[curr_index];
+						               curr_index++;
+					               });
+				}
 			}
 			VecRestoreArrayRead(petsc_vec, &petsc_vec_view);
 		}

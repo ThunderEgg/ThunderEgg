@@ -92,11 +92,13 @@ template <int D> class PCShellCreator
 		VecGetArrayRead(x, &x_view);
 		int index = 0;
 		for (int p_index = 0; p_index < te_x->getNumLocalPatches(); p_index++) {
-			LocalData<D> ld = te_x->getLocalData(0, p_index);
-			nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
-				ld[coord] = x_view[index];
-				index++;
-			});
+			for (int c = 0; c < te_x->getNumComponents(); c++) {
+				LocalData<D> ld = te_x->getLocalData(c, p_index);
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+					ld[coord] = x_view[index];
+					index++;
+				});
+			}
 		}
 
 		VecRestoreArrayRead(x, &x_view);
@@ -107,11 +109,13 @@ template <int D> class PCShellCreator
 		VecGetArray(b, &b_view);
 		index = 0;
 		for (int p_index = 0; p_index < te_b->getNumLocalPatches(); p_index++) {
-			const LocalData<D> ld = te_b->getLocalData(0, p_index);
-			nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
-				b_view[index] = ld[coord];
-				index++;
-			});
+			for (int c = 0; c < te_x->getNumComponents(); c++) {
+				const LocalData<D> ld = te_b->getLocalData(c, p_index);
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+					b_view[index] = ld[coord];
+					index++;
+				});
+			}
 		}
 		VecRestoreArray(b, &b_view);
 
