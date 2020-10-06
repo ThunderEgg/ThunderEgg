@@ -26,22 +26,27 @@
 namespace ThunderEgg
 {
 /**
- * @brief Exchanges ghost cells on patches
+ * @brief Exchanges ghost cells on patches, uses a BiLinear interpolation scheme for refinement
+ * boundaries
  */
 class BiLinearGhostFiller : public MPIGhostFiller<2>
 {
 	public:
+	/**
+	 * @brief Construct a new BiLinearGhostFiller object
+	 *
+	 * @param domain_in the domain to fill ghosts for
+	 */
+	BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain_in)
+	: MPIGhostFiller<2>(domain_in, 1)
+	{
+	}
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 	                               const std::vector<LocalData<2>> &   local_datas,
 	                               const std::vector<LocalData<2>> &nbr_datas, const Side<2> side,
 	                               const NbrType nbr_type, const Orthant<2> orthant) const override;
 	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 	                                 const std::vector<LocalData<2>> &local_datas) const override;
-
-	BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain_in)
-	: MPIGhostFiller<2>(domain_in, 1)
-	{
-	}
 };
 } // namespace ThunderEgg
 #endif

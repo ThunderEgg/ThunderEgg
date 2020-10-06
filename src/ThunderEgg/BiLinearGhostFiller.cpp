@@ -25,8 +25,7 @@ namespace ThunderEgg
 {
 namespace
 {
-void FillGhostForNormalNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
-                           const std::vector<LocalData<2>> &   local_datas,
+void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas,
                            const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
 {
 	for (int c = 0; c < local_datas.size(); c++) {
@@ -94,8 +93,7 @@ void FillLocalGhostsForCoarseNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
 		               }
 	               });
 }
-void FillLocalGhostsForFineNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
-                               const LocalData<2> &local_data, const Side<2> side)
+void FillLocalGhostsForFineNbr(const LocalData<2> &local_data, const Side<2> side)
 {
 	auto local_slice  = local_data.getSliceOnSide(side);
 	auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
@@ -113,7 +111,7 @@ void BiLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const PatchI
 {
 	switch (nbr_type) {
 		case NbrType::Normal:
-			FillGhostForNormalNbr(pinfo, local_datas, nbr_datas, side);
+			FillGhostForNormalNbr(local_datas, nbr_datas, side);
 			break;
 		case NbrType::Coarse:
 			FillGhostForCoarseNbr(pinfo, local_datas, nbr_datas, side, orthant);
@@ -140,7 +138,7 @@ std::shared_ptr<const PatchInfo<2>> pinfo, const std::vector<LocalData<2>> &loca
 						FillLocalGhostsForCoarseNbr(pinfo, local_data, side);
 						break;
 					case NbrType::Fine:
-						FillLocalGhostsForFineNbr(pinfo, local_data, side);
+						FillLocalGhostsForFineNbr(local_data, side);
 						break;
 					default:
 						throw RuntimeError("Unsupported Nbr Type");
