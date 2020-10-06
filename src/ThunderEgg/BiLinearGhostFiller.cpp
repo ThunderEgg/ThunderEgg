@@ -20,8 +20,91 @@
  ***************************************************************************/
 
 #include <ThunderEgg/BiLinearGhostFiller.h>
+#include <ThunderEgg/RuntimeError.h>
 namespace ThunderEgg
 {
+namespace
+{
+void FillGhostForNormalNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
+                           const std::vector<LocalData<2>> &   local_datas,
+                           const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
+{
+	for (int c = 0; c < local_datas.size(); c++) {
+		auto local_slice = local_datas[c].getSliceOnSide(side);
+		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
+		nested_loop<1>(
+		nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
+		[&](const std::array<int, 1> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
+	}
+}
+void FillGhostForCoarseNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
+                           const std::vector<LocalData<2>> &   local_datas,
+                           const std::vector<LocalData<2>> &nbr_datas, const Side<2> side,
+                           const Orthant<2> orthant)
+{
+	auto nbr_info = pinfo->getCoarseNbrInfo(side);
+	int  offset   = 0;
+	if (orthant.collapseOnAxis(side.getAxisIndex()) == Orthant<1>::upper()) {
+		offset = pinfo->ns[!side.getAxisIndex()];
+	}
+	for (int c = 0; c < local_datas.size(); c++) {
+		auto local_slice = local_datas[c].getSliceOnSide(side);
+		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
+		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
+		               [&](const std::array<int, 1> &coord) {
+			               nbr_ghosts[{(coord[0] + offset) / 2}] += 2.0 / 3.0 * local_slice[coord];
+		               });
+	}
+}
+void FillGhostForFineNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
+                         const std::vector<LocalData<2>> &   local_datas,
+                         const std::vector<LocalData<2>> &nbr_datas, const Side<2> side,
+                         const Orthant<2> orthant)
+{
+	auto nbr_info = pinfo->getFineNbrInfo(side);
+	int  offset   = 0;
+	if (orthant.collapseOnAxis(side.getAxisIndex()) == Orthant<1>::upper()) {
+		offset = pinfo->ns[!side.getAxisIndex()];
+	}
+	for (int c = 0; c < local_datas.size(); c++) {
+		auto local_slice = local_datas[c].getSliceOnSide(side);
+		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
+		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
+		               [&](const std::array<int, 1> &coord) {
+			               nbr_ghosts[coord] += 2.0 / 3.0 * local_slice[{(coord[0] + offset) / 2}];
+		               });
+	}
+}
+void FillLocalGhostsForCoarseNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
+                                 const LocalData<2> &local_data, const Side<2> side)
+{
+	auto local_slice  = local_data.getSliceOnSide(side);
+	auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
+	int  offset       = 0;
+	if (pinfo->getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper()) {
+		offset = pinfo->ns[!side.getAxisIndex()];
+	}
+	nested_loop<1>(local_ghosts.getStart(), local_ghosts.getEnd(),
+	               [&](const std::array<int, 1> &coord) {
+		               local_ghosts[coord] += 2.0 / 3.0 * local_slice[coord];
+		               if ((coord[0] + offset) % 2 == 0) {
+			               local_ghosts[{coord[0] + 1}] += -1.0 / 3.0 * local_slice[coord];
+		               } else {
+			               local_ghosts[{coord[0] - 1}] += -1.0 / 3.0 * local_slice[coord];
+		               }
+	               });
+}
+void FillLocalGhostsForFineNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
+                               const LocalData<2> &local_data, const Side<2> side)
+{
+	auto local_slice  = local_data.getSliceOnSide(side);
+	auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
+	nested_loop<1>(local_ghosts.getStart(), local_ghosts.getEnd(),
+	               [&](const std::array<int, 1> &coord) {
+		               local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord];
+	               });
+}
+} // namespace
 void BiLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
                                                     const std::vector<LocalData<2>> &   local_datas,
                                                     const std::vector<LocalData<2>> &   nbr_datas,
@@ -29,45 +112,17 @@ void BiLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const PatchI
                                                     const Orthant<2> orthant) const
 {
 	switch (nbr_type) {
-		case NbrType::Normal: {
-			for (int c = 0; c < local_datas.size(); c++) {
-				auto local_slice = local_datas[c].getSliceOnSide(side);
-				auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
-				nested_loop<1>(
-				nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
-				[&](const std::array<int, 1> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
-			}
-		} break;
-		case NbrType::Coarse: {
-			auto nbr_info = pinfo->getCoarseNbrInfo(side);
-			int  offset   = 0;
-			if (orthant.collapseOnAxis(side.getAxisIndex()) == Orthant<1>::upper()) {
-				offset = pinfo->ns[!side.getAxisIndex()];
-			}
-			for (int c = 0; c < local_datas.size(); c++) {
-				auto local_slice = local_datas[c].getSliceOnSide(side);
-				auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
-				nested_loop<1>(
-				nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
-					nbr_ghosts[{(coord[0] + offset) / 2}] += 2.0 / 3.0 * local_slice[coord];
-				});
-			}
-		} break;
-		case NbrType::Fine: {
-			auto nbr_info = pinfo->getFineNbrInfo(side);
-			int  offset   = 0;
-			if (orthant.collapseOnAxis(side.getAxisIndex()) == Orthant<1>::upper()) {
-				offset = pinfo->ns[!side.getAxisIndex()];
-			}
-			for (int c = 0; c < local_datas.size(); c++) {
-				auto local_slice = local_datas[c].getSliceOnSide(side);
-				auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
-				nested_loop<1>(
-				nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
-					nbr_ghosts[coord] += 2.0 / 3.0 * local_slice[{(coord[0] + offset) / 2}];
-				});
-			}
-		} break;
+		case NbrType::Normal:
+			FillGhostForNormalNbr(pinfo, local_datas, nbr_datas, side);
+			break;
+		case NbrType::Coarse:
+			FillGhostForCoarseNbr(pinfo, local_datas, nbr_datas, side, orthant);
+			break;
+		case NbrType::Fine:
+			FillGhostForFineNbr(pinfo, local_datas, nbr_datas, side, orthant);
+			break;
+		default:
+			throw RuntimeError("Unsupported Nbr Type");
 	}
 }
 
@@ -81,33 +136,14 @@ std::shared_ptr<const PatchInfo<2>> pinfo, const std::vector<LocalData<2>> &loca
 					case NbrType::Normal:
 						// nothing needs to be done
 						break;
-					case NbrType::Coarse: {
-						auto local_slice  = local_data.getSliceOnSide(side);
-						auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
-						int  offset       = 0;
-						if (pinfo->getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper()) {
-							offset = pinfo->ns[!side.getAxisIndex()];
-						}
-						nested_loop<1>(local_ghosts.getStart(), local_ghosts.getEnd(),
-						               [&](const std::array<int, 1> &coord) {
-							               local_ghosts[coord] += 2.0 / 3.0 * local_slice[coord];
-							               if ((coord[0] + offset) % 2 == 0) {
-								               local_ghosts[{coord[0] + 1}]
-								               += -1.0 / 3.0 * local_slice[coord];
-							               } else {
-								               local_ghosts[{coord[0] - 1}]
-								               += -1.0 / 3.0 * local_slice[coord];
-							               }
-						               });
-					} break;
-					case NbrType::Fine: {
-						auto local_slice  = local_data.getSliceOnSide(side);
-						auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
-						nested_loop<1>(local_ghosts.getStart(), local_ghosts.getEnd(),
-						               [&](const std::array<int, 1> &coord) {
-							               local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord];
-						               });
-					} break;
+					case NbrType::Coarse:
+						FillLocalGhostsForCoarseNbr(pinfo, local_data, side);
+						break;
+					case NbrType::Fine:
+						FillLocalGhostsForFineNbr(pinfo, local_data, side);
+						break;
+					default:
+						throw RuntimeError("Unsupported Nbr Type");
 				}
 			}
 		}
