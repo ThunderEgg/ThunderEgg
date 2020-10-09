@@ -196,18 +196,25 @@ class Timer
 		}
 	}
 	/**
-	 * @brief Set the id of the domain that timings should be associated with
+	 * @brief Start a new Domain associated timing
 	 *
-	 * @param domain_id the id of the domain
+	 * @param domain_id the id of the Domain
+	 * @param name the name of the timing
 	 */
-	void setDomainId(int domain_id)
+	void startDomainTiming(int domain_id, const std::string &name)
 	{
 		//
 	}
 	/**
-	 * @brief Clear the set domain id, timings after this will be associated with no domain
+	 * @brief Stop a Domain associated timing
+	 *
+	 * @param domain_id the id of the Domain
+	 * @param name the name of the timing
+	 *
+	 * @exception TimerException if the domain id and name does not match the name of the last
+	 * started timing.
 	 */
-	void unsetDomainId()
+	void stopDomainTiming(int domain_id, const std::string &name)
 	{
 		//
 	}
@@ -220,6 +227,12 @@ class Timer
 	 */
 	friend std::ostream &operator<<(std::ostream &os, const Timer &timer)
 	{
+		if (timer.stack.size() > 1) {
+			Timing &curr_timing = timer.stack.back();
+			throw RuntimeError(
+			"Cannot output Timer results with unfinished timings, check that all timings have been stopped. Currently waiting on timing \""
+			+ curr_timing.name + "\"");
+		}
 		timer.stack.empty();
 		os << std::endl;
 		os << "TIMING RESULTS" << std::endl;
@@ -229,7 +242,7 @@ class Timer
 			timing.print("", os);
 		}
 		return os;
-	}
+	} // namespace ThunderEgg
 };
 } // namespace ThunderEgg
 #endif

@@ -359,8 +359,8 @@ TEST_CASE("ValVector<3> getValArray", "[ValVector]")
 	int           nz                = GENERATE(1, 4, 5);
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
-	int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
-	           * num_local_patches * num_components;
+	size_t        size              = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)
+	              * (nz + 2 * num_ghost_cells) * num_local_patches * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);

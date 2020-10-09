@@ -173,7 +173,7 @@ TEST_CASE(
 		}
 	}
 
-	CHECK(local_vector->getNumLocalPatches() == patch_iface_interfaces.size());
+	CHECK(local_vector->getNumLocalPatches() == (int) patch_iface_interfaces.size());
 	CHECK(local_vector->getNumLocalCells() == n * patch_iface_interfaces.size());
 }
 TEST_CASE(
