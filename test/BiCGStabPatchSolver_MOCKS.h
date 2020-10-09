@@ -59,7 +59,7 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 	                      const std::vector<LocalData<D>> &   us,
 	                      std::vector<LocalData<D>> &         fs) const override
 	{
-		for (int c = 0; c < fs.size(); c++) {
+		for (size_t c = 0; c < fs.size(); c++) {
 			nested_loop<D>(fs[c].getStart(), fs[c].getEnd(), [&](const std::array<int, D> &coord) {
 				fs[c][coord] = us[c][coord] / 2;
 			});

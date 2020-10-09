@@ -52,7 +52,7 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const Patch
                                                      const Orthant<3> orthant) const
 {
 	if (nbr_type == NbrType::Normal) {
-		for (int c = 0; c < local_datas.size(); c++) {
+		for (size_t c = 0; c < local_datas.size(); c++) {
 			auto local_slice = local_datas[c].getSliceOnSide(side);
 			auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
 			nested_loop<2>(
@@ -63,7 +63,7 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const Patch
 		auto               nbr_info = pinfo->getCoarseNbrInfo(side);
 		std::array<int, 2> offset
 		= getOffset(pinfo->ns, side, orthant.collapseOnAxis(side.getAxisIndex()));
-		for (int c = 0; c < local_datas.size(); c++) {
+		for (size_t c = 0; c < local_datas.size(); c++) {
 			auto local_slice = local_datas[c].getSliceOnSide(side);
 			auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
 			nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
@@ -79,7 +79,7 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const Patch
 		auto               nbr_info = pinfo->getFineNbrInfo(side);
 		std::array<int, 2> offset
 		= getOffset(pinfo->ns, side, orthant.collapseOnAxis(side.getAxisIndex()));
-		for (int c = 0; c < local_datas.size(); c++) {
+		for (size_t c = 0; c < local_datas.size(); c++) {
 			auto local_slice = local_datas[c].getSliceOnSide(side);
 			auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
 			nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),

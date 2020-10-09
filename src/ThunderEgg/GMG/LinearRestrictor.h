@@ -98,7 +98,7 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 			            : coarse_local_datas[0].getLengths()[i];
 		}
 
-		for (int c = 0; c < fine_datas.size(); c++) {
+		for (size_t c = 0; c < fine_datas.size(); c++) {
 			// interpolate interior values
 			nested_loop<D>(
 			fine_datas[c].getStart(), fine_datas[c].getEnd(), [&](const std::array<int, D> &coord) {
@@ -130,7 +130,7 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	{
 		auto coarse_local_datas = coarser_vector->getLocalDatas(parent_index);
 		auto fine_datas         = finer_vector->getLocalDatas(pinfo->local_index);
-		for (int c = 0; c < fine_datas.size(); c++) {
+		for (size_t c = 0; c < fine_datas.size(); c++) {
 			// just copy the values
 			nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(),
 			               [&](const std::array<int, D> &coord) {

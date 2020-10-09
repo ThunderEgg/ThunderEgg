@@ -62,6 +62,16 @@ class Timer
 	 */
 	struct Timing {
 		/**
+		 * @brief Pointer to parent timer
+		 */
+		const Timing *parent = nullptr;
+		/**
+		 * @brief The domain id of the timing
+		 *
+		 * If no domain is associated, it is set to the max value of int
+		 */
+		int domain_id = std::numeric_limits<int>::max();
+		/**
 		 * @brief The name of the timing
 		 */
 		std::string name;
@@ -70,17 +80,17 @@ class Timer
 		 */
 		std::deque<double> times;
 		/**
-		 * @brief A list of timings that are neseted in this timing
+		 * @brief A list of timings that are nested in this timing
 		 */
 		std::list<Timing> timings;
 		/**
-		 * @brief A map from timing name to a reference of the nested timing
+		 * @brief A map from timing domain id and name to a reference of the nested timing
 		 */
-		std::map<std::string, std::reference_wrapper<Timing>> timing_map;
+		std::map<std::tuple<int, std::string>, std::reference_wrapper<Timing>> timing_map;
 		/**
 		 * @brief The starting time of the latest timing
 		 */
-		std::chrono::steady_clock::time_point start;
+		std::chrono::steady_clock::time_point start_time;
 		/**
 		 * @brief Construct a new Timing object
 		 */
@@ -88,25 +98,47 @@ class Timer
 		/**
 		 * @brief Construct a new Timing object
 		 *
+		 * @param parent pointer to parent timing
+		 * @param domain_id the id of the domain associated with the timing
 		 * @param name the name of the timing
 		 */
-		explicit Timing(const std::string &name) : name(name) {}
+		Timing(const Timing *parent, int domain_id, const std::string &name)
+		: parent(parent), domain_id(domain_id), name(name)
+		{
+		}
 		/**
 		 * @brief get a Timing that is nested in this timing
 		 *
+		 * @param domain_id the id of the domain associated with the timing
 		 * @param name  the name of the timing
 		 * @return Timing& A reference to the timing
 		 */
-		Timing &getTiming(const std::string &name)
+		Timing &getTiming(int domain_id, const std::string &name)
 		{
-			auto timing_map_iter = timing_map.find(name);
+			auto key             = std::make_tuple(domain_id, name);
+			auto timing_map_iter = timing_map.find(key);
 			if (timing_map_iter == timing_map.end()) {
-				timings.push_back(Timing(name));
-				timing_map.emplace(name, timings.back());
+				timings.push_back(Timing(this, domain_id, name));
+				timing_map.emplace(key, timings.back());
 				return timings.back();
 			} else {
 				return timing_map_iter->second;
 			}
+		}
+		/**
+		 * @brief Start a timing
+		 */
+		void start()
+		{
+			start_time = std::chrono::steady_clock::now();
+		}
+		/**
+		 * @brief stop a timing
+		 */
+		void stop()
+		{
+			std::chrono::duration<double> time = std::chrono::steady_clock::now() - start_time;
+			times.push_back(time.count());
 		}
 		/**
 		 * @brief Print a the results of this timing and the results of the timings that are nested
@@ -117,8 +149,14 @@ class Timer
 		 */
 		void print(const std::string &parent_string, std::ostream &os) const
 		{
-			os << parent_string + name << std::endl;
-			os << std::string((parent_string + name).size(), '-') << std::endl;
+			std::string my_string = parent_string;
+			if (domain_id != std::numeric_limits<int>::max() && parent != nullptr
+			    && domain_id != parent->domain_id) {
+				my_string += "(Domain " + std::to_string(domain_id) + ") ";
+			}
+			my_string += name;
+			os << my_string << std::endl;
+			os << std::string(my_string.size(), '-') << std::endl;
 
 			if (times.size() == 1) {
 				os << "   time (sec): " << times[0] << std::endl << std::endl;
@@ -141,7 +179,7 @@ class Timer
 				os << std::endl;
 			}
 			for (const Timing &timing : timings) {
-				timing.print(parent_string + name + " -> ", os);
+				timing.print(my_string + " -> ", os);
 			}
 		}
 	};
@@ -170,10 +208,7 @@ class Timer
 	 */
 	void start(const std::string &name)
 	{
-		Timing &curr_timing = stack.back();
-		Timing &next_timing = curr_timing.getTiming(name);
-		next_timing.start   = std::chrono::steady_clock::now();
-		stack.push_back(next_timing);
+		startDomainTiming(std::numeric_limits<int>::max(), name);
 	}
 	/**
 	 * @brief Stop a timing
@@ -184,16 +219,7 @@ class Timer
 	 */
 	void stop(const std::string &name)
 	{
-		Timing &curr_timing = stack.back();
-		if (curr_timing.name == name) {
-			std::chrono::duration<double> time
-			= std::chrono::steady_clock::now() - curr_timing.start;
-			curr_timing.times.push_back(time.count());
-			stack.pop_back();
-		} else {
-			throw RuntimeError("Timer was expecting to end \"" + curr_timing.name
-			                   + "\", instead got \"" + name + "\"");
-		}
+		stopDomainTiming(std::numeric_limits<int>::max(), name);
 	}
 	/**
 	 * @brief Start a new Domain associated timing
@@ -203,7 +229,10 @@ class Timer
 	 */
 	void startDomainTiming(int domain_id, const std::string &name)
 	{
-		//
+		Timing &curr_timing = stack.back();
+		Timing &next_timing = curr_timing.getTiming(domain_id, name);
+		next_timing.start();
+		stack.push_back(next_timing);
 	}
 	/**
 	 * @brief Stop a Domain associated timing
@@ -216,7 +245,14 @@ class Timer
 	 */
 	void stopDomainTiming(int domain_id, const std::string &name)
 	{
-		//
+		Timing &curr_timing = stack.back();
+		if (curr_timing.domain_id == domain_id && curr_timing.name == name && stack.size() > 1) {
+			curr_timing.stop();
+			stack.pop_back();
+		} else {
+			throw RuntimeError("Timer was expecting to end \"" + curr_timing.name
+			                   + "\", instead got \"" + name + "\"");
+		}
 	}
 	/**
 	 * @brief ostream operator for Timer

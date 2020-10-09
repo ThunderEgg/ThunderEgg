@@ -170,12 +170,10 @@ TEST_CASE("Timer DomainTiming", "[Timer]")
 	CHECK(getNextLine() == "TIMING RESULTS");
 	CHECK(getNextLine() == "==============");
 	CHECK(getNextLine() == "");
-	CHECK(getNextLine() == "Domain 0");
-	CHECK(getNextLine() == "========");
-	CHECK(getNextLine() == "");
-	CHECK(getNextLine() == "A");
-	CHECK(getNextLine() == "-");
+	CHECK(getNextLine() == "(Domain 0) A");
+	CHECK(getNextLine() == "------------");
 	CHECK(getNextLine().find("time (sec):") != string::npos);
+	CHECK(getNextLine() == "");
 	CHECK(getNextLine() == "");
 	CHECK(reader.eof());
 }
@@ -209,6 +207,7 @@ TEST_CASE("Timer  two sequential DomainTimings", "[Timer]")
 	CHECK(getNextLine() == "------------");
 	CHECK(getNextLine().find("time (sec):") != string::npos);
 	CHECK(getNextLine() == "");
+	CHECK(getNextLine() == "");
 	CHECK(reader.eof());
 }
 TEST_CASE("Timer DomainTiming with unassociated timing before")
@@ -241,6 +240,7 @@ TEST_CASE("Timer DomainTiming with unassociated timing before")
 	CHECK(getNextLine() == "------------");
 	CHECK(getNextLine().find("time (sec):") != string::npos);
 	CHECK(getNextLine() == "");
+	CHECK(getNextLine() == "");
 	CHECK(reader.eof());
 }
 TEST_CASE("Timer DomainTiming nested in unassociated timing", "[Timer]")
@@ -270,8 +270,9 @@ TEST_CASE("Timer DomainTiming nested in unassociated timing", "[Timer]")
 	CHECK(getNextLine().find("time (sec):") != string::npos);
 	CHECK(getNextLine() == "");
 	CHECK(getNextLine() == "A -> (Domain 0) A");
-	CHECK(getNextLine() == "------------------");
+	CHECK(getNextLine() == "-----------------");
 	CHECK(getNextLine().find("time (sec):") != string::npos);
+	CHECK(getNextLine() == "");
 	CHECK(getNextLine() == "");
 	CHECK(reader.eof());
 }
@@ -305,6 +306,7 @@ TEST_CASE("Timer nested DomainTiming same domain", "[Timer]")
 	CHECK(getNextLine() == "-----------------");
 	CHECK(getNextLine().find("time (sec):") != string::npos);
 	CHECK(getNextLine() == "");
+	CHECK(getNextLine() == "");
 	CHECK(reader.eof());
 }
 TEST_CASE("Timer nested DomainTiming different domain", "[Timer]")
@@ -337,6 +339,7 @@ TEST_CASE("Timer nested DomainTiming different domain", "[Timer]")
 	CHECK(getNextLine() == "----------------------------");
 	CHECK(getNextLine().find("time (sec):") != string::npos);
 	CHECK(getNextLine() == "");
+	CHECK(getNextLine() == "");
 	CHECK(reader.eof());
 }
 TEST_CASE("Timer consecutive DomainTiming two different ids", "[Timer]")
@@ -368,6 +371,7 @@ TEST_CASE("Timer consecutive DomainTiming two different ids", "[Timer]")
 	CHECK(getNextLine() == "(Domain 1) A");
 	CHECK(getNextLine() == "------------");
 	CHECK(getNextLine().find("time (sec):") != string::npos);
+	CHECK(getNextLine() == "");
 	CHECK(getNextLine() == "");
 	CHECK(reader.eof());
 }
