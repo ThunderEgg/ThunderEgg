@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_DOMAIN_H
 #define THUNDEREGG_DOMAIN_H
 #include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/Timer.h>
 #include <ThunderEgg/Vector.h>
 #include <cmath>
 #include <deque>
@@ -123,6 +124,10 @@ template <int D> class Domain
 	 * @brief mpi rank
 	 */
 	int rank;
+	/**
+	 * @brief The timer
+	 */
+	mutable std::shared_ptr<Timer> timer;
 
 	/**
 	 * @brief Give the patches local indexes.
@@ -358,6 +363,32 @@ template <int D> class Domain
 		double retval;
 		MPI_Allreduce(&sum, &retval, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		return retval;
+	}
+	/**
+	 * @brief Set the Timer object
+	 *
+	 * @param timer the timer
+	 */
+	void setTimer(std::shared_ptr<Timer> timer) const
+	{
+		this->timer = timer;
+	}
+	/**
+	 * @brief Get the Timer object
+	 *
+	 * @return std::shared_ptr<Timer> the timer
+	 */
+	std::shared_ptr<Timer> getTimer() const
+	{
+		return timer;
+	}
+	/**
+	 * @brief Check if the Domain has a timer associated with it
+	 * @return true if the Domain has a timer associated with it
+	 */
+	bool hasTimer() const
+	{
+		return timer != nullptr;
 	}
 };
 

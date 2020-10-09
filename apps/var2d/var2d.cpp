@@ -330,7 +330,6 @@ int main(int argc, char *argv[])
 
 		// set the patch solver
 		auto p_solver = make_shared<BiCGStabPatchSolver<2>>(p_operator, ps_tol, ps_max_it);
-		p_solver->setTimer(timer);
 
 		if (neumann && !no_zero_rhs_avg) {
 			double fdiff = domain->integrate(f) / domain->volume();
@@ -380,7 +379,6 @@ int main(int argc, char *argv[])
 
 				auto new_p_solver
 				= make_shared<BiCGStabPatchSolver<2>>(new_p_operator, ps_tol, ps_max_it);
-				p_solver->setTimer(timer);
 
 				auto interpolator
 				= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
@@ -405,7 +403,6 @@ int main(int argc, char *argv[])
 
 			auto coarse_p_solver
 			= make_shared<BiCGStabPatchSolver<2>>(coarse_p_operator, ps_tol, ps_max_it);
-			p_solver->setTimer(timer);
 			builder.addCoarsestLevel(coarse_p_operator, coarse_p_solver, interpolator, coarse_vg);
 
 			M = builder.getCycle();

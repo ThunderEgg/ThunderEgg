@@ -90,17 +90,14 @@ class Timer
 		 *
 		 * @param name the name of the timing
 		 */
-		Timing(std::string name)
-		{
-			this->name = name;
-		}
+		explicit Timing(const std::string &name) : name(name) {}
 		/**
 		 * @brief get a Timing that is nested in this timing
 		 *
 		 * @param name  the name of the timing
 		 * @return Timing& A reference to the timing
 		 */
-		Timing &getTiming(std::string name)
+		Timing &getTiming(const std::string &name)
 		{
 			auto timing_map_iter = timing_map.find(name);
 			if (timing_map_iter == timing_map.end()) {
@@ -118,7 +115,7 @@ class Timer
 		 * @param parent_string the string of timings that this timing is nested in
 		 * @param os the stream
 		 */
-		void print(std::string parent_string, std::ostream &os) const
+		void print(const std::string &parent_string, std::ostream &os) const
 		{
 			os << parent_string + name << std::endl;
 			os << std::string((parent_string + name).size(), '-') << std::endl;
@@ -171,7 +168,7 @@ class Timer
 	 *
 	 * @param name the name of the timing
 	 */
-	void start(std::string name)
+	void start(const std::string &name)
 	{
 		Timing &curr_timing = stack.back();
 		Timing &next_timing = curr_timing.getTiming(name);
@@ -185,7 +182,7 @@ class Timer
 	 *
 	 * @exception TimerException if the name does not match the name of the last started timing.
 	 */
-	void stop(std::string name)
+	void stop(const std::string &name)
 	{
 		Timing &curr_timing = stack.back();
 		if (curr_timing.name == name) {

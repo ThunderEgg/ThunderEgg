@@ -4,7 +4,6 @@ if(PETSC_FOUND)
     test.cpp
     PatchInfo.cpp
     OctTree.cpp
-    Domain.cpp
     LocalData.cpp
     Utils.cpp
     utils/DomainReader.cpp

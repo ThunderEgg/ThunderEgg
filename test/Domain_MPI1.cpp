@@ -32,3 +32,41 @@ TEST_CASE("Domain constructors work", "[Domain]")
 	CHECK(d.volume() == Approx(spacing * spacing * n * n));
 	// TODO Check intigrate
 }
+TEST_CASE("Domain setTimer", "[Domain]")
+{
+	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+
+	int    n         = 10;
+	double spacing   = 0.01;
+	int    num_ghost = 1;
+
+	pinfo_map[0].reset(new PatchInfo<2>());
+	pinfo_map[0]->id = 0;
+	pinfo_map[0]->ns.fill(n);
+	pinfo_map[0]->spacings.fill(spacing);
+	pinfo_map[0]->num_ghost_cells = num_ghost;
+	Domain<2> d(pinfo_map, {n, n}, num_ghost);
+
+	auto timer = make_shared<Timer>();
+	d.setTimer(timer);
+	CHECK(d.getTimer() == timer);
+	CHECK(d.hasTimer());
+}
+TEST_CASE("Domain getTimer default is no timer", "[Domain]")
+{
+	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+
+	int    n         = 10;
+	double spacing   = 0.01;
+	int    num_ghost = 1;
+
+	pinfo_map[0].reset(new PatchInfo<2>());
+	pinfo_map[0]->id = 0;
+	pinfo_map[0]->ns.fill(n);
+	pinfo_map[0]->spacings.fill(spacing);
+	pinfo_map[0]->num_ghost_cells = num_ghost;
+	Domain<2> d(pinfo_map, {n, n}, num_ghost);
+
+	CHECK(d.getTimer() == nullptr);
+	CHECK_FALSE(d.hasTimer());
+}
