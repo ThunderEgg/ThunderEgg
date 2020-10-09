@@ -196,6 +196,22 @@ class Timer
 		}
 	}
 	/**
+	 * @brief Set the id of the domain that timings should be associated with
+	 *
+	 * @param domain_id the id of the domain
+	 */
+	void setDomainId(int domain_id)
+	{
+		//
+	}
+	/**
+	 * @brief Clear the set domain id, timings after this will be associated with no domain
+	 */
+	void unsetDomainId()
+	{
+		//
+	}
+	/**
 	 * @brief ostream operator for Timer
 	 *
 	 * @param os the stream

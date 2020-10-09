@@ -43,7 +43,7 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < vec.data.size(); i++) {
+	for (size_t i = 0; i < vec.data.size(); i++) {
 		double x    = (i + 0.5) / vec.data.size();
 		vec.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
@@ -84,7 +84,7 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < vec.data.size(); i++) {
+	for (size_t i = 0; i < vec.data.size(); i++) {
 		double x    = (i + 0.5) / vec.data.size();
 		vec.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
@@ -127,12 +127,12 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < a->data.size(); i++) {
+	for (size_t i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
 		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (int i = 0; i < b->data.size(); i++) {
+	for (size_t i = 0; i < b->data.size(); i++) {
 		double x   = (i + 0.5) / b->data.size();
 		b->data[i] = (x - 0.5) * (x - 0.5);
 	}

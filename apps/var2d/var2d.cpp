@@ -357,6 +357,12 @@ int main(int argc, char *argv[])
 			timer->start("GMG Setup");
 
 			auto curr_domain = domain;
+
+			curr_domain->setTimer(timer);
+			int domain_level = 0;
+			curr_domain->setId(domain_level);
+			domain_level++;
+
 			auto next_domain = dcg->getCoarserDomain();
 			auto restrictor  = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
 
@@ -367,6 +373,10 @@ int main(int argc, char *argv[])
 			auto prev_domain = curr_domain;
 			curr_domain      = next_domain;
 			while (dcg->hasCoarserDomain()) {
+				curr_domain->setTimer(timer);
+				curr_domain->setId(domain_level);
+				domain_level++;
+
 				auto next_domain = dcg->getCoarserDomain();
 				auto new_vg      = make_shared<ValVectorGenerator<2>>(curr_domain, 1);
 				auto new_gf      = make_shared<BiLinearGhostFiller>(curr_domain);
@@ -390,6 +400,10 @@ int main(int argc, char *argv[])
 				prev_domain = curr_domain;
 				curr_domain = next_domain;
 			}
+			curr_domain->setTimer(timer);
+			curr_domain->setId(domain_level);
+			domain_level++;
+
 			auto interpolator
 			= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
 			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(curr_domain, 1);

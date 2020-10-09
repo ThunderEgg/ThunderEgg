@@ -49,6 +49,10 @@ template <int D> class Domain
 
 	private:
 	/**
+	 * @brief The id of the domain
+	 */
+	int id = -1;
+	/**
 	 * @brief The number of cells in each direction
 	 */
 	std::array<int, D> ns;
@@ -389,6 +393,24 @@ template <int D> class Domain
 	bool hasTimer() const
 	{
 		return timer != nullptr;
+	}
+	/**
+	 * @brief Set the id of the domain
+	 *
+	 * @param new_id the new id of the domain
+	 */
+	void setId(int new_id)
+	{
+		id = new_id;
+	}
+	/**
+	 * @brief Get the domain's id
+	 *
+	 * @return int the id
+	 */
+	int getId()
+	{
+		return id;
 	}
 };
 

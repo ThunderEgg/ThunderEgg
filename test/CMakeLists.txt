@@ -1,13 +1,7 @@
 if(PETSC_FOUND)
   add_executable(
-    unit_tests_mpiany
-    test.cpp
-    PatchInfo.cpp
-    OctTree.cpp
-    LocalData.cpp
-    Utils.cpp
-    utils/DomainReader.cpp
-    Timer.cpp)
+    unit_tests_mpiany test.cpp PatchInfo.cpp OctTree.cpp LocalData.cpp
+                      Utils.cpp utils/DomainReader.cpp)
   target_include_directories(unit_tests_mpiany
                              PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
   target_link_libraries(unit_tests_mpiany ThunderEgg)
