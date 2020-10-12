@@ -44,6 +44,9 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/NbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Operator.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/Orthant.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Orthant.cpp)
+
 if(p4est_FOUND)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.h)

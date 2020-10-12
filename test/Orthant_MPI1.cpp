@@ -1223,3 +1223,95 @@ TEST_CASE("Test iterator for Orthant<3>", "[Orthant]")
 	CHECK(*iter == Orthant<3>::null());
 	CHECK(iter == Orthant<3>::getValues().end());
 }
+TEST_CASE("Test from_json for Orthant<1>", "[Orthant]")
+{
+	nlohmann::json j;
+	j["null"]  = nullptr;
+	j["lower"] = "LOWER";
+	j["upper"] = "UPPER";
+	CHECK(j["null"].get<Orthant<1>>() == Orthant<1>::null());
+	CHECK(j["lower"].get<Orthant<1>>() == Orthant<1>::lower());
+	CHECK(j["upper"].get<Orthant<1>>() == Orthant<1>::upper());
+}
+TEST_CASE("Test from_json for Orthant<2>", "[Orthant]")
+{
+	nlohmann::json j;
+	j["null"] = nullptr;
+	j["sw"]   = "SW";
+	j["se"]   = "SE";
+	j["nw"]   = "NW";
+	j["ne"]   = "NE";
+	CHECK(j["null"].get<Orthant<2>>() == Orthant<2>::null());
+	CHECK(j["sw"].get<Orthant<2>>() == Orthant<2>::sw());
+	CHECK(j["se"].get<Orthant<2>>() == Orthant<2>::se());
+	CHECK(j["nw"].get<Orthant<2>>() == Orthant<2>::nw());
+	CHECK(j["ne"].get<Orthant<2>>() == Orthant<2>::ne());
+}
+TEST_CASE("Test from_json for Orthant<3>", "[Orthant]")
+{
+	nlohmann::json j;
+	j["null"] = nullptr;
+	j["bsw"]  = "BSW";
+	j["bse"]  = "BSE";
+	j["bnw"]  = "BNW";
+	j["bne"]  = "BNE";
+	j["tsw"]  = "TSW";
+	j["tse"]  = "TSE";
+	j["tnw"]  = "TNW";
+	j["tne"]  = "TNE";
+	CHECK(j["null"].get<Orthant<3>>() == Orthant<3>::null());
+	CHECK(j["bsw"].get<Orthant<3>>() == Orthant<3>::bsw());
+	CHECK(j["bse"].get<Orthant<3>>() == Orthant<3>::bse());
+	CHECK(j["bnw"].get<Orthant<3>>() == Orthant<3>::bnw());
+	CHECK(j["bne"].get<Orthant<3>>() == Orthant<3>::bne());
+	CHECK(j["tsw"].get<Orthant<3>>() == Orthant<3>::tsw());
+	CHECK(j["tse"].get<Orthant<3>>() == Orthant<3>::tse());
+	CHECK(j["tnw"].get<Orthant<3>>() == Orthant<3>::tnw());
+	CHECK(j["tne"].get<Orthant<3>>() == Orthant<3>::tne());
+}
+TEST_CASE("Test to_json for Orthant<1>", "[Orthant]")
+{
+	nlohmann::json j;
+	j["null"]  = Orthant<1>::null();
+	j["lower"] = Orthant<1>::lower();
+	j["upper"] = Orthant<1>::upper();
+	CHECK(j["null"] == nullptr);
+	CHECK(j["lower"] == "LOWER");
+	CHECK(j["upper"] == "UPPER");
+}
+TEST_CASE("Test to_json for Orthant<2>", "[Orthant]")
+{
+	nlohmann::json j;
+	j["null"] = Orthant<2>::null();
+	j["sw"]   = Orthant<2>::sw();
+	j["se"]   = Orthant<2>::se();
+	j["nw"]   = Orthant<2>::nw();
+	j["ne"]   = Orthant<2>::ne();
+	CHECK(j["null"] == nullptr);
+	CHECK(j["sw"] == "SW");
+	CHECK(j["se"] == "SE");
+	CHECK(j["nw"] == "NW");
+	CHECK(j["ne"] == "NE");
+}
+TEST_CASE("Test to_json for Orthant<3>", "[Orthant]")
+{
+	nlohmann::json j;
+	j["null"] = Orthant<3>::null();
+	j["bsw"]  = Orthant<3>::bsw();
+	j["bse"]  = Orthant<3>::bse();
+	j["bnw"]  = Orthant<3>::bnw();
+	j["bne"]  = Orthant<3>::bne();
+	j["tsw"]  = Orthant<3>::tsw();
+	j["tse"]  = Orthant<3>::tse();
+	j["tnw"]  = Orthant<3>::tnw();
+	j["tne"]  = Orthant<3>::tne();
+	CHECK(j["null"] == nullptr);
+	CHECK(j["bsw"] == "BSW");
+	CHECK(j["bse"] == "BSE");
+	CHECK(j["bnw"] == "BNW");
+	CHECK(j["bne"] == "BNE");
+	CHECK(j["tsw"] == "TSW");
+	CHECK(j["tse"] == "TSE");
+	CHECK(j["tnw"] == "TNW");
+	CHECK(j["tne"] == "TNE");
+}

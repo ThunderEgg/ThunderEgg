@@ -44,9 +44,7 @@ template <int D> class DomainReader
 		if (patch_j.find("parent_id") != patch_j.end()) {
 			patch_j.at("parent_id").get_to(pinfo->parent_id);
 			patch_j.at("parent_rank").get_to(pinfo->parent_rank);
-			if (patch_j.contains("orth_on_parent")) {
-				pinfo->orth_on_parent = GetOrthant(patch_j.at("orth_on_parent"));
-			}
+			patch_j["orth_on_parent"].get_to(pinfo->orth_on_parent);
 		}
 		patch_j.at("starts").get_to(pinfo->starts);
 		patch_j.at("lengths").get_to(pinfo->spacings);
@@ -74,8 +72,9 @@ template <int D> class DomainReader
 				} break;
 				case ThunderEgg::NbrType::Coarse: {
 					pinfo->nbr_info[side.getIndex()].reset(new ThunderEgg::CoarseNbrInfo<D>(
-					nbr_j.at("ids").get<array1>()[0],
-					GetOrthant(nbr_j.at("orth_on_coarse")).collapseOnAxis(side.getAxisIndex())));
+					nbr_j.at("ids").get<array1>()[0], nbr_j.at("orth_on_coarse")
+					                                  .get<ThunderEgg::Orthant<D>>()
+					                                  .collapseOnAxis(side.getAxisIndex())));
 					pinfo->getCoarseNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
 				} break;
 				default:
@@ -89,8 +88,6 @@ template <int D> class DomainReader
 		}
 		return pinfo;
 	}
-
-	static ThunderEgg::Orthant<D> GetOrthant(nlohmann::json &orth_j);
 
 	public:
 	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in,
@@ -131,6 +128,4 @@ template <int D> class DomainReader
 		return finer_domain;
 	}
 };
-template <> ThunderEgg::Orthant<2> DomainReader<2>::GetOrthant(nlohmann::json &orth_j);
-template <> ThunderEgg::Orthant<3> DomainReader<3>::GetOrthant(nlohmann::json &orth_j);
 extern template class DomainReader<2>;
