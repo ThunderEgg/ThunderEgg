@@ -18,8 +18,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-#include "../tpl/json.hpp"
 #include <ThunderEgg/Domain.h>
+#include <ThunderEgg/tpl/json.hpp>
 #include <fstream>
 #include <string>
 template <int D> class DomainReader
@@ -57,34 +57,8 @@ template <int D> class DomainReader
 		pinfo->ns              = ns;
 		nlohmann::json &nbrs_j = patch_j.at("nbrs");
 		for (nlohmann::json &nbr_j : nbrs_j) {
-			std::string         nbr_type_str = nbr_j["type"];
-			ThunderEgg::NbrType nbr_type;
-			if (nbr_type_str == "NORMAL") {
-				nbr_type = ThunderEgg::NbrType::Normal;
-			} else if (nbr_type_str == "COARSE") {
-				nbr_type = ThunderEgg::NbrType::Coarse;
-			} else if (nbr_type_str == "FINE") {
-				nbr_type = ThunderEgg::NbrType::Fine;
-			} else {
-				throw "parsing error";
-			}
-			std::string         side_str = nbr_j["side"];
-			ThunderEgg::Side<D> side;
-			if (side_str == "WEST") {
-				side = ThunderEgg::Side<D>::west();
-			} else if (side_str == "EAST") {
-				side = ThunderEgg::Side<D>::east();
-			} else if (side_str == "SOUTH") {
-				side = ThunderEgg::Side<D>::south();
-			} else if (side_str == "NORTH") {
-				side = ThunderEgg::Side<D>::north();
-			} else if (side_str == "BOTTOM") {
-				side = ThunderEgg::Side<D>::bottom();
-			} else if (side_str == "TOP") {
-				side = ThunderEgg::Side<D>::top();
-			} else {
-				throw "parsing error";
-			}
+			ThunderEgg::NbrType nbr_type = nbr_j["type"].get<ThunderEgg::NbrType>();
+			ThunderEgg::Side<D> side     = nbr_j["side"].get<ThunderEgg::Side<D>>();
 			using array  = std::array<int, ThunderEgg::Orthant<D - 1>::num_orthants>;
 			using array1 = std::array<int, 1>;
 			switch (nbr_type) {

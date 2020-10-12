@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_SIDE_H
 #define THUNDEREGG_SIDE_H
+#include <ThunderEgg/tpl/json.hpp>
 #include <array>
 #include <iostream>
 #include <numeric>
@@ -417,5 +418,11 @@ inline std::ostream &operator<<(std::ostream &os, const Side<3> &s)
 	}
 	return os;
 }
+void to_json(nlohmann::json &j, const Side<1> &s);
+void to_json(nlohmann::json &j, const Side<2> &s);
+void to_json(nlohmann::json &j, const Side<3> &s);
+void from_json(const nlohmann::json &j, Side<1> &s);
+void from_json(const nlohmann::json &j, Side<2> &s);
+void from_json(const nlohmann::json &j, Side<3> &s);
 } // namespace ThunderEgg
 #endif

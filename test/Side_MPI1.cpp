@@ -585,3 +585,87 @@ TEST_CASE("HigherSideOnAxis works for Side<1>", "[Side]")
 {
 	CHECK(Side<1>::HigherSideOnAxis(0) == Side<1>::east());
 }
+TEST_CASE("Test to_json for Side<1>", "[Side]")
+{
+	nlohmann::json j;
+	j["null"] = Side<1>::null();
+	j["west"] = Side<1>::west();
+	j["east"] = Side<1>::east();
+	CHECK(j["null"] == nullptr);
+	CHECK(j["west"] == "WEST");
+	CHECK(j["east"] == "EAST");
+}
+TEST_CASE("Test to_json for Side<2>", "[Side]")
+{
+	nlohmann::json j;
+	j["null"]  = Side<2>::null();
+	j["west"]  = Side<2>::west();
+	j["east"]  = Side<2>::east();
+	j["south"] = Side<2>::south();
+	j["north"] = Side<2>::north();
+	CHECK(j["null"] == nullptr);
+	CHECK(j["west"] == "WEST");
+	CHECK(j["east"] == "EAST");
+	CHECK(j["south"] == "SOUTH");
+	CHECK(j["north"] == "NORTH");
+}
+TEST_CASE("Test to_json for Side<3>", "[Side]")
+{
+	nlohmann::json j;
+	j["null"]   = Side<3>::null();
+	j["west"]   = Side<3>::west();
+	j["east"]   = Side<3>::east();
+	j["south"]  = Side<3>::south();
+	j["north"]  = Side<3>::north();
+	j["bottom"] = Side<3>::bottom();
+	j["top"]    = Side<3>::top();
+	CHECK(j["null"] == nullptr);
+	CHECK(j["west"] == "WEST");
+	CHECK(j["east"] == "EAST");
+	CHECK(j["south"] == "SOUTH");
+	CHECK(j["north"] == "NORTH");
+	CHECK(j["bottom"] == "BOTTOM");
+	CHECK(j["top"] == "TOP");
+}
+TEST_CASE("Test from_json for Side<1>", "[Side]")
+{
+	nlohmann::json j;
+	j["null"] = nullptr;
+	j["west"] = "WEST";
+	j["east"] = "EAST";
+	CHECK(j["null"].get<Side<1>>() == Side<1>::null());
+	CHECK(j["west"].get<Side<1>>() == Side<1>::west());
+	CHECK(j["east"].get<Side<1>>() == Side<1>::east());
+}
+TEST_CASE("Test from_json for Side<2>", "[Side]")
+{
+	nlohmann::json j;
+	j["null"]  = nullptr;
+	j["west"]  = "WEST";
+	j["east"]  = "EAST";
+	j["south"] = "SOUTH";
+	j["north"] = "NORTH";
+	CHECK(j["null"].get<Side<2>>() == Side<2>::null());
+	CHECK(j["west"].get<Side<2>>() == Side<2>::west());
+	CHECK(j["east"].get<Side<3>>() == Side<3>::east());
+	CHECK(j["south"].get<Side<2>>() == Side<2>::south());
+	CHECK(j["north"].get<Side<2>>() == Side<2>::north());
+}
+TEST_CASE("Test from_json for Side<3>", "[Side]")
+{
+	nlohmann::json j;
+	j["null"]   = nullptr;
+	j["west"]   = "WEST";
+	j["east"]   = "EAST";
+	j["south"]  = "SOUTH";
+	j["north"]  = "NORTH";
+	j["bottom"] = "BOTTOM";
+	j["top"]    = "TOP";
+	CHECK(j["null"].get<Side<3>>() == Side<3>::null());
+	CHECK(j["west"].get<Side<3>>() == Side<3>::west());
+	CHECK(j["east"].get<Side<3>>() == Side<3>::east());
+	CHECK(j["south"].get<Side<3>>() == Side<3>::south());
+	CHECK(j["north"].get<Side<3>>() == Side<3>::north());
+	CHECK(j["bottom"].get<Side<3>>() == Side<3>::bottom());
+	CHECK(j["top"].get<Side<3>>() == Side<3>::top());
+}

@@ -4,5 +4,7 @@ ignore:
   - "apps/**/*"
   - "tpl/*"
   - "tpl/**/*"
+  - "src/ThunderEgg/tpl/*"
+  - "src/ThunderEgg/tpl/**/*"
   - "src/ThunderEgg/Experimental/**/*"
   - "src/ThunderEgg/Experimental/*"
