@@ -17,9 +17,7 @@
 #
 
 #If environment variable FFTWDIR is specified, it has same effect as FFTW_DIR
-if(NOT FFTW_DIR)
-  find_path (FFTW_DIR include/fftw3.h HINTS ENV FFTW_DIR)
-endif()
+
 
 # Check if we can use PkgConfig
 find_package(PkgConfig)
@@ -50,18 +48,39 @@ if( FFTW_DIR )
   )
 
 else()
-
-  find_library(
-    FFTW_LIB
-    NAMES "fftw3"
-    PATHS ${PKG_FFTW_LIBRARY_DIRS} ${LIB_INSTALL_DIR}
-  )
-
-  find_path(
-    FFTW_INCLUDES
-    NAMES "fftw3.h"
-    PATHS ${PKG_FFTW_INCLUDE_DIRS} ${INCLUDE_INSTALL_DIR}
-  )
+  find_path (FFTW_DIR include/fftw3.h HINTS ENV FFTW_DIR)
+  if( FFTW_DIR )
+    #find libs
+    find_library(
+      FFTW_LIB
+      NAMES "fftw3"
+      PATHS ${FFTW_DIR}
+      PATH_SUFFIXES "lib" "lib64"
+    )
+    
+    #find includes
+    find_path(
+      FFTW_INCLUDES
+      NAMES "fftw3.h"
+      PATHS ${FFTW_DIR}
+      PATH_SUFFIXES "include"
+    )
+    
+  else()
+  
+    
+    find_library(
+      FFTW_LIB
+      NAMES "fftw3"
+      PATHS ${PKG_FFTW_LIBRARY_DIRS} ${LIB_INSTALL_DIR}
+    )
+  
+    find_path(
+      FFTW_INCLUDES
+      NAMES "fftw3.h"
+      PATHS ${PKG_FFTW_INCLUDE_DIRS} ${INCLUDE_INSTALL_DIR}
+    )
+  endif()
 
 endif( FFTW_DIR )
 
