@@ -17,7 +17,9 @@
 #
 
 #If environment variable FFTWDIR is specified, it has same effect as FFTW_DIR
-find_path (FFTW_DIR include/fftw3.h HINTS ENV FFTW_DIR)
+if(NOT FFTW_DIR)
+  find_path (FFTW_DIR include/fftw3.h HINTS ENV FFTW_DIR)
+endif()
 
 # Check if we can use PkgConfig
 find_package(PkgConfig)
@@ -33,6 +35,7 @@ if( FFTW_DIR )
   find_library(
     FFTW_LIB
     NAMES "fftw3"
+    NO_DEFAULT_PATH
     PATHS ${FFTW_DIR}
     PATH_SUFFIXES "lib" "lib64"
   )
@@ -41,6 +44,7 @@ if( FFTW_DIR )
   find_path(
     FFTW_INCLUDES
     NAMES "fftw3.h"
+    NO_DEFAULT_PATH
     PATHS ${FFTW_DIR}
     PATH_SUFFIXES "include"
   )
@@ -66,12 +70,3 @@ set(FFTW_LIBRARIES ${FFTW_LIB} ${FFTWF_LIB})
 if(FFTWL_LIB)
   set(FFTW_LIBRARIES ${FFTW_LIBRARIES} ${FFTWL_LIB})
 endif()
-
-
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(FFTW DEFAULT_MSG
-                                  FFTW_INCLUDES FFTW_LIBRARIES)
-
-mark_as_advanced(FFTW_INCLUDES FFTW_LIBRARIES FFTW_LIB )
-
-
