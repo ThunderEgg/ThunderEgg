@@ -24,6 +24,7 @@
 #include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NormalNbrInfo.h>
 #include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Serializable.h>
 #include <ThunderEgg/TypeDefs.h>
 #include <bitset>
@@ -470,6 +471,79 @@ template <int D> struct PatchInfo : public Serializable {
 		return reader.getPos();
 	}
 };
+template <int D> void to_json(nlohmann::json &j, const PatchInfo<D> &pinfo)
+{
+	j["id"]             = pinfo.id;
+	j["parent_id"]      = pinfo.parent_id;
+	j["parent_rank"]    = pinfo.parent_rank;
+	j["orth_on_parent"] = pinfo.orth_on_parent;
+	j["rank"]           = pinfo.rank;
+	j["starts"]         = pinfo.starts;
+	j["lengths"]        = pinfo.spacings;
+	for (int i = 0; i < D; i++) {
+		j["lengths"][i] = pinfo.spacings[i] * pinfo.ns[i];
+	}
+	j["nbrs"] = nlohmann::json::array();
+	for (Side<D> s : Side<D>::getValues()) {
+		if (pinfo.hasNbr(s)) {
+			switch (pinfo.getNbrType(s)) {
+				case NbrType::Normal:
+					j["nbrs"].push_back(pinfo.getNormalNbrInfo(s));
+					break;
+				case NbrType::Coarse:
+					j["nbrs"].push_back(pinfo.getCoarseNbrInfo(s));
+					break;
+				case NbrType::Fine:
+					j["nbrs"].push_back(pinfo.getFineNbrInfo(s));
+					break;
+				default:
+					throw RuntimeError("Unsupported NbrType");
+			}
+			j["nbrs"].back()["type"] = pinfo.getNbrType(s);
+			j["nbrs"].back()["side"] = s;
+		}
+	}
+	if (pinfo.child_ids[0] != -1) {
+		j["child_ids"]   = pinfo.child_ids;
+		j["child_ranks"] = pinfo.child_ranks;
+	}
+}
+template <int D> void from_json(const nlohmann::json &j, PatchInfo<D> &pinfo)
+{
+	pinfo.id          = j["id"];
+	pinfo.parent_id   = j["parent_id"];
+	pinfo.parent_rank = j["parent_rank"];
+	if (j.contains("orth_on_parent")) {
+		j["orth_on_parent"].get_to(pinfo.orth_on_parent);
+	}
+	pinfo.rank     = j["rank"];
+	pinfo.starts   = j["starts"].get<std::array<double, D>>();
+	pinfo.spacings = j["lengths"].get<std::array<double, D>>();
+	pinfo.ns.fill(1);
+	for (const auto &nbr_j : j["nbrs"]) {
+		Side<D> s = nbr_j["side"].get<Side<D>>();
+		switch (nbr_j["type"].get<NbrType>()) {
+			case NbrType::Normal:
+				pinfo.nbr_info[s.getIndex()] = std::make_shared<NormalNbrInfo<D>>();
+				pinfo.getNormalNbrInfo(s)    = nbr_j.get<NormalNbrInfo<D>>();
+				break;
+			case NbrType::Coarse:
+				pinfo.nbr_info[s.getIndex()] = std::make_shared<CoarseNbrInfo<D>>();
+				pinfo.getCoarseNbrInfo(s)    = nbr_j.get<CoarseNbrInfo<D>>();
+				break;
+			case NbrType::Fine:
+				pinfo.nbr_info[s.getIndex()] = std::make_shared<FineNbrInfo<D>>();
+				pinfo.getFineNbrInfo(s)      = nbr_j.get<FineNbrInfo<D>>();
+				break;
+			default:
+				throw RuntimeError("Unsupported NbrType");
+		}
+	}
+	if (j.contains("child_ids")) {
+		pinfo.child_ids   = j["child_ids"].get<std::array<int, Orthant<D>::num_orthants>>();
+		pinfo.child_ranks = j["child_ranks"].get<std::array<int, Orthant<D>::num_orthants>>();
+	}
+}
 extern template struct PatchInfo<2>;
 extern template struct PatchInfo<3>;
 } // namespace ThunderEgg

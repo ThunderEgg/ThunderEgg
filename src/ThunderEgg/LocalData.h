@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_LOCALDATA_H
 #define THUNDEREGG_LOCALDATA_H
 #include <ThunderEgg/LocalDataManager.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/Side.h>
 #include <algorithm>
 #include <cmath>
@@ -109,6 +110,15 @@ template <int D> class LocalData
 		}
 	}
 
+	template <int idx, class Type, class... Types> int getIndex(Type t, Types... args) const
+	{
+		return strides[idx] * t + getIndex<idx + 1>(args...);
+	}
+	template <int idx, class Type> int getIndex(Type t) const
+	{
+		return strides[idx] * t;
+	}
+
 	public:
 	LocalData() {}
 	/**
@@ -176,9 +186,7 @@ template <int D> class LocalData
 	inline double &operator[](const std::array<int, D> &coord)
 	{
 		int idx = 0;
-		for (size_t i = 0; i < D; i++) {
-			idx += strides[i] * coord[i];
-		}
+		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
 		return data[idx];
 	}
 	/**
@@ -190,10 +198,18 @@ template <int D> class LocalData
 	inline const double &operator[](const std::array<int, D> &coord) const
 	{
 		int idx = 0;
-		for (size_t i = 0; i < D; i++) {
-			idx += strides[i] * coord[i];
-		}
+		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
 		return data[idx];
+	}
+	template <class... Types> inline double &operator()(Types... args)
+	{
+		static_assert(sizeof...(args) == D, "incorrect number of arguments");
+		return data[getIndex<0>(args...)];
+	}
+	template <class... Types> inline const double &operator()(Types... args) const
+	{
+		static_assert(sizeof...(args) == D, "incorrect number of arguments");
+		return data[getIndex<0>(args...)];
 	}
 	/**
 	 * @brief Get a slice with dimensions D-1 on the specified side of the patch
@@ -285,8 +301,15 @@ template <int D> class LocalData
 		return data;
 	}
 };
-extern template class LocalData<1>;
-extern template class LocalData<2>;
-extern template class LocalData<3>;
+/*
+template <> inline const double &LocalData<2>::operator[](const std::array<int, 2> &coord) const
+{
+    return data[strides[0] * coord[0] + strides[1] * coord[1]];
+}
+template <> inline double &LocalData<2>::operator[](const std::array<int, 2> &coord)
+{
+    return data[strides[0] * coord[0] + strides[1] * coord[1]];
+}
+*/
 } // namespace ThunderEgg
 #endif

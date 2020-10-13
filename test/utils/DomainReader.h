@@ -33,54 +33,13 @@ template <int D> class DomainReader
 	std::shared_ptr<ThunderEgg::PatchInfo<D>> parsePatch(nlohmann::json &patch_j)
 	{
 		auto pinfo             = std::make_shared<ThunderEgg::PatchInfo<D>>();
+		*pinfo                 = patch_j.get<ThunderEgg::PatchInfo<D>>();
 		pinfo->num_ghost_cells = num_ghost;
-		patch_j.at("id").get_to(pinfo->id);
-		patch_j.at("rank").get_to(pinfo->rank);
-		patch_j.at("rank").get_to(pinfo->rank);
-		if (patch_j.find("child_ids") != patch_j.end()) {
-			patch_j.at("child_ids").get_to(pinfo->child_ids);
-			patch_j.at("child_ranks").get_to(pinfo->child_ranks);
-		}
-		if (patch_j.find("parent_id") != patch_j.end()) {
-			patch_j.at("parent_id").get_to(pinfo->parent_id);
-			patch_j.at("parent_rank").get_to(pinfo->parent_rank);
-			patch_j["orth_on_parent"].get_to(pinfo->orth_on_parent);
-		}
-		patch_j.at("starts").get_to(pinfo->starts);
-		patch_j.at("lengths").get_to(pinfo->spacings);
+		pinfo->ns              = ns;
 		for (size_t d = 0; d < D; d++) {
 			pinfo->spacings[d] /= ns[d];
 		}
 
-		pinfo->ns              = ns;
-		nlohmann::json &nbrs_j = patch_j.at("nbrs");
-		for (nlohmann::json &nbr_j : nbrs_j) {
-			ThunderEgg::NbrType nbr_type = nbr_j["type"].get<ThunderEgg::NbrType>();
-			ThunderEgg::Side<D> side     = nbr_j["side"].get<ThunderEgg::Side<D>>();
-			using array  = std::array<int, ThunderEgg::Orthant<D - 1>::num_orthants>;
-			using array1 = std::array<int, 1>;
-			switch (nbr_type) {
-				case ThunderEgg::NbrType::Normal: {
-					pinfo->nbr_info[side.getIndex()].reset(
-					new ThunderEgg::NormalNbrInfo<D>(nbr_j.at("ids").get<array1>()[0]));
-					pinfo->getNormalNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
-				} break;
-				case ThunderEgg::NbrType::Fine: {
-					pinfo->nbr_info[side.getIndex()].reset(
-					new ThunderEgg::FineNbrInfo<D>(nbr_j.at("ids").get<array>()));
-					pinfo->getFineNbrInfo(side).ranks = nbr_j.at("ranks").get<array>();
-				} break;
-				case ThunderEgg::NbrType::Coarse: {
-					pinfo->nbr_info[side.getIndex()].reset(new ThunderEgg::CoarseNbrInfo<D>(
-					nbr_j.at("ids").get<array1>()[0], nbr_j.at("orth_on_coarse")
-					                                  .get<ThunderEgg::Orthant<D>>()
-					                                  .collapseOnAxis(side.getAxisIndex())));
-					pinfo->getCoarseNbrInfo(side).rank = nbr_j.at("ranks").get<array1>()[0];
-				} break;
-				default:
-					throw "parsing error";
-			}
-		}
 		for (ThunderEgg::Side<D> s : ThunderEgg::Side<D>::getValues()) {
 			if (!pinfo->hasNbr(s)) {
 				pinfo->neumann[s.getIndex()] = neumann;
