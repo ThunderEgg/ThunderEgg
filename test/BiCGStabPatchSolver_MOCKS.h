@@ -47,7 +47,8 @@ template <int D> class MockGhostFiller : public GhostFiller<D>
 template <int D> class MockPatchOperator : public PatchOperator<D>
 {
 	private:
-	mutable bool rhs_was_modified = false;
+	mutable bool rhs_was_modified   = false;
+	mutable bool interior_dirichlet = false;
 
 	public:
 	MockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
@@ -56,10 +57,11 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 	{
 	}
 	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                      const std::vector<LocalData<D>> &   us,
-	                      std::vector<LocalData<D>> &         fs) const override
+	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
+	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
-		for (int c = 0; c < fs.size(); c++) {
+		interior_dirichlet |= treat_interior_boundary_as_dirichlet;
+		for (size_t c = 0; c < fs.size(); c++) {
 			nested_loop<D>(fs[c].getStart(), fs[c].getEnd(), [&](const std::array<int, D> &coord) {
 				fs[c][coord] = us[c][coord] / 2;
 			});
@@ -74,6 +76,10 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 	bool rhsWasModified()
 	{
 		return rhs_was_modified;
+	}
+	bool interiorDirichlet()
+	{
+		return interior_dirichlet;
 	}
 };
 } // namespace

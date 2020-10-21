@@ -67,8 +67,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 	}
 	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                      const std::vector<LocalData<D>> &   us,
-	                      std::vector<LocalData<D>> &         fs) const override
+	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
+	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
 		std::array<double, D> h2 = pinfo->spacings;
 		for (size_t i = 0; i < D; i++) {
@@ -76,33 +76,29 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 
 		loop<0, D - 1>([&](int axis) {
-			Side<D> lower_side = Side<D>::LowerSideOnAxis(axis);
-			Side<D> upper_side = Side<D>::HigherSideOnAxis(axis);
-			if (!pinfo->hasNbr(lower_side)) {
-				LocalData<D - 1>       lower = us[0].getGhostSliceOnSide(lower_side, 1);
-				const LocalData<D - 1> mid   = us[0].getSliceOnSide(lower_side);
-				if (neumann) {
-					nested_loop<D - 1>(
-					mid.getStart(), mid.getEnd(),
-					[&](std::array<int, D - 1> coord) { lower[coord] = mid[coord]; });
-				} else {
-					nested_loop<D - 1>(
-					mid.getStart(), mid.getEnd(),
-					[&](std::array<int, D - 1> coord) { lower[coord] = -mid[coord]; });
-				}
+			Side<D>                lower_side = Side<D>::LowerSideOnAxis(axis);
+			Side<D>                upper_side = Side<D>::HigherSideOnAxis(axis);
+			LocalData<D - 1>       lower      = us[0].getGhostSliceOnSide(lower_side, 1);
+			const LocalData<D - 1> lower_mid  = us[0].getSliceOnSide(lower_side);
+			if (!pinfo->hasNbr(lower_side) && neumann) {
+				nested_loop<D - 1>(
+				lower_mid.getStart(), lower_mid.getEnd(),
+				[&](std::array<int, D - 1> coord) { lower[coord] = lower_mid[coord]; });
+			} else if (!pinfo->hasNbr(lower_side) || treat_interior_boundary_as_dirichlet) {
+				nested_loop<D - 1>(
+				lower_mid.getStart(), lower_mid.getEnd(),
+				[&](std::array<int, D - 1> coord) { lower[coord] = -lower_mid[coord]; });
 			}
-			if (!pinfo->hasNbr(upper_side)) {
-				LocalData<D - 1>       upper = us[0].getGhostSliceOnSide(upper_side, 1);
-				const LocalData<D - 1> mid   = us[0].getSliceOnSide(upper_side);
-				if (neumann) {
-					nested_loop<D - 1>(
-					mid.getStart(), mid.getEnd(),
-					[&](std::array<int, D - 1> coord) { upper[coord] = mid[coord]; });
-				} else {
-					nested_loop<D - 1>(
-					mid.getStart(), mid.getEnd(),
-					[&](std::array<int, D - 1> coord) { upper[coord] = -mid[coord]; });
-				}
+			LocalData<D - 1>       upper     = us[0].getGhostSliceOnSide(upper_side, 1);
+			const LocalData<D - 1> upper_mid = us[0].getSliceOnSide(upper_side);
+			if (!pinfo->hasNbr(upper_side) && neumann) {
+				nested_loop<D - 1>(
+				upper_mid.getStart(), upper_mid.getEnd(),
+				[&](std::array<int, D - 1> coord) { upper[coord] = upper_mid[coord]; });
+			} else if (!pinfo->hasNbr(upper_side) || treat_interior_boundary_as_dirichlet) {
+				nested_loop<D - 1>(
+				upper_mid.getStart(), upper_mid.getEnd(),
+				[&](std::array<int, D - 1> coord) { upper[coord] = -upper_mid[coord]; });
 			}
 			int stride = us[0].getStrides()[axis];
 			nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) {

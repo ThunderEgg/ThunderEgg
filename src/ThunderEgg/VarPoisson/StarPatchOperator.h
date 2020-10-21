@@ -69,8 +69,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		this->ghost_filler->fillGhost(this->coeffs);
 	}
 	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                      const std::vector<LocalData<D>> &   us,
-	                      std::vector<LocalData<D>> &         fs) const override
+	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
+	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
 		const LocalData<D>    c  = coeffs->getLocalData(0, pinfo->local_index);
 		std::array<double, D> h2 = pinfo->spacings;
@@ -80,14 +80,14 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		loop<0, D - 1>([&](int axis) {
 			Side<D> lower_side(axis * 2);
 			Side<D> upper_side(axis * 2 + 1);
-			if (!pinfo->hasNbr(lower_side)) {
+			if (!pinfo->hasNbr(lower_side) || treat_interior_boundary_as_dirichlet) {
 				LocalData<D - 1>       lower = us[0].getGhostSliceOnSide(lower_side, 1);
 				const LocalData<D - 1> mid   = us[0].getSliceOnSide(lower_side);
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
 					lower[coord] = -mid[coord];
 				});
 			}
-			if (!pinfo->hasNbr(upper_side)) {
+			if (!pinfo->hasNbr(upper_side) || treat_interior_boundary_as_dirichlet) {
 				LocalData<D - 1>       upper = us[0].getGhostSliceOnSide(upper_side, 1);
 				const LocalData<D - 1> mid   = us[0].getSliceOnSide(upper_side);
 				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) {
