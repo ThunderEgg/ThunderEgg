@@ -59,4 +59,5 @@ TEST_CASE("BiCGStabPatchSolver smooth", "[BiCGStabPatchSolver]")
 	}
 	CHECK(mgf->numCalls() == 2);
 	CHECK(mpo->rhsWasModified());
+	CHECK(mpo->interiorDirichlet());
 }

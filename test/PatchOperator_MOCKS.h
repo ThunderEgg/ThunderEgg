@@ -65,9 +65,10 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 		}
 	}
 	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                      const std::vector<LocalData<D>> &   us,
-	                      std::vector<LocalData<D>> &         fs) const override
+	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
+	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
+		CHECK_FALSE(treat_interior_boundary_as_dirichlet);
 		CHECK(patches_to_be_called.count(pinfo) == 1);
 		patches_to_be_called.erase(pinfo);
 		INFO("LOCAL_INDEX: " << pinfo->local_index);
