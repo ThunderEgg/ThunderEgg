@@ -23,3 +23,5 @@
 
 template class ThunderEgg::Domain<2>;
 template class ThunderEgg::Domain<3>;
+template void ThunderEgg::to_json<2>(nlohmann::json &j, const Domain<2> &domain);
+template void ThunderEgg::to_json<3>(nlohmann::json &j, const Domain<3> &domain);

@@ -625,8 +625,16 @@ template <int D> void Domain<D>::indexBCGlobal()
 		}
 	}
 }
+template <int D> void to_json(nlohmann::json &j, const Domain<D> &domain)
+{
+	for (auto pinfo : domain.getPatchInfoVector()) {
+		j.push_back(*pinfo);
+	}
+}
 
 extern template class Domain<2>;
 extern template class Domain<3>;
+extern template void to_json<2>(nlohmann::json &j, const Domain<2> &domain);
+extern template void to_json<3>(nlohmann::json &j, const Domain<3> &domain);
 } // namespace ThunderEgg
 #endif
