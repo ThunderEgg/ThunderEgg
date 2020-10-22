@@ -69,6 +69,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/Side.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Side.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
+list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/TriLinearGhostFiller.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/TriLinearGhostFiller.cpp)

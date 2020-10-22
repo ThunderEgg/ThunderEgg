@@ -22,11 +22,13 @@
 #ifndef THUNDEREGG_TIMER_H
 #define THUNDEREGG_TIMER_H
 #include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/tpl/json.hpp>
 #include <chrono>
 #include <deque>
 #include <functional>
 #include <list>
 #include <map>
+#include <ostream>
 #include <string>
 #include <vector>
 namespace ThunderEgg
@@ -60,7 +62,9 @@ class Timer
 	/**
 	 * @brief Simple structure for keeping track of a timing
 	 */
-	struct Timing {
+	class Timing
+	{
+		public:
 		/**
 		 * @brief Pointer to parent timer
 		 */
@@ -76,9 +80,21 @@ class Timer
 		 */
 		std::string name;
 		/**
-		 * @brief A list of times
+		 * @brief The number of calls for this timing
 		 */
-		std::deque<double> times;
+		size_t num_calls = 0;
+		/**
+		 * @brief Minimum time
+		 */
+		double max = std::numeric_limits<double>::min();
+		/**
+		 * @brief Maximum time
+		 */
+		double min = std::numeric_limits<double>::max();
+		/**
+		 * @brief Sum of all timings
+		 */
+		double sum = 0;
 		/**
 		 * @brief A list of timings that are nested in this timing
 		 */
@@ -102,10 +118,7 @@ class Timer
 		 * @param domain_id the id of the domain associated with the timing
 		 * @param name the name of the timing
 		 */
-		Timing(const Timing *parent, int domain_id, const std::string &name)
-		: parent(parent), domain_id(domain_id), name(name)
-		{
-		}
+		Timing(const Timing *parent, int domain_id, const std::string &name);
 		/**
 		 * @brief get a Timing that is nested in this timing
 		 *
@@ -113,33 +126,15 @@ class Timer
 		 * @param name  the name of the timing
 		 * @return Timing& A reference to the timing
 		 */
-		Timing &getTiming(int domain_id, const std::string &name)
-		{
-			auto key             = std::make_tuple(domain_id, name);
-			auto timing_map_iter = timing_map.find(key);
-			if (timing_map_iter == timing_map.end()) {
-				timings.push_back(Timing(this, domain_id, name));
-				timing_map.emplace(key, timings.back());
-				return timings.back();
-			} else {
-				return timing_map_iter->second;
-			}
-		}
+		Timing &getTiming(int domain_id, const std::string &name);
 		/**
 		 * @brief Start a timing
 		 */
-		void start()
-		{
-			start_time = std::chrono::steady_clock::now();
-		}
+		void start();
 		/**
 		 * @brief stop a timing
 		 */
-		void stop()
-		{
-			std::chrono::duration<double> time = std::chrono::steady_clock::now() - start_time;
-			times.push_back(time.count());
-		}
+		void stop();
 		/**
 		 * @brief Print a the results of this timing and the results of the timings that are nested
 		 * in this timing.
@@ -147,42 +142,10 @@ class Timer
 		 * @param parent_string the string of timings that this timing is nested in
 		 * @param os the stream
 		 */
-		void print(const std::string &parent_string, std::ostream &os) const
-		{
-			std::string my_string = parent_string;
-			if (domain_id != std::numeric_limits<int>::max() && parent != nullptr
-			    && domain_id != parent->domain_id) {
-				my_string += "(Domain " + std::to_string(domain_id) + ") ";
-			}
-			my_string += name;
-			os << my_string << std::endl;
-			os << std::string(my_string.size(), '-') << std::endl;
-
-			if (times.size() == 1) {
-				os << "   time (sec): " << times[0] << std::endl << std::endl;
-			} else {
-				os << "  total calls: " << times.size() << std::endl;
-				double average = 0;
-				for (double t : times) {
-					average += t;
-				}
-				average /= times.size();
-
-				os << "average (sec): " << average << std::endl;
-				if (times.size() < 10) {
-					os << "  times (sec):";
-					for (double t : times) {
-						os << " " << t;
-					}
-					os << std::endl;
-				}
-				os << std::endl;
-			}
-			for (const Timing &timing : timings) {
-				timing.print(my_string + " -> ", os);
-			}
-		}
+		void        print(const std::string &parent_string, std::ostream &os) const;
+		friend void to_json(nlohmann::json &j, const Timing &timing);
 	};
+	friend void to_json(nlohmann::json &j, const Timing &timing);
 	/**
 	 * @brief the root timing, this is not really a timing itself, it just contains other timings
 	 */
@@ -198,19 +161,13 @@ class Timer
 	/**
 	 * @brief Construct a new empty Timer object
 	 */
-	Timer()
-	{
-		stack.push_back(root);
-	}
+	Timer();
 	/**
 	 * @brief Start a new timing
 	 *
 	 * @param name the name of the timing
 	 */
-	void start(const std::string &name)
-	{
-		startDomainTiming(std::numeric_limits<int>::max(), name);
-	}
+	void start(const std::string &name);
 	/**
 	 * @brief Stop a timing
 	 *
@@ -218,10 +175,7 @@ class Timer
 	 *
 	 * @exception TimerException if the name does not match the name of the last started timing.
 	 */
-	void stop(const std::string &name)
-	{
-		stopDomainTiming(std::numeric_limits<int>::max(), name);
-	}
+	void stop(const std::string &name);
 	/**
 	 * @brief add a domain to to timer
 	 *
@@ -229,14 +183,7 @@ class Timer
 	 * @param domain the domain
 	 * @exception RuntimerError if domain with same id was already added
 	 */
-	void addDomain(int domain_id, nlohmann::json domain)
-	{
-		auto pair = domains.emplace(domain_id, domain);
-		if (!pair.second) {
-			throw RuntimeError("Domain with id " + std::to_string(domain_id)
-			                   + " was already added to timer");
-		}
-	}
+	void addDomain(int domain_id, nlohmann::json domain);
 	/**
 	 * @brief Start a new Domain associated timing
 	 *
@@ -244,18 +191,7 @@ class Timer
 	 * @param name the name of the timing
 	 * @exception RuntimerError if domain was not added with addDomain
 	 */
-	void startDomainTiming(int domain_id, const std::string &name)
-	{
-		if (domain_id != std::numeric_limits<int>::max()
-		    && domains.find(domain_id) == domains.end()) {
-			throw RuntimeError("Domain with id " + std::to_string(domain_id)
-			                   + " was not added to timer");
-		}
-		Timing &curr_timing = stack.back();
-		Timing &next_timing = curr_timing.getTiming(domain_id, name);
-		next_timing.start();
-		stack.push_back(next_timing);
-	}
+	void startDomainTiming(int domain_id, const std::string &name);
 	/**
 	 * @brief Stop a Domain associated timing
 	 *
@@ -265,17 +201,7 @@ class Timer
 	 * @exception RuntimeError if the domain id and name does not match the name of the last
 	 * started timing.
 	 */
-	void stopDomainTiming(int domain_id, const std::string &name)
-	{
-		Timing &curr_timing = stack.back();
-		if (curr_timing.domain_id == domain_id && curr_timing.name == name && stack.size() > 1) {
-			curr_timing.stop();
-			stack.pop_back();
-		} else {
-			throw RuntimeError("Timer was expecting to end \"" + curr_timing.name
-			                   + "\", instead got \"" + name + "\"");
-		}
-	}
+	void stopDomainTiming(int domain_id, const std::string &name);
 	/**
 	 * @brief ostream operator for Timer
 	 *
@@ -283,23 +209,8 @@ class Timer
 	 * @param timer the timer
 	 * @return std::ostream& the stream
 	 */
-	friend std::ostream &operator<<(std::ostream &os, const Timer &timer)
-	{
-		if (timer.stack.size() > 1) {
-			const Timing &curr_timing = timer.stack.back();
-			throw RuntimeError(
-			"Cannot output Timer results with unfinished timings, check that all timings have been stopped. Currently waiting on timing \""
-			+ curr_timing.name + "\"");
-		}
-		os << std::endl;
-		os << "TIMING RESULTS" << std::endl;
-		os << "==============" << std::endl << std::endl;
-
-		for (const Timing &timing : timer.root.timings) {
-			timing.print("", os);
-		}
-		return os;
-	} // namespace ThunderEgg
+	friend std::ostream &operator<<(std::ostream &os, const Timer &timer);
+	friend void          to_json(nlohmann::json &j, const Timer &timer);
 };
 } // namespace ThunderEgg
 #endif
