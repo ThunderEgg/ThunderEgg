@@ -376,6 +376,7 @@ template <int D> class Domain
 	void setTimer(std::shared_ptr<Timer> timer) const
 	{
 		this->timer = timer;
+		timer->addDomain(id, *this);
 	}
 	/**
 	 * @brief Get the Timer object

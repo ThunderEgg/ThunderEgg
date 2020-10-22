@@ -192,6 +192,7 @@ class Timer
 	 * in the other.
 	 */
 	std::list<std::reference_wrapper<Timing>> stack;
+	std::map<int, nlohmann::json>             domains;
 
 	public:
 	/**
@@ -222,13 +223,34 @@ class Timer
 		stopDomainTiming(std::numeric_limits<int>::max(), name);
 	}
 	/**
+	 * @brief add a domain to to timer
+	 *
+	 * @param domain_id the id of the domain
+	 * @param domain the domain
+	 * @exception RuntimerError if domain with same id was already added
+	 */
+	void addDomain(int domain_id, nlohmann::json domain)
+	{
+		auto pair = domains.emplace(domain_id, domain);
+		if (!pair.second) {
+			throw RuntimeError("Domain with id " + std::to_string(domain_id)
+			                   + " was already added to timer");
+		}
+	}
+	/**
 	 * @brief Start a new Domain associated timing
 	 *
 	 * @param domain_id the id of the Domain
 	 * @param name the name of the timing
+	 * @exception RuntimerError if domain was not added with addDomain
 	 */
 	void startDomainTiming(int domain_id, const std::string &name)
 	{
+		if (domain_id != std::numeric_limits<int>::max()
+		    && domains.find(domain_id) == domains.end()) {
+			throw RuntimeError("Domain with id " + std::to_string(domain_id)
+			                   + " was not added to timer");
+		}
 		Timing &curr_timing = stack.back();
 		Timing &next_timing = curr_timing.getTiming(domain_id, name);
 		next_timing.start();
@@ -240,7 +262,7 @@ class Timer
 	 * @param domain_id the id of the Domain
 	 * @param name the name of the timing
 	 *
-	 * @exception TimerException if the domain id and name does not match the name of the last
+	 * @exception RuntimeError if the domain id and name does not match the name of the last
 	 * started timing.
 	 */
 	void stopDomainTiming(int domain_id, const std::string &name)
@@ -264,12 +286,11 @@ class Timer
 	friend std::ostream &operator<<(std::ostream &os, const Timer &timer)
 	{
 		if (timer.stack.size() > 1) {
-			Timing &curr_timing = timer.stack.back();
+			const Timing &curr_timing = timer.stack.back();
 			throw RuntimeError(
 			"Cannot output Timer results with unfinished timings, check that all timings have been stopped. Currently waiting on timing \""
 			+ curr_timing.name + "\"");
 		}
-		timer.stack.empty();
 		os << std::endl;
 		os << "TIMING RESULTS" << std::endl;
 		os << "==============" << std::endl << std::endl;

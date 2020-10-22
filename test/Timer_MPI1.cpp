@@ -1,8 +1,25 @@
 #include "catch.hpp"
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Timer.h>
 #include <sstream>
 using namespace std;
 using namespace ThunderEgg;
+static Domain<2> GetDomain()
+{
+	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+
+	int    n         = 10;
+	double spacing   = 0.01;
+	int    num_ghost = 1;
+
+	pinfo_map[0].reset(new PatchInfo<2>());
+	pinfo_map[0]->id = 0;
+	pinfo_map[0]->ns.fill(n);
+	pinfo_map[0]->spacings.fill(spacing);
+	pinfo_map[0]->num_ghost_cells = num_ghost;
+	Domain<2> d(pinfo_map, {n, n}, num_ghost);
+	return d;
+}
 TEST_CASE("No Timing", "[Timer]")
 {
 	Timer timer;
@@ -153,6 +170,7 @@ TEST_CASE("Timer ostream operator throws with unfinished timing", "[Timer]")
 TEST_CASE("Timer DomainTiming", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	// check output
@@ -180,6 +198,7 @@ TEST_CASE("Timer DomainTiming", "[Timer]")
 TEST_CASE("Timer  two sequential DomainTimings", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
@@ -215,6 +234,7 @@ TEST_CASE("Timer DomainTiming with unassociated timing before")
 	Timer timer;
 	timer.start("A");
 	timer.stop("A");
+	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	// check output
@@ -247,6 +267,7 @@ TEST_CASE("Timer DomainTiming nested in unassociated timing", "[Timer]")
 {
 	Timer timer;
 	timer.start("A");
+	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	timer.stop("A");
@@ -279,6 +300,7 @@ TEST_CASE("Timer DomainTiming nested in unassociated timing", "[Timer]")
 TEST_CASE("Timer nested DomainTiming same domain", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -312,6 +334,8 @@ TEST_CASE("Timer nested DomainTiming same domain", "[Timer]")
 TEST_CASE("Timer nested DomainTiming different domain", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(1, "B");
 	timer.stopDomainTiming(1, "B");
@@ -345,6 +369,8 @@ TEST_CASE("Timer nested DomainTiming different domain", "[Timer]")
 TEST_CASE("Timer consecutive DomainTiming two different ids", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	timer.startDomainTiming(1, "A");
@@ -378,6 +404,7 @@ TEST_CASE("Timer consecutive DomainTiming two different ids", "[Timer]")
 TEST_CASE("Timer Two DomainTimings Sequential Stop second before started", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	int          id   = GENERATE(0, 1);
@@ -387,25 +414,41 @@ TEST_CASE("Timer Two DomainTimings Sequential Stop second before started", "[Tim
 TEST_CASE("Timer DomainTimings Nested Wrong id on stop", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(1, "A"), RuntimeError);
 }
 TEST_CASE("Timer DomainTimings Nested Wrong name on stop", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(0, "blah"), RuntimeError);
 }
 TEST_CASE("Timer DomainTimings Nested Wrong name and id on stop", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(1, "blah"), RuntimeError);
 }
 TEST_CASE("Timer Two DomainTimings Nested Wrong Order", "[Timer]")
 {
 	Timer timer;
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(1, "B");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(0, "A"), RuntimeError);
+}
+TEST_CASE("Timer addDomain twice fails", "[Timer]")
+{
+	Timer timer;
+	timer.addDomain(0, GetDomain());
+	REQUIRE_THROWS_AS(timer.addDomain(0, GetDomain()), RuntimeError);
+}
+TEST_CASE("Timer startDomainTiming fails without added domain", "[Timer]")
+{
+	Timer timer;
+	REQUIRE_THROWS_AS(timer.startDomainTiming(0, "A"), RuntimeError);
 }
