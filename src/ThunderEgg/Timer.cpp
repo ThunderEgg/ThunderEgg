@@ -22,84 +22,170 @@
 #include <ThunderEgg/Timer.h>
 namespace ThunderEgg
 {
-Timer::Timing::Timing(const Timing *parent, int domain_id, const std::string &name)
-: parent(parent), domain_id(domain_id), name(name)
+class Timer::Timing
 {
-}
-Timer::Timing &Timer::Timing::getTiming(int domain_id, const std::string &name)
-{
-	auto key             = std::make_tuple(domain_id, name);
-	auto timing_map_iter = timing_map.find(key);
-	if (timing_map_iter == timing_map.end()) {
-		timings.push_back(Timing(this, domain_id, name));
-		timing_map.emplace(key, timings.back());
-		return timings.back();
-	} else {
-		return timing_map_iter->second;
+	public:
+	/**
+	 * @brief Pointer to parent timer
+	 */
+	const Timing *parent = nullptr;
+	/**
+	 * @brief The name of the timing
+	 */
+	std::string name;
+	/**
+	 * @brief The domain id of the timing
+	 *
+	 * If no domain is associated, it is set to the max value of int
+	 */
+	int domain_id = std::numeric_limits<int>::max();
+	/**
+	 * @brief The number of calls for this timing
+	 */
+	size_t num_calls = 0;
+	/**
+	 * @brief Minimum time
+	 */
+	double max = std::numeric_limits<double>::min();
+	/**
+	 * @brief Maximum time
+	 */
+	double min = std::numeric_limits<double>::max();
+	/**
+	 * @brief Sum of all timings
+	 */
+	double sum = 0;
+	/**
+	 * @brief A list of timings that are nested in this timing
+	 */
+	std::list<Timing> timings;
+	/**
+	 * @brief A map from timing domain id and name to a reference of the nested timing
+	 */
+	std::map<std::tuple<std::string, int>, std::reference_wrapper<Timing>> timing_map;
+	/**
+	 * @brief The starting time of the latest timing
+	 */
+	std::chrono::steady_clock::time_point start_time;
+	/**
+	 * @brief Construct a new Timing object
+	 */
+	Timing() = default;
+	/**
+	 * @brief Construct a new Timing object
+	 *
+	 * @param parent pointer to parent timing
+	 * @param domain_id the id of the domain associated with the timing
+	 * @param name the name of the timing
+	 */
+	Timing(const Timing *parent, int domain_id, const std::string &name)
+	: parent(parent), name(name), domain_id(domain_id)
+	{
 	}
-}
-void Timer::Timing::start()
-{
-	start_time = std::chrono::steady_clock::now();
-}
-void Timer::Timing::stop()
-{
-	std::chrono::duration<double> duration = std::chrono::steady_clock::now() - start_time;
-	double                        time     = duration.count();
-	sum += time;
-	max = std::max(max, time);
-	min = std::min(min, time);
-	num_calls++;
-}
-void Timer::Timing::print(const std::string &parent_string, std::ostream &os) const
-{
-	std::string my_string = parent_string;
-	if (domain_id != std::numeric_limits<int>::max() && parent != nullptr
-	    && domain_id != parent->domain_id) {
-		my_string += "(Domain " + std::to_string(domain_id) + ") ";
+	/**
+	 * @brief get a Timing that is nested in this timing
+	 *
+	 * @param domain_id the id of the domain associated with the timing
+	 * @param name  the name of the timing
+	 * @return Timing& A reference to the timing
+	 */
+	Timing &getTiming(int domain_id, const std::string &name)
+	{
+		auto key             = std::make_tuple(name, domain_id);
+		auto timing_map_iter = timing_map.find(key);
+		if (timing_map_iter == timing_map.end()) {
+			timings.push_back(Timing(this, domain_id, name));
+			timing_map.emplace(key, timings.back());
+			return timings.back();
+		} else {
+			return timing_map_iter->second;
+		}
 	}
-	my_string += name;
-	os << my_string << std::endl;
-	os << std::string(my_string.size(), '-') << std::endl;
+	/**
+	 * @brief Start a timing
+	 */
+	void start()
+	{
+		start_time = std::chrono::steady_clock::now();
+	}
+	/**
+	 * @brief stop a timing
+	 */
+	void stop()
+	{
+		std::chrono::duration<double> duration = std::chrono::steady_clock::now() - start_time;
+		double                        time     = duration.count();
+		sum += time;
+		max = std::max(max, time);
+		min = std::min(min, time);
+		num_calls++;
+	}
+	/**
+	 * @brief Print a the results of this timing and the results of the timings that are nested
+	 * in this timing.
+	 *
+	 * @param parent_string the string of timings that this timing is nested in
+	 * @param os the stream
+	 */
+	void print(const std::string &parent_string, std::ostream &os) const
+	{
+		std::string my_string = parent_string + name;
+		os << my_string << std::endl;
+		os << std::string(my_string.size(), '-') << std::endl;
 
-	if (num_calls == 1) {
-		os << "   time (sec): " << sum << std::endl << std::endl;
-	} else {
-		os << "  total calls: " << num_calls << std::endl;
-		os << "average (sec): " << sum / num_calls << std::endl;
+		if (num_calls == 1) {
+			os << "   time (sec): " << sum << std::endl << std::endl;
+		} else {
+			os << "  total calls: " << num_calls << std::endl;
+			os << "average (sec): " << sum / num_calls << std::endl;
+			os << "    min (sec): " << min << std::endl;
+			os << "    max (sec): " << max << std::endl;
+		}
+		printMergedChildren(my_string + " -> ", os);
 	}
-	for (const Timing &timing : timings) {
-		timing.print(my_string + " -> ", os);
+	/**
+	 * @brief Merge the children together and print the timings
+	 *
+	 * @param parent_string the string of timings that this timing is nested in
+	 * @param os the stream
+	 */
+	void printMergedChildren(const std::string &parent_string, std::ostream &os) const
+	{
+		for (const Timing &timing : timings) {
+			timing.print(parent_string, os);
+		}
 	}
-}
-void to_json(nlohmann::json &j, const Timer::Timing &timing)
+
+	friend void to_json(nlohmann::json &j, const Timing &timing)
+	{
+		if (timing.name != "") {
+			j["name"] = timing.name;
+		}
+		if (timing.domain_id != std::numeric_limits<int>::max()) {
+			j["domain_id"] = timing.domain_id;
+		}
+		if (timing.sum != 0) {
+			j["sum"] = timing.sum;
+		}
+		if (timing.num_calls != 0) {
+			j["num_calls"] = timing.num_calls;
+		}
+		if (timing.max != std::numeric_limits<double>::min()) {
+			j["max"] = timing.max;
+		}
+		if (timing.min != std::numeric_limits<double>::max()) {
+			j["min"] = timing.min;
+		}
+		if (timing.timings.size() > 0) {
+			j["timings"] = timing.timings;
+		}
+	}
+};
+Timer::Timer() : root(new Timing())
 {
-	if (timing.name != "") {
-		j["name"] = timing.name;
-	}
-	if (timing.domain_id != std::numeric_limits<int>::max()) {
-		j["domain_id"] = timing.domain_id;
-	}
-	if (timing.sum != 0) {
-		j["sum"] = timing.sum;
-	}
-	if (timing.num_calls != 0) {
-		j["num_calls"] = timing.num_calls;
-	}
-	if (timing.max != std::numeric_limits<double>::min()) {
-		j["max"] = timing.max;
-	}
-	if (timing.min != std::numeric_limits<double>::max()) {
-		j["min"] = timing.min;
-	}
-	if (timing.timings.size() > 0) {
-		j["timings"] = timing.timings;
-	}
+	stack.push_back(*root);
 }
-Timer::Timer()
-{
-	stack.push_back(root);
-}
+Timer::~Timer() = default;
 void Timer::start(const std::string &name)
 {
 	startDomainTiming(std::numeric_limits<int>::max(), name);
@@ -150,15 +236,17 @@ std::ostream &operator<<(std::ostream &os, const Timer &timer)
 	os << "TIMING RESULTS" << std::endl;
 	os << "==============" << std::endl << std::endl;
 
-	for (const Timer::Timing &timing : timer.root.timings) {
-		timing.print("", os);
+	if (timer.root->timings.empty()) {
+		os << "No timings to report." << std::endl << std::endl;
+	} else {
+		timer.root->printMergedChildren("", os);
 	}
 	return os;
 }
 void to_json(nlohmann::json &j, const Timer &timer)
 {
-	if (timer.root.timings.size() > 0) {
-		j = timer.root;
+	if (timer.root->timings.size() > 0) {
+		j = *timer.root;
 		if (timer.domains.size() > 0) {
 			j["domains"] = timer.domains;
 		}

@@ -62,94 +62,11 @@ class Timer
 	/**
 	 * @brief Simple structure for keeping track of a timing
 	 */
-	class Timing
-	{
-		public:
-		/**
-		 * @brief Pointer to parent timer
-		 */
-		const Timing *parent = nullptr;
-		/**
-		 * @brief The domain id of the timing
-		 *
-		 * If no domain is associated, it is set to the max value of int
-		 */
-		int domain_id = std::numeric_limits<int>::max();
-		/**
-		 * @brief The name of the timing
-		 */
-		std::string name;
-		/**
-		 * @brief The number of calls for this timing
-		 */
-		size_t num_calls = 0;
-		/**
-		 * @brief Minimum time
-		 */
-		double max = std::numeric_limits<double>::min();
-		/**
-		 * @brief Maximum time
-		 */
-		double min = std::numeric_limits<double>::max();
-		/**
-		 * @brief Sum of all timings
-		 */
-		double sum = 0;
-		/**
-		 * @brief A list of timings that are nested in this timing
-		 */
-		std::list<Timing> timings;
-		/**
-		 * @brief A map from timing domain id and name to a reference of the nested timing
-		 */
-		std::map<std::tuple<int, std::string>, std::reference_wrapper<Timing>> timing_map;
-		/**
-		 * @brief The starting time of the latest timing
-		 */
-		std::chrono::steady_clock::time_point start_time;
-		/**
-		 * @brief Construct a new Timing object
-		 */
-		Timing() = default;
-		/**
-		 * @brief Construct a new Timing object
-		 *
-		 * @param parent pointer to parent timing
-		 * @param domain_id the id of the domain associated with the timing
-		 * @param name the name of the timing
-		 */
-		Timing(const Timing *parent, int domain_id, const std::string &name);
-		/**
-		 * @brief get a Timing that is nested in this timing
-		 *
-		 * @param domain_id the id of the domain associated with the timing
-		 * @param name  the name of the timing
-		 * @return Timing& A reference to the timing
-		 */
-		Timing &getTiming(int domain_id, const std::string &name);
-		/**
-		 * @brief Start a timing
-		 */
-		void start();
-		/**
-		 * @brief stop a timing
-		 */
-		void stop();
-		/**
-		 * @brief Print a the results of this timing and the results of the timings that are nested
-		 * in this timing.
-		 *
-		 * @param parent_string the string of timings that this timing is nested in
-		 * @param os the stream
-		 */
-		void        print(const std::string &parent_string, std::ostream &os) const;
-		friend void to_json(nlohmann::json &j, const Timing &timing);
-	};
-	friend void to_json(nlohmann::json &j, const Timing &timing);
+	class Timing;
 	/**
 	 * @brief the root timing, this is not really a timing itself, it just contains other timings
 	 */
-	Timing root;
+	std::unique_ptr<Timing> root;
 	/**
 	 * @brief The stack that keeps track of what timing we are one. Each sequential timing is nested
 	 * in the other.
@@ -162,6 +79,10 @@ class Timer
 	 * @brief Construct a new empty Timer object
 	 */
 	Timer();
+	/**
+	 * @brief Destruct a Timer object
+	 */
+	~Timer();
 	/**
 	 * @brief Start a new timing
 	 *

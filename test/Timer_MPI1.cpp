@@ -20,6 +20,16 @@ static Domain<2> GetDomain()
 	Domain<2> d(pinfo_map, {n, n}, num_ghost);
 	return d;
 }
+static int occurrences(const std::string &s, const std::string &target)
+{
+	int                    occurrences = 0;
+	std::string::size_type pos         = 0;
+	while ((pos = s.find(target, pos)) != std::string::npos) {
+		++occurrences;
+		pos += target.length();
+	}
+	return occurrences;
+}
 TEST_CASE("Two Timings Sequential Stop second before started", "[Timer]")
 {
 	Timer timer;
@@ -191,4 +201,188 @@ TEST_CASE("Timer to_json domain timing", "[Timer]")
 	CHECK(j["timings"][0]["num_calls"].is_number());
 	CHECK(j["timings"][0]["name"] == "A");
 	CHECK(j["timings"][0]["domain_id"] == 0);
+}
+TEST_CASE("Timer ostream empty timing", "[Timer]")
+{
+	Timer        timer;
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "No timings to report") == 1);
+}
+TEST_CASE("Timer ostream unassociated timing", "[Timer]")
+{
+	Timer timer;
+	timer.start("A");
+	timer.stop("A");
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "A") == 1);
+	CHECK(occurrences(s, "time (sec)") == 1);
+	CHECK(occurrences(s, "average (sec)") == 0);
+	CHECK(occurrences(s, "min (sec)") == 0);
+	CHECK(occurrences(s, "max (sec)") == 0);
+	CHECK(occurrences(s, "total calls") == 0);
+}
+TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
+{
+	Timer timer;
+	timer.start("A");
+	timer.start("B");
+	timer.stop("B");
+	timer.stop("A");
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "A") == 2);
+	CHECK(occurrences(s, "B") == 1);
+	CHECK(occurrences(s, "time (sec)") == 2);
+	CHECK(occurrences(s, "average (sec)") == 0);
+	CHECK(occurrences(s, "min (sec)") == 0);
+	CHECK(occurrences(s, "max (sec)") == 0);
+	CHECK(occurrences(s, "total calls") == 0);
+}
+TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
+{
+	Timer timer;
+	timer.start("A");
+	timer.stop("A");
+	timer.start("A");
+	timer.stop("A");
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "A") == 1);
+	CHECK(occurrences(s, "time (sec)") == 0);
+	CHECK(occurrences(s, "average (sec)") == 1);
+	CHECK(occurrences(s, "min (sec)") == 1);
+	CHECK(occurrences(s, "max (sec)") == 1);
+	CHECK(occurrences(s, "total calls") == 1);
+}
+TEST_CASE("Timer ostream domain timing", "[Timer]")
+{
+	Timer timer;
+	timer.addDomain(0, GetDomain());
+	timer.startDomainTiming(0, "A");
+	timer.stopDomainTiming(0, "A");
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "A") == 1);
+	CHECK(occurrences(s, "time (sec)") == 1);
+	CHECK(occurrences(s, "average (sec)") == 0);
+	CHECK(occurrences(s, "min (sec)") == 0);
+	CHECK(occurrences(s, "max (sec)") == 0);
+	CHECK(occurrences(s, "total calls") == 0);
+}
+TEST_CASE("Timer ostream domain timing two different domains sequential", "[Timer]")
+{
+	Timer timer;
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
+	timer.startDomainTiming(0, "A");
+	timer.stopDomainTiming(0, "A");
+	timer.startDomainTiming(1, "A");
+	timer.stopDomainTiming(1, "A");
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "A") == 1);
+	CHECK(occurrences(s, "time (sec)") == 0);
+	CHECK(occurrences(s, "average (sec)") == 1);
+	CHECK(occurrences(s, "min (sec)") == 1);
+	CHECK(occurrences(s, "max (sec)") == 1);
+	CHECK(occurrences(s, "total calls") == 1);
+}
+TEST_CASE("Timer ostream domain timing two different domains sequential nested", "[Timer]")
+{
+	Timer timer;
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
+	timer.startDomainTiming(0, "A");
+	timer.startDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "A");
+	timer.startDomainTiming(1, "A");
+	timer.startDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "A");
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "A") == 2);
+	CHECK(occurrences(s, "B") == 1);
+	CHECK(occurrences(s, "time (sec)") == 0);
+	CHECK(occurrences(s, "average (sec)") == 2);
+	CHECK(occurrences(s, "min (sec)") == 2);
+	CHECK(occurrences(s, "max (sec)") == 2);
+	CHECK(occurrences(s, "total calls") == 2);
+}
+TEST_CASE(
+"Timer ostream domain timing two different domains sequential nested first domain has extra timing",
+"[Timer]")
+{
+	Timer timer;
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
+	timer.startDomainTiming(0, "A");
+	timer.startDomainTiming(0, "C");
+	timer.stopDomainTiming(0, "C");
+	timer.startDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "A");
+	timer.startDomainTiming(1, "A");
+	timer.startDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "A");
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "A") == 3);
+	CHECK(occurrences(s, "B") == 1);
+	CHECK(occurrences(s, "B") == 1);
+	CHECK(occurrences(s, "time (sec)") == 0);
+	CHECK(occurrences(s, "average (sec)") == 3);
+	CHECK(occurrences(s, "min (sec)") == 3);
+	CHECK(occurrences(s, "max (sec)") == 3);
+	CHECK(occurrences(s, "total calls") == 3);
+}
+TEST_CASE(
+"Timer ostream domain timing two different domains sequential nested second domain has extra timing",
+"[Timer]")
+{
+	Timer timer;
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
+	timer.startDomainTiming(0, "A");
+	timer.startDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "A");
+	timer.startDomainTiming(1, "A");
+	timer.startDomainTiming(0, "C");
+	timer.stopDomainTiming(0, "C");
+	timer.startDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "A");
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "A") == 3);
+	CHECK(occurrences(s, "B") == 1);
+	CHECK(occurrences(s, "B") == 1);
+	CHECK(occurrences(s, "time (sec)") == 0);
+	CHECK(occurrences(s, "average (sec)") == 3);
+	CHECK(occurrences(s, "min (sec)") == 3);
+	CHECK(occurrences(s, "max (sec)") == 3);
+	CHECK(occurrences(s, "total calls") == 3);
 }
