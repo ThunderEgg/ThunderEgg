@@ -120,42 +120,6 @@ class Timer::Timing
 		min = std::min(min, time);
 		num_calls++;
 	}
-	/**
-	 * @brief Print a the results of this timing and the results of the timings that are nested
-	 * in this timing.
-	 *
-	 * @param parent_string the string of timings that this timing is nested in
-	 * @param os the stream
-	 */
-	void print(const std::string &parent_string, std::ostream &os) const
-	{
-		std::string my_string = parent_string + name;
-		os << my_string << std::endl;
-		os << std::string(my_string.size(), '-') << std::endl;
-
-		if (num_calls == 1) {
-			os << "   time (sec): " << sum << std::endl << std::endl;
-		} else {
-			os << "  total calls: " << num_calls << std::endl;
-			os << "average (sec): " << sum / num_calls << std::endl;
-			os << "    min (sec): " << min << std::endl;
-			os << "    max (sec): " << max << std::endl;
-		}
-		printMergedChildren(my_string + " -> ", os);
-	}
-	/**
-	 * @brief Merge the children together and print the timings
-	 *
-	 * @param parent_string the string of timings that this timing is nested in
-	 * @param os the stream
-	 */
-	void printMergedChildren(const std::string &parent_string, std::ostream &os) const
-	{
-		for (const Timing &timing : timings) {
-			timing.print(parent_string, os);
-		}
-	}
-
 	friend void to_json(nlohmann::json &j, const Timing &timing)
 	{
 		if (timing.name != "") {
@@ -224,6 +188,59 @@ void Timer::stopDomainTiming(int domain_id, const std::string &name)
 		                   + name + "\"");
 	}
 }
+
+static void PrintMergedTimings(const std::string &parent_string, std::ostream &os,
+                               nlohmann::json &timings);
+static void PrintTiming(const std::string &parent_string, std::ostream &os, nlohmann::json &timing)
+{
+	std::string my_string = parent_string + timing["name"].get<std::string>();
+	os << my_string << std::endl;
+	os << std::string(my_string.size(), '-') << std::endl;
+
+	if (timing["num_calls"].get<size_t>() == 1) {
+		os << "   time (sec): " << timing["sum"].get<double>() << std::endl << std::endl;
+	} else {
+		os << "  total calls: " << timing["num_calls"].get<size_t>() << std::endl;
+		os << "average (sec): " << timing["sum"].get<double>() / timing["num_calls"].get<size_t>()
+		   << std::endl;
+		os << "    min (sec): " << timing["min"].get<double>() << std::endl;
+		os << "    max (sec): " << timing["max"].get<double>() << std::endl;
+	}
+	PrintMergedTimings(my_string + " -> ", os, timing["timings"]);
+}
+static void MergeTiming(nlohmann::json &a, nlohmann::json &b)
+{
+	a["num_calls"]            = a["num_calls"].get<size_t>() + b["num_calls"].get<size_t>();
+	a["sum"]                  = a["sum"].get<double>() + b["sum"].get<double>();
+	a["min"]                  = std::min(a["min"].get<double>(), b["min"].get<double>());
+	a["max"]                  = std::max(a["max"].get<double>(), b["max"].get<double>());
+	nlohmann::json &a_timings = a["timings"];
+	for (const nlohmann::json &b_timing : b["timings"]) {
+		a_timings.push_back(b_timing);
+	}
+}
+static nlohmann::json MergeTimings(nlohmann::json &timings)
+{
+	nlohmann::json                merged_timings;
+	std::map<std::string, size_t> inserted_names;
+	for (nlohmann::json &timing : timings) {
+		auto pair = inserted_names.emplace(timing["name"], merged_timings.size());
+		if (pair.second == true) {
+			merged_timings.push_back(timing);
+		} else {
+			MergeTiming(merged_timings[pair.first->second], timing);
+		}
+	}
+	return merged_timings;
+}
+static void PrintMergedTimings(const std::string &parent_string, std::ostream &os,
+                               nlohmann::json &timings)
+{
+	nlohmann::json merged_timings = MergeTimings(timings);
+	for (nlohmann::json &timing : merged_timings) {
+		PrintTiming(parent_string, os, timing);
+	}
+}
 std::ostream &operator<<(std::ostream &os, const Timer &timer)
 {
 	if (timer.stack.size() > 1) {
@@ -236,10 +253,11 @@ std::ostream &operator<<(std::ostream &os, const Timer &timer)
 	os << "TIMING RESULTS" << std::endl;
 	os << "==============" << std::endl << std::endl;
 
-	if (timer.root->timings.empty()) {
+	nlohmann::json timer_j = timer;
+	if (timer_j["timings"] == nullptr) {
 		os << "No timings to report." << std::endl << std::endl;
 	} else {
-		timer.root->printMergedChildren("", os);
+		PrintMergedTimings("", os, timer_j["timings"]);
 	}
 	return os;
 }

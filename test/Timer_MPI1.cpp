@@ -349,12 +349,12 @@ TEST_CASE(
 	INFO(s);
 	CHECK(occurrences(s, "A") == 3);
 	CHECK(occurrences(s, "B") == 1);
-	CHECK(occurrences(s, "B") == 1);
-	CHECK(occurrences(s, "time (sec)") == 0);
-	CHECK(occurrences(s, "average (sec)") == 3);
-	CHECK(occurrences(s, "min (sec)") == 3);
-	CHECK(occurrences(s, "max (sec)") == 3);
-	CHECK(occurrences(s, "total calls") == 3);
+	CHECK(occurrences(s, "C") == 1);
+	CHECK(occurrences(s, "time (sec)") == 1);
+	CHECK(occurrences(s, "average (sec)") == 2);
+	CHECK(occurrences(s, "min (sec)") == 2);
+	CHECK(occurrences(s, "max (sec)") == 2);
+	CHECK(occurrences(s, "total calls") == 2);
 }
 TEST_CASE(
 "Timer ostream domain timing two different domains sequential nested second domain has extra timing",
@@ -379,10 +379,10 @@ TEST_CASE(
 	INFO(s);
 	CHECK(occurrences(s, "A") == 3);
 	CHECK(occurrences(s, "B") == 1);
-	CHECK(occurrences(s, "B") == 1);
-	CHECK(occurrences(s, "time (sec)") == 0);
-	CHECK(occurrences(s, "average (sec)") == 3);
-	CHECK(occurrences(s, "min (sec)") == 3);
-	CHECK(occurrences(s, "max (sec)") == 3);
-	CHECK(occurrences(s, "total calls") == 3);
+	CHECK(occurrences(s, "C") == 1);
+	CHECK(occurrences(s, "time (sec)") == 1);
+	CHECK(occurrences(s, "average (sec)") == 2);
+	CHECK(occurrences(s, "min (sec)") == 2);
+	CHECK(occurrences(s, "max (sec)") == 2);
+	CHECK(occurrences(s, "total calls") == 2);
 }
