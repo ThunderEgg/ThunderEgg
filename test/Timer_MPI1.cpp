@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Timer.h>
+#include <fstream>
 #include <sstream>
 using namespace std;
 using namespace ThunderEgg;
@@ -393,4 +394,82 @@ TEST_CASE(
 	CHECK(occurrences(s, "min (sec)") == 2);
 	CHECK(occurrences(s, "max (sec)") == 2);
 	CHECK(occurrences(s, "average calls per rank") == 2);
+}
+TEST_CASE("Timer saveToFile new empty file", "[Timer]")
+{
+	Timer timer(MPI_COMM_WORLD);
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
+	timer.startDomainTiming(0, "A");
+	timer.startDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "A");
+	timer.startDomainTiming(1, "A");
+	timer.startDomainTiming(0, "C");
+	timer.stopDomainTiming(0, "C");
+	timer.startDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "A");
+
+	std::remove("timer.json");
+	timer.saveToFile("timer.json");
+	nlohmann::json j = timer;
+
+	ifstream       input("timer.json");
+	nlohmann::json file_j;
+	input >> file_j;
+	nlohmann::json extra_j;
+	CHECK_THROWS(input >> extra_j);
+	CHECK(file_j.dump() == j.dump());
+	input.close();
+	std::remove("timer.json");
+}
+TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
+{
+	Timer timer(MPI_COMM_WORLD);
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
+	timer.startDomainTiming(0, "A");
+	timer.startDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "A");
+	timer.startDomainTiming(1, "A");
+	timer.startDomainTiming(0, "C");
+	timer.stopDomainTiming(0, "C");
+	timer.startDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "A");
+
+	std::remove("timer.json");
+	timer.saveToFile("timer.json");
+	timer.saveToFile("timer.json");
+	nlohmann::json j = timer;
+
+	ifstream       input("timer.json");
+	nlohmann::json file_j;
+	input >> file_j;
+	nlohmann::json extra_j;
+	CHECK_THROWS(input >> extra_j);
+	CHECK(file_j.dump() == j.dump());
+	input.close();
+	std::remove("timer.json");
+}
+TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
+{
+	Timer timer(MPI_COMM_WORLD);
+	timer.addDomain(0, GetDomain());
+	timer.addDomain(1, GetDomain());
+	timer.startDomainTiming(0, "A");
+	timer.startDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "B");
+	timer.stopDomainTiming(0, "A");
+	timer.startDomainTiming(1, "A");
+	timer.startDomainTiming(0, "C");
+	timer.stopDomainTiming(0, "C");
+	timer.startDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "B");
+	timer.stopDomainTiming(1, "A");
+
+	CHECK_THROWS_AS(timer.saveToFile("surely/this/directory/does/not/exist/timer.json"),
+	                RuntimeError);
 }

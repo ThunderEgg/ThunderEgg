@@ -141,6 +141,14 @@ class Timer
 	 * @param timer the timer
 	 */
 	friend void to_json(nlohmann::json &j, const Timer &timer);
+	/**
+	 * @brief Save a json representation of the timer to the file. This is collective over all
+	 * processes.
+	 *
+	 * @param filename the file to save to
+	 * @exception RuntimeError on rank 0 if the file cannot be opened for writing.
+	 */
+	void saveToFile(const std::string &filename) const;
 };
 } // namespace ThunderEgg
 #endif

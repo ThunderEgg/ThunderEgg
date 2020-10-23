@@ -21,6 +21,8 @@
 
 #include <ThunderEgg/Timer.h>
 #include <chrono>
+#include <fstream>
+#include <iomanip>
 namespace ThunderEgg
 {
 class Timer::Timing
@@ -347,6 +349,20 @@ void to_json(nlohmann::json &output_j, const Timer &timer)
 	} else {
 		std::string j_string = j.dump();
 		MPI_Send(j_string.data(), j_string.size() + 1, MPI_CHAR, 0, 0, timer.comm);
+	}
+}
+void Timer::saveToFile(const std::string &filename) const
+{
+	nlohmann::json j = *this;
+	int            rank;
+	MPI_Comm_rank(comm, &rank);
+	if (rank == 0) {
+		std::ofstream out(filename, std::ofstream::out | std::ofstream::trunc);
+		if (out.fail()) {
+			throw RuntimeError("Failed to open file " + filename);
+		}
+		out << std::setw(4) << j;
+		out.close();
 	}
 }
 } // namespace ThunderEgg
