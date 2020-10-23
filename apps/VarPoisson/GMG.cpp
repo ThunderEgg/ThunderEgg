@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
 		*/
 	}
 
-	std::shared_ptr<Timer> timer = make_shared<Timer>();
+	std::shared_ptr<Timer> timer = make_shared<Timer>(MPI_COMM_WORLD);
 	for (int loop = 0; loop < loop_count; loop++) {
 		timer->start("Domain Initialization");
 

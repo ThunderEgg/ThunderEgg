@@ -65,7 +65,7 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
 
 	u->setWithGhost(1);
-	d_fine->setTimer(make_shared<Timer>());
+	d_fine->setTimer(make_shared<Timer>(MPI_COMM_WORLD));
 	mps.apply(f, u);
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
@@ -102,7 +102,7 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
 
 	u->setWithGhost(1);
-	d_fine->setTimer(make_shared<Timer>());
+	d_fine->setTimer(make_shared<Timer>(MPI_COMM_WORLD));
 	mps.smooth(f, u);
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {

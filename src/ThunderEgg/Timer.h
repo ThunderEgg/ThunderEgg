@@ -23,14 +23,11 @@
 #define THUNDEREGG_TIMER_H
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/tpl/json.hpp>
-#include <chrono>
-#include <deque>
-#include <functional>
 #include <list>
 #include <map>
+#include <mpi.h>
 #include <ostream>
 #include <string>
-#include <vector>
 namespace ThunderEgg
 {
 /**
@@ -60,6 +57,10 @@ class Timer
 {
 	private:
 	/**
+	 * @brief The mpi communicator
+	 */
+	MPI_Comm comm;
+	/**
 	 * @brief Simple structure for keeping track of a timing
 	 */
 	class Timing;
@@ -78,7 +79,7 @@ class Timer
 	/**
 	 * @brief Construct a new empty Timer object
 	 */
-	Timer();
+	Timer(MPI_Comm comm);
 	/**
 	 * @brief Destruct a Timer object
 	 */
@@ -124,14 +125,22 @@ class Timer
 	 */
 	void stopDomainTiming(int domain_id, const std::string &name);
 	/**
-	 * @brief ostream operator for Timer
+	 * @brief ostream operator for Timer, this is collective for all ranks, will only output on rank
+	 * 0
 	 *
 	 * @param os the stream
 	 * @param timer the timer
 	 * @return std::ostream& the stream
 	 */
 	friend std::ostream &operator<<(std::ostream &os, const Timer &timer);
-	friend void          to_json(nlohmann::json &j, const Timer &timer);
+	/**
+	 * @brief Convert a timer to a json serialization, this is collective over all processes will
+	 * only result in a json object for rank 0, will be null for all other ranks
+	 *
+	 * @param j resulting json
+	 * @param timer the timer
+	 */
+	friend void to_json(nlohmann::json &j, const Timer &timer);
 };
 } // namespace ThunderEgg
 #endif

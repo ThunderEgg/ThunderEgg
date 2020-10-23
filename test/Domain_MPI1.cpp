@@ -47,7 +47,7 @@ TEST_CASE("Domain setTimer", "[Domain]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	Domain<2> d(pinfo_map, {n, n}, num_ghost);
 
-	auto timer = make_shared<Timer>();
+	auto timer = make_shared<Timer>(MPI_COMM_WORLD);
 	d.setTimer(timer);
 	CHECK(d.getTimer() == timer);
 	CHECK(d.hasTimer());
@@ -67,7 +67,7 @@ TEST_CASE("Domain setTimer adds domain to timer", "[Domain]")
 	pinfo_map[0]->num_ghost_cells = num_ghost;
 	Domain<2> d(pinfo_map, {n, n}, num_ghost);
 
-	auto timer = make_shared<Timer>();
+	auto timer = make_shared<Timer>(MPI_COMM_WORLD);
 	d.setId(0);
 	d.setTimer(timer);
 	// will throw exception if domain not added to timer

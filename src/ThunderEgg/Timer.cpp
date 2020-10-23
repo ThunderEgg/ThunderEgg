@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Timer.h>
+#include <chrono>
 namespace ThunderEgg
 {
 class Timer::Timing
@@ -145,7 +146,7 @@ class Timer::Timing
 		}
 	}
 };
-Timer::Timer() : root(new Timing())
+Timer::Timer(MPI_Comm comm) : comm(comm), root(new Timing())
 {
 	stack.push_back(*root);
 }
@@ -189,24 +190,28 @@ void Timer::stopDomainTiming(int domain_id, const std::string &name)
 	}
 }
 
-static void PrintMergedTimings(const std::string &parent_string, std::ostream &os,
+static void PrintMergedTimings(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
                                nlohmann::json &timings);
-static void PrintTiming(const std::string &parent_string, std::ostream &os, nlohmann::json &timing)
+static void PrintTiming(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
+                        nlohmann::json &timing)
 {
 	std::string my_string = parent_string + timing["name"].get<std::string>();
 	os << my_string << std::endl;
 	os << std::string(my_string.size(), '-') << std::endl;
 
+	int size;
+	MPI_Comm_size(comm, &size);
+
 	if (timing["num_calls"].get<size_t>() == 1) {
-		os << "   time (sec): " << timing["sum"].get<double>() << std::endl << std::endl;
+		os << "              time (sec): " << timing["sum"].get<double>() << std::endl << std::endl;
 	} else {
-		os << "  total calls: " << timing["num_calls"].get<size_t>() << std::endl;
-		os << "average (sec): " << timing["sum"].get<double>() / timing["num_calls"].get<size_t>()
-		   << std::endl;
-		os << "    min (sec): " << timing["min"].get<double>() << std::endl;
-		os << "    max (sec): " << timing["max"].get<double>() << std::endl;
+		os << "  average calls per rank: " << timing["num_calls"].get<double>() / size << std::endl;
+		os << "           average (sec): "
+		   << timing["sum"].get<double>() / timing["num_calls"].get<size_t>() << std::endl;
+		os << "               min (sec): " << timing["min"].get<double>() << std::endl;
+		os << "               max (sec): " << timing["max"].get<double>() << std::endl;
 	}
-	PrintMergedTimings(my_string + " -> ", os, timing["timings"]);
+	PrintMergedTimings(comm, my_string + " -> ", os, timing["timings"]);
 }
 static void MergeTiming(nlohmann::json &a, nlohmann::json &b)
 {
@@ -233,12 +238,12 @@ static nlohmann::json MergeTimings(nlohmann::json &timings)
 	}
 	return merged_timings;
 }
-static void PrintMergedTimings(const std::string &parent_string, std::ostream &os,
+static void PrintMergedTimings(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
                                nlohmann::json &timings)
 {
 	nlohmann::json merged_timings = MergeTimings(timings);
 	for (nlohmann::json &timing : merged_timings) {
-		PrintTiming(parent_string, os, timing);
+		PrintTiming(comm, parent_string, os, timing);
 	}
 }
 std::ostream &operator<<(std::ostream &os, const Timer &timer)
@@ -249,25 +254,99 @@ std::ostream &operator<<(std::ostream &os, const Timer &timer)
 		"Cannot output Timer results with unfinished timings, check that all timings have been stopped. Currently waiting on timing \""
 		+ curr_timing.name + "\"");
 	}
-	os << std::endl;
-	os << "TIMING RESULTS" << std::endl;
-	os << "==============" << std::endl << std::endl;
-
 	nlohmann::json timer_j = timer;
-	if (timer_j["timings"] == nullptr) {
-		os << "No timings to report." << std::endl << std::endl;
-	} else {
-		PrintMergedTimings("", os, timer_j["timings"]);
+
+	int rank;
+	MPI_Comm_rank(timer.comm, &rank);
+	if (rank == 0) {
+		os << std::endl;
+		os << "TIMING RESULTS" << std::endl;
+		os << "==============" << std::endl << std::endl;
+
+		if (timer_j["timings"] == nullptr) {
+			os << "No timings to report." << std::endl << std::endl;
+		} else {
+			PrintMergedTimings(timer.comm, "", os, timer_j["timings"]);
+		}
 	}
 	return os;
 }
-void to_json(nlohmann::json &j, const Timer &timer)
+static void DecorateTimingsWithRank(nlohmann::json &timings_j, int rank)
 {
-	if (timer.root->timings.size() > 0) {
-		j = *timer.root;
-		if (timer.domains.size() > 0) {
-			j["domains"] = timer.domains;
+	for (auto &timing : timings_j) {
+		timing["rank"] = rank;
+		if (timing.contains("timings")) {
+			DecorateTimingsWithRank(timing["timings"], rank);
 		}
+	}
+}
+static void DecorateWithRank(nlohmann::json &j, int rank)
+{
+	if (j.contains("timings")) {
+		DecorateTimingsWithRank(j["timings"], rank);
+	}
+}
+static void MergeIncomingDomains(nlohmann::json &j, nlohmann::json &incoming_j)
+{
+	for (size_t i = 0; i < j.size(); i++) {
+		nlohmann::json &patches          = j[i][1];
+		nlohmann::json &incoming_patches = incoming_j[i][1];
+		for (auto &patch : incoming_patches) {
+			patches.push_back(patch);
+		}
+	}
+}
+static void MergeIncomingTimings(nlohmann::json &j, nlohmann::json &incoming_j)
+{
+	for (auto &timing : incoming_j) {
+		j.push_back(timing);
+	}
+}
+static void MergeIncomingJson(nlohmann::json &j, nlohmann::json &incoming_j)
+{
+	if (j.contains("domains")) {
+		MergeIncomingDomains(j["domains"], incoming_j["domains"]);
+	}
+	if (j.contains("timings") || incoming_j.contains("timings")) {
+		MergeIncomingTimings(j["timings"], incoming_j["timings"]);
+	}
+	//
+}
+void to_json(nlohmann::json &output_j, const Timer &timer)
+{
+	int rank;
+	int size;
+	MPI_Comm_rank(timer.comm, &rank);
+	MPI_Comm_size(timer.comm, &size);
+	nlohmann::json j = *timer.root;
+
+	if (timer.domains.size() > 0) {
+		j["domains"] = timer.domains;
+	}
+	DecorateWithRank(j, rank);
+	if (rank == 0) {
+		for (int incoming_rank = 1; incoming_rank < size; incoming_rank++) {
+			MPI_Status status;
+			MPI_Probe(incoming_rank, 0, timer.comm, &status);
+
+			int size;
+			MPI_Get_count(&status, MPI_CHAR, &size);
+
+			char incoming_j_string[size];
+			MPI_Recv(incoming_j_string, size, MPI_CHAR, incoming_rank, 0, timer.comm, &status);
+
+			nlohmann::json incoming_j = nlohmann::json::parse(incoming_j_string);
+			MergeIncomingJson(j, incoming_j);
+		}
+		if (j != nullptr) {
+			j["comm_size"] = size;
+		}
+		for (auto &el : j.items()) {
+			output_j[el.key()] = el.value();
+		}
+	} else {
+		std::string j_string = j.dump();
+		MPI_Send(j_string.data(), j_string.size() + 1, MPI_CHAR, 0, 0, timer.comm);
 	}
 }
 } // namespace ThunderEgg
