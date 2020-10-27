@@ -104,7 +104,7 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	{
 		u->setWithGhost(0);
 		if (domain->hasTimer()) {
-			domain->getTimer()->start("Total Patch Solve");
+			domain->getTimer()->startDomainTiming(domain->getId(), "Total Patch Solve");
 		}
 		for (std::shared_ptr<const PatchInfo<D>> pinfo : domain->getPatchInfoVector()) {
 			if (domain->hasTimer()) {
@@ -118,7 +118,7 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			}
 		}
 		if (domain->hasTimer()) {
-			domain->getTimer()->stop("Total Patch Solve");
+			domain->getTimer()->stopDomainTiming(domain->getId(), "Total Patch Solve");
 		}
 	}
 	/**
@@ -131,7 +131,7 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	                    std::shared_ptr<Vector<D>>       u) const override
 	{
 		if (domain->hasTimer()) {
-			domain->getTimer()->start("Total Patch Smooth");
+			domain->getTimer()->startDomainTiming(domain->getId(), "Total Patch Smooth");
 		}
 		ghost_filler->fillGhost(u);
 		for (std::shared_ptr<const PatchInfo<D>> pinfo : domain->getPatchInfoVector()) {
@@ -146,7 +146,7 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			}
 		}
 		if (domain->hasTimer()) {
-			domain->getTimer()->stop("Total Patch Smooth");
+			domain->getTimer()->stopDomainTiming(domain->getId(), "Total Patch Smooth");
 		}
 	}
 };

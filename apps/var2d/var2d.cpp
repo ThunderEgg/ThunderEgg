@@ -325,7 +325,6 @@ int main(int argc, char *argv[])
 		// patch operator
 		shared_ptr<BiLinearGhostFiller>  gf(new BiLinearGhostFiller(domain));
 		shared_ptr<StarPatchOperator<2>> p_operator(new StarPatchOperator<2>(h, domain, gf));
-		// shared_ptr<fivePoint> p_operator(new fivePoint(domain, gf));
 		p_operator->addDrichletBCToRHS(f, gfun, hfun);
 
 		// set the patch solver
@@ -358,13 +357,14 @@ int main(int argc, char *argv[])
 
 			auto curr_domain = domain;
 
-			curr_domain->setTimer(timer);
 			int domain_level = 0;
 			curr_domain->setId(domain_level);
+			curr_domain->setTimer(timer);
 			domain_level++;
 
 			auto next_domain = dcg->getCoarserDomain();
-			auto restrictor  = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
+			auto restrictor
+			= make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1, true);
 
 			GMG::CycleBuilder<2> builder(copts);
 			builder.addFinestLevel(p_operator, p_solver, restrictor, vg);
@@ -373,8 +373,8 @@ int main(int argc, char *argv[])
 			auto prev_domain = curr_domain;
 			curr_domain      = next_domain;
 			while (dcg->hasCoarserDomain()) {
-				curr_domain->setTimer(timer);
 				curr_domain->setId(domain_level);
+				curr_domain->setTimer(timer);
 				domain_level++;
 
 				auto next_domain = dcg->getCoarserDomain();
@@ -382,7 +382,7 @@ int main(int argc, char *argv[])
 				auto new_gf      = make_shared<BiLinearGhostFiller>(curr_domain);
 				auto new_coeffs  = new_vg->getNewVector();
 
-				restrictor->restrict(new_coeffs, prev_coeffs);
+				DomainTools::SetValuesWithGhost<2>(domain, new_coeffs, hfun);
 
 				auto new_p_operator
 				= make_shared<StarPatchOperator<2>>(new_coeffs, curr_domain, new_gf);
@@ -392,7 +392,8 @@ int main(int argc, char *argv[])
 
 				auto interpolator
 				= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
-				restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
+				restrictor
+				= make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1, true);
 
 				builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator,
 				                             vg);
@@ -400,8 +401,8 @@ int main(int argc, char *argv[])
 				prev_domain = curr_domain;
 				curr_domain = next_domain;
 			}
-			curr_domain->setTimer(timer);
 			curr_domain->setId(domain_level);
+			curr_domain->setTimer(timer);
 			domain_level++;
 
 			auto interpolator
@@ -409,6 +410,7 @@ int main(int argc, char *argv[])
 			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(curr_domain, 1);
 			auto coarse_gf     = make_shared<BiLinearGhostFiller>(curr_domain);
 			auto coarse_coeffs = coarse_vg->getNewVector();
+			DomainTools::SetValuesWithGhost<2>(domain, coarse_coeffs, hfun);
 
 			restrictor->restrict(coarse_coeffs, prev_coeffs);
 
@@ -472,13 +474,13 @@ int main(int argc, char *argv[])
 
 		// residual
 		shared_ptr<ValVector<2>> resid = ValVector<2>::GetNewVector(domain, 1);
-		// VecAXPBYPCZ(resid->vec, -1.0, 1.0, 0.0, au->vec, f->vec);
+		resid->scaleThenAddScaled(0, -1, au, 1, f);
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
 		shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain, 1);
-		// VecAXPBYPCZ(error->vec, -1.0, 1.0, 0.0, exact->vec, u->vec);
+		error->scaleThenAddScaled(0, -1, exact, 1, u);
 		if (neumann) {
 			double uavg = domain->integrate(u) / domain->volume();
 			double eavg = domain->integrate(exact) / domain->volume();
@@ -532,9 +534,8 @@ int main(int argc, char *argv[])
 		}
 	}
 	cout.unsetf(std::ios_base::floatfield);
-	if (my_global_rank == 0) {
-		cout << *timer;
-	}
+	cout << *timer;
+	timer->saveToFile("timings.json");
 	PetscFinalize();
 	return 0;
 }

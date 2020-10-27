@@ -409,7 +409,7 @@ template <int D> class Domain
 	 *
 	 * @return int the id
 	 */
-	int getId()
+	int getId() const
 	{
 		return id;
 	}
