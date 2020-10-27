@@ -125,6 +125,26 @@ class Timer
 	 */
 	void stopDomainTiming(int domain_id, const std::string &name);
 	/**
+	 * @brief Start a new Domain associated timing
+	 *
+	 * @param patch_id the id of the PatchInfo
+	 * @param domain_id the id of the Domain
+	 * @param name the name of the timing
+	 * @exception RuntimerError if domain was not added with addDomain
+	 */
+	void startPatchTiming(int patch_id, int domain_id, const std::string &name);
+	/**
+	 * @brief Stop a Domain associated timing
+	 *
+	 * @param patch_id the id of the PatchInfo
+	 * @param domain_id the id of the Domain
+	 * @param name the name of the timing
+	 *
+	 * @exception RuntimeError if the domain id and name does not match the name of the last
+	 * started timing.
+	 */
+	void stopPatchTiming(int patch_id, int domain_id, const std::string &name);
+	/**
 	 * @brief ostream operator for Timer, this is collective for all ranks, will only output on rank
 	 * 0
 	 *

@@ -136,13 +136,15 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 		ghost_filler->fillGhost(u);
 		for (std::shared_ptr<const PatchInfo<D>> pinfo : domain->getPatchInfoVector()) {
 			if (domain->hasTimer()) {
-				domain->getTimer()->start("Single Patch Solve");
+				domain->getTimer()->startPatchTiming(pinfo->id, domain->getId(),
+				                                     "Single Patch Solve");
 			}
 			auto fs = f->getLocalDatas(pinfo->local_index);
 			auto us = u->getLocalDatas(pinfo->local_index);
 			solveSinglePatch(pinfo, fs, us);
 			if (domain->hasTimer()) {
-				domain->getTimer()->stop("Single Patch Solve");
+				domain->getTimer()->stopPatchTiming(pinfo->id, domain->getId(),
+				                                    "Single Patch Solve");
 			}
 		}
 		if (domain->hasTimer()) {

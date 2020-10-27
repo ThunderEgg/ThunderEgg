@@ -43,6 +43,12 @@ class Timer::Timing
 	 */
 	int domain_id = std::numeric_limits<int>::max();
 	/**
+	 * @brief The patch id of the timing
+	 *
+	 * If no patch is associated, it is set to the max value of int
+	 */
+	int patch_id = std::numeric_limits<int>::max();
+	/**
 	 * @brief The number of calls for this timing
 	 */
 	size_t num_calls = 0;
@@ -63,9 +69,9 @@ class Timer::Timing
 	 */
 	std::list<Timing> timings;
 	/**
-	 * @brief A map from timing domain id and name to a reference of the nested timing
+	 * @brief A map from timing name,domain id, and patch id to a reference of the nested timing
 	 */
-	std::map<std::tuple<std::string, int>, std::reference_wrapper<Timing>> timing_map;
+	std::map<std::tuple<std::string, int, int>, std::reference_wrapper<Timing>> timing_map;
 	/**
 	 * @brief The starting time of the latest timing
 	 */
@@ -79,25 +85,27 @@ class Timer::Timing
 	 *
 	 * @param parent pointer to parent timing
 	 * @param domain_id the id of the domain associated with the timing
+	 * @param patch_id the id of the patch associated with the timing
 	 * @param name the name of the timing
 	 */
-	Timing(const Timing *parent, int domain_id, const std::string &name)
-	: parent(parent), name(name), domain_id(domain_id)
+	Timing(const Timing *parent, int patch_id, int domain_id, const std::string &name)
+	: parent(parent), name(name), domain_id(domain_id), patch_id(patch_id)
 	{
 	}
 	/**
 	 * @brief get a Timing that is nested in this timing
 	 *
+	 * @param child_patch_id the id of the patch associated with the timing
 	 * @param child_domain_id the id of the domain associated with the timing
 	 * @param child_name  the name of the timing
 	 * @return Timing& A reference to the timing
 	 */
-	Timing &getTiming(int child_domain_id, const std::string &child_name)
+	Timing &getTiming(int child_patch_id, int child_domain_id, const std::string &child_name)
 	{
-		auto key             = std::make_tuple(child_name, child_domain_id);
+		auto key             = std::make_tuple(child_name, child_domain_id, child_patch_id);
 		auto timing_map_iter = timing_map.find(key);
 		if (timing_map_iter == timing_map.end()) {
-			timings.push_back(Timing(this, child_domain_id, child_name));
+			timings.push_back(Timing(this, child_patch_id, child_domain_id, child_name));
 			timing_map.emplace(key, timings.back());
 			return timings.back();
 		} else {
@@ -130,6 +138,9 @@ class Timer::Timing
 		}
 		if (timing.domain_id != std::numeric_limits<int>::max()) {
 			j["domain_id"] = timing.domain_id;
+		}
+		if (timing.patch_id != std::numeric_limits<int>::max()) {
+			j["patch_id"] = timing.patch_id;
 		}
 		if (timing.sum != 0) {
 			j["sum"] = timing.sum;
@@ -171,19 +182,28 @@ void Timer::addDomain(int domain_id, nlohmann::json domain)
 }
 void Timer::startDomainTiming(int domain_id, const std::string &name)
 {
+	startPatchTiming(std::numeric_limits<int>::max(), domain_id, name);
+}
+void Timer::stopDomainTiming(int domain_id, const std::string &name)
+{
+	stopPatchTiming(std::numeric_limits<int>::max(), domain_id, name);
+}
+void Timer::startPatchTiming(int patch_id, int domain_id, const std::string &name)
+{
 	if (domain_id != std::numeric_limits<int>::max() && domains.find(domain_id) == domains.end()) {
 		throw RuntimeError("Domain with id " + std::to_string(domain_id)
 		                   + " was not added to timer");
 	}
 	Timing &curr_timing = stack.back();
-	Timing &next_timing = curr_timing.getTiming(domain_id, name);
+	Timing &next_timing = curr_timing.getTiming(patch_id, domain_id, name);
 	next_timing.start();
 	stack.push_back(next_timing);
 }
-void Timer::stopDomainTiming(int domain_id, const std::string &name)
+void Timer::stopPatchTiming(int patch_id, int domain_id, const std::string &name)
 {
 	Timing &curr_timing = stack.back();
-	if (curr_timing.domain_id == domain_id && curr_timing.name == name && stack.size() > 1) {
+	if (curr_timing.patch_id == patch_id && curr_timing.domain_id == domain_id
+	    && curr_timing.name == name && stack.size() > 1) {
 		curr_timing.stop();
 		stack.pop_back();
 	} else {

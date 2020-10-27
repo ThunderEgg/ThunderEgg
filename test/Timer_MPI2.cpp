@@ -590,20 +590,20 @@ TEST_CASE("Timer saveToFile new empty file", "[Timer]")
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
-		std::remove("timer.json");
+		std::remove("timerne2.json");
 	}
-	timer.saveToFile("timer.json");
+	timer.saveToFile("timerne2.json");
 	nlohmann::json j = timer;
 
 	if (rank == 0) {
-		ifstream       input("timer.json");
+		ifstream       input("timerne2.json");
 		nlohmann::json file_j;
 		input >> file_j;
 		nlohmann::json extra_j;
 		CHECK_THROWS(input >> extra_j);
 		CHECK(file_j.dump() == j.dump());
 		input.close();
-		std::remove("timer.json");
+		std::remove("timerne2.json");
 	}
 }
 TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
@@ -625,21 +625,21 @@ TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
-		std::remove("timer.json");
+		std::remove("timerow2.json");
 	}
-	timer.saveToFile("timer.json");
-	timer.saveToFile("timer.json");
+	timer.saveToFile("timerow2.json");
+	timer.saveToFile("timerow2.json");
 	nlohmann::json j = timer;
 
 	if (rank == 0) {
-		ifstream       input("timer.json");
+		ifstream       input("timerow2.json");
 		nlohmann::json file_j;
 		input >> file_j;
 		nlohmann::json extra_j;
 		CHECK_THROWS(input >> extra_j);
 		CHECK(file_j.dump() == j.dump());
 		input.close();
-		std::remove("timer.json");
+		std::remove("timerow2.json");
 	}
 }
 TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")

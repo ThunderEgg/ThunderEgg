@@ -211,6 +211,31 @@ TEST_CASE("Timer to_json domain timing", "[Timer]")
 	CHECK(j["timings"][0]["name"] == "A");
 	CHECK(j["timings"][0]["domain_id"] == 0);
 }
+TEST_CASE("Timer to_json patch timing", "[Timer]")
+{
+	Timer timer(MPI_COMM_WORLD);
+	timer.addDomain(0, GetDomain());
+	timer.startPatchTiming(0, 0, "A");
+	timer.stopPatchTiming(0, 0, "A");
+	const nlohmann::json j = timer;
+	REQUIRE(j != nullptr);
+	INFO(j.dump(4));
+	CHECK(j.size() == 3);
+	CHECK(j["comm_size"] == 1);
+	CHECK(j["domains"].is_array());
+	CHECK(j["domains"].size() == 1);
+	CHECK(j["domains"][0].is_array());
+	CHECK(j["domains"][0].size() == 2);
+	CHECK(j["timings"].is_array());
+	CHECK(j["timings"].size() == 1);
+	CHECK(j["timings"][0]["min"].is_number());
+	CHECK(j["timings"][0]["max"].is_number());
+	CHECK(j["timings"][0]["sum"].is_number());
+	CHECK(j["timings"][0]["num_calls"].is_number());
+	CHECK(j["timings"][0]["name"] == "A");
+	CHECK(j["timings"][0]["domain_id"] == 0);
+	CHECK(j["timings"][0]["patch_id"] == 0);
+}
 TEST_CASE("Timer ostream empty timing", "[Timer]")
 {
 	Timer        timer(MPI_COMM_WORLD);
@@ -262,6 +287,25 @@ TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
 	timer.stop("A");
 	timer.start("A");
 	timer.stop("A");
+	stringstream ss;
+	ss << timer;
+	std::string s = ss.str();
+	INFO(s);
+	CHECK(occurrences(s, "A") == 1);
+	CHECK(occurrences(s, "time (sec)") == 0);
+	CHECK(occurrences(s, "average (sec)") == 1);
+	CHECK(occurrences(s, "min (sec)") == 1);
+	CHECK(occurrences(s, "max (sec)") == 1);
+	CHECK(occurrences(s, "average calls per rank") == 1);
+}
+TEST_CASE("Timer ostream sequential patch timing", "[Timer]")
+{
+	Timer timer(MPI_COMM_WORLD);
+	timer.addDomain(0, GetDomain());
+	timer.startPatchTiming(0, 0, "A");
+	timer.stopPatchTiming(0, 0, "A");
+	timer.startPatchTiming(0, 0, "A");
+	timer.stopPatchTiming(0, 0, "A");
 	stringstream ss;
 	ss << timer;
 	std::string s = ss.str();
@@ -411,18 +455,18 @@ TEST_CASE("Timer saveToFile new empty file", "[Timer]")
 	timer.stopDomainTiming(1, "B");
 	timer.stopDomainTiming(1, "A");
 
-	std::remove("timer.json");
-	timer.saveToFile("timer.json");
+	std::remove("timerne.json");
+	timer.saveToFile("timerne.json");
 	nlohmann::json j = timer;
 
-	ifstream       input("timer.json");
+	ifstream       input("timerne.json");
 	nlohmann::json file_j;
 	input >> file_j;
 	nlohmann::json extra_j;
 	CHECK_THROWS(input >> extra_j);
 	CHECK(file_j.dump() == j.dump());
 	input.close();
-	std::remove("timer.json");
+	std::remove("timerne.json");
 }
 TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
 {
@@ -440,19 +484,19 @@ TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
 	timer.stopDomainTiming(1, "B");
 	timer.stopDomainTiming(1, "A");
 
-	std::remove("timer.json");
-	timer.saveToFile("timer.json");
-	timer.saveToFile("timer.json");
+	std::remove("timerow.json");
+	timer.saveToFile("timerow.json");
+	timer.saveToFile("timerow.json");
 	nlohmann::json j = timer;
 
-	ifstream       input("timer.json");
+	ifstream       input("timerow.json");
 	nlohmann::json file_j;
 	input >> file_j;
 	nlohmann::json extra_j;
 	CHECK_THROWS(input >> extra_j);
 	CHECK(file_j.dump() == j.dump());
 	input.close();
-	std::remove("timer.json");
+	std::remove("timerow.json");
 }
 TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
 {
