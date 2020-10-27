@@ -88,16 +88,16 @@ class Timer::Timing
 	/**
 	 * @brief get a Timing that is nested in this timing
 	 *
-	 * @param domain_id the id of the domain associated with the timing
-	 * @param name  the name of the timing
+	 * @param child_domain_id the id of the domain associated with the timing
+	 * @param child_name  the name of the timing
 	 * @return Timing& A reference to the timing
 	 */
-	Timing &getTiming(int domain_id, const std::string &name)
+	Timing &getTiming(int child_domain_id, const std::string &child_name)
 	{
-		auto key             = std::make_tuple(name, domain_id);
+		auto key             = std::make_tuple(child_name, child_domain_id);
 		auto timing_map_iter = timing_map.find(key);
 		if (timing_map_iter == timing_map.end()) {
-			timings.push_back(Timing(this, domain_id, name));
+			timings.push_back(Timing(this, child_domain_id, child_name));
 			timing_map.emplace(key, timings.back());
 			return timings.back();
 		} else {
@@ -209,7 +209,7 @@ static void PrintTiming(MPI_Comm comm, const std::string &parent_string, std::os
 	} else {
 		os << "  average calls per rank: " << timing["num_calls"].get<double>() / size << std::endl;
 		os << "           average (sec): "
-		   << timing["sum"].get<double>() / timing["num_calls"].get<size_t>() << std::endl;
+		   << timing["sum"].get<double>() / timing["num_calls"].get<double>() << std::endl;
 		os << "               min (sec): " << timing["min"].get<double>() << std::endl;
 		os << "               max (sec): " << timing["max"].get<double>() << std::endl;
 	}
@@ -288,19 +288,19 @@ static void DecorateWithRank(nlohmann::json &j, int rank)
 		DecorateTimingsWithRank(j["timings"], rank);
 	}
 }
-static void MergeIncomingDomains(nlohmann::json &j, nlohmann::json &incoming_j)
+static void MergeIncomingDomains(nlohmann::json &j, const nlohmann::json &incoming_j)
 {
 	for (size_t i = 0; i < j.size(); i++) {
-		nlohmann::json &patches          = j[i][1];
-		nlohmann::json &incoming_patches = incoming_j[i][1];
-		for (auto &patch : incoming_patches) {
+		nlohmann::json &      patches          = j[i][1];
+		const nlohmann::json &incoming_patches = incoming_j[i][1];
+		for (const auto &patch : incoming_patches) {
 			patches.push_back(patch);
 		}
 	}
 }
-static void MergeIncomingTimings(nlohmann::json &j, nlohmann::json &incoming_j)
+static void MergeIncomingTimings(nlohmann::json &j, const nlohmann::json &incoming_j)
 {
-	for (auto &timing : incoming_j) {
+	for (const auto &timing : incoming_j) {
 		j.push_back(timing);
 	}
 }
@@ -312,7 +312,6 @@ static void MergeIncomingJson(nlohmann::json &j, nlohmann::json &incoming_j)
 	if (j.contains("timings") || incoming_j.contains("timings")) {
 		MergeIncomingTimings(j["timings"], incoming_j["timings"]);
 	}
-	//
 }
 void to_json(nlohmann::json &output_j, const Timer &timer)
 {
@@ -331,11 +330,12 @@ void to_json(nlohmann::json &output_j, const Timer &timer)
 			MPI_Status status;
 			MPI_Probe(incoming_rank, 0, timer.comm, &status);
 
-			int size;
-			MPI_Get_count(&status, MPI_CHAR, &size);
+			int buffer_size;
+			MPI_Get_count(&status, MPI_CHAR, &buffer_size);
 
-			char incoming_j_string[size];
-			MPI_Recv(incoming_j_string, size, MPI_CHAR, incoming_rank, 0, timer.comm, &status);
+			char incoming_j_string[buffer_size];
+			MPI_Recv(incoming_j_string, buffer_size, MPI_CHAR, incoming_rank, 0, timer.comm,
+			         &status);
 
 			nlohmann::json incoming_j = nlohmann::json::parse(incoming_j_string);
 			MergeIncomingJson(j, incoming_j);
@@ -343,12 +343,12 @@ void to_json(nlohmann::json &output_j, const Timer &timer)
 		if (j != nullptr) {
 			j["comm_size"] = size;
 		}
-		for (auto &el : j.items()) {
+		for (const auto &el : j.items()) {
 			output_j[el.key()] = el.value();
 		}
 	} else {
 		std::string j_string = j.dump();
-		MPI_Send(j_string.data(), j_string.size() + 1, MPI_CHAR, 0, 0, timer.comm);
+		MPI_Send(j_string.data(), (int) j_string.size() + 1, MPI_CHAR, 0, 0, timer.comm);
 	}
 }
 void Timer::saveToFile(const std::string &filename) const

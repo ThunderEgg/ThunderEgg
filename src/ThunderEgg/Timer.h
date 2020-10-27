@@ -79,7 +79,7 @@ class Timer
 	/**
 	 * @brief Construct a new empty Timer object
 	 */
-	Timer(MPI_Comm comm);
+	explicit Timer(MPI_Comm comm);
 	/**
 	 * @brief Destruct a Timer object
 	 */
