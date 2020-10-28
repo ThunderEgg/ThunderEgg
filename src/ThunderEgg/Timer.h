@@ -140,10 +140,36 @@ class Timer
 	 * @param domain_id the id of the Domain
 	 * @param name the name of the timing
 	 *
-	 * @exception RuntimeError if the domain id and name does not match the name of the last
-	 * started timing.
+	 * @exception RuntimeError if the patch id, domain id and name does not match the name of the
+	 * last started timing.
 	 */
 	void stopPatchTiming(int patch_id, int domain_id, const std::string &name);
+	/**
+	 * @brief Add information to a timing
+	 *
+	 * Has to be called after start is called for the timing and before stop is called for the
+	 * timing
+	 *
+	 * @param name the name of the information
+	 * @param info the value of the information
+	 *
+	 * @exception RuntimeError there is no timing to add information to, or if adding int
+	 * information to existing double information
+	 */
+	void addIntInfo(const std::string &name, int info);
+	/**
+	 * @brief Add information to a timing
+	 *
+	 * Has to be called after start is called for the timing and before stop is called for the
+	 * timing
+	 *
+	 * @param name the name of the information
+	 * @param info the value of the information
+	 *
+	 * @exception RuntimeError there is no timing to add information to, or if adding double
+	 * information to existing int information
+	 */
+	void addDoubleInfo(const std::string &name, double info);
 	/**
 	 * @brief ostream operator for Timer, this is collective for all ranks, will only output on rank
 	 * 0

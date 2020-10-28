@@ -23,6 +23,78 @@
 #include <chrono>
 #include <fstream>
 #include <iomanip>
+
+namespace
+{
+class Info
+{
+	public:
+	/**
+	 * @brief serialize Info as json object
+	 *
+	 * @param j json object to add to
+	 */
+	virtual void to_json(nlohmann::json &j) = 0;
+};
+class IntInfo : public Info
+{
+	private:
+	std::string name;
+	long int    sum       = 0;
+	int         min       = std::numeric_limits<int>::max();
+	int         max       = std::numeric_limits<int>::min();
+	int         num_calls = 0;
+
+	public:
+	IntInfo(const std::string &name) : name(name) {}
+	void addInfo(int info)
+	{
+		sum += info;
+		min = std::min(min, info);
+		max = std::max(max, info);
+		num_calls++;
+	}
+	void to_json(nlohmann::json &j) override
+	{
+		j["name"]      = name;
+		j["sum"]       = sum;
+		j["min"]       = min;
+		j["max"]       = max;
+		j["num_calls"] = num_calls;
+	}
+};
+class DoubleInfo : public Info
+{
+	private:
+	std::string name;
+	double      sum       = 0;
+	double      min       = std::numeric_limits<double>::max();
+	double      max       = std::numeric_limits<double>::lowest();
+	int         num_calls = 0;
+
+	public:
+	DoubleInfo(const std::string &name) : name(name) {}
+	void addInfo(double info)
+	{
+		sum += info;
+		min = std::min(min, info);
+		max = std::max(max, info);
+		num_calls++;
+	}
+	void to_json(nlohmann::json &j) override
+	{
+		j["name"]      = name;
+		j["sum"]       = sum;
+		j["min"]       = min;
+		j["max"]       = max;
+		j["num_calls"] = num_calls;
+	}
+};
+void to_json(nlohmann::json &j, const std::unique_ptr<Info> &info)
+{
+	info->to_json(j);
+}
+} // namespace
 namespace ThunderEgg
 {
 class Timer::Timing
@@ -55,7 +127,7 @@ class Timer::Timing
 	/**
 	 * @brief Minimum time
 	 */
-	double max = std::numeric_limits<double>::min();
+	double max = std::numeric_limits<double>::lowest();
 	/**
 	 * @brief Maximum time
 	 */
@@ -69,9 +141,17 @@ class Timer::Timing
 	 */
 	std::list<Timing> timings;
 	/**
+	 * @brief A list of informaiton associated with this timing
+	 */
+	std::list<std::unique_ptr<Info>> infos;
+	/**
 	 * @brief A map from timing name,domain id, and patch id to a reference of the nested timing
 	 */
 	std::map<std::tuple<std::string, int, int>, std::reference_wrapper<Timing>> timing_map;
+	/**
+	 * @brief A map from name to Info object
+	 */
+	std::map<std::string, Info *> info_map;
 	/**
 	 * @brief The starting time of the latest timing
 	 */
@@ -131,6 +211,58 @@ class Timer::Timing
 		min = std::min(min, time);
 		num_calls++;
 	}
+	/**
+	 * @brief Add information to this timing
+	 *
+	 * Has to be called after start is called for the timing and before stop is called for the
+	 * timing
+	 *
+	 * @param info_name the name of the information
+	 * @param info the value of the information
+	 *
+	 * @exception RuntimeError if adding int
+	 * information to existing double information
+	 */
+	void addIntInfo(const std::string &info_name, int info)
+	{
+		auto     pair     = info_map.emplace(info_name, nullptr);
+		IntInfo *info_ptr = dynamic_cast<IntInfo *>(pair.first->second);
+		if (pair.second == true) {
+			info_ptr = new IntInfo(info_name);
+			infos.emplace_back(info_ptr);
+			pair.first->second = info_ptr;
+		} else if (info_ptr == nullptr) {
+			throw RuntimeError("Adding int info to existing double info timing" + name
+			                   + " for info " + info_name);
+		}
+		info_ptr->addInfo(info);
+	}
+	/**
+	 * @brief Add information to this timing
+	 *
+	 * Has to be called after start is called for the timing and before stop is called for the
+	 * timing
+	 *
+	 * @param info_name the name of the information
+	 * @param info the value of the information
+	 *
+	 * @exception RuntimeError if adding double
+	 * information to existing int information
+	 */
+	void addDoubleInfo(const std::string &info_name, double info)
+	{
+		auto        pair     = info_map.emplace(info_name, nullptr);
+		DoubleInfo *info_ptr = dynamic_cast<DoubleInfo *>(pair.first->second);
+		if (pair.second == true) {
+			info_ptr = new DoubleInfo(info_name);
+			infos.emplace_back(info_ptr);
+			pair.first->second = info_ptr;
+		} else if (info_ptr == nullptr) {
+			throw RuntimeError("Adding int info to existing int info timing" + name + " for info "
+			                   + info_name);
+		}
+		info_ptr->addInfo(info);
+	}
 	friend void to_json(nlohmann::json &j, const Timing &timing)
 	{
 		if (timing.name != "") {
@@ -148,7 +280,7 @@ class Timer::Timing
 		if (timing.num_calls != 0) {
 			j["num_calls"] = timing.num_calls;
 		}
-		if (timing.max != std::numeric_limits<double>::min()) {
+		if (timing.max != std::numeric_limits<double>::lowest()) {
 			j["max"] = timing.max;
 		}
 		if (timing.min != std::numeric_limits<double>::max()) {
@@ -156,6 +288,9 @@ class Timer::Timing
 		}
 		if (timing.timings.size() > 0) {
 			j["timings"] = timing.timings;
+		}
+		if (timing.infos.size() > 0) {
+			j["infos"] = timing.infos;
 		}
 	}
 };
@@ -212,6 +347,23 @@ void Timer::stopPatchTiming(int patch_id, int domain_id, const std::string &name
 	}
 }
 
+void Timer::addIntInfo(const std::string &name, int info)
+{
+	if (stack.size() == 1) {
+		throw RuntimeError("No timing to add information to");
+	}
+	Timing &curr_timing = stack.back();
+	curr_timing.addIntInfo(name, info);
+}
+
+void Timer::addDoubleInfo(const std::string &name, double info)
+{
+	if (stack.size() == 1) {
+		throw RuntimeError("No timing to add information to");
+	}
+	Timing &curr_timing = stack.back();
+	curr_timing.addDoubleInfo(name, info);
+}
 static void PrintMergedTimings(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
                                nlohmann::json &timings);
 static void PrintTiming(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
@@ -225,7 +377,7 @@ static void PrintTiming(MPI_Comm comm, const std::string &parent_string, std::os
 	MPI_Comm_size(comm, &size);
 
 	if (timing["num_calls"].get<size_t>() == 1) {
-		os << "              time (sec): " << timing["sum"].get<double>() << std::endl << std::endl;
+		os << "              time (sec): " << timing["sum"].get<double>() << std::endl;
 	} else {
 		os << "  average calls per rank: " << timing["num_calls"].get<double>() / size << std::endl;
 		os << "           average (sec): "
@@ -233,14 +385,51 @@ static void PrintTiming(MPI_Comm comm, const std::string &parent_string, std::os
 		os << "               min (sec): " << timing["min"].get<double>() << std::endl;
 		os << "               max (sec): " << timing["max"].get<double>() << std::endl;
 	}
+	for (const auto &info : timing["infos"]) {
+		if (info["num_calls"] == 1) {
+			os << info["name"].get<std::string>() << ": " << info["sum"].get<double>() << std::endl;
+		} else {
+			os << info["name"].get<std::string>()
+			   << " avg: " << info["sum"].get<double>() / info["num_calls"].get<double>()
+			   << std::endl;
+			os << info["name"].get<std::string>() << " min: " << info["min"].get<double>()
+			   << std::endl;
+			os << info["name"].get<std::string>() << " max: " << info["max"].get<double>()
+			   << std::endl;
+		}
+	}
+	os << std::endl;
 	PrintMergedTimings(comm, my_string + " -> ", os, timing["timings"]);
+}
+static void MergeInfo(nlohmann::json &a, const nlohmann::json &b)
+{
+	a["num_calls"] = a["num_calls"].get<size_t>() + b["num_calls"].get<size_t>();
+	a["sum"]       = a["sum"].get<double>() + b["sum"].get<double>();
+	a["min"]       = std::min(a["min"].get<double>(), b["min"].get<double>());
+	a["max"]       = std::max(a["max"].get<double>(), b["max"].get<double>());
+}
+static void MergeInfos(nlohmann::json &a_infos, const nlohmann::json &b_infos)
+{
+	std::map<std::string, size_t> inserted_names;
+	for (size_t i = 0; i < a_infos.size(); i++) {
+		inserted_names[a_infos[i]["name"]] = i;
+	}
+	for (const nlohmann::json &info : b_infos) {
+		auto pair = inserted_names.emplace(info["name"], a_infos.size());
+		if (pair.second == true) {
+			a_infos.push_back(info);
+		} else {
+			MergeInfo(a_infos[pair.first->second], info);
+		}
+	}
 }
 static void MergeTiming(nlohmann::json &a, nlohmann::json &b)
 {
-	a["num_calls"]            = a["num_calls"].get<size_t>() + b["num_calls"].get<size_t>();
-	a["sum"]                  = a["sum"].get<double>() + b["sum"].get<double>();
-	a["min"]                  = std::min(a["min"].get<double>(), b["min"].get<double>());
-	a["max"]                  = std::max(a["max"].get<double>(), b["max"].get<double>());
+	a["num_calls"] = a["num_calls"].get<size_t>() + b["num_calls"].get<size_t>();
+	a["sum"]       = a["sum"].get<double>() + b["sum"].get<double>();
+	a["min"]       = std::min(a["min"].get<double>(), b["min"].get<double>());
+	a["max"]       = std::max(a["max"].get<double>(), b["max"].get<double>());
+	MergeInfos(a["infos"], b["infos"]);
 	nlohmann::json &a_timings = a["timings"];
 	for (const nlohmann::json &b_timing : b["timings"]) {
 		a_timings.push_back(b_timing);
