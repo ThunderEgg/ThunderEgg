@@ -26,9 +26,16 @@
 
 namespace
 {
+/**
+ * @brief Stores scalar information associated with a timing
+ */
 class Info
 {
 	public:
+	/**
+	 * @brief Destroy the Info object
+	 */
+	virtual ~Info() {}
 	/**
 	 * @brief serialize Info as json object
 	 *
@@ -36,17 +43,45 @@ class Info
 	 */
 	virtual void to_json(nlohmann::json &j) = 0;
 };
+/**
+ * @brief Stores integer information
+ */
 class IntInfo : public Info
 {
 	private:
+	/**
+	 * @brief name of the information
+	 */
 	std::string name;
-	long int    sum       = 0;
-	int         min       = std::numeric_limits<int>::max();
-	int         max       = std::numeric_limits<int>::min();
-	int         num_calls = 0;
+	/**
+	 * @brief Sum of all informations
+	 */
+	long int sum = 0;
+	/**
+	 * @brief Min value
+	 */
+	int min = std::numeric_limits<int>::max();
+	/**
+	 * @brief max value
+	 */
+	int max = std::numeric_limits<int>::min();
+	/**
+	 * @brief number of informations stored
+	 */
+	int num_calls = 0;
 
 	public:
-	IntInfo(const std::string &name) : name(name) {}
+	/**
+	 * @brief Construct a new Int Info object
+	 *
+	 * @param name the name of the information
+	 */
+	explicit IntInfo(const std::string &name) : name(name) {}
+	/**
+	 * @brief Add information
+	 *
+	 * @param info the value to add
+	 */
 	void addInfo(int info)
 	{
 		sum += info;
@@ -63,17 +98,45 @@ class IntInfo : public Info
 		j["num_calls"] = num_calls;
 	}
 };
+/**
+ * @brief Stores double information
+ */
 class DoubleInfo : public Info
 {
 	private:
+	/**
+	 * @brief name of the information
+	 */
 	std::string name;
-	double      sum       = 0;
-	double      min       = std::numeric_limits<double>::max();
-	double      max       = std::numeric_limits<double>::lowest();
-	int         num_calls = 0;
+	/**
+	 * @brief sum of all informations
+	 */
+	double sum = 0;
+	/**
+	 * @brief min value
+	 */
+	double min = std::numeric_limits<double>::max();
+	/**
+	 * @brief max value
+	 */
+	double max = std::numeric_limits<double>::lowest();
+	/**
+	 * @brief number of informations stored
+	 */
+	int num_calls = 0;
 
 	public:
-	DoubleInfo(const std::string &name) : name(name) {}
+	/**
+	 * @brief Construct a new Double Info object
+	 *
+	 * @param name the name of the information
+	 */
+	explicit DoubleInfo(const std::string &name) : name(name) {}
+	/**
+	 * @brief add information
+	 *
+	 * @param info the value to add
+	 */
 	void addInfo(double info)
 	{
 		sum += info;
@@ -366,6 +429,14 @@ void Timer::addDoubleInfo(const std::string &name, double info)
 }
 static void PrintMergedTimings(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
                                nlohmann::json &timings);
+/**
+ * @brief Print a timing
+ *
+ * @param comm the mpi comm
+ * @param parent_string the parent string
+ * @param os the output stream
+ * @param timing the timing to print
+ */
 static void PrintTiming(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
                         nlohmann::json &timing)
 {
@@ -401,6 +472,12 @@ static void PrintTiming(MPI_Comm comm, const std::string &parent_string, std::os
 	os << std::endl;
 	PrintMergedTimings(comm, my_string + " -> ", os, timing["timings"]);
 }
+/**
+ * @brief Merge one info object with another
+ *
+ * @param a the info object to merge to
+ * @param b the info object to merge
+ */
 static void MergeInfo(nlohmann::json &a, const nlohmann::json &b)
 {
 	a["num_calls"] = a["num_calls"].get<size_t>() + b["num_calls"].get<size_t>();
@@ -408,6 +485,12 @@ static void MergeInfo(nlohmann::json &a, const nlohmann::json &b)
 	a["min"]       = std::min(a["min"].get<double>(), b["min"].get<double>());
 	a["max"]       = std::max(a["max"].get<double>(), b["max"].get<double>());
 }
+/**
+ * @brief Merge together infos with same name
+ *
+ * @param a_infos the info array to merge to
+ * @param b_infos the info array to merge
+ */
 static void MergeInfos(nlohmann::json &a_infos, const nlohmann::json &b_infos)
 {
 	std::map<std::string, size_t> inserted_names;
@@ -423,6 +506,12 @@ static void MergeInfos(nlohmann::json &a_infos, const nlohmann::json &b_infos)
 		}
 	}
 }
+/**
+ * @brief Merge one timing with another
+ *
+ * @param a the timing to merge to
+ * @param b the timing to merge
+ */
 static void MergeTiming(nlohmann::json &a, nlohmann::json &b)
 {
 	a["num_calls"] = a["num_calls"].get<size_t>() + b["num_calls"].get<size_t>();
@@ -435,6 +524,12 @@ static void MergeTiming(nlohmann::json &a, nlohmann::json &b)
 		a_timings.push_back(b_timing);
 	}
 }
+/**
+ * @brief Merge together timings with same name
+ *
+ * @param timings the timings array
+ * @return nlohmann::json the resulting merged array
+ */
 static nlohmann::json MergeTimings(nlohmann::json &timings)
 {
 	nlohmann::json                merged_timings;
@@ -449,6 +544,14 @@ static nlohmann::json MergeTimings(nlohmann::json &timings)
 	}
 	return merged_timings;
 }
+/**
+ * @brief merge timings with same name together
+ *
+ * @param comm the mpi comm
+ * @param parent_string the string of the parent timing
+ * @param os the output stream
+ * @param timings the timings to print
+ */
 static void PrintMergedTimings(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
                                nlohmann::json &timings)
 {
@@ -482,6 +585,13 @@ std::ostream &operator<<(std::ostream &os, const Timer &timer)
 	}
 	return os;
 }
+/**
+ * @brief add rank value to timings array
+ *
+ * @param j the timing to array
+ * @param rank the rank value to add
+ */
+
 static void DecorateTimingsWithRank(nlohmann::json &timings_j, int rank)
 {
 	for (auto &timing : timings_j) {
@@ -491,12 +601,24 @@ static void DecorateTimingsWithRank(nlohmann::json &timings_j, int rank)
 		}
 	}
 }
+/**
+ * @brief add rank value to timer object
+ *
+ * @param j the timing to array
+ * @param rank the rank value to add
+ */
 static void DecorateWithRank(nlohmann::json &j, int rank)
 {
 	if (j.contains("timings")) {
 		DecorateTimingsWithRank(j["timings"], rank);
 	}
 }
+/**
+ * @brief merge domains
+ *
+ * @param j the domain array to merge to
+ * @param incoming_j the domain array to merge
+ */
 static void MergeIncomingDomains(nlohmann::json &j, const nlohmann::json &incoming_j)
 {
 	for (size_t i = 0; i < j.size(); i++) {
@@ -507,12 +629,24 @@ static void MergeIncomingDomains(nlohmann::json &j, const nlohmann::json &incomi
 		}
 	}
 }
+/**
+ * @brief merge timing arrays
+ *
+ * @param j the timing array to merge to
+ * @param incoming_j the timing array to merge
+ */
 static void MergeIncomingTimings(nlohmann::json &j, const nlohmann::json &incoming_j)
 {
 	for (const auto &timing : incoming_j) {
 		j.push_back(timing);
 	}
 }
+/**
+ * @brief Merge json objects from other ranks
+ *
+ * @param j the json object for this rank
+ * @param incoming_j the json object from the other rank
+ */
 static void MergeIncomingJson(nlohmann::json &j, nlohmann::json &incoming_j)
 {
 	if (j.contains("domains")) {

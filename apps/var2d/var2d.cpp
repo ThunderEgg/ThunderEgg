@@ -275,70 +275,34 @@ int main(int argc, char *argv[])
 			return sinl(M_PI * y) * cosl(2 * M_PI * x);
 		};
 		hfun = [](const std::array<double, 2> &coord) { return 1; };
-		/*
-		ffun = [](const std::array<double, 2> &coord) {
-		    return 0;
-		};
-		gfun = [](const std::array<double, 2> &coord) {
-		    return 1;
-		};
-		hfun = [](const std::array<double, 2> &coord) { return 1; };
-		*/
 	}
 
 	std::shared_ptr<Timer> timer = make_shared<Timer>(MPI_COMM_WORLD);
 	for (int loop = 0; loop < loop_count; loop++) {
 		timer->start("Domain Initialization");
 
-		/*
-		if (f_outim) {
-		    IfaceMatrixHelper imh(dc);
-		    PW<Mat>           IA = imh.formCRSMatrix();
-		    PetscViewer       viewer;
-		    PetscViewerBinaryOpen(PETSC_COMM_WORLD, args::get(f_outim).c_str(), FILE_MODE_WRITE,
-		                          &viewer);
-		    MatView(IA, viewer);
-		    PetscViewerDestroy(&viewer);
-		}
-		*/
-
-		std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain, 1));
-		shared_ptr<ValVector<2>>            u     = ValVector<2>::GetNewVector(domain, 1);
-		shared_ptr<ValVector<2>>            exact = ValVector<2>::GetNewVector(domain, 1);
-		shared_ptr<ValVector<2>>            f     = ValVector<2>::GetNewVector(domain, 1);
-		shared_ptr<ValVector<2>>            au    = ValVector<2>::GetNewVector(domain, 1);
-		shared_ptr<ValVector<2>>            h     = ValVector<2>::GetNewVector(domain, 1);
-		shared_ptr<PETSc::VecWrapper<1>>    h_bc  = PETSc::VecWrapper<2>::GetNewBCVector(domain);
+		auto                  vg    = make_shared<ValVectorGenerator<2>>(domain, 1);
+		shared_ptr<Vector<2>> u     = vg->getNewVector();
+		shared_ptr<Vector<2>> exact = vg->getNewVector();
+		shared_ptr<Vector<2>> f     = vg->getNewVector();
+		shared_ptr<Vector<2>> au    = vg->getNewVector();
+		shared_ptr<Vector<2>> h     = vg->getNewVector();
 
 		DomainTools::SetValues<2>(domain, f, ffun);
 		DomainTools::SetValues<2>(domain, exact, gfun);
 		DomainTools::SetValuesWithGhost<2>(domain, h, hfun);
-		DomainTools::SetBCValues<2>(domain, h_bc, hfun);
-		if (neumann) {
-			// Init::initNeumann2d(*domain, f->vec, exact->vec, ffun, gfun, nfunx, nfuny);
-		} else {
-			// DomainTools<2>::addDirichlet(domain, f, gfun);
-		}
 
 		timer->stop("Domain Initialization");
 
 		// patch operator
-		shared_ptr<BiLinearGhostFiller>  gf(new BiLinearGhostFiller(domain));
-		shared_ptr<StarPatchOperator<2>> p_operator(new StarPatchOperator<2>(h, domain, gf));
+		auto gf         = make_shared<BiLinearGhostFiller>(domain);
+		auto p_operator = make_shared<StarPatchOperator<2>>(h, domain, gf);
 		p_operator->addDrichletBCToRHS(f, gfun, hfun);
 
 		// set the patch solver
 		auto p_solver = make_shared<BiCGStabPatchSolver<2>>(p_operator, ps_tol, ps_max_it);
 
-		if (neumann && !no_zero_rhs_avg) {
-			double fdiff = domain->integrate(f) / domain->volume();
-			if (my_global_rank == 0)
-				cout << "Fdiff: " << fdiff << endl;
-			f->shift(-fdiff);
-		}
-
-		std::shared_ptr<Operator<2>> A       = p_operator;
-		Mat                          A_petsc = nullptr;
+		std::shared_ptr<Operator<2>> A = p_operator;
 		std::shared_ptr<Operator<2>> M;
 		///////////////////
 		// setup start
@@ -349,10 +313,7 @@ int main(int argc, char *argv[])
 		timer->stop("Matrix Formation");
 		// preconditoners
 		timer->start("Preconditioner Setup");
-		if (preconditioner == "Schwarz") {
-			M = p_solver;
-			//	M.reset(new SchwarzPrec<2>(sch, p_solver, p_interp));
-		} else if (preconditioner == "GMG") {
+		if (preconditioner == "GMG") {
 			timer->start("GMG Setup");
 
 			auto curr_domain = domain;
@@ -382,7 +343,7 @@ int main(int argc, char *argv[])
 				auto new_gf      = make_shared<BiLinearGhostFiller>(curr_domain);
 				auto new_coeffs  = new_vg->getNewVector();
 
-				DomainTools::SetValuesWithGhost<2>(domain, new_coeffs, hfun);
+				DomainTools::SetValuesWithGhost<2>(curr_domain, new_coeffs, hfun);
 
 				auto new_p_operator
 				= make_shared<StarPatchOperator<2>>(new_coeffs, curr_domain, new_gf);
@@ -392,27 +353,22 @@ int main(int argc, char *argv[])
 
 				auto interpolator
 				= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
-				restrictor
-				= make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1, true);
+				restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
 
 				builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator,
 				                             vg);
-				//
 				prev_domain = curr_domain;
 				curr_domain = next_domain;
 			}
 			curr_domain->setId(domain_level);
 			curr_domain->setTimer(timer);
-			domain_level++;
 
 			auto interpolator
 			= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
 			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(curr_domain, 1);
 			auto coarse_gf     = make_shared<BiLinearGhostFiller>(curr_domain);
 			auto coarse_coeffs = coarse_vg->getNewVector();
-			DomainTools::SetValuesWithGhost<2>(domain, coarse_coeffs, hfun);
-
-			restrictor->restrict(coarse_coeffs, prev_coeffs);
+			DomainTools::SetValuesWithGhost<2>(curr_domain, coarse_coeffs, hfun);
 
 			auto coarse_p_operator
 			= make_shared<StarPatchOperator<2>>(coarse_coeffs, curr_domain, coarse_gf);
@@ -424,49 +380,16 @@ int main(int argc, char *argv[])
 			M = builder.getCycle();
 
 			timer->stop("GMG Setup");
-		} else if (preconditioner == "cheb") {
-			throw 3;
 		}
 		timer->stop("Preconditioner Setup");
 
-		// PW<KSP> solver;
-		// setup petsc if needed
-		if (solver_type == "petsc") {
-			timer->start("Petsc Setup");
-
-			// KSPCreate(MPI_COMM_WORLD, &solver);
-			// KSPSetFromOptions(solver);
-			// KSPSetOperators(solver, A_petsc, A_petsc);
-			if (M != nullptr) {
-				PC M_petsc = PETSc::PCShellCreator<2>::GetNewPCShell(M, A, vg);
-				// KSPGetPC(solver, &M_petsc);
-			}
-			// KSPSetUp(solver);
-			// KSPSetTolerances(solver, tolerance, PETSC_DEFAULT, PETSC_DEFAULT, 5000);
-
-			timer->stop("Petsc Setup");
-		}
-		///////////////////
-		// setup end
-		///////////////////
 		timer->stop("Linear System Setup");
 
 		timer->start("Linear Solve");
-		if (solver_type == "petsc") {
-			/*
-			KSPSolve(solver, f->vec, u->vec);
-			int its;
-			KSPGetIterationNumber(solver, &its);
-			if (my_global_rank == 0) {
-			    cout << "Iterations: " << its << endl;
-			}
-			*/
-		} else {
-			u->set(0);
-			int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000, 1e-12, timer);
-			if (my_global_rank == 0) {
-				cout << "Iterations: " << its << endl;
-			}
+		u->set(0);
+		int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000, 1e-12, timer);
+		if (my_global_rank == 0) {
+			cout << "Iterations: " << its << endl;
 		}
 		timer->stop("Linear Solve");
 
@@ -529,9 +452,6 @@ int main(int argc, char *argv[])
 			writer.write();
 		}
 #endif
-		if (A_petsc != nullptr) {
-			MatDestroy(&A_petsc);
-		}
 	}
 	cout.unsetf(std::ios_base::floatfield);
 	cout << *timer;
