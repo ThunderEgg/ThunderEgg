@@ -427,18 +427,37 @@ void Timer::addDoubleInfo(const std::string &name, double info)
 	Timing &curr_timing = stack.back();
 	curr_timing.addDoubleInfo(name, info);
 }
-static void PrintMergedTimings(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
+static void PrintMergedTimings(MPI_Comm comm, size_t max_name_size,
+                               const std::string &parent_string, std::ostream &os,
                                nlohmann::json &timings);
+/**
+ * @brief Output an information line
+ *
+ * @param os the ostream
+ * @param max_name_size the max size of an information name
+ * @param name the name
+ * @param value the value
+ */
+static void OutputLine(std::ostream &os, size_t max_name_size, const std::string &name,
+                       double value)
+{
+	os.width(max_name_size + 1);
+	os << std::right << name << std::left;
+	os.width(0);
+	os << ": " << value << std::endl;
+}
+
 /**
  * @brief Print a timing
  *
  * @param comm the mpi comm
+ * @param max_name_size the max size of a name
  * @param parent_string the parent string
  * @param os the output stream
  * @param timing the timing to print
  */
-static void PrintTiming(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
-                        nlohmann::json &timing)
+static void PrintTiming(MPI_Comm comm, size_t max_name_size, const std::string &parent_string,
+                        std::ostream &os, nlohmann::json &timing)
 {
 	std::string my_string = parent_string + timing["name"].get<std::string>();
 	os << my_string << std::endl;
@@ -448,29 +467,30 @@ static void PrintTiming(MPI_Comm comm, const std::string &parent_string, std::os
 	MPI_Comm_size(comm, &size);
 
 	if (timing["num_calls"].get<size_t>() == 1) {
-		os << "              time (sec): " << timing["sum"].get<double>() << std::endl;
+		OutputLine(os, max_name_size, "time (sec)", timing["sum"].get<double>());
 	} else {
-		os << "  average calls per rank: " << timing["num_calls"].get<double>() / size << std::endl;
-		os << "           average (sec): "
-		   << timing["sum"].get<double>() / timing["num_calls"].get<double>() << std::endl;
-		os << "               min (sec): " << timing["min"].get<double>() << std::endl;
-		os << "               max (sec): " << timing["max"].get<double>() << std::endl;
+		OutputLine(os, max_name_size, "average calls per rank",
+		           timing["num_calls"].get<double>() / size);
+		OutputLine(os, max_name_size, "average (sec)",
+		           timing["sum"].get<double>() / timing["num_calls"].get<double>());
+		OutputLine(os, max_name_size, "min (sec)", timing["min"].get<double>());
+		OutputLine(os, max_name_size, "max (sec)", timing["max"].get<double>());
 	}
 	for (const auto &info : timing["infos"]) {
 		if (info["num_calls"] == 1) {
-			os << info["name"].get<std::string>() << ": " << info["sum"].get<double>() << std::endl;
+			OutputLine(os, max_name_size, info["name"].get<std::string>(),
+			           info["sum"].get<double>());
 		} else {
-			os << info["name"].get<std::string>()
-			   << " avg: " << info["sum"].get<double>() / info["num_calls"].get<double>()
-			   << std::endl;
-			os << info["name"].get<std::string>() << " min: " << info["min"].get<double>()
-			   << std::endl;
-			os << info["name"].get<std::string>() << " max: " << info["max"].get<double>()
-			   << std::endl;
+			OutputLine(os, max_name_size, info["name"].get<std::string>() + " avg",
+			           info["sum"].get<double>() / info["num_calls"].get<double>());
+			OutputLine(os, max_name_size, info["name"].get<std::string>() + " min",
+			           info["min"].get<double>());
+			OutputLine(os, max_name_size, info["name"].get<std::string>() + " max",
+			           info["max"].get<double>());
 		}
 	}
 	os << std::endl;
-	PrintMergedTimings(comm, my_string + " -> ", os, timing["timings"]);
+	PrintMergedTimings(comm, max_name_size, my_string + " -> ", os, timing["timings"]);
 }
 /**
  * @brief Merge one info object with another
@@ -548,16 +568,31 @@ static nlohmann::json MergeTimings(nlohmann::json &timings)
  * @brief merge timings with same name together
  *
  * @param comm the mpi comm
+ * @param max_name_size the max size of a name
  * @param parent_string the string of the parent timing
  * @param os the output stream
  * @param timings the timings to print
  */
-static void PrintMergedTimings(MPI_Comm comm, const std::string &parent_string, std::ostream &os,
+static void PrintMergedTimings(MPI_Comm comm, size_t max_name_size,
+                               const std::string &parent_string, std::ostream &os,
                                nlohmann::json &timings)
 {
 	nlohmann::json merged_timings = MergeTimings(timings);
 	for (nlohmann::json &timing : merged_timings) {
-		PrintTiming(comm, parent_string, os, timing);
+		PrintTiming(comm, max_name_size, parent_string, os, timing);
+	}
+}
+void GetMaxInfoNameLength(const nlohmann::json &timings, size_t &max_name_size)
+{
+	for (const nlohmann::json &timing : timings) {
+		if (timing.contains("infos")) {
+			for (const nlohmann::json &info : timing["infos"]) {
+				max_name_size = std::max(max_name_size, info["name"].size() + 4);
+			}
+		}
+		if (timing.contains("timings")) {
+			GetMaxInfoNameLength(timing["timings"], max_name_size);
+		}
 	}
 }
 std::ostream &operator<<(std::ostream &os, const Timer &timer)
@@ -580,7 +615,9 @@ std::ostream &operator<<(std::ostream &os, const Timer &timer)
 		if (timer_j["timings"] == nullptr) {
 			os << "No timings to report." << std::endl << std::endl;
 		} else {
-			PrintMergedTimings(timer.comm, "", os, timer_j["timings"]);
+			size_t max_name_size = std::strlen("average calls per rank");
+			GetMaxInfoNameLength(timer_j["timings"], max_name_size);
+			PrintMergedTimings(timer.comm, max_name_size, "", os, timer_j["timings"]);
 		}
 	}
 	return os;
