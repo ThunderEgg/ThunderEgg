@@ -69,7 +69,7 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 					= orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_datas[0].getLengths()[i];
 				}
 
-				for (int c = 0; c < fine_datas.size(); c++) {
+				for (size_t c = 0; c < fine_datas.size(); c++) {
 					nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(),
 					               [&](const std::array<int, D> &coord) {
 						               std::array<int, D> coarse_coord;
@@ -80,7 +80,7 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 					               });
 				}
 			} else {
-				for (int c = 0; c < fine_datas.size(); c++) {
+				for (size_t c = 0; c < fine_datas.size(); c++) {
 					nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(),
 					               [&](const std::array<int, D> &coord) {
 						               fine_datas[c][coord] += coarse_local_datas[c][coord];

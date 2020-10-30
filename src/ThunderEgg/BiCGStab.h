@@ -95,6 +95,9 @@ template <int D> class BiCGStab
 			s->addScaled(-alpha, ap);
 			if (s->twoNorm() / r0_norm <= tolerance) {
 				x->addScaled(alpha, p);
+				if (timer) {
+					timer->stop("Iteration");
+				}
 				break;
 			}
 			if (Mr != nullptr) {

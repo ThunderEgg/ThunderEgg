@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_DOMAIN_H
 #define THUNDEREGG_DOMAIN_H
 #include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/Timer.h>
 #include <ThunderEgg/Vector.h>
 #include <cmath>
 #include <deque>
@@ -47,6 +48,10 @@ template <int D> class Domain
 	std::vector<int> patch_id_bc_map_vec;
 
 	private:
+	/**
+	 * @brief The id of the domain
+	 */
+	int id = -1;
 	/**
 	 * @brief The number of cells in each direction
 	 */
@@ -123,6 +128,10 @@ template <int D> class Domain
 	 * @brief mpi rank
 	 */
 	int rank;
+	/**
+	 * @brief The timer
+	 */
+	mutable std::shared_ptr<Timer> timer;
 
 	/**
 	 * @brief Give the patches local indexes.
@@ -359,6 +368,51 @@ template <int D> class Domain
 		MPI_Allreduce(&sum, &retval, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 		return retval;
 	}
+	/**
+	 * @brief Set the Timer object
+	 *
+	 * @param timer the timer
+	 */
+	void setTimer(std::shared_ptr<Timer> timer) const
+	{
+		this->timer = timer;
+		timer->addDomain(id, *this);
+	}
+	/**
+	 * @brief Get the Timer object
+	 *
+	 * @return std::shared_ptr<Timer> the timer
+	 */
+	std::shared_ptr<Timer> getTimer() const
+	{
+		return timer;
+	}
+	/**
+	 * @brief Check if the Domain has a timer associated with it
+	 * @return true if the Domain has a timer associated with it
+	 */
+	bool hasTimer() const
+	{
+		return timer != nullptr;
+	}
+	/**
+	 * @brief Set the id of the domain
+	 *
+	 * @param new_id the new id of the domain
+	 */
+	void setId(int new_id)
+	{
+		id = new_id;
+	}
+	/**
+	 * @brief Get the domain's id
+	 *
+	 * @return int the id
+	 */
+	int getId() const
+	{
+		return id;
+	}
 };
 
 template <int D> void Domain<D>::indexDomainsLocal(bool local_id_set)
@@ -572,8 +626,16 @@ template <int D> void Domain<D>::indexBCGlobal()
 		}
 	}
 }
+template <int D> void to_json(nlohmann::json &j, const Domain<D> &domain)
+{
+	for (auto pinfo : domain.getPatchInfoVector()) {
+		j.push_back(*pinfo);
+	}
+}
 
 extern template class Domain<2>;
 extern template class Domain<3>;
+extern template void to_json<2>(nlohmann::json &j, const Domain<2> &domain);
+extern template void to_json<3>(nlohmann::json &j, const Domain<3> &domain);
 } // namespace ThunderEgg
 #endif

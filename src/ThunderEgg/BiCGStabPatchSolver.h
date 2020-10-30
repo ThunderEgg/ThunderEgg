@@ -207,7 +207,10 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		auto f_copy_lds = f_copy->getLocalDatas(0);
 		op->addGhostToRHS(pinfo, us, f_copy_lds);
 
-		BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
+		int iterations = BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
+		if (this->getDomain()->hasTimer()) {
+			this->getDomain()->getTimer()->addIntInfo("Iterations", iterations);
+		}
 	}
 };
 } // namespace ThunderEgg

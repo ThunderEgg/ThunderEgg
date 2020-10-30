@@ -191,7 +191,7 @@ template <int D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 	                               const std::vector<LocalData<D>> &nbr_datas, const Side<D> side,
 	                               const NbrType nbr_type, const Orthant<D> orthant) const override
 	{
-		for (int c = 0; c < nbr_datas.size(); c++) {
+		for (size_t c = 0; c < nbr_datas.size(); c++) {
 			int index = 0;
 			for (int i = 0; i < pinfo->num_ghost_cells; i++) {
 				LocalData<D - 1> slice = nbr_datas[c].getGhostSliceOnSide(side.opposite(), i + 1);

@@ -138,7 +138,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	void processRecvs(std::vector<MPI_Request> &requests, std::vector<std::vector<double>> &buffers,
 	                  std::shared_ptr<const Vector<D>> u) const
 	{
-		int num_requests = requests.size();
+		size_t num_requests = requests.size();
 		for (size_t i = 0; i < num_requests; i++) {
 			int finished_index;
 			MPI_Waitany(requests.size(), requests.data(), &finished_index, MPI_STATUS_IGNORE);

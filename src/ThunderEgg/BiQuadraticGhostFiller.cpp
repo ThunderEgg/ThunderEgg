@@ -49,7 +49,7 @@ void FillGhostForLocalWithFineNbr(const LocalData<2> &local_data, const Side<2> 
 void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas,
                            const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
 {
-	for (int c = 0; c < local_datas.size(); c++) {
+	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOnSide(side);
 		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
 		nested_loop<1>(
@@ -60,7 +60,7 @@ void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas,
 void FillGhostForCoarseNbrLower(const std::vector<LocalData<2>> &local_datas,
                                 const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
 {
-	for (int c = 0; c < local_datas.size(); c++) {
+	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice       = local_datas[c].getSliceOnSide(side);
 		auto inner_slice = local_datas[c].getSliceOnSide(side, 1);
 		auto ghost       = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
@@ -73,7 +73,7 @@ void FillGhostForCoarseNbrLower(const std::vector<LocalData<2>> &local_datas,
 void FillGhostForCoarseNbrUpper(const std::vector<LocalData<2>> &local_datas,
                                 const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
 {
-	for (int c = 0; c < local_datas.size(); c++) {
+	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice       = local_datas[c].getSliceOnSide(side);
 		auto inner_slice = local_datas[c].getSliceOnSide(side, 1);
 		auto ghost       = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
@@ -86,7 +86,7 @@ void FillGhostForCoarseNbrUpper(const std::vector<LocalData<2>> &local_datas,
 void FillGhostForFineNbrLower(const std::vector<LocalData<2>> &local_datas,
                               const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
 {
-	for (int c = 0; c < local_datas.size(); c++) {
+	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice = local_datas[c].getSliceOnSide(side);
 		auto ghost = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
 		int  n     = ghost.getLengths()[0];
@@ -106,7 +106,7 @@ void FillGhostForFineNbrLower(const std::vector<LocalData<2>> &local_datas,
 void FillGhostForFineNbrUpper(const std::vector<LocalData<2>> &local_datas,
                               const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
 {
-	for (int c = 0; c < local_datas.size(); c++) {
+	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice = local_datas[c].getSliceOnSide(side);
 		auto ghost = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
 		int  n     = ghost.getLengths()[0];

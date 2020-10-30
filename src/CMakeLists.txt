@@ -44,6 +44,9 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/NbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Operator.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/Orthant.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Orthant.cpp)
+
 if(p4est_FOUND)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.h)
@@ -63,8 +66,10 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Side.h)
+list(APPEND ThunderEgg_HDRS ThunderEgg/Side.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
+list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/TriLinearGhostFiller.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/TriLinearGhostFiller.cpp)
@@ -79,6 +84,8 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/Vector.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Vector.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/VectorGenerator.h)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/tpl/json.hpp)
 
 include(ThunderEgg/Experimental/CMakeLists.txt)
 include(ThunderEgg/GMG/CMakeLists.txt)

@@ -22,13 +22,12 @@
 #ifndef THUNDEREGG_TIMER_H
 #define THUNDEREGG_TIMER_H
 #include <ThunderEgg/RuntimeError.h>
-#include <chrono>
-#include <deque>
-#include <functional>
+#include <ThunderEgg/tpl/json.hpp>
 #include <list>
 #include <map>
+#include <mpi.h>
+#include <ostream>
 #include <string>
-#include <vector>
 namespace ThunderEgg
 {
 /**
@@ -58,126 +57,39 @@ class Timer
 {
 	private:
 	/**
+	 * @brief The mpi communicator
+	 */
+	MPI_Comm comm;
+	/**
 	 * @brief Simple structure for keeping track of a timing
 	 */
-	struct Timing {
-		/**
-		 * @brief The name of the timing
-		 */
-		std::string name;
-		/**
-		 * @brief A list of times
-		 */
-		std::deque<double> times;
-		/**
-		 * @brief A list of timings that are neseted in this timing
-		 */
-		std::list<Timing> timings;
-		/**
-		 * @brief A map from timing name to a reference of the nested timing
-		 */
-		std::map<std::string, std::reference_wrapper<Timing>> timing_map;
-		/**
-		 * @brief The starting time of the latest timing
-		 */
-		std::chrono::steady_clock::time_point start;
-		/**
-		 * @brief Construct a new Timing object
-		 */
-		Timing() = default;
-		/**
-		 * @brief Construct a new Timing object
-		 *
-		 * @param name the name of the timing
-		 */
-		Timing(std::string name)
-		{
-			this->name = name;
-		}
-		/**
-		 * @brief get a Timing that is nested in this timing
-		 *
-		 * @param name  the name of the timing
-		 * @return Timing& A reference to the timing
-		 */
-		Timing &getTiming(std::string name)
-		{
-			auto timing_map_iter = timing_map.find(name);
-			if (timing_map_iter == timing_map.end()) {
-				timings.push_back(Timing(name));
-				timing_map.emplace(name, timings.back());
-				return timings.back();
-			} else {
-				return timing_map_iter->second;
-			}
-		}
-		/**
-		 * @brief Print a the results of this timing and the results of the timings that are nested
-		 * in this timing.
-		 *
-		 * @param parent_string the string of timings that this timing is nested in
-		 * @param os the stream
-		 */
-		void print(std::string parent_string, std::ostream &os) const
-		{
-			os << parent_string + name << std::endl;
-			os << std::string((parent_string + name).size(), '-') << std::endl;
-
-			if (times.size() == 1) {
-				os << "   time (sec): " << times[0] << std::endl << std::endl;
-			} else {
-				os << "  total calls: " << times.size() << std::endl;
-				double average = 0;
-				for (double t : times) {
-					average += t;
-				}
-				average /= times.size();
-
-				os << "average (sec): " << average << std::endl;
-				if (times.size() < 10) {
-					os << "  times (sec):";
-					for (double t : times) {
-						os << " " << t;
-					}
-					os << std::endl;
-				}
-				os << std::endl;
-			}
-			for (const Timing &timing : timings) {
-				timing.print(parent_string + name + " -> ", os);
-			}
-		}
-	};
+	class Timing;
 	/**
 	 * @brief the root timing, this is not really a timing itself, it just contains other timings
 	 */
-	Timing root;
+	std::unique_ptr<Timing> root;
 	/**
 	 * @brief The stack that keeps track of what timing we are one. Each sequential timing is nested
 	 * in the other.
 	 */
 	std::list<std::reference_wrapper<Timing>> stack;
+	std::map<int, nlohmann::json>             domains;
 
 	public:
 	/**
 	 * @brief Construct a new empty Timer object
 	 */
-	Timer()
-	{
-		stack.push_back(root);
-	}
+	explicit Timer(MPI_Comm comm);
+	/**
+	 * @brief Destruct a Timer object
+	 */
+	~Timer();
 	/**
 	 * @brief Start a new timing
 	 *
 	 * @param name the name of the timing
 	 */
-	void start(std::string name)
-	{
-		Timing &curr_timing = stack.back();
-		Timing &next_timing = curr_timing.getTiming(name);
-		next_timing.start   = std::chrono::steady_clock::now();
-		stack.push_back(next_timing);
-	}
+	void start(const std::string &name);
 	/**
 	 * @brief Stop a timing
 	 *
@@ -185,38 +97,104 @@ class Timer
 	 *
 	 * @exception TimerException if the name does not match the name of the last started timing.
 	 */
-	void stop(std::string name)
-	{
-		Timing &curr_timing = stack.back();
-		if (curr_timing.name == name) {
-			std::chrono::duration<double> time
-			= std::chrono::steady_clock::now() - curr_timing.start;
-			curr_timing.times.push_back(time.count());
-			stack.pop_back();
-		} else {
-			throw RuntimeError("Timer was expecting to end \"" + curr_timing.name
-			                   + "\", instead got \"" + name + "\"");
-		}
-	}
+	void stop(const std::string &name);
 	/**
-	 * @brief ostream operator for Timer
+	 * @brief add a domain to to timer
+	 *
+	 * @param domain_id the id of the domain
+	 * @param domain the domain
+	 * @exception RuntimerError if domain with same id was already added
+	 */
+	void addDomain(int domain_id, nlohmann::json domain);
+	/**
+	 * @brief Start a new Domain associated timing
+	 *
+	 * @param domain_id the id of the Domain
+	 * @param name the name of the timing
+	 * @exception RuntimerError if domain was not added with addDomain
+	 */
+	void startDomainTiming(int domain_id, const std::string &name);
+	/**
+	 * @brief Stop a Domain associated timing
+	 *
+	 * @param domain_id the id of the Domain
+	 * @param name the name of the timing
+	 *
+	 * @exception RuntimeError if the domain id and name does not match the name of the last
+	 * started timing.
+	 */
+	void stopDomainTiming(int domain_id, const std::string &name);
+	/**
+	 * @brief Start a new Domain associated timing
+	 *
+	 * @param patch_id the id of the PatchInfo
+	 * @param domain_id the id of the Domain
+	 * @param name the name of the timing
+	 * @exception RuntimerError if domain was not added with addDomain
+	 */
+	void startPatchTiming(int patch_id, int domain_id, const std::string &name);
+	/**
+	 * @brief Stop a Domain associated timing
+	 *
+	 * @param patch_id the id of the PatchInfo
+	 * @param domain_id the id of the Domain
+	 * @param name the name of the timing
+	 *
+	 * @exception RuntimeError if the patch id, domain id and name does not match the name of the
+	 * last started timing.
+	 */
+	void stopPatchTiming(int patch_id, int domain_id, const std::string &name);
+	/**
+	 * @brief Add information to a timing
+	 *
+	 * Has to be called after start is called for the timing and before stop is called for the
+	 * timing
+	 *
+	 * @param name the name of the information
+	 * @param info the value of the information
+	 *
+	 * @exception RuntimeError there is no timing to add information to, or if adding int
+	 * information to existing double information
+	 */
+	void addIntInfo(const std::string &name, int info);
+	/**
+	 * @brief Add information to a timing
+	 *
+	 * Has to be called after start is called for the timing and before stop is called for the
+	 * timing
+	 *
+	 * @param name the name of the information
+	 * @param info the value of the information
+	 *
+	 * @exception RuntimeError there is no timing to add information to, or if adding double
+	 * information to existing int information
+	 */
+	void addDoubleInfo(const std::string &name, double info);
+	/**
+	 * @brief ostream operator for Timer, this is collective for all ranks, will only output on rank
+	 * 0
 	 *
 	 * @param os the stream
 	 * @param timer the timer
 	 * @return std::ostream& the stream
 	 */
-	friend std::ostream &operator<<(std::ostream &os, const Timer &timer)
-	{
-		timer.stack.empty();
-		os << std::endl;
-		os << "TIMING RESULTS" << std::endl;
-		os << "==============" << std::endl << std::endl;
-
-		for (const Timing &timing : timer.root.timings) {
-			timing.print("", os);
-		}
-		return os;
-	}
+	friend std::ostream &operator<<(std::ostream &os, const Timer &timer);
+	/**
+	 * @brief Convert a timer to a json serialization, this is collective over all processes will
+	 * only result in a json object for rank 0, will be null for all other ranks
+	 *
+	 * @param j resulting json
+	 * @param timer the timer
+	 */
+	friend void to_json(nlohmann::json &j, const Timer &timer);
+	/**
+	 * @brief Save a json representation of the timer to the file. This is collective over all
+	 * processes.
+	 *
+	 * @param filename the file to save to
+	 * @exception RuntimeError on rank 0 if the file cannot be opened for writing.
+	 */
+	void saveToFile(const std::string &filename) const;
 };
 } // namespace ThunderEgg
 #endif

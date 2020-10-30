@@ -28,7 +28,7 @@ namespace
 void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas,
                            const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
 {
-	for (int c = 0; c < local_datas.size(); c++) {
+	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOnSide(side);
 		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
 		nested_loop<1>(
@@ -46,7 +46,7 @@ void FillGhostForCoarseNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
 	if (orthant.collapseOnAxis(side.getAxisIndex()) == Orthant<1>::upper()) {
 		offset = pinfo->ns[!side.getAxisIndex()];
 	}
-	for (int c = 0; c < local_datas.size(); c++) {
+	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOnSide(side);
 		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),
@@ -65,7 +65,7 @@ void FillGhostForFineNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
 	if (orthant.collapseOnAxis(side.getAxisIndex()) == Orthant<1>::upper()) {
 		offset = pinfo->ns[!side.getAxisIndex()];
 	}
-	for (int c = 0; c < local_datas.size(); c++) {
+	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOnSide(side);
 		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(),

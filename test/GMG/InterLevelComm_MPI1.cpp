@@ -115,7 +115,7 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
 		auto vec_lds = coarse_vec->getLocalDatas(i);
 		nested_loop<2>(vec_lds[0].getStart(), vec_lds[0].getEnd(), [&](const array<int, 2> &coord) {
-			for (int c = 0; c < vec_lds.size(); c++) {
+			for (size_t c = 0; c < vec_lds.size(); c++) {
 				vec_lds[c][coord] = idx;
 				idx++;
 			}
@@ -130,7 +130,7 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 		auto vec_lds      = coarse_vec->getLocalDatas(i);
 		auto expected_lds = coarse_expected->getLocalDatas(i);
 		nested_loop<2>(vec_lds[0].getStart(), vec_lds[0].getEnd(), [&](const array<int, 2> &coord) {
-			for (int c = 0; c < vec_lds.size(); c++) {
+			for (size_t c = 0; c < vec_lds.size(); c++) {
 				REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));
 			}
 		});

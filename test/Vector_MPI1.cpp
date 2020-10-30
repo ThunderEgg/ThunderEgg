@@ -320,7 +320,7 @@ TEST_CASE("Vector<3> copy", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < a->data.size(); i++) {
+	for (size_t i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
 		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
@@ -368,18 +368,18 @@ TEST_CASE("Vector<3> add", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < a->data.size(); i++) {
+	for (size_t i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
 		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (int i = 0; i < b->data.size(); i++) {
+	for (size_t i = 0; i < b->data.size(); i++) {
 		double x        = (i + 0.5) / b->data.size();
 		b->data[i]      = (x - 0.5) * (x - 0.5);
 		b_copy->data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (int i = 0; i < expected->data.size(); i++) {
+	for (size_t i = 0; i < expected->data.size(); i++) {
 		double x          = (i + 0.5) / expected->data.size();
 		expected->data[i] = 10 - (x - 0.75) * (x - 0.75) + (x - 0.5) * (x - 0.5);
 	}
@@ -427,18 +427,18 @@ TEST_CASE("Vector<3> addScaled", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < a->data.size(); i++) {
+	for (size_t i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
 		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (int i = 0; i < b->data.size(); i++) {
+	for (size_t i = 0; i < b->data.size(); i++) {
 		double x        = (i + 0.5) / b->data.size();
 		b->data[i]      = (x - 0.5) * (x - 0.5);
 		b_copy->data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (int i = 0; i < expected->data.size(); i++) {
+	for (size_t i = 0; i < expected->data.size(); i++) {
 		double x          = (i + 0.5) / expected->data.size();
 		expected->data[i] = 0.7 * (10 - (x - 0.75) * (x - 0.75)) + (x - 0.5) * (x - 0.5);
 	}
@@ -486,18 +486,18 @@ TEST_CASE("Vector<3> scaleThenAdd", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < a->data.size(); i++) {
+	for (size_t i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
 		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (int i = 0; i < b->data.size(); i++) {
+	for (size_t i = 0; i < b->data.size(); i++) {
 		double x        = (i + 0.5) / b->data.size();
 		b->data[i]      = (x - 0.5) * (x - 0.5);
 		b_copy->data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (int i = 0; i < expected->data.size(); i++) {
+	for (size_t i = 0; i < expected->data.size(); i++) {
 		double x          = (i + 0.5) / expected->data.size();
 		expected->data[i] = (10 - (x - 0.75) * (x - 0.75)) + 0.7 * (x - 0.5) * (x - 0.5);
 	}
@@ -545,18 +545,18 @@ TEST_CASE("Vector<3> scaleThenAddScaled", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < a->data.size(); i++) {
+	for (size_t i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
 		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (int i = 0; i < b->data.size(); i++) {
+	for (size_t i = 0; i < b->data.size(); i++) {
 		double x        = (i + 0.5) / b->data.size();
 		b->data[i]      = (x - 0.5) * (x - 0.5);
 		b_copy->data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (int i = 0; i < expected->data.size(); i++) {
+	for (size_t i = 0; i < expected->data.size(); i++) {
 		double x          = (i + 0.5) / expected->data.size();
 		expected->data[i] = -2 * (10 - (x - 0.75) * (x - 0.75)) + 0.7 * (x - 0.5) * (x - 0.5);
 	}
@@ -606,23 +606,23 @@ TEST_CASE("Vector<3> scaleThenAddScaled two vectors", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < a->data.size(); i++) {
+	for (size_t i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
 		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (int i = 0; i < b->data.size(); i++) {
+	for (size_t i = 0; i < b->data.size(); i++) {
 		double x        = (i + 0.5) / b->data.size();
 		b->data[i]      = (x - 0.5) * (x - 0.5);
 		b_copy->data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (int i = 0; i < c->data.size(); i++) {
+	for (size_t i = 0; i < c->data.size(); i++) {
 		double x   = (i + 0.5) / c->data.size();
 		c->data[i] = 1 + (x - 0.25) * (x - 0.25);
 	}
 
-	for (int i = 0; i < expected->data.size(); i++) {
+	for (size_t i = 0; i < expected->data.size(); i++) {
 		double x          = (i + 0.5) / expected->data.size();
 		expected->data[i] = -2 * (10 - (x - 0.75) * (x - 0.75)) + 0.7 * (x - 0.5) * (x - 0.5)
 		                    + 9 * (1 + (x - 0.25) * (x - 0.25));
@@ -664,7 +664,7 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < vec.data.size(); i++) {
+	for (size_t i = 0; i < vec.data.size(); i++) {
 		double x    = (i + 0.5) / vec.data.size();
 		vec.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
@@ -703,7 +703,7 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < vec.data.size(); i++) {
+	for (size_t i = 0; i < vec.data.size(); i++) {
 		double x    = (i + 0.5) / vec.data.size();
 		vec.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
@@ -744,12 +744,12 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (int i = 0; i < a->data.size(); i++) {
+	for (size_t i = 0; i < a->data.size(); i++) {
 		double x   = (i + 0.5) / a->data.size();
 		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (int i = 0; i < b->data.size(); i++) {
+	for (size_t i = 0; i < b->data.size(); i++) {
 		double x   = (i + 0.5) / b->data.size();
 		b->data[i] = (x - 0.5) * (x - 0.5);
 	}

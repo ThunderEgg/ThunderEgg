@@ -15,7 +15,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
     "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Wall -g -O3")
 set(CMAKE_CXX_STANDARD 11)
 
-# find_program(CCACHE_FOUND ccache)
+find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
   message("-- Using ccache.")
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)

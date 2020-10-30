@@ -44,6 +44,11 @@ template <int start, typename T> class Loop<start, start, T>
 		lambda(start);
 	}
 };
+template <typename T> class Loop<0, -1, T>
+{
+	public:
+	static void inline loop_loop(T lambda) {}
+};
 template <int start, int stop, typename T> inline void loop(T lambda)
 {
 	Loop<start, stop, T>::loop_loop(lambda);

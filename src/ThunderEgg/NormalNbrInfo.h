@@ -99,5 +99,16 @@ template <int D> class NormalNbrInfo : public NbrInfo<D>
 		return reader.getPos();
 	}
 };
+template <int D> void to_json(nlohmann::json &j, const NormalNbrInfo<D> &n)
+{
+	j["type"]  = NbrType::Normal;
+	j["ids"]   = {n.id};
+	j["ranks"] = {n.rank};
+}
+template <int D> void from_json(const nlohmann::json &j, NormalNbrInfo<D> &n)
+{
+	n.id   = j["ids"][0];
+	n.rank = j["ranks"][0];
+}
 } // namespace ThunderEgg
 #endif

@@ -64,8 +64,8 @@ template <int D> class CoarseNbrInfo : public NbrInfo<D>
 	 * @brief Construct a new CoarseNbrInfo object
 	 *
 	 * @param id the id of the neighbor
-	 * @param orth_on_coarse The orthant that this patch in relation to the coarser
-	 * patch's interface.
+	 * @param orth_on_coarse The orthant of the neighboring patch's interface that the this patch
+	 * lies along.
 	 */
 	CoarseNbrInfo(int id, Orthant<D - 1> orth_on_coarse)
 	{
@@ -109,5 +109,18 @@ template <int D> class CoarseNbrInfo : public NbrInfo<D>
 		return reader.getPos();
 	}
 };
+template <int D> void to_json(nlohmann::json &j, const CoarseNbrInfo<D> &n)
+{
+	j["type"]           = NbrType::Coarse;
+	j["ids"]            = {n.id};
+	j["ranks"]          = {n.rank};
+	j["orth_on_coarse"] = n.orth_on_coarse;
+}
+template <int D> void from_json(const nlohmann::json &j, CoarseNbrInfo<D> &n)
+{
+	n.id             = j["ids"][0];
+	n.rank           = j["ranks"][0];
+	n.orth_on_coarse = j["orth_on_coarse"].get<Orthant<D - 1>>();
+}
 } // namespace ThunderEgg
 #endif

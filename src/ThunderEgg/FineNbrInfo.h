@@ -115,5 +115,16 @@ template <int D> class FineNbrInfo : public NbrInfo<D>
 		return reader.getPos();
 	}
 };
+template <int D> void to_json(nlohmann::json &j, const FineNbrInfo<D> &n)
+{
+	j["type"]  = NbrType::Fine;
+	j["ids"]   = n.ids;
+	j["ranks"] = n.ranks;
+}
+template <int D> void from_json(const nlohmann::json &j, FineNbrInfo<D> &n)
+{
+	n.ids   = j["ids"].get<std::array<int, Orthant<D - 1>::num_orthants>>();
+	n.ranks = j["ranks"].get<std::array<int, Orthant<D - 1>::num_orthants>>();
+}
 } // namespace ThunderEgg
 #endif
