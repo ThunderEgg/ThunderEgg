@@ -83,14 +83,21 @@ template <int D> class BiCGStab
 
 			if (Mr != nullptr) {
 				/* Solve M*mp = p;  */
-				printf("%5d %16.8e\n", num_its, residual);
+				//printf("%5d %16.8e\n", num_its, residual);
 				Mr->apply(p, mp);
 				A->apply(mp, ap);
 			} else {
 				A->apply(p, ap);
-				// printf("       %5d %16.8e\n", num_its, residual);
+				//printf("  (patch)   %5d %16.8e\n", num_its, residual);
 			}
-			double alpha = rho / rhat->dot(ap);
+            double rhat_dot_ap = rhat->dot(ap);
+            if (rhat_dot_ap == 0)
+            {
+                printf("BICG failed (1)\n");
+                exit(0);
+            }
+			//double alpha = rho / rhat->dot(ap);
+            double alpha = rho/rhat_dot_ap;
 			s->copy(resid);
 			s->addScaled(-alpha, ap);
 			if (s->twoNorm() / r0_norm <= tolerance) {
@@ -106,7 +113,14 @@ template <int D> class BiCGStab
 			} else {
 				A->apply(s, as);
 			}
-			double omega = as->dot(s) / as->dot(as);
+            double as_dot_as = as->dot(as);
+            if (as_dot_as == 0)
+            {
+                printf("BICG failed (2)\n");
+                exit(0);
+            }
+			//double omega = as->dot(s) / as->dot(as);
+            double omega = as->dot(s)/as_dot_as;
 
 			// update x and residual
 			if (Mr != nullptr) {
@@ -117,6 +131,25 @@ template <int D> class BiCGStab
 			resid->addScaled(-alpha, ap, -omega, as);
 
 			double rho_new = resid->dot(rhat);
+            if (omega == 0)
+            {
+                printf("BiCG Failed (3)\n");
+                exit(0);
+            }
+            if (rho == 0)
+            {
+                if (Mr == nullptr)
+                {
+                    printf("BiCG Failed at (4) in the patch solver; " \
+                           "exiting routine; num_its = %d\n",num_its);
+                    break;
+                }
+                else
+                {
+                    printf("BiCG Failed at (4) in global solver.\n");
+                    exit(0);                    
+                }
+            }
 			double beta    = rho_new * alpha / (rho * omega);
 			p->addScaled(-omega, ap);
 			p->scaleThenAdd(beta, resid);
