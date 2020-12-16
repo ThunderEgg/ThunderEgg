@@ -60,7 +60,7 @@ template <int D> class BiCGStab
 		}
 		A->apply(x, resid);
 		resid->scaleThenAdd(-1, b);
-		double                     r0_norm = resid->twoNorm();
+		double                     r0_norm = b->twoNorm();
 		std::shared_ptr<Vector<D>> rhat    = vg->getNewVector();
 		rhat->copy(resid);
 		std::shared_ptr<Vector<D>> p = vg->getNewVector();
