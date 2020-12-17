@@ -45,13 +45,17 @@ template <int D> class BiCGStab
 	 * @param x the initial LHS guess.
 	 * @param b the RHS vector.
 	 * @param Mr the right preconditioner. Set to nullptr if there is no right preconditioner.
+	 * @param timer the timer
+	 * @param output print output to std::cout
+	 * @param os the stream to output to
 	 *
 	 * @return the number of iterations
 	 */
 	static int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
 	                 std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
 	                 std::shared_ptr<const Operator<D>> Mr = nullptr, int max_it = 1000,
-	                 double tolerance = 1e-12, std::shared_ptr<ThunderEgg::Timer> timer = nullptr)
+	                 double tolerance = 1e-12, std::shared_ptr<ThunderEgg::Timer> timer = nullptr,
+	                 bool output = false, std::ostream &os = std::cout)
 	{
 		std::shared_ptr<Vector<D>> resid = vg->getNewVector();
 		std::shared_ptr<Vector<D>> ms;
@@ -78,6 +82,11 @@ template <int D> class BiCGStab
 			return num_its;
 		}
 		double residual = resid->twoNorm() / r0_norm;
+		if (output) {
+			char buf[100];
+			sprintf(buf, "%5d %16.8e\n", num_its, residual);
+			os << std::string(buf);
+		}
 		while (residual > tolerance && num_its < max_it) {
 			if (timer) {
 				timer->start("Iteration");
@@ -133,6 +142,11 @@ template <int D> class BiCGStab
 				throw DivergenceError("BiCGSTab reached divergence criteria on iteration "
 				                      + std::to_string(num_its) + " with residual two norm "
 				                      + std::to_string(residual));
+			}
+			if (output) {
+				char buf[100];
+				sprintf(buf, "%5d %16.8e\n", num_its, residual);
+				os << std::string(buf);
 			}
 			if (timer) {
 				timer->stop("Iteration");
