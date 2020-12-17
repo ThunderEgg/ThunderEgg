@@ -82,5 +82,42 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 		return interior_dirichlet;
 	}
 };
+template <int D> class NonLinMockPatchOperator : public PatchOperator<D>
+{
+	private:
+	mutable bool rhs_was_modified   = false;
+	mutable bool interior_dirichlet = false;
+
+	public:
+	NonLinMockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
+	                        std::shared_ptr<const GhostFiller<D>> ghost_filler)
+	: PatchOperator<D>(domain, ghost_filler)
+	{
+	}
+	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
+	                      bool treat_interior_boundary_as_dirichlet) const override
+	{
+		interior_dirichlet |= treat_interior_boundary_as_dirichlet;
+		for (size_t c = 0; c < fs.size(); c++) {
+			nested_loop<D>(fs[c].getStart(), fs[c].getEnd(),
+			               [&](const std::array<int, D> &coord) { fs[c][coord] += 1; });
+		}
+	}
+	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                   const std::vector<LocalData<D>> &   us,
+	                   std::vector<LocalData<D>> &         fs) const override
+	{
+		rhs_was_modified = true;
+	}
+	bool rhsWasModified()
+	{
+		return rhs_was_modified;
+	}
+	bool interiorDirichlet()
+	{
+		return interior_dirichlet;
+	}
+};
 } // namespace
 } // namespace ThunderEgg

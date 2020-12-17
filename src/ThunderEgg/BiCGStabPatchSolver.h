@@ -177,6 +177,10 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 	 * @brief tolerance for each solve
 	 */
 	double tol;
+	/**
+	 * @brief whether or not to continue on BreakDownError
+	 */
+	bool continue_on_breakdown;
 
 	public:
 	/**
@@ -185,11 +189,12 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 	 * @param op_in the PatchOperator to use
 	 * @param tol_in the tolerance to use for patch solves
 	 * @param max_it_in the maximum number of iterations to use for patch solves
+	 * @param continue_on_breakdown continue on breakdown exception
 	 */
 	BiCGStabPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in, double tol_in = 1e-12,
-	                    int max_it_in = 1000)
+	                    int max_it_in = 1000, bool continue_on_breakdown = false)
 	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), op(op_in), max_it(max_it_in),
-	  tol(tol_in)
+	  tol(tol_in), continue_on_breakdown(continue_on_breakdown)
 	{
 	}
 	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
@@ -207,9 +212,16 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 		auto f_copy_lds = f_copy->getLocalDatas(0);
 		op->addGhostToRHS(pinfo, us, f_copy_lds);
 
-		int iterations = BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
-		if (this->getDomain()->hasTimer()) {
-			this->getDomain()->getTimer()->addIntInfo("Iterations", iterations);
+		try {
+			int iterations
+			= BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
+			if (this->getDomain()->hasTimer()) {
+				this->getDomain()->getTimer()->addIntInfo("Iterations", iterations);
+			}
+		} catch (const BreakdownError &err) {
+			if (!continue_on_breakdown) {
+				throw err;
+			}
 		}
 	}
 };

@@ -61,3 +61,53 @@ TEST_CASE("BiCGStabPatchSolver smooth", "[BiCGStabPatchSolver]")
 	CHECK(mpo->rhsWasModified());
 	CHECK(mpo->interiorDirichlet());
 }
+TEST_CASE("BiCGStabPatchSolver propagates BreakdownError", "[BiCGStabPatchSolver]")
+{
+	auto mesh_file
+	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto                  nx        = GENERATE(2, 5);
+	auto                  ny        = GENERATE(2, 5);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+
+	auto num_components = GENERATE(1, 2, 3);
+	INFO("num_components: " << num_components);
+	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
+	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
+	f->set(1);
+
+	auto mgf = make_shared<MockGhostFiller<2>>();
+	// the patch operator is just a 0.5I operator
+	auto mpo = make_shared<NonLinMockPatchOperator<2>>(d_fine, mgf);
+
+	BiCGStabPatchSolver<2> bcgs_solver(mpo, -1);
+
+	CHECK_THROWS_AS(bcgs_solver.smooth(f, u), BreakdownError);
+}
+TEST_CASE("BiCGStabPatchSolver does not propagate BreakdownError", "[BiCGStabPatchSolver]")
+{
+	auto mesh_file
+	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto                  nx        = GENERATE(2, 5);
+	auto                  ny        = GENERATE(2, 5);
+	int                   num_ghost = 1;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+
+	auto num_components = GENERATE(1, 2, 3);
+	INFO("num_components: " << num_components);
+	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
+	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
+	f->set(1);
+
+	auto mgf = make_shared<MockGhostFiller<2>>();
+	// the patch operator is just a 0.5I operator
+	auto mpo = make_shared<NonLinMockPatchOperator<2>>(d_fine, mgf);
+
+	BiCGStabPatchSolver<2> bcgs_solver(mpo, -1, 1000, true);
+
+	CHECK_NOTHROW(bcgs_solver.smooth(f, u));
+}
