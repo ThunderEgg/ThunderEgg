@@ -11,11 +11,15 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/BiLinearGhostFiller.cpp)
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiQuadraticGhostFiller.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/BiQuadraticGhostFiller.cpp)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/BreakdownError.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/BufferReader.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/BufferWriter.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/CoarseNbrInfo.h)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/DivergenceError.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Domain.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Domain.cpp)
