@@ -93,7 +93,7 @@ template <int D> class BiCGStab
 			}
 
 			if (rho == 0) {
-				throw BreakdownError("BiCGStab broke down rho was 0 on iteration "
+				throw BreakdownError("BiCGStab broke down, rho was 0 on iteration "
 				                     + std::to_string(num_its));
 			}
 
