@@ -106,3 +106,53 @@ TEST_CASE("giving a good initial guess reduces the iterations", "[BiCGStab]")
 
 	CHECK(iterations_with_solved_guess == 0);
 }
+namespace
+{
+class MockVector : public Vector<2>
+{
+	public:
+	mutable int norm_calls = 0;
+	double      dot_value;
+	MockVector(double dot_value) : Vector<2>(MPI_COMM_WORLD, 1, 0, 10), dot_value(dot_value) {}
+	LocalData<2>       getLocalData(int, int) override {}
+	const LocalData<2> getLocalData(int, int) const override {}
+	double             dot(std::shared_ptr<const Vector<2>>) const override
+	{
+		return dot_value;
+	}
+	double twoNorm() const override
+	{
+		norm_calls++;
+		return norm_calls;
+	}
+};
+class MockVectorGenerator : public VectorGenerator<2>
+{
+	public:
+	std::shared_ptr<MockVector> vec;
+	MockVectorGenerator(std::shared_ptr<MockVector> vec) : vec(vec) {}
+	std::shared_ptr<Vector<2>> getNewVector() const override
+	{
+		return vec;
+	}
+};
+class MockOperator : public Operator<2>
+{
+	public:
+	void apply(std::shared_ptr<const Vector<2>>, std::shared_ptr<Vector<2>>) const override {}
+};
+} // namespace
+TEST_CASE("throws breakdown exception when rho is 0", "[BiCGStab]")
+{
+	auto vec = make_shared<MockVector>(0);
+	CHECK_THROWS_AS(BiCGStab<2>::solve(make_shared<MockVectorGenerator>(vec),
+	                                   make_shared<MockOperator>(), vec, vec),
+	                BreakdownError);
+}
+TEST_CASE("throws divergence exception when residual keeps increasing", "[BiCGStab]")
+{
+	auto vec = make_shared<MockVector>(1);
+	CHECK_THROWS_AS(BiCGStab<2>::solve(make_shared<MockVectorGenerator>(vec),
+	                                   make_shared<MockOperator>(), vec, vec),
+	                DivergenceError);
+}

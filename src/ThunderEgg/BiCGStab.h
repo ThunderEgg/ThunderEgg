@@ -21,6 +21,8 @@
 
 #ifndef THUNDEREGG_BICGSTAB_H
 #define THUNDEREGG_BICGSTAB_H
+#include <ThunderEgg/BreakdownError.h>
+#include <ThunderEgg/DivergenceError.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Timer.h>
 #include <ThunderEgg/VectorGenerator.h>
@@ -81,14 +83,16 @@ template <int D> class BiCGStab
 				timer->start("Iteration");
 			}
 
+			if (rho == 0) {
+				throw BreakdownError("BiCGStab broke down rho was 0 on iteration "
+				                     + std::to_string(num_its));
+			}
+
 			if (Mr != nullptr) {
-				/* Solve M*mp = p;  */
-				printf("%5d %16.8e\n", num_its, residual);
 				Mr->apply(p, mp);
 				A->apply(mp, ap);
 			} else {
 				A->apply(p, ap);
-				// printf("       %5d %16.8e\n", num_its, residual);
 			}
 			double alpha = rho / rhat->dot(ap);
 			s->copy(resid);
@@ -124,8 +128,12 @@ template <int D> class BiCGStab
 			num_its++;
 			rho      = rho_new;
 			residual = resid->twoNorm() / r0_norm;
-			// printf("%5d %16.8e\n", num_its, residual);
 
+			if (residual > 100) {
+				throw DivergenceError("BiCGSTab reached divergence criteria on iteration "
+				                      + std::to_string(num_its) + " with residual two norm "
+				                      + std::to_string(residual));
+			}
 			if (timer) {
 				timer->stop("Iteration");
 			}
