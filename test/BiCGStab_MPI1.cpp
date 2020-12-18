@@ -171,7 +171,11 @@ class MockVector : public Vector<2>
 	double twoNorm() const override
 	{
 		norm_calls++;
-		return norm_calls;
+		if (norm_calls == 1) {
+			return 1;
+		} else {
+			return norm_calls * 1e6;
+		}
 	}
 };
 class MockVectorGenerator : public VectorGenerator<2>

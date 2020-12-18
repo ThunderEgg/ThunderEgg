@@ -138,7 +138,7 @@ template <int D> class BiCGStab
 			rho      = rho_new;
 			residual = resid->twoNorm() / r0_norm;
 
-			if (residual > 100) {
+			if (residual > 1e6) {
 				throw DivergenceError("BiCGStab reached divergence criteria on iteration "
 				                      + std::to_string(num_its) + " with residual two norm "
 				                      + std::to_string(residual));
