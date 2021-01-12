@@ -16,6 +16,7 @@ jobs:
           - cmake
           - libfftw3-dev
           - libopenmpi-dev
+          - libp4est-dev
           - openmpi-bin
           - libpetsc3.7.7-dbg
           - libblas-dev
@@ -36,6 +37,7 @@ jobs:
           - cmake
           - libfftw3-dev
           - libopenmpi-dev
+          - libp4est-dev
           - openmpi-bin
           - libpetsc3.7.7-dbg
           - libblas-dev
