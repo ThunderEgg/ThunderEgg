@@ -28,8 +28,7 @@ endif()
 
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Zoltan DEFAULT_MSG
-                                  Zoltan_INCLUDES Zoltan_LIBRARIES)
+find_package_handle_standard_args(Zoltan
+                                  REQUIRED_VARS Zoltan_INCLUDES Zoltan_LIBRARIES)
 
 mark_as_advanced(Zoltan_INCLUDES Zoltan_LIBRARIES Zoltan_LIB )
-
