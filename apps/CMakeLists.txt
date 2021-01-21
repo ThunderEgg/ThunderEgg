@@ -1,6 +1,9 @@
 project(ThunderEgg_Apps)
 
-find_package(VTK)
+find_path(_vtkc NAMES FindVTK.cmake VTKConfig.cmake)
+if(_vtkc)
+  find_package(VTK)
+endif()
 if(VTK_FOUND)
   set(CMAKE_CXX_FLAGS "-DHAVE_VTK ${CMAKE_CXX_FLAGS}")
   message("-- VTK found, enabling vtk output")

@@ -48,7 +48,7 @@ if( FFTW_DIR )
   )
 
 else()
-  find_path (FFTW_DIR include/fftw3.h HINTS ENV FFTW_DIR)
+  find_path (FFTW_DIR NAMES include/fftw3.h HINTS ENV FFTW_DIR)
   if( FFTW_DIR )
     #find libs
     find_library(
@@ -57,7 +57,7 @@ else()
       PATHS ${FFTW_DIR}
       PATH_SUFFIXES "lib" "lib64"
     )
-    
+
     #find includes
     find_path(
       FFTW_INCLUDES
@@ -65,16 +65,16 @@ else()
       PATHS ${FFTW_DIR}
       PATH_SUFFIXES "include"
     )
-    
+
   else()
-  
-    
+
+
     find_library(
       FFTW_LIB
       NAMES "fftw3"
       PATHS ${PKG_FFTW_LIBRARY_DIRS} ${LIB_INSTALL_DIR}
     )
-  
+
     find_path(
       FFTW_INCLUDES
       NAMES "fftw3.h"
@@ -91,7 +91,7 @@ if(FFTWL_LIB)
 endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(FFTW DEFAULT_MSG
-                                  FFTW_INCLUDES FFTW_LIBRARIES)
+find_package_handle_standard_args(FFTW
+                                 REQUIRED_VARS FFTW_INCLUDES FFTW_LIBRARIES)
 
 mark_as_advanced(FFTW_INCLUDES FFTW_LIBRARIES FFTW_LIB )

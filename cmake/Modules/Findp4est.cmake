@@ -1,16 +1,14 @@
 # - Try to find p4est
 #
 
-find_path (p4est_DIR include/p4est.h HINTS p4est_DIR ENV p4est_DIR CPATH)
+find_path (p4est_DIR NAMES include/p4est.h HINTS p4est_DIR ENV p4est_DIR CPATH)
 
   SET(p4est_INCLUDES ${p4est_DIR})
-  find_path (p4est_INCLUDE_DIR p4est.h HINTS "${p4est_DIR}/include" PATH_SUFFIXES include NO_DEFAULT_PATH)
+  find_path (p4est_INCLUDE_DIR NAMES p4est.h HINTS "${p4est_DIR}/include" PATH_SUFFIXES include NO_DEFAULT_PATH)
   list(APPEND p4est_INCLUDES ${p4est_INCLUDE_DIR})
-  find_library(p4est_LIBRARIES p4est PATHS "${p4est_DIR}/lib" ${p4est_DIR})
+  find_library(p4est_LIBRARIES NAMES p4est PATHS "${p4est_DIR}/lib" ${p4est_DIR})
 
-if(NOT (p4est_INCLUDE_DIR AND p4est_LIBRARIES))
-  SET(p4est_FOUND NO)
-else()
+if(p4est_INCLUDE_DIR AND p4est_LIBRARIES)
   #get linker flags from config header
   file(READ ${p4est_INCLUDE_DIR}/p4est_config.h p4est_config_h)
   string(REGEX MATCH "#define P4EST_LIBS [^\n]*" p4est_extra_lib_string ${p4est_config_h})
@@ -38,17 +36,12 @@ else()
     list(APPEND p4est_LIBRARIES ${extra_lib})
     unset(extra_lib CACHE)
   endforeach(lib)
-  
+
   message("-- p4est libraries: ${p4est_LIBRARIES}")
 
   list(APPEND p4est_LIBRARIES ${p4est_extra_lib})
 
-IF(EXISTS ${p4est_DIR}/include/p4est.h)
-  SET(p4est_FOUND YES)
-ELSE(EXISTS ${p4est_DIR}/include/p4est.h)
-  SET(p4est_FOUND NO)
-ENDIF(EXISTS ${p4est_DIR}/include/p4est.h)
 endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(p4est DEFAULT_MSG p4est_LIBRARIES p4est_INCLUDES)
+find_package_handle_standard_args(p4est REQUIRED_VARS p4est_LIBRARIES p4est_INCLUDE_DIR)

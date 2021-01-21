@@ -1,7 +1,5 @@
-cmake_minimum_required(VERSION 2.8.8)
-project(ThunderEgg)
-enable_language(CXX)
-enable_language(C)
+cmake_minimum_required(VERSION 2.8.12)
+project(ThunderEgg LANGUAGES C CXX)
 enable_testing()
 
 # set(CMAKE_CXX_EXTENSIONS OFF)
