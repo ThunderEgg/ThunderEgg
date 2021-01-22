@@ -1,14 +1,7 @@
 # thunderegg
 ![alt text](https://github.com/GEM3D/pressurePoissonSolver/blob/master/icon.png)
 
-This is a library for solving Poisson's equation on adaptively refined block-structured Cartesian grids in two and three dimensions in a distributive parallel environment.
-
-The code offers two solvers:
-* Domain decomposition using a Schur complement, which is solved using GMRES preconditioned with BoomerAMG.
- 
-* Geometric multigrid method using a Fast Adaptive Composite (FAC) type algorithm.
-
-The Schur complement method works well for 2D problems, but not 3D.  The Geometric multigrid method works well for both 2D and 3D.
+ThunderEgg is an object-oriented C++ library designed for flexibility and to allow users to implement parallel multigrid preconditioners for various problems on octree and quadtree adaptive meshes.
 
 # Members of the team :
 
@@ -17,10 +10,15 @@ The Schur complement method works well for 2D problems, but not 3D.  The Geometr
 * Grady Wright
 
 # Required Software
-* FFTW
-* Zoltan
-* PETSc
+* MPI
 * CMake
+* BLAS and LAPACK
+
+## Optional Software
+* FFTW - [FFTW PatchSolver](https://thunderegg.dev/docs/develop/doc/html/classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html)
+* PETSc - ThunderEgg provides [a set of interfaces](https://thunderegg.dev/docs/develop/doc/html/namespaceThunderEgg_1_1PETSc.html) to use PETSc Krylov Solvers and PETSc matrices.
+* Zoltan - currently needed to compile examples
+* p4est - for compatibility with the p4est quadtree library
 
 # Compiling
 Create a seperate source directory and run cmake in the build directory:
@@ -37,6 +35,8 @@ Paths to libraries can be specified with the following cmake options
 -DFFTW_DIR=/path/to/library
 -DPETSC_DIR=/path/to/library
 -DZOLTAN_DIR=/path/to/library
+-Dp4est_DIR=/path/to/library
+
 ```
 Then compile with make:
 ```
@@ -45,6 +45,6 @@ make
 
 # Examples:
 
-Both of these examples support both the Schur compliment and geometric multigrid methods:
-* apps/2d/steady2d  : Two dimensional example for Poisson's equation
-* apps/3d/steady    : Three dimensional example for Poisson's equation
+Example applications are in the `apps` directory.
+
+TODO cleanup/simplify example applications
