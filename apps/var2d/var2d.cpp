@@ -21,7 +21,6 @@
 
 #include "Init.h"
 #include "Writers/ClawWriter.h"
-#include <ThunderEgg/BiCGStab.h>
 #include <ThunderEgg/BiCGStabPatchSolver.h>
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/Domain.h>
@@ -30,6 +29,7 @@
 #include <ThunderEgg/GMG/CycleBuilder.h>
 #include <ThunderEgg/GMG/DirectInterpolator.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
+#include <ThunderEgg/Iterative/BiCGStab.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
 #include <ThunderEgg/Timer.h>
@@ -387,7 +387,7 @@ int main(int argc, char *argv[])
 
 		timer->start("Linear Solve");
 		u->set(0);
-		int its = BiCGStab<2>::solve(vg, A, u, f, M, 1000, 1e-12, timer);
+		int its = Iterative::BiCGStab<2>::solve(vg, A, u, f, M, 1000, 1e-12, timer);
 		if (my_global_rank == 0) {
 			cout << "Iterations: " << its << endl;
 		}

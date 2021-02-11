@@ -21,13 +21,14 @@
 
 #include "catch.hpp"
 #include "utils/DomainReader.h"
-#include <ThunderEgg/BiCGStab.h>
 #include <ThunderEgg/BiLinearGhostFiller.h>
+#include <ThunderEgg/Iterative/BiCGStab.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/ValVectorGenerator.h>
 #include <sstream>
 using namespace std;
 using namespace ThunderEgg;
+using namespace ThunderEgg::Iterative;
 
 TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]")
 {

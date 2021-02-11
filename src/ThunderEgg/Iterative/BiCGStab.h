@@ -29,6 +29,8 @@
 
 namespace ThunderEgg
 {
+namespace Iterative
+{
 /**
  * @brief ThunderEgg implementation of BiCGStab iterative solver.
  *
@@ -155,5 +157,6 @@ template <int D> class BiCGStab
 		return num_its;
 	}
 };
+} // namespace Iterative
 } // namespace ThunderEgg
 #endif

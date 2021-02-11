@@ -22,9 +22,9 @@
 #ifndef THUNDEREGG_SCHUR_BICGSTABSOLVER_H
 #define THUNDEREGG_SCHUR_BICGSTABSOLVER_H
 
-#include <ThunderEgg/BiCGStab.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/Level.h>
+#include <ThunderEgg/Iterative/BiCGStab.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
 #include <ThunderEgg/ValVector.h>
@@ -214,7 +214,8 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 
 		int iterations = 0;
 		try {
-			iterations = BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
+			iterations
+			= Iterative::BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
 		} catch (const BreakdownError &err) {
 			if (!continue_on_breakdown) {
 				throw err;

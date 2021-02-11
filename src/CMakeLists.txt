@@ -1,8 +1,6 @@
 project(ThunderEgg_Lib)
 
 # determine sources first
-list(APPEND ThunderEgg_HDRS ThunderEgg/BiCGStab.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiCGStabPatchSolver.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiLinearGhostFiller.h)
@@ -97,6 +95,7 @@ include(ThunderEgg/PETSc/CMakeLists.txt)
 include(ThunderEgg/Poisson/CMakeLists.txt)
 include(ThunderEgg/Schur/CMakeLists.txt)
 include(ThunderEgg/VarPoisson/CMakeLists.txt)
+include(ThunderEgg/Iterative/CMakeLists.txt)
 
 add_library(ThunderEgg ${ThunderEgg_SRCS} ${ThunderEgg_HDRS})
 target_compile_features(ThunderEgg PUBLIC cxx_std_11)
