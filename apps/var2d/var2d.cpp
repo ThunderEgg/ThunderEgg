@@ -387,7 +387,11 @@ int main(int argc, char *argv[])
 
 		timer->start("Linear Solve");
 		u->set(0);
-		int its = Iterative::BiCGStab<2>::solve(vg, A, u, f, M, 1000, 1e-12, timer);
+		Iterative::BiCGStab<2> solver;
+		solver.setMaxIterations(1000);
+		solver.setTolerance(1e-12);
+		solver.setTimer(timer);
+		int its = solver.solve(vg, A, u, f, M);
 		if (my_global_rank == 0) {
 			cout << "Iterations: " << its << endl;
 		}

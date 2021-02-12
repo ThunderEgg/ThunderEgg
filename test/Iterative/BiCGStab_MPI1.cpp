@@ -30,6 +30,42 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Iterative;
 
+TEST_CASE("BiCGStab default max iterations", "[BiCGStab]")
+{
+	BiCGStab<2> bcgs;
+	CHECK(bcgs.getMaxIterations() == 1000);
+}
+TEST_CASE("BiCGStab set max iterations", "[BiCGStab]")
+{
+	BiCGStab<2> bcgs;
+	int         iterations = GENERATE(1, 2, 3);
+	bcgs.setMaxIterations(iterations);
+	CHECK(bcgs.getMaxIterations() == iterations);
+}
+TEST_CASE("BiCGStab default tolerance", "[BiCGStab]")
+{
+	BiCGStab<2> bcgs;
+	CHECK(bcgs.getTolerance() == 1e-12);
+}
+TEST_CASE("BiCGStab set tolerance", "[BiCGStab]")
+{
+	BiCGStab<2> bcgs;
+	double      tolerance = GENERATE(1.2, 2.3, 3.4);
+	bcgs.setTolerance(tolerance);
+	CHECK(bcgs.getTolerance() == tolerance);
+}
+TEST_CASE("BiCGStab default timer", "[BiCGStab]")
+{
+	BiCGStab<2> bcgs;
+	CHECK(bcgs.getTimer() == nullptr);
+}
+TEST_CASE("BiCGStab set timer", "[BiCGStab]")
+{
+	BiCGStab<2> bcgs;
+	auto        timer = make_shared<Timer>(MPI_COMM_WORLD);
+	bcgs.setTimer(timer);
+	CHECK(bcgs.getTimer() == timer);
+}
 TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
@@ -61,8 +97,10 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]
 
 	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
 
-	BiCGStab<2>::solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec,
-	                   nullptr, 1000, tolerance);
+	BiCGStab<2> solver;
+	solver.setMaxIterations(1000);
+	solver.setTolerance(tolerance);
+	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
 
 	p_operator->apply(g_vec, residual);
 	residual->addScaled(-1, f_vec);
@@ -101,8 +139,11 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 
 	std::stringstream ss;
 
-	BiCGStab<2>::solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec,
-	                   nullptr, 1000, tolerance, nullptr, true, ss);
+	BiCGStab<2> solver;
+	solver.setMaxIterations(1000);
+	solver.setTolerance(tolerance);
+	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec, nullptr,
+	             true, ss);
 
 	INFO(ss.str());
 	int    prev_iteration;
@@ -146,12 +187,13 @@ TEST_CASE("giving a good initial guess reduces the iterations", "[BiCGStab]")
 
 	double tolerance = 1e-5;
 
-	BiCGStab<2>::solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec,
-	                   nullptr, 1000, tolerance);
+	BiCGStab<2> solver;
+	solver.setMaxIterations(1000);
+	solver.setTolerance(tolerance);
+	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
 
 	int iterations_with_solved_guess
-	= BiCGStab<2>::solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec,
-	                     nullptr, 1000, tolerance);
+	= solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
 
 	CHECK(iterations_with_solved_guess == 0);
 }
@@ -197,15 +239,17 @@ class MockOperator : public Operator<2>
 } // namespace
 TEST_CASE("throws breakdown exception when rho is 0", "[BiCGStab]")
 {
-	auto vec = make_shared<MockVector>(0);
-	CHECK_THROWS_AS(BiCGStab<2>::solve(make_shared<MockVectorGenerator>(vec),
-	                                   make_shared<MockOperator>(), vec, vec),
-	                BreakdownError);
+	auto        vec = make_shared<MockVector>(0);
+	BiCGStab<2> solver;
+	CHECK_THROWS_AS(
+	solver.solve(make_shared<MockVectorGenerator>(vec), make_shared<MockOperator>(), vec, vec),
+	BreakdownError);
 }
 TEST_CASE("throws divergence exception when residual keeps increasing", "[BiCGStab]")
 {
-	auto vec = make_shared<MockVector>(1);
-	CHECK_THROWS_AS(BiCGStab<2>::solve(make_shared<MockVectorGenerator>(vec),
-	                                   make_shared<MockOperator>(), vec, vec),
-	                DivergenceError);
+	auto        vec = make_shared<MockVector>(1);
+	BiCGStab<2> solver;
+	CHECK_THROWS_AS(
+	solver.solve(make_shared<MockVectorGenerator>(vec), make_shared<MockOperator>(), vec, vec),
+	DivergenceError);
 }

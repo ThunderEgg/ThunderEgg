@@ -19,10 +19,11 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_BICGSTAB_H
-#define THUNDEREGG_BICGSTAB_H
+#ifndef THUNDEREGG_ITERATIVE_BICGSTAB_H
+#define THUNDEREGG_ITERATIVE_BICGSTAB_H
 #include <ThunderEgg/BreakdownError.h>
 #include <ThunderEgg/DivergenceError.h>
+#include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Timer.h>
 #include <ThunderEgg/VectorGenerator.h>
@@ -36,28 +37,84 @@ namespace Iterative
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <int D> class BiCGStab
+template <int D> class BiCGStab : public Solver<D>
 {
+	private:
+	/**
+	 * @brief The maximum number of iterations
+	 */
+	int max_iterations = 1000;
+	/**
+	 * @brief The maximum number of iterations
+	 */
+	double tolerance = 1e-12;
+	/**
+	 * @brief The timer
+	 */
+	std::shared_ptr<Timer> timer = nullptr;
+
 	public:
 	/**
-	 * @brief Perform an iterative solve
+	 * @brief Set the maximum number of iterations
 	 *
-	 * @param vg a VectorGenerator that allows for the creation of temporary work vectors
-	 * @param A the matrix
-	 * @param x the initial LHS guess.
-	 * @param b the RHS vector.
-	 * @param Mr the right preconditioner. Set to nullptr if there is no right preconditioner.
-	 * @param timer the timer
-	 * @param output print output to std::cout
-	 * @param os the stream to output to
-	 *
-	 * @return the number of iterations
+	 * @param max_iterations_in the maximum number of iterations
 	 */
-	static int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
-	                 std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
-	                 std::shared_ptr<const Operator<D>> Mr = nullptr, int max_it = 1000,
-	                 double tolerance = 1e-12, std::shared_ptr<ThunderEgg::Timer> timer = nullptr,
-	                 bool output = false, std::ostream &os = std::cout)
+	void setMaxIterations(int max_iterations_in)
+	{
+		max_iterations = max_iterations_in;
+	};
+	/**
+	 * @brief Get the maximum number of iterations
+	 *
+	 * @return int the maximum number of iterations
+	 */
+	int getMaxIterations() const
+	{
+		return max_iterations;
+	}
+	/**
+	 * @brief Set the stopping tolerance
+	 *
+	 * @param tolerance_in the stopping tolerance
+	 */
+	void setTolerance(double tolerance_in)
+	{
+		tolerance = tolerance_in;
+	};
+	/**
+	 * @brief Get the stopping tolerance
+	 *
+	 * @return double the stopping tolerance
+	 */
+	double getTolerance() const
+	{
+		return tolerance;
+	}
+	/**
+	 * @brief Set the Timer object
+	 *
+	 * @param timer_in the Timer
+	 */
+	void setTimer(std::shared_ptr<Timer> timer_in)
+	{
+		timer = timer_in;
+	}
+
+	/**
+	 * @brief Get the Timer object
+	 *
+	 * @return std::shared_ptr<Timer> the Timer
+	 */
+	std::shared_ptr<Timer> getTimer() const
+	{
+		return timer;
+	}
+
+	public:
+	int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
+	          std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
+	          std::shared_ptr<const Operator<D>> Mr = nullptr, bool output = false,
+	          std::ostream &os = std::cout) const override
 	{
 		std::shared_ptr<Vector<D>> resid = vg->getNewVector();
 		std::shared_ptr<Vector<D>> ms;
@@ -89,7 +146,7 @@ template <int D> class BiCGStab
 			sprintf(buf, "%5d %16.8e\n", num_its, residual);
 			os << std::string(buf);
 		}
-		while (residual > tolerance && num_its < max_it) {
+		while (residual > tolerance && num_its < max_iterations) {
 			if (timer) {
 				timer->start("Iteration");
 			}

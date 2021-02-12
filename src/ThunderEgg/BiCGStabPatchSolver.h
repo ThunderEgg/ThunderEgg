@@ -214,8 +214,10 @@ template <int D> class BiCGStabPatchSolver : public PatchSolver<D>
 
 		int iterations = 0;
 		try {
-			iterations
-			= Iterative::BiCGStab<D>::solve(vg, single_op, u_single, f_copy, nullptr, max_it, tol);
+			Iterative::BiCGStab<D> solver;
+			solver.setMaxIterations(max_it);
+			solver.setTolerance(tol);
+			iterations = solver.solve(vg, single_op, u_single, f_copy);
 		} catch (const BreakdownError &err) {
 			if (!continue_on_breakdown) {
 				throw err;

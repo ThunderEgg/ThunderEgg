@@ -29,14 +29,37 @@ namespace ThunderEgg
 {
 namespace Iterative
 {
+/**
+ * @brief Represents an iterative solver
+ *
+ * @tparam D the number of cartesian dimensions
+ */
 template <int D> class Solver
 {
 	public:
+	/**
+	 * @brief Destroy the Solver object
+	 */
+	virtual ~Solver() {}
+	/**
+	 * @brief Perform an iterative solve
+	 *
+	 * @param vg a VectorGenerator that allows for the creation of temporary work vectors
+	 * @param A the matrix
+	 * @param x the initial LHS guess.
+	 * @param b the RHS vector.
+	 * @param Mr the right preconditioner. Set to nullptr if there is no right preconditioner.
+	 * @param output print output to the provided stream
+	 * @param os the stream to output to
+	 *
+	 * @return the number of iterations
+	 */
 	virtual int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
 	                  std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
-	                  std::shared_ptr<const Operator<D>> Mr = nullptr)
-	= 0;
+	                  std::shared_ptr<const Operator<D>> Mr = nullptr, bool output = false,
+	                  std::ostream &os = std::cout) const = 0;
 };
 //
 } // namespace Iterative
 } // namespace ThunderEgg
+#endif
