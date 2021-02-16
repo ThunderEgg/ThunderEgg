@@ -33,11 +33,11 @@ namespace ThunderEgg
 namespace Iterative
 {
 /**
- * @brief ThunderEgg implementation of BiCGStab iterative solver.
+ * @brief ThunderEgg implementation of the Conjugate Gradient iterative solver.
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <int D> class BiCGStab : public Solver<D>
+template <int D> class CG : public Solver<D>
 {
 	private:
 	/**
@@ -52,22 +52,6 @@ template <int D> class BiCGStab : public Solver<D>
 	 * @brief The timer
 	 */
 	std::shared_ptr<Timer> timer = nullptr;
-
-	void applyWithPreconditioner(std::shared_ptr<VectorGenerator<D>> vg,
-	                             std::shared_ptr<const Operator<D>>  M_l,
-	                             std::shared_ptr<const Operator<D>>  A,
-	                             std::shared_ptr<const Operator<D>>  M_r,
-	                             std::shared_ptr<const Vector<D>>    x,
-	                             std::shared_ptr<Vector<D>>          b) const
-	{
-		if (M_l == nullptr && M_r == nullptr) {
-			A->apply(x, b);
-		} else if (M_l == nullptr && M_r != nullptr) {
-			std::shared_ptr<Vector<D>> tmp = vg->getNewVector();
-			A->apply(x, tmp);
-			M_r->apply(tmp, b);
-		}
-	}
 
 	public:
 	/**
@@ -133,6 +117,8 @@ template <int D> class BiCGStab : public Solver<D>
 	          std::ostream &os = std::cout) const override
 	{
 		std::shared_ptr<Vector<D>> resid = vg->getNewVector();
+		std::shared_ptr<Vector<D>> z     = vg->getNewVector();
+		std::shared_ptr<Vector<D>> p     = vg->getNewVector();
 		std::shared_ptr<Vector<D>> ms;
 		std::shared_ptr<Vector<D>> mp;
 		if (Mr != nullptr) {
@@ -172,7 +158,12 @@ template <int D> class BiCGStab : public Solver<D>
 				                     + std::to_string(num_its));
 			}
 
-			applyWithPreconditioner(vg, nullptr, A, Mr, p, ap);
+			if (Mr != nullptr) {
+				Mr->apply(p, mp);
+				A->apply(mp, ap);
+			} else {
+				A->apply(p, ap);
+			}
 			double alpha = rho / rhat->dot(ap);
 			s->copy(resid);
 			s->addScaled(-alpha, ap);
@@ -183,9 +174,20 @@ template <int D> class BiCGStab : public Solver<D>
 				}
 				break;
 			}
-			applyWithPreconditioner(vg, nullptr, A, Mr, s, as);
+			if (Mr != nullptr) {
+				Mr->apply(s, ms);
+				A->apply(ms, as);
+			} else {
+				A->apply(s, as);
+			}
 			double omega = as->dot(s) / as->dot(as);
-			x->addScaled(alpha, p, omega, s);
+
+			// update x and residual
+			if (Mr != nullptr) {
+				x->addScaled(alpha, mp, omega, ms);
+			} else {
+				x->addScaled(alpha, p, omega, s);
+			}
 			resid->addScaled(-alpha, ap, -omega, as);
 
 			double rho_new = resid->dot(rhat);
