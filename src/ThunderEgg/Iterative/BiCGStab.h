@@ -64,8 +64,8 @@ template <int D> class BiCGStab : public Solver<D>
 			A->apply(x, b);
 		} else if (M_l == nullptr && M_r != nullptr) {
 			std::shared_ptr<Vector<D>> tmp = vg->getNewVector();
-			A->apply(x, tmp);
-			M_r->apply(tmp, b);
+			M_r->apply(x, tmp);
+			A->apply(tmp, b);
 		}
 	}
 
@@ -133,14 +133,14 @@ template <int D> class BiCGStab : public Solver<D>
 	          std::ostream &os = std::cout) const override
 	{
 		std::shared_ptr<Vector<D>> resid = vg->getNewVector();
-		std::shared_ptr<Vector<D>> ms;
-		std::shared_ptr<Vector<D>> mp;
-		if (Mr != nullptr) {
-			ms = vg->getNewVector();
-			mp = vg->getNewVector();
-		}
+
 		A->apply(x, resid);
 		resid->scaleThenAdd(-1, b);
+
+		std::shared_ptr<Vector<D>> initial_guess = vg->getNewVector();
+		initial_guess->copy(x);
+		x->set(0);
+
 		double                     r0_norm = b->twoNorm();
 		std::shared_ptr<Vector<D>> rhat    = vg->getNewVector();
 		rhat->copy(resid);
@@ -186,7 +186,8 @@ template <int D> class BiCGStab : public Solver<D>
 			applyWithPreconditioner(vg, nullptr, A, Mr, s, as);
 			double omega = as->dot(s) / as->dot(as);
 			x->addScaled(alpha, p, omega, s);
-			resid->addScaled(-alpha, ap, -omega, as);
+			resid->addScaled(-alpha, ap);
+			resid->addScaled(-omega, as);
 
 			double rho_new = resid->dot(rhat);
 			double beta    = rho_new * alpha / (rho * omega);
@@ -211,6 +212,11 @@ template <int D> class BiCGStab : public Solver<D>
 				timer->stop("Iteration");
 			}
 		}
+		if (Mr != nullptr) {
+			Mr->apply(x, resid);
+			x->copy(resid);
+		}
+		x->add(initial_guess);
 		return num_its;
 	}
 };

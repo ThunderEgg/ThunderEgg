@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_ITERATIVE_BICGSTAB_H
-#define THUNDEREGG_ITERATIVE_BICGSTAB_H
+#ifndef THUNDEREGG_ITERATIVE_CG_H
+#define THUNDEREGG_ITERATIVE_CG_H
 #include <ThunderEgg/BreakdownError.h>
 #include <ThunderEgg/DivergenceError.h>
 #include <ThunderEgg/Iterative/Solver.h>
@@ -33,7 +33,7 @@ namespace ThunderEgg
 namespace Iterative
 {
 /**
- * @brief ThunderEgg implementation of the Conjugate Gradient iterative solver.
+ * @brief ThunderEgg implementation of CG iterative solver.
  *
  * @tparam D the number of Cartesian dimensions
  */
@@ -52,6 +52,22 @@ template <int D> class CG : public Solver<D>
 	 * @brief The timer
 	 */
 	std::shared_ptr<Timer> timer = nullptr;
+
+	void applyWithPreconditioner(std::shared_ptr<VectorGenerator<D>> vg,
+	                             std::shared_ptr<const Operator<D>>  M_l,
+	                             std::shared_ptr<const Operator<D>>  A,
+	                             std::shared_ptr<const Operator<D>>  M_r,
+	                             std::shared_ptr<const Vector<D>>    x,
+	                             std::shared_ptr<Vector<D>>          b) const
+	{
+		if (M_l == nullptr && M_r == nullptr) {
+			A->apply(x, b);
+		} else if (M_l == nullptr && M_r != nullptr) {
+			std::shared_ptr<Vector<D>> tmp = vg->getNewVector();
+			M_r->apply(x, tmp);
+			A->apply(tmp, b);
+		}
+	}
 
 	public:
 	/**
@@ -117,26 +133,20 @@ template <int D> class CG : public Solver<D>
 	          std::ostream &os = std::cout) const override
 	{
 		std::shared_ptr<Vector<D>> resid = vg->getNewVector();
-		std::shared_ptr<Vector<D>> z     = vg->getNewVector();
-		std::shared_ptr<Vector<D>> p     = vg->getNewVector();
-		std::shared_ptr<Vector<D>> ms;
-		std::shared_ptr<Vector<D>> mp;
-		if (Mr != nullptr) {
-			ms = vg->getNewVector();
-			mp = vg->getNewVector();
-		}
+
 		A->apply(x, resid);
 		resid->scaleThenAdd(-1, b);
+
+		std::shared_ptr<Vector<D>> initial_guess = vg->getNewVector();
+		initial_guess->copy(x);
+		x->set(0);
+
 		double                     r0_norm = b->twoNorm();
-		std::shared_ptr<Vector<D>> rhat    = vg->getNewVector();
-		rhat->copy(resid);
-		std::shared_ptr<Vector<D>> p = vg->getNewVector();
+		std::shared_ptr<Vector<D>> p       = vg->getNewVector();
 		p->copy(resid);
 		std::shared_ptr<Vector<D>> ap = vg->getNewVector();
-		std::shared_ptr<Vector<D>> as = vg->getNewVector();
 
-		std::shared_ptr<Vector<D>> s   = vg->getNewVector();
-		double                     rho = rhat->dot(resid);
+		double rho = resid->dot(resid);
 
 		int num_its = 0;
 		if (r0_norm == 0) {
@@ -154,56 +164,23 @@ template <int D> class CG : public Solver<D>
 			}
 
 			if (rho == 0) {
-				throw BreakdownError("BiCGStab broke down, rho was 0 on iteration "
+				throw BreakdownError("CG broke down, rho was 0 on iteration "
 				                     + std::to_string(num_its));
 			}
 
-			if (Mr != nullptr) {
-				Mr->apply(p, mp);
-				A->apply(mp, ap);
-			} else {
-				A->apply(p, ap);
-			}
-			double alpha = rho / rhat->dot(ap);
-			s->copy(resid);
-			s->addScaled(-alpha, ap);
-			if (s->twoNorm() / r0_norm <= tolerance) {
-				x->addScaled(alpha, p);
-				if (timer) {
-					timer->stop("Iteration");
-				}
-				break;
-			}
-			if (Mr != nullptr) {
-				Mr->apply(s, ms);
-				A->apply(ms, as);
-			} else {
-				A->apply(s, as);
-			}
-			double omega = as->dot(s) / as->dot(as);
+			applyWithPreconditioner(vg, nullptr, A, Mr, p, ap);
+			double alpha = rho / p->dot(ap);
+			x->addScaled(alpha, p);
+			resid->addScaled(-alpha, ap);
 
-			// update x and residual
-			if (Mr != nullptr) {
-				x->addScaled(alpha, mp, omega, ms);
-			} else {
-				x->addScaled(alpha, p, omega, s);
-			}
-			resid->addScaled(-alpha, ap, -omega, as);
-
-			double rho_new = resid->dot(rhat);
-			double beta    = rho_new * alpha / (rho * omega);
-			p->addScaled(-omega, ap);
+			double rho_new = resid->dot(resid);
+			double beta    = rho_new / rho;
 			p->scaleThenAdd(beta, resid);
 
 			num_its++;
 			rho      = rho_new;
 			residual = resid->twoNorm() / r0_norm;
 
-			if (residual > 1e6) {
-				throw DivergenceError("BiCGStab reached divergence criteria on iteration "
-				                      + std::to_string(num_its) + " with residual two norm "
-				                      + std::to_string(residual));
-			}
 			if (output) {
 				char buf[100];
 				sprintf(buf, "%5d %16.8e\n", num_its, residual);
@@ -213,6 +190,11 @@ template <int D> class CG : public Solver<D>
 				timer->stop("Iteration");
 			}
 		}
+		if (Mr != nullptr) {
+			Mr->apply(x, resid);
+			x->copy(resid);
+		}
+		x->add(initial_guess);
 		return num_its;
 	}
 };
