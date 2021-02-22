@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <set>
 
@@ -31,24 +32,15 @@ namespace
 {
 template <int D> class MockGhostFiller : public GhostFiller<D>
 {
-	private:
-	mutable int num_calls = 0;
-
 	public:
-	void fillGhost(std::shared_ptr<const Vector<D>> u) const override
-	{
-		num_calls++;
-	}
-	int numCalls()
-	{
-		return num_calls;
-	}
+	void fillGhost(std::shared_ptr<const Vector<D>> u) const override {}
 };
 template <int D> class MockPatchOperator : public PatchOperator<D>
 {
 	private:
 	mutable bool rhs_was_modified   = false;
 	mutable bool interior_dirichlet = false;
+	mutable int  num_apply_calls    = 0;
 
 	public:
 	MockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
@@ -60,12 +52,8 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
 	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
-		interior_dirichlet |= treat_interior_boundary_as_dirichlet;
-		for (size_t c = 0; c < fs.size(); c++) {
-			nested_loop<D>(fs[c].getStart(), fs[c].getEnd(), [&](const std::array<int, D> &coord) {
-				fs[c][coord] = us[c][coord] / 2;
-			});
-		}
+		interior_dirichlet |= true;
+		num_apply_calls++;
 	}
 	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
 	                   const std::vector<LocalData<D>> &   us,
@@ -80,6 +68,10 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 	bool interiorDirichlet()
 	{
 		return interior_dirichlet;
+	}
+	int getNumApplyCalls()
+	{
+		return num_apply_calls;
 	}
 };
 template <int D> class NonLinMockPatchOperator : public PatchOperator<D>
@@ -119,5 +111,31 @@ template <int D> class NonLinMockPatchOperator : public PatchOperator<D>
 		return interior_dirichlet;
 	}
 };
+template <int D> class MockSolver : public Iterative::Solver<D>
+{
+	private:
+	std::function<int(std::shared_ptr<VectorGenerator<D>>, std::shared_ptr<const Operator<D>>,
+	                  std::shared_ptr<Vector<D>>, std::shared_ptr<const Vector<D>>,
+	                  std::shared_ptr<const Operator<D>>)>
+	callback;
+
+	public:
+	MockSolver(
+	std::function<int(std::shared_ptr<VectorGenerator<D>>, std::shared_ptr<const Operator<D>>,
+	                  std::shared_ptr<Vector<D>>, std::shared_ptr<const Vector<D>>,
+	                  std::shared_ptr<const Operator<D>>)>
+	callback)
+	: callback(callback)
+	{
+	}
+	int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
+	          std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
+	          std::shared_ptr<const Operator<D>> Mr = nullptr, bool output = false,
+	          std::ostream &os = std::cout) const override
+	{
+		return callback(vg, A, x, b, Mr);
+	}
+};
+
 } // namespace
 } // namespace ThunderEgg

@@ -1,8 +1,6 @@
 project(ThunderEgg_Lib)
 
 # determine sources first
-list(APPEND ThunderEgg_HDRS ThunderEgg/BiCGStabPatchSolver.h)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiLinearGhostFiller.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/BiLinearGhostFiller.cpp)
 

@@ -19,9 +19,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_SCHUR_BICGSTABSOLVER_H
-#define THUNDEREGG_SCHUR_BICGSTABSOLVER_H
+#ifndef THUNDEREGG_ITERATIVE_PATCHSOLVER_H
+#define THUNDEREGG_ITERATIVE_PATCHSOLVER_H
 
+#include <ThunderEgg/BreakdownError.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/Iterative/Solver.h>
@@ -33,12 +34,14 @@
 
 namespace ThunderEgg
 {
+namespace Iterative
+{
 /**
  * @brief Solves the patches using a Iterative iterative solver on each patch
  *
  * @tparam D the number of cartesian dimensions
  */
-template <int D> class IterativePatchSolver : public PatchSolver<D>
+template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 {
 	private:
 	/**
@@ -165,20 +168,15 @@ template <int D> class IterativePatchSolver : public PatchSolver<D>
 	};
 
 	/**
+	 * @brief The iterative solver being used
+	 */
+	std::shared_ptr<const Solver<D>> solver;
+
+	/**
 	 * @brief The operator for the solve
 	 */
 	std::shared_ptr<const PatchOperator<D>> op;
 
-	std::shared_ptr<const Iterative::Solver<D>> solver;
-
-	/**
-	 * @brief maximum number of iterators for each solve
-	 */
-	int max_it;
-	/**
-	 * @brief tolerance for each solve
-	 */
-	double tol;
 	/**
 	 * @brief whether or not to continue on BreakDownError
 	 */
@@ -193,11 +191,10 @@ template <int D> class IterativePatchSolver : public PatchSolver<D>
 	 * @param max_it_in the maximum number of iterations to use for patch solves
 	 * @param continue_on_breakdown continue on breakdown exception
 	 */
-	IterativePatchSolver(std::shared_ptr<const Iterative::Solver<D>> solver,
-	                     std::shared_ptr<const PatchOperator<D>> op_in, double tol_in = 1e-12,
-	                     int max_it_in = 1000, bool continue_on_breakdown = false)
-	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), solver(solver), op(op_in),
-	  max_it(max_it_in), tol(tol_in), continue_on_breakdown(continue_on_breakdown)
+	PatchSolver(std::shared_ptr<const Iterative::Solver<D>> solver,
+	            std::shared_ptr<const PatchOperator<D>> op_in, bool continue_on_breakdown = false)
+	: ThunderEgg::PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), solver(solver),
+	  op(op_in), continue_on_breakdown(continue_on_breakdown)
 	{
 	}
 	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
@@ -228,5 +225,6 @@ template <int D> class IterativePatchSolver : public PatchSolver<D>
 		}
 	}
 };
+} // namespace Iterative
 } // namespace ThunderEgg
 #endif

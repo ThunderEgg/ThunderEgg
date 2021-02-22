@@ -245,11 +245,3 @@ TEST_CASE("throws breakdown exception when rho is 0", "[BiCGStab]")
 	solver.solve(make_shared<MockVectorGenerator>(vec), make_shared<MockOperator>(), vec, vec),
 	BreakdownError);
 }
-TEST_CASE("throws divergence exception when residual keeps increasing", "[BiCGStab]")
-{
-	auto        vec = make_shared<MockVector>(1);
-	BiCGStab<2> solver;
-	CHECK_THROWS_AS(
-	solver.solve(make_shared<MockVectorGenerator>(vec), make_shared<MockOperator>(), vec, vec),
-	DivergenceError);
-}

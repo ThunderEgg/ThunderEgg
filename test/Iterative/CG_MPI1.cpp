@@ -245,11 +245,3 @@ TEST_CASE("CG throws breakdown exception when rho is 0", "[CG]")
 	solver.solve(make_shared<MockVectorGenerator>(vec), make_shared<MockOperator>(), vec, vec),
 	BreakdownError);
 }
-TEST_CASE("CG throws divergence exception when residual keeps increasing", "[CG]")
-{
-	auto  vec = make_shared<MockVector>(1);
-	CG<2> solver;
-	CHECK_THROWS_AS(
-	solver.solve(make_shared<MockVectorGenerator>(vec), make_shared<MockOperator>(), vec, vec),
-	DivergenceError);
-}
