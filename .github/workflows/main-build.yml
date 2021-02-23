@@ -27,7 +27,7 @@ jobs:
         wget --quiet $SONAR_SCANNER_URL
         unzip sonar-scanner-*-linux.zip
         mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
-        echo $HOME/build-scanner-linux/bin >> $GITHUB_PATH
+        echo $HOME/sonar-scanner-linux/bin >> $GITHUB_PATH
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
