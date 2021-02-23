@@ -27,14 +27,13 @@ jobs:
         unzip sonar-scanner-*-linux.zip
         mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
         echo $HOME/build-scanner-linux/bin >> $GITHUB_PATH
-        pwd
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
     - name: Cmake Configure
       run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ .
     - name: Build
-      run: build-wrapper-linux-x86 make
+      run: build-wrapper-linux-x86-64 make
     - name: Run Tests
       run: ctest --output-on-failure
     - name: Generate Coverage Report
