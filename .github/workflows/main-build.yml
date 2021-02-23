@@ -3,7 +3,6 @@ on: [push]
 env:
   SONAR_WRAPPER_URL: https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
   SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.0.2311-linux.zip
-  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -42,4 +41,7 @@ jobs:
     - name: Upload to codecov.io
       run: bash <(curl -s https://codecov.io/bash)
     - name: Run sonar-scanner
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: sonar-scanner
