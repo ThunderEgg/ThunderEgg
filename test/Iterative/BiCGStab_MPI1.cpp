@@ -260,7 +260,55 @@ class MockOperator : public Operator<2>
 	public:
 	void apply(std::shared_ptr<const Vector<2>>, std::shared_ptr<Vector<2>>) const override {}
 };
+class I2Operator : public Operator<2>
+{
+	public:
+	void apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> y) const override
+	{
+		y->copy(x);
+		y->scale(2);
+	}
+};
 } // namespace
+TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
+{
+	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
+	INFO("MESH FILE " << mesh_file);
+	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
+	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+
+	auto ffun = [](const std::array<double, 2> &coord) {
+		double x = coord[0];
+		double y = coord[1];
+		return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
+	};
+	auto gfun = [](const std::array<double, 2> &coord) {
+		double x = coord[0];
+		double y = coord[1];
+		return sin(M_PI * y) * cos(2 * M_PI * x);
+	};
+
+	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
+	DomainTools::SetValues<2>(domain, f_vec, ffun);
+	auto residual = ValVector<2>::GetNewVector(domain, 1);
+
+	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+
+	auto gf = make_shared<BiLinearGhostFiller>(domain);
+
+	auto op = make_shared<I2Operator>();
+
+	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
+
+	BiCGStab<2> solver;
+	solver.setMaxIterations(1000);
+	solver.setTolerance(tolerance);
+	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), op, g_vec, f_vec);
+
+	op->apply(g_vec, residual);
+	residual->addScaled(-1, f_vec);
+	CHECK(residual->dot(residual) / f_vec->dot(f_vec) <= tolerance);
+}
 TEST_CASE("throws breakdown exception when rho is 0", "[BiCGStab]")
 {
 	auto        vec = make_shared<MockVector>(0);
