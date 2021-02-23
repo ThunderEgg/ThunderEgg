@@ -9,6 +9,10 @@ jobs:
         fetch-depth: 0
     - name: Install dependencies
       run: sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev libtrilinos-zoltan-dev
+    - name: Set CXXFLAGS
+      run: export CXXFLAGS=""-g -O0 -Wall -W -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
+    - name: Set LDFLAGS
+      run: export LDFLAGS="-lgcov"
     - name: Cmake Configure
       run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ .
     - name: Build
