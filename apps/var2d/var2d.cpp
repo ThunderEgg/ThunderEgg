@@ -21,7 +21,6 @@
 
 #include "Init.h"
 #include "Writers/ClawWriter.h"
-#include <ThunderEgg/BiCGStabPatchSolver.h>
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>
@@ -30,6 +29,7 @@
 #include <ThunderEgg/GMG/DirectInterpolator.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/Iterative/BiCGStab.h>
+#include <ThunderEgg/Iterative/PatchSolver.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
 #include <ThunderEgg/Timer.h>
@@ -300,7 +300,10 @@ int main(int argc, char *argv[])
 		p_operator->addDrichletBCToRHS(f, gfun, hfun);
 
 		// set the patch solver
-		auto p_solver = make_shared<BiCGStabPatchSolver<2>>(p_operator, ps_tol, ps_max_it);
+		auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
+		p_bcgs->setTolerance(ps_tol);
+		p_bcgs->setMaxIterations(ps_max_it);
+		auto p_solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, p_operator);
 
 		std::shared_ptr<Operator<2>> A = p_operator;
 		std::shared_ptr<Operator<2>> M;
@@ -348,8 +351,7 @@ int main(int argc, char *argv[])
 				auto new_p_operator
 				= make_shared<StarPatchOperator<2>>(new_coeffs, curr_domain, new_gf);
 
-				auto new_p_solver
-				= make_shared<BiCGStabPatchSolver<2>>(new_p_operator, ps_tol, ps_max_it);
+				auto new_p_solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, new_p_operator);
 
 				auto interpolator
 				= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
@@ -374,7 +376,7 @@ int main(int argc, char *argv[])
 			= make_shared<StarPatchOperator<2>>(coarse_coeffs, curr_domain, coarse_gf);
 
 			auto coarse_p_solver
-			= make_shared<BiCGStabPatchSolver<2>>(coarse_p_operator, ps_tol, ps_max_it);
+			= make_shared<Iterative::PatchSolver<2>>(p_bcgs, coarse_p_operator);
 			builder.addCoarsestLevel(coarse_p_operator, coarse_p_solver, interpolator, coarse_vg);
 
 			M = builder.getCycle();
