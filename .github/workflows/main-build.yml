@@ -1,21 +1,28 @@
 name: Main ThunderEgg Build / Test / Analyze
 on: [push]
+env:
+  SONAR_WRAPPER_URL: https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+  SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.0.2311-linux.zip
 jobs:
   build:
     runs-on: ubuntu-20.04
+    env:
+      CXXFLAGS: -g -O0 -Wall -W -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline
+      LDFLAGS: -lgcov
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
     - name: Install dependencies
       run: |
         sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev libtrilinos-zoltan-dev
-        echo "/home/runner/.local/bin" >> $GITHUB_PATH
+        echo $HOME/.local/bin >> $GITHUB_PATH
         pip install gcovr
-    - name: Set CXXFLAGS
-      run: export CXXFLAGS="-g -O0 -Wall -W -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
-    - name: Set LDFLAGS
-      run: export LDFLAGS="-lgcov"
+    - name: Download Sonar Build Wrapper
+      run: |
+        wget $SONAR_SCANNER_URL
+        unzip build-wrapper-linux-x86.zip
+        echo $HOME/build-wrapper-linux-x86 >> $GITHUB_PATH
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Cmake Configure
       run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ .
     - name: Build
