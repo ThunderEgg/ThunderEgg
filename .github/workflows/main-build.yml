@@ -3,6 +3,7 @@ on: [push]
 env:
   SONAR_WRAPPER_URL: https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
   SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.0.2311-linux.zip
+environment: SonarCloud
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -40,3 +41,5 @@ jobs:
       run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
     - name: Upload to codecov.io
       run: bash <(curl -s https://codecov.io/bash)
+    - name: Run sonar-scanner
+      run: sonar-scanner
