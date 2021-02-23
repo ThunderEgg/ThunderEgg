@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     env:
-      CXXFLAGS: -g -O0 -Wall -W -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline
+      CXXFLAGS: -g -O0 -Wall -Wno-system-headers -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline
       LDFLAGS: -lgcov
     steps:
     - name: Install dependencies
@@ -17,7 +17,7 @@ jobs:
         pip install gcovr
     - name: Download Sonar Build Wrapper
       run: |
-        wget $SONAR_WRAPPER_URL
+        wget -quiet $SONAR_WRAPPER_URL
         unzip build-wrapper-linux-x86.zip
         echo $HOME/build-wrapper-linux-x86 >> $GITHUB_PATH
     - uses: actions/checkout@v2
