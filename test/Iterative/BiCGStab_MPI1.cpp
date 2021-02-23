@@ -106,6 +106,30 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]
 	residual->addScaled(-1, f_vec);
 	CHECK(residual->dot(residual) / f_vec->dot(f_vec) <= tolerance);
 }
+TEST_CASE("BiCGStab handles zero rhs vector", "[BiCGStab]")
+{
+	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
+	INFO("MESH FILE " << mesh_file);
+	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
+	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+
+	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
+
+	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+
+	auto gf = make_shared<BiLinearGhostFiller>(domain);
+
+	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
+
+	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
+
+	BiCGStab<2> solver;
+	solver.setMaxIterations(1000);
+	solver.setTolerance(tolerance);
+	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
+
+	CHECK(g_vec->infNorm() == 0);
+}
 TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
