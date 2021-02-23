@@ -19,12 +19,13 @@ jobs:
       run: |
         wget --quiet $SONAR_WRAPPER_URL
         unzip build-wrapper-linux-x86.zip
+        mv build-wrapper-linux-x86 $HOME/build-wrapper-linux-x86
         echo $HOME/build-wrapper-linux-x86 >> $GITHUB_PATH
     - name: Install Sonar Scanner
       run: |
         wget --quiet $SONAR_SCANNER_URL
         unzip sonar-scanner-*-linux.zip
-        mv sonar-scanner-*-linux sonar-scanner-linux
+        mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
         echo $HOME/build-scanner-linux/bin >> $GITHUB_PATH
         pwd
     - uses: actions/checkout@v2
@@ -33,7 +34,7 @@ jobs:
     - name: Cmake Configure
       run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ .
     - name: Build
-      run: make
+      run: build-wrapper-linux-x86 make
     - name: Run Tests
       run: ctest --output-on-failure
     - name: Generate Coverage Report
