@@ -1,0 +1,15 @@
+name: Main ThunderEgg build
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth:0
+    - name: Install dependencies
+      run: sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libpetsc-real3.12-dev libblas-dev liblapack-dev libtrilinos-zoltan-dev
+    - name: Cmake Configure
+      run: cmake -DPETSC_DIR=/petscdir/petsc3.12/x86_64-linux-gnu-real/ .
+    - name: Build
+      run: make
