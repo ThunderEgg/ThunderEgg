@@ -14,7 +14,7 @@ if(PETSC_FOUND)
   set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
 
   foreach(ARG1 RANGE 1 1)
-    set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
+    set(OptionalCatchTestLauncher ${MPIEXEC} "--oversubscribe" ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
     set(AdditionalCatchParameters -a WORKING_DIRECTORY
                                   ${CMAKE_CURRENT_SOURCE_DIR})
     parseandaddcatchtests(
@@ -50,7 +50,7 @@ if(PETSC_FOUND)
 
     list(FILTER TEST_MPI${ARG1}_PETSC_SRC INCLUDE REGEX ".*_PETSC_.*")
 
-    set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
+    set(OptionalCatchTestLauncher ${MPIEXEC} "--oversubscribe" ${MPIEXEC_NUMPROC_FLAG}  ${ARG1})
     set(AdditionalCatchParameters -a WORKING_DIRECTORY
                                   ${CMAKE_CURRENT_SOURCE_DIR})
 
