@@ -11,6 +11,7 @@ jobs:
       run: |
         sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev libtrilinos-zoltan-dev
         pip install gcovr
+        export PATH=$PATH:/home/runner/.local/bin
     - name: Set CXXFLAGS
       run: export CXXFLAGS="-g -O0 -Wall -W -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
     - name: Set LDFLAGS
