@@ -13,3 +13,5 @@ jobs:
       run: cmake -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real/ .
     - name: Build
       run: make
+    - name: Run Tests
+      run: ctest --output-on-failure
