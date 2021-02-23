@@ -17,7 +17,7 @@ jobs:
         pip install gcovr
     - name: Download Sonar Build Wrapper
       run: |
-        wget $SONAR_SCANNER_URL
+        wget $SONAR_WRAPPER_URL
         unzip build-wrapper-linux-x86.zip
         echo $HOME/build-wrapper-linux-x86 >> $GITHUB_PATH
     - uses: actions/checkout@v2
