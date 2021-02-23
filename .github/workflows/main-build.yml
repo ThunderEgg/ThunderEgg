@@ -15,11 +15,18 @@ jobs:
         sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev libtrilinos-zoltan-dev
         echo $HOME/.local/bin >> $GITHUB_PATH
         pip install gcovr
-    - name: Download Sonar Build Wrapper
+    - name: Install Sonar Build Wrapper
       run: |
         wget --quiet $SONAR_WRAPPER_URL
         unzip build-wrapper-linux-x86.zip
         echo $HOME/build-wrapper-linux-x86 >> $GITHUB_PATH
+    - name: Install Sonar Scanner
+      run: |
+        wget --quiet $SONAR_SCANNER_URL
+        unzip sonar-scanner-*-linux.zip
+        mv sonar-scannar-*-linux sonar-scanner-linux
+        echo $HOME/build-scanner-linux/bin >> $GITHUB_PATH
+        pwd
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
