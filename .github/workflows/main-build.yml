@@ -10,7 +10,7 @@ jobs:
     - name: Install dependencies
       run: sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev libtrilinos-zoltan-dev
     - name: Cmake Configure
-      run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ .
+      run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/ -DPETSC_ARCH=x86_64-linux-gnu-real-debug .
     - name: Build
       run: make
     - name: Run Tests
