@@ -1,0 +1,47 @@
+name: Main ThunderEgg Build / Test / Analyze
+on: [push]
+env:
+  SONAR_WRAPPER_URL: https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+  SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.0.2311-linux.zip
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      CXXFLAGS: -g -O0 -Wall -Wno-system-headers -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline
+      LDFLAGS: -lgcov
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev libtrilinos-zoltan-dev
+        echo $HOME/.local/bin >> $GITHUB_PATH
+        pip install gcovr
+    - name: Install Sonar Build Wrapper
+      run: |
+        wget --quiet $SONAR_WRAPPER_URL
+        unzip build-wrapper-linux-x86.zip
+        mv build-wrapper-linux-x86 $HOME/build-wrapper-linux-x86
+        echo $HOME/build-wrapper-linux-x86 >> $GITHUB_PATH
+    - name: Install Sonar Scanner
+      run: |
+        wget --quiet $SONAR_SCANNER_URL
+        unzip sonar-scanner-*-linux.zip
+        mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
+        echo $HOME/sonar-scanner-linux/bin >> $GITHUB_PATH
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Cmake Configure
+      run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ .
+    - name: Build
+      run: build-wrapper-linux-x86-64 --out-dir bw-output make
+    - name: Run Tests
+      run: ctest --output-on-failure
+    - name: Generate Coverage Report
+      run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
+    - name: Upload to codecov.io
+      run: bash <(curl -s https://codecov.io/bash)
+    - name: Run sonar-scanner
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: sonar-scanner
