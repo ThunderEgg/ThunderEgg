@@ -71,7 +71,9 @@ template <int D> class CG : public Solver<D>
 
 	public:
 	/**
-	 * @brief Set the maximum number of iterations
+	 * @brief Set the maximum number of iterations.
+	 *
+	 * Default is 1000
 	 *
 	 * @param max_iterations_in the maximum number of iterations
 	 */
@@ -82,6 +84,8 @@ template <int D> class CG : public Solver<D>
 	/**
 	 * @brief Get the maximum number of iterations
 	 *
+	 * Default is 1000
+	 *
 	 * @return int the maximum number of iterations
 	 */
 	int getMaxIterations() const
@@ -91,6 +95,8 @@ template <int D> class CG : public Solver<D>
 	/**
 	 * @brief Set the stopping tolerance
 	 *
+	 * Default is 1e-12
+	 *
 	 * @param tolerance_in the stopping tolerance
 	 */
 	void setTolerance(double tolerance_in)
@@ -99,6 +105,8 @@ template <int D> class CG : public Solver<D>
 	};
 	/**
 	 * @brief Get the stopping tolerance
+	 *
+	 * Default is 1e-12
 	 *
 	 * @return double the stopping tolerance
 	 */
