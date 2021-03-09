@@ -66,10 +66,10 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Side.h)
-list(APPEND ThunderEgg_HDRS ThunderEgg/Side.cpp)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Side.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
-list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.cpp)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Timer.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/TriLinearGhostFiller.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/TriLinearGhostFiller.cpp)
@@ -132,6 +132,10 @@ if(p4est_FOUND)
 endif()
 
 target_include_directories(ThunderEgg PUBLIC ${ThunderEgg_Includes})
+target_include_directories(ThunderEgg PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<INSTALL_INTERFACE:include>  
+)
 target_link_libraries(ThunderEgg PUBLIC ${ThunderEgg_Libs})
 target_link_libraries(ThunderEgg PUBLIC ${MPI_C_LIBRARIES})
 target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
@@ -143,6 +147,13 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+
+set(ThunderEgg_HDRS_String "")
+foreach(HDR ${ThunderEgg_HDRS})
+  set(ThunderEgg_HDRS_String "${ThunderEgg_HDRS_String}\n#include<${HDR}>")
+endforeach(HDR)
+configure_file("ThunderEgg.h.in" "ThunderEgg.h")
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 install(
   DIRECTORY ThunderEgg/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg
