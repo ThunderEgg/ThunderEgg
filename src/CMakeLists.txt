@@ -153,7 +153,8 @@ foreach(HDR ${ThunderEgg_HDRS})
   set(ThunderEgg_HDRS_String "${ThunderEgg_HDRS_String}\n#include<${HDR}>")
 endforeach(HDR)
 configure_file("ThunderEgg.h.in" "ThunderEgg.h")
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.h"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(
   DIRECTORY ThunderEgg/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg
