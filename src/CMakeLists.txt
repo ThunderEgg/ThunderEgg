@@ -50,7 +50,7 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/Orthant.cpp)
 if(p4est_FOUND)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.h)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.cpp)
+  list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomGen.cpp)
 
 endif(p4est_FOUND)
 
