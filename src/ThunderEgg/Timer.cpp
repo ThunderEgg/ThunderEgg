@@ -337,16 +337,10 @@ class Timer::Timing
 		if (timing.patch_id != std::numeric_limits<int>::max()) {
 			j["patch_id"] = timing.patch_id;
 		}
-		if (timing.sum != 0) {
-			j["sum"] = timing.sum;
-		}
 		if (timing.num_calls != 0) {
 			j["num_calls"] = timing.num_calls;
-		}
-		if (timing.max != std::numeric_limits<double>::lowest()) {
+			j["sum"] = timing.sum;
 			j["max"] = timing.max;
-		}
-		if (timing.min != std::numeric_limits<double>::max()) {
 			j["min"] = timing.min;
 		}
 		if (timing.timings.size() > 0) {

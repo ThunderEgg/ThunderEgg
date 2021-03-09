@@ -219,7 +219,7 @@ TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
 		CHECK(j["timings"][0]["num_calls"].is_number());
 		CHECK(j["timings"][0]["name"] == "A");
 
-		CHECK(j["timings"][0]["rank"] == 0);
+		CHECK(j["timings"][1]["rank"] == 0);
 		CHECK(j["timings"][1]["min"].is_number());
 		CHECK(j["timings"][1]["max"].is_number());
 		CHECK(j["timings"][1]["sum"].is_number());
