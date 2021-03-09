@@ -41,7 +41,7 @@ using namespace ThunderEgg::Poisson;
 
 int main(int argc, char *argv[])
 {
-	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
+	MPI_Init(&argc, &argv);
 
 	// parse input
 	CLI::App app{"ThunderEgg 3d poisson solver example"};
@@ -52,15 +52,8 @@ int main(int argc, char *argv[])
 	app.add_option("-n,--num_cells", n, "Number of cells in each direction, on each patch")
 	->required();
 
-	int loop_count = 1;
-	app.add_option("-l", loop_count, "Number of times to run program");
-
-	string matrix_type = "wrap";
-	app.add_set_ignore_case("--matrix_type", matrix_type, {"wrap", "crs", "pbm"},
-	                        "Which type of matrix operator to use");
-
 	int div = 0;
-	app.add_option("--divide", div, "Number of levels to add to octtree");
+	app.add_option("--divide", div, "Number of levels to add to oct-tree");
 
 	bool no_zero_rhs_avg = false;
 	app.add_flag("--nozerof", no_zero_rhs_avg,
@@ -72,9 +65,6 @@ int main(int argc, char *argv[])
 	bool neumann;
 	app.add_flag("--neumann", neumann, "Use neumann boundary conditions");
 
-	bool solve_schur = false;
-	app.add_flag("--schur", solve_schur, "Solve the schur compliment system");
-
 	string mesh_filename = "";
 	app.add_option("--mesh", mesh_filename, "Filename of mesh to use")
 	->required()
@@ -83,22 +73,6 @@ int main(int argc, char *argv[])
 	string problem = "trig";
 	app.add_set_ignore_case("--problem", problem, {"trig", "gauss", "zero"},
 	                        "Which problem to solve");
-
-	string solver_type = "thunderegg";
-	app.add_set_ignore_case("--solver", solver_type, {"petsc", "thunderegg"},
-	                        "Which Solver to use");
-	string preconditioner = "";
-	app.add_set_ignore_case("--prec", preconditioner, {"GMG", "Schwarz", "BlockJacobi", "cheb"},
-	                        "Which Preconditoner to use");
-
-	string patch_solver = "fftw";
-	app.add_option("--patch_solver", patch_solver, "Which patch solver to use");
-
-	bool setrow = false;
-	app.add_flag("--setrow", setrow, "Set row in matrix");
-
-	string petsc_opts = "";
-	app.add_option("--petsc_opts", petsc_opts, "petsc options");
 
 	// GMG options
 
@@ -124,28 +98,15 @@ int main(int argc, char *argv[])
 
 	gmg->add_option("--cycle_type", copts.cycle_type, "Cycle type");
 
+	string patch_solver = "fftw";
+	gmg->add_set_ignore_case("--patch_solver", patch_solver, {"fftw", "dft", "bcgs"},
+	                         "Which patch solver to use");
 	// output options
-
-	string claw_filename = "";
-	app.add_option("--out_claw", claw_filename, "Filename of clawpack output");
 
 #ifdef HAVE_VTK
 	string vtk_filename = "";
 	app.add_option("--out_vtk", vtk_filename, "Filename of vtk output");
 #endif
-
-	string matrix_filename = "";
-	app.add_option("--out_matrix", matrix_filename, "Filename of matrix output");
-	string solution_filename = "";
-	app.add_option("--out_solution", solution_filename, "Filename of solution output");
-	string resid_filename = "";
-	app.add_option("--out_resid", resid_filename, "Filename of residual output");
-	string error_filename = "";
-	app.add_option("--out_error", error_filename, "Filename of error output");
-	string rhs_filename = "";
-	app.add_option("--out_rhs", rhs_filename, "Filename of rhs output");
-	string gamma_filename = "";
-	app.add_option("--out_gamma", gamma_filename, "Filename of gamma output");
 
 	string config_out_filename = "";
 	auto   out_config_opt
@@ -159,8 +120,6 @@ int main(int argc, char *argv[])
 		file_out << app.config_to_str(true, true);
 		file_out.close();
 	}
-
-	PetscOptionsInsertString(nullptr, petsc_opts.c_str());
 
 	int num_procs;
 	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
@@ -287,178 +246,195 @@ int main(int argc, char *argv[])
 	new StarPatchOperator<3>(domain, ghost_filler, neumann));
 
 	std::shared_ptr<Timer> timer = make_shared<Timer>(MPI_COMM_WORLD);
-	for (int loop = 0; loop < loop_count; loop++) {
-		timer->start("Domain Initialization");
+	timer->start("Domain Initialization");
 
-		// Initialize Vectors
-		shared_ptr<ValVector<3>> u     = ValVector<3>::GetNewVector(domain, 1);
-		shared_ptr<ValVector<3>> exact = ValVector<3>::GetNewVector(domain, 1);
-		shared_ptr<ValVector<3>> f     = ValVector<3>::GetNewVector(domain, 1);
-		shared_ptr<ValVector<3>> au    = ValVector<3>::GetNewVector(domain, 1);
+	// Initialize Vectors
+	shared_ptr<ValVector<3>> u     = ValVector<3>::GetNewVector(domain, 1);
+	shared_ptr<ValVector<3>> exact = ValVector<3>::GetNewVector(domain, 1);
+	shared_ptr<ValVector<3>> f     = ValVector<3>::GetNewVector(domain, 1);
+	shared_ptr<ValVector<3>> au    = ValVector<3>::GetNewVector(domain, 1);
 
-		DomainTools::SetValues<3>(domain, f, ffun);
-		DomainTools::SetValues<3>(domain, exact, gfun);
-		if (neumann) {
-			p_operator->addDrichletBCToRHS(f, gfun);
-		} else {
-			p_operator->addNeumannBCToRHS(f, gfun, {nfunx, nfuny, nfunz});
-		}
+	DomainTools::SetValues<3>(domain, f, ffun);
+	DomainTools::SetValues<3>(domain, exact, gfun);
+	if (neumann) {
+		p_operator->addDrichletBCToRHS(f, gfun);
+	} else {
+		p_operator->addNeumannBCToRHS(f, gfun, {nfunx, nfuny, nfunz});
+	}
 
-		timer->stop("Domain Initialization");
+	timer->stop("Domain Initialization");
 
-		if (neumann && !no_zero_rhs_avg) {
-			double fdiff = domain->integrate(f) / domain->volume();
-			if (my_global_rank == 0)
-				cout << "Fdiff: " << fdiff << endl;
-			f->shift(-fdiff);
-		}
+	if (neumann && !no_zero_rhs_avg) {
+		double fdiff = domain->integrate(f) / domain->volume();
+		if (my_global_rank == 0)
+			cout << "Fdiff: " << fdiff << endl;
+		f->shift(-fdiff);
+	}
 
-		std::shared_ptr<Operator<3>> A;
-		std::shared_ptr<Operator<3>> M;
-		///////////////////
-		// setup start
-		///////////////////
-		timer->start("Linear System Setup");
+	std::shared_ptr<Operator<3>> A;
+	std::shared_ptr<Operator<3>> M;
+	///////////////////
+	// setup start
+	///////////////////
+	timer->start("Linear System Setup");
 
-		A = p_operator;
-		// preconditoners
-		timer->start("Preconditioner Setup");
+	A = p_operator;
+	// preconditoners
+	timer->start("Preconditioner Setup");
 
-		auto curr_domain = domain;
+	auto curr_domain = domain;
 
-		int domain_level = 0;
+	int domain_level = 0;
+	curr_domain->setId(domain_level);
+	curr_domain->setTimer(timer);
+	domain_level++;
+
+	auto next_domain = dcg->getCoarserDomain();
+	auto restrictor  = make_shared<GMG::LinearRestrictor<3>>(curr_domain, next_domain, 1, true);
+
+	// set the patch solver
+	auto p_bcgs = make_shared<Iterative::BiCGStab<3>>();
+	// p_bcgs->setTolerance(ps_tol);
+	// p_bcgs->setMaxIterations(ps_max_it);
+
+	// set the patch solver
+	shared_ptr<PatchSolver<3>> p_solver;
+	if (patch_solver == "dft") {
+		p_solver = make_shared<DFTPatchSolver<3>>(p_operator);
+	} else if (patch_solver == "fftw") {
+		p_solver = make_shared<FFTWPatchSolver<3>>(p_operator);
+	} else {
+		p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, p_operator);
+	}
+
+	GMG::CycleBuilder<3>                builder(copts);
+	std::shared_ptr<VectorGenerator<3>> vg(new ValVectorGenerator<3>(domain, 1));
+	builder.addFinestLevel(p_operator, p_solver, restrictor, vg);
+
+	auto prev_domain = curr_domain;
+	curr_domain      = next_domain;
+	while (dcg->hasCoarserDomain()) {
 		curr_domain->setId(domain_level);
 		curr_domain->setTimer(timer);
 		domain_level++;
 
 		auto next_domain = dcg->getCoarserDomain();
-		auto restrictor  = make_shared<GMG::LinearRestrictor<3>>(curr_domain, next_domain, 1, true);
+		auto new_vg      = make_shared<ValVectorGenerator<3>>(curr_domain, 1);
+		auto new_gf      = make_shared<TriLinearGhostFiller>(curr_domain);
+		auto new_coeffs  = new_vg->getNewVector();
 
-		// set the patch solver
-		auto p_bcgs = make_shared<Iterative::BiCGStab<3>>();
-		// p_bcgs->setTolerance(ps_tol);
-		// p_bcgs->setMaxIterations(ps_max_it);
+		auto new_p_operator = make_shared<StarPatchOperator<3>>(curr_domain, new_gf);
 
-		// set the patch solver
-		shared_ptr<PatchSolver<3>> p_solver;
-		p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, p_operator);
-
-		GMG::CycleBuilder<3>                builder(copts);
-		std::shared_ptr<VectorGenerator<3>> vg(new ValVectorGenerator<3>(domain, 1));
-		builder.addFinestLevel(p_operator, p_solver, restrictor, vg);
-
-		auto prev_domain = curr_domain;
-		curr_domain      = next_domain;
-		while (dcg->hasCoarserDomain()) {
-			curr_domain->setId(domain_level);
-			curr_domain->setTimer(timer);
-			domain_level++;
-
-			auto next_domain = dcg->getCoarserDomain();
-			auto new_vg      = make_shared<ValVectorGenerator<3>>(curr_domain, 1);
-			auto new_gf      = make_shared<TriLinearGhostFiller>(curr_domain);
-			auto new_coeffs  = new_vg->getNewVector();
-
-			auto new_p_operator = make_shared<StarPatchOperator<3>>(curr_domain, new_gf);
-
-			auto new_p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, new_p_operator);
-
-			auto interpolator
-			= make_shared<GMG::DirectInterpolator<3>>(curr_domain, prev_domain, 1);
-			restrictor = make_shared<GMG::LinearRestrictor<3>>(curr_domain, next_domain, 1);
-
-			builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator,
-			                             new_vg);
-			prev_domain = curr_domain;
-			curr_domain = next_domain;
+		shared_ptr<PatchSolver<3>> new_p_solver;
+		if (patch_solver == "dft") {
+			new_p_solver = make_shared<DFTPatchSolver<3>>(new_p_operator);
+		} else if (patch_solver == "fftw") {
+			new_p_solver = make_shared<FFTWPatchSolver<3>>(new_p_operator);
+		} else {
+			new_p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, new_p_operator);
 		}
-		curr_domain->setId(domain_level);
-		curr_domain->setTimer(timer);
 
 		auto interpolator = make_shared<GMG::DirectInterpolator<3>>(curr_domain, prev_domain, 1);
-		auto coarse_vg    = make_shared<ValVectorGenerator<3>>(curr_domain, 1);
-		auto coarse_gf    = make_shared<TriLinearGhostFiller>(curr_domain);
+		restrictor        = make_shared<GMG::LinearRestrictor<3>>(curr_domain, next_domain, 1);
 
-		auto coarse_p_operator = make_shared<StarPatchOperator<3>>(curr_domain, coarse_gf);
-
-		auto coarse_p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, coarse_p_operator);
-		builder.addCoarsestLevel(coarse_p_operator, coarse_p_solver, interpolator, coarse_vg);
-
-		M = builder.getCycle();
-
-		timer->stop("Preconditioner Setup");
-
-		timer->stop("Linear System Setup");
-
-		timer->start("Linear Solve");
-
-		Iterative::BiCGStab<3> solver;
-		solver.setTimer(timer);
-		int its = solver.solve(vg, A, u, f, M, true);
-		if (my_global_rank == 0) {
-			cout << "Iterations: " << its << endl;
-		}
-		timer->stop("Linear Solve");
-
-		A->apply(u, au);
-
-		shared_ptr<ValVector<3>> resid = ValVector<3>::GetNewVector(domain, 1);
-		resid->addScaled(-1, au, 1, f);
-
-		double residual = resid->twoNorm();
-		double fnorm    = f->twoNorm();
-
-		// error
-		shared_ptr<ValVector<3>> error = ValVector<3>::GetNewVector(domain, 1);
-		error->addScaled(-1, exact, 1, u);
-		if (neumann) {
-			double uavg = domain->integrate(u) / domain->volume();
-			double eavg = domain->integrate(exact) / domain->volume();
-
-			if (my_global_rank == 0) {
-				cout << "Average of computed solution: " << uavg << endl;
-				cout << "Average of exact solution: " << eavg << endl;
-			}
-
-			error->shift(eavg - uavg);
-		}
-		double error_norm     = error->twoNorm();
-		double error_norm_inf = error->infNorm();
-		double exact_norm     = exact->twoNorm();
-
-		double ausum = domain->integrate(au);
-		double fsum  = domain->integrate(f);
-		if (my_global_rank == 0) {
-			std::cout << std::scientific;
-			std::cout.precision(13);
-			std::cout << "Error (2-norm):   " << error_norm / exact_norm << endl;
-			std::cout << "Error (inf-norm): " << error_norm_inf << endl;
-			std::cout << "Residual: " << residual / fnorm << endl;
-			std::cout << u8"ΣAu-Σf: " << ausum - fsum << endl;
-			cout.unsetf(std::ios_base::floatfield);
-			int total_cells = domain->getNumGlobalCells();
-			cout << "Total cells: " << total_cells << endl;
-			cout << "Cores: " << num_procs << endl;
-		}
-
-		// output
-#ifdef HAVE_VTK
-		if (vtk_filename != "") {
-			VtkWriter writer(dc, vtk_filename);
-			writer.add(u->vec, "Solution");
-			writer.add(error->vec, "Error");
-			writer.add(exact->vec, "Exact");
-			writer.add(resid->vec, "Residual");
-			writer.add(f->vec, "RHS");
-			writer.write();
-		}
-#endif
-		cout.unsetf(std::ios_base::floatfield);
+		builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator,
+		                             new_vg);
+		prev_domain = curr_domain;
+		curr_domain = next_domain;
 	}
+	curr_domain->setId(domain_level);
+	curr_domain->setTimer(timer);
+
+	auto interpolator = make_shared<GMG::DirectInterpolator<3>>(curr_domain, prev_domain, 1);
+	auto coarse_vg    = make_shared<ValVectorGenerator<3>>(curr_domain, 1);
+	auto coarse_gf    = make_shared<TriLinearGhostFiller>(curr_domain);
+
+	auto coarse_p_operator = make_shared<StarPatchOperator<3>>(curr_domain, coarse_gf);
+
+	shared_ptr<PatchSolver<3>> coarse_p_solver;
+	if (patch_solver == "dft") {
+		coarse_p_solver = make_shared<DFTPatchSolver<3>>(coarse_p_operator);
+	} else if (patch_solver == "fftw") {
+		coarse_p_solver = make_shared<FFTWPatchSolver<3>>(coarse_p_operator);
+	} else {
+		coarse_p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, coarse_p_operator);
+	}
+	builder.addCoarsestLevel(coarse_p_operator, coarse_p_solver, interpolator, coarse_vg);
+
+	M = builder.getCycle();
+
+	timer->stop("Preconditioner Setup");
+
+	timer->stop("Linear System Setup");
+
+	timer->start("Linear Solve");
+
+	Iterative::BiCGStab<3> solver;
+	solver.setTimer(timer);
+	int its = solver.solve(vg, A, u, f, M, true);
+	if (my_global_rank == 0) {
+		cout << "Iterations: " << its << endl;
+	}
+	timer->stop("Linear Solve");
+
+	A->apply(u, au);
+
+	shared_ptr<ValVector<3>> resid = ValVector<3>::GetNewVector(domain, 1);
+	resid->addScaled(-1, au, 1, f);
+
+	double residual = resid->twoNorm();
+	double fnorm    = f->twoNorm();
+
+	// error
+	shared_ptr<ValVector<3>> error = ValVector<3>::GetNewVector(domain, 1);
+	error->addScaled(-1, exact, 1, u);
+	if (neumann) {
+		double uavg = domain->integrate(u) / domain->volume();
+		double eavg = domain->integrate(exact) / domain->volume();
+
+		if (my_global_rank == 0) {
+			cout << "Average of computed solution: " << uavg << endl;
+			cout << "Average of exact solution: " << eavg << endl;
+		}
+
+		error->shift(eavg - uavg);
+	}
+	double error_norm     = error->twoNorm();
+	double error_norm_inf = error->infNorm();
+	double exact_norm     = exact->twoNorm();
+
+	double ausum = domain->integrate(au);
+	double fsum  = domain->integrate(f);
+	if (my_global_rank == 0) {
+		std::cout << std::scientific;
+		std::cout.precision(13);
+		std::cout << "Error (2-norm):   " << error_norm / exact_norm << endl;
+		std::cout << "Error (inf-norm): " << error_norm_inf << endl;
+		std::cout << "Residual: " << residual / fnorm << endl;
+		std::cout << u8"ΣAu-Σf: " << ausum - fsum << endl;
+		cout.unsetf(std::ios_base::floatfield);
+		int total_cells = domain->getNumGlobalCells();
+		cout << "Total cells: " << total_cells << endl;
+		cout << "Cores: " << num_procs << endl;
+	}
+
+	// output
+#ifdef HAVE_VTK
+	if (vtk_filename != "") {
+		VtkWriter writer(dc, vtk_filename);
+		writer.add(u->vec, "Solution");
+		writer.add(error->vec, "Error");
+		writer.add(exact->vec, "Exact");
+		writer.add(resid->vec, "Residual");
+		writer.add(f->vec, "RHS");
+		writer.write();
+	}
+#endif
+	cout.unsetf(std::ios_base::floatfield);
 
 	if (my_global_rank == 0) {
 		cout << *timer;
 	}
-	PetscFinalize();
+	MPI_Finalize();
 	return 0;
 }
