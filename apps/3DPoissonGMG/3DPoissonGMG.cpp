@@ -240,10 +240,10 @@ int main(int argc, char *argv[])
 
 	domain = dcg->getFinestDomain();
 
-	auto ghost_filler = make_shared<TriLinearGhostFiller>(domain);
+	shared_ptr<GhostFiller<3>> ghost_filler = make_shared<TriLinearGhostFiller>(domain);
 	// patch operator
-	shared_ptr<StarPatchOperator<3>> p_operator(
-	new StarPatchOperator<3>(domain, ghost_filler, neumann));
+	shared_ptr<StarPatchOperator<3>> patch_operator
+	= make_shared<StarPatchOperator<3>>(domain, ghost_filler, neumann);
 
 	std::shared_ptr<Timer> timer = make_shared<Timer>(MPI_COMM_WORLD);
 	timer->start("Domain Initialization");
@@ -257,9 +257,9 @@ int main(int argc, char *argv[])
 	DomainTools::SetValues<3>(domain, f, ffun);
 	DomainTools::SetValues<3>(domain, exact, gfun);
 	if (neumann) {
-		p_operator->addDrichletBCToRHS(f, gfun);
+		patch_operator->addDrichletBCToRHS(f, gfun);
 	} else {
-		p_operator->addNeumannBCToRHS(f, gfun, {nfunx, nfuny, nfunz});
+		patch_operator->addNeumannBCToRHS(f, gfun, {nfunx, nfuny, nfunz});
 	}
 
 	timer->stop("Domain Initialization");
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
 	///////////////////
 	timer->start("Linear System Setup");
 
-	A = p_operator;
+	A = patch_operator;
 	// preconditoners
 	timer->start("Preconditioner Setup");
 
@@ -300,16 +300,16 @@ int main(int argc, char *argv[])
 	// set the patch solver
 	shared_ptr<PatchSolver<3>> p_solver;
 	if (patch_solver == "dft") {
-		p_solver = make_shared<DFTPatchSolver<3>>(p_operator);
+		p_solver = make_shared<DFTPatchSolver<3>>(patch_operator);
 	} else if (patch_solver == "fftw") {
-		p_solver = make_shared<FFTWPatchSolver<3>>(p_operator);
+		p_solver = make_shared<FFTWPatchSolver<3>>(patch_operator);
 	} else {
-		p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, p_operator);
+		p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, patch_operator);
 	}
 
 	GMG::CycleBuilder<3>                builder(copts);
 	std::shared_ptr<VectorGenerator<3>> vg(new ValVectorGenerator<3>(domain, 1));
-	builder.addFinestLevel(p_operator, p_solver, restrictor, vg);
+	builder.addFinestLevel(patch_operator, p_solver, restrictor, vg);
 
 	auto prev_domain = curr_domain;
 	curr_domain      = next_domain;
