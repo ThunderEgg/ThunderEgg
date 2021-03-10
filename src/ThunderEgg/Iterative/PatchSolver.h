@@ -227,4 +227,6 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 };
 } // namespace Iterative
 } // namespace ThunderEgg
+extern template class ThunderEgg::Iterative::PatchSolver<2>;
+extern template class ThunderEgg::Iterative::PatchSolver<3>;
 #endif

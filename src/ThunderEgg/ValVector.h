@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_VALVECTOR_H
 #define THUNDEREGG_VALVECTOR_H
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Vector.h>
 #include <valarray>
 namespace ThunderEgg
@@ -154,5 +155,8 @@ template <int D> class ValVector : public Vector<D>
 		return vec;
 	}
 };
+extern template class ValVector<1>;
+extern template class ValVector<2>;
+extern template class ValVector<3>;
 } // namespace ThunderEgg
 #endif

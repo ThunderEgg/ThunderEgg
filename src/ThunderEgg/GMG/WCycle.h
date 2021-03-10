@@ -86,6 +86,8 @@ template <int D> class WCycle : public Cycle<D>
 		num_mid_sweeps    = opts.mid_sweeps;
 	}
 };
+extern template class WCycle<2>;
+extern template class WCycle<3>;
 } // namespace GMG
 } // namespace ThunderEgg
 #endif

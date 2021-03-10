@@ -78,6 +78,8 @@ template <int D> class VCycle : public Cycle<D>
 		num_coarse_sweeps = opts.coarse_sweeps;
 	}
 };
+extern template class VCycle<2>;
+extern template class VCycle<3>;
 } // namespace GMG
 } // namespace ThunderEgg
 #endif

@@ -77,8 +77,10 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/TriLinearGhostFiller.cpp)
 list(APPEND ThunderEgg_HDRS ThunderEgg/TypeDefs.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/ValVector.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/ValVector.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/ValVectorGenerator.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/ValVectorGenerator.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Vector.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Vector.cpp)

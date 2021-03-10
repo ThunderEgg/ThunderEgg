@@ -208,4 +208,6 @@ template <int D> class CG : public Solver<D>
 };
 } // namespace Iterative
 } // namespace ThunderEgg
+extern template class ThunderEgg::Iterative::CG<2>;
+extern template class ThunderEgg::Iterative::CG<3>;
 #endif
