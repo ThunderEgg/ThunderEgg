@@ -43,11 +43,11 @@ int main(int argc, char *argv[])
 {
 	MPI_Init(&argc, &argv);
 
-	// parse input
+	// command line options
 	CLI::App app{"ThunderEgg 3d poisson solver example"};
 
 	app.set_config("--config", "", "Read an ini file", false);
-	// program options
+
 	int n;
 	app.add_option("-n,--num_cells", n, "Number of cells in each direction, on each patch")
 	->required();
@@ -127,26 +127,13 @@ int main(int argc, char *argv[])
 	int my_global_rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &my_global_rank);
 
-	// Set the number of discretization points in the x and y direction.
-	std::array<int, 3> ns;
-	ns.fill(n);
-
-	///////////////
-	// Create Mesh
-	///////////////
-	shared_ptr<Domain<3>> domain;
-	Tree<3>               t;
-	t = Tree<3>(mesh_filename);
-	for (int i = 0; i < div; i++) {
-		t.refineLeaves();
-	}
-
 	// the functions that we are using
-	function<double(const std::array<double, 3> &)> ffun;
-	function<double(const std::array<double, 3> &)> gfun;
-	function<double(const std::array<double, 3> &)> nfunx;
-	function<double(const std::array<double, 3> &)> nfuny;
-	function<double(const std::array<double, 3> &)> nfunz;
+	function<double(const std::array<double, 3> &)> ffun; // rhs
+	function<double(const std::array<double, 3> &)> gfun; // lhs
+	// functions needed for neumann boundary conditions
+	function<double(const std::array<double, 3> &)> nfunx; // lhs derivative in x direction
+	function<double(const std::array<double, 3> &)> nfuny; // lhs derivative in y direction
+	function<double(const std::array<double, 3> &)> nfunz; // lhs derivative in z direction
 
 	if (problem == "zero") {
 		ffun  = [](const std::array<double, 3> &) { return 0; };
@@ -236,26 +223,51 @@ int main(int argc, char *argv[])
 		};
 	}
 
-	shared_ptr<DomainGenerator<3>> dcg(new DomGen<3>(t, ns, 1, neumann));
-
-	domain = dcg->getFinestDomain();
-
-	shared_ptr<GhostFiller<3>> ghost_filler = make_shared<TriLinearGhostFiller>(domain);
-	// patch operator
-	shared_ptr<StarPatchOperator<3>> patch_operator
-	= make_shared<StarPatchOperator<3>>(domain, ghost_filler, neumann);
-
+	// create a Timer object to keep track of timings
 	std::shared_ptr<Timer> timer = make_shared<Timer>(MPI_COMM_WORLD);
+
+	// read in a tree from file
+	Tree<3> t;
+	t = Tree<3>(mesh_filename);
+	for (int i = 0; i < div; i++) {
+		t.refineLeaves();
+	}
+
+	// Set the number of cells in the x, y and z direction.
+	std::array<int, 3> ns;
+	ns[0] = n;
+	ns[1] = n;
+	ns[2] = n;
+
+	// A DomainGenerator will create domains for the Multigrid algorithm from a tree
+	int                            num_ghost_cells  = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
+	shared_ptr<DomainGenerator<3>> domain_generator = make_shared<DomGen<3>>(t, ns, num_ghost_cells, neumann);
+
+	// Get the finest domain from the tree
+	shared_ptr<Domain<3>> domain = domain_generator->getFinestDomain();
+
+	// A patch operator needs a GhostFiller object to define how to fill ghost cells for the patches.
+	// This one will use a tri-linear interpolation scheme at the refinement boundarys of the domain
+	shared_ptr<GhostFiller<3>> ghost_filler = make_shared<TriLinearGhostFiller>(domain);
+
+	// create patch operator that uses a typical 2nd order 7 point poisson stencil
+	shared_ptr<StarPatchOperator<3>> patch_operator = make_shared<StarPatchOperator<3>>(domain, ghost_filler, neumann);
+
 	timer->start("Domain Initialization");
 
-	// Initialize Vectors
-	shared_ptr<ValVector<3>> u     = ValVector<3>::GetNewVector(domain, 1);
-	shared_ptr<ValVector<3>> exact = ValVector<3>::GetNewVector(domain, 1);
-	shared_ptr<ValVector<3>> f     = ValVector<3>::GetNewVector(domain, 1);
-	shared_ptr<ValVector<3>> au    = ValVector<3>::GetNewVector(domain, 1);
+	// Create some new vectors for the domain
+	int num_components = 1; //the poisson operator just has one value in each cell
 
-	DomainTools::SetValues<3>(domain, f, ffun);
+	shared_ptr<ValVector<3>> u     = ValVector<3>::GetNewVector(domain, num_components);
+	shared_ptr<ValVector<3>> exact = ValVector<3>::GetNewVector(domain, num_components);
+	shared_ptr<ValVector<3>> f     = ValVector<3>::GetNewVector(domain, num_components);
+
+	// fill the vectors with some values
+	DomainTools::SetValues<3>(domain, f, ffun); // fill the f vector with the associated domain using the ffun function
 	DomainTools::SetValues<3>(domain, exact, gfun);
+
+	// modify the rhs to set the boundary conditions
+	// the patch operator contains some helper functions for this
 	if (neumann) {
 		patch_operator->addDrichletBCToRHS(f, gfun);
 	} else {
@@ -271,97 +283,119 @@ int main(int argc, char *argv[])
 		f->shift(-fdiff);
 	}
 
-	std::shared_ptr<Operator<3>> A;
-	std::shared_ptr<Operator<3>> M;
 	///////////////////
 	// setup start
 	///////////////////
 	timer->start("Linear System Setup");
 
-	A = patch_operator;
+	std::shared_ptr<Operator<3>> A = patch_operator; // a PatchOperator can be passed the BiCGStab to use as an operator
+
 	// preconditoners
 	timer->start("Preconditioner Setup");
 
-	auto curr_domain = domain;
-
 	int domain_level = 0;
-	curr_domain->setId(domain_level);
-	curr_domain->setTimer(timer);
+	domain->setId(domain_level);
+	domain->setTimer(timer);
 	domain_level++;
 
-	auto next_domain = dcg->getCoarserDomain();
-	auto restrictor  = make_shared<GMG::LinearRestrictor<3>>(curr_domain, next_domain, 1, true);
-
 	// set the patch solver
-	auto p_bcgs = make_shared<Iterative::BiCGStab<3>>();
+	auto patch_bcgs = make_shared<Iterative::BiCGStab<3>>();
 	// p_bcgs->setTolerance(ps_tol);
 	// p_bcgs->setMaxIterations(ps_max_it);
 
-	// set the patch solver
-	shared_ptr<PatchSolver<3>> p_solver;
+	// create a CycleBuilder and set the options
+	GMG::CycleBuilder<3> builder(copts);
+
+	// the GMG cycle needs a vector generator for domain of each level to generate temporary work vectors
+	std::shared_ptr<VectorGenerator<3>> vg(new ValVectorGenerator<3>(domain, num_components));
+
+	// Create a smoother for the finest level
+	shared_ptr<GMG::Smoother<3>> finest_smoother;
 	if (patch_solver == "dft") {
-		p_solver = make_shared<DFTPatchSolver<3>>(patch_operator);
+		finest_smoother = make_shared<DFTPatchSolver<3>>(patch_operator);
 	} else if (patch_solver == "fftw") {
-		p_solver = make_shared<FFTWPatchSolver<3>>(patch_operator);
+		finest_smoother = make_shared<FFTWPatchSolver<3>>(patch_operator);
 	} else {
-		p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, patch_operator);
+		finest_smoother = make_shared<Iterative::PatchSolver<3>>(patch_bcgs, patch_operator);
 	}
 
-	GMG::CycleBuilder<3>                builder(copts);
-	std::shared_ptr<VectorGenerator<3>> vg(new ValVectorGenerator<3>(domain, 1));
-	builder.addFinestLevel(patch_operator, p_solver, restrictor, vg);
+	// the next coarser domain is needed for the restrictor
+	shared_ptr<Domain<3>> coarser_domain = domain_generator->getCoarserDomain();
 
-	auto prev_domain = curr_domain;
-	curr_domain      = next_domain;
-	while (dcg->hasCoarserDomain()) {
-		curr_domain->setId(domain_level);
-		curr_domain->setTimer(timer);
+	shared_ptr<GMG::Restrictor<3>> finest_restrictor = make_shared<GMG::LinearRestrictor<3>>(domain, coarser_domain, num_components);
+
+	//add the finest level
+	builder.addFinestLevel(patch_operator, finest_smoother, finest_restrictor, vg);
+
+	shared_ptr<Domain<3>> finer_domain   = domain;
+	shared_ptr<Domain<3>> current_domain = coarser_domain;
+
+	//generate each of the middle levels
+	while (domain_generator->hasCoarserDomain()) {
+		current_domain->setId(domain_level);
+		current_domain->setTimer(timer);
 		domain_level++;
 
-		auto next_domain = dcg->getCoarserDomain();
-		auto new_vg      = make_shared<ValVectorGenerator<3>>(curr_domain, 1);
-		auto new_gf      = make_shared<TriLinearGhostFiller>(curr_domain);
-		auto new_coeffs  = new_vg->getNewVector();
+		// get the coarser domain
+		coarser_domain = domain_generator->getCoarserDomain();
 
-		auto new_p_operator = make_shared<StarPatchOperator<3>>(curr_domain, new_gf);
+		// vector generator
+		auto middle_vector_generator = make_shared<ValVectorGenerator<3>>(current_domain, num_components);
 
-		shared_ptr<PatchSolver<3>> new_p_solver;
+		// create operator for middle domain
+		auto middle_ghost_filler   = make_shared<TriLinearGhostFiller>(current_domain);
+		auto middle_patch_operator = make_shared<StarPatchOperator<3>>(current_domain, middle_ghost_filler);
+
+		// smoother
+		shared_ptr<GMG::Smoother<3>> middle_smoother;
 		if (patch_solver == "dft") {
-			new_p_solver = make_shared<DFTPatchSolver<3>>(new_p_operator);
+			middle_smoother = make_shared<DFTPatchSolver<3>>(middle_patch_operator);
 		} else if (patch_solver == "fftw") {
-			new_p_solver = make_shared<FFTWPatchSolver<3>>(new_p_operator);
+			middle_smoother = make_shared<FFTWPatchSolver<3>>(middle_patch_operator);
 		} else {
-			new_p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, new_p_operator);
+			middle_smoother = make_shared<Iterative::PatchSolver<3>>(patch_bcgs, middle_patch_operator);
 		}
 
-		auto interpolator = make_shared<GMG::DirectInterpolator<3>>(curr_domain, prev_domain, 1);
-		restrictor        = make_shared<GMG::LinearRestrictor<3>>(curr_domain, next_domain, 1);
+		// restrictor and interpolator
+		shared_ptr<GMG::Interpolator<3>> interpolator = make_shared<GMG::DirectInterpolator<3>>(current_domain, finer_domain, num_components);
+		shared_ptr<GMG::Restrictor<3>>   restrictor   = make_shared<GMG::LinearRestrictor<3>>(current_domain, coarser_domain, num_components);
 
-		builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator,
-		                             new_vg);
-		prev_domain = curr_domain;
-		curr_domain = next_domain;
+		// add the middle level
+		builder.addIntermediateLevel(middle_patch_operator, middle_smoother, restrictor, interpolator, middle_vector_generator);
+
+		finer_domain   = current_domain;
+		current_domain = coarser_domain;
 	}
-	curr_domain->setId(domain_level);
-	curr_domain->setTimer(timer);
+	current_domain->setId(domain_level);
+	current_domain->setTimer(timer);
 
-	auto interpolator = make_shared<GMG::DirectInterpolator<3>>(curr_domain, prev_domain, 1);
-	auto coarse_vg    = make_shared<ValVectorGenerator<3>>(curr_domain, 1);
-	auto coarse_gf    = make_shared<TriLinearGhostFiller>(curr_domain);
+	//add the coarsest level to the builder
 
-	auto coarse_p_operator = make_shared<StarPatchOperator<3>>(curr_domain, coarse_gf);
+	// vector generator
+	shared_ptr<VectorGenerator<3>> coarsest_vector_generator = make_shared<ValVectorGenerator<3>>(current_domain, 1);
 
-	shared_ptr<PatchSolver<3>> coarse_p_solver;
+	// patch operator
+	shared_ptr<GhostFiller<3>>   coarsest_ghost_filler   = make_shared<TriLinearGhostFiller>(current_domain);
+	shared_ptr<PatchOperator<3>> coarsest_patch_operator = make_shared<StarPatchOperator<3>>(current_domain, coarsest_ghost_filler);
+
+	// smoother
+	shared_ptr<GMG::Smoother<3>> coarsest_smoother;
 	if (patch_solver == "dft") {
-		coarse_p_solver = make_shared<DFTPatchSolver<3>>(coarse_p_operator);
+		coarsest_smoother = make_shared<DFTPatchSolver<3>>(coarsest_patch_operator);
 	} else if (patch_solver == "fftw") {
-		coarse_p_solver = make_shared<FFTWPatchSolver<3>>(coarse_p_operator);
+		coarsest_smoother = make_shared<FFTWPatchSolver<3>>(coarsest_patch_operator);
 	} else {
-		coarse_p_solver = make_shared<Iterative::PatchSolver<3>>(p_bcgs, coarse_p_operator);
+		coarsest_smoother = make_shared<Iterative::PatchSolver<3>>(patch_bcgs, coarsest_patch_operator);
 	}
-	builder.addCoarsestLevel(coarse_p_operator, coarse_p_solver, interpolator, coarse_vg);
 
-	M = builder.getCycle();
+	// coarsets level only needs an interpolator
+	shared_ptr<GMG::Interpolator<3>> interpolator = make_shared<GMG::DirectInterpolator<3>>(current_domain, finer_domain, 1);
+
+	// add the coarsest level
+	builder.addCoarsestLevel(coarsest_patch_operator, coarsest_smoother, interpolator, coarsest_vector_generator);
+
+	// get the preconditioner operator
+	std::shared_ptr<Operator<3>> M = builder.getCycle();
 
 	timer->stop("Preconditioner Setup");
 
@@ -369,57 +403,65 @@ int main(int argc, char *argv[])
 
 	timer->start("Linear Solve");
 
+	// solve the system using bcgs with GMG as the preconditioner
+
 	Iterative::BiCGStab<3> solver;
 	solver.setTimer(timer);
-	int its = solver.solve(vg, A, u, f, M, true);
+	solver.setTolerance(tolerance);
+
+	int num_iterations = solver.solve(vg, A, u, f, M, true);
+
 	if (my_global_rank == 0) {
-		cout << "Iterations: " << its << endl;
+		cout << "Iterations: " << num_iterations << endl;
 	}
 	timer->stop("Linear Solve");
 
+	// calculate residual
+	shared_ptr<ValVector<3>> au              = ValVector<3>::GetNewVector(domain, num_components);
+	shared_ptr<ValVector<3>> residual_vector = ValVector<3>::GetNewVector(domain, num_components);
+
 	A->apply(u, au);
 
-	shared_ptr<ValVector<3>> resid = ValVector<3>::GetNewVector(domain, 1);
-	resid->addScaled(-1, au, 1, f);
+	residual_vector->addScaled(-1, au, 1, f);
 
-	double residual = resid->twoNorm();
+	double residual = residual_vector->twoNorm();
 	double fnorm    = f->twoNorm();
 
-	// error
+	// calculate error
 	shared_ptr<ValVector<3>> error = ValVector<3>::GetNewVector(domain, 1);
 	error->addScaled(-1, exact, 1, u);
 	if (neumann) {
-		double uavg = domain->integrate(u) / domain->volume();
-		double eavg = domain->integrate(exact) / domain->volume();
+		double u_average     = domain->integrate(u) / domain->volume();
+		double exact_average = domain->integrate(exact) / domain->volume();
 
 		if (my_global_rank == 0) {
-			cout << "Average of computed solution: " << uavg << endl;
-			cout << "Average of exact solution: " << eavg << endl;
+			cout << "Average of computed solution: " << u_average << endl;
+			cout << "Average of exact solution: " << exact_average << endl;
 		}
 
-		error->shift(eavg - uavg);
+		error->shift(exact_average - u_average);
 	}
 	double error_norm     = error->twoNorm();
 	double error_norm_inf = error->infNorm();
 	double exact_norm     = exact->twoNorm();
 
-	double ausum = domain->integrate(au);
-	double fsum  = domain->integrate(f);
+	double au_sum = domain->integrate(au);
+	double f_sum  = domain->integrate(f);
 	if (my_global_rank == 0) {
 		std::cout << std::scientific;
 		std::cout.precision(13);
 		std::cout << "Error (2-norm):   " << error_norm / exact_norm << endl;
 		std::cout << "Error (inf-norm): " << error_norm_inf << endl;
 		std::cout << "Residual: " << residual / fnorm << endl;
-		std::cout << u8"ΣAu-Σf: " << ausum - fsum << endl;
+		std::cout << u8"ΣAu-Σf: " << au_sum - f_sum << endl;
 		cout.unsetf(std::ios_base::floatfield);
 		int total_cells = domain->getNumGlobalCells();
 		cout << "Total cells: " << total_cells << endl;
-		cout << "Cores: " << num_procs << endl;
+		cout << "Number of Processors: " << num_procs << endl;
 	}
 
-	// output
 #ifdef HAVE_VTK
+	// output
 	if (vtk_filename != "") {
 		VtkWriter writer(dc, vtk_filename);
 		writer.add(u->vec, "Solution");
@@ -432,9 +474,8 @@ int main(int argc, char *argv[])
 #endif
 	cout.unsetf(std::ios_base::floatfield);
 
-	if (my_global_rank == 0) {
-		cout << *timer;
-	}
+	// output timer
+	cout << *timer;
 	MPI_Finalize();
 	return 0;
 }
