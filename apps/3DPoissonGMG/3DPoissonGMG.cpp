@@ -25,10 +25,6 @@
 #include "Writers/VtkWriter.h"
 #endif
 #include <cmath>
-#include <iostream>
-#include <memory>
-#include <string>
-#include <unistd.h>
 
 // =========== //
 // main driver //
