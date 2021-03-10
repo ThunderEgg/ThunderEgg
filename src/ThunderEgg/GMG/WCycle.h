@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_GMG_WCYCLE_H
 #define THUNDEREGG_GMG_WCYCLE_H
 #include <ThunderEgg/GMG/Cycle.h>
+#include <ThunderEgg/GMG/CycleOpts.h>
 namespace ThunderEgg
 {
 namespace GMG

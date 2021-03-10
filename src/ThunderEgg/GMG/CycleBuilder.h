@@ -218,6 +218,8 @@ template <int D> class CycleBuilder
 		return cycle;
 	}
 };
+extern template class CycleBuilder<2>;
+extern template class CycleBuilder<3>;
 } // namespace GMG
 } // namespace ThunderEgg
 
