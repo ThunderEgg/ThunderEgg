@@ -127,4 +127,6 @@ template <int D> class PatchOperator : public Operator<D>
 	}
 };
 } // namespace ThunderEgg
+extern template struct ThunderEgg::PatchOperator<2>;
+extern template struct ThunderEgg::PatchOperator<3>;
 #endif

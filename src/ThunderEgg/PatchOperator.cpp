@@ -2,7 +2,7 @@
  *  ThunderEgg, a library for solving Poisson's equation on adaptively
  *  refined block-structured Cartesian grids
  *
- *  Copyright (C) 2019-2020 ThunderEgg Developers. See AUTHORS.md file at the
+ *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
  *  top-level directory.
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-#include "DomainReader.h"
-template class DomainReader<2>;
-template class DomainReader<3>;
+
+#include <ThunderEgg/PatchOperator.h>
+template struct ThunderEgg::PatchOperator<2>;
+template struct ThunderEgg::PatchOperator<3>;

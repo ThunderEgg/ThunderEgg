@@ -58,6 +58,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/PatchInfo.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/PatchInfo.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchOperator.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/PatchOperator.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
 
