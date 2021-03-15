@@ -214,7 +214,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 
 		int iterations = 0;
 		try {
-			solver->solve(vg, single_op, u_single, f_copy);
+			iterations = solver->solve(vg, single_op, u_single, f_copy);
 		} catch (const BreakdownError &err) {
 			if (!continue_on_breakdown) {
 				throw err;
@@ -227,4 +227,6 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 };
 } // namespace Iterative
 } // namespace ThunderEgg
+extern template class ThunderEgg::Iterative::PatchSolver<2>;
+extern template class ThunderEgg::Iterative::PatchSolver<3>;
 #endif

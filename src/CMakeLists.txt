@@ -50,7 +50,7 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/Orthant.cpp)
 if(p4est_FOUND)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.h)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.cpp)
+  list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomGen.cpp)
 
 endif(p4est_FOUND)
 
@@ -58,6 +58,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/PatchInfo.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/PatchInfo.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchOperator.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/PatchOperator.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
 
@@ -66,10 +67,10 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Side.h)
-list(APPEND ThunderEgg_HDRS ThunderEgg/Side.cpp)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Side.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
-list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.cpp)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Timer.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/TriLinearGhostFiller.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/TriLinearGhostFiller.cpp)
@@ -77,8 +78,10 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/TriLinearGhostFiller.cpp)
 list(APPEND ThunderEgg_HDRS ThunderEgg/TypeDefs.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/ValVector.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/ValVector.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/ValVectorGenerator.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/ValVectorGenerator.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Vector.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Vector.cpp)
@@ -132,6 +135,10 @@ if(p4est_FOUND)
 endif()
 
 target_include_directories(ThunderEgg PUBLIC ${ThunderEgg_Includes})
+target_include_directories(ThunderEgg PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<INSTALL_INTERFACE:include>  
+)
 target_link_libraries(ThunderEgg PUBLIC ${ThunderEgg_Libs})
 target_link_libraries(ThunderEgg PUBLIC ${MPI_C_LIBRARIES})
 target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
@@ -143,6 +150,14 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+
+set(ThunderEgg_HDRS_String "")
+foreach(HDR ${ThunderEgg_HDRS})
+  set(ThunderEgg_HDRS_String "${ThunderEgg_HDRS_String}\n#include<${HDR}>")
+endforeach(HDR)
+configure_file("ThunderEgg.h.in" "ThunderEgg.h")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.h"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(
   DIRECTORY ThunderEgg/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg

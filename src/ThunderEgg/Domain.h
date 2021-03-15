@@ -35,8 +35,14 @@
 namespace ThunderEgg
 {
 /**
- * @brief Represents the domain of the problem.
+ * @brief Uses a collection of PatchInfo objects to represent the domain of the problem.
  *
+ * Each patch passed to the constructor needs to have the following complete information:
+ * 	* Each patch within a domain have to have a unique id set.
+ *  * Each patch needs to have the neighboring patch information filled out, with the id of neighbor
+ * patches.
+ *
+ *  When passed to the constructor, the constructor will create an indexing for the
  * This class mainly manages a set of patches that makes up the domain. It is responsible for
  * setting up the indexing of the domains, which is used in the rest of the ThunderEgg library.
  *

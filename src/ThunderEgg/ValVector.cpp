@@ -19,6 +19,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <ThunderEgg/GMG/Cycle.h>
-template class ThunderEgg::GMG::Cycle<2>;
-template class ThunderEgg::GMG::Cycle<3>;
+#include <ThunderEgg/ValVector.h>
+template class ThunderEgg::ValVector<1>;
+template class ThunderEgg::ValVector<2>;
+template class ThunderEgg::ValVector<3>;

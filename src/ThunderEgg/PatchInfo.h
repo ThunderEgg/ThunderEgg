@@ -35,12 +35,12 @@
 namespace ThunderEgg
 {
 /**
- * @brief Contains useful information for a patch
+ * @brief Contains metadata for a patch
  *
- * This contains information for a specific patch. Information like:
+ * This contains metadata for a specific patch. Information like:
  * * The globally unique id of this patch
- * * The local and global indexes of this patch in the domain
- * * The parent patch (if there is one)
+ * * The local and global indexes of this patch in the Domain
+ * * The parent patch in the tree (if there is one)
  *
  * It also contains information for a patch's neighbor:
  * * What are the neighbors id?

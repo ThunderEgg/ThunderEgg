@@ -19,6 +19,6 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <ThunderEgg/GMG/Cycle.h>
-template class ThunderEgg::GMG::Cycle<2>;
-template class ThunderEgg::GMG::Cycle<3>;
+#include <ThunderEgg/Iterative/BiCGStab.h>
+template class ThunderEgg::Iterative::BiCGStab<2>;
+template class ThunderEgg::Iterative::BiCGStab<3>;

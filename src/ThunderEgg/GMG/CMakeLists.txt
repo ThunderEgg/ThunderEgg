@@ -2,6 +2,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Cycle.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/Cycle.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleBuilder.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/CycleBuilder.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleOpts.h)
 
@@ -29,4 +30,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Restrictor.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Smoother.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/VCycle.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/VCycle.cpp)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/WCycle.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/WCycle.cpp)

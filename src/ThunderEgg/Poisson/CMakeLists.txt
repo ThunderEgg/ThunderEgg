@@ -28,6 +28,4 @@ if(PETSC_FOUND)
   list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/MatrixHelper2d.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/MatrixHelper2d.cpp)
 
-  list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/StencilHelper.h)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/StencilHelper2d.h)
 endif(PETSC_FOUND)

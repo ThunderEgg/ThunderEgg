@@ -132,6 +132,8 @@ template <int D> class Cycle : public Operator<D>
 		return finest_level;
 	}
 };
+extern template class Cycle<2>;
+extern template class Cycle<3>;
 } // namespace GMG
 } // namespace ThunderEgg
 #endif

@@ -88,3 +88,4 @@ template <int D> class DomainReader
 	}
 };
 extern template class DomainReader<2>;
+extern template class DomainReader<3>;

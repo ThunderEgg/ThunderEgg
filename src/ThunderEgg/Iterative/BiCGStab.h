@@ -230,4 +230,6 @@ template <int D> class BiCGStab : public Solver<D>
 };
 } // namespace Iterative
 } // namespace ThunderEgg
+extern template class ThunderEgg::Iterative::BiCGStab<2>;
+extern template class ThunderEgg::Iterative::BiCGStab<3>;
 #endif

@@ -301,6 +301,9 @@ template <int D> class LocalData
 		return data;
 	}
 };
+extern template class LocalData<1>;
+extern template class LocalData<2>;
+extern template class LocalData<3>;
 /*
 template <> inline const double &LocalData<2>::operator[](const std::array<int, 2> &coord) const
 {

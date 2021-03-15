@@ -59,5 +59,8 @@ template <int D> class ValVectorGenerator : public VectorGenerator<D>
 		return ValVector<D>::GetNewVector(domain, num_components);
 	}
 };
+extern template class ValVectorGenerator<1>;
+extern template class ValVectorGenerator<2>;
+extern template class ValVectorGenerator<3>;
 } // namespace ThunderEgg
 #endif

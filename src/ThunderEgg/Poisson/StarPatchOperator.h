@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_VARPOISSON_STARPATCHOPERATOR_H
-#define THUNDEREGG_VARPOISSON_STARPATCHOPERATOR_H
+#ifndef THUNDEREGG_POISSON_STARPATCHOPERATOR_H
+#define THUNDEREGG_POISSON_STARPATCHOPERATOR_H
 
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/Level.h>
