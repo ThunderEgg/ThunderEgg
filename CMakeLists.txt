@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.13)
 project(ThunderEgg LANGUAGES C CXX)
 enable_testing()
 
@@ -13,22 +13,25 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
     "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Wall -g -O3")
 set(CMAKE_CXX_STANDARD 11)
 
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG true)
+
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
   message("-- Using ccache.")
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
 endif(CCACHE_FOUND)
-
 find_package(MPI REQUIRED)
 find_package(PETSc)
 find_package(FFTW)
 find_package(Zoltan)
-find_package(p4est)
 find_package(BLAS)
 find_package(LAPACK)
-if(p4est_FOUND)
-  find_package(sc REQUIRED)
+
+find_package(P4EST HINTS ${P4EST_DIR})
+if(P4EST_FOUND)
+  find_package(SC PATHS ${P4EST_DIR} ${SC_DIR} REQUIRED)
+  find_package(ZLIB REQUIRED)
 endif()
 
 add_subdirectory(tpl)

@@ -47,12 +47,12 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/Operator.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Orthant.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Orthant.cpp)
 
-if(p4est_FOUND)
+if(P4EST_FOUND)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomGen.cpp)
 
-endif(p4est_FOUND)
+endif(P4EST_FOUND)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchInfo.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/PatchInfo.cpp)
@@ -113,10 +113,6 @@ list(APPEND ThunderEgg_Includes ${PETSC_INCLUDES})
 if(Zoltan_FOUND)
   list(APPEND ThunderEgg_Includes ${Zoltan_INCLUDES})
 endif(Zoltan_FOUND)
-if(p4est_FOUND)
-  list(APPEND ThunderEgg_Includes ${p4est_INCLUDES})
-  list(APPEND ThunderEgg_Includes ${sc_INCLUDES})
-endif()
 
 # set link list(APPEND ThunderEgg_Libs ${MPI_CXX_LIBRARIES})
 list(APPEND ThunderEgg_Libs ${PETSC_LIBRARIES})
@@ -129,10 +125,6 @@ if(Zoltan_FOUND)
 endif(Zoltan_FOUND)
 list(APPEND ThunderEgg_Libs ${BLAS_LIBRARIES})
 list(APPEND ThunderEgg_Libs ${LAPACK_LIBRARIES})
-if(p4est_FOUND)
-  list(APPEND ThunderEgg_Libs ${p4est_LIBRARIES})
-  list(APPEND ThunderEgg_Libs ${sc_LIBRARIES})
-endif()
 
 target_include_directories(ThunderEgg PUBLIC ${ThunderEgg_Includes})
 target_include_directories(ThunderEgg PUBLIC
@@ -142,7 +134,9 @@ target_include_directories(ThunderEgg PUBLIC
 target_link_libraries(ThunderEgg PUBLIC ${ThunderEgg_Libs})
 target_link_libraries(ThunderEgg PUBLIC ${MPI_C_LIBRARIES})
 target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
-
+if(P4EST_FOUND)
+  target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
+endif()
 install(
   TARGETS ThunderEgg
   EXPORT ThunderEggConfig

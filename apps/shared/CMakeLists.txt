@@ -1,6 +1,6 @@
 #determine sources first
 list(APPEND UTILS_SRCS Init.cpp Init.h)
-if(p4est_FOUND)
+if(P4EST_FOUND)
     list(APPEND UTILS_SRCS TreeToP4est.cpp TreeToP4est.h)
 endif()
 
