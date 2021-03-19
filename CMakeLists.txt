@@ -34,6 +34,11 @@ endif()
 
 add_subdirectory(tpl)
 add_subdirectory(src)
+
+# imported target, for use from FetchContent
+add_library(THUNDEREGG::THUNDEREGG INTERFACE IMPORTED GLOBAL)
+target_link_libraries(THUNDEREGG::THUNDEREGG INTERFACE ThunderEgg)
+
 if(examples)
   add_subdirectory(apps)
 endif(examples)
