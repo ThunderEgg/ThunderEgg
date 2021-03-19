@@ -5,12 +5,10 @@ enable_testing()
 # set(CMAKE_CXX_EXTENSIONS OFF)
 include(GNUInstallDirs)
 
+include(cmake/options.cmake)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
-# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3") set
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g -O0")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
-    "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Wall -g -O3")
 set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG true)
@@ -36,8 +34,12 @@ endif()
 
 add_subdirectory(tpl)
 add_subdirectory(src)
-add_subdirectory(apps)
-add_subdirectory(test)
+if(examples)
+  add_subdirectory(apps)
+endif(examples)
+if(unit_tests)
+  add_subdirectory(test)
+endif(unit_tests)
 
 find_package(Doxygen)
 if(Doxygen_FOUND)

@@ -13,7 +13,7 @@ find_library(
 
 #find includes
 find_path(
-  Zoltan_INCLUDES
+  Zoltan_INCLUDE_DIRS
   NAMES "zoltan.h"
   PATHS ${Zoltan_DIR}
   PATH_SUFFIXES "include" "trilinos"

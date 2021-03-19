@@ -111,7 +111,7 @@ target_include_directories(
 list(APPEND ThunderEgg_Includes ${MPI_C_INCLUDE_PATH})
 list(APPEND ThunderEgg_Includes ${PETSC_INCLUDES})
 if(Zoltan_FOUND)
-  list(APPEND ThunderEgg_Includes ${Zoltan_INCLUDES})
+  list(APPEND ThunderEgg_Includes ${Zoltan_INCLUDE_DIRS})
 endif(Zoltan_FOUND)
 
 # set link list(APPEND ThunderEgg_Libs ${MPI_CXX_LIBRARIES})
