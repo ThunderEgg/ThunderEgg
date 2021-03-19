@@ -134,9 +134,11 @@ target_include_directories(ThunderEgg PUBLIC
 target_link_libraries(ThunderEgg PUBLIC ${ThunderEgg_Libs})
 target_link_libraries(ThunderEgg PUBLIC ${MPI_C_LIBRARIES})
 target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
-if(P4EST_FOUND)
+
+if(TARGET P4EST::P4EST)
   target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
-endif()
+endif(TARGET P4EST::P4EST)
+
 install(
   TARGETS ThunderEgg
   EXPORT ThunderEggConfig
@@ -165,3 +167,7 @@ include(PkgConfigHandler)
 configure_pc_file("ThunderEgg" "ThunderEgg.pc.in" "ThunderEgg.pc")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.pc"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+# imported target, for use from FetchContent
+add_library(THUNDEREGG::THUNDEREGG INTERFACE IMPORTED GLOBAL)
+target_link_libraries(THUNDEREGG::THUNDEREGG INTERFACE ThunderEgg)
