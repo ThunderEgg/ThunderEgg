@@ -47,12 +47,12 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/Operator.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Orthant.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Orthant.cpp)
 
-if(P4EST_FOUND)
+if(TARGET P4EST::P4EST)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomGen.cpp)
 
-endif(P4EST_FOUND)
+endif(TARGET P4EST::P4EST)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchInfo.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/PatchInfo.cpp)
