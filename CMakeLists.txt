@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.14)
 project(ThunderEgg LANGUAGES C CXX)
 enable_testing()
 
@@ -27,7 +27,14 @@ find_package(BLAS)
 find_package(LAPACK)
 
 if(NOT TARGET P4EST::P4EST)
-  find_package(P4EST HINTS ${P4EST_DIR})
+include(FetchContent)
+FetchContent_Declare(
+  p4est
+  GIT_REPOSITORY https://github.com/cburstedde/p4est
+  GIT_TAG        feature-cmake
+)
+FetchContent_MakeAvailable(p4est)
+  #find_package(P4EST HINTS ${P4EST_DIR})
 endif(NOT TARGET P4EST::P4EST)
 if(TARGET P4EST::P4EST AND NOT TARGET SC::SC)
   find_package(SC PATHS ${P4EST_DIR} ${SC_DIR} REQUIRED)
