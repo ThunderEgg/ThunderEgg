@@ -23,8 +23,6 @@
 #include "catch.hpp"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/Experimental/DomGen.h>
-#include <ThunderEgg/Experimental/OctTree.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/ValVector.h>
 using namespace std;

@@ -173,7 +173,7 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 	int    prev_iteration;
 	double resid;
 	ss >> prev_iteration >> resid;
-	while (prev_iteration < 18) {
+	while (prev_iteration < 5) {
 		int iteration;
 		ss >> iteration >> resid;
 		CHECK(iteration == prev_iteration + 1);

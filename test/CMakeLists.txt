@@ -1,4 +1,3 @@
-if(PETSC_FOUND)
   add_executable(unit_tests_mpiany test.cpp OctTree.cpp LocalData.cpp Utils.cpp
                                    utils/DomainReader.cpp)
   target_include_directories(unit_tests_mpiany
@@ -82,4 +81,3 @@ if(PETSC_FOUND)
   add_mpi_test(2)
   add_mpi_test(3)
 
-endif(PETSC_FOUND)
