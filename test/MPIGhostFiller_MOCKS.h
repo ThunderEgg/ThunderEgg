@@ -25,9 +25,10 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/MPIGhostFiller.h>
 #include <ThunderEgg/ValVector.h>
+
 #include <list>
 
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 namespace ThunderEgg
 {
@@ -153,7 +154,7 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		}
 		CHECK(remaining_local_calls.empty());
 		CHECK(remaining_nbr_calls.empty());
-		INFO("REMAINING CALL")
+		INFO("REMAINING CALL");
 		for (auto call : remaining_nbr_calls) {
 			auto patch = std::get<0>(call);
 			INFO("id: " << patch->id);
@@ -326,7 +327,7 @@ template <int D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 						}
 					} else {
 						// values should be zero on ghost cells
-						INFO("Physical Boundary")
+						INFO("Physical Boundary");
 
 						for (int i = 0; i < pinfo->num_ghost_cells; i++) {
 							auto slice = data.getGhostSliceOnSide(s, i + 1);

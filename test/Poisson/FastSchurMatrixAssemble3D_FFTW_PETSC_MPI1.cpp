@@ -20,7 +20,6 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
@@ -31,12 +30,19 @@
 #include <ThunderEgg/Schur/PatchSolverWrapper.h>
 #include <ThunderEgg/Schur/VecWrapperGenerator.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 #define MESHES                                                                                     \
 	"mesh_inputs/3d_uniform_2x2x2_mpi1.json", "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json",        \
 	"mesh_inputs/3d_mid_refine_4x4x4_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+
 TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws exception for non-square patches",
           "[Poisson::FastSchurMatrixAssemble3D]")
 {
@@ -128,8 +134,8 @@ TEST_CASE(
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
 	m_operator->apply(g_vec, f_vec);
 
-	CHECK(f_vec->infNorm() == Approx(f_vec_expected->infNorm()));
-	CHECK(f_vec->twoNorm() == Approx(f_vec_expected->twoNorm()));
+	CHECK(f_vec->infNorm() == Catch::Approx(f_vec_expected->infNorm()));
+	CHECK(f_vec->twoNorm() == Catch::Approx(f_vec_expected->twoNorm()));
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (auto iface : iface_domain->getInterfaces()) {
@@ -140,7 +146,7 @@ TEST_CASE(
 		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(0, iface->local_index);
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
-			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
+			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
 	}
 	MatDestroy(&A);
@@ -182,8 +188,8 @@ TEST_CASE(
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
 	m_operator->apply(g_vec, f_vec);
 
-	CHECK(f_vec->infNorm() == Approx(f_vec_expected->infNorm()));
-	CHECK(f_vec->twoNorm() == Approx(f_vec_expected->twoNorm()));
+	CHECK(f_vec->infNorm() == Catch::Approx(f_vec_expected->infNorm()));
+	CHECK(f_vec->twoNorm() == Catch::Approx(f_vec_expected->twoNorm()));
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
@@ -191,7 +197,7 @@ TEST_CASE(
 		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(0, i);
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
-			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
+			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
 	}
 	MatDestroy(&A);

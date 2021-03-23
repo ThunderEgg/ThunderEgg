@@ -20,7 +20,6 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/BiQuadraticGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
@@ -28,11 +27,18 @@
 #include <ThunderEgg/PETSc/VecWrapper.h>
 #include <ThunderEgg/Poisson/MatrixHelper2d.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+
 TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPatchOperator",
           "[Poisson::MatrixHelper2d]")
 {
@@ -80,7 +86,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
-			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
+			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
 	}
 	MatDestroy(&A);
@@ -133,7 +139,7 @@ TEST_CASE(
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
-			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
+			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
 	}
 	MatDestroy(&A);

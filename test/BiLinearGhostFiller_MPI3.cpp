@@ -3,12 +3,16 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/ValVector.h>
 
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
 constexpr auto uniform = "mesh_inputs/2d_uniform_2x2_mpi3.json";
 constexpr auto refined = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi3.json";
+
 TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFiller]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, uniform, refined);
@@ -45,7 +49,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
@@ -57,7 +61,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 				               [&](const array<int, 1> &coord) {
 					               ///
 					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
 			}
 		}
@@ -100,7 +104,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
@@ -112,7 +116,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 				               [&](const array<int, 1> &coord) {
 					               ///
 					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
 			}
 		}

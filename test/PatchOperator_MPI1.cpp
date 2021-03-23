@@ -1,10 +1,13 @@
 #include "PatchOperator_MOCKS.h"
-#include "catch.hpp"
 #include "utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/MPIGhostFiller.h>
 #include <ThunderEgg/ValVector.h>
+
 #include <list>
+
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 

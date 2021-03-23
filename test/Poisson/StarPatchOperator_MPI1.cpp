@@ -20,20 +20,26 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/BiQuadraticGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/ValVector.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_4x4_mpi1.json",                \
 	"mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json",                                             \
 	"mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+
 TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPatchOperator]")
 {
 	auto                  nx        = GENERATE(2, 10);
@@ -107,7 +113,7 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 	}
 }
@@ -153,7 +159,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
-			CHECK(vec_ld[coord] + 1 == Approx(1 + expected_vec_ld[coord]));
+			CHECK(vec_ld[coord] + 1 == Catch::Approx(1 + expected_vec_ld[coord]));
 		});
 	}
 }
@@ -201,7 +207,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
-			CHECK(vec_ld[coord] + 1 == Approx(1 + exptected_vec_ld[coord]));
+			CHECK(vec_ld[coord] + 1 == Catch::Approx(1 + exptected_vec_ld[coord]));
 		});
 	}
 }

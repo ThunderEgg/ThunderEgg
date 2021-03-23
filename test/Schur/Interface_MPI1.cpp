@@ -20,11 +20,15 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/Schur/Interface.h>
+
 #include <algorithm>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 TEST_CASE("Schur::Interface id constructor", "[Schur::Interface]")
 {
 	Schur::Interface<2> iface(2);

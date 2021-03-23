@@ -18,13 +18,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-#include "catch.hpp"
 #include "utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/ValVector.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace ThunderEgg;
 using namespace std;
+
 const string uniform     = "mesh_inputs/2d_uniform_quad_mpi2.json";
 const string mid_uniform = "mesh_inputs/2d_4x4_mid_on_1_mpi2.json";
 #define MESHES uniform

@@ -19,13 +19,17 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "catch.hpp"
 #include "utils/DomainReader.h"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/Iterative/BiCGStab.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/ValVectorGenerator.h>
+
 #include <sstream>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Iterative;

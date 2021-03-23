@@ -1,10 +1,14 @@
 #include "PatchSolver_MOCKS.h"
-#include "catch.hpp"
 #include "utils/DomainReader.h"
 #include <ThunderEgg/Iterative/PatchSolver.h>
 #include <ThunderEgg/ValVector.h>
+
 #include <list>
 #include <sstream>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 

@@ -20,14 +20,20 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/DirectInterpolator.h>
 #include <ThunderEgg/ValVector.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi2.json";
+
 TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 {
 	auto                  num_components = GENERATE(1, 2, 3);
@@ -86,7 +92,7 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {
-				               REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));
+				               REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
 			               });
 		}
 	}
@@ -151,7 +157,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {
-				               REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));
+				               REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
 			               });
 		}
 	}

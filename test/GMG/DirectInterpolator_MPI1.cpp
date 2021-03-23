@@ -20,13 +20,18 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/DirectInterpolator.h>
 #include <ThunderEgg/ValVector.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 const string mesh_file         = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 const string refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
 TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
@@ -88,7 +93,7 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 			INFO("c:     " << c);
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {
-				               REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));
+				               REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
 			               });
 		}
 	}
@@ -155,7 +160,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 			INFO("c:     " << c);
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {
-				               REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));
+				               REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
 			               });
 		}
 	}
@@ -227,7 +232,7 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 			INFO("c:     " << c);
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {
-				               REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));
+				               REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
 			               });
 		}
 	}

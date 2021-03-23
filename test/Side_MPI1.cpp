@@ -1,6 +1,8 @@
-#include "catch.hpp"
 #include <ThunderEgg/Side.h>
 #include <sstream>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("Test num_sides for Side<1>", "[Side]")

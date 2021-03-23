@@ -23,7 +23,8 @@
 #include <ThunderEgg/PatchSolver.h>
 #include <set>
 
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
 
 namespace ThunderEgg
 {
@@ -114,7 +115,7 @@ template <int D> class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 				auto inner  = us[0].getSliceOnSide(s);
 				nested_loop<D - 1>(
 				ghosts.getStart(), ghosts.getEnd(), [&](const std::array<int, D - 1> &coord) {
-					CHECK((ghosts[coord] + inner[coord]) / 2 == Approx(schur_fill_value));
+					CHECK((ghosts[coord] + inner[coord]) / 2 == Catch::Approx(schur_fill_value));
 				});
 			}
 		}

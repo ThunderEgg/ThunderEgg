@@ -21,9 +21,10 @@
 
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/PatchSolver.h>
+
 #include <set>
 
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 namespace ThunderEgg
 {

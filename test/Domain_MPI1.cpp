@@ -1,7 +1,12 @@
-#include "catch.hpp"
 #include <ThunderEgg/Domain.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 TEST_CASE("Domain constructors work", "[Domain]")
 {
 	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
@@ -29,7 +34,7 @@ TEST_CASE("Domain constructors work", "[Domain]")
 	CHECK(d.getNumLocalBCCells() == 4 * n);
 	CHECK(d.getNumCellsInPatch() == n * n);
 	CHECK(d.getNumGhostCells() == num_ghost);
-	CHECK(d.volume() == Approx(spacing * spacing * n * n));
+	CHECK(d.volume() == Catch::Approx(spacing * spacing * n * n));
 	// TODO Check intigrate
 }
 TEST_CASE("Domain setTimer", "[Domain]")

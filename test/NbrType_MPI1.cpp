@@ -1,5 +1,7 @@
-#include "catch.hpp"
 #include <ThunderEgg/NbrType.h>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace ThunderEgg;
 TEST_CASE("NbrType to_json", "[NbrType]")
 {

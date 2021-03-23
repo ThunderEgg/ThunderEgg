@@ -20,11 +20,14 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <limits>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 TEST_CASE(
 "Schur::InterfaceDomain<2> patch interface local indexes start from 0 2d_refined_complicated",
 "[Schur::InterfaceDomain]")

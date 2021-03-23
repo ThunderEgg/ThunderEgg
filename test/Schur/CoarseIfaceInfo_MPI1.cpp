@@ -19,9 +19,12 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "catch.hpp"
 #include <ThunderEgg/Schur/CoarseIfaceInfo.h>
+
 #include <algorithm>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 

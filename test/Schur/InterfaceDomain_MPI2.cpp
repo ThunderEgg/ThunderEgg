@@ -20,11 +20,15 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/Schur/InterfaceDomain.h>
+
 #include <limits>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 TEST_CASE("Schur::InterfaceDomain<2> getNumLocalInterfaces 2d_refined_east",
           "[Schur::InterfaceDomain]")
 {

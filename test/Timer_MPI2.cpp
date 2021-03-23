@@ -1,10 +1,15 @@
-#include "catch.hpp"
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Timer.h>
+
 #include <fstream>
 #include <sstream>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 static Domain<2> GetDomain()
 {
 	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;

@@ -20,11 +20,15 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/Schur/InterfaceDomain.h>
+
 #include <limits>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 TEST_CASE("Schur::InterfaceDomain<2> getNumLocalInterfaces", "[Schur::InterfaceDomain]")
 {
 	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);

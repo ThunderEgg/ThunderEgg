@@ -24,7 +24,7 @@
 #include <ThunderEgg/PatchOperator.h>
 #include <set>
 
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 namespace ThunderEgg
 {

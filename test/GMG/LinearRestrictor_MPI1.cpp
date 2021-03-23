@@ -20,15 +20,21 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/ValVector.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 const string uniform_mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 const string refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
+
 TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
@@ -67,7 +73,7 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo->local_index);
 		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
@@ -77,7 +83,7 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
 			} else {
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
@@ -134,8 +140,8 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 		LocalData<2> vec_ld2      = coarse_vec->getLocalData(1, pinfo->local_index);
 		LocalData<2> expected_ld2 = coarse_expected->getLocalData(1, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
-			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
+			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost       = vec_ld.getGhostSliceOnSide(s, 1);
@@ -147,8 +153,8 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-					               CHECK(vec_ghost2[coord] == Approx(expected_ghost2[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost2[coord] == Catch::Approx(expected_ghost2[coord]));
 				               });
 			} else {
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
@@ -199,7 +205,7 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo->local_index);
 		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
@@ -259,8 +265,8 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 		LocalData<2> vec_ld2      = coarse_vec->getLocalData(1, pinfo->local_index);
 		LocalData<2> expected_ld2 = coarse_expected->getLocalData(1, pinfo->local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
-			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
+			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost       = vec_ld.getGhostSliceOnSide(s, 1);

@@ -18,14 +18,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-#include "catch.hpp"
 #include "utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/ValVector.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace ThunderEgg;
 using namespace std;
+
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+
 TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLevelComm]")
 {
 	auto                  nx        = GENERATE(2);
@@ -131,7 +137,7 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 		auto expected_lds = coarse_expected->getLocalDatas(i);
 		nested_loop<2>(vec_lds[0].getStart(), vec_lds[0].getEnd(), [&](const array<int, 2> &coord) {
 			for (size_t c = 0; c < vec_lds.size(); c++) {
-				REQUIRE(vec_lds[c][coord] == Approx(expected_lds[c][coord]));
+				REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
 			}
 		});
 	}

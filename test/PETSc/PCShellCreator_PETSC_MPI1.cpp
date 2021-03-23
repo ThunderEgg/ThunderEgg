@@ -20,13 +20,18 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
 #include <ThunderEgg/PETSc/VecWrapper.h>
 #include <ThunderEgg/ValVectorGenerator.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
@@ -80,7 +85,7 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
-			CHECK(0.5 * x_ld[coord] == Approx(b_ld[coord]));
+			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
 		});
 	}
 	PCDestroy(&P);
@@ -129,14 +134,14 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I and two components", "[PETSc::P
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
-			CHECK(0.5 * x_ld[coord] == Approx(b_ld[coord]));
+			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
 		});
 		LocalData<2> x_ld2 = x->getLocalData(1, pinfo->local_index);
 		LocalData<2> b_ld2 = b->getLocalData(1, pinfo->local_index);
 		nested_loop<2>(x_ld2.getStart(), x_ld2.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
-			CHECK(0.5 * x_ld2[coord] == Approx(b_ld2[coord]));
+			CHECK(0.5 * x_ld2[coord] == Catch::Approx(b_ld2[coord]));
 		});
 	}
 	PCDestroy(&P);

@@ -1,7 +1,10 @@
-#include "catch.hpp"
 #include <ThunderEgg/PatchInfo.h>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 {
 	PatchInfo<3> *d_ptr = new PatchInfo<3>;

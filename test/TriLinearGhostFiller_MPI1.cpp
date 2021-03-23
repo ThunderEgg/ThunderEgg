@@ -4,12 +4,16 @@
 #include <ThunderEgg/TriLinearGhostFiller.h>
 #include <ThunderEgg/ValVectorGenerator.h>
 
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
 constexpr auto single_mesh_file  = "mesh_inputs/3d_uniform_2x2x2_mpi1.json";
 constexpr auto refined_mesh_file = "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json";
+
 TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFiller]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file);
@@ -49,7 +53,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 		LocalData<3> vec_ld      = vec->getLocalData(0, pinfo->local_index);
 		LocalData<3> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
@@ -60,7 +64,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
 			}
 		}
@@ -114,7 +118,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 		LocalData<3> vec_ld2      = vec->getLocalData(1, pinfo->local_index);
 		LocalData<3> expected_ld2 = expected->getLocalData(1, pinfo->local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
@@ -125,12 +129,12 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
 			}
 		}
 		nested_loop<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3> &coord) {
-			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
+			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld2.getGhostSliceOnSide(s, 1);
@@ -141,7 +145,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
 			}
 		}
@@ -195,7 +199,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		LocalData<3> vec_ld2      = vec->getLocalData(1, pinfo->local_index);
 		LocalData<3> expected_ld2 = expected->getLocalData(1, pinfo->local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
@@ -206,12 +210,12 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
 			}
 		}
 		nested_loop<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3> &coord) {
-			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
+			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld2.getGhostSliceOnSide(s, 1);
@@ -222,7 +226,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
 			}
 		}
@@ -268,7 +272,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 		LocalData<3> vec_ld      = vec->getLocalData(0, pinfo->local_index);
 		LocalData<3> expected_ld = expected->getLocalData(0, pinfo->local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
-			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
@@ -279,7 +283,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
 			}
 		}

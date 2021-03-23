@@ -1,5 +1,8 @@
-#include "catch.hpp"
 #include <ThunderEgg/PatchInfo.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("FineNbrInfo Serialization/Deserialization", "[FineNbrInfo]")
