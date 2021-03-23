@@ -13,7 +13,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install cmake libfftw3-dev libopenmpi-dev libp4est-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev libtrilinos-zoltan-dev
+        sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev libtrilinos-zoltan-dev
         echo $HOME/.local/bin >> $GITHUB_PATH
         pip install gcovr
     - name: Install Sonar Build Wrapper
