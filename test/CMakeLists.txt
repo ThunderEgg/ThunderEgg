@@ -43,9 +43,9 @@
     if(NOT FFTW_FOUND)
       list(FILTER TEST_MPI${ARG1}_SRC EXCLUDE REGEX ".*_FFTW_.*")
     endif(NOT FFTW_FOUND)
-    if(NOT p4est_FOUND)
+    if(NOT TARGET P4EST::P4EST)
       list(FILTER TEST_MPI${ARG1}_SRC EXCLUDE REGEX ".*_P4EST_.*")
-    endif(NOT p4est_FOUND)
+    endif(NOT TARGET P4EST::P4EST)
 
     list(FILTER TEST_MPI${ARG1}_PETSC_SRC INCLUDE REGEX ".*_PETSC_.*")
 
