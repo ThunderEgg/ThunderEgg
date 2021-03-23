@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     env:
-      CXXFLAGS: -g -O0 -Wall -Wno-system-headers -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -coverage -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline
+      CXXFLAGS: -g -O0 -Wall -Wno-system-headers -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline
       LDFLAGS: -lgcov
     steps:
     - name: Install dependencies
@@ -32,7 +32,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Cmake Configure
-      run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ .
+      run: cmake -Dunit_tests=ON -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ .
     - name: Build
       run: build-wrapper-linux-x86-64 --out-dir bw-output make
     - name: Run Tests
