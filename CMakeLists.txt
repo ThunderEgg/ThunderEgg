@@ -27,14 +27,18 @@ find_package(BLAS)
 find_package(LAPACK)
 
 if(NOT TARGET P4EST::P4EST)
-include(FetchContent)
-FetchContent_Declare(
-  p4est
-  GIT_REPOSITORY https://github.com/cburstedde/p4est
-  GIT_TAG        feature-cmake
-)
-FetchContent_MakeAvailable(p4est)
-  #find_package(P4EST HINTS ${P4EST_DIR})
+  if(NOT p4est_external)
+    find_package(P4EST HINTS ${P4EST_DIR})
+  endif(NOT p4est_external)
+  if(p4est_external OR NOT TARGET P4EST::P4EST)
+    include(FetchContent)
+    FetchContent_Declare(
+      p4est
+      GIT_REPOSITORY https://github.com/cburstedde/p4est
+      GIT_TAG        feature-cmake
+    )
+    FetchContent_MakeAvailable(p4est)
+  endif()
 endif(NOT TARGET P4EST::P4EST)
 if(TARGET P4EST::P4EST AND NOT TARGET SC::SC)
   find_package(SC PATHS ${P4EST_DIR} ${SC_DIR} REQUIRED)

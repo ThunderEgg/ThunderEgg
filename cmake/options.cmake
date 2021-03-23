@@ -1,6 +1,8 @@
 option(examples "build example applicaitons" off)
 option(unit_tests "build unit tests" off)
 
+option(p4est_external "force build of p4est" off)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
 # --- default install directory under build/local
