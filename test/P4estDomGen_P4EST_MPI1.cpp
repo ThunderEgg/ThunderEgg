@@ -31,9 +31,6 @@
 using namespace std;
 using namespace ThunderEgg;
 
-#define MESHES \
-	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
-
 TEST_CASE("SinglePatch", "[p4estDomGen]")
 {
 	p4est_connectivity_t *    conn  = p4est_connectivity_new_unitsquare();
@@ -99,6 +96,11 @@ TEST_CASE("P4estDomGen 2x2 Uniform", "[p4estDomGen]")
 	auto domain_1 = dg.getFinestDomain();
 	auto domain_0 = dg.getCoarserDomain();
 
+	SECTION("correct number of patches")
+	{
+		CHECK(domain_1->getNumGlobalPatches() == 4);
+		CHECK(domain_0->getNumGlobalPatches() == 1);
+	}
 	SECTION("patches have correct spacings")
 	{
 		for (auto patch : domain_1->getPatchInfoVector()) {

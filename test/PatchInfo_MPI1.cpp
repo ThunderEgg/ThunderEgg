@@ -136,13 +136,14 @@ TEST_CASE("PatchInfo to_json no children", "[PatchInfo]")
 TEST_CASE("PatchInfo to_json no children no neighbors", "[PatchInfo]")
 {
 	PatchInfo<3> d;
-	d.id          = 9;
-	d.rank        = 0;
-	d.parent_id   = 2;
-	d.parent_rank = 3;
-	d.starts      = {1, 2, 3};
-	d.spacings    = {0.1, 0.2, 0.3};
-	d.ns          = {10, 20, 30};
+	d.id           = 9;
+	d.rank         = 0;
+	d.parent_id    = 2;
+	d.parent_rank  = 3;
+	d.refine_level = 329;
+	d.starts       = {1, 2, 3};
+	d.spacings     = {0.1, 0.2, 0.3};
+	d.ns           = {10, 20, 30};
 
 	nlohmann::json j = d;
 
@@ -150,6 +151,7 @@ TEST_CASE("PatchInfo to_json no children no neighbors", "[PatchInfo]")
 	CHECK(j["parent_id"] == d.parent_id);
 	CHECK(j["parent_rank"] == d.parent_rank);
 	CHECK(j["rank"] == d.rank);
+	CHECK(j["refine_level"] == 329);
 	CHECK(j["child_ids"] == nullptr);
 	CHECK(j["child_ranks"] == nullptr);
 	CHECK(j["orth_on_parent"] == nullptr);
@@ -172,15 +174,16 @@ TEST_CASE("PatchInfo to_json no children no neighbors", "[PatchInfo]")
 TEST_CASE("PatchInfo to_json with children", "[PatchInfo]")
 {
 	PatchInfo<3> d;
-	d.id          = 9;
-	d.rank        = 0;
-	d.parent_id   = 2;
-	d.parent_rank = 3;
-	d.starts      = {1, 2, 3};
-	d.spacings    = {0.1, 0.2, 0.3};
-	d.ns          = {10, 20, 30};
-	d.child_ids   = {3, 4, 5, 6, 7, 8, 9, 10};
-	d.child_ranks = {1, 2, 3, 4, 5, 6, 7, 8};
+	d.id           = 9;
+	d.rank         = 0;
+	d.parent_id    = 2;
+	d.parent_rank  = 3;
+	d.refine_level = 329;
+	d.starts       = {1, 2, 3};
+	d.spacings     = {0.1, 0.2, 0.3};
+	d.ns           = {10, 20, 30};
+	d.child_ids    = {3, 4, 5, 6, 7, 8, 9, 10};
+	d.child_ranks  = {1, 2, 3, 4, 5, 6, 7, 8};
 	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
 	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
 	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
@@ -191,6 +194,7 @@ TEST_CASE("PatchInfo to_json with children", "[PatchInfo]")
 	CHECK(j["parent_id"] == d.parent_id);
 	CHECK(j["parent_rank"] == d.parent_rank);
 	CHECK(j["rank"] == d.rank);
+	CHECK(j["refine_level"] == 329);
 
 	REQUIRE(j["child_ids"].is_array());
 	REQUIRE(j["child_ids"].size() == 8);
@@ -241,12 +245,13 @@ TEST_CASE("PatchInfo to_json with children", "[PatchInfo]")
 TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
 {
 	nlohmann::json j;
-	j["id"]          = 9;
-	j["rank"]        = 3;
-	j["parent_id"]   = 2;
-	j["parent_rank"] = 3;
-	j["starts"]      = {1, 2, 3};
-	j["lengths"]     = {10, 20, 30};
+	j["id"]           = 9;
+	j["rank"]         = 3;
+	j["refine_level"] = 329;
+	j["parent_id"]    = 2;
+	j["parent_rank"]  = 3;
+	j["starts"]       = {1, 2, 3};
+	j["lengths"]      = {10, 20, 30};
 	j["nbrs"]
 	= {NormalNbrInfo<3>(1), CoarseNbrInfo<3>(2, Orthant<2>::nw()), FineNbrInfo<3>({3, 4, 5, 6})};
 	j["nbrs"][0]["side"] = "NORTH";
@@ -256,6 +261,7 @@ TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
 	PatchInfo<3> d = j.get<PatchInfo<3>>();
 	CHECK(d.id == 9);
 	CHECK(d.rank == 3);
+	CHECK(d.refine_level == 329);
 	CHECK(d.parent_id == 2);
 	CHECK(d.parent_rank == 3);
 	CHECK(d.orth_on_parent == Orthant<3>::null());
@@ -283,6 +289,7 @@ TEST_CASE("PatchInfo from_json with children", "[PatchInfo]")
 	nlohmann::json j;
 	j["id"]             = 9;
 	j["rank"]           = 3;
+	j["refine_level"]   = 329;
 	j["parent_id"]      = 2;
 	j["parent_rank"]    = 3;
 	j["orth_on_parent"] = "TNW";
@@ -299,6 +306,7 @@ TEST_CASE("PatchInfo from_json with children", "[PatchInfo]")
 	PatchInfo<3> d = j.get<PatchInfo<3>>();
 	CHECK(d.id == 9);
 	CHECK(d.rank == 3);
+	CHECK(d.refine_level == 329);
 	CHECK(d.parent_id == 2);
 	CHECK(d.parent_rank == 3);
 	CHECK(d.orth_on_parent == Orthant<3>::tnw());
