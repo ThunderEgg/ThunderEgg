@@ -517,10 +517,12 @@ template <int D> void from_json(const nlohmann::json &j, PatchInfo<D> &pinfo)
 	if (j.contains("orth_on_parent")) {
 		j["orth_on_parent"].get_to(pinfo.orth_on_parent);
 	}
-	pinfo.refine_level = j["refine_level"];
-	pinfo.rank         = j["rank"];
-	pinfo.starts       = j["starts"].get<std::array<double, D>>();
-	pinfo.spacings     = j["lengths"].get<std::array<double, D>>();
+	if (j.contains("refine_level")) {
+		pinfo.refine_level = j["refine_level"];
+	}
+	pinfo.rank     = j["rank"];
+	pinfo.starts   = j["starts"].get<std::array<double, D>>();
+	pinfo.spacings = j["lengths"].get<std::array<double, D>>();
 	pinfo.ns.fill(1);
 	for (const auto &nbr_j : j["nbrs"]) {
 		Side<D> s = nbr_j["side"].get<Side<D>>();
