@@ -52,6 +52,13 @@ if(TARGET P4EST::P4EST)
   list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomGen.cpp)
 
+  if(TARGET P4EST::P8EST)
+
+    list(APPEND ThunderEgg_HDRS ThunderEgg/P8estDomainGenerator.h)
+    list(APPEND ThunderEgg_SRCS ThunderEgg/P8estDomainGenerator.cpp)
+
+  endif(TARGET P4EST::P8EST)
+
 endif(TARGET P4EST::P4EST)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchInfo.h)
@@ -138,6 +145,9 @@ target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
 if(TARGET P4EST::P4EST)
   target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
 endif(TARGET P4EST::P4EST)
+if(TARGET P4EST::P8EST)
+  target_link_libraries(ThunderEgg PUBLIC P4EST::P8EST)
+endif(TARGET P4EST::P8EST)
 
 install(
   TARGETS ThunderEgg
