@@ -39,25 +39,25 @@ struct IterateFunctions {
 
 void IterVolumeWrap(p8est_iter_volume_info_t *info, void *user_data)
 {
-	IterateFunctions *functions = (IterateFunctions *) user_data;
+	const IterateFunctions *functions = (IterateFunctions *) user_data;
 	functions->iter_volume(info);
 }
 
 void IterFaceWrap(p8est_iter_face_info_t *info, void *user_data)
 {
-	IterateFunctions *functions = (IterateFunctions *) user_data;
+	const IterateFunctions *functions = (IterateFunctions *) user_data;
 	functions->iter_face(info);
 }
 
-void p8est_iterate_ext(p8est_t *                                       p8est,
-                       p8est_ghost_t *                                 ghost_layer,
-                       std::function<void(p8est_iter_volume_info_t *)> iter_volume,
-                       std::function<void(p8est_iter_face_info_t *)>   iter_face,
-                       int                                             remote)
+void p8est_iterate_ext(p8est_t *                                              p8est,
+                       p8est_ghost_t *                                        ghost_layer,
+                       const std::function<void(p8est_iter_volume_info_t *)> &iter_volume,
+                       const std::function<void(p8est_iter_face_info_t *)> &  iter_face,
+                       int                                                    remote)
 {
 	IterateFunctions functions = {iter_volume, iter_face};
 	p8est_iterate_ext(
-	p8est, ghost_layer, &functions, iter_volume ? IterVolumeWrap : nullptr, iter_face ? IterFaceWrap : nullptr, nullptr, nullptr, remote);
+	p8est, ghost_layer, &functions, iter_volume ? &IterVolumeWrap : nullptr, iter_face ? &IterFaceWrap : nullptr, nullptr, nullptr, remote);
 }
 
 struct CoarsenFunctions {
@@ -67,7 +67,7 @@ struct CoarsenFunctions {
 
 int CoarsenWrap(p8est_t *p8est, p4est_topidx_t which_tree, p8est_quadrant_t *quadrants[])
 {
-	CoarsenFunctions *functions = (CoarsenFunctions *) p8est->user_pointer;
+	const CoarsenFunctions *functions = (CoarsenFunctions *) p8est->user_pointer;
 	return functions->coarsen(which_tree, quadrants);
 }
 
@@ -78,16 +78,16 @@ void ReplaceWrap(p8est_t *         p8est,
                  int               num_incoming,
                  p8est_quadrant_t *incoming[])
 {
-	CoarsenFunctions *functions = (CoarsenFunctions *) p8est->user_pointer;
+	const CoarsenFunctions *functions = (CoarsenFunctions *) p8est->user_pointer;
 	functions->replace(which_tree, num_outgoing, outgoing, num_incoming, incoming);
 }
 
-void p8est_coarsen_ext(p8est_t *                                                                                 p8est,
-                       int                                                                                       coarsen_recursive,
-                       int                                                                                       callback_orphans,
-                       std::function<int(p4est_topidx_t, p8est_quadrant_t *[])>                                  coarsen,
-                       p8est_init_t                                                                              init_fn,
-                       std::function<void(p4est_topidx_t, int, p8est_quadrant_t *[], int, p8est_quadrant_t *[])> replace)
+void p8est_coarsen_ext(p8est_t *                                                                                        p8est,
+                       int                                                                                              coarsen_recursive,
+                       int                                                                                              callback_orphans,
+                       const std::function<int(p4est_topidx_t, p8est_quadrant_t *[])> &                                 coarsen,
+                       p8est_init_t                                                                                     init_fn,
+                       const std::function<void(p4est_topidx_t, int, p8est_quadrant_t *[], int, p8est_quadrant_t *[])> &replace)
 {
 	CoarsenFunctions functions = {coarsen, replace};
 	p8est->user_pointer        = &functions;
@@ -116,7 +116,7 @@ struct Data {
 	PatchInfo<3> *     pinfo;
 };
 
-void InitData(p8est_t *p8est, p4est_topidx_t which_tree, p8est_quadrant_t *quadrant)
+void InitData([[maybe_unused]] p8est_t *p8est, [[maybe_unused]] p4est_topidx_t which_tree, p8est_quadrant_t *quadrant)
 {
 	Data &data = *(Data *) quadrant->p.user_data;
 	data.id    = -1;
@@ -165,7 +165,7 @@ void SetIds(p8est_t *p8est)
 /*
  * constructor
  */
-P8estDomainGenerator::P8estDomainGenerator(p8est_t *p8est, const std::array<int, 3> &ns, int num_ghost_cells, BlockMapFunc bmf)
+P8estDomainGenerator::P8estDomainGenerator(p8est_t *p8est, const std::array<int, 3> &ns, int num_ghost_cells, const BlockMapFunc &bmf)
 : ns(ns),
   num_ghost_cells(num_ghost_cells),
   bmf(bmf)
@@ -216,7 +216,7 @@ void P8estDomainGenerator::coarsenTree()
 	my_p8est,
 	false,
 	true,
-	[&](p4est_topidx_t which_tree, p8est_quadrant_t *quadrant[]) {
+	[&]([[maybe_unused]] p4est_topidx_t which_tree, p8est_quadrant_t *quadrant[]) {
 		if (quadrant[1] == nullptr) {
 			// update child data to point to self
 			Data *data                  = (Data *) quadrant[0]->p.user_data;
@@ -249,14 +249,18 @@ void P8estDomainGenerator::coarsenTree()
 		}
 	},
 	InitData,
-	[](p4est_topidx_t which_tree, int num_outgoing, p8est_quadrant_t *outgoing[], int num_incoming, p8est_quadrant_t *incoming[]) {
-		Data *data         = (Data *) incoming[0]->p.user_data;
-		Data *fine_sw_data = (Data *) outgoing[0]->p.user_data;
-		data->id           = fine_sw_data->id;
+	[]([[maybe_unused]] p4est_topidx_t which_tree,
+	   [[maybe_unused]] int            num_outgoing,
+	   p8est_quadrant_t *              outgoing[],
+	   [[maybe_unused]] int            num_incoming,
+	   p8est_quadrant_t *              incoming[]) {
+		Data *      data         = (Data *) incoming[0]->p.user_data;
+		const Data *fine_sw_data = (Data *) outgoing[0]->p.user_data;
+		data->id                 = fine_sw_data->id;
 		for (int i = 0; i < 8; i++) {
-			Data *fine_data      = (Data *) outgoing[i]->p.user_data;
-			data->child_ids[i]   = fine_data->id;
-			data->child_ranks[i] = fine_data->rank;
+			const Data *fine_data = (Data *) outgoing[i]->p.user_data;
+			data->child_ids[i]    = fine_data->id;
+			data->child_ranks[i]  = fine_data->rank;
 		}
 	});
 	p8est_partition_ext(my_p8est, true, nullptr);
@@ -314,9 +318,9 @@ namespace
  * @param side2
  * @param ghost_data
  */
-void addCoarseNbrInfo(p8est_iter_face_side_t side1, p8est_iter_face_side_t side2, Data *ghost_data)
+void addCoarseNbrInfo(const p8est_iter_face_side_t &side1, const p8est_iter_face_side_t &side2, Data *ghost_data)
 {
-	Data *nbr_data;
+	const Data *nbr_data;
 	if (side2.is.full.is_ghost) {
 		nbr_data = ghost_data + side2.is.full.quadid;
 	} else {
@@ -343,7 +347,7 @@ void addCoarseNbrInfo(p8est_iter_face_side_t side1, p8est_iter_face_side_t side2
  * @param side2
  * @param ghost_data
  */
-void addFineNbrInfo(p8est_iter_face_side_t side1, p8est_iter_face_side_t side2, Data *ghost_data)
+void addFineNbrInfo(const p8est_iter_face_side_t &side1, const p8est_iter_face_side_t &side2, Data *ghost_data)
 {
 	if (!side1.is.full.is_ghost) {
 		Data *data = (Data *) side1.is.full.quad->p.user_data;
@@ -373,7 +377,7 @@ void addFineNbrInfo(p8est_iter_face_side_t side1, p8est_iter_face_side_t side2, 
  * @param side2
  * @param ghost_data
  */
-void addNormalNbrInfo(p8est_iter_face_side_t side1, p8est_iter_face_side_t side2, Data *ghost_data)
+void addNormalNbrInfo(const p8est_iter_face_side_t &side1, const p8est_iter_face_side_t &side2, Data *ghost_data)
 {
 	if (!side1.is.full.is_ghost) {
 		Data *data = (Data *) side1.is.full.quad->p.user_data;
@@ -398,7 +402,7 @@ void addNormalNbrInfo(p8est_iter_face_side_t side1, p8est_iter_face_side_t side2
  * @param side2
  * @param ghost_data p8est ghost data array
  */
-void addNbrInfo(p8est_iter_face_side_t side1, p8est_iter_face_side_t side2, Data *ghost_data)
+void addNbrInfo(const p8est_iter_face_side_t &side1, const p8est_iter_face_side_t &side2, Data *ghost_data)
 {
 	if (side1.is_hanging) {
 		addCoarseNbrInfo(side1, side2, ghost_data);
@@ -460,7 +464,7 @@ void P8estDomainGenerator::updateParentRanksOfPreviousDomain()
 	std::map<int, std::set<int>> out_info;
 	for (auto pair : new_level) {
 		id_rank_map[pair.first] = my_p8est->mpirank;
-		auto &pinfo             = pair.second;
+		const auto &pinfo       = pair.second;
 		for (int i = 0; i < 8; i++) {
 			if (pinfo->child_ranks[i] != -1 && pinfo->child_ranks[i] != my_p8est->mpirank) {
 				out_info[pinfo->child_ranks[i]].insert(pinfo->id);
@@ -469,7 +473,7 @@ void P8estDomainGenerator::updateParentRanksOfPreviousDomain()
 	}
 	// get incoming information
 	std::set<int> incoming_ids;
-	for (auto &pair : old_level) {
+	for (const auto &pair : old_level) {
 		if (!new_level.count(pair.second->parent_id)) {
 			incoming_ids.insert(pair.second->parent_id);
 		}
@@ -482,7 +486,7 @@ void P8estDomainGenerator::updateParentRanksOfPreviousDomain()
 		std::vector<int> buffer(pair.second.begin(), pair.second.end());
 		buffers.push_back(buffer);
 		MPI_Request request;
-		MPI_Isend(buffer.data(), buffer.size(), MPI_INT, dest, 0, MPI_COMM_WORLD, &request);
+		MPI_Isend(buffer.data(), (int) buffer.size(), MPI_INT, dest, 0, MPI_COMM_WORLD, &request);
 		send_requests.push_back(request);
 	}
 	// recv info

@@ -61,6 +61,10 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	std::list<std::shared_ptr<Domain<3>>> domains;
 
 	/**
+	 * @brief The dimensions of each patch
+	 */
+	std::array<int, 3> ns;
+	/**
 	 * @brief the number of ghost cells on each side of the patch
 	 */
 	int num_ghost_cells;
@@ -70,10 +74,6 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 * Will start with num_levels-1
 	 */
 	int curr_level;
-	/**
-	 * @brief The dimensions of each patch
-	 */
-	std::array<int, 3> ns;
 	/**
 	 * @brief The length of a block on the x-axis
 	 */
@@ -133,7 +133,7 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 * @param inf the function used to set neumann boundary conditions
 	 * @param bmf the function used to map the blocks to the domain
 	 */
-	P8estDomainGenerator(p8est_t *p8est, const std::array<int, 3> &ns, int num_ghost_cells, BlockMapFunc bmf);
+	P8estDomainGenerator(p8est_t *p8est, const std::array<int, 3> &ns, int num_ghost_cells, const BlockMapFunc &bmf);
 	~P8estDomainGenerator();
 	std::shared_ptr<Domain<3>> getFinestDomain();
 	bool                       hasCoarserDomain();

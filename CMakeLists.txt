@@ -9,12 +9,7 @@ include(cmake/options.cmake)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
-if(unit_tests)
-  # even though ThunderEgg is a c++ 11 library catch2 requires c++ 17
-  set(CMAKE_CXX_STANDARD 17)
-else()
-  set(CMAKE_CXX_STANDARD 11)
-endif()
+set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG true)
 
