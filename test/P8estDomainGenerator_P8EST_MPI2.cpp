@@ -65,7 +65,7 @@ std::vector<PatchInfo<3>> GetAllPatchesOnRank0(std::shared_ptr<const Domain<3>> 
 			patches.get_to(all_patches);
 			for (auto &patch : all_patches) {
 				patch.ns = domain->getNs();
-				for (int i = 0; i < 2; i++) {
+				for (int i = 0; i < 3; i++) {
 					patch.spacings[i] /= patch.ns[i];
 				}
 			}
@@ -82,7 +82,7 @@ std::string GetAllPatchesJSONString(const std::vector<PatchInfo<3>> &patches)
 	return patches_j.dump(1);
 }
 } // namespace
-TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
+TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[P8estDomainGenerator]")
 {
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -1768,7 +1768,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bsw_patch->id);
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tsw_bsw_patch->id);
 
-			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tse_patch->id);
+			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tsw_patch->id);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bse_tsw_patch->id);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bsw_tne_patch->id);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bse_patch->id);
@@ -1776,7 +1776,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bsw_tne_patch->id);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bsw_tsw_patch->id);
-			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bnw_tnw_patch->id);
+			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bnw_tsw_patch->id);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bnw_patch->id);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tsw_bnw_patch->id);
 
@@ -1796,8 +1796,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_bse_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bse_bne_patch->id);
 			CHECK(domain_2_bse_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bse_tse_patch->id);
 
-			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bse_bne_patch->id);
-			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bsw_bne_patch->id);
+			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_bne_patch->id);
+			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bse_bne_patch->id);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bse_bsw_patch->id);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bne_bsw_patch->id);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bse_tnw_patch->id);
@@ -1820,8 +1820,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tne_patch->id);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bse_tne_patch->id);
-			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bse_tne_patch->id);
-			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bne_tne_patch->id);
+			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bse_tsw_patch->id);
+			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bne_tsw_patch->id);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bse_bnw_patch->id);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tse_bnw_patch->id);
 
@@ -1829,7 +1829,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bse_tse_patch->id);
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bne_tse_patch->id);
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bse_bne_patch->id);
-			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tse_tne_patch->id);
+			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tse_bne_patch->id);
 
 			CHECK(domain_2_bnw_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bnw_bse_patch->id);
 			CHECK(domain_2_bnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bsw_bnw_patch->id);
@@ -1910,7 +1910,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bnw_tne_patch->id);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bne_tne_patch->id);
-			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bne_bsw_patch->id);
+			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bne_tsw_patch->id);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bne_bnw_patch->id);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tne_bnw_patch->id);
 
@@ -1927,8 +1927,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tsw_bsw_patch->id);
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tse_bsw_patch->id);
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tsw_bne_patch->id);
-			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_tne_patch->id);
-			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tsw_tne_patch->id);
+			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_tse_patch->id);
+			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tsw_tse_patch->id);
 
 			CHECK(domain_2_tsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tsw_bne_patch->id);
 			CHECK(domain_2_tsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_bsw_patch->id);
@@ -1952,7 +1952,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tsw_tne_patch->id);
 			CHECK(domain_2_tsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tsw_bse_patch->id);
 
-			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tsw_tse_patch->id);
+			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tsw_tne_patch->id);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_tsw_patch->id);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tnw_tsw_patch->id);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tsw_bnw_patch->id);
@@ -1961,13 +1961,13 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tse_tnw_patch->id);
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_tse_patch->id);
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tnw_tse_patch->id);
-			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tsw_bnw_patch->id);
+			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tsw_bne_patch->id);
 
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tsw_bse_patch->id);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tse_bse_patch->id);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tse_bnw_patch->id);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bse_tsw_patch->id);
-			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bse_tsw_patch->id);
+			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tse_tsw_patch->id);
 
 			CHECK(domain_2_tse_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tse_bsw_patch->id);
 			CHECK(domain_2_tse_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tse_bne_patch->id);
@@ -2011,7 +2011,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_bnw_patch->id);
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tnw_bnw_patch->id);
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bnw_tsw_patch->id);
-			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bnw_tsw_patch->id);
+			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tnw_tsw_patch->id);
 
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tnw_bsw_patch->id);
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tne_bsw_patch->id);
@@ -2021,7 +2021,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tnw_tse_patch->id);
 
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tnw_bne_patch->id);
-			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_bsw_patch->id);
+			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tnw_bsw_patch->id);
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bnw_tnw_patch->id);
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tnw_tnw_patch->id);
 
@@ -2039,7 +2039,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tnw_tsw_patch->id);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tne_tsw_patch->id);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_tne_patch->id);
-			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tse_tne_patch->id);
+			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tnw_tne_patch->id);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tnw_bse_patch->id);
 
 			CHECK(domain_2_tnw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tnw_tne_patch->id);
@@ -2051,10 +2051,10 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tnw_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tnw_tse_patch->id);
 			CHECK(domain_2_tnw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tnw_bne_patch->id);
 
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tne_bse_patch->id);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tnw_bse_patch->id);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tne_bnw_patch->id);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tse_bnw_patch->id);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tnw_bse_patch->id);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tne_bse_patch->id);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tse_bnw_patch->id);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tne_bnw_patch->id);
 			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bne_tsw_patch->id);
 			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tne_tsw_patch->id);
 
@@ -2068,7 +2068,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tne_bne_patch->id);
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tne_bsw_patch->id);
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bne_tnw_patch->id);
-			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tne_tne_patch->id);
+			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tne_tnw_patch->id);
 
 			CHECK(domain_2_tne_bne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tne_bnw_patch->id);
 			CHECK(domain_2_tne_bne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tne_bse_patch->id);
@@ -2119,9 +2119,9 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_1_tne_patch->id);
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_1_bse_patch->id);
 
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_1_tnw_patch->id);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_1_tse_patch->id);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_1_bne_patch->id);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_1_tne_patch->id);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_1_tsw_patch->id);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_1_bnw_patch->id);
 
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_1_tnw_patch->id);
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_1_tse_patch->id);
@@ -2157,7 +2157,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bsw_patch->rank);
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tsw_bsw_patch->rank);
 
-			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tse_patch->rank);
+			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tsw_patch->rank);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bse_tsw_patch->rank);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bsw_tne_patch->rank);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bse_patch->rank);
@@ -2165,7 +2165,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bsw_tne_patch->rank);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bsw_tsw_patch->rank);
-			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bnw_tnw_patch->rank);
+			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bnw_tsw_patch->rank);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bnw_patch->rank);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tsw_bnw_patch->rank);
 
@@ -2185,8 +2185,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_bse_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bse_bne_patch->rank);
 			CHECK(domain_2_bse_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bse_tse_patch->rank);
 
-			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bse_bne_patch->rank);
-			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bsw_bne_patch->rank);
+			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_bne_patch->rank);
+			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bse_bne_patch->rank);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bse_bsw_patch->rank);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bne_bsw_patch->rank);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bse_tnw_patch->rank);
@@ -2209,8 +2209,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tne_patch->rank);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bse_tne_patch->rank);
-			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bse_tne_patch->rank);
-			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bne_tne_patch->rank);
+			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bse_tsw_patch->rank);
+			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bne_tsw_patch->rank);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bse_bnw_patch->rank);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tse_bnw_patch->rank);
 
@@ -2218,7 +2218,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bse_tse_patch->rank);
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bne_tse_patch->rank);
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bse_bne_patch->rank);
-			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tse_tne_patch->rank);
+			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tse_bne_patch->rank);
 
 			CHECK(domain_2_bnw_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bnw_bse_patch->rank);
 			CHECK(domain_2_bnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bsw_bnw_patch->rank);
@@ -2299,7 +2299,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bnw_tne_patch->rank);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bne_tne_patch->rank);
-			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bne_bsw_patch->rank);
+			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bne_tsw_patch->rank);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bne_bnw_patch->rank);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tne_bnw_patch->rank);
 
@@ -2316,8 +2316,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tsw_bsw_patch->rank);
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tse_bsw_patch->rank);
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tsw_bne_patch->rank);
-			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_tne_patch->rank);
-			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tsw_tne_patch->rank);
+			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_tse_patch->rank);
+			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tsw_tse_patch->rank);
 
 			CHECK(domain_2_tsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tsw_bne_patch->rank);
 			CHECK(domain_2_tsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_bsw_patch->rank);
@@ -2341,7 +2341,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tsw_tne_patch->rank);
 			CHECK(domain_2_tsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tsw_bse_patch->rank);
 
-			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tsw_tse_patch->rank);
+			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tsw_tne_patch->rank);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_tsw_patch->rank);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tnw_tsw_patch->rank);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tsw_bnw_patch->rank);
@@ -2350,13 +2350,13 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tse_tnw_patch->rank);
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_tse_patch->rank);
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tnw_tse_patch->rank);
-			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tsw_bnw_patch->rank);
+			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tsw_bne_patch->rank);
 
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tsw_bse_patch->rank);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tse_bse_patch->rank);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tse_bnw_patch->rank);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bse_tsw_patch->rank);
-			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bse_tsw_patch->rank);
+			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tse_tsw_patch->rank);
 
 			CHECK(domain_2_tse_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tse_bsw_patch->rank);
 			CHECK(domain_2_tse_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tse_bne_patch->rank);
@@ -2400,7 +2400,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_bnw_patch->rank);
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tnw_bnw_patch->rank);
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bnw_tsw_patch->rank);
-			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bnw_tsw_patch->rank);
+			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tnw_tsw_patch->rank);
 
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tnw_bsw_patch->rank);
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tne_bsw_patch->rank);
@@ -2410,7 +2410,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tnw_tse_patch->rank);
 
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tnw_bne_patch->rank);
-			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_bsw_patch->rank);
+			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tnw_bsw_patch->rank);
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bnw_tnw_patch->rank);
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tnw_tnw_patch->rank);
 
@@ -2428,7 +2428,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tnw_tsw_patch->rank);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tne_tsw_patch->rank);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_tne_patch->rank);
-			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tse_tne_patch->rank);
+			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tnw_tne_patch->rank);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tnw_bse_patch->rank);
 
 			CHECK(domain_2_tnw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tnw_tne_patch->rank);
@@ -2440,10 +2440,10 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tnw_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tnw_tse_patch->rank);
 			CHECK(domain_2_tnw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tnw_bne_patch->rank);
 
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tne_bse_patch->rank);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tnw_bse_patch->rank);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tne_bnw_patch->rank);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tse_bnw_patch->rank);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tnw_bse_patch->rank);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tne_bse_patch->rank);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tse_bnw_patch->rank);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tne_bnw_patch->rank);
 			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bne_tsw_patch->rank);
 			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tne_tsw_patch->rank);
 
@@ -2457,7 +2457,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tne_bne_patch->rank);
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tne_bsw_patch->rank);
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bne_tnw_patch->rank);
-			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tne_tne_patch->rank);
+			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tne_tnw_patch->rank);
 
 			CHECK(domain_2_tne_bne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tne_bnw_patch->rank);
 			CHECK(domain_2_tne_bne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tne_bse_patch->rank);
@@ -2508,9 +2508,9 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_1_tne_patch->rank);
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_1_bse_patch->rank);
 
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_1_tnw_patch->rank);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_1_tse_patch->rank);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_1_bne_patch->rank);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_1_tne_patch->rank);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_1_tsw_patch->rank);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_1_bnw_patch->rank);
 
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_1_tnw_patch->rank);
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_1_tse_patch->rank);
@@ -2518,7 +2518,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[p8estDomGen]")
 		}
 	}
 }
-TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
+TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[P8estDomainGenerator]")
 {
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -3457,289 +3457,289 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 	SECTION("patches have correct spacings")
 	{
 		if (rank == 0) {
-			CHECK(domain_3_bsw_bsw_bsw_patch->spacings[0] == 0.125 * scale_x / nx);
-			CHECK(domain_3_bsw_bsw_bsw_patch->spacings[1] == 0.125 * scale_y / ny);
-			CHECK(domain_3_bsw_bsw_bsw_patch->spacings[2] == 0.125 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bsw_bse_patch->spacings[0] == 0.125 * scale_x / nx);
-			CHECK(domain_3_bsw_bsw_bse_patch->spacings[1] == 0.125 * scale_y / ny);
-			CHECK(domain_3_bsw_bsw_bse_patch->spacings[2] == 0.125 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bsw_bnw_patch->spacings[0] == 0.125 * scale_x / nx);
-			CHECK(domain_3_bsw_bsw_bnw_patch->spacings[1] == 0.125 * scale_y / ny);
-			CHECK(domain_3_bsw_bsw_bnw_patch->spacings[2] == 0.125 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bsw_bne_patch->spacings[0] == 0.125 * scale_x / nx);
-			CHECK(domain_3_bsw_bsw_bne_patch->spacings[1] == 0.125 * scale_y / ny);
-			CHECK(domain_3_bsw_bsw_bne_patch->spacings[2] == 0.125 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bsw_tsw_patch->spacings[0] == 0.125 * scale_x / nx);
-			CHECK(domain_3_bsw_bsw_tsw_patch->spacings[1] == 0.125 * scale_y / ny);
-			CHECK(domain_3_bsw_bsw_tsw_patch->spacings[2] == 0.125 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bsw_tse_patch->spacings[0] == 0.125 * scale_x / nx);
-			CHECK(domain_3_bsw_bsw_tse_patch->spacings[1] == 0.125 * scale_y / ny);
-			CHECK(domain_3_bsw_bsw_tse_patch->spacings[2] == 0.125 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bsw_tnw_patch->spacings[0] == 0.125 * scale_x / nx);
-			CHECK(domain_3_bsw_bsw_tnw_patch->spacings[1] == 0.125 * scale_y / ny);
-			CHECK(domain_3_bsw_bsw_tnw_patch->spacings[2] == 0.125 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bsw_tne_patch->spacings[0] == 0.125 * scale_x / nx);
-			CHECK(domain_3_bsw_bsw_tne_patch->spacings[1] == 0.125 * scale_y / ny);
-			CHECK(domain_3_bsw_bsw_tne_patch->spacings[2] == 0.125 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bsw_bse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bsw_bse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bsw_bnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bsw_bnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bsw_bne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bsw_bne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bsw_bne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bsw_tsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bsw_tsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bsw_tsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bsw_tse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bsw_tse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bsw_tse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bsw_tnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bsw_tnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bsw_tnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bsw_tne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bsw_tne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bsw_tne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bse_bsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bse_bsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bse_bsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bse_bse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bse_bse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bse_bse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bse_bnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bse_bnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bse_bnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bse_bne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bse_bne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bse_bne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bse_tsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bse_tsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bse_tsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bse_tse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bse_tse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bse_tse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bse_tnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bse_tnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bse_tnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bse_tne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bse_tne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bse_tne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bnw_bsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bnw_bsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bnw_bsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bnw_bse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bnw_bse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bnw_bse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bnw_bnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bnw_bnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bnw_bnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bnw_bne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bnw_bne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bnw_bne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bnw_tsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bnw_tsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bnw_tsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bnw_tse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bnw_tse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bnw_tse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bnw_tnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bnw_tnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bnw_tnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bnw_tne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bnw_tne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bnw_tne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bne_bsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bne_bsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bne_bsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bne_bse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bne_bse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bne_bse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bne_bnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bne_bnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bne_bnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bne_bne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bne_bne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bne_bne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bne_tsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bne_tsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bne_tsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bne_tse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bne_tse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bne_tse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bne_tnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bne_tnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bne_tnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_bne_tne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_bne_tne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_bne_tne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tsw_bsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tsw_bsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tsw_bsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tsw_bse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tsw_bse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tsw_bse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tsw_bnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tsw_bnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tsw_bnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tsw_bne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tsw_bne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tsw_bne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tsw_tsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tsw_tsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tsw_tsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tsw_tse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tsw_tse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tsw_tse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tsw_tnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tsw_tnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tsw_tnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tsw_tne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tsw_tne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tsw_tne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tse_bsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tse_bsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tse_bsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tse_bse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tse_bse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tse_bse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tse_bnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tse_bnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tse_bnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tse_bne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tse_bne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tse_bne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tse_tsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tse_tsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tse_tsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tse_tse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tse_tse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tse_tse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tse_tnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tse_tnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tse_tnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tse_tne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tse_tne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tse_tne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tnw_bsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tnw_bsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tnw_bsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tnw_bse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tnw_bse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tnw_bse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tnw_bnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tnw_bnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tnw_bnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tnw_bne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tnw_bne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tnw_bne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tnw_tsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tnw_tsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tnw_tsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tnw_tse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tnw_tse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tnw_tse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tnw_tnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tnw_tnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tnw_tnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tnw_tne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tnw_tne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tnw_tne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tne_bsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tne_bsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tne_bsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tne_bse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tne_bse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tne_bse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tne_bnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tne_bnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tne_bnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tne_bne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tne_bne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tne_bne_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tne_tsw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tne_tsw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tne_tsw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tne_tse_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tne_tse_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tne_tse_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tne_tnw_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tne_tnw_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tne_tnw_patch->spacings[2] == 0.25 * scale_z / nz);
-
-			CHECK(domain_3_tne_tne_patch->spacings[0] == 0.25 * scale_x / nx);
-			CHECK(domain_3_tne_tne_patch->spacings[1] == 0.25 * scale_y / ny);
-			CHECK(domain_3_tne_tne_patch->spacings[2] == 0.25 * scale_z / nz);
+			CHECK(domain_3_bsw_bsw_bsw_patch->spacings[0] == Catch::Approx(0.125 * scale_x / nx));
+			CHECK(domain_3_bsw_bsw_bsw_patch->spacings[1] == Catch::Approx(0.125 * scale_y / ny));
+			CHECK(domain_3_bsw_bsw_bsw_patch->spacings[2] == Catch::Approx(0.125 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bsw_bse_patch->spacings[0] == Catch::Approx(0.125 * scale_x / nx));
+			CHECK(domain_3_bsw_bsw_bse_patch->spacings[1] == Catch::Approx(0.125 * scale_y / ny));
+			CHECK(domain_3_bsw_bsw_bse_patch->spacings[2] == Catch::Approx(0.125 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bsw_bnw_patch->spacings[0] == Catch::Approx(0.125 * scale_x / nx));
+			CHECK(domain_3_bsw_bsw_bnw_patch->spacings[1] == Catch::Approx(0.125 * scale_y / ny));
+			CHECK(domain_3_bsw_bsw_bnw_patch->spacings[2] == Catch::Approx(0.125 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bsw_bne_patch->spacings[0] == Catch::Approx(0.125 * scale_x / nx));
+			CHECK(domain_3_bsw_bsw_bne_patch->spacings[1] == Catch::Approx(0.125 * scale_y / ny));
+			CHECK(domain_3_bsw_bsw_bne_patch->spacings[2] == Catch::Approx(0.125 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bsw_tsw_patch->spacings[0] == Catch::Approx(0.125 * scale_x / nx));
+			CHECK(domain_3_bsw_bsw_tsw_patch->spacings[1] == Catch::Approx(0.125 * scale_y / ny));
+			CHECK(domain_3_bsw_bsw_tsw_patch->spacings[2] == Catch::Approx(0.125 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bsw_tse_patch->spacings[0] == Catch::Approx(0.125 * scale_x / nx));
+			CHECK(domain_3_bsw_bsw_tse_patch->spacings[1] == Catch::Approx(0.125 * scale_y / ny));
+			CHECK(domain_3_bsw_bsw_tse_patch->spacings[2] == Catch::Approx(0.125 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bsw_tnw_patch->spacings[0] == Catch::Approx(0.125 * scale_x / nx));
+			CHECK(domain_3_bsw_bsw_tnw_patch->spacings[1] == Catch::Approx(0.125 * scale_y / ny));
+			CHECK(domain_3_bsw_bsw_tnw_patch->spacings[2] == Catch::Approx(0.125 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bsw_tne_patch->spacings[0] == Catch::Approx(0.125 * scale_x / nx));
+			CHECK(domain_3_bsw_bsw_tne_patch->spacings[1] == Catch::Approx(0.125 * scale_y / ny));
+			CHECK(domain_3_bsw_bsw_tne_patch->spacings[2] == Catch::Approx(0.125 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bsw_bse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bsw_bse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bsw_bnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bsw_bnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bsw_bne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bsw_bne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bsw_bne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bsw_tsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bsw_tsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bsw_tsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bsw_tse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bsw_tse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bsw_tse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bsw_tnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bsw_tnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bsw_tnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bsw_tne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bsw_tne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bsw_tne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bse_bsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bse_bsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bse_bsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bse_bse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bse_bse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bse_bse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bse_bnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bse_bnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bse_bnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bse_bne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bse_bne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bse_bne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bse_tsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bse_tsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bse_tsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bse_tse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bse_tse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bse_tse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bse_tnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bse_tnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bse_tnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bse_tne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bse_tne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bse_tne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bnw_bsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bnw_bsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bnw_bsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bnw_bse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bnw_bse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bnw_bse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bnw_bnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bnw_bnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bnw_bnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bnw_bne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bnw_bne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bnw_bne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bnw_tsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bnw_tsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bnw_tsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bnw_tse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bnw_tse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bnw_tse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bnw_tnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bnw_tnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bnw_tnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bnw_tne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bnw_tne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bnw_tne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bne_bsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bne_bsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bne_bsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bne_bse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bne_bse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bne_bse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bne_bnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bne_bnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bne_bnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bne_bne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bne_bne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bne_bne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bne_tsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bne_tsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bne_tsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bne_tse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bne_tse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bne_tse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bne_tnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bne_tnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bne_tnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_bne_tne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_bne_tne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_bne_tne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tsw_bsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tsw_bsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tsw_bsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tsw_bse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tsw_bse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tsw_bse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tsw_bnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tsw_bnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tsw_bnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tsw_bne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tsw_bne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tsw_bne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tsw_tsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tsw_tsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tsw_tsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tsw_tse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tsw_tse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tsw_tse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tsw_tnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tsw_tnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tsw_tnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tsw_tne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tsw_tne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tsw_tne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tse_bsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tse_bsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tse_bsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tse_bse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tse_bse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tse_bse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tse_bnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tse_bnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tse_bnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tse_bne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tse_bne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tse_bne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tse_tsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tse_tsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tse_tsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tse_tse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tse_tse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tse_tse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tse_tnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tse_tnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tse_tnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tse_tne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tse_tne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tse_tne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tnw_bsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tnw_bsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tnw_bsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tnw_bse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tnw_bse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tnw_bse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tnw_bnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tnw_bnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tnw_bnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tnw_bne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tnw_bne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tnw_bne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tnw_tsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tnw_tsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tnw_tsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tnw_tse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tnw_tse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tnw_tse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tnw_tnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tnw_tnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tnw_tnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tnw_tne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tnw_tne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tnw_tne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tne_bsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tne_bsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tne_bsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tne_bse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tne_bse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tne_bse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tne_bnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tne_bnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tne_bnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tne_bne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tne_bne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tne_bne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tne_tsw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tne_tsw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tne_tsw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tne_tse_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tne_tse_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tne_tse_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tne_tnw_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tne_tnw_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tne_tnw_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
+
+			CHECK(domain_3_tne_tne_patch->spacings[0] == Catch::Approx(0.25 * scale_x / nx));
+			CHECK(domain_3_tne_tne_patch->spacings[1] == Catch::Approx(0.25 * scale_y / ny));
+			CHECK(domain_3_tne_tne_patch->spacings[2] == Catch::Approx(0.25 * scale_z / nz));
 		}
 
 		for (auto patch : domain_2->getPatchInfoVector()) {
@@ -6040,7 +6040,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bsw_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bsw_bsw_bsw_patch->id);
 			CHECK(domain_3_bsw_bsw_tsw_patch->getCoarseNbrInfo(Side<3>::top()).id == domain_3_bsw_tsw_patch->id);
 
-			CHECK(domain_3_bsw_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_bsw_bsw_tse_patch->id);
+			CHECK(domain_3_bsw_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_bsw_bsw_tsw_patch->id);
 			CHECK(domain_3_bsw_bsw_tse_patch->getCoarseNbrInfo(Side<3>::east()).id == domain_3_bsw_bse_patch->id);
 			CHECK(domain_3_bsw_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_bsw_bsw_tne_patch->id);
 			CHECK(domain_3_bsw_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bsw_bsw_bse_patch->id);
@@ -6053,7 +6053,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bsw_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::top()).id == domain_3_bsw_tsw_patch->id);
 
 			CHECK(domain_3_bsw_bsw_tne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_bsw_bsw_tnw_patch->id);
-			CHECK(domain_3_bsw_bsw_tne_patch->getCoarseNbrInfo(Side<3>::east()).id == domain_3_bse_bse_patch->id);
+			CHECK(domain_3_bsw_bsw_tne_patch->getCoarseNbrInfo(Side<3>::east()).id == domain_3_bsw_bse_patch->id);
 			CHECK(domain_3_bsw_bsw_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_bsw_bsw_tse_patch->id);
 			CHECK(domain_3_bsw_bsw_tne_patch->getCoarseNbrInfo(Side<3>::north()).id == domain_3_bsw_bnw_patch->id);
 			CHECK(domain_3_bsw_bsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bsw_bsw_bne_patch->id);
@@ -6089,7 +6089,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bsw_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ids[3] == domain_3_bsw_bsw_tne_patch->id);
 			CHECK(domain_3_bsw_tsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tsw_bsw_patch->id);
 
-			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_bsw_tse_patch->id);
+			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_bsw_tsw_patch->id);
 			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_bse_tsw_patch->id);
 			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_bsw_tne_patch->id);
 			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bsw_bse_patch->id);
@@ -6097,7 +6097,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_bsw_tne_patch->id);
 			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_bsw_tsw_patch->id);
-			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_bnw_tnw_patch->id);
+			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_bnw_tsw_patch->id);
 			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bsw_bnw_patch->id);
 			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tsw_bnw_patch->id);
 
@@ -6117,8 +6117,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bse_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_bse_bne_patch->id);
 			CHECK(domain_3_bse_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_bse_tse_patch->id);
 
-			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_bse_bne_patch->id);
-			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_bsw_bne_patch->id);
+			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_bsw_bne_patch->id);
+			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_bse_bne_patch->id);
 			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_bse_bsw_patch->id);
 			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_bne_bsw_patch->id);
 			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_bse_tnw_patch->id);
@@ -6141,8 +6141,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_bsw_tne_patch->id);
 			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_bse_tne_patch->id);
-			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_bse_tne_patch->id);
-			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_bne_tne_patch->id);
+			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_bse_tsw_patch->id);
+			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_bne_tsw_patch->id);
 			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bse_bnw_patch->id);
 			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tse_bnw_patch->id);
 
@@ -6150,7 +6150,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_bse_tse_patch->id);
 			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_bne_tse_patch->id);
 			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bse_bne_patch->id);
-			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tse_tne_patch->id);
+			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tse_bne_patch->id);
 
 			CHECK(domain_3_bnw_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_bnw_bse_patch->id);
 			CHECK(domain_3_bnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_bsw_bnw_patch->id);
@@ -6231,7 +6231,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_bnw_tne_patch->id);
 			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_bne_tne_patch->id);
-			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_bne_bsw_patch->id);
+			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_bne_tsw_patch->id);
 			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bne_bnw_patch->id);
 			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tne_bnw_patch->id);
 
@@ -6248,8 +6248,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_tsw_bsw_patch->id);
 			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tse_bsw_patch->id);
 			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tsw_bne_patch->id);
-			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bsw_tne_patch->id);
-			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tsw_tne_patch->id);
+			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bsw_tse_patch->id);
+			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tsw_tse_patch->id);
 
 			CHECK(domain_3_tsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tsw_bne_patch->id);
 			CHECK(domain_3_tsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tsw_bsw_patch->id);
@@ -6273,7 +6273,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tsw_tne_patch->id);
 			CHECK(domain_3_tsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_tsw_bse_patch->id);
 
-			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tsw_tse_patch->id);
+			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tsw_tne_patch->id);
 			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tsw_tsw_patch->id);
 			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tnw_tsw_patch->id);
 			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_tsw_bnw_patch->id);
@@ -6282,13 +6282,13 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tse_tnw_patch->id);
 			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tsw_tse_patch->id);
 			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tnw_tse_patch->id);
-			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_tsw_bnw_patch->id);
+			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_tsw_bne_patch->id);
 
 			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_tsw_bse_patch->id);
 			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tse_bse_patch->id);
 			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tse_bnw_patch->id);
 			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bse_tsw_patch->id);
-			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_bse_tsw_patch->id);
+			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tse_tsw_patch->id);
 
 			CHECK(domain_3_tse_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_tse_bsw_patch->id);
 			CHECK(domain_3_tse_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tse_bne_patch->id);
@@ -6332,7 +6332,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tsw_bnw_patch->id);
 			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tnw_bnw_patch->id);
 			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bnw_tsw_patch->id);
-			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_bnw_tsw_patch->id);
+			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tnw_tsw_patch->id);
 
 			CHECK(domain_3_tnw_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_tnw_bsw_patch->id);
 			CHECK(domain_3_tnw_bse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tne_bsw_patch->id);
@@ -6342,7 +6342,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tnw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tnw_tse_patch->id);
 
 			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tnw_bne_patch->id);
-			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tsw_bsw_patch->id);
+			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tnw_bsw_patch->id);
 			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bnw_tnw_patch->id);
 			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tnw_tnw_patch->id);
 
@@ -6360,7 +6360,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_tnw_tsw_patch->id);
 			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tne_tsw_patch->id);
 			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tsw_tne_patch->id);
-			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tse_tne_patch->id);
+			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tnw_tne_patch->id);
 			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_tnw_bse_patch->id);
 
 			CHECK(domain_3_tnw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tnw_tne_patch->id);
@@ -6372,10 +6372,10 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tnw_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tnw_tse_patch->id);
 			CHECK(domain_3_tnw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_tnw_bne_patch->id);
 
-			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_tne_bse_patch->id);
-			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tnw_bse_patch->id);
-			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tne_bnw_patch->id);
-			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tse_bnw_patch->id);
+			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_tnw_bse_patch->id);
+			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tne_bse_patch->id);
+			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tse_bnw_patch->id);
+			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_3_tne_bnw_patch->id);
 			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bne_tsw_patch->id);
 			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tne_tsw_patch->id);
 
@@ -6389,7 +6389,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_3_tne_bne_patch->id);
 			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tne_bsw_patch->id);
 			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_3_bne_tnw_patch->id);
-			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tne_tne_patch->id);
+			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_3_tne_tnw_patch->id);
 
 			CHECK(domain_3_tne_bne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_3_tne_bnw_patch->id);
 			CHECK(domain_3_tne_bne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_3_tne_bse_patch->id);
@@ -6441,7 +6441,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bsw_patch->id);
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tsw_bsw_patch->id);
 
-			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tse_patch->id);
+			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tsw_patch->id);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bse_tsw_patch->id);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bsw_tne_patch->id);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bse_patch->id);
@@ -6449,7 +6449,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bsw_tne_patch->id);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bsw_tsw_patch->id);
-			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bnw_tnw_patch->id);
+			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bnw_tsw_patch->id);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bnw_patch->id);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tsw_bnw_patch->id);
 
@@ -6469,8 +6469,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_bse_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bse_bne_patch->id);
 			CHECK(domain_2_bse_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bse_tse_patch->id);
 
-			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bse_bne_patch->id);
-			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bsw_bne_patch->id);
+			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_bne_patch->id);
+			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bse_bne_patch->id);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bse_bsw_patch->id);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bne_bsw_patch->id);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bse_tnw_patch->id);
@@ -6493,8 +6493,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tne_patch->id);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bse_tne_patch->id);
-			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bse_tne_patch->id);
-			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bne_tne_patch->id);
+			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bse_tsw_patch->id);
+			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bne_tsw_patch->id);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bse_bnw_patch->id);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tse_bnw_patch->id);
 
@@ -6502,7 +6502,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bse_tse_patch->id);
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bne_tse_patch->id);
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bse_bne_patch->id);
-			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tse_tne_patch->id);
+			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tse_bne_patch->id);
 
 			CHECK(domain_2_bnw_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bnw_bse_patch->id);
 			CHECK(domain_2_bnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bsw_bnw_patch->id);
@@ -6583,7 +6583,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bnw_tne_patch->id);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bne_tne_patch->id);
-			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bne_bsw_patch->id);
+			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bne_tsw_patch->id);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bne_bnw_patch->id);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tne_bnw_patch->id);
 
@@ -6600,8 +6600,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tsw_bsw_patch->id);
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tse_bsw_patch->id);
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tsw_bne_patch->id);
-			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_tne_patch->id);
-			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tsw_tne_patch->id);
+			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_tse_patch->id);
+			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tsw_tse_patch->id);
 
 			CHECK(domain_2_tsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tsw_bne_patch->id);
 			CHECK(domain_2_tsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_bsw_patch->id);
@@ -6625,7 +6625,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tsw_tne_patch->id);
 			CHECK(domain_2_tsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tsw_bse_patch->id);
 
-			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tsw_tse_patch->id);
+			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tsw_tne_patch->id);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_tsw_patch->id);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tnw_tsw_patch->id);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tsw_bnw_patch->id);
@@ -6634,13 +6634,13 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tse_tnw_patch->id);
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_tse_patch->id);
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tnw_tse_patch->id);
-			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tsw_bnw_patch->id);
+			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tsw_bne_patch->id);
 
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tsw_bse_patch->id);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tse_bse_patch->id);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tse_bnw_patch->id);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bse_tsw_patch->id);
-			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bse_tsw_patch->id);
+			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tse_tsw_patch->id);
 
 			CHECK(domain_2_tse_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tse_bsw_patch->id);
 			CHECK(domain_2_tse_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tse_bne_patch->id);
@@ -6684,7 +6684,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_bnw_patch->id);
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tnw_bnw_patch->id);
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bnw_tsw_patch->id);
-			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bnw_tsw_patch->id);
+			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tnw_tsw_patch->id);
 
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tnw_bsw_patch->id);
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tne_bsw_patch->id);
@@ -6694,7 +6694,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tnw_tse_patch->id);
 
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tnw_bne_patch->id);
-			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_bsw_patch->id);
+			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tnw_bsw_patch->id);
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bnw_tnw_patch->id);
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tnw_tnw_patch->id);
 
@@ -6712,7 +6712,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tnw_tsw_patch->id);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tne_tsw_patch->id);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_tne_patch->id);
-			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tse_tne_patch->id);
+			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tnw_tne_patch->id);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tnw_bse_patch->id);
 
 			CHECK(domain_2_tnw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tnw_tne_patch->id);
@@ -6724,10 +6724,10 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tnw_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tnw_tse_patch->id);
 			CHECK(domain_2_tnw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_tnw_bne_patch->id);
 
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tne_bse_patch->id);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tnw_bse_patch->id);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tne_bnw_patch->id);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tse_bnw_patch->id);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tnw_bse_patch->id);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tne_bse_patch->id);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tse_bnw_patch->id);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tne_bnw_patch->id);
 			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bne_tsw_patch->id);
 			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tne_tsw_patch->id);
 
@@ -6741,7 +6741,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tne_bne_patch->id);
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tne_bsw_patch->id);
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bne_tnw_patch->id);
-			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tne_tne_patch->id);
+			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tne_tnw_patch->id);
 
 			CHECK(domain_2_tne_bne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tne_bnw_patch->id);
 			CHECK(domain_2_tne_bne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tne_bse_patch->id);
@@ -6792,9 +6792,9 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_1_tne_patch->id);
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_1_bse_patch->id);
 
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_1_tnw_patch->id);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_1_tse_patch->id);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_1_bne_patch->id);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_1_tne_patch->id);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_1_tsw_patch->id);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_1_bnw_patch->id);
 
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_1_tnw_patch->id);
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_1_tse_patch->id);
@@ -6830,7 +6830,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bsw_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bsw_bsw_bsw_patch->rank);
 			CHECK(domain_3_bsw_bsw_tsw_patch->getCoarseNbrInfo(Side<3>::top()).rank == domain_3_bsw_tsw_patch->rank);
 
-			CHECK(domain_3_bsw_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_bsw_bsw_tse_patch->rank);
+			CHECK(domain_3_bsw_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_bsw_bsw_tsw_patch->rank);
 			CHECK(domain_3_bsw_bsw_tse_patch->getCoarseNbrInfo(Side<3>::east()).rank == domain_3_bsw_bse_patch->rank);
 			CHECK(domain_3_bsw_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_bsw_bsw_tne_patch->rank);
 			CHECK(domain_3_bsw_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bsw_bsw_bse_patch->rank);
@@ -6843,7 +6843,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bsw_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::top()).rank == domain_3_bsw_tsw_patch->rank);
 
 			CHECK(domain_3_bsw_bsw_tne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_bsw_bsw_tnw_patch->rank);
-			CHECK(domain_3_bsw_bsw_tne_patch->getCoarseNbrInfo(Side<3>::east()).rank == domain_3_bse_bse_patch->rank);
+			CHECK(domain_3_bsw_bsw_tne_patch->getCoarseNbrInfo(Side<3>::east()).rank == domain_3_bsw_bse_patch->rank);
 			CHECK(domain_3_bsw_bsw_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_bsw_bsw_tse_patch->rank);
 			CHECK(domain_3_bsw_bsw_tne_patch->getCoarseNbrInfo(Side<3>::north()).rank == domain_3_bsw_bnw_patch->rank);
 			CHECK(domain_3_bsw_bsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bsw_bsw_bne_patch->rank);
@@ -6879,7 +6879,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bsw_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ranks[3] == domain_3_bsw_bsw_tne_patch->rank);
 			CHECK(domain_3_bsw_tsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tsw_bsw_patch->rank);
 
-			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_bsw_tse_patch->rank);
+			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_bsw_tsw_patch->rank);
 			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_bse_tsw_patch->rank);
 			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_bsw_tne_patch->rank);
 			CHECK(domain_3_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bsw_bse_patch->rank);
@@ -6887,7 +6887,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_bsw_tne_patch->rank);
 			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_bsw_tsw_patch->rank);
-			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_bnw_tnw_patch->rank);
+			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_bnw_tsw_patch->rank);
 			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bsw_bnw_patch->rank);
 			CHECK(domain_3_bsw_tnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tsw_bnw_patch->rank);
 
@@ -6907,8 +6907,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bse_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_bse_bne_patch->rank);
 			CHECK(domain_3_bse_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_bse_tse_patch->rank);
 
-			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_bse_bne_patch->rank);
-			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_bsw_bne_patch->rank);
+			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_bsw_bne_patch->rank);
+			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_bse_bne_patch->rank);
 			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_bse_bsw_patch->rank);
 			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_bne_bsw_patch->rank);
 			CHECK(domain_3_bse_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_bse_tnw_patch->rank);
@@ -6931,8 +6931,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_bsw_tne_patch->rank);
 			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_bse_tne_patch->rank);
-			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_bse_tne_patch->rank);
-			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_bne_tne_patch->rank);
+			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_bse_tsw_patch->rank);
+			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_bne_tsw_patch->rank);
 			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bse_bnw_patch->rank);
 			CHECK(domain_3_bse_tnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tse_bnw_patch->rank);
 
@@ -6940,7 +6940,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_bse_tse_patch->rank);
 			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_bne_tse_patch->rank);
 			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bse_bne_patch->rank);
-			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tse_tne_patch->rank);
+			CHECK(domain_3_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tse_bne_patch->rank);
 
 			CHECK(domain_3_bnw_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_bnw_bse_patch->rank);
 			CHECK(domain_3_bnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_bsw_bnw_patch->rank);
@@ -7021,7 +7021,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_bnw_tne_patch->rank);
 			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_bne_tne_patch->rank);
-			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_bne_bsw_patch->rank);
+			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_bne_tsw_patch->rank);
 			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bne_bnw_patch->rank);
 			CHECK(domain_3_bne_tnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tne_bnw_patch->rank);
 
@@ -7038,8 +7038,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_tsw_bsw_patch->rank);
 			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tse_bsw_patch->rank);
 			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tsw_bne_patch->rank);
-			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bsw_tne_patch->rank);
-			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tsw_tne_patch->rank);
+			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bsw_tse_patch->rank);
+			CHECK(domain_3_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tsw_tse_patch->rank);
 
 			CHECK(domain_3_tsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tsw_bne_patch->rank);
 			CHECK(domain_3_tsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tsw_bsw_patch->rank);
@@ -7063,7 +7063,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tsw_tne_patch->rank);
 			CHECK(domain_3_tsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_tsw_bse_patch->rank);
 
-			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tsw_tse_patch->rank);
+			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tsw_tne_patch->rank);
 			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tsw_tsw_patch->rank);
 			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tnw_tsw_patch->rank);
 			CHECK(domain_3_tsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_tsw_bnw_patch->rank);
@@ -7072,13 +7072,13 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tse_tnw_patch->rank);
 			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tsw_tse_patch->rank);
 			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tnw_tse_patch->rank);
-			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_tsw_bnw_patch->rank);
+			CHECK(domain_3_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_tsw_bne_patch->rank);
 
 			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_tsw_bse_patch->rank);
 			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tse_bse_patch->rank);
 			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tse_bnw_patch->rank);
 			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bse_tsw_patch->rank);
-			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_bse_tsw_patch->rank);
+			CHECK(domain_3_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tse_tsw_patch->rank);
 
 			CHECK(domain_3_tse_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_tse_bsw_patch->rank);
 			CHECK(domain_3_tse_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tse_bne_patch->rank);
@@ -7122,7 +7122,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tsw_bnw_patch->rank);
 			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tnw_bnw_patch->rank);
 			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bnw_tsw_patch->rank);
-			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_bnw_tsw_patch->rank);
+			CHECK(domain_3_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tnw_tsw_patch->rank);
 
 			CHECK(domain_3_tnw_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_tnw_bsw_patch->rank);
 			CHECK(domain_3_tnw_bse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tne_bsw_patch->rank);
@@ -7132,7 +7132,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tnw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tnw_tse_patch->rank);
 
 			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tnw_bne_patch->rank);
-			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tsw_bsw_patch->rank);
+			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tnw_bsw_patch->rank);
 			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bnw_tnw_patch->rank);
 			CHECK(domain_3_tnw_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tnw_tnw_patch->rank);
 
@@ -7150,7 +7150,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_tnw_tsw_patch->rank);
 			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tne_tsw_patch->rank);
 			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tsw_tne_patch->rank);
-			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tse_tne_patch->rank);
+			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tnw_tne_patch->rank);
 			CHECK(domain_3_tnw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_tnw_bse_patch->rank);
 
 			CHECK(domain_3_tnw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tnw_tne_patch->rank);
@@ -7162,10 +7162,10 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tnw_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tnw_tse_patch->rank);
 			CHECK(domain_3_tnw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_tnw_bne_patch->rank);
 
-			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_tne_bse_patch->rank);
-			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tnw_bse_patch->rank);
-			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tne_bnw_patch->rank);
-			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tse_bnw_patch->rank);
+			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_tnw_bse_patch->rank);
+			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tne_bse_patch->rank);
+			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tse_bnw_patch->rank);
+			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_3_tne_bnw_patch->rank);
 			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bne_tsw_patch->rank);
 			CHECK(domain_3_tne_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tne_tsw_patch->rank);
 
@@ -7179,7 +7179,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_3_tne_bne_patch->rank);
 			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tne_bsw_patch->rank);
 			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_3_bne_tnw_patch->rank);
-			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tne_tne_patch->rank);
+			CHECK(domain_3_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_3_tne_tnw_patch->rank);
 
 			CHECK(domain_3_tne_bne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_3_tne_bnw_patch->rank);
 			CHECK(domain_3_tne_bne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_3_tne_bse_patch->rank);
@@ -7231,7 +7231,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bsw_patch->rank);
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tsw_bsw_patch->rank);
 
-			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tse_patch->rank);
+			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tsw_patch->rank);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bse_tsw_patch->rank);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bsw_tne_patch->rank);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bse_patch->rank);
@@ -7239,7 +7239,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bsw_tne_patch->rank);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bsw_tsw_patch->rank);
-			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bnw_tnw_patch->rank);
+			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bnw_tsw_patch->rank);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bnw_patch->rank);
 			CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tsw_bnw_patch->rank);
 
@@ -7259,8 +7259,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_bse_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bse_bne_patch->rank);
 			CHECK(domain_2_bse_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bse_tse_patch->rank);
 
-			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bse_bne_patch->rank);
-			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bsw_bne_patch->rank);
+			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_bne_patch->rank);
+			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bse_bne_patch->rank);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bse_bsw_patch->rank);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bne_bsw_patch->rank);
 			CHECK(domain_2_bse_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bse_tnw_patch->rank);
@@ -7283,8 +7283,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tne_patch->rank);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bse_tne_patch->rank);
-			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bse_tne_patch->rank);
-			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bne_tne_patch->rank);
+			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bse_tsw_patch->rank);
+			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bne_tsw_patch->rank);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bse_bnw_patch->rank);
 			CHECK(domain_2_bse_tnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tse_bnw_patch->rank);
 
@@ -7292,7 +7292,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bse_tse_patch->rank);
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bne_tse_patch->rank);
 			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bse_bne_patch->rank);
-			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tse_tne_patch->rank);
+			CHECK(domain_2_bse_tne_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tse_bne_patch->rank);
 
 			CHECK(domain_2_bnw_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bnw_bse_patch->rank);
 			CHECK(domain_2_bnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bsw_bnw_patch->rank);
@@ -7373,7 +7373,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bnw_tne_patch->rank);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bne_tne_patch->rank);
-			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bne_bsw_patch->rank);
+			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bne_tsw_patch->rank);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bne_bnw_patch->rank);
 			CHECK(domain_2_bne_tnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tne_bnw_patch->rank);
 
@@ -7390,8 +7390,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tsw_bsw_patch->rank);
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tse_bsw_patch->rank);
 			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tsw_bne_patch->rank);
-			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_tne_patch->rank);
-			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tsw_tne_patch->rank);
+			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_tse_patch->rank);
+			CHECK(domain_2_tsw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tsw_tse_patch->rank);
 
 			CHECK(domain_2_tsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tsw_bne_patch->rank);
 			CHECK(domain_2_tsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_bsw_patch->rank);
@@ -7415,7 +7415,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tsw_tne_patch->rank);
 			CHECK(domain_2_tsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tsw_bse_patch->rank);
 
-			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tsw_tse_patch->rank);
+			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tsw_tne_patch->rank);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_tsw_patch->rank);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tnw_tsw_patch->rank);
 			CHECK(domain_2_tsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tsw_bnw_patch->rank);
@@ -7424,13 +7424,13 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tse_tnw_patch->rank);
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_tse_patch->rank);
 			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tnw_tse_patch->rank);
-			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tsw_bnw_patch->rank);
+			CHECK(domain_2_tsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tsw_bne_patch->rank);
 
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tsw_bse_patch->rank);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tse_bse_patch->rank);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tse_bnw_patch->rank);
 			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bse_tsw_patch->rank);
-			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bse_tsw_patch->rank);
+			CHECK(domain_2_tse_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tse_tsw_patch->rank);
 
 			CHECK(domain_2_tse_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tse_bsw_patch->rank);
 			CHECK(domain_2_tse_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tse_bne_patch->rank);
@@ -7474,7 +7474,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_bnw_patch->rank);
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tnw_bnw_patch->rank);
 			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bnw_tsw_patch->rank);
-			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bnw_tsw_patch->rank);
+			CHECK(domain_2_tnw_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tnw_tsw_patch->rank);
 
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tnw_bsw_patch->rank);
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tne_bsw_patch->rank);
@@ -7484,7 +7484,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tnw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tnw_tse_patch->rank);
 
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tnw_bne_patch->rank);
-			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_bsw_patch->rank);
+			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tnw_bsw_patch->rank);
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bnw_tnw_patch->rank);
 			CHECK(domain_2_tnw_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tnw_tnw_patch->rank);
 
@@ -7502,7 +7502,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tnw_tsw_patch->rank);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tne_tsw_patch->rank);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_tne_patch->rank);
-			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tse_tne_patch->rank);
+			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tnw_tne_patch->rank);
 			CHECK(domain_2_tnw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tnw_bse_patch->rank);
 
 			CHECK(domain_2_tnw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tnw_tne_patch->rank);
@@ -7514,10 +7514,10 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tnw_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tnw_tse_patch->rank);
 			CHECK(domain_2_tnw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_tnw_bne_patch->rank);
 
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tne_bse_patch->rank);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tnw_bse_patch->rank);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tne_bnw_patch->rank);
-			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tse_bnw_patch->rank);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tnw_bse_patch->rank);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tne_bse_patch->rank);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tse_bnw_patch->rank);
+			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tne_bnw_patch->rank);
 			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bne_tsw_patch->rank);
 			CHECK(domain_2_tne_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tne_tsw_patch->rank);
 
@@ -7531,7 +7531,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tne_bne_patch->rank);
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tne_bsw_patch->rank);
 			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bne_tnw_patch->rank);
-			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tne_tne_patch->rank);
+			CHECK(domain_2_tne_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tne_tnw_patch->rank);
 
 			CHECK(domain_2_tne_bne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tne_bnw_patch->rank);
 			CHECK(domain_2_tne_bne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tne_bse_patch->rank);
@@ -7582,7 +7582,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_1_tne_patch->rank);
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_1_bse_patch->rank);
 
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_1_tnw_patch->rank);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_1_tne_patch->rank);
 			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_1_tse_patch->rank);
 			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_1_bne_patch->rank);
 
@@ -7611,7 +7611,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 refined bsw", "[p8estDomGen]")
 		}
 	}
 }
-TEST_CASE("P8estDomainGenerator 2x2x2 refined bsw", "[p8estDomGen]")
+TEST_CASE("P8estDomainGenerator 2x2x2 refined bsw", "[P8estDomainGenerator]")
 {
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -8388,7 +8388,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bsw_patch->id);
 			CHECK(domain_2_bsw_tsw_patch->getCoarseNbrInfo(Side<3>::top()).id == domain_2_tsw_patch->id);
 
-			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tse_patch->id);
+			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tsw_patch->id);
 			CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::east()).id == domain_2_bse_patch->id);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bsw_tne_patch->id);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bse_patch->id);
@@ -8436,9 +8436,9 @@ TEST_CASE("P8estDomainGenerator 2x2x2 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tne_patch->id);
 			CHECK(domain_2_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bse_patch->id);
 
-			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tnw_patch->id);
-			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tse_patch->id);
-			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bne_patch->id);
+			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tne_patch->id);
+			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tsw_patch->id);
+			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bnw_patch->id);
 
 			CHECK(domain_2_tne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tnw_patch->id);
 			CHECK(domain_2_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tse_patch->id);
@@ -8468,9 +8468,9 @@ TEST_CASE("P8estDomainGenerator 2x2x2 refined bsw", "[p8estDomGen]")
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_1_tne_patch->id);
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_1_bse_patch->id);
 
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_1_tnw_patch->id);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_1_tse_patch->id);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_1_bne_patch->id);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_1_tne_patch->id);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_1_tsw_patch->id);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_1_bnw_patch->id);
 
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_1_tnw_patch->id);
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_1_tse_patch->id);
@@ -8506,7 +8506,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bsw_patch->rank);
 			CHECK(domain_2_bsw_tsw_patch->getCoarseNbrInfo(Side<3>::top()).rank == domain_2_tsw_patch->rank);
 
-			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tse_patch->rank);
+			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tsw_patch->rank);
 			CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::east()).rank == domain_2_bse_patch->rank);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bsw_tne_patch->rank);
 			CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bse_patch->rank);
@@ -8554,9 +8554,9 @@ TEST_CASE("P8estDomainGenerator 2x2x2 refined bsw", "[p8estDomGen]")
 			CHECK(domain_2_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tne_patch->rank);
 			CHECK(domain_2_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bse_patch->rank);
 
-			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tnw_patch->rank);
-			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tse_patch->rank);
-			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bne_patch->rank);
+			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tne_patch->rank);
+			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tsw_patch->rank);
+			CHECK(domain_2_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bnw_patch->rank);
 
 			CHECK(domain_2_tne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tnw_patch->rank);
 			CHECK(domain_2_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tse_patch->rank);
@@ -8586,9 +8586,9 @@ TEST_CASE("P8estDomainGenerator 2x2x2 refined bsw", "[p8estDomGen]")
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_1_tne_patch->rank);
 			CHECK(domain_1_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_1_bse_patch->rank);
 
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_1_tnw_patch->rank);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_1_tse_patch->rank);
-			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_1_bne_patch->rank);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_1_tne_patch->rank);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_1_tsw_patch->rank);
+			CHECK(domain_1_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_1_bnw_patch->rank);
 
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_1_tnw_patch->rank);
 			CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_1_tse_patch->rank);

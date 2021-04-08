@@ -636,29 +636,34 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 
 	domain_0_patch = domain_0->getPatchInfoVector()[0];
 
-	SECTION("patches have starts set")
-	{
-		REQUIRE(domain_2_bsw_bsw_patch != nullptr);
-		REQUIRE(domain_2_bsw_bse_patch != nullptr);
-		REQUIRE(domain_2_bsw_bnw_patch != nullptr);
-		REQUIRE(domain_2_bsw_bne_patch != nullptr);
-		REQUIRE(domain_2_bsw_tsw_patch != nullptr);
-		REQUIRE(domain_2_bsw_tse_patch != nullptr);
-		REQUIRE(domain_2_bsw_tnw_patch != nullptr);
-		REQUIRE(domain_2_bsw_tne_patch != nullptr);
-		REQUIRE(domain_2_bse_patch != nullptr);
-		REQUIRE(domain_2_bnw_patch != nullptr);
-		REQUIRE(domain_2_bne_patch != nullptr);
+	REQUIRE(domain_2_bsw_bsw_patch != nullptr);
+	REQUIRE(domain_2_bsw_bse_patch != nullptr);
+	REQUIRE(domain_2_bsw_bnw_patch != nullptr);
+	REQUIRE(domain_2_bsw_bne_patch != nullptr);
+	REQUIRE(domain_2_bsw_tsw_patch != nullptr);
+	REQUIRE(domain_2_bsw_tse_patch != nullptr);
+	REQUIRE(domain_2_bsw_tnw_patch != nullptr);
+	REQUIRE(domain_2_bsw_tne_patch != nullptr);
+	REQUIRE(domain_2_bse_patch != nullptr);
+	REQUIRE(domain_2_bnw_patch != nullptr);
+	REQUIRE(domain_2_bne_patch != nullptr);
+	REQUIRE(domain_2_tsw_patch != nullptr);
+	REQUIRE(domain_2_tse_patch != nullptr);
+	REQUIRE(domain_2_tnw_patch != nullptr);
+	REQUIRE(domain_2_tne_patch != nullptr);
 
-		REQUIRE(domain_1_bsw_patch != nullptr);
-		REQUIRE(domain_1_bse_patch != nullptr);
-		REQUIRE(domain_1_bnw_patch != nullptr);
-		REQUIRE(domain_1_bne_patch != nullptr);
+	REQUIRE(domain_1_bsw_patch != nullptr);
+	REQUIRE(domain_1_bse_patch != nullptr);
+	REQUIRE(domain_1_bnw_patch != nullptr);
+	REQUIRE(domain_1_bne_patch != nullptr);
+	REQUIRE(domain_1_tsw_patch != nullptr);
+	REQUIRE(domain_1_tse_patch != nullptr);
+	REQUIRE(domain_1_tnw_patch != nullptr);
+	REQUIRE(domain_1_tne_patch != nullptr);
 
-		CHECK(domain_0_patch->starts[0] == Catch::Approx(0.0));
-		CHECK(domain_0_patch->starts[1] == Catch::Approx(0.0));
-		CHECK(domain_0_patch->starts[2] == Catch::Approx(0.0));
-	}
+	CHECK(domain_0_patch->starts[0] == Catch::Approx(0.0));
+	CHECK(domain_0_patch->starts[1] == Catch::Approx(0.0));
+	CHECK(domain_0_patch->starts[2] == Catch::Approx(0.0));
 
 	SECTION("patches have correct spacings")
 	{

@@ -104,6 +104,7 @@ AlignTrailingComments : true
 #   false:
 #     someFunction(foo,bar,baz);
 AllowAllParametersOfDeclarationOnNextLine : false
+AllowAllConstructorInitializersOnNextLine : false
 
 # Allow contracting simple braced statements to 
 # a single line
@@ -158,12 +159,12 @@ AlwaysBreakTemplateDeclarations : false
 
 # If false, a function call’s arguments will either
 # be all on the same line or will have one line each.
-BinPackArguments : true
+BinPackArguments : false
 
 # If false, a function declaration’s or function
 # definition’s parameters will either all be on
 # the same line or will have one line each.
-BinPackParameters : true
+BinPackParameters : false
 
 # If true, binary operators will be placed after line breaks.
 BreakBeforeBinaryOperators : true
@@ -207,7 +208,7 @@ BreakConstructorInitializersBeforeComma : false
 # limit. In this case, clang-format will respect the
 # input’s line breaking decisions within statements
 # unless they contradict other rules.
-ColumnLimit : 100
+ColumnLimit : 150
 
 # A regular expression that describes comments with (--inanc this may be important for OpenMP/OpenACC)
 # special meaning, which should not be split into
@@ -217,7 +218,7 @@ CommentPragmas : ''
 
 # If the constructor initializers don’t fit on a
 # line, put each initializer on its own line
-ConstructorInitializerAllOnOneLineOrOnePerLine : false
+ConstructorInitializerAllOnOneLineOrOnePerLine : true
 
 # The number of characters to use for indentation
 # of constructor initializer lists

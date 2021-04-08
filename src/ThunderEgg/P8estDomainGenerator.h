@@ -23,7 +23,6 @@
 #define THUNDEREGG_P8ESTDOMAINGENERATOR_H
 #include <ThunderEgg/DomainGenerator.h>
 #include <functional>
-#include <list>
 #include <p8est.h>
 namespace ThunderEgg
 {
@@ -47,8 +46,7 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 * @param y the resulting y coordinate of the mapping function
 	 * @param z the resulting z coordinate of the mapping function
 	 */
-	using BlockMapFunc = std::function<void(int block_no, double unit_x, double unit_y,
-	                                        double unit_z, double &x, double &y, double &z)>;
+	using BlockMapFunc = std::function<void(int block_no, double unit_x, double unit_y, double unit_z, double &x, double &y, double &z)>;
 
 	private:
 	/**
@@ -58,9 +56,9 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	/**
 	 * @brief List of the domains
 	 *
-	 * Finest domain is stored in front
+	 * Finesr domain is stored in back
 	 */
-	std::list<std::shared_ptr<Domain<2>>> domain_list;
+	std::list<std::shared_ptr<Domain<3>>> domains;
 
 	/**
 	 * @brief the number of ghost cells on each side of the patch
@@ -73,13 +71,9 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 */
 	int curr_level;
 	/**
-	 * @brief The number of levels the p4est quad-tree
-	 */
-	int num_levels;
-	/**
 	 * @brief The dimensions of each patch
 	 */
-	std::array<int, 2> ns;
+	std::array<int, 3> ns;
 	/**
 	 * @brief The length of a block on the x-axis
 	 */
@@ -89,18 +83,45 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 */
 	double y_scale;
 	/**
+	 * @brief The length of a block on the z-axis
+	 */
+	double z_scale;
+	/**
 	 * @brief The block Mapping function being used.
 	 */
 	BlockMapFunc bmf;
-	/**
-	 * @brief The function used to set neumann boundary conditions
-	 */
-	IsNeumannFunc<3> inf;
 
 	/**
 	 * @brief Get a new coarser level and add it to the end of domain_list
 	 */
 	void extractLevel();
+
+	/**
+	 * @brief coaren the p8est tree
+	 */
+	void coarsenTree();
+
+	/**
+	 * @brief create the patchinfo objects using the cureent leaves of the tree
+	 */
+	void createPatchInfos();
+
+	/**
+	 * @brief Add NbrInfo objects to PatchInfo objects
+	 */
+	void linkNeighbors();
+
+	/**
+	 * @brief Get the patchinfos at the current leaves
+	 *
+	 * @return the PatchInfo objects
+	 */
+	std::map<int, std::shared_ptr<PatchInfo<3>>> getPatchInfos();
+
+	/**
+	 * @brief update the parent_rank for the previous domain
+	 */
+	void updateParentRanksOfPreviousDomain();
 
 	public:
 	/**
@@ -112,8 +133,7 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 * @param inf the function used to set neumann boundary conditions
 	 * @param bmf the function used to map the blocks to the domain
 	 */
-	P8estDomainGenerator(p8est_t *p8est, const std::array<int, 3> &ns, int num_ghost_cells,
-	                     BlockMapFunc bmf);
+	P8estDomainGenerator(p8est_t *p8est, const std::array<int, 3> &ns, int num_ghost_cells, BlockMapFunc bmf);
 	~P8estDomainGenerator();
 	std::shared_ptr<Domain<3>> getFinestDomain();
 	bool                       hasCoarserDomain();
