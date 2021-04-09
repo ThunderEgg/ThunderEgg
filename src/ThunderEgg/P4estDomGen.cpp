@@ -66,14 +66,12 @@ static void get_num_levels(p4est_iter_volume_info_t *info, void *user_data)
 static void set_ids(p4est_iter_volume_info_t *info, void *user_data)
 {
 	my_data *data = (my_data *) info->quad->p.user_data;
-	data->id      = *(int *) user_data + info->quadid
-	           + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset;
+	data->id      = *(int *) user_data + info->quadid + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset;
 }
 /**
  * Constructor
  */
-P4estDomGen::P4estDomGen(p4est_t *p4est, const std::array<int, 2> &ns, int num_ghost_cells,
-                         IsNeumannFunc<2> inf, BlockMapFunc bmf)
+P4estDomGen::P4estDomGen(p4est_t *p4est, const std::array<int, 2> &ns, int num_ghost_cells, IsNeumannFunc<2> inf, BlockMapFunc bmf)
 {
 	this->num_ghost_cells = num_ghost_cells;
 	this->ns              = ns;
@@ -96,8 +94,7 @@ P4estDomGen::P4estDomGen(p4est_t *p4est, const std::array<int, 2> &ns, int num_g
 	MPI_Allreduce(&max_level, &global_max_level, 1, MPI_INT, MPI_MAX, my_p4est->mpicomm);
 
 	int global_id_start;
-	MPI_Scan(&my_p4est->local_num_quadrants, &global_id_start, 1, MPI_INT, MPI_SUM,
-	         my_p4est->mpicomm);
+	MPI_Scan(&my_p4est->local_num_quadrants, &global_id_start, 1, MPI_INT, MPI_SUM, my_p4est->mpicomm);
 	global_id_start -= my_p4est->local_num_quadrants;
 
 	// set global ids
@@ -154,8 +151,7 @@ static void create_domains(p4est_iter_volume_info_t *info, void *user_data)
 			pinfo.child_ranks[i] = data->child_rank;
 		}
 	}
-	pinfo.local_index
-	= info->quadid + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset;
+	pinfo.local_index = info->quadid + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset;
 
 	// patch dimensions
 	pinfo.ns              = ctx.ns;
@@ -185,8 +181,7 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 		p4est_iter_face_side_t side_info1 = ((p4est_iter_face_side_t *) info->sides.array)[0];
 		p4est_iter_face_side_t side_info2 = ((p4est_iter_face_side_t *) info->sides.array)[1];
 
-		auto link_side_to_side = [&](p4est_iter_face_side_t side_info1,
-		                             p4est_iter_face_side_t side_info2) {
+		auto link_side_to_side = [&](p4est_iter_face_side_t side_info1, p4est_iter_face_side_t side_info2) {
 			Side<2> side(side_info1.face);
 			if (side_info1.is_hanging) {
 				// coarse nbr
@@ -202,10 +197,9 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 				}
 				for (Orthant<1> o : Orthant<1>::getValues()) {
 					if (!side_info1.is.hanging.is_ghost[o.getIndex()]) {
-						my_data *data
-						= (my_data *) side_info1.is.hanging.quad[o.getIndex()]->p.user_data;
-						PatchInfo<2> &pinfo = *dmap[data->id];
-						pinfo.nbr_info[side.getIndex()].reset(new CoarseNbrInfo<2>(nbr_id, o));
+						my_data *     data                = (my_data *) side_info1.is.hanging.quad[o.getIndex()]->p.user_data;
+						PatchInfo<2> &pinfo               = *dmap[data->id];
+						pinfo.nbr_info[side.getIndex()]   = make_unique<CoarseNbrInfo<2>>(nbr_id, o);
 						pinfo.getCoarseNbrInfo(side).rank = nbr_rank;
 					}
 				}
@@ -228,8 +222,8 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 							ranks[i]      = info->p4est->mpirank;
 						}
 					}
-					PatchInfo<2> &pinfo = *dmap[id];
-					pinfo.nbr_info[side.getIndex()].reset(new FineNbrInfo<2>(nbr_ids));
+					PatchInfo<2> &pinfo                 = *dmap[id];
+					pinfo.nbr_info[side.getIndex()]     = make_unique<FineNbrInfo<2>>(nbr_ids);
 					pinfo.getFineNbrInfo(side).ranks[0] = ranks[0];
 					pinfo.getFineNbrInfo(side).ranks[1] = ranks[1];
 				}
@@ -248,8 +242,8 @@ static void link_domains(p4est_iter_face_info_t *info, void *user_data)
 						nbr_id        = data->id;
 						nbr_rank      = info->p4est->mpirank;
 					}
-					PatchInfo<2> &pinfo = *dmap[id];
-					pinfo.nbr_info[side.getIndex()].reset(new NormalNbrInfo<2>(nbr_id));
+					PatchInfo<2> &pinfo               = *dmap[id];
+					pinfo.nbr_info[side.getIndex()]   = make_unique<NormalNbrInfo<2>>(nbr_id);
 					pinfo.getNormalNbrInfo(side).rank = nbr_rank;
 				}
 			}
@@ -292,8 +286,11 @@ static int coarsen(p4est_t *p4est, p4est_topidx_t which_tree, p4est_quadrant_t *
 /**
  * @brief set parent info in finer level
  */
-static void coarsen_replace(p4est_t *p4est, p4est_topidx_t which_tree, int num_outgoing,
-                            p4est_quadrant_t *outgoing[], int num_incoming,
+static void coarsen_replace(p4est_t *         p4est,
+                            p4est_topidx_t    which_tree,
+                            int               num_outgoing,
+                            p4est_quadrant_t *outgoing[],
+                            int               num_incoming,
                             p4est_quadrant_t *incoming[])
 {
 	coarsen_domains_ctx &ctx       = *(coarsen_domains_ctx *) p4est->user_pointer;
@@ -335,7 +332,7 @@ void P4estDomGen::extractLevel()
 	p4est_ghost_exchange_data(my_p4est, ghost, ghost_data);
 
 	std::map<int, std::shared_ptr<PatchInfo<2>>> new_level;
-	create_domains_ctx ctx = {ghost_data, ns, &new_level, bmf, x_scale, y_scale, num_ghost_cells};
+	create_domains_ctx                           ctx = {ghost_data, ns, &new_level, bmf, x_scale, y_scale, num_ghost_cells};
 	// create domain objects and set neighbor information
 	p4est_iterate_ext(my_p4est, ghost, &ctx, create_domains, link_domains, nullptr, 0);
 
@@ -399,8 +396,7 @@ void P4estDomGen::extractLevel()
 		}
 	}
 	// create Domain object
-	domain_list.push_back(
-	shared_ptr<Domain<2>>(new Domain<2>(new_level, ns, num_ghost_cells, true)));
+	domain_list.push_back(shared_ptr<Domain<2>>(new Domain<2>(new_level, ns, num_ghost_cells, true)));
 	domain_list.back()->setNeumann(inf);
 
 	curr_level--;

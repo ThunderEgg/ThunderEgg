@@ -27,7 +27,8 @@
 using namespace std;
 using namespace ThunderEgg;
 
-template <typename Container, typename Value> bool contains(Container &deque, Value a)
+template <typename Container, typename Value>
+bool contains(Container &deque, Value a)
 {
 	return find(deque.begin(), deque.end(), a) != deque.end();
 }
@@ -39,7 +40,7 @@ TEST_CASE("Schur::FineIfaceInfo constructor", "[Schur::FineIfaceInfo]")
 		auto          pinfo               = make_shared<PatchInfo<2>>();
 		pinfo->rank                       = 0;
 		pinfo->id                         = id;
-		pinfo->nbr_info[s.getIndex()]     = make_shared<FineNbrInfo<2>>(nbr_ids);
+		pinfo->nbr_info[s.getIndex()]     = make_unique<FineNbrInfo<2>>(nbr_ids);
 		pinfo->getFineNbrInfo(s).ranks[0] = 1;
 		pinfo->getFineNbrInfo(s).ranks[1] = 2;
 		Schur::FineIfaceInfo<2> iface_info(pinfo, s);
@@ -64,6 +65,5 @@ TEST_CASE("Schur::FineIfaceInfo constructor", "[Schur::FineIfaceInfo]")
 		CHECK(iface_info.global_index == -1);
 		CHECK(iface_info.fine_global_indexes[0] == -1);
 		CHECK(iface_info.fine_global_indexes[1] == -1);
-		CHECK(iface_info.nbr_info == pinfo->nbr_info[s.getIndex()]);
 	}
 }

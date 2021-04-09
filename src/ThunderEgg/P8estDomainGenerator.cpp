@@ -332,7 +332,7 @@ void addCoarseNbrInfo(const p8est_iter_face_side_t &side1, const p8est_iter_face
 
 			Side<3> side(side1.face);
 
-			data->pinfo->nbr_info[side.getIndex()]             = make_shared<CoarseNbrInfo<3>>();
+			data->pinfo->nbr_info[side.getIndex()]             = make_unique<CoarseNbrInfo<3>>();
 			data->pinfo->getCoarseNbrInfo(side).id             = nbr_data->id;
 			data->pinfo->getCoarseNbrInfo(side).rank           = nbr_data->rank;
 			data->pinfo->getCoarseNbrInfo(side).orth_on_coarse = Orthant<2>(i);
@@ -362,7 +362,7 @@ void addFineNbrInfo(const p8est_iter_face_side_t &side1, const p8est_iter_face_s
 
 		Side<3> side(side1.face);
 
-		data->pinfo->nbr_info[side.getIndex()] = make_shared<FineNbrInfo<3>>();
+		data->pinfo->nbr_info[side.getIndex()] = make_unique<FineNbrInfo<3>>();
 		for (int i = 0; i < 4; i++) {
 			data->pinfo->getFineNbrInfo(side).ids[i]   = nbr_datas[i]->id;
 			data->pinfo->getFineNbrInfo(side).ranks[i] = nbr_datas[i]->rank;
@@ -390,7 +390,7 @@ void addNormalNbrInfo(const p8est_iter_face_side_t &side1, const p8est_iter_face
 
 		Side<3> side(side1.face);
 
-		data->pinfo->nbr_info[side.getIndex()]   = make_shared<NormalNbrInfo<3>>(nbr_data->id);
+		data->pinfo->nbr_info[side.getIndex()]   = make_unique<NormalNbrInfo<3>>(nbr_data->id);
 		data->pinfo->getNormalNbrInfo(side).rank = nbr_data->rank;
 	}
 }

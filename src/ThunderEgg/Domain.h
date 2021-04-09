@@ -153,15 +153,6 @@ template <int D> class Domain
 	void indexDomainsGlobal(bool global_id_set = false);
 
 	/**
-	 * @brief Give the boundary conditions local indexes.
-	 */
-	void indexBCLocal();
-	/**
-	 * @brief Give the boundary conditions global indexes
-	 */
-	void indexBCGlobal();
-
-	/**
 	 * @brief Give patches new global and local indexes
 	 *
 	 * @param local_id_set true if local indexes are set by user
@@ -173,8 +164,6 @@ template <int D> class Domain
 		if (!global_id_set) {
 			indexDomainsGlobal();
 		}
-		indexBCLocal();
-		indexBCGlobal();
 	}
 
 	public:
@@ -185,9 +174,13 @@ template <int D> class Domain
 	 * @param local_id_set true if local indexes are set by user
 	 * @param global_id_set true if global indexes are set by user
 	 */
-	Domain(std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_map, std::array<int, D> ns_in,
-	       int num_ghost_cells_in, bool local_id_set = false, bool global_id_set = false)
-	: ns(ns_in), num_ghost_cells(num_ghost_cells_in)
+	Domain(std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_map,
+	       std::array<int, D>                           ns_in,
+	       int                                          num_ghost_cells_in,
+	       bool                                         local_id_set  = false,
+	       bool                                         global_id_set = false)
+	: ns(ns_in),
+	  num_ghost_cells(num_ghost_cells_in)
 	{
 		num_cells_in_patch            = 1;
 		num_cells_in_patch_with_ghost = 1;
@@ -217,8 +210,7 @@ template <int D> class Domain
 	 */
 	std::vector<std::shared_ptr<const PatchInfo<D>>> getPatchInfoVector() const
 	{
-		return std::vector<std::shared_ptr<const PatchInfo<D>>>(pinfo_vector.cbegin(),
-		                                                        pinfo_vector.cend());
+		return std::vector<std::shared_ptr<const PatchInfo<D>>>(pinfo_vector.cbegin(), pinfo_vector.cend());
 	}
 	/**
 	 * @brief Get map that goes form patch's id to the PatchInfo pointer
@@ -232,8 +224,7 @@ template <int D> class Domain
 	 */
 	std::map<int, std::shared_ptr<const PatchInfo<D>>> getPatchInfoMap() const
 	{
-		return std::map<int, std::shared_ptr<const PatchInfo<D>>>(pinfo_id_map.cbegin(),
-		                                                          pinfo_id_map.cend());
+		return std::map<int, std::shared_ptr<const PatchInfo<D>>>(pinfo_id_map.cbegin(), pinfo_id_map.cend());
 	}
 	/**
 	 * @brief Get a vector of patch ids. Index in vector corresponds to the patch's local index.
@@ -361,8 +352,7 @@ template <int D> class Domain
 				const LocalData<D> u_data = u->getLocalData(c, d.local_index);
 
 				double patch_sum = 0;
-				nested_loop<D>(u_data.getStart(), u_data.getEnd(),
-				               [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
+				nested_loop<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
 
 				for (size_t i = 0; i < D; i++) {
 					patch_sum *= d.spacings[i];
@@ -571,8 +561,7 @@ template <int D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 		int         source = in_off_proc_rank_vec[i];
 		int         size   = in_off_proc_rank_size_vec[i];
 		MPI_Request request;
-		MPI_Irecv(&patch_global_index_map_vec_off_proc[curr_pos], size, MPI_INT, source, 0,
-		          MPI_COMM_WORLD, &request);
+		MPI_Irecv(&patch_global_index_map_vec_off_proc[curr_pos], size, MPI_INT, source, 0, MPI_COMM_WORLD, &request);
 		requests.push_back(request);
 		curr_pos += size;
 	}
@@ -602,34 +591,6 @@ template <int D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 	}
 	for (auto &p : pinfo_id_map) {
 		p.second->setGlobalNeighborIndexes(rev_map);
-	}
-}
-template <int D> void Domain<D>::indexBCLocal()
-{
-	int curr_i = 0;
-	for (auto pinfo : pinfo_vector) {
-		for (Side<D> s : Side<D>::getValues()) {
-			if (!pinfo->hasNbr(s)) {
-				pinfo->setBCLocalIndex(s, curr_i);
-				patch_id_bc_map_vec.push_back(pinfo->id);
-				curr_i++;
-			}
-		}
-	}
-	local_num_bc = curr_i;
-}
-template <int D> void Domain<D>::indexBCGlobal()
-{
-	int curr_i;
-	MPI_Scan(&local_num_bc, &curr_i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-	curr_i -= local_num_bc;
-	for (auto pinfo : pinfo_vector) {
-		for (Side<D> s : Side<D>::getValues()) {
-			if (!pinfo->hasNbr(s)) {
-				pinfo->setBCGlobalIndex(s, curr_i);
-				curr_i++;
-			}
-		}
 	}
 }
 template <int D> void to_json(nlohmann::json &j, const Domain<D> &domain)

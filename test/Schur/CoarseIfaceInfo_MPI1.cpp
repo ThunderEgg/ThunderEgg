@@ -28,19 +28,20 @@
 using namespace std;
 using namespace ThunderEgg;
 
-template <typename Container, typename Value> bool contains(Container &deque, Value a)
+template <typename Container, typename Value>
+bool contains(Container &deque, Value a)
 {
 	return find(deque.begin(), deque.end(), a) != deque.end();
 }
 TEST_CASE("Schur::CoarseIfaceInfo constructor", "[Schur::CoarseIfaceInfo]")
 {
 	for (Side<2> s : Side<2>::getValues()) {
-		int  id                       = 1;
-		int  nbr_id                   = 2;
-		auto pinfo                    = make_shared<PatchInfo<2>>();
-		pinfo->rank                   = 0;
-		pinfo->id                     = id;
-		pinfo->nbr_info[s.getIndex()] = make_shared<CoarseNbrInfo<2>>(nbr_id, Orthant<1>::upper());
+		int  id                                   = 1;
+		int  nbr_id                               = 2;
+		auto pinfo                                = make_shared<PatchInfo<2>>();
+		pinfo->rank                               = 0;
+		pinfo->id                                 = id;
+		pinfo->nbr_info[s.getIndex()]             = make_unique<CoarseNbrInfo<2>>(nbr_id, Orthant<1>::upper());
 		pinfo->getCoarseNbrInfo(s).rank           = 1;
 		pinfo->getCoarseNbrInfo(s).orth_on_coarse = Orthant<1>::upper();
 		Schur::CoarseIfaceInfo<2> iface_info(pinfo, s);
@@ -60,6 +61,5 @@ TEST_CASE("Schur::CoarseIfaceInfo constructor", "[Schur::CoarseIfaceInfo]")
 		CHECK(iface_info.global_index == -1);
 		CHECK(iface_info.coarse_col_local_index == -1);
 		CHECK(iface_info.coarse_global_index == -1);
-		CHECK(iface_info.nbr_info == pinfo->nbr_info[s.getIndex()]);
 	}
 }

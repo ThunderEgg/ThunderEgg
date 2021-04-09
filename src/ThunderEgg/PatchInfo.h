@@ -122,15 +122,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @brief Nbr info objects for each side.
 	 * If there is no neighbor, it should be set to nullptr.
 	 */
-	std::array<std::shared_ptr<NbrInfo<D>>, Side<D>::num_sides> nbr_info;
-	/**
-	 * @brief local index in the boundary conditions vector
-	 */
-	std::array<int, Side<D>::num_sides> bc_local_index;
-	/**
-	 * @brief global index in the boundary conditions vector
-	 */
-	std::array<int, Side<D>::num_sides> bc_global_index;
+	std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::num_sides> nbr_info;
 
 	/**
 	 * @brief Construct a new Patch Info object
@@ -139,13 +131,92 @@ template <int D> struct PatchInfo : public Serializable {
 	PatchInfo()
 	{
 		starts.fill(0);
-		nbr_info.fill(nullptr);
+		// nbr_info.fill(nullptr);
 		ns.fill(1);
 		spacings.fill(1);
-		bc_local_index.fill(-1);
-		bc_global_index.fill(-1);
 		child_ids.fill(-1);
 		child_ranks.fill(-1);
+	}
+
+	/**
+	 * @brief Copy constructor
+	 *
+	 * @param other_pinfo  object to copy
+	 */
+	PatchInfo(const PatchInfo<D> &other_pinfo)
+	: id(other_pinfo.id),
+	  local_index(other_pinfo.local_index),
+	  global_index(other_pinfo.global_index),
+	  refine_level(other_pinfo.refine_level),
+	  parent_id(other_pinfo.parent_id),
+	  parent_rank(other_pinfo.parent_rank),
+	  child_ids(other_pinfo.child_ids),
+	  child_ranks(other_pinfo.child_ranks),
+	  num_ghost_cells(other_pinfo.num_ghost_cells),
+	  rank(other_pinfo.rank),
+	  orth_on_parent(other_pinfo.orth_on_parent),
+	  neumann(other_pinfo.neumann),
+	  ns(other_pinfo.ns),
+	  starts(other_pinfo.starts),
+	  spacings(other_pinfo.spacings)
+	{
+		for (Side<D> s : Side<D>::getValues()) {
+			if (other_pinfo.hasNbr(s)) {
+				switch (other_pinfo.getNbrType(s)) {
+					case NbrType::Normal:
+						nbr_info[s.getIndex()] = std::make_unique<NormalNbrInfo<D>>(other_pinfo.getNormalNbrInfo(s));
+						break;
+					case NbrType::Fine:
+						nbr_info[s.getIndex()] = std::make_unique<FineNbrInfo<D>>(other_pinfo.getFineNbrInfo(s));
+						break;
+					case NbrType::Coarse:
+						nbr_info[s.getIndex()] = std::make_unique<CoarseNbrInfo<D>>(other_pinfo.getCoarseNbrInfo(s));
+						break;
+					default:
+						throw RuntimeError("Unknown NbrType");
+						break;
+				}
+			}
+		}
+	}
+	PatchInfo<D> &operator=(const PatchInfo<D> &other_pinfo)
+	{
+		id              = other_pinfo.id;
+		local_index     = other_pinfo.local_index;
+		global_index    = other_pinfo.global_index;
+		refine_level    = other_pinfo.refine_level;
+		parent_id       = other_pinfo.parent_id;
+		parent_rank     = other_pinfo.parent_rank;
+		child_ids       = other_pinfo.child_ids;
+		child_ranks     = other_pinfo.child_ranks;
+		num_ghost_cells = other_pinfo.num_ghost_cells;
+		rank            = other_pinfo.rank;
+		orth_on_parent  = other_pinfo.orth_on_parent;
+		neumann         = other_pinfo.neumann;
+		ns              = other_pinfo.ns;
+		starts          = other_pinfo.starts;
+		spacings        = other_pinfo.spacings;
+		for (Side<D> s : Side<D>::getValues()) {
+			if (other_pinfo.hasNbr(s)) {
+				switch (other_pinfo.getNbrType(s)) {
+					case NbrType::Normal:
+						nbr_info[s.getIndex()] = std::make_unique<NormalNbrInfo<D>>(other_pinfo.getNormalNbrInfo(s));
+						break;
+					case NbrType::Fine:
+						nbr_info[s.getIndex()] = std::make_unique<FineNbrInfo<D>>(other_pinfo.getFineNbrInfo(s));
+						break;
+					case NbrType::Coarse:
+						nbr_info[s.getIndex()] = std::make_unique<CoarseNbrInfo<D>>(other_pinfo.getCoarseNbrInfo(s));
+						break;
+					default:
+						throw RuntimeError("Unknown NbrType");
+						break;
+				}
+			} else {
+				nbr_info[s.getIndex()] = nullptr;
+			}
+		}
+		return *this;
 	}
 	/**
 	 * @brief Compare the ids of the patches
@@ -179,19 +250,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 */
 	NormalNbrInfo<D> &getNormalNbrInfo(Side<D> s) const
 	{
-		return *std::dynamic_pointer_cast<NormalNbrInfo<D>>(nbr_info[s.getIndex()]);
-	}
-	/**
-	 * @brief Get the NormalNbrInfo pointer
-	 *
-	 * Neighbor must be of Normal type, otherwise a nullptr will be returned.
-	 *
-	 * @param s the side
-	 * @return std::shared_ptr<NormalNbrInfo<D>> the pointer
-	 */
-	std::shared_ptr<NormalNbrInfo<D>> getNormalNbrInfoPtr(Side<D> s) const
-	{
-		return std::dynamic_pointer_cast<NormalNbrInfo<D>>(nbr_info[s.getIndex()]);
+		return *dynamic_cast<NormalNbrInfo<D> *>(nbr_info[s.getIndex()].get());
 	}
 	/**
 	 * @brief Get the CoarseNbrInfo object
@@ -202,19 +261,7 @@ template <int D> struct PatchInfo : public Serializable {
 	*/
 	CoarseNbrInfo<D> &getCoarseNbrInfo(Side<D> s) const
 	{
-		return *std::dynamic_pointer_cast<CoarseNbrInfo<D>>(nbr_info[s.getIndex()]);
-	}
-	/**
-	 * @brief Get the CoarseNbrInfo pointer
-	 *
-	 * Neighbor must be of Coarse type, otherwise a nullptr will be returned.
-	 *
-	 * @param s the side
-	 * @return std::shared_ptr<CoarseNbrInfo<D>> the pointer
-	 */
-	std::shared_ptr<CoarseNbrInfo<D>> getCoarseNbrInfoPtr(Side<D> s) const
-	{
-		return std::dynamic_pointer_cast<CoarseNbrInfo<D>>(nbr_info[s.getIndex()]);
+		return *dynamic_cast<CoarseNbrInfo<D> *>(nbr_info[s.getIndex()].get());
 	}
 	/**
 	 * @brief Get the FineNbrInfo object
@@ -226,19 +273,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 */
 	FineNbrInfo<D> &getFineNbrInfo(Side<D> s) const
 	{
-		return *std::dynamic_pointer_cast<FineNbrInfo<D>>(nbr_info[s.getIndex()]);
-	}
-	/**
-	 * @brief Get the FineNbrInfo pointer
-	 *
-	 * Neighbor must be of Coarse type, otherwise a nullptr will be returned.
-	 *
-	 * @param s the side
-	 * @return std::shared_ptr<FineNbrInfo<D>> the pointer
-	 */
-	std::shared_ptr<FineNbrInfo<D>> getFineNbrInfoPtr(Side<D> s) const
-	{
-		return std::dynamic_pointer_cast<FineNbrInfo<D>>(nbr_info[s.getIndex()]);
+		return *dynamic_cast<FineNbrInfo<D> *>(nbr_info[s.getIndex()].get());
 	}
 	/**
 	 * @brief Return whether the patch has a neighbor
@@ -308,8 +343,7 @@ template <int D> struct PatchInfo : public Serializable {
 			if (!hasNbr(s)) {
 				std::array<double, D> bound_start = starts;
 				if (!s.isLowerOnAxis()) {
-					bound_start[s.getAxisIndex()]
-					+= spacings[s.getAxisIndex()] * ns[s.getAxisIndex()];
+					bound_start[s.getAxisIndex()] += spacings[s.getAxisIndex()] * ns[s.getAxisIndex()];
 				}
 				std::array<double, D> bound_end = bound_start;
 				for (size_t dir = 0; dir < D; dir++) {
@@ -346,46 +380,6 @@ template <int D> struct PatchInfo : public Serializable {
 			}
 		}
 		return retval;
-	}
-	/**
-	 * @brief set the local index in the boundary condition vector
-	 *
-	 * @param s the side that the boundary is on
-	 * @param local_index the index
-	 */
-	void setBCLocalIndex(Side<D> s, int local_index)
-	{
-		bc_local_index[s.getIndex()] = local_index;
-	}
-	/**
-	 * @brief get the local index in the boundnary condition vector
-	 *
-	 * @param s the side that the boundary is on
-	 * @return int the index
-	 */
-	int getBCLocalIndex(Side<D> s)
-	{
-		return bc_local_index[s.getIndex()];
-	}
-	/**
-	 * @brief set the global index in the boundary condition vector
-	 *
-	 * @param s the side that the boundary is on
-	 * @param local_index the index
-	 */
-	void setBCGlobalIndex(Side<D> s, int global_index)
-	{
-		bc_global_index[s.getIndex()] = global_index;
-	}
-	/**
-	 * @brief get the global index in the boundnary condition vector
-	 *
-	 * @param s the side that the boundary is on
-	 * @return int the index
-	 */
-	int getBCGlobalIndex(Side<D> s)
-	{
-		return bc_global_index[s.getIndex()];
 	}
 	int serialize(char *buffer) const
 	{
@@ -450,22 +444,22 @@ template <int D> struct PatchInfo : public Serializable {
 			if (has_nbr[i]) {
 				NbrType type;
 				reader >> type;
-				std::shared_ptr<NbrInfo<D>> info;
+				NbrInfo<D> *info;
 				switch (type) {
 					case NbrType::Normal:
-						info.reset(new NormalNbrInfo<D>());
-						reader >> *std::static_pointer_cast<NormalNbrInfo<D>>(info);
+						info = new NormalNbrInfo<D>();
+						reader >> *static_cast<NormalNbrInfo<D> *>(info);
 						break;
 					case NbrType::Fine:
-						info.reset(new FineNbrInfo<D>());
-						reader >> *std::static_pointer_cast<FineNbrInfo<D>>(info);
+						info = new FineNbrInfo<D>();
+						reader >> *static_cast<FineNbrInfo<D> *>(info);
 						break;
 					case NbrType::Coarse:
-						info.reset(new CoarseNbrInfo<D>());
-						reader >> *std::static_pointer_cast<CoarseNbrInfo<D>>(info);
+						info = new CoarseNbrInfo<D>();
+						reader >> *static_cast<CoarseNbrInfo<D> *>(info);
 						break;
 				}
-				nbr_info[i] = info;
+				nbr_info[i].reset(info);
 			}
 		}
 		return reader.getPos();
@@ -528,15 +522,15 @@ template <int D> void from_json(const nlohmann::json &j, PatchInfo<D> &pinfo)
 		Side<D> s = nbr_j["side"].get<Side<D>>();
 		switch (nbr_j["type"].get<NbrType>()) {
 			case NbrType::Normal:
-				pinfo.nbr_info[s.getIndex()] = std::make_shared<NormalNbrInfo<D>>();
+				pinfo.nbr_info[s.getIndex()] = std::make_unique<NormalNbrInfo<D>>();
 				pinfo.getNormalNbrInfo(s)    = nbr_j.get<NormalNbrInfo<D>>();
 				break;
 			case NbrType::Coarse:
-				pinfo.nbr_info[s.getIndex()] = std::make_shared<CoarseNbrInfo<D>>();
+				pinfo.nbr_info[s.getIndex()] = std::make_unique<CoarseNbrInfo<D>>();
 				pinfo.getCoarseNbrInfo(s)    = nbr_j.get<CoarseNbrInfo<D>>();
 				break;
 			case NbrType::Fine:
-				pinfo.nbr_info[s.getIndex()] = std::make_shared<FineNbrInfo<D>>();
+				pinfo.nbr_info[s.getIndex()] = std::make_unique<FineNbrInfo<D>>();
 				pinfo.getFineNbrInfo(s)      = nbr_j.get<FineNbrInfo<D>>();
 				break;
 			default:

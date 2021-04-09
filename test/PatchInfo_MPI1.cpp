@@ -74,14 +74,8 @@ TEST_CASE("PatchInfo Default Values", "[PatchInfo]")
 	for (double spacing : pinfo.spacings) {
 		CHECK(spacing == 1);
 	}
-	for (auto nbr_info : pinfo.nbr_info) {
+	for (auto &nbr_info : pinfo.nbr_info) {
 		CHECK(nbr_info == nullptr);
-	}
-	for (int idx : pinfo.bc_local_index) {
-		CHECK(idx == -1);
-	}
-	for (int idx : pinfo.bc_global_index) {
-		CHECK(idx == -1);
 	}
 }
 TEST_CASE("PatchInfo to_json no children", "[PatchInfo]")
@@ -344,4 +338,115 @@ TEST_CASE("PatchInfo from_json with children", "[PatchInfo]")
 	CHECK(d.getNbrType(Side<3>::north()) == NbrType::Normal);
 	CHECK_FALSE(d.hasNbr(Side<3>::bottom()));
 	CHECK_FALSE(d.hasNbr(Side<3>::top()));
+}
+TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
+{
+	PatchInfo<3> d;
+	d.id              = 9;
+	d.local_index     = 10;
+	d.global_index    = 10;
+	d.rank            = 0;
+	d.parent_id       = 2;
+	d.parent_rank     = 3;
+	d.num_ghost_cells = 239;
+	d.refine_level    = 329;
+	d.neumann[1]      = true;
+	d.starts          = {1, 2, 3};
+	d.spacings        = {0.1, 0.2, 0.3};
+	d.ns              = {10, 20, 30};
+	d.child_ids       = {3, 4, 5, 6, 7, 8, 9, 10};
+	d.child_ranks     = {1, 2, 3, 4, 5, 6, 7, 8};
+	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
+	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
+	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
+
+	PatchInfo<3> d2(d);
+
+	CHECK(d.id == d2.id);
+	CHECK(d.local_index == d2.global_index);
+	CHECK(d.rank == d2.rank);
+	CHECK(d.parent_id == d2.parent_id);
+	CHECK(d.parent_rank == d2.parent_rank);
+	CHECK(d.num_ghost_cells == d2.num_ghost_cells);
+	CHECK(d.refine_level == d2.refine_level);
+	CHECK(d.neumann == d2.neumann);
+	CHECK(d.starts == d2.starts);
+	CHECK(d.spacings == d2.spacings);
+	CHECK(d.ns == d2.ns);
+	CHECK(d.child_ids == d2.child_ids);
+	CHECK(d.child_ranks == d2.child_ranks);
+
+	for (Side<3> s : Side<3>::getValues()) {
+		REQUIRE(d.hasNbr(s) == d2.hasNbr(s));
+		if (d.hasNbr(s)) {
+			CHECK(d.nbr_info[s.getIndex()] != d2.nbr_info[s.getIndex()]);
+			switch (d.getNbrType(s)) {
+				case NbrType::Normal:
+					CHECK(d.getNormalNbrInfo(s).id == d2.getNormalNbrInfo(s).id);
+					break;
+				case NbrType::Fine:
+					CHECK(d.getFineNbrInfo(s).ids[0] == d2.getFineNbrInfo(s).ids[0]);
+					break;
+				case NbrType::Coarse:
+					CHECK(d.getCoarseNbrInfo(s).id == d2.getCoarseNbrInfo(s).id);
+					break;
+			}
+		}
+	}
+}
+TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
+{
+	PatchInfo<3> d;
+	d.id              = 9;
+	d.local_index     = 10;
+	d.global_index    = 10;
+	d.rank            = 0;
+	d.parent_id       = 2;
+	d.parent_rank     = 3;
+	d.num_ghost_cells = 239;
+	d.refine_level    = 329;
+	d.neumann[1]      = true;
+	d.starts          = {1, 2, 3};
+	d.spacings        = {0.1, 0.2, 0.3};
+	d.ns              = {10, 20, 30};
+	d.child_ids       = {3, 4, 5, 6, 7, 8, 9, 10};
+	d.child_ranks     = {1, 2, 3, 4, 5, 6, 7, 8};
+	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
+	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
+	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
+
+	PatchInfo<3> d2;
+	d2 = d;
+
+	CHECK(d.id == d2.id);
+	CHECK(d.local_index == d2.global_index);
+	CHECK(d.rank == d2.rank);
+	CHECK(d.parent_id == d2.parent_id);
+	CHECK(d.parent_rank == d2.parent_rank);
+	CHECK(d.num_ghost_cells == d2.num_ghost_cells);
+	CHECK(d.refine_level == d2.refine_level);
+	CHECK(d.neumann == d2.neumann);
+	CHECK(d.starts == d2.starts);
+	CHECK(d.spacings == d2.spacings);
+	CHECK(d.ns == d2.ns);
+	CHECK(d.child_ids == d2.child_ids);
+	CHECK(d.child_ranks == d2.child_ranks);
+
+	for (Side<3> s : Side<3>::getValues()) {
+		REQUIRE(d.hasNbr(s) == d2.hasNbr(s));
+		if (d.hasNbr(s)) {
+			CHECK(d.nbr_info[s.getIndex()] != d2.nbr_info[s.getIndex()]);
+			switch (d.getNbrType(s)) {
+				case NbrType::Normal:
+					CHECK(d.getNormalNbrInfo(s).id == d2.getNormalNbrInfo(s).id);
+					break;
+				case NbrType::Fine:
+					CHECK(d.getFineNbrInfo(s).ids[0] == d2.getFineNbrInfo(s).ids[0]);
+					break;
+				case NbrType::Coarse:
+					CHECK(d.getCoarseNbrInfo(s).id == d2.getCoarseNbrInfo(s).id);
+					break;
+			}
+		}
+	}
 }

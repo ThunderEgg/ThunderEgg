@@ -28,7 +28,8 @@
 using namespace std;
 using namespace ThunderEgg;
 
-template <typename Container, typename Value> bool contains(Container &deque, Value a)
+template <typename Container, typename Value>
+bool contains(Container &deque, Value a)
 {
 	return find(deque.begin(), deque.end(), a) != deque.end();
 }
@@ -40,7 +41,7 @@ TEST_CASE("Schur::NormalIfaceInfo constructor", "[Schur::NormalIfaceInfo]")
 		auto pinfo                      = make_shared<PatchInfo<2>>();
 		pinfo->rank                     = 0;
 		pinfo->id                       = id;
-		pinfo->nbr_info[s.getIndex()]   = make_shared<NormalNbrInfo<2>>(nbr_id);
+		pinfo->nbr_info[s.getIndex()]   = make_unique<NormalNbrInfo<2>>(nbr_id);
 		pinfo->getNormalNbrInfo(s).rank = 1;
 		Schur::NormalIfaceInfo<2> iface_info(pinfo, s);
 		INFO("Side: " << s);
@@ -66,6 +67,5 @@ TEST_CASE("Schur::NormalIfaceInfo constructor", "[Schur::NormalIfaceInfo]")
 		CHECK(iface_info.row_local_index == -1);
 		CHECK(iface_info.col_local_index == -1);
 		CHECK(iface_info.global_index == -1);
-		CHECK(iface_info.nbr_info == pinfo->nbr_info[s.getIndex()]);
 	}
 }

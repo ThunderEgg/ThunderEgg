@@ -52,10 +52,6 @@ template <int D> class FineIfaceInfo : public IfaceInfo<D>
 
 	public:
 	/**
-	 * @brief convenience pointer to associated NbrInfo object
-	 */
-	std::shared_ptr<FineNbrInfo<D>> nbr_info;
-	/**
 	 * @brief the ranks of the fine patches' interfaces
 	 */
 	std::array<int, Orthant<D - 1>::num_orthants> fine_ranks;
@@ -79,12 +75,12 @@ template <int D> class FineIfaceInfo : public IfaceInfo<D>
 	 * @param pinfo the associated PatchInfo object
 	 * @param s the side of the patch that the interface is on
 	 */
-	FineIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
-	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s)), nbr_info(pinfo->getFineNbrInfoPtr(s))
+	FineIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s) : IfaceInfo<D>(pinfo->rank, GetId(pinfo, s))
 	{
+		auto nbr_info = pinfo->getFineNbrInfo(s);
 		for (size_t i = 0; i < fine_ids.size(); i++) {
-			fine_ids[i]   = nbr_info->ids[i] * Side<D>::num_sides + s.opposite().getIndex();
-			fine_ranks[i] = nbr_info->ranks[i];
+			fine_ids[i]   = nbr_info.ids[i] * Side<D>::num_sides + s.opposite().getIndex();
+			fine_ranks[i] = nbr_info.ranks[i];
 		}
 		fine_col_local_indexes.fill(-1);
 		fine_global_indexes.fill(-1);
