@@ -131,7 +131,6 @@ template <int D> struct PatchInfo : public Serializable {
 	PatchInfo()
 	{
 		starts.fill(0);
-		// nbr_info.fill(nullptr);
 		ns.fill(1);
 		spacings.fill(1);
 		child_ids.fill(-1);
@@ -179,6 +178,12 @@ template <int D> struct PatchInfo : public Serializable {
 			}
 		}
 	}
+	/**
+	 * @brief Copy asisgnment
+	 *
+	 * @param other_pinfo the object to copy
+	 * @return PatchInfo<D>& this object
+	 */
 	PatchInfo<D> &operator=(const PatchInfo<D> &other_pinfo)
 	{
 		id              = other_pinfo.id;
