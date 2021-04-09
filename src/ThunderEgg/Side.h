@@ -336,6 +336,27 @@ template <int D> class Side
 	{
 		return val != other.val;
 	}
+
+	/**
+	 * @brief Get the sides that are orthogonal to this side
+	 *
+	 * @return std::array<Side<D>, num_sides - 2> the orthongal sides
+	 */
+	std::array<Side<D>, num_sides - 2> getOrthogonalSides() const
+	{
+		std::array<Side<D>, num_sides - 2> retval;
+
+		Side<D> opposite_of_this = opposite();
+
+		size_t i = 0;
+		for (Side<D> s : getValues()) {
+			if (s != *this && s != opposite_of_this) {
+				retval[i] = s;
+				i++;
+			}
+		}
+		return retval;
+	}
 };
 /**
  * @brief ostream operator that prints a string representation of side enum.

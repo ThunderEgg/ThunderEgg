@@ -671,3 +671,64 @@ TEST_CASE("Test from_json for Side<3>", "[Side]")
 	CHECK(j["bottom"].get<Side<3>>() == Side<3>::bottom());
 	CHECK(j["top"].get<Side<3>>() == Side<3>::top());
 }
+TEST_CASE("getOrthogonalSides for Side<1>", "[Side]")
+{
+	CHECK(Side<1>::east().getOrthogonalSides().size() == 0);
+	CHECK(Side<1>::east().getOrthogonalSides().size() == 0);
+}
+TEST_CASE("getOrthogonalSides for Side<2>", "[Side]")
+{
+	CHECK(Side<2>::west().getOrthogonalSides().size() == 2);
+	CHECK(Side<2>::west().getOrthogonalSides()[0] == Side<2>::south());
+	CHECK(Side<2>::west().getOrthogonalSides()[1] == Side<2>::north());
+
+	CHECK(Side<2>::east().getOrthogonalSides().size() == 2);
+	CHECK(Side<2>::east().getOrthogonalSides()[0] == Side<2>::south());
+	CHECK(Side<2>::east().getOrthogonalSides()[1] == Side<2>::north());
+
+	CHECK(Side<2>::south().getOrthogonalSides().size() == 2);
+	CHECK(Side<2>::south().getOrthogonalSides()[0] == Side<2>::west());
+	CHECK(Side<2>::south().getOrthogonalSides()[1] == Side<2>::east());
+
+	CHECK(Side<2>::north().getOrthogonalSides().size() == 2);
+	CHECK(Side<2>::north().getOrthogonalSides()[0] == Side<2>::west());
+	CHECK(Side<2>::north().getOrthogonalSides()[1] == Side<2>::east());
+}
+TEST_CASE("getOrthogonalSides for Side<3>", "[Side]")
+{
+	CHECK(Side<3>::west().getOrthogonalSides().size() == 4);
+	CHECK(Side<3>::west().getOrthogonalSides()[0] == Side<3>::south());
+	CHECK(Side<3>::west().getOrthogonalSides()[1] == Side<3>::north());
+	CHECK(Side<3>::west().getOrthogonalSides()[2] == Side<3>::bottom());
+	CHECK(Side<3>::west().getOrthogonalSides()[3] == Side<3>::top());
+
+	CHECK(Side<3>::east().getOrthogonalSides().size() == 4);
+	CHECK(Side<3>::east().getOrthogonalSides()[0] == Side<3>::south());
+	CHECK(Side<3>::east().getOrthogonalSides()[1] == Side<3>::north());
+	CHECK(Side<3>::east().getOrthogonalSides()[2] == Side<3>::bottom());
+	CHECK(Side<3>::east().getOrthogonalSides()[3] == Side<3>::top());
+
+	CHECK(Side<3>::south().getOrthogonalSides().size() == 4);
+	CHECK(Side<3>::south().getOrthogonalSides()[0] == Side<3>::west());
+	CHECK(Side<3>::south().getOrthogonalSides()[1] == Side<3>::east());
+	CHECK(Side<3>::south().getOrthogonalSides()[2] == Side<3>::bottom());
+	CHECK(Side<3>::south().getOrthogonalSides()[3] == Side<3>::top());
+
+	CHECK(Side<3>::north().getOrthogonalSides().size() == 4);
+	CHECK(Side<3>::north().getOrthogonalSides()[0] == Side<3>::west());
+	CHECK(Side<3>::north().getOrthogonalSides()[1] == Side<3>::east());
+	CHECK(Side<3>::north().getOrthogonalSides()[2] == Side<3>::bottom());
+	CHECK(Side<3>::north().getOrthogonalSides()[3] == Side<3>::top());
+
+	CHECK(Side<3>::bottom().getOrthogonalSides().size() == 4);
+	CHECK(Side<3>::bottom().getOrthogonalSides()[0] == Side<3>::west());
+	CHECK(Side<3>::bottom().getOrthogonalSides()[1] == Side<3>::east());
+	CHECK(Side<3>::bottom().getOrthogonalSides()[2] == Side<3>::south());
+	CHECK(Side<3>::bottom().getOrthogonalSides()[3] == Side<3>::north());
+
+	CHECK(Side<3>::top().getOrthogonalSides().size() == 4);
+	CHECK(Side<3>::top().getOrthogonalSides()[0] == Side<3>::west());
+	CHECK(Side<3>::top().getOrthogonalSides()[1] == Side<3>::east());
+	CHECK(Side<3>::top().getOrthogonalSides()[2] == Side<3>::south());
+	CHECK(Side<3>::top().getOrthogonalSides()[3] == Side<3>::north());
+}
