@@ -64,7 +64,6 @@ TEST_CASE("PatchInfo Default Values", "[PatchInfo]")
 	CHECK(pinfo.num_ghost_cells == 0);
 	CHECK(pinfo.rank == -1);
 	CHECK(pinfo.orth_on_parent == Orthant<3>::null());
-	CHECK(pinfo.neumann.to_ulong() == 0);
 	for (int n : pinfo.ns) {
 		CHECK(n == 1);
 	}
@@ -350,7 +349,6 @@ TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
 	d.parent_rank     = 3;
 	d.num_ghost_cells = 239;
 	d.refine_level    = 329;
-	d.neumann[1]      = true;
 	d.starts          = {1, 2, 3};
 	d.spacings        = {0.1, 0.2, 0.3};
 	d.ns              = {10, 20, 30};
@@ -369,7 +367,6 @@ TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
 	CHECK(d.parent_rank == d2.parent_rank);
 	CHECK(d.num_ghost_cells == d2.num_ghost_cells);
 	CHECK(d.refine_level == d2.refine_level);
-	CHECK(d.neumann == d2.neumann);
 	CHECK(d.starts == d2.starts);
 	CHECK(d.spacings == d2.spacings);
 	CHECK(d.ns == d2.ns);
@@ -405,7 +402,6 @@ TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 	d.parent_rank     = 3;
 	d.num_ghost_cells = 239;
 	d.refine_level    = 329;
-	d.neumann[1]      = true;
 	d.starts          = {1, 2, 3};
 	d.spacings        = {0.1, 0.2, 0.3};
 	d.ns              = {10, 20, 30};
@@ -425,7 +421,6 @@ TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 	CHECK(d.parent_rank == d2.parent_rank);
 	CHECK(d.num_ghost_cells == d2.num_ghost_cells);
 	CHECK(d.refine_level == d2.refine_level);
-	CHECK(d.neumann == d2.neumann);
 	CHECK(d.starts == d2.starts);
 	CHECK(d.spacings == d2.spacings);
 	CHECK(d.ns == d2.ns);

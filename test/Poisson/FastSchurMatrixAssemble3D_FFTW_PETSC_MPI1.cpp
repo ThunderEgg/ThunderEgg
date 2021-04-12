@@ -31,15 +31,15 @@
 #include <ThunderEgg/Schur/VecWrapperGenerator.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
 using namespace ThunderEgg;
 
-#define MESHES                                                                                     \
-	"mesh_inputs/3d_uniform_2x2x2_mpi1.json", "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json",        \
+#define MESHES                                                                              \
+	"mesh_inputs/3d_uniform_2x2x2_mpi1.json", "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", \
 	"mesh_inputs/3d_mid_refine_4x4x4_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
@@ -52,13 +52,14 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws exception for non-square pa
 	int                   ny        = GENERATE(4, 10);
 	int                   nz        = GENERATE(6, 12);
 	int                   num_ghost = 1;
+	bitset<6>             neumann;
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
 
 	auto gf         = make_shared<TriLinearGhostFiller>(d_fine);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator);
+	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver), RuntimeError);
 }
@@ -66,7 +67,8 @@ namespace ThunderEgg
 {
 namespace
 {
-template <int D> class MockGhostFiller : public GhostFiller<D>
+template <int D>
+class MockGhostFiller : public GhostFiller<D>
 {
 	public:
 	void fillGhost(std::shared_ptr<const Vector<D>> u) const override {}
@@ -79,13 +81,14 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws with unsupported ghost fill
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
 	int                   num_ghost = 1;
+	bitset<6>             neumann;
 	DomainReader<3>       domain_reader(mesh_file, {10, 10, 10}, num_ghost);
 	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
 
 	auto gf         = make_shared<MockGhostFiller<3>>();
 	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator);
+	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver), RuntimeError);
 }
@@ -97,6 +100,7 @@ TEST_CASE(
 	INFO("MESH FILE " << mesh_file);
 	int                   n         = 4;
 	int                   num_ghost = 1;
+	bitset<6>             neumann;
 	DomainReader<3>       domain_reader(mesh_file, {n, n, n}, num_ghost);
 	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
@@ -116,7 +120,7 @@ TEST_CASE(
 
 	auto gf               = make_shared<TriLinearGhostFiller>(d_fine);
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator);
+	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<3>>(iface_domain, p_solver);
 	p_solver_wrapper->apply(g_vec, f_vec_expected);
 
@@ -159,7 +163,8 @@ TEST_CASE(
 	INFO("MESH FILE " << mesh_file);
 	int                   n         = 4;
 	int                   num_ghost = 1;
-	DomainReader<3>       domain_reader(mesh_file, {n, n, n}, num_ghost, true);
+	bitset<6>             neumann   = 0xFF;
+	DomainReader<3>       domain_reader(mesh_file, {n, n, n}, num_ghost);
 	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
 
@@ -179,7 +184,7 @@ TEST_CASE(
 
 	auto gf               = make_shared<TriLinearGhostFiller>(d_fine);
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf, true);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator);
+	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<3>>(iface_domain, p_solver);
 	p_solver_wrapper->apply(g_vec, f_vec_expected);
 

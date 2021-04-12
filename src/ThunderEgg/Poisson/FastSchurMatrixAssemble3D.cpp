@@ -347,7 +347,7 @@ void FillBlockColumnForFineToCoarseInterface(int                                
  * @param iface_domain the InterfaceDomain
  * @return vector<set<Block>> the vector of blocks
  */
-vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<3>> iface_domain)
+vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<3>> iface_domain, std::bitset<6> neumann)
 {
 	map<unsigned long, set<Block>> bc_to_blocks;
 	for (auto iface : iface_domain->getInterfaces()) {
@@ -358,8 +358,12 @@ vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<3>> iface_domain)
 			IfaceType<3>             type  = patch.type;
 			for (Side<3> s : Side<3>::getValues()) {
 				if (sinfo.pinfo->hasNbr(s)) {
-					int   j = sinfo.getIfaceInfo(s)->global_index;
-					Block block(s, j, aux, i, sinfo.pinfo->neumann, type);
+					int            j = sinfo.getIfaceInfo(s)->global_index;
+					std::bitset<6> patch_neumann;
+					for (Side<3> s : Side<3>::getValues()) {
+						patch_neumann[s.getIndex()] = neumann[s.getIndex()] && !sinfo.pinfo->hasNbr(s);
+					}
+					Block block(s, j, aux, i, patch_neumann, type);
 					bc_to_blocks[block.non_dirichlet_boundary.to_ulong()].insert(block);
 				}
 			}
@@ -440,14 +444,18 @@ void AssembleMatrix(std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domai
 	auto ns = iface_domain->getDomain()->getNs();
 	int  n  = ns[0];
 
-	for (const set<Block> &blocks : GetBlocks(iface_domain)) {
+	for (const set<Block> &blocks : GetBlocks(iface_domain, solver->getNeumann())) {
 		// create domain representing curr_type
 		std::shared_ptr<PatchInfo<3>> pinfo(new PatchInfo<3>());
 		pinfo->nbr_info[0] = make_unique<NormalNbrInfo<3>>();
 		pinfo->ns.fill(n);
 		pinfo->spacings.fill(1.0 / n);
-		pinfo->neumann         = blocks.begin()->non_dirichlet_boundary;
 		pinfo->num_ghost_cells = 1;
+		for (Side<3> s : Side<3>::getValues()) {
+			if (!blocks.begin()->non_dirichlet_boundary[s.getIndex()]) {
+				pinfo->nbr_info[s.getIndex()] = make_unique<NormalNbrInfo<3>>();
+			}
+		}
 		solver->addPatch(pinfo);
 
 		map<Block, shared_ptr<vector<double>>, std::function<bool(const Block &a, const Block &b)>> coeffs(

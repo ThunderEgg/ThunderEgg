@@ -27,16 +27,16 @@
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/ValVector.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
 using namespace ThunderEgg;
 
-#define MESHES                                                                                     \
-	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_4x4_mpi1.json",                \
-	"mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json",                                             \
+#define MESHES                                                                      \
+	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_4x4_mpi1.json", \
+	"mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json",                              \
 	"mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
@@ -171,7 +171,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 	auto                  nx        = GENERATE(2, 10);
 	auto                  ny        = GENERATE(2, 10);
 	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost, true);
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 2> &coord) {
@@ -267,7 +267,7 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence with neuma
 	int    num_ghost = 1;
 	double errors[2];
 	for (int i = 0; i < 2; i++) {
-		DomainReader<2>       domain_reader(mesh_file, {ns[i], ns[i]}, num_ghost, true);
+		DomainReader<2>       domain_reader(mesh_file, {ns[i], ns[i]}, num_ghost);
 		shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
 		auto ffun = [](const std::array<double, 2> &coord) {

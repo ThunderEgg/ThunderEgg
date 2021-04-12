@@ -28,15 +28,15 @@
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
 using namespace ThunderEgg;
 
-#define MESHES                                                                                     \
-	"mesh_inputs/3d_uniform_2x2x2_mpi1.json", "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json",        \
+#define MESHES                                                                              \
+	"mesh_inputs/3d_uniform_2x2x2_mpi1.json", "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", \
 	"mesh_inputs/3d_mid_refine_4x4x4_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
@@ -49,6 +49,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 	auto                  ny        = GENERATE(8, 10);
 	auto                  nz        = GENERATE(8, 10);
 	int                   num_ghost = 1;
+	bitset<6>             neumann;
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
@@ -70,7 +71,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 	p_operator->apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
-	Poisson::MatrixHelper mh(d_fine);
+	Poisson::MatrixHelper mh(d_fine, neumann);
 	Mat                   A          = mh.formCRSMatrix();
 	auto                  m_operator = make_shared<PETSc::MatWrapper<3>>(A);
 	m_operator->apply(g_vec, f_vec);
@@ -108,7 +109,8 @@ TEST_CASE(
 	auto                  ny        = GENERATE(8, 10);
 	auto                  nz        = GENERATE(8, 10);
 	int                   num_ghost = 1;
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost, true);
+	bitset<6>             neumann   = 0xFF;
+	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 3> &coord) {
@@ -129,7 +131,7 @@ TEST_CASE(
 	p_operator->apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
-	Poisson::MatrixHelper mh(d_fine);
+	Poisson::MatrixHelper mh(d_fine, neumann);
 	Mat                   A          = mh.formCRSMatrix();
 	auto                  m_operator = make_shared<PETSc::MatWrapper<3>>(A);
 	m_operator->apply(g_vec, f_vec);
@@ -165,9 +167,10 @@ TEST_CASE("Poisson::MatrixHelper constructor throws error with odd number of cel
 	INFO("MESH: " << mesh_file);
 	auto axis = GENERATE(0, 1, 2);
 	INFO("axis: " << axis);
-	int n_even    = 10;
-	int n_odd     = 11;
-	int num_ghost = 1;
+	int       n_even    = 10;
+	int       n_odd     = 11;
+	int       num_ghost = 1;
+	bitset<6> neumann;
 
 	array<int, 3> ns;
 	ns.fill(n_even);
@@ -175,5 +178,5 @@ TEST_CASE("Poisson::MatrixHelper constructor throws error with odd number of cel
 	DomainReader<3>       domain_reader(mesh_file, ns, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	CHECK_THROWS_AS(Poisson::MatrixHelper(d), RuntimeError);
+	CHECK_THROWS_AS(Poisson::MatrixHelper(d, neumann), RuntimeError);
 }

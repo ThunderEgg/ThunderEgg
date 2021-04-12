@@ -22,10 +22,10 @@
 #include <ThunderEgg/tpl/json.hpp>
 #include <fstream>
 #include <string>
-template <int D> class DomainReader
+template <int D>
+class DomainReader
 {
 	private:
-	bool                                      neumann;
 	std::array<int, D>                        ns;
 	int                                       num_ghost;
 	std::shared_ptr<ThunderEgg::Domain<D>>    coarser_domain;
@@ -39,19 +39,12 @@ template <int D> class DomainReader
 		for (size_t d = 0; d < D; d++) {
 			pinfo->spacings[d] /= ns[d];
 		}
-
-		for (ThunderEgg::Side<D> s : ThunderEgg::Side<D>::getValues()) {
-			if (!pinfo->hasNbr(s)) {
-				pinfo->neumann[s.getIndex()] = neumann;
-			}
-		}
 		return pinfo;
 	}
 
 	public:
-	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in,
-	             bool neumann_in = false)
-	: neumann(neumann_in), ns(ns_in), num_ghost(num_ghost_in)
+	DomainReader(std::string file_name, std::array<int, D> ns_in, int num_ghost_in)
+	: ns(ns_in), num_ghost(num_ghost_in)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);

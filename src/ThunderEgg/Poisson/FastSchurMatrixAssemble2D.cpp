@@ -291,7 +291,7 @@ void FillBlockColumnForFineToCoarseInterface(int                                
  * @param iface_domain the InterfaceDomain
  * @return vector<set<Block>> the vector of blocks
  */
-vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<2>> iface_domain)
+vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<2>> iface_domain, std::bitset<4> neumann)
 {
 	map<unsigned long, set<Block>> bc_to_blocks;
 	for (auto iface : iface_domain->getInterfaces()) {
@@ -302,8 +302,12 @@ vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<2>> iface_domain)
 			IfaceType<2>             type  = patch.type;
 			for (Side<2> s : Side<2>::getValues()) {
 				if (sinfo.pinfo->hasNbr(s)) {
-					int   j = sinfo.getIfaceInfo(s)->global_index;
-					Block block(s, j, aux, i, sinfo.pinfo->neumann, type);
+					int            j = sinfo.getIfaceInfo(s)->global_index;
+					std::bitset<4> patch_neumann;
+					for (Side<2> s : Side<2>::getValues()) {
+						patch_neumann[s.getIndex()] = neumann[s.getIndex()] && !sinfo.pinfo->hasNbr(s);
+					}
+					Block block(s, j, aux, i, patch_neumann, type);
 					bc_to_blocks[block.non_dirichlet_boundary.to_ulong()].insert(block);
 				}
 			}
@@ -389,7 +393,7 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>> iface_domain, std:
 	auto ns = iface_domain->getDomain()->getNs();
 	int  n  = ns[0];
 
-	for (const set<Block> &blocks : GetBlocks(iface_domain)) {
+	for (const set<Block> &blocks : GetBlocks(iface_domain, solver->getNeumann())) {
 		// create domain representing curr_type
 		auto pinfo             = make_shared<PatchInfo<2>>();
 		pinfo->nbr_info[0]     = make_unique<NormalNbrInfo<2>>();
@@ -398,8 +402,13 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>> iface_domain, std:
 		piinfo->pinfo          = pinfo;
 		pinfo->ns.fill(n);
 		pinfo->spacings.fill(1.0 / n);
-		pinfo->neumann = blocks.begin()->non_dirichlet_boundary;
 		piinfo->setIfaceInfo(Side<2>::west(), make_shared<NormalIfaceInfo<2>>(pinfo, Side<2>::west()));
+
+		for (Side<2> s : Side<2>::getValues()) {
+			if (!blocks.begin()->non_dirichlet_boundary[s.getIndex()]) {
+				pinfo->nbr_info[s.getIndex()] = make_unique<NormalNbrInfo<2>>();
+			}
+		}
 
 		solver->addPatch(pinfo);
 

@@ -28,14 +28,14 @@
 #include <ThunderEgg/Poisson/MatrixHelper2d.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
 using namespace ThunderEgg;
 
-#define MESHES                                                                                     \
+#define MESHES \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
@@ -46,6 +46,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 	INFO("MESH FILE " << mesh_file);
 	int                   n         = 32;
 	int                   num_ghost = 1;
+	bitset<4>             neumann;
 	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
@@ -66,7 +67,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 	p_operator->apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
-	Poisson::MatrixHelper2d mh(d_fine);
+	Poisson::MatrixHelper2d mh(d_fine, neumann);
 	Mat                     A          = mh.formCRSMatrix();
 	auto                    m_operator = make_shared<PETSc::MatWrapper<2>>(A);
 	m_operator->apply(g_vec, f_vec);
@@ -99,7 +100,8 @@ TEST_CASE(
 	INFO("MESH FILE " << mesh_file);
 	int                   n         = 32;
 	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost, true);
+	bitset<4>             neumann   = 0xF;
+	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 2> &coord) {
@@ -119,7 +121,7 @@ TEST_CASE(
 	p_operator->apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
-	Poisson::MatrixHelper2d mh(d_fine);
+	Poisson::MatrixHelper2d mh(d_fine, neumann);
 	Mat                     A          = mh.formCRSMatrix();
 	auto                    m_operator = make_shared<PETSc::MatWrapper<2>>(A);
 	m_operator->apply(g_vec, f_vec);

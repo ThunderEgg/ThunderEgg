@@ -25,10 +25,7 @@
 using namespace std;
 using namespace ThunderEgg::Poisson;
 using namespace ThunderEgg;
-MatrixHelper2d::MatrixHelper2d(std::shared_ptr<Domain<2>> domain)
-{
-	this->domain = domain;
-}
+MatrixHelper2d::MatrixHelper2d(std::shared_ptr<Domain<2>> domain, std::bitset<4> neumann) : domain(domain), neumann(neumann) {}
 Mat MatrixHelper2d::formCRSMatrix(double lambda)
 {
 	Mat A;
@@ -90,7 +87,7 @@ Mat MatrixHelper2d::formCRSMatrix(double lambda)
 		}
 		// boundaries
 		for (Side<2> s : Side<2>::getValues()) {
-			StencilHelper2d *sh = getStencilHelper(*pinfo, s);
+			StencilHelper2d *sh = getStencilHelper(*pinfo, s, neumann);
 			for (int i = 0; i < sh->n; i++) {
 				int     row    = sh->row(i);
 				int     size   = sh->size(i);

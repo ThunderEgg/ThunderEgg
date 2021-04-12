@@ -28,6 +28,8 @@ namespace ThunderEgg
 {
 namespace Poisson
 {
+namespace
+{
 /**
  * @brief Helps with adding stencil values at boundary patches
  */
@@ -275,8 +277,8 @@ class NormalSH : public StencilHelper
 	{
 		const NormalNbrInfo<3> &nbr_info = pinfo->getNormalNbrInfo(s);
 		double                  h        = 0;
-		int idx     = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
-		int nbr_idx = nbr_info.global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		int                     idx      = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		int                     nbr_idx  = nbr_info.global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
 		if (s == Side<3>::west()) {
 			h         = pinfo->spacings[0];
 			start     = idx;
@@ -371,9 +373,9 @@ class CoarseSH : public StencilHelper
 	{
 		const CoarseNbrInfo<3> &nbr_info = pinfo->getCoarseNbrInfo(s);
 		double                  h        = 0;
-		int idx     = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
-		int nbr_idx = nbr_info.global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
-		quad        = (int) nbr_info.orth_on_coarse.getIndex();
+		int                     idx      = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		int                     nbr_idx  = nbr_info.global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		quad                             = (int) nbr_info.orth_on_coarse.getIndex();
 		if (s == Side<3>::west()) {
 			h         = pinfo->spacings[0];
 			start     = idx;
@@ -495,8 +497,8 @@ class FineSH : public StencilHelper
 	{
 		const FineNbrInfo<3> &nbr_info = pinfo->getFineNbrInfo(s);
 		double                h        = 0;
-		int idx = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
-		int nbr_idx[4];
+		int                   idx      = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		int                   nbr_idx[4];
 		for (int i = 0; i < 4; i++) {
 			nbr_idx[i] = nbr_info.global_indexes[i] * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
 		}
@@ -594,10 +596,10 @@ class FineSH : public StencilHelper
  *
  * @param pinfo the patch we are processing
  * @param s the side of the patch we are processing
+ * @param neumann neumann boundary conditions
  * @return std::unique_ptr<StencilHelper>
  */
-std::unique_ptr<StencilHelper> getStencilHelper(std::shared_ptr<const PatchInfo<3>> pinfo,
-                                                Side<3>                             s)
+std::unique_ptr<StencilHelper> getStencilHelper(std::shared_ptr<const PatchInfo<3>> pinfo, Side<3> s, std::bitset<6> neumann)
 {
 	StencilHelper *retval = nullptr;
 	if (pinfo->hasNbr(s)) {
@@ -616,7 +618,7 @@ std::unique_ptr<StencilHelper> getStencilHelper(std::shared_ptr<const PatchInfo<
 				break;
 		}
 	} else {
-		if (pinfo->isNeumann(s)) {
+		if (!pinfo->hasNbr(s) && neumann[s.getIndex()]) {
 			retval = new NeumannSH(pinfo, s);
 		} else {
 			retval = new DirichletSH(pinfo, s);
@@ -624,6 +626,7 @@ std::unique_ptr<StencilHelper> getStencilHelper(std::shared_ptr<const PatchInfo<
 	}
 	return std::unique_ptr<StencilHelper>(retval);
 }
+} // namespace
 } // namespace Poisson
 } // namespace ThunderEgg
 #endif

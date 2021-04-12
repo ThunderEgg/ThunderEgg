@@ -28,8 +28,6 @@
 #include <ThunderEgg/Serializable.h>
 #include <ThunderEgg/TypeDefs.h>
 #include <bitset>
-#include <deque>
-#include <map>
 #include <memory>
 
 namespace ThunderEgg
@@ -103,10 +101,6 @@ template <int D> struct PatchInfo : public Serializable {
 	 */
 	Orthant<D> orth_on_parent = Orthant<D>::null();
 	/**
-	 * @brief Whether the patch has neumann boundary conditions on one side.
-	 */
-	std::bitset<Side<D>::num_sides> neumann;
-	/**
 	 * @brief The number of cells in each direction
 	 */
 	std::array<int, D> ns;
@@ -154,7 +148,6 @@ template <int D> struct PatchInfo : public Serializable {
 	  num_ghost_cells(other_pinfo.num_ghost_cells),
 	  rank(other_pinfo.rank),
 	  orth_on_parent(other_pinfo.orth_on_parent),
-	  neumann(other_pinfo.neumann),
 	  ns(other_pinfo.ns),
 	  starts(other_pinfo.starts),
 	  spacings(other_pinfo.spacings)
@@ -197,7 +190,6 @@ template <int D> struct PatchInfo : public Serializable {
 		num_ghost_cells = other_pinfo.num_ghost_cells;
 		rank            = other_pinfo.rank;
 		orth_on_parent  = other_pinfo.orth_on_parent;
-		neumann         = other_pinfo.neumann;
 		ns              = other_pinfo.ns;
 		starts          = other_pinfo.starts;
 		spacings        = other_pinfo.spacings;
@@ -301,15 +293,6 @@ template <int D> struct PatchInfo : public Serializable {
 		return orth_on_parent != Orthant<D>::null();
 	}
 	/**
-	 * @brief Return wether the boundary conditions are neumann
-	 *
-	 * @param s the side
-	 */
-	inline bool isNeumann(Side<D> s) const
-	{
-		return neumann[s.getIndex()];
-	}
-	/**
 	 * @brief Set the local indexes in the NbrInfo objects
 	 *
 	 * @param rev_map map from id to local_index
@@ -334,29 +317,6 @@ template <int D> struct PatchInfo : public Serializable {
 		for (Side<D> s : Side<D>::getValues()) {
 			if (hasNbr(s)) {
 				nbr_info[s.getIndex()]->setGlobalIndexes(rev_map);
-			}
-		}
-	}
-	/**
-	 * @brief Set the neumann boundary conditions
-	 *
-	 * @param inf the function for determining boundary conditions
-	 */
-	void setNeumann(IsNeumannFunc<D> inf)
-	{
-		for (Side<D> s : Side<D>::getValues()) {
-			if (!hasNbr(s)) {
-				std::array<double, D> bound_start = starts;
-				if (!s.isLowerOnAxis()) {
-					bound_start[s.getAxisIndex()] += spacings[s.getAxisIndex()] * ns[s.getAxisIndex()];
-				}
-				std::array<double, D> bound_end = bound_start;
-				for (size_t dir = 0; dir < D; dir++) {
-					if (dir != s.getAxisIndex()) {
-						bound_end[dir] += spacings[dir] * ns[dir];
-					}
-				}
-				neumann[s.getIndex()] = inf(s, bound_end, bound_start);
 			}
 		}
 	}
@@ -398,7 +358,6 @@ template <int D> struct PatchInfo : public Serializable {
 		writer << child_ranks;
 		writer << rank;
 		writer << orth_on_parent;
-		writer << neumann;
 		writer << starts;
 		writer << spacings;
 		std::bitset<Side<D>::num_sides> has_nbr;
@@ -440,7 +399,6 @@ template <int D> struct PatchInfo : public Serializable {
 		reader >> child_ranks;
 		reader >> rank;
 		reader >> orth_on_parent;
-		reader >> neumann;
 		reader >> starts;
 		reader >> spacings;
 		std::bitset<Side<D>::num_sides> has_nbr;

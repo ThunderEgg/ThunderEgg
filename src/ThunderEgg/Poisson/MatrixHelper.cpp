@@ -24,7 +24,7 @@
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Poisson;
-MatrixHelper::MatrixHelper(std::shared_ptr<Domain<3>> domain) : domain(domain)
+MatrixHelper::MatrixHelper(std::shared_ptr<Domain<3>> domain, std::bitset<6> neumann) : domain(domain), neumann(neumann)
 {
 	for (int n : domain->getNs()) {
 		if (n % 2 != 0) {
@@ -237,7 +237,7 @@ Mat MatrixHelper::formCRSMatrix()
 		addBottomCoefficients(A, pinfo);
 		// boundaries
 		for (Side<3> s : Side<3>::getValues()) {
-			unique_ptr<StencilHelper> sh = getStencilHelper(pinfo, s);
+			unique_ptr<StencilHelper> sh = getStencilHelper(pinfo, s, neumann);
 			for (int yi = 0; yi < sh->ny; yi++) {
 				for (int xi = 0; xi < sh->nx; xi++) {
 					int           row    = sh->row(xi, yi);

@@ -36,14 +36,16 @@ class MatrixHelper2d
 {
 	private:
 	std::shared_ptr<Domain<2>> domain;
+	std::bitset<4>             neumann;
 
 	public:
 	/**
 	 * @brief Create a MatrixHelper for a given domain
 	 *
 	 * @param domain the domain
+	 * @param neumann the boundary conditions
 	 */
-	MatrixHelper2d(std::shared_ptr<Domain<2>> domain);
+	MatrixHelper2d(std::shared_ptr<Domain<2>> domain, std::bitset<4> neumann);
 
 	/**
 	 * @brief Form the matrix

@@ -250,17 +250,6 @@ template <int D> class Domain
 		return ns;
 	}
 	/**
-	 * @brief Set the neumann boundary conditions
-	 *
-	 * @param inf the function that determines boundary conditions
-	 */
-	void setNeumann(IsNeumannFunc<D> inf)
-	{
-		for (auto &p : pinfo_id_map) {
-			p.second->setNeumann(inf);
-		}
-	}
-	/**
 	 * @brief Get the number of global patches
 	 */
 	int getNumGlobalPatches() const

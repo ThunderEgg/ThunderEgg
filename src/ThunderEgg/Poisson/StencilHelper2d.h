@@ -27,6 +27,8 @@ namespace ThunderEgg
 {
 namespace Poisson
 {
+namespace
+{
 class StencilHelper2d
 {
 	public:
@@ -209,15 +211,14 @@ class CoarseSH2d : public StencilHelper2d
 {
 	private:
 	std::valarray<double> mid_coeffs = {{-1.0 / 30, -1.0 / 30, 1.0 / 3, 1.0 / 3, 1.0 / 5, 1.0 / 5}};
-	std::valarray<double> end_coeffs
-	= {{-1.0 / 30, 1.0 / 15, -1.0 / 10, 1.0 / 3, 1.0 / 3, 1.0 / 5, 1.0 / 5}};
-	int colz[7];
-	int start;
-	int bnbr_start;
-	int enbr_start;
-	int bnbr_start_in;
-	int enbr_start_in;
-	int stride;
+	std::valarray<double> end_coeffs = {{-1.0 / 30, 1.0 / 15, -1.0 / 10, 1.0 / 3, 1.0 / 3, 1.0 / 5, 1.0 / 5}};
+	int                   colz[7];
+	int                   start;
+	int                   bnbr_start;
+	int                   enbr_start;
+	int                   bnbr_start_in;
+	int                   enbr_start_in;
+	int                   stride;
 
 	public:
 	CoarseSH2d(PatchInfo<2> &d, Side<2> s)
@@ -446,7 +447,7 @@ class FineSH2d : public StencilHelper2d
 	}
 };
 
-StencilHelper2d *getStencilHelper(PatchInfo<2> &d, Side<2> s)
+StencilHelper2d *getStencilHelper(PatchInfo<2> &d, Side<2> s, std::bitset<4> neumann)
 {
 	StencilHelper2d *retval = nullptr;
 	if (d.hasNbr(s)) {
@@ -462,7 +463,7 @@ StencilHelper2d *getStencilHelper(PatchInfo<2> &d, Side<2> s)
 				break;
 		}
 	} else {
-		if (d.isNeumann(s)) {
+		if (!d.hasNbr(s) && neumann[s.getIndex()]) {
 			retval = new NeumannSH2d(d, s);
 		} else {
 			retval = new DirichletSH2d(d, s);
@@ -470,6 +471,7 @@ StencilHelper2d *getStencilHelper(PatchInfo<2> &d, Side<2> s)
 	}
 	return retval;
 }
+} // namespace
 } // namespace Poisson
 } // namespace ThunderEgg
 #endif
