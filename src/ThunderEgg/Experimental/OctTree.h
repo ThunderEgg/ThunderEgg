@@ -78,7 +78,6 @@ template <int D> struct Tree {
 	 * @param n the node to refine.
 	 */
 	void refineNode(Node<D> &n);
-	void zoltanBalanceDomains();
 };
 template <int D> inline Tree<D>::Tree()
 {

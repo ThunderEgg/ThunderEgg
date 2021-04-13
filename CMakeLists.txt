@@ -22,7 +22,6 @@ endif(CCACHE_FOUND)
 find_package(MPI REQUIRED)
 find_package(PETSc)
 find_package(FFTW)
-find_package(Zoltan)
 find_package(BLAS)
 find_package(LAPACK)
 

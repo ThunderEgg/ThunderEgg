@@ -21,28 +21,12 @@
 
 #include "Init.h"
 #include "Writers/ClawWriter.h"
-#include <ThunderEgg/BiLinearGhostFiller.h>
-#include <ThunderEgg/Domain.h>
-#include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/Experimental/DomGen.h>
-#include <ThunderEgg/GMG/CycleBuilder.h>
-#include <ThunderEgg/GMG/DirectInterpolator.h>
-#include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/Iterative/BiCGStab.h>
-#include <ThunderEgg/Iterative/PatchSolver.h>
-#include <ThunderEgg/PETSc/MatWrapper.h>
-#include <ThunderEgg/PETSc/PCShellCreator.h>
-#include <ThunderEgg/Timer.h>
-#include <ThunderEgg/ValVectorGenerator.h>
-#include <ThunderEgg/VarPoisson/StarPatchOperator.h>
+#include <ThunderEgg.h>
 #ifdef HAVE_VTK
 #include "Writers/VtkWriter2d.h"
 #endif
-#ifdef HAVE_P4EST
-#include "TreeToP4est.h"
-#include <ThunderEgg/P4estDomGen.h>
-#endif
 #include "CLI11.hpp"
+#include "TreeToP4est.h"
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -214,24 +198,16 @@ int main(int argc, char *argv[])
 	}
 
 	shared_ptr<DomainGenerator<2>> dcg;
-#ifdef HAVE_P4EST
-	if (use_p4est) {
-		TreeToP4est ttp(t);
+	TreeToP4est                    ttp(t);
 
-		auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
-			x = unit_x;
-			y = unit_y;
-		};
-		auto inf
-		= [=](Side<2> s, const array<double, 2> &, const array<double, 2> &) { return neumann; };
+	auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
+		x = unit_x;
+		y = unit_y;
+	};
+	auto inf
+	= [=](Side<2> s, const array<double, 2> &, const array<double, 2> &) { return neumann; };
 
-		dcg.reset(new P4estDomGen(ttp.p4est, ns, 1, inf, bmf));
-#else
-	if (false) {
-#endif
-	} else {
-		dcg.reset(new DomGen<2>(t, ns, 1, neumann));
-	}
+	dcg.reset(new P4estDomGen(ttp.p4est, ns, 1, inf, bmf));
 
 	domain = dcg->getFinestDomain();
 

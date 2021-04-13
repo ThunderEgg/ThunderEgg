@@ -24,6 +24,7 @@
 #ifdef HAVE_VTK
 #include "Writers/VtkWriter.h"
 #endif
+#include "TreeToP4est.h"
 #include <cmath>
 
 // =========== //
@@ -245,6 +246,14 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < div; i++) {
 		t.refineLeaves();
 	}
+	TreeToP4est ttp(t);
+
+	auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
+		x = unit_x;
+		y = unit_y;
+	};
+	auto inf
+	= [=](Side<2> s, const array<double, 2> &, const array<double, 2> &) { return neumann; };
 
 	// Set the number of cells in the x, y and z direction.
 	std::array<int, 2> ns;
@@ -253,7 +262,7 @@ int main(int argc, char *argv[])
 
 	// A DomainGenerator will create domains for the Multigrid algorithm from a tree
 	int                            num_ghost_cells  = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
-	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<DomGen<2>>(t, ns, num_ghost_cells, neumann);
+	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<P4estDomGen>(ttp.p4est, ns, 1, inf, bmf);
 
 	// Get the finest domain from the tree
 	shared_ptr<Domain<2>> domain = domain_generator->getFinestDomain();
@@ -323,10 +332,11 @@ int main(int argc, char *argv[])
 
 	// Create a smoother for the finest level
 	shared_ptr<GMG::Smoother<2>> finest_smoother;
+	bitset<4>                    neumann_bitset = neumann ? 0xF : 0x0;
 	if (patch_solver == "dft") {
-		finest_smoother = make_shared<DFTPatchSolver<2>>(patch_operator);
+		finest_smoother = make_shared<DFTPatchSolver<2>>(patch_operator, neumann_bitset);
 	} else if (patch_solver == "fftw") {
-		finest_smoother = make_shared<FFTWPatchSolver<2>>(patch_operator);
+		finest_smoother = make_shared<FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
 	} else {
 		finest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, patch_operator);
 	}
@@ -361,9 +371,9 @@ int main(int argc, char *argv[])
 		// smoother
 		shared_ptr<GMG::Smoother<2>> middle_smoother;
 		if (patch_solver == "dft") {
-			middle_smoother = make_shared<DFTPatchSolver<2>>(middle_patch_operator);
+			middle_smoother = make_shared<DFTPatchSolver<2>>(middle_patch_operator, neumann_bitset);
 		} else if (patch_solver == "fftw") {
-			middle_smoother = make_shared<FFTWPatchSolver<2>>(middle_patch_operator);
+			middle_smoother = make_shared<FFTWPatchSolver<2>>(middle_patch_operator, neumann_bitset);
 		} else {
 			middle_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, middle_patch_operator);
 		}
@@ -393,9 +403,9 @@ int main(int argc, char *argv[])
 	// smoother
 	shared_ptr<GMG::Smoother<2>> coarsest_smoother;
 	if (patch_solver == "dft") {
-		coarsest_smoother = make_shared<DFTPatchSolver<2>>(coarsest_patch_operator);
+		coarsest_smoother = make_shared<DFTPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
 	} else if (patch_solver == "fftw") {
-		coarsest_smoother = make_shared<FFTWPatchSolver<2>>(coarsest_patch_operator);
+		coarsest_smoother = make_shared<FFTWPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
 	} else {
 		coarsest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, coarsest_patch_operator);
 	}

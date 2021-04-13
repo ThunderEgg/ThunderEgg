@@ -118,7 +118,6 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 * @param p8est the p8est object
 	 * @param ns the number of cells in each direction
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
-	 * @param inf the function used to set neumann boundary conditions
 	 * @param bmf the function used to map the blocks to the domain
 	 */
 	P8estDomainGenerator(p8est_t *p8est, const std::array<int, 3> &ns, int num_ghost_cells, const BlockMapFunc &bmf);

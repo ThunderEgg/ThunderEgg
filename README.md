@@ -17,7 +17,6 @@ ThunderEgg is an object-oriented C++ library designed for flexibility and to all
 ## Optional Software
 * FFTW - [FFTW PatchSolver](https://thunderegg.dev/docs/develop/doc/html/classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html)
 * PETSc - ThunderEgg provides [a set of interfaces](https://thunderegg.dev/docs/develop/doc/html/namespaceThunderEgg_1_1PETSc.html) to use PETSc Krylov Solvers and PETSc matrices.
-* Zoltan - currently needed to compile examples
 * p4est - for compatibility with the p4est quadtree library
 
 # Compiling
@@ -34,7 +33,6 @@ Paths to libraries can be specified with the following cmake options
 ```
 -DFFTW_DIR=/path/to/library
 -DPETSC_DIR=/path/to/library
--DZOLTAN_DIR=/path/to/library
 -Dp4est_DIR=/path/to/library
 
 ```
