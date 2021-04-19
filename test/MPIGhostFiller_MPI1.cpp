@@ -21,12 +21,13 @@ TEST_CASE("No calls for 1 patch domain", "[MPIGhostFiller]")
 	auto                  nx             = GENERATE(2, 5);
 	auto                  ny             = GENERATE(2, 5);
 	int                   num_ghost      = 1;
+	int                   num_cases      = GENERATE(1, 2);
 	DomainReader<2>       domain_reader(single_mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
 	auto vec = ValVector<2>::GetNewVector(d_coarse, num_components);
 
-	CallMockMPIGhostFiller<2> mgf(d_coarse, num_components, 1);
+	CallMockMPIGhostFiller<2> mgf(d_coarse, num_components, num_cases);
 
 	mgf.fillGhost(vec);
 

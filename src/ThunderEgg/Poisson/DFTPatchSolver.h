@@ -51,16 +51,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @brief Comparator used in the maps, patches with the same spacings and boundary conditions
 	 * will be equal
 	 */
-	std::function<bool(const std::shared_ptr<const PatchInfo<D>> &, const std::shared_ptr<const PatchInfo<D>> &)> CompareByBoundaryAndSpacings
-	= [&](const std::shared_ptr<const PatchInfo<D>> &a, const std::shared_ptr<const PatchInfo<D>> &b) -> bool {
-		std::bitset<Side<D>::num_sides> a_neumann;
-		std::bitset<Side<D>::num_sides> b_neumann;
-		for (Side<D> s : Side<D>::getValues()) {
-			a_neumann[s.getIndex()] = patchIsNeumannOnSide(a, s);
-			b_neumann[s.getIndex()] = patchIsNeumannOnSide(b, s);
-		}
-		return std::forward_as_tuple(a_neumann.to_ulong(), a->spacings[0]) < std::forward_as_tuple(b_neumann.to_ulong(), b->spacings[0]);
-	};
+	using CompareFunction = std::function<bool(const PatchInfo<D> &, const PatchInfo<D> &)>;
 	/**
 	 * @brief The patch opertar that we are solving for
 	 */
@@ -68,13 +59,11 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	/**
 	 * @brief Map of patchinfo to DFT plan
 	 */
-	std::map<std::shared_ptr<const PatchInfo<D>>, std::array<std::shared_ptr<std::valarray<double>>, D>, decltype(CompareByBoundaryAndSpacings)>
-	plan1;
+	std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction> plan1;
 	/**
 	 * @brief Map of patchinfo to inverse DFT plan
 	 */
-	std::map<std::shared_ptr<const PatchInfo<D>>, std::array<std::shared_ptr<std::valarray<double>>, D>, decltype(CompareByBoundaryAndSpacings)>
-	plan2;
+	std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction> plan2;
 	/**
 	 * @brief Temporary copy for the modified right hand side
 	 */
@@ -90,7 +79,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	/**
 	 * @brief Map of PatchInfo object to it's respective eigenvalue array.
 	 */
-	std::map<std::shared_ptr<const PatchInfo<D>>, std::valarray<double>, decltype(CompareByBoundaryAndSpacings)> eigen_vals;
+	std::map<const PatchInfo<D>, std::valarray<double>, CompareFunction> eigen_vals;
 	/**
 	 * @brief map of DFT transforms for each type and size
 	 */
@@ -109,9 +98,9 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @return true if neumann
 	 * @return false if not neumann
 	 */
-	bool patchIsNeumannOnSide(const std::shared_ptr<const PatchInfo<D>> &pinfo, Side<D> s)
+	bool patchIsNeumannOnSide(const PatchInfo<D> &pinfo, Side<D> s)
 	{
-		return !pinfo->hasNbr(s) && neumann[s.getIndex()];
+		return !pinfo.hasNbr(s) && neumann[s.getIndex()];
 	}
 	/**
 	 * @brief get arrays of coefficients necessary for each transform.
@@ -260,7 +249,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @param pinfo the patch
 	 * @return std::array<DftType, D> an array of tranforms for each axis
 	 */
-	std::array<DftType, D> getTransformsForPatch(std::shared_ptr<const ThunderEgg::PatchInfo<D>> pinfo)
+	std::array<DftType, D> getTransformsForPatch(const ThunderEgg::PatchInfo<D> &pinfo)
 	{
 		// get transform types for each axis
 		std::array<DftType, D> transforms;
@@ -283,7 +272,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @param pinfo the patch
 	 * @return std::array<DftType, D> an array of tranforms for each axis
 	 */
-	std::array<DftType, D> getInverseTransformsForPatch(std::shared_ptr<const ThunderEgg::PatchInfo<D>> pinfo)
+	std::array<DftType, D> getInverseTransformsForPatch(const ThunderEgg::PatchInfo<D> &pinfo)
 	{
 		// get transform types for each axis
 		std::array<DftType, D> transforms_inv;
@@ -306,7 +295,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @param pinfo the patch
 	 * @return std::valarray<double> the eigen values
 	 */
-	std::valarray<double> getEigenValues(std::shared_ptr<const PatchInfo<D>> pinfo)
+	std::valarray<double> getEigenValues(const PatchInfo<D> &pinfo)
 	{
 		std::valarray<double> retval(this->domain->getNumCellsInPatch());
 
@@ -314,26 +303,26 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		size_t                curr_stride = 1;
 		for (size_t i = 0; i < D; i++) {
 			all_strides[i] = curr_stride;
-			curr_stride *= pinfo->ns[i];
+			curr_stride *= pinfo.ns[i];
 		}
 
 		for (size_t axis = 0; axis < D; axis++) {
-			int    n = pinfo->ns[axis];
-			double h = pinfo->spacings[axis];
+			int    n = pinfo.ns[axis];
+			double h = pinfo.spacings[axis];
 
 			std::valarray<size_t> sizes(D - 1);
 			std::valarray<size_t> strides(D - 1);
 			size_t                ones_size = 1;
 			for (size_t i = 0; i < axis; i++) {
 				strides[i] = all_strides[i];
-				sizes[i]   = pinfo->ns[i];
-				ones_size *= pinfo->ns[i];
+				sizes[i]   = pinfo.ns[i];
+				ones_size *= pinfo.ns[i];
 			}
 			int input_stride = (int) all_strides[axis];
 			for (size_t i = axis + 1; i < D; i++) {
 				strides[i - 1] = all_strides[i];
-				sizes[i - 1]   = pinfo->ns[i];
-				ones_size *= pinfo->ns[i];
+				sizes[i - 1]   = pinfo.ns[i];
+				ones_size *= pinfo.ns[i];
 			}
 
 			std::valarray<double> ones(ones_size);
@@ -362,7 +351,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 *
 	 * @param pinfo the patch
 	 */
-	void addPatch(std::shared_ptr<const PatchInfo<D>> pinfo)
+	void addPatch(const PatchInfo<D> &pinfo)
 	{
 		if (plan1.count(pinfo) == 0) {
 			plan1[pinfo]      = plan(getTransformsForPatch(pinfo));
@@ -381,11 +370,22 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	DFTPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in, std::bitset<Side<D>::num_sides> neumann)
 	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()),
 	  op(op_in),
-	  plan1(CompareByBoundaryAndSpacings),
-	  plan2(CompareByBoundaryAndSpacings),
-	  eigen_vals(CompareByBoundaryAndSpacings),
 	  neumann(neumann)
 	{
+		CompareFunction compare = [&](const PatchInfo<D> &a, const PatchInfo<D> &b) -> bool {
+			std::bitset<Side<D>::num_sides> a_neumann;
+			std::bitset<Side<D>::num_sides> b_neumann;
+			for (Side<D> s : Side<D>::getValues()) {
+				a_neumann[s.getIndex()] = patchIsNeumannOnSide(a, s);
+				b_neumann[s.getIndex()] = patchIsNeumannOnSide(b, s);
+			}
+			return std::forward_as_tuple(a_neumann.to_ulong(), a.spacings[0]) < std::forward_as_tuple(b_neumann.to_ulong(), b.spacings[0]);
+		};
+
+		plan1      = std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction>(compare);
+		plan2      = std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction>(compare);
+		eigen_vals = std::map<const PatchInfo<D>, std::valarray<double>, CompareFunction>(compare);
+
 		f_copy = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1, 1);
 		tmp    = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1, 1);
 		if (!(D % 2)) {
@@ -393,7 +393,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		}
 		// process patches
 		for (auto pinfo : this->domain->getPatchInfoVector()) {
-			addPatch(pinfo);
+			addPatch(*pinfo);
 		}
 	}
 	void
@@ -407,15 +407,15 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		std::vector<LocalData<D>> f_copy_lds = {f_copy_ld};
 		op->addGhostToRHS(pinfo, us, f_copy_lds);
 
-		executePlan(plan1.at(pinfo), f_copy_ld, tmp_ld);
+		executePlan(plan1.at(*pinfo), f_copy_ld, tmp_ld);
 
-		tmp->getValArray() /= eigen_vals.at(pinfo);
+		tmp->getValArray() /= eigen_vals.at(*pinfo);
 
 		if (neumann.all() && pinfo->nbr_info == std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::num_sides>()) {
 			tmp->getValArray()[0] = 0;
 		}
 
-		executePlan(plan2.at(pinfo), tmp_ld, us[0]);
+		executePlan(plan2.at(*pinfo), tmp_ld, us[0]);
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {

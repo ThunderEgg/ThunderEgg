@@ -32,11 +32,12 @@
 
 namespace ThunderEgg
 {
-template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
+template <int D>
+class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 {
 	private:
 	int num_components;
-	mutable std::list<std::tuple<std::shared_ptr<const PatchInfo<D>>, const Side<D>, const NbrType,
+	mutable std::list<std::tuple<std::shared_ptr<const PatchInfo<D>>, const std::vector<Side<D>>, const NbrType,
 	                             const Orthant<D>, int, int>>
 	nbr_calls;
 
@@ -45,11 +46,11 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
 	                               const std::vector<LocalData<D>> &   local_datas,
-	                               const std::vector<LocalData<D>> &nbr_datas, const Side<D> side,
+	                               const std::vector<LocalData<D>> &nbr_datas, const std::vector<Side<D>> &sides,
 	                               const NbrType nbr_type, const Orthant<D> orthant) const override
 	{
 		called = true;
-		nbr_calls.emplace_back(pinfo, side, nbr_type, orthant, local_datas.size(),
+		nbr_calls.emplace_back(pinfo, sides, nbr_type, orthant, local_datas.size(),
 		                       nbr_datas.size());
 	}
 
@@ -80,7 +81,7 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		auto remaining_local_calls = local_calls;
 
 		auto check_for_nbr_call
-		= [&](const std::tuple<std::shared_ptr<const PatchInfo<D>>, const Side<D>, const NbrType,
+		= [&](const std::tuple<std::shared_ptr<const PatchInfo<D>>, const std::vector<Side<D>>, const NbrType,
 		                       const Orthant<D>, int, int> &call) {
 			  // check if call was made for neighbor
 			  auto found_call
@@ -112,13 +113,13 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 			for (auto side : Side<D>::getValues()) {
 				INFO("side: " << side);
+				std::vector<Side<D>> sides{side};
 				if (patch->hasNbr(side)) {
 					switch (patch->getNbrType(side)) {
 						case NbrType::Normal: {
 							INFO("NbrType: Normal");
 
-							auto call = make_tuple(patch, side, NbrType::Normal, Orthant<D>::null(),
-							                       num_components, num_components);
+							auto call = make_tuple(patch, sides, NbrType::Normal, Orthant<D>::null(), num_components, num_components);
 							check_for_nbr_call(call);
 
 						} break;
@@ -127,8 +128,7 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 							for (auto orthant : Orthant<D>::getValuesOnSide(side)) {
 								INFO("Orthant: " << orthant.getIndex());
-								auto call = make_tuple(patch, side, NbrType::Fine, orthant,
-								                       num_components, num_components);
+								auto call = make_tuple(patch, sides, NbrType::Fine, orthant, num_components, num_components);
 								check_for_nbr_call(call);
 							}
 						} break;
@@ -141,8 +141,7 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 							INFO("Orthant: " << orthant.getIndex());
 
-							auto call = make_tuple(patch, side, NbrType::Coarse, orthant,
-							                       num_components, num_components);
+							auto call = make_tuple(patch, sides, NbrType::Coarse, orthant, num_components, num_components);
 							check_for_nbr_call(call);
 
 						} break;
@@ -163,7 +162,7 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 				starts = starts + " " + std::to_string(patch->starts[i]);
 			}
 			INFO(starts);
-			INFO("side: " << std::get<1>(call));
+			INFO("side: " << std::get<1>(call)[0]);
 			std::string nbrtype = "";
 			switch (std::get<2>(call)) {
 				case NbrType::Normal:
@@ -184,18 +183,19 @@ template <int D> class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		}
 	}
 };
-template <int D> class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
+template <int D>
+class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 {
 	public:
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
 	                               const std::vector<LocalData<D>> &   local_datas,
-	                               const std::vector<LocalData<D>> &nbr_datas, const Side<D> side,
+	                               const std::vector<LocalData<D>> &nbr_datas, const std::vector<Side<D>> &sides,
 	                               const NbrType nbr_type, const Orthant<D> orthant) const override
 	{
 		for (size_t c = 0; c < nbr_datas.size(); c++) {
 			int index = 0;
 			for (int i = 0; i < pinfo->num_ghost_cells; i++) {
-				LocalData<D - 1> slice = nbr_datas[c].getGhostSliceOnSide(side.opposite(), i + 1);
+				LocalData<D - 1> slice = nbr_datas[c].getGhostSliceOnSide(sides[0].opposite(), i + 1);
 				nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
 				                   [&](const std::array<int, D - 1> &coord) {
 					                   slice[coord] += pinfo->id + index + c;

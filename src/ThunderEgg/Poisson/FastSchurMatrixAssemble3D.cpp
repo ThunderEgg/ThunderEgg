@@ -300,7 +300,9 @@ void FillBlockColumnForCoarseToFineInterface(int                                
 	vector<double>            ghosts(n * n);
 	std::vector<LocalData<3>> us        = {u};
 	std::vector<LocalData<3>> nbr_datas = {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
-	ghost_filler->fillGhostCellsForNbrPatch(new_pinfo, us, nbr_datas, s, NbrType::Fine, Orthant<3>::getValuesOnSide(s)[type.getOrthant().getIndex()]);
+	std::vector<Side<3>>      sides     = {s};
+	ghost_filler->fillGhostCellsForNbrPatch(
+	new_pinfo, us, nbr_datas, sides, NbrType::Fine, Orthant<3>::getValuesOnSide(s)[type.getOrthant().getIndex()]);
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			block[(xi + yi * n) * n * n + j] = -ghosts[xi + yi * n] / 2;
@@ -333,8 +335,9 @@ void FillBlockColumnForFineToCoarseInterface(int                                
 	vector<double>            ghosts(n * n);
 	std::vector<LocalData<3>> us        = {u};
 	std::vector<LocalData<3>> nbr_datas = {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
+	std::vector<Side<3>>      sides     = {s};
 	ghost_filler->fillGhostCellsForNbrPatch(
-	new_pinfo, us, nbr_datas, s, NbrType::Coarse, Orthant<3>::getValuesOnSide(s.opposite())[type.getOrthant().getIndex()]);
+	new_pinfo, us, nbr_datas, sides, NbrType::Coarse, Orthant<3>::getValuesOnSide(s.opposite())[type.getOrthant().getIndex()]);
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			block[(xi + yi * n) * n * n + j] = -ghosts[xi + yi * n] / 2;
@@ -456,7 +459,7 @@ void AssembleMatrix(std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domai
 				pinfo->nbr_info[s.getIndex()] = make_unique<NormalNbrInfo<3>>();
 			}
 		}
-		solver->addPatch(pinfo);
+		solver->addPatch(*pinfo);
 
 		map<Block, shared_ptr<vector<double>>, std::function<bool(const Block &a, const Block &b)>> coeffs(
 		[](const Block &a, const Block &b) { return std::tie(a.aux, a.type) < std::tie(b.aux, b.type); });

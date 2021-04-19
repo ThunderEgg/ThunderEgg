@@ -37,18 +37,16 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	 *
 	 * @param domain_in the domain that is being fill for
 	 */
-	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain_in)
-	: MPIGhostFiller<2>(domain_in, 1)
-	{
-	}
+	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain_in) : MPIGhostFiller<2>(domain_in, 1) {}
 
 	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
 	                               const std::vector<LocalData<2>> &   local_datas,
-	                               const std::vector<LocalData<2>> &nbr_datas, const Side<2> side,
-	                               const NbrType nbr_type, const Orthant<2> orthant) const override;
+	                               const std::vector<LocalData<2>> &   nbr_datas,
+	                               const std::vector<Side<2>> &        sides,
+	                               const NbrType                       nbr_type,
+	                               const Orthant<2>                    orthant) const override;
 
-	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                                 const std::vector<LocalData<2>> &local_datas) const override;
+	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<2>> pinfo, const std::vector<LocalData<2>> &local_datas) const override;
 };
 } // namespace ThunderEgg
 #endif
