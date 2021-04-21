@@ -15,6 +15,9 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/BufferWriter.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/CoarseNbrInfo.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/Corner.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Corner.cpp)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/DivergenceError.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Domain.h)

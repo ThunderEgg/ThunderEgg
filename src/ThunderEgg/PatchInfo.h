@@ -21,6 +21,7 @@
 #ifndef THUNDEREGG_PATCHINFO_H
 #define THUNDEREGG_PATCHINFO_H
 #include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Corner.h>
 #include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NormalNbrInfo.h>
 #include <ThunderEgg/Orthant.h>
@@ -117,6 +118,11 @@ template <int D> struct PatchInfo : public Serializable {
 	 * If there is no neighbor, it should be set to nullptr.
 	 */
 	std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::num_sides> nbr_info;
+	/**
+	 * @brief Nbr info objects for each corner
+	 * If there is no neighbor, it should be set to nullptr.
+	 */
+	std::array<std::unique_ptr<NbrInfo<1>>, Corner<D>::num_corners> corner_nbr_info;
 
 	/**
 	 * @brief Construct a new Patch Info object
