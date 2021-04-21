@@ -45,7 +45,7 @@ template <int D> class Orthant
 	unsigned char val = num_orthants;
 
 	public:
-	static constexpr size_t num_orthants = 1 << D;
+	static constexpr size_t num_orthants = D > 0 ? 1 << D : 0;
 	/**
 	 * @brief Create new Orthant<D> with given value.
 	 *
@@ -416,6 +416,25 @@ template <int D> class Orthant
 };
 
 /**
+ * @brief ostream operator that prints a string representation of Orthant<0> enum.
+ *
+ * For example, Orthant<0>::null() will print out "Orthant<0>::null()".
+ *
+ * @param os the ostream
+ * @param o the orthant
+ *
+ * @return  the ostream
+ */
+inline std::ostream &operator<<(std::ostream &os, const Orthant<0> &o)
+{
+	if (o == Orthant<0>::null()) {
+		os << "Orthant<0>::null()";
+	} else {
+		os << "Orthant<0> invalid value: " << o.getIndex();
+	}
+	return os;
+}
+/**
  * @brief ostream operator that prints a string representation of Orthant<1> enum.
  *
  * For example, Orthant<1>::lower() will print out "Orthant<1>::lower()".
@@ -500,9 +519,11 @@ inline std::ostream &operator<<(std::ostream &os, const Orthant<3> &o)
 	}
 	return os;
 }
+void to_json(nlohmann::json &j, const Orthant<0> &o);
 void to_json(nlohmann::json &j, const Orthant<1> &o);
 void to_json(nlohmann::json &j, const Orthant<2> &o);
 void to_json(nlohmann::json &j, const Orthant<3> &o);
+void from_json(const nlohmann::json &j, Orthant<0> &o);
 void from_json(const nlohmann::json &j, Orthant<1> &o);
 void from_json(const nlohmann::json &j, Orthant<2> &o);
 void from_json(const nlohmann::json &j, Orthant<3> &o);

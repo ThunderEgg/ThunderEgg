@@ -13,6 +13,9 @@ TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
 	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
 	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
+	d.corner_nbr_info[Corner<3>::bsw().getIndex()].reset(new NormalNbrInfo<1>(1));
+	d.corner_nbr_info[Corner<3>::tse().getIndex()].reset(new CoarseNbrInfo<1>(2, Orthant<0>::null()));
+	d.corner_nbr_info[Corner<3>::bnw().getIndex()].reset(new FineNbrInfo<1>({1}));
 
 	// serialize and then deserialize
 	char *buff = new char[d.serialize(nullptr)];
@@ -45,6 +48,27 @@ TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 
 	REQUIRE(!out.hasNbr(Side<3>::bottom()));
 	REQUIRE(!out.hasNbr(Side<3>::top()));
+
+	REQUIRE(out.hasCornerNbr(Corner<3>::bsw()));
+	REQUIRE(out.getCornerNbrType(Corner<3>::bsw()) == NbrType::Normal);
+	REQUIRE(out.getCornerNormalNbrInfo(Corner<3>::bsw()).id == 1);
+
+	REQUIRE(!out.hasCornerNbr(Corner<3>::bse()));
+
+	REQUIRE(out.hasCornerNbr(Corner<3>::bnw()));
+	REQUIRE(out.getCornerNbrType(Corner<3>::bnw()) == NbrType::Fine);
+	REQUIRE(out.getCornerFineNbrInfo(Corner<3>::bnw()).ids[0] == 1);
+
+	REQUIRE(!out.hasCornerNbr(Corner<3>::bne()));
+	REQUIRE(!out.hasCornerNbr(Corner<3>::tsw()));
+
+	REQUIRE(out.hasCornerNbr(Corner<3>::tse()));
+	REQUIRE(out.getCornerNbrType(Corner<3>::tse()) == NbrType::Coarse);
+	REQUIRE(out.getCornerCoarseNbrInfo(Corner<3>::tse()).id == 2);
+	REQUIRE(out.getCornerCoarseNbrInfo(Corner<3>::tse()).orth_on_coarse == Orthant<0>::null());
+
+	REQUIRE(!out.hasCornerNbr(Corner<3>::tnw()));
+	REQUIRE(!out.hasCornerNbr(Corner<3>::tne()));
 }
 TEST_CASE("PatchInfo Default Values", "[PatchInfo]")
 {
@@ -76,6 +100,9 @@ TEST_CASE("PatchInfo Default Values", "[PatchInfo]")
 	for (auto &nbr_info : pinfo.nbr_info) {
 		CHECK(nbr_info == nullptr);
 	}
+	for (auto &nbr_info : pinfo.corner_nbr_info) {
+		CHECK(nbr_info == nullptr);
+	}
 }
 TEST_CASE("PatchInfo to_json no children", "[PatchInfo]")
 {
@@ -91,6 +118,9 @@ TEST_CASE("PatchInfo to_json no children", "[PatchInfo]")
 	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
 	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
 	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
+	d.corner_nbr_info[Corner<3>::bsw().getIndex()].reset(new NormalNbrInfo<1>(1));
+	d.corner_nbr_info[Corner<3>::tse().getIndex()].reset(new CoarseNbrInfo<1>(2, Orthant<0>(0)));
+	d.corner_nbr_info[Corner<3>::bnw().getIndex()].reset(new FineNbrInfo<1>({1}));
 
 	nlohmann::json j = d;
 
@@ -125,6 +155,18 @@ TEST_CASE("PatchInfo to_json no children", "[PatchInfo]")
 
 	CHECK(j["nbrs"][2]["type"] == "NORMAL");
 	CHECK(j["nbrs"][2]["side"] == "NORTH");
+
+	REQUIRE(j["corner_nbrs"].is_array());
+	REQUIRE(j["corner_nbrs"].size() == 3);
+
+	CHECK(j["corner_nbrs"][0]["type"] == "NORMAL");
+	CHECK(j["corner_nbrs"][0]["corner"] == "BSW");
+
+	CHECK(j["corner_nbrs"][1]["type"] == "FINE");
+	CHECK(j["corner_nbrs"][1]["corner"] == "BNW");
+
+	CHECK(j["corner_nbrs"][2]["type"] == "COARSE");
+	CHECK(j["corner_nbrs"][2]["corner"] == "TSE");
 }
 TEST_CASE("PatchInfo to_json no children no neighbors", "[PatchInfo]")
 {
@@ -238,18 +280,21 @@ TEST_CASE("PatchInfo to_json with children", "[PatchInfo]")
 TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
 {
 	nlohmann::json j;
-	j["id"]           = 9;
-	j["rank"]         = 3;
-	j["refine_level"] = 329;
-	j["parent_id"]    = 2;
-	j["parent_rank"]  = 3;
-	j["starts"]       = {1, 2, 3};
-	j["lengths"]      = {10, 20, 30};
-	j["nbrs"]
-	= {NormalNbrInfo<3>(1), CoarseNbrInfo<3>(2, Orthant<2>::nw()), FineNbrInfo<3>({3, 4, 5, 6})};
-	j["nbrs"][0]["side"] = "NORTH";
-	j["nbrs"][1]["side"] = "EAST";
-	j["nbrs"][2]["side"] = "SOUTH";
+	j["id"]                       = 9;
+	j["rank"]                     = 3;
+	j["refine_level"]             = 329;
+	j["parent_id"]                = 2;
+	j["parent_rank"]              = 3;
+	j["starts"]                   = {1, 2, 3};
+	j["lengths"]                  = {10, 20, 30};
+	j["nbrs"]                     = {NormalNbrInfo<3>(1), CoarseNbrInfo<3>(2, Orthant<2>::nw()), FineNbrInfo<3>({3, 4, 5, 6})};
+	j["nbrs"][0]["side"]          = "NORTH";
+	j["nbrs"][1]["side"]          = "EAST";
+	j["nbrs"][2]["side"]          = "SOUTH";
+	j["corner_nbrs"]              = {NormalNbrInfo<1>(1), CoarseNbrInfo<1>(2, Orthant<0>(0)), FineNbrInfo<1>({1})};
+	j["corner_nbrs"][0]["corner"] = "BSW";
+	j["corner_nbrs"][1]["corner"] = "TSE";
+	j["corner_nbrs"][2]["corner"] = "BNW";
 
 	PatchInfo<3> d = j.get<PatchInfo<3>>();
 	CHECK(d.id == 9);
@@ -276,6 +321,18 @@ TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
 	CHECK(d.getNbrType(Side<3>::north()) == NbrType::Normal);
 	CHECK_FALSE(d.hasNbr(Side<3>::bottom()));
 	CHECK_FALSE(d.hasNbr(Side<3>::top()));
+
+	CHECK(d.hasCornerNbr(Corner<3>::bsw()));
+	CHECK(d.getCornerNbrType(Corner<3>::bsw()) == NbrType::Normal);
+	CHECK_FALSE(d.hasCornerNbr(Corner<3>::bse()));
+	CHECK(d.hasCornerNbr(Corner<3>::bnw()));
+	CHECK(d.getCornerNbrType(Corner<3>::bnw()) == NbrType::Fine);
+	CHECK_FALSE(d.hasCornerNbr(Corner<3>::bne()));
+	CHECK_FALSE(d.hasCornerNbr(Corner<3>::tsw()));
+	CHECK(d.hasCornerNbr(Corner<3>::tse()));
+	CHECK(d.getCornerNbrType(Corner<3>::tse()) == NbrType::Coarse);
+	CHECK_FALSE(d.hasCornerNbr(Corner<3>::tnw()));
+	CHECK_FALSE(d.hasCornerNbr(Corner<3>::tne()));
 }
 TEST_CASE("PatchInfo from_json with children", "[PatchInfo]")
 {
@@ -357,6 +414,9 @@ TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
 	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
 	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
 	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
+	d.corner_nbr_info[Corner<3>::bsw().getIndex()].reset(new NormalNbrInfo<1>(1));
+	d.corner_nbr_info[Corner<3>::tse().getIndex()].reset(new CoarseNbrInfo<1>(2, Orthant<0>(0)));
+	d.corner_nbr_info[Corner<3>::bnw().getIndex()].reset(new FineNbrInfo<1>({1}));
 
 	PatchInfo<3> d2(d);
 
@@ -390,6 +450,23 @@ TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
 			}
 		}
 	}
+	for (Corner<3> c : Corner<3>::getValues()) {
+		REQUIRE(d.hasCornerNbr(c) == d2.hasCornerNbr(c));
+		if (d.hasCornerNbr(c)) {
+			CHECK(d.corner_nbr_info[c.getIndex()] != d2.corner_nbr_info[c.getIndex()]);
+			switch (d.getCornerNbrType(c)) {
+				case NbrType::Normal:
+					CHECK(d.getCornerNormalNbrInfo(c).id == d2.getCornerNormalNbrInfo(c).id);
+					break;
+				case NbrType::Fine:
+					CHECK(d.getCornerFineNbrInfo(c).ids[0] == d2.getCornerFineNbrInfo(c).ids[0]);
+					break;
+				case NbrType::Coarse:
+					CHECK(d.getCornerCoarseNbrInfo(c).id == d2.getCornerCoarseNbrInfo(c).id);
+					break;
+			}
+		}
+	}
 }
 TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 {
@@ -410,6 +487,9 @@ TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
 	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
 	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
+	d.corner_nbr_info[Corner<3>::bsw().getIndex()].reset(new NormalNbrInfo<1>(1));
+	d.corner_nbr_info[Corner<3>::tse().getIndex()].reset(new CoarseNbrInfo<1>(2, Orthant<0>(0)));
+	d.corner_nbr_info[Corner<3>::bnw().getIndex()].reset(new FineNbrInfo<1>({1}));
 
 	PatchInfo<3> d2;
 	d2 = d;
@@ -440,6 +520,23 @@ TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 					break;
 				case NbrType::Coarse:
 					CHECK(d.getCoarseNbrInfo(s).id == d2.getCoarseNbrInfo(s).id);
+					break;
+			}
+		}
+	}
+	for (Corner<3> c : Corner<3>::getValues()) {
+		REQUIRE(d.hasCornerNbr(c) == d2.hasCornerNbr(c));
+		if (d.hasCornerNbr(c)) {
+			CHECK(d.corner_nbr_info[c.getIndex()] != d2.corner_nbr_info[c.getIndex()]);
+			switch (d.getCornerNbrType(c)) {
+				case NbrType::Normal:
+					CHECK(d.getCornerNormalNbrInfo(c).id == d2.getCornerNormalNbrInfo(c).id);
+					break;
+				case NbrType::Fine:
+					CHECK(d.getCornerFineNbrInfo(c).ids[0] == d2.getCornerFineNbrInfo(c).ids[0]);
+					break;
+				case NbrType::Coarse:
+					CHECK(d.getCornerCoarseNbrInfo(c).id == d2.getCornerCoarseNbrInfo(c).id);
 					break;
 			}
 		}

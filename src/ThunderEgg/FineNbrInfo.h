@@ -38,19 +38,19 @@ template <int D> class FineNbrInfo : public NbrInfo<D>
 	/**
 	 * @brief The mpi rank that the neighbor resides on.
 	 */
-	std::array<int, Orthant<D - 1>::num_orthants> ranks;
+	std::array<int, Orthant<D>::num_orthants / 2> ranks;
 	/**
 	 * @brief The ids of the neighbors
 	 */
-	std::array<int, Orthant<D - 1>::num_orthants> ids;
+	std::array<int, Orthant<D>::num_orthants / 2> ids;
 	/**
 	 * @brief The global indexes of the neighbors
 	 */
-	std::array<int, Orthant<D - 1>::num_orthants> global_indexes;
+	std::array<int, Orthant<D>::num_orthants / 2> global_indexes;
 	/**
 	 * @brief The local indexes of the neighbors
 	 */
-	std::array<int, Orthant<D - 1>::num_orthants> local_indexes;
+	std::array<int, Orthant<D>::num_orthants / 2> local_indexes;
 	/**
 	 * @brief Construct a new empty FineNbrInfo object
 	 */
@@ -67,7 +67,7 @@ template <int D> class FineNbrInfo : public NbrInfo<D>
 	 *
 	 * @param ids the ids of the neighbors
 	 */
-	FineNbrInfo(std::array<int, Orthant<D - 1>::num_orthants> ids)
+	FineNbrInfo(std::array<int, Orthant<D>::num_orthants / 2> ids)
 	{
 		ranks.fill(0);
 		this->ids = ids;
@@ -123,8 +123,8 @@ template <int D> void to_json(nlohmann::json &j, const FineNbrInfo<D> &n)
 }
 template <int D> void from_json(const nlohmann::json &j, FineNbrInfo<D> &n)
 {
-	n.ids   = j["ids"].get<std::array<int, Orthant<D - 1>::num_orthants>>();
-	n.ranks = j["ranks"].get<std::array<int, Orthant<D - 1>::num_orthants>>();
+	n.ids   = j["ids"].get<std::array<int, Orthant<D>::num_orthants / 2>>();
+	n.ranks = j["ranks"].get<std::array<int, Orthant<D>::num_orthants / 2>>();
 }
 } // namespace ThunderEgg
 #endif
