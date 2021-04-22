@@ -36,7 +36,10 @@ if(NOT TARGET P4EST::P4EST)
       GIT_REPOSITORY https://github.com/cburstedde/p4est
       GIT_TAG        feature-cmake
     )
+    set(OLD_BUILD_TESTING ${BUILD_TESTING})
+    set(BUILD_TESTING OFF)
     FetchContent_MakeAvailable(p4est)
+    set(BUILD_TESTING ${OLD_BUILD_TESTING})
   endif()
 endif(NOT TARGET P4EST::P4EST)
 if(TARGET P4EST::P4EST AND NOT TARGET SC::SC)
