@@ -29,11 +29,11 @@
 namespace ThunderEgg
 {
 /**
- * @brief An enum-style class that represents the edges of a 3d patch
+ * @brief An enum-style class that represents the edges of a 3D patch
  *
  * The edges are named in the following way:
  *
- * bse means Bottom-South-West, which is in the edge of where the bottom, south, and west sides
+ * bs means Bottom-South-West, which is in the edge of where the bottom and south sides
  * meet.
  */
 template <int D> class Edge
