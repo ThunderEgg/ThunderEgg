@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <ThunderEgg/P4estDomGen.h>
+#include <ThunderEgg/P4estDomainGenerator.h>
 
 #include <p4est.h>
 #include <p4est_mesh.h>
@@ -33,17 +33,15 @@ using namespace ThunderEgg;
 
 TEST_CASE("SinglePatch", "[p4estDomGen]")
 {
-	p4est_connectivity_t *    conn  = p4est_connectivity_new_unitsquare();
-	p4est_t *                 p4est = p4est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
-	IsNeumannFunc<2>          inf   = [](Side<2> s, const std::array<double, 2> &lower,
-                              const std::array<double, 2> &upper) { return false; };
-	P4estDomGen::BlockMapFunc bmf
+	p4est_connectivity_t *             conn  = p4est_connectivity_new_unitsquare();
+	p4est_t *                          p4est = p4est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
+	P4estDomainGenerator::BlockMapFunc bmf
 	= [](int block_no, double unit_x, double unit_y, double &x, double &y) {
 		  x = unit_x;
 		  y = unit_y;
 	  };
-	P4estDomGen dg(p4est, {10, 10}, 1, inf, bmf);
-	auto        domain = dg.getFinestDomain();
+	P4estDomainGenerator dg(p4est, {10, 10}, 1, bmf);
+	auto                 domain = dg.getFinestDomain();
 	CHECK(domain->getNumGlobalPatches() == 1);
 	auto patch = domain->getPatchInfoVector()[0];
 	CHECK_FALSE(patch->hasNbr(Side<2>::west()));
@@ -63,7 +61,7 @@ TEST_CASE("SinglePatch", "[p4estDomGen]")
 
 	CHECK_FALSE(dg.hasCoarserDomain());
 }
-TEST_CASE("P4estDomGen 2x2 Uniform", "[p4estDomGen]")
+TEST_CASE("P4estDomainGenerator 2x2 Uniform", "[p4estDomGen]")
 {
 	p4est_connectivity_t *conn = p4est_connectivity_new_unitsquare();
 
@@ -73,9 +71,6 @@ TEST_CASE("P4estDomGen 2x2 Uniform", "[p4estDomGen]")
 	p4est, false,
 	[](p4est_t *p4est, p4est_topidx_t witch_tree, p4est_quadrant_t *quadrant) -> int { return 1; },
 	nullptr);
-
-	IsNeumannFunc<2> inf = [](Side<2> s, const std::array<double, 2> &lower,
-	                          const std::array<double, 2> &upper) { return false; };
 
 	int    nx              = GENERATE(5, 10);
 	int    ny              = GENERATE(5, 10);
@@ -89,13 +84,13 @@ TEST_CASE("P4estDomGen 2x2 Uniform", "[p4estDomGen]")
 	INFO("scale_x: " << scale_y);
 	INFO("num_ghost_cells: " << num_ghost_cells);
 
-	P4estDomGen::BlockMapFunc bmf
+	P4estDomainGenerator::BlockMapFunc bmf
 	= [&](int block_no, double unit_x, double unit_y, double &x, double &y) {
 		  x = scale_x * unit_x;
 		  y = scale_y * unit_y;
 	  };
 
-	P4estDomGen dg(p4est, {nx, ny}, num_ghost_cells, inf, bmf);
+	P4estDomainGenerator dg(p4est, {nx, ny}, num_ghost_cells, bmf);
 
 	auto domain_1 = dg.getFinestDomain();
 	auto domain_0 = dg.getCoarserDomain();
@@ -370,7 +365,7 @@ TEST_CASE("P4estDomGen 2x2 Uniform", "[p4estDomGen]")
 		CHECK_FALSE(domain_0_coarser_patch->hasCornerNbr(Corner<2>::ne()));
 	}
 }
-TEST_CASE("P4estDomGen 2x2 Refined SW", "[p4estDomGen]")
+TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 {
 	p4est_connectivity_t *conn = p4est_connectivity_new_unitsquare();
 
@@ -387,9 +382,6 @@ TEST_CASE("P4estDomGen 2x2 Refined SW", "[p4estDomGen]")
 	},
 	nullptr);
 
-	IsNeumannFunc<2> inf = [](Side<2> s, const std::array<double, 2> &lower,
-	                          const std::array<double, 2> &upper) { return false; };
-
 	int    nx              = GENERATE(5, 10);
 	int    ny              = GENERATE(5, 10);
 	double scale_x         = GENERATE(0.5, 1.0);
@@ -402,13 +394,13 @@ TEST_CASE("P4estDomGen 2x2 Refined SW", "[p4estDomGen]")
 	INFO("scale_x: " << scale_y);
 	INFO("num_ghost_cells: " << num_ghost_cells);
 
-	P4estDomGen::BlockMapFunc bmf
+	P4estDomainGenerator::BlockMapFunc bmf
 	= [&](int block_no, double unit_x, double unit_y, double &x, double &y) {
 		  x = scale_x * unit_x;
 		  y = scale_y * unit_y;
 	  };
 
-	P4estDomGen dg(p4est, {nx, ny}, num_ghost_cells, inf, bmf);
+	P4estDomainGenerator dg(p4est, {nx, ny}, num_ghost_cells, bmf);
 
 	auto domain_2 = dg.getFinestDomain();
 	auto domain_1 = dg.getCoarserDomain();
@@ -930,17 +922,15 @@ TEST_CASE("P4estDomGen 2x2 Refined SW", "[p4estDomGen]")
 }
 TEST_CASE("2x1 brick", "[p4estDomGen]")
 {
-	p4est_connectivity_t *    conn  = p4est_connectivity_new_brick(2, 1, false, false);
-	p4est_t *                 p4est = p4est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
-	IsNeumannFunc<2>          inf   = [](Side<2> s, const std::array<double, 2> &lower,
-                              const std::array<double, 2> &upper) { return false; };
-	P4estDomGen::BlockMapFunc bmf
+	p4est_connectivity_t *             conn  = p4est_connectivity_new_brick(2, 1, false, false);
+	p4est_t *                          p4est = p4est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
+	P4estDomainGenerator::BlockMapFunc bmf
 	= [](int block_no, double unit_x, double unit_y, double &x, double &y) {
 		  x = unit_x;
 		  y = unit_y;
 	  };
-	P4estDomGen dg(p4est, {10, 10}, 1, inf, bmf);
-	auto        domain = dg.getFinestDomain();
+	P4estDomainGenerator dg(p4est, {10, 10}, 1, bmf);
+	auto                 domain = dg.getFinestDomain();
 	CHECK(domain->getNumGlobalPatches() == 2);
 	auto patch1 = domain->getPatchInfoVector()[0];
 	CHECK_FALSE(patch1->hasNbr(Side<2>::west()));

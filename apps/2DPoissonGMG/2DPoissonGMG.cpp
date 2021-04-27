@@ -252,8 +252,6 @@ int main(int argc, char *argv[])
 		x = unit_x;
 		y = unit_y;
 	};
-	auto inf
-	= [=](Side<2> s, const array<double, 2> &, const array<double, 2> &) { return neumann; };
 
 	// Set the number of cells in the x, y and z direction.
 	std::array<int, 2> ns;
@@ -262,7 +260,7 @@ int main(int argc, char *argv[])
 
 	// A DomainGenerator will create domains for the Multigrid algorithm from a tree
 	int                            num_ghost_cells  = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
-	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<P4estDomGen>(ttp.p4est, ns, 1, inf, bmf);
+	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<P4estDomainGenerator>(ttp.p4est, ns, 1, bmf);
 
 	// Get the finest domain from the tree
 	shared_ptr<Domain<2>> domain = domain_generator->getFinestDomain();

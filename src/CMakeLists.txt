@@ -55,8 +55,8 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/Orthant.cpp)
 
 if(TARGET P4EST::P4EST)
 
-  list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.h)
-  list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomGen.cpp)
+  list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomainGenerator.h)
+  list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomainGenerator.cpp)
 
   if(TARGET P4EST::P8EST)
 

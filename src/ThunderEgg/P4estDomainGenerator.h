@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_P4ESTDOMGEN_H
-#define THUNDEREGG_P4ESTDOMGEN_H
+#ifndef THUNDEREGG_P4ESTDOMAINGENERATOR_H
+#define THUNDEREGG_P4ESTDOMAINGENERATOR_H
 #include <ThunderEgg/DomainGenerator.h>
 #include <functional>
 #include <list>
@@ -30,7 +30,7 @@ namespace ThunderEgg
 /**
  * @brief Generates Domain objects form a given p4est object
  */
-class P4estDomGen : public DomainGenerator<2>
+class P4estDomainGenerator : public DomainGenerator<2>
 {
 	public:
 	/**
@@ -45,8 +45,7 @@ class P4estDomGen : public DomainGenerator<2>
 	 * @param x the resulting x coordinate of the mapping function
 	 * @param y the resulting y coordinate of the mapping function
 	 */
-	using BlockMapFunc
-	= std::function<void(int block_no, double unit_x, double unit_y, double &x, double &y)>;
+	using BlockMapFunc = std::function<void(int block_no, double unit_x, double unit_y, double &x, double &y)>;
 
 	private:
 	/**
@@ -56,10 +55,14 @@ class P4estDomGen : public DomainGenerator<2>
 	/**
 	 * @brief List of the domains
 	 *
-	 * Finest domain is stored in front
+	 * Finesr domain is stored in back
 	 */
-	std::list<std::shared_ptr<Domain<2>>> domain_list;
+	std::list<std::shared_ptr<Domain<2>>> domains;
 
+	/**
+	 * @brief The dimensions of each patch
+	 */
+	std::array<int, 2> ns;
 	/**
 	 * @brief the number of ghost cells on each side of the patch
 	 */
@@ -71,48 +74,53 @@ class P4estDomGen : public DomainGenerator<2>
 	 */
 	int curr_level;
 	/**
-	 * @brief The number of levels the p4est quad-tree
-	 */
-	int num_levels;
-	/**
-	 * @brief The dimensions of each patch
-	 */
-	std::array<int, 2> ns;
-	/**
-	 * @brief The length of a block on the x-axis
-	 */
-	double x_scale;
-	/**
-	 * @brief The length of a block on the y-axis
-	 */
-	double y_scale;
-	/**
 	 * @brief The block Mapping function being used.
 	 */
 	BlockMapFunc bmf;
-	/**
-	 * @brief The function used to set neumann boundary conditions
-	 */
-	IsNeumannFunc<2> inf;
 
 	/**
 	 * @brief Get a new coarser level and add it to the end of domain_list
 	 */
 	void extractLevel();
 
+	/**
+	 * @brief coaren the p8est tree
+	 */
+	void coarsenTree();
+
+	/**
+	 * @brief create the patchinfo objects using the cureent leaves of the tree
+	 */
+	void createPatchInfos();
+
+	/**
+	 * @brief Add NbrInfo objects to PatchInfo objects
+	 */
+	void linkNeighbors();
+
+	/**
+	 * @brief Get the patchinfos at the current leaves
+	 *
+	 * @return the PatchInfo objects
+	 */
+	std::map<int, std::shared_ptr<PatchInfo<2>>> getPatchInfos();
+
+	/**
+	 * @brief update the parent_rank for the previous domain
+	 */
+	void updateParentRanksOfPreviousDomain();
+
 	public:
 	/**
-	 * @brief Construct a new P4estDomGen object
+	 * @brief Construct a new P4estDomainGenerator object
 	 *
 	 * @param p4est the p4est object
 	 * @param ns the number of cells in each direction
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
-	 * @param inf the function used to set neumann boundary conditions
 	 * @param bmf the function used to map the blocks to the domain
 	 */
-	P4estDomGen(p4est_t *p4est, const std::array<int, 2> &ns, int num_ghost_cells,
-	            IsNeumannFunc<2> inf, BlockMapFunc bmf);
-	~P4estDomGen();
+	P4estDomainGenerator(p4est_t *p4est, const std::array<int, 2> &ns, int num_ghost_cells, const BlockMapFunc &bmf);
+	~P4estDomainGenerator();
 	std::shared_ptr<Domain<2>> getFinestDomain();
 	bool                       hasCoarserDomain();
 	std::shared_ptr<Domain<2>> getCoarserDomain();

@@ -204,10 +204,8 @@ int main(int argc, char *argv[])
 		x = unit_x;
 		y = unit_y;
 	};
-	auto inf
-	= [=](Side<2> s, const array<double, 2> &, const array<double, 2> &) { return neumann; };
 
-	dcg.reset(new P4estDomGen(ttp.p4est, ns, 1, inf, bmf));
+	dcg.reset(new P4estDomainGenerator(ttp.p4est, ns, 1, bmf));
 
 	domain = dcg->getFinestDomain();
 
