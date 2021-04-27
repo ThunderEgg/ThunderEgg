@@ -61,6 +61,24 @@ TEST_CASE("Corner<3> named constructors give expected index values", "[Corner]")
 	CHECK(Corner<3>::tne().getIndex() == 7);
 	CHECK(Corner<3>::null().getIndex() == 8);
 }
+TEST_CASE("Corner<2> opposite", "[Corner]")
+{
+	CHECK(Corner<2>::sw().opposite() == Corner<2>::ne());
+	CHECK(Corner<2>::se().opposite() == Corner<2>::nw());
+	CHECK(Corner<2>::nw().opposite() == Corner<2>::se());
+	CHECK(Corner<2>::ne().opposite() == Corner<2>::sw());
+}
+TEST_CASE("Corner<3> opposite", "[Corner]")
+{
+	CHECK(Corner<3>::bsw().opposite() == Corner<2>::tne());
+	CHECK(Corner<3>::bse().opposite() == Corner<2>::tnw());
+	CHECK(Corner<3>::bnw().opposite() == Corner<2>::tse());
+	CHECK(Corner<3>::bne().opposite() == Corner<2>::tsw());
+	CHECK(Corner<3>::tsw().opposite() == Corner<2>::bne());
+	CHECK(Corner<3>::tse().opposite() == Corner<2>::bnw());
+	CHECK(Corner<3>::tnw().opposite() == Corner<2>::bse());
+	CHECK(Corner<3>::tne().opposite() == Corner<2>::bsw());
+}
 TEST_CASE("Corner<2> getNbrOnSide is as expected", "[Corner]")
 {
 	CHECK(Corner<2>::sw().getNbrOnSide(Side<2>::west()) == Corner<2>::se());

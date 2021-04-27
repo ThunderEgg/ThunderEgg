@@ -578,7 +578,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::be()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::tw()));
 		CHECK(domain_1_tne_patch->hasEdgeNbr(Edge<3>::sw()));
-		CHECK(domain_1_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).id == domain_1_tse_patch->id);
+		CHECK(domain_1_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).id == domain_1_tsw_patch->id);
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::ne()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::se()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::nw()));
@@ -721,7 +721,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::be()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::tw()));
 		CHECK(domain_1_tne_patch->hasEdgeNbr(Edge<3>::sw()));
-		CHECK(domain_1_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).rank == domain_1_tse_patch->rank);
+		CHECK(domain_1_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).rank == domain_1_tsw_patch->rank);
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::ne()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::se()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::nw()));
@@ -1953,7 +1953,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::be()));
 		CHECK_FALSE(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::tw()));
 		CHECK(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::sw()));
-		CHECK(domain_2_bsw_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).id == domain_2_bsw_tse_patch->id);
+		CHECK(domain_2_bsw_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).id == domain_2_bsw_tsw_patch->id);
 		CHECK(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::ne()));
 		CHECK(domain_2_bsw_tne_patch->getEdgeCoarseNbrInfo(Edge<3>::ne()).id == domain_2_bne_patch->id);
 		CHECK_FALSE(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::se()));
@@ -2069,7 +2069,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::be()));
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::tw()));
 		CHECK(domain_2_tne_patch->hasEdgeNbr(Edge<3>::sw()));
-		CHECK(domain_2_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).id == domain_2_tse_patch->id);
+		CHECK(domain_2_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).id == domain_2_tsw_patch->id);
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::ne()));
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::se()));
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::nw()));
@@ -2197,7 +2197,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::be()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::tw()));
 		CHECK(domain_1_tne_patch->hasEdgeNbr(Edge<3>::sw()));
-		CHECK(domain_1_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).id == domain_1_tse_patch->id);
+		CHECK(domain_1_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).id == domain_1_tsw_patch->id);
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::ne()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::se()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::nw()));
@@ -2345,7 +2345,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::be()));
 		CHECK_FALSE(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::tw()));
 		CHECK(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::sw()));
-		CHECK(domain_2_bsw_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).rank == domain_2_bsw_tse_patch->rank);
+		CHECK(domain_2_bsw_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).rank == domain_2_bsw_tsw_patch->rank);
 		CHECK(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::ne()));
 		CHECK(domain_2_bsw_tne_patch->getEdgeCoarseNbrInfo(Edge<3>::ne()).rank == domain_2_bne_patch->rank);
 		CHECK_FALSE(domain_2_bsw_tne_patch->hasEdgeNbr(Edge<3>::se()));
@@ -2461,7 +2461,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::be()));
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::tw()));
 		CHECK(domain_2_tne_patch->hasEdgeNbr(Edge<3>::sw()));
-		CHECK(domain_2_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).rank == domain_2_tse_patch->rank);
+		CHECK(domain_2_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).rank == domain_2_tsw_patch->rank);
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::ne()));
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::se()));
 		CHECK_FALSE(domain_2_tne_patch->hasEdgeNbr(Edge<3>::nw()));
@@ -2589,7 +2589,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::be()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::tw()));
 		CHECK(domain_1_tne_patch->hasEdgeNbr(Edge<3>::sw()));
-		CHECK(domain_1_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).rank == domain_1_tse_patch->rank);
+		CHECK(domain_1_tne_patch->getEdgeNormalNbrInfo(Edge<3>::sw()).rank == domain_1_tsw_patch->rank);
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::ne()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::se()));
 		CHECK_FALSE(domain_1_tne_patch->hasEdgeNbr(Edge<3>::nw()));

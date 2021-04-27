@@ -336,6 +336,16 @@ template <int D> class Corner
 		return Corner<D - 1>(((val >> 1) & upper_mask) | (val & ~upper_mask));
 	}
 	/**
+	 * @brief get the corner on the opposite side
+	 *
+	 * @return Corner<D> the corner on the opposite side
+	 */
+	Corner<D> opposite() const
+	{
+		unsigned char mask = ~((~0x0U) << D);
+		return Corner<D>(val ^ mask);
+	}
+	/**
 	 * @brief Get an array of all Corner<D> values that lie on a particular side of the cube.
 	 *
 	 * When the two axis that the side lies on are arranged in the following way, the octants are

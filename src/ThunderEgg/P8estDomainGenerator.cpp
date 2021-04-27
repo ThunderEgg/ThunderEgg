@@ -35,6 +35,8 @@ namespace
 struct IterateFunctions {
 	std::function<void(p8est_iter_volume_info_t *)> iter_volume;
 	std::function<void(p8est_iter_face_info_t *)>   iter_face;
+	std::function<void(p8est_iter_edge_info_t *)>   iter_edge;
+	std::function<void(p8est_iter_corner_info_t *)> iter_corner;
 };
 
 void IterVolumeWrap(p8est_iter_volume_info_t *info, void *user_data)
@@ -49,15 +51,35 @@ void IterFaceWrap(p8est_iter_face_info_t *info, void *user_data)
 	functions->iter_face(info);
 }
 
+void IterEdgeWrap(p8est_iter_edge_info_t *info, void *user_data)
+{
+	const IterateFunctions *functions = (IterateFunctions *) user_data;
+	functions->iter_edge(info);
+}
+
+void IterCornerWrap(p8est_iter_corner_info_t *info, void *user_data)
+{
+	const IterateFunctions *functions = (IterateFunctions *) user_data;
+	functions->iter_corner(info);
+}
+
 void p8est_iterate_ext(p8est_t *                                              p8est,
                        p8est_ghost_t *                                        ghost_layer,
                        const std::function<void(p8est_iter_volume_info_t *)> &iter_volume,
                        const std::function<void(p8est_iter_face_info_t *)> &  iter_face,
+                       const std::function<void(p8est_iter_edge_info_t *)> &  iter_edge,
+                       const std::function<void(p8est_iter_corner_info_t *)> &iter_corner,
                        int                                                    remote)
 {
-	IterateFunctions functions = {iter_volume, iter_face};
-	p8est_iterate_ext(
-	p8est, ghost_layer, &functions, iter_volume ? &IterVolumeWrap : nullptr, iter_face ? &IterFaceWrap : nullptr, nullptr, nullptr, remote);
+	IterateFunctions functions = {iter_volume, iter_face, iter_edge, iter_corner};
+	p8est_iterate_ext(p8est,
+	                  ghost_layer,
+	                  &functions,
+	                  iter_volume ? &IterVolumeWrap : nullptr,
+	                  iter_face ? &IterFaceWrap : nullptr,
+	                  iter_edge ? &IterEdgeWrap : nullptr,
+	                  iter_corner ? &IterCornerWrap : nullptr,
+	                  remote);
 }
 
 struct CoarsenFunctions {
@@ -100,7 +122,7 @@ int GetMaxLevel(p8est_t *p8est)
 	int max_level = 0;
 
 	p8est_iterate_ext(
-	p8est, nullptr, [&](p8est_iter_volume_info_t *info) { max_level = max(max_level, (int) info->quad->level); }, nullptr, false);
+	p8est, nullptr, [&](p8est_iter_volume_info_t *info) { max_level = max(max_level, (int) info->quad->level); }, nullptr, nullptr, nullptr, false);
 
 	int global_max_level;
 
@@ -139,6 +161,8 @@ void SetRanks(p8est_t *p8est)
 		data->rank = rank;
 	},
 	nullptr,
+	nullptr,
+	nullptr,
 	false);
 }
 
@@ -156,6 +180,8 @@ void SetIds(p8est_t *p8est)
 		data->id   = curr_global_id;
 		curr_global_id++;
 	},
+	nullptr,
+	nullptr,
 	nullptr,
 	false);
 }
@@ -303,6 +329,8 @@ void P8estDomainGenerator::createPatchInfos()
 		}
 	},
 	nullptr,
+	nullptr,
+	nullptr,
 	false);
 }
 
@@ -412,11 +440,260 @@ void addNbrInfo(const p8est_iter_face_side_t &side1, const p8est_iter_face_side_
 		addNormalNbrInfo(side1, side2, ghost_data);
 	}
 }
+
+/**
+ * @brief Get the Edge object from a given p8est edge index
+ *
+ * @param p8est_edge
+ * @return Edge<3>
+ */
+Edge<3> getEdge(int p8est_edge)
+{
+	Edge<3> edge;
+	switch (p8est_edge) {
+		case 0:
+			edge = Edge<3>::bs();
+			break;
+		case 1:
+			edge = Edge<3>::bn();
+			break;
+		case 2:
+			edge = Edge<3>::ts();
+			break;
+		case 3:
+			edge = Edge<3>::tn();
+			break;
+		case 4:
+			edge = Edge<3>::bw();
+			break;
+		case 5:
+			edge = Edge<3>::be();
+			break;
+		case 6:
+			edge = Edge<3>::tw();
+			break;
+		case 7:
+			edge = Edge<3>::te();
+			break;
+		case 8:
+			edge = Edge<3>::sw();
+			break;
+		case 9:
+			edge = Edge<3>::se();
+			break;
+		case 10:
+			edge = Edge<3>::nw();
+			break;
+		case 11:
+			edge = Edge<3>::ne();
+			break;
+		default:
+			edge = Edge<3>::null();
+	}
+	return edge;
+}
+
+/**
+ * @brief set the EdgeCoarseNbrInfos on side1
+ *
+ * @param side1
+ * @param side2
+ * @param ghost_data
+ */
+void addEdgeCoarseNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_edge_side_t &side2, Data *ghost_data)
+{
+	const Data *nbr_data;
+	if (side2.is.full.is_ghost) {
+		nbr_data = ghost_data + side2.is.full.quadid;
+	} else {
+		nbr_data = (Data *) side2.is.full.quad->p.user_data;
+	}
+	for (int i = 0; i < 2; i++) {
+		if (!side1.is.hanging.is_ghost[i]) {
+			Data *data = (Data *) side1.is.hanging.quad[i]->p.user_data;
+
+			Edge<3> edge = getEdge(side1.edge);
+
+			data->pinfo->edge_nbr_info[edge.getIndex()]            = make_unique<CoarseNbrInfo<2>>();
+			data->pinfo->getEdgeCoarseNbrInfo(edge).id             = nbr_data->id;
+			data->pinfo->getEdgeCoarseNbrInfo(edge).rank           = nbr_data->rank;
+			data->pinfo->getEdgeCoarseNbrInfo(edge).orth_on_coarse = Orthant<1>(i);
+		}
+	}
+}
+
+/**
+ * @brief set the EdgeFineNbrInfo on side1
+ *
+ * @param side1
+ * @param side2
+ * @param ghost_data
+ */
+void addEdgeFineNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_edge_side_t &side2, Data *ghost_data)
+{
+	if (!side1.is.full.is_ghost) {
+		Data *data = (Data *) side1.is.full.quad->p.user_data;
+		Data *nbr_datas[2];
+		for (int i = 0; i < 2; i++) {
+			if (side2.is.hanging.is_ghost[i]) {
+				nbr_datas[i] = ghost_data + side2.is.hanging.quadid[i];
+			} else {
+				nbr_datas[i] = (Data *) side2.is.hanging.quad[i]->p.user_data;
+			}
+		}
+
+		Edge<3> edge = getEdge(side1.edge);
+
+		data->pinfo->edge_nbr_info[edge.getIndex()] = make_unique<FineNbrInfo<2>>();
+		for (int i = 0; i < 2; i++) {
+			data->pinfo->getEdgeFineNbrInfo(edge).ids[i]   = nbr_datas[i]->id;
+			data->pinfo->getEdgeFineNbrInfo(edge).ranks[i] = nbr_datas[i]->rank;
+		}
+	}
+}
+
+/**
+ * @brief Set the EdgeNormalNbrInfo on side1
+ *
+ * @param side1
+ * @param side2
+ * @param ghost_data
+ */
+void addEdgeNormalNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_edge_side_t &side2, Data *ghost_data)
+{
+	if (!side1.is.full.is_ghost) {
+		Data *data = (Data *) side1.is.full.quad->p.user_data;
+		Data *nbr_data;
+		if (side2.is.full.is_ghost) {
+			nbr_data = ghost_data + side2.is.full.quadid;
+		} else {
+			nbr_data = (Data *) side2.is.full.quad->p.user_data;
+		}
+
+		Edge<3> edge = getEdge(side1.edge);
+
+		data->pinfo->edge_nbr_info[edge.getIndex()]  = make_unique<NormalNbrInfo<2>>(nbr_data->id);
+		data->pinfo->getEdgeNormalNbrInfo(edge).rank = nbr_data->rank;
+	}
+}
+
+/**
+ * @brief Add information from side2 to NbrInfo objects on side1
+ *
+ * @param side1
+ * @param side2
+ * @param ghost_data p8est ghost data array
+ */
+void addEdgeNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_edge_side_t &side2, Data *ghost_data)
+{
+	if (side1.is_hanging) {
+		addEdgeCoarseNbrInfo(side1, side2, ghost_data);
+	} else if (side2.is_hanging) {
+		addEdgeFineNbrInfo(side1, side2, ghost_data);
+	} else {
+		addEdgeNormalNbrInfo(side1, side2, ghost_data);
+	}
+}
+
+/**
+ * @brief set the CornerFineNbrInfo on side1
+ *
+ * @param side1
+ * @param side2
+ * @param ghost_data
+ */
+void addCornerFineNbrInfo(const p8est_iter_corner_side_t &side1, const p8est_iter_corner_side_t &side2, Data *ghost_data)
+{
+	if (!side1.is_ghost) {
+		Data *data = (Data *) side1.quad->p.user_data;
+		Data *nbr_data;
+		if (side2.is_ghost) {
+			nbr_data = ghost_data + side2.quadid;
+		} else {
+			nbr_data = (Data *) side2.quad->p.user_data;
+		}
+
+		Corner<3> corner(side1.corner);
+
+		data->pinfo->corner_nbr_info[corner.getIndex()]    = make_unique<FineNbrInfo<1>>();
+		data->pinfo->getCornerFineNbrInfo(corner).ids[0]   = nbr_data->id;
+		data->pinfo->getCornerFineNbrInfo(corner).ranks[0] = nbr_data->rank;
+	}
+}
+
+/**
+ * @brief set the CornerCoarseNbrInfos on side1
+ *
+ * @param side1
+ * @param side2
+ * @param ghost_data
+ */
+void addCornerCoarseNbrInfo(const p8est_iter_corner_side_t &side1, const p8est_iter_corner_side_t &side2, Data *ghost_data)
+{
+	if (!side1.is_ghost) {
+		const Data *nbr_data;
+		if (side2.is_ghost) {
+			nbr_data = ghost_data + side2.quadid;
+		} else {
+			nbr_data = (Data *) side2.quad->p.user_data;
+		}
+		Data *data = (Data *) side1.quad->p.user_data;
+
+		Corner<3> corner(side1.corner);
+
+		data->pinfo->corner_nbr_info[corner.getIndex()]  = make_unique<CoarseNbrInfo<1>>();
+		data->pinfo->getCornerCoarseNbrInfo(corner).id   = nbr_data->id;
+		data->pinfo->getCornerCoarseNbrInfo(corner).rank = nbr_data->rank;
+	}
+}
+
+/**
+ * @brief Set the CornerNormalNbrInfo on side1
+ *
+ * @param side1
+ * @param side2
+ * @param ghost_data
+ */
+void addCornerNormalNbrInfo(const p8est_iter_corner_side_t &side1, const p8est_iter_corner_side_t &side2, Data *ghost_data)
+{
+	if (!side1.is_ghost) {
+		Data *data = (Data *) side1.quad->p.user_data;
+		Data *nbr_data;
+		if (side2.is_ghost) {
+			nbr_data = ghost_data + side2.quadid;
+		} else {
+			nbr_data = (Data *) side2.quad->p.user_data;
+		}
+
+		Corner<3> corner(side1.corner);
+
+		data->pinfo->corner_nbr_info[corner.getIndex()]  = make_unique<NormalNbrInfo<1>>(nbr_data->id);
+		data->pinfo->getCornerNormalNbrInfo(corner).rank = nbr_data->rank;
+	}
+}
+
+/**
+ * @brief Add information from side2 to NbrInfo objects on side1
+ *
+ * @param side1
+ * @param side2
+ * @param ghost_data p8est ghost data array
+ */
+void addCornerNbrInfo(const p8est_iter_corner_side_t &side1, const p8est_iter_corner_side_t &side2, Data *ghost_data)
+{
+	if (side1.quad->level > side2.quad->level) {
+		addCornerCoarseNbrInfo(side1, side2, ghost_data);
+	} else if (side1.quad->level < side2.quad->level) {
+		addCornerFineNbrInfo(side1, side2, ghost_data);
+	} else {
+		addCornerNormalNbrInfo(side1, side2, ghost_data);
+	}
+}
 } // namespace
 
 void P8estDomainGenerator::linkNeighbors()
 {
-	p8est_ghost_t *ghost = p8est_ghost_new(my_p8est, P8EST_CONNECT_FACE);
+	p8est_ghost_t *ghost = p8est_ghost_new(my_p8est, P8EST_CONNECT_CORNER);
 
 	Data ghost_data[ghost->ghosts.elem_count];
 	p8est_ghost_exchange_data(my_p8est, ghost, ghost_data);
@@ -431,6 +708,27 @@ void P8estDomainGenerator::linkNeighbors()
 			p8est_iter_face_side_t side2 = ((p8est_iter_face_side_t *) info->sides.array)[1];
 			addNbrInfo(side1, side2, ghost_data);
 			addNbrInfo(side2, side1, ghost_data);
+		}
+	},
+	[&](p8est_iter_edge_info *info) {
+		if (info->sides.elem_count == 4) {
+			p8est_iter_edge_side_t side1 = ((p8est_iter_edge_side_t *) info->sides.array)[0];
+			p8est_iter_edge_side_t side2 = ((p8est_iter_edge_side_t *) info->sides.array)[1];
+			p8est_iter_edge_side_t side3 = ((p8est_iter_edge_side_t *) info->sides.array)[2];
+			p8est_iter_edge_side_t side4 = ((p8est_iter_edge_side_t *) info->sides.array)[3];
+			addEdgeNbrInfo(side1, side4, ghost_data);
+			addEdgeNbrInfo(side4, side1, ghost_data);
+			addEdgeNbrInfo(side2, side3, ghost_data);
+			addEdgeNbrInfo(side3, side2, ghost_data);
+		}
+	},
+	[&](p8est_iter_corner_info *info) {
+		if (info->sides.elem_count == 8) {
+			for (Corner<3> c : Corner<3>::getValues()) {
+				p8est_iter_corner_side_t side1 = ((p8est_iter_corner_side_t *) info->sides.array)[c.getIndex()];
+				p8est_iter_corner_side_t side2 = ((p8est_iter_corner_side_t *) info->sides.array)[c.opposite().getIndex()];
+				addCornerNbrInfo(side1, side2, ghost_data);
+			}
 		}
 	},
 	false);
@@ -448,6 +746,8 @@ std::map<int, std::shared_ptr<PatchInfo<3>>> P8estDomainGenerator::getPatchInfos
 		Data *data                 = (Data *) info->quad->p.user_data;
 		pinfo_map[data->pinfo->id] = shared_ptr<PatchInfo<3>>(data->pinfo);
 	},
+	nullptr,
+	nullptr,
 	nullptr,
 	false);
 

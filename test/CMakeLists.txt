@@ -70,6 +70,9 @@ function(add_mpi_test ARG1)
     target_link_libraries(unit_tests_mpi${ARG1} ThunderEgg Catch2)
     target_include_directories(unit_tests_mpi${ARG1}
                                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    if(TARGET P4EST::P4EST)
+      set_source_files_properties(test.cpp PROPERTIES COMPILE_FLAGS "-DTEST_P4EST")
+    ENDIF(TARGET P4EST::P4EST)
     parseandaddcatchtests(unit_tests_mpi${ARG1})
   endif()
 

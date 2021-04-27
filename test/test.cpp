@@ -1,9 +1,15 @@
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch_session.hpp>
 #include <mpi.h>
+#if TEST_P4EST
+#include <sc.h>
+#endif
 
 int main(int argc, char *argv[])
 {
+#if TEST_P4EST
+	sc_set_log_defaults(NULL, NULL, SC_LP_SILENT);
+#endif
 	// global setup...
 	MPI_Init(nullptr, nullptr);
 
