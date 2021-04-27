@@ -13,7 +13,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev 
+        sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build
         echo $HOME/.local/bin >> $GITHUB_PATH
         pip install gcovr
     - name: Install Sonar Build Wrapper
@@ -32,9 +32,9 @@ jobs:
       with:
         fetch-depth: 0
     - name: Cmake Configure
-      run: cmake -Dunit_tests=ON -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ .
+      run: cmake -Dunit_tests=ON -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ -GNinja .
     - name: Build
-      run: build-wrapper-linux-x86-64 --out-dir bw-output make
+      run: build-wrapper-linux-x86-64 --out-dir bw-output ninja
     - name: Run Tests
       run: ctest --output-on-failure
     - name: Generate Coverage Report
