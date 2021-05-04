@@ -248,9 +248,7 @@ void FillBlockColumnForCoarseToFineInterface(int                                
 	vector<double>            ghosts(n);
 	std::vector<LocalData<2>> us        = {u};
 	std::vector<LocalData<2>> nbr_datas = {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
-	std::vector<Side<2>>      sides     = {s};
-	ghost_filler->fillGhostCellsForNbrPatch(
-	new_pinfo, us, nbr_datas, sides, NbrType::Fine, Orthant<2>::getValuesOnSide(s)[type.getOrthant().getIndex()]);
+	ghost_filler->fillGhostCellsForNbrPatch(new_pinfo, us, nbr_datas, s, NbrType::Fine, type.getOrthant());
 	for (int i = 0; i < n; i++) {
 		block[i * n + j] = -ghosts[i] / 2;
 	}
@@ -281,9 +279,7 @@ void FillBlockColumnForFineToCoarseInterface(int                                
 	vector<double>            ghosts(n);
 	std::vector<LocalData<2>> us        = {u};
 	std::vector<LocalData<2>> nbr_datas = {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
-	std::vector<Side<2>>      sides     = {s};
-	ghost_filler->fillGhostCellsForNbrPatch(
-	new_pinfo, us, nbr_datas, sides, NbrType::Coarse, Orthant<2>::getValuesOnSide(s.opposite())[type.getOrthant().getIndex()]);
+	ghost_filler->fillGhostCellsForNbrPatch(new_pinfo, us, nbr_datas, s, NbrType::Coarse, type.getOrthant());
 	for (int i = 0; i < n; i++) {
 		block[i * n + j] = -ghosts[i] / 2;
 	}

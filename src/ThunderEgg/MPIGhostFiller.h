@@ -43,22 +43,22 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	struct RemoteCall {
 		std::shared_ptr<const PatchInfo<D>> pinfo;
-		const std::vector<Side<D>>          sides;
+		const Side<D>                       side;
 		const NbrType                       nbr_type;
-		const Orthant<D>                    orthant;
+		const Orthant<D - 1>                orthant;
 		int                                 local_index;
 		/**
 		 * @brief offset in buffer
 		 */
 		size_t offset;
 		RemoteCall(std::shared_ptr<const PatchInfo<D>> pinfo,
-		           const std::vector<Side<D>> &        sides,
+		           const Side<D> &                     side,
 		           const NbrType                       nbr_type,
-		           const Orthant<D>                    orthant,
+		           const Orthant<D - 1>                orthant,
 		           int                                 local_index,
 		           size_t                              offset)
 		: pinfo(pinfo),
-		  sides(sides),
+		  side(side),
 		  nbr_type(nbr_type),
 		  orthant(orthant),
 		  local_index(local_index),
@@ -71,19 +71,19 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	struct LocalCall {
 		std::shared_ptr<const PatchInfo<D>> pinfo;
-		const std::vector<Side<D>>          sides;
+		const Side<D>                       side;
 		const NbrType                       nbr_type;
-		const Orthant<D>                    orthant;
+		const Orthant<D - 1>                orthant;
 		int                                 local_index;
 		int                                 nbr_local_index;
 		LocalCall(std::shared_ptr<const PatchInfo<D>> pinfo,
-		          const std::vector<Side<D>> &        sides,
+		          const Side<D> &                     side,
 		          const NbrType                       nbr_type,
-		          const Orthant<D>                    orthant,
+		          const Orthant<D - 1>                orthant,
 		          int                                 local_index,
 		          size_t                              nbr_local_index)
 		: pinfo(pinfo),
-		  sides(sides),
+		  side(side),
 		  nbr_type(nbr_type),
 		  orthant(orthant),
 		  local_index(local_index),
@@ -124,11 +124,11 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @brief Get the LocalData object for the buffer
 	 *
 	 * @param buffer_ptr pointer to the ghost cells position in the buffer
-	 * @param sides  the side(s) that the ghost cells are on
+	 * @param side  the side that the ghost cells are on
 	 * @param component_index  the component index
 	 * @return LocalData<D> the LocalData object
 	 */
-	LocalData<D> getLocalDataForBuffer(double *buffer_ptr, const std::vector<Side<D>> sides, int component_index) const
+	LocalData<D> getLocalDataForBuffer(double *buffer_ptr, Side<D> side, int component_index) const
 	{
 		auto ns              = domain->getNs();
 		int  num_ghost_cells = domain->getNumGhostCells();
@@ -136,19 +136,19 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		std::array<int, D> strides;
 		strides[0] = 1;
 		for (size_t i = 1; i < D; i++) {
-			if (i - 1 == sides[0].getAxisIndex()) {
+			if (i - 1 == side.getAxisIndex()) {
 				strides[i] = num_ghost_cells * strides[i - 1];
 			} else {
 				strides[i] = ns[i - 1] * strides[i - 1];
 			}
 		}
-		int size = D - 1 == sides[0].getAxisIndex() ? (num_ghost_cells * strides[D - 1]) : (ns[D - 1] * strides[D - 1]);
+		int size = D - 1 == side.getAxisIndex() ? (num_ghost_cells * strides[D - 1]) : (ns[D - 1] * strides[D - 1]);
 		// transform buffer ptr so that it points to first non-ghost cell
 		double *transformed_buffer_ptr = buffer_ptr + size * component_index;
-		if (sides[0].isLowerOnAxis()) {
-			transformed_buffer_ptr -= (-num_ghost_cells) * strides[sides[0].getAxisIndex()];
+		if (side.isLowerOnAxis()) {
+			transformed_buffer_ptr -= (-num_ghost_cells) * strides[side.getAxisIndex()];
 		} else {
-			transformed_buffer_ptr -= ns[sides[0].getAxisIndex()] * strides[sides[0].getAxisIndex()];
+			transformed_buffer_ptr -= ns[side.getAxisIndex()] * strides[side.getAxisIndex()];
 		}
 
 		LocalData<D> buffer_data(transformed_buffer_ptr, strides, ns, num_ghost_cells);
@@ -177,21 +177,19 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	void processRecvs(std::vector<MPI_Request> &requests, std::vector<std::vector<double>> &buffers, std::shared_ptr<const Vector<D>> u) const
 	{
-		size_t               num_requests = requests.size();
-		std::vector<Side<D>> sides(1);
+		size_t num_requests = requests.size();
 		for (size_t i = 0; i < num_requests; i++) {
 			int finished_index;
 			MPI_Waitany(requests.size(), requests.data(), &finished_index, MPI_STATUS_IGNORE);
 			for (auto t : incoming_ghosts[finished_index]) {
-				int     local_index  = std::get<0>(t);
-				Side<D> side         = std::get<1>(t);
-				sides[0]             = std::get<1>(t);
-				size_t buffer_offset = std::get<2>(t);
+				int     local_index   = std::get<0>(t);
+				Side<D> side          = std::get<1>(t);
+				size_t  buffer_offset = std::get<2>(t);
 
 				for (int c = 0; c < u->getNumComponents(); c++) {
 					const LocalData<D> local_data  = u->getLocalData(c, local_index);
 					double *           buffer_ptr  = buffers[finished_index].data() + buffer_offset * u->getNumComponents();
-					LocalData<D>       buffer_data = getLocalDataForBuffer(buffer_ptr, sides, c);
+					LocalData<D>       buffer_data = getLocalDataForBuffer(buffer_ptr, side, c);
 					for (int ig = 0; ig < domain->getNumGhostCells(); ig++) {
 						LocalData<D - 1> local_slice  = local_data.getGhostSliceOnSide(side, ig + 1);
 						LocalData<D - 1> buffer_slice = buffer_data.getGhostSliceOnSide(side, ig + 1);
@@ -213,21 +211,20 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	std::vector<MPI_Request> postSends(std::vector<std::vector<double>> &buffers, std::shared_ptr<const Vector<D>> u) const
 	{
 		std::vector<MPI_Request> send_requests(send_buff_lengths.size());
-		std::vector<Side<D>>     sides(1);
 		for (size_t i = 0; i < remote_calls.size(); i++) {
 			for (const RemoteCall &call : remote_calls[i]) {
-				sides[0]            = call.sides[0].opposite();
+				Side<D> side        = call.side.opposite();
 				auto    local_datas = u->getLocalDatas(call.local_index);
 				double *buffer_ptr  = buffers[i].data() + call.offset * u->getNumComponents();
 
 				// create LocalData objects for the buffer
 				std::vector<LocalData<D>> buffer_datas(u->getNumComponents());
 				for (int c = 0; c < u->getNumComponents(); c++) {
-					buffer_datas[c] = getLocalDataForBuffer(buffer_ptr, sides, c);
+					buffer_datas[c] = getLocalDataForBuffer(buffer_ptr, side, c);
 				}
 
 				// make the call
-				fillGhostCellsForNbrPatch(call.pinfo, local_datas, buffer_datas, call.sides, call.nbr_type, call.orthant);
+				fillGhostCellsForNbrPatch(call.pinfo, local_datas, buffer_datas, call.side, call.nbr_type, call.orthant);
 			}
 			MPI_Isend(buffers[i].data(), buffers[i].size(), MPI_DOUBLE, index_rank_map[i], 0, MPI_COMM_WORLD, &send_requests[i]);
 		}
@@ -256,8 +253,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		// rank nbr_id side orthant nbrtype pinfo local_index
-		std::set<std::tuple<int, int, const std::vector<Side<D>>, const Orthant<D>, const NbrType, std::shared_ptr<const PatchInfo<D>>, int>>
-		remote_call_set;
+		std::set<std::tuple<int, int, const Side<D>, const Orthant<D - 1>, const NbrType, std::shared_ptr<const PatchInfo<D>>, int>> remote_call_set;
 		// rank id side local index
 		std::set<std::tuple<int, int, const Side<D>, int>> incoming_ghost_set;
 
@@ -276,44 +272,41 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		std::set<int> ranks;
 		for (auto pinfo : domain->getPatchInfoVector()) {
 			for (Side<D> s : Side<D>::getValues()) {
-				std::vector<Side<D>> sides{s};
-				std::vector<Side<D>> sides_opposite{s.opposite()};
 				if (pinfo->hasNbr(s)) {
 					switch (pinfo->getNbrType(s)) {
 						case NbrType::Normal: {
 							auto nbrinfo = pinfo->getNormalNbrInfo(s);
 							if (nbrinfo.rank == rank) {
-								local_calls.emplace_back(pinfo, sides, NbrType::Normal, Orthant<D>::null(), pinfo->local_index, nbrinfo.local_index);
+								local_calls.emplace_back(pinfo, s, NbrType::Normal, Orthant<D - 1>::null(), pinfo->local_index, nbrinfo.local_index);
 							} else {
 								ranks.insert(nbrinfo.rank);
 								remote_call_set.emplace(
-								nbrinfo.rank, nbrinfo.id, sides_opposite, Orthant<D>::null(), NbrType::Normal, pinfo, pinfo->local_index);
+								nbrinfo.rank, nbrinfo.id, s.opposite(), Orthant<D - 1>::null(), NbrType::Normal, pinfo, pinfo->local_index);
 								incoming_ghost_set.emplace(nbrinfo.rank, pinfo->id, s, pinfo->local_index);
 							}
 						} break;
 						case NbrType::Fine: {
-							auto nbrinfo  = pinfo->getFineNbrInfo(s);
-							auto orthants = Orthant<D>::getValuesOnSide(s);
-							for (size_t i = 0; i < orthants.size(); i++) {
+							auto nbrinfo = pinfo->getFineNbrInfo(s);
+							for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
 								if (nbrinfo.ranks[i] == rank) {
-									local_calls.emplace_back(pinfo, sides, NbrType::Fine, orthants[i], pinfo->local_index, nbrinfo.local_indexes[i]);
+									local_calls.emplace_back(
+									pinfo, s, NbrType::Fine, Orthant<D - 1>(i), pinfo->local_index, nbrinfo.local_indexes[i]);
 								} else {
 									ranks.insert(nbrinfo.ranks[i]);
 									remote_call_set.emplace(
-									nbrinfo.ranks[i], nbrinfo.ids[i], sides_opposite, orthants[i], NbrType::Fine, pinfo, pinfo->local_index);
+									nbrinfo.ranks[i], nbrinfo.ids[i], s.opposite(), Orthant<D - 1>(i), NbrType::Fine, pinfo, pinfo->local_index);
 									incoming_ghost_set.emplace(nbrinfo.ranks[i], pinfo->id, s, pinfo->local_index);
 								}
 							}
 						} break;
 						case NbrType::Coarse: {
 							auto nbrinfo = pinfo->getCoarseNbrInfo(s);
-							auto orthant = Orthant<D>::getValuesOnSide(s.opposite())[nbrinfo.orth_on_coarse.getIndex()];
 							if (nbrinfo.rank == rank) {
-								local_calls.emplace_back(pinfo, sides, NbrType::Coarse, orthant, pinfo->local_index, nbrinfo.local_index);
+								local_calls.emplace_back(pinfo, s, NbrType::Coarse, nbrinfo.orth_on_coarse, pinfo->local_index, nbrinfo.local_index);
 							} else {
 								ranks.insert(nbrinfo.rank);
 								remote_call_set.emplace(
-								nbrinfo.rank, nbrinfo.id, sides_opposite, orthant, NbrType::Coarse, pinfo, pinfo->local_index);
+								nbrinfo.rank, nbrinfo.id, s.opposite(), nbrinfo.orth_on_coarse, NbrType::Coarse, pinfo, pinfo->local_index);
 								incoming_ghost_set.emplace(nbrinfo.rank, pinfo->id, s, pinfo->local_index);
 							}
 						} break;
@@ -335,7 +328,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		for (auto call : remote_call_set) {
 			int  local_buffer_index = rank_index_map[std::get<0>(call)];
 			int  id                 = std::get<1>(call);
-			auto side               = std::get<2>(call)[0].opposite();
+			auto side               = std::get<2>(call).opposite();
 			auto orthant            = std::get<3>(call);
 			auto nbr_type           = std::get<4>(call);
 			auto pinfo              = std::get<5>(call);
@@ -353,8 +346,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				send_buff_lengths[local_buffer_index] += length;
 			}
 
-			std::vector<Side<D>> sides{side};
-			remote_calls[local_buffer_index].emplace_back(pinfo, sides, nbr_type, orthant, local_index, offset);
+			remote_calls[local_buffer_index].emplace_back(pinfo, side, nbr_type, orthant, local_index, offset);
 			prev_id_side = std::make_tuple(id, side);
 		}
 		recv_buff_lengths.resize(ranks.size());
@@ -380,16 +372,48 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param local_datas the local data for patch that ghost cells are being filled from
 	 * @param nbr_datas  the local data for the neighboring patch, where ghost cells are being
 	 * filled.
-	 * @param sides the side(s) that the neighboring patch is on
+	 * @param side the side that the neighboring patch is on
 	 * @param nbr_type the type of neighbor
-	 * @param orthant the orthant that the neighbors ghost cells lie on
+	 * @param orthant_on_coarse the orthant that the neighbors ghost cells lie on if the neighbor is coarser
 	 */
 	virtual void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
 	                                       const std::vector<LocalData<D>> &   local_datas,
 	                                       const std::vector<LocalData<D>> &   nbr_datas,
-	                                       const std::vector<Side<D>> &        sides,
-	                                       const NbrType                       nbr_type,
-	                                       const Orthant<D>                    orthant) const = 0;
+	                                       Side<D>                             side,
+	                                       NbrType                             nbr_type,
+	                                       Orthant<D - 1>                      orthant_on_coarse) const = 0;
+	/**
+	 * @brief Fill the edge ghost cells for the neighboring patch
+	 *
+	 * @param pinfo the patch that ghost cells are being filled from
+	 * @param local_datas the local data for patch that ghost cells are being filled from
+	 * @param nbr_datas  the local data for the neighboring patch, where ghost cells are being
+	 * filled.
+	 * @param edge the edge that the neighboring patch is on
+	 * @param nbr_type the type of neighbor
+	 * @param orthant_on_coarse the orthant that the neighbors ghost cells lie on if the neighbor is coarser
+	 */
+	virtual void fillGhostCellsForEdgeNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                                           const std::vector<LocalData<D>> &   local_datas,
+	                                           const std::vector<LocalData<D>> &   nbr_datas,
+	                                           Edge<D>                             edge,
+	                                           NbrType                             nbr_type,
+	                                           Orthant<1>                          orthant_on_coarse) const = 0;
+	/**
+	 * @brief Fill the corner ghost cells for the neighboring patch
+	 *
+	 * @param pinfo the patch that ghost cells are being filled from
+	 * @param local_datas the local data for patch that ghost cells are being filled from
+	 * @param nbr_datas  the local data for the neighboring patch, where ghost cells are being
+	 * filled.
+	 * @param corner the edge that the neighboring patch is on
+	 * @param nbr_type the type of neighbor
+	 */
+	virtual void fillGhostCellsForCornerNbrPatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	                                             const std::vector<LocalData<D>> &   local_datas,
+	                                             const std::vector<LocalData<D>> &   nbr_datas,
+	                                             Corner<D>                           corner,
+	                                             NbrType                             nbr_type) const = 0;
 
 	/**
 	 * @brief Perform any on this patches ghost cells.
@@ -446,7 +470,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		for (const LocalCall &call : local_calls) {
 			auto local_datas = u->getLocalDatas(call.local_index);
 			auto nbr_datas   = u->getLocalDatas(call.nbr_local_index);
-			fillGhostCellsForNbrPatch(call.pinfo, local_datas, nbr_datas, call.sides, call.nbr_type, call.orthant);
+			fillGhostCellsForNbrPatch(call.pinfo, local_datas, nbr_datas, call.side, call.nbr_type, call.orthant);
 		}
 
 		processRecvs(recv_requests, recv_buffers, u);

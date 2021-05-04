@@ -118,9 +118,13 @@ template <int D> void to_json(nlohmann::json &j, const CoarseNbrInfo<D> &n)
 }
 template <int D> void from_json(const nlohmann::json &j, CoarseNbrInfo<D> &n)
 {
-	n.id             = j["ids"][0];
-	n.rank           = j["ranks"][0];
-	n.orth_on_coarse = j["orth_on_coarse"].get<Orthant<D - 1>>();
+	n.id   = j["ids"][0];
+	n.rank = j["ranks"][0];
+	if (j.contains("orth_on_coarse")) {
+		n.orth_on_coarse = j["orth_on_coarse"].get<Orthant<D - 1>>();
+	} else {
+		n.orth_on_coarse = Orthant<D - 1>::null();
+	}
 }
 } // namespace ThunderEgg
 #endif

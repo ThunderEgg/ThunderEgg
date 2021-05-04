@@ -24,8 +24,8 @@
 
 #include <algorithm>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -34,9 +34,9 @@ TEST_CASE(
 "Schur::Interface enumerateIfacesFromPiinfoVector refined interface on processor boundary",
 "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_east_on_1_mpi2.json", {10, 10},
-	                              0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                                    domain_reader("mesh_inputs/2d_refined_east_1x2_east_on_1_mpi2.json", {10, 10},
+                                  0);
+	auto                                               domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<const Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto &patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -305,8 +305,8 @@ TEST_CASE(
 TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on processor boundary",
           "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_uniform_1x2_east_on_1_mpi2.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                                    domain_reader("mesh_inputs/2d_uniform_1x2_east_on_1_mpi2.json", {10, 10}, 0);
+	auto                                               domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<const Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto &patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -371,8 +371,8 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
 }
 TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh", "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi2.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                                    domain_reader("mesh_inputs/2d_refined_complicated_mpi2.json", {10, 10}, 0);
+	auto                                               domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<const Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto &patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -393,10 +393,10 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh", "
 		for (auto piinfo : off_proc_piinfos) {
 			off_proc_patch_ids.insert(piinfo->pinfo->id);
 		}
-		CHECK(off_proc_patch_ids.count(26) == 1);
-		CHECK(off_proc_patch_ids.count(21) == 1);
-		CHECK(off_proc_patch_ids.count(17) == 1);
+		CHECK(off_proc_patch_ids.count(22) == 1);
 		CHECK(off_proc_patch_ids.count(20) == 1);
+		CHECK(off_proc_patch_ids.count(17) == 1);
+		CHECK(off_proc_patch_ids.count(33) == 1);
 	} else {
 		CHECK(ifaces.size() == 2);
 		CHECK(ifaces[1].size() == 12);
@@ -406,12 +406,12 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh", "
 		for (auto piinfo : off_proc_piinfos) {
 			off_proc_patch_ids.insert(piinfo->pinfo->id);
 		}
-		CHECK(off_proc_patch_ids.count(27) == 1);
+		CHECK(off_proc_patch_ids.count(23) == 1);
 		CHECK(off_proc_patch_ids.count(29) == 1);
 		CHECK(off_proc_patch_ids.count(30) == 1);
-		CHECK(off_proc_patch_ids.count(23) == 1);
-		CHECK(off_proc_patch_ids.count(22) == 1);
-		CHECK(off_proc_patch_ids.count(24) == 1);
-		CHECK(off_proc_patch_ids.count(6) == 1);
+		CHECK(off_proc_patch_ids.count(35) == 1);
+		CHECK(off_proc_patch_ids.count(34) == 1);
+		CHECK(off_proc_patch_ids.count(36) == 1);
+		CHECK(off_proc_patch_ids.count(10) == 1);
 	}
 }

@@ -117,26 +117,26 @@ void FillGhostForFineNbrUpper(const std::vector<LocalData<2>> &local_datas, cons
 void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
                                                        const std::vector<LocalData<2>> &   local_datas,
                                                        const std::vector<LocalData<2>> &   nbr_datas,
-                                                       const std::vector<Side<2>> &        sides,
-                                                       const NbrType                       nbr_type,
-                                                       const Orthant<2>                    orthant) const
+                                                       Side<2>                             side,
+                                                       NbrType                             nbr_type,
+                                                       Orthant<1>                          orthant) const
 {
 	switch (nbr_type) {
 		case NbrType::Normal:
-			FillGhostForNormalNbr(local_datas, nbr_datas, sides[0]);
+			FillGhostForNormalNbr(local_datas, nbr_datas, side);
 			break;
 		case NbrType::Coarse:
-			if (orthant.collapseOnAxis(sides[0].getAxisIndex()) == Orthant<1>::lower()) {
-				FillGhostForCoarseNbrLower(local_datas, nbr_datas, sides[0]);
+			if (orthant == Orthant<1>::lower()) {
+				FillGhostForCoarseNbrLower(local_datas, nbr_datas, side);
 			} else {
-				FillGhostForCoarseNbrUpper(local_datas, nbr_datas, sides[0]);
+				FillGhostForCoarseNbrUpper(local_datas, nbr_datas, side);
 			}
 			break;
 		case NbrType::Fine:
-			if (orthant.collapseOnAxis(sides[0].getAxisIndex()) == Orthant<1>::lower()) {
-				FillGhostForFineNbrLower(local_datas, nbr_datas, sides[0]);
+			if (orthant == Orthant<1>::lower()) {
+				FillGhostForFineNbrLower(local_datas, nbr_datas, side);
 			} else {
-				FillGhostForFineNbrUpper(local_datas, nbr_datas, sides[0]);
+				FillGhostForFineNbrUpper(local_datas, nbr_datas, side);
 			}
 			break;
 		default:
