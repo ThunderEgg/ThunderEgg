@@ -556,8 +556,8 @@ std::vector<std::shared_ptr<PatchInfo<2>>> P4estDomainGenerator::getPatchInfos()
 	my_p4est,
 	nullptr,
 	[&](p4est_iter_volume_info_t *info) {
-		Data *data           = (Data *) info->quad->p.user_data;
-		pinfos[info->quadid] = shared_ptr<PatchInfo<2>>(data->pinfo);
+		Data *data                                                                                        = (Data *) info->quad->p.user_data;
+		pinfos[p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset + info->quadid] = shared_ptr<PatchInfo<2>>(data->pinfo);
 	},
 	nullptr,
 	nullptr,
