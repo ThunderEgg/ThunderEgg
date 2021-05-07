@@ -46,11 +46,11 @@ template <int D> class CoarseNbrInfo : public NbrInfo<D>
 	/**
 	 * @brief The local index of the neighbor
 	 */
-	int local_index = 0;
+	int local_index = -1;
 	/**
 	 * @brief The global index of the neighbor
 	 */
-	int global_index = 0;
+	int global_index = -1;
 	/**
 	 * @brief The orthant that this patch in relation to the coarser patch's interface.
 	 */
@@ -72,25 +72,28 @@ template <int D> class CoarseNbrInfo : public NbrInfo<D>
 		this->id             = id;
 		this->orth_on_coarse = orth_on_coarse;
 	}
-	NbrType getNbrType()
+	NbrType getNbrType() const
 	{
 		return NbrType::Coarse;
 	}
-	void getNbrIds(std::deque<int> &nbr_ids)
+	void getNbrIds(std::deque<int> &nbr_ids) const
 	{
 		nbr_ids.push_back(id);
 	};
-	void getNbrRanks(std::deque<int> &nbr_ranks)
+	void getNbrRanks(std::deque<int> &nbr_ranks) const
 	{
 		nbr_ranks.push_back(rank);
 	}
-	void setGlobalIndexes(std::map<int, int> &rev_map)
+	void setGlobalIndexes(const std::map<int, int> &id_to_global_index_map)
 	{
-		global_index = rev_map.at(local_index);
+		global_index = id_to_global_index_map.at(id);
 	}
-	void setLocalIndexes(std::map<int, int> &rev_map)
+	void setLocalIndexes(const std::map<int, int> &id_to_local_index_map)
 	{
-		local_index = rev_map.at(id);
+		auto iter = id_to_local_index_map.find(id);
+		if (iter != id_to_local_index_map.end()) {
+			local_index = iter->second;
+		}
 	}
 	int serialize(char *buffer) const
 	{

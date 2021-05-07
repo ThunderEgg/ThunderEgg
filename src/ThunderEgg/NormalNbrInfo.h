@@ -45,11 +45,11 @@ template <int D> class NormalNbrInfo : public NbrInfo<D>
 	/**
 	 * @brief The local index of the neighbor
 	 */
-	int local_index = 0;
+	int local_index = -1;
 	/**
 	 * @brief The global index of the neighbor
 	 */
-	int global_index = 0;
+	int global_index = -1;
 	/**
 	 * @brief Construct a new empty NormalNbrInfo object
 	 */
@@ -64,25 +64,28 @@ template <int D> class NormalNbrInfo : public NbrInfo<D>
 	{
 		this->id = id;
 	}
-	NbrType getNbrType()
+	NbrType getNbrType() const
 	{
 		return NbrType::Normal;
 	}
-	void getNbrIds(std::deque<int> &nbr_ids)
+	void getNbrIds(std::deque<int> &nbr_ids) const
 	{
 		nbr_ids.push_back(id);
 	}
-	void getNbrRanks(std::deque<int> &nbr_ranks)
+	void getNbrRanks(std::deque<int> &nbr_ranks) const
 	{
 		nbr_ranks.push_back(rank);
 	}
-	void setGlobalIndexes(std::map<int, int> &rev_map)
+	void setGlobalIndexes(const std::map<int, int> &id_to_global_index_map)
 	{
-		global_index = rev_map.at(local_index);
+		global_index = id_to_global_index_map.at(id);
 	}
-	void setLocalIndexes(std::map<int, int> &rev_map)
+	void setLocalIndexes(const std::map<int, int> &id_to_local_index_map)
 	{
-		local_index = rev_map.at(id);
+		auto iter = id_to_local_index_map.find(id);
+		if (iter != id_to_local_index_map.end()) {
+			local_index = iter->second;
+		}
 	}
 	int serialize(char *buffer) const
 	{

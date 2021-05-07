@@ -58,8 +58,8 @@ template <int D> class FineNbrInfo : public NbrInfo<D>
 	{
 		ranks.fill(0);
 		ids.fill(0);
-		global_indexes.fill(0);
-		local_indexes.fill(0);
+		local_indexes.fill(-1);
+		global_indexes.fill(-1);
 	}
 	~FineNbrInfo() = default;
 	/**
@@ -67,37 +67,41 @@ template <int D> class FineNbrInfo : public NbrInfo<D>
 	 *
 	 * @param ids the ids of the neighbors
 	 */
-	FineNbrInfo(std::array<int, Orthant<D>::num_orthants / 2> ids)
+	FineNbrInfo(std::array<int, Orthant<D>::num_orthants / 2> ids) : ids(ids)
 	{
 		ranks.fill(0);
-		this->ids = ids;
+		local_indexes.fill(-1);
+		global_indexes.fill(-1);
 	}
-	NbrType getNbrType()
+	NbrType getNbrType() const
 	{
 		return NbrType::Fine;
 	}
-	void getNbrIds(std::deque<int> &nbr_ids)
+	void getNbrIds(std::deque<int> &nbr_ids) const
 	{
 		for (size_t i = 0; i < ids.size(); i++) {
 			nbr_ids.push_back(ids[i]);
 		}
 	};
-	void getNbrRanks(std::deque<int> &nbr_ranks)
+	void getNbrRanks(std::deque<int> &nbr_ranks) const
 	{
 		for (size_t i = 0; i < ranks.size(); i++) {
 			nbr_ranks.push_back(ranks[i]);
 		}
 	}
-	void setGlobalIndexes(std::map<int, int> &rev_map)
+	void setGlobalIndexes(const std::map<int, int> &id_to_global_index_map)
 	{
 		for (size_t i = 0; i < global_indexes.size(); i++) {
-			global_indexes[i] = rev_map.at(local_indexes[i]);
+			global_indexes[i] = id_to_global_index_map.at(ids[i]);
 		}
 	}
-	void setLocalIndexes(std::map<int, int> &rev_map)
+	void setLocalIndexes(const std::map<int, int> &id_to_local_index_map)
 	{
 		for (size_t i = 0; i < local_indexes.size(); i++) {
-			local_indexes[i] = rev_map.at(ids[i]);
+			auto iter = id_to_local_index_map.find(ids[i]);
+			if (iter != id_to_local_index_map.end()) {
+				local_indexes[i] = iter->second;
+			}
 		}
 	}
 	int serialize(char *buffer) const

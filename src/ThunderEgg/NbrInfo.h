@@ -44,27 +44,27 @@ template <int D> class NbrInfo : public Serializable
 	/**
 	 * @brief Get the NbrType
 	 */
-	virtual NbrType getNbrType() = 0;
+	virtual NbrType getNbrType() const = 0;
 	/**
 	 * @brief Add to a deque of neighbor ids
 	 */
-	virtual void getNbrIds(std::deque<int> &nbr_ids) = 0;
+	virtual void getNbrIds(std::deque<int> &nbr_ids) const = 0;
 	/**
 	 * @brief Add to a deque of neighbor ranks
 	 */
-	virtual void getNbrRanks(std::deque<int> &nbr_ranks) = 0;
+	virtual void getNbrRanks(std::deque<int> &nbr_ranks) const = 0;
 	/**
 	 * @brief Set the local indexes in the NbrInfo objects
 	 *
 	 * @param rev_map map from id to local_index
 	 */
-	virtual void setGlobalIndexes(std::map<int, int> &rev_map) = 0;
+	virtual void setGlobalIndexes(const std::map<int, int> &rev_map) = 0;
 	/**
 	 * @brief Set the global indexes in the NbrInfo objects
 	 *
 	 * @param rev_map map from local_index to global_index
 	 */
-	virtual void setLocalIndexes(std::map<int, int> &rev_map) = 0;
+	virtual void setLocalIndexes(const std::map<int, int> &rev_map) = 0;
 };
 } // namespace ThunderEgg
 #endif

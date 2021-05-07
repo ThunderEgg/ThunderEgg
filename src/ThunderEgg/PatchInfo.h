@@ -490,35 +490,53 @@ template <int D> struct PatchInfo : public Serializable {
 	/**
 	 * @brief Set the local indexes in the NbrInfo objects
 	 *
-	 * @param rev_map map from id to local_index
+	 * @param id_to_local_index_map map from id to local_index
 	 */
-	void setLocalNeighborIndexes(std::map<int, int> &rev_map)
+	void setNeighborLocalIndexes(const std::map<int, int> &id_to_local_index_map)
 	{
-		local_index = rev_map.at(id);
 		for (Side<D> s : Side<D>::getValues()) {
 			if (hasNbr(s)) {
-				nbr_info[s.getIndex()]->setLocalIndexes(rev_map);
+				nbr_info[s.getIndex()]->setLocalIndexes(id_to_local_index_map);
+			}
+		}
+		for (Edge<D> e : Edge<D>::getValues()) {
+			if (hasEdgeNbr(e)) {
+				edge_nbr_info[e.getIndex()]->setLocalIndexes(id_to_local_index_map);
+			}
+		}
+		for (Corner<D> c : Corner<D>::getValues()) {
+			if (hasCornerNbr(c)) {
+				corner_nbr_info[c.getIndex()]->setLocalIndexes(id_to_local_index_map);
 			}
 		}
 	}
 	/**
 	 * @brief Set the global indexes in the NbrInfo objects
 	 *
-	 * @param rev_map map form local_index to global_index
+	 * @param id_to_global_index_map map form id to global_index
 	 */
-	void setGlobalNeighborIndexes(std::map<int, int> &rev_map)
+	void setNeighborGlobalIndexes(const std::map<int, int> &id_to_global_index_map)
 	{
-		global_index = rev_map.at(local_index);
 		for (Side<D> s : Side<D>::getValues()) {
 			if (hasNbr(s)) {
-				nbr_info[s.getIndex()]->setGlobalIndexes(rev_map);
+				nbr_info[s.getIndex()]->setGlobalIndexes(id_to_global_index_map);
+			}
+		}
+		for (Edge<D> e : Edge<D>::getValues()) {
+			if (hasEdgeNbr(e)) {
+				edge_nbr_info[e.getIndex()]->setGlobalIndexes(id_to_global_index_map);
+			}
+		}
+		for (Corner<D> c : Corner<D>::getValues()) {
+			if (hasCornerNbr(c)) {
+				corner_nbr_info[c.getIndex()]->setGlobalIndexes(id_to_global_index_map);
 			}
 		}
 	}
 	/**
 	 * @brief return a vector of neighbor ids
 	 */
-	std::deque<int> getNbrIds()
+	std::deque<int> getNbrIds() const
 	{
 		std::deque<int> retval;
 		for (Side<D> s : Side<D>::getValues()) {
@@ -526,17 +544,37 @@ template <int D> struct PatchInfo : public Serializable {
 				nbr_info[s.getIndex()]->getNbrIds(retval);
 			}
 		}
+		for (Edge<D> e : Edge<D>::getValues()) {
+			if (hasEdgeNbr(e)) {
+				edge_nbr_info[e.getIndex()]->getNbrIds(retval);
+			}
+		}
+		for (Corner<D> c : Corner<D>::getValues()) {
+			if (hasCornerNbr(c)) {
+				corner_nbr_info[c.getIndex()]->getNbrIds(retval);
+			}
+		}
 		return retval;
 	}
 	/**
 	 * @brief return a vector of neighbor ranks
 	 */
-	std::deque<int> getNbrRanks()
+	std::deque<int> getNbrRanks() const
 	{
 		std::deque<int> retval;
 		for (Side<D> s : Side<D>::getValues()) {
 			if (hasNbr(s)) {
 				nbr_info[s.getIndex()]->getNbrRanks(retval);
+			}
+		}
+		for (Edge<D> e : Edge<D>::getValues()) {
+			if (hasEdgeNbr(e)) {
+				edge_nbr_info[e.getIndex()]->getNbrRanks(retval);
+			}
+		}
+		for (Corner<D> c : Corner<D>::getValues()) {
+			if (hasCornerNbr(c)) {
+				corner_nbr_info[c.getIndex()]->getNbrRanks(retval);
 			}
 		}
 		return retval;
