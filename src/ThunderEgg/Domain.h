@@ -205,18 +205,21 @@ template <int D> class Domain
 
 	public:
 	/**
-	 * @brief Construct a new Domain object with a given PatchInfo map.
+	 * @brief Construct a new Domain object
 	 *
+	 * @tparam InputIterator
 	 * @param id the id of the domain should be unique within a multigrid cycle
-	 *
-	 * @param pinfo_map map that goes from patch id to the PatchInfo pointer
+	 * @param ns the number of cells in each direction
+	 * @param num_ghost_cells the number of ghost cells on each side of the patch
+	 * @param first_pinfo start iterator for PatchInfo objects
+	 * @param last_pinfo end iterator for PatchInfo objects
 	 */
 	template <class InputIterator>
-	Domain(int id, std::array<int, D> ns_in, int num_ghost_cells_in, InputIterator first_pinfo, InputIterator last_pinfo)
+	Domain(int id, std::array<int, D> ns, int num_ghost_cells, InputIterator first_pinfo, InputIterator last_pinfo)
 	: id(id),
-	  ns(ns_in),
+	  ns(ns),
 	  pinfos(first_pinfo, last_pinfo),
-	  num_ghost_cells(num_ghost_cells_in)
+	  num_ghost_cells(num_ghost_cells)
 	{
 		num_cells_in_patch            = 1;
 		num_cells_in_patch_with_ghost = 1;
