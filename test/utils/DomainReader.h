@@ -56,20 +56,20 @@ class DomainReader
 		}
 		input_stream >> j;
 		input_stream.close();
-		std::map<int, std::shared_ptr<ThunderEgg::PatchInfo<D>>> finer_map;
+		std::deque<std::shared_ptr<ThunderEgg::PatchInfo<D>>> finer_patches;
 		for (nlohmann::json &patch_j : j.at("levels")[0]) {
 			auto patch = parsePatch(patch_j);
 			if (patch->rank == rank)
-				finer_map[patch->id] = patch;
+				finer_patches.push_back(patch);
 		}
-		finer_domain = std::make_shared<ThunderEgg::Domain<D>>(finer_map, ns, num_ghost);
-		std::map<int, std::shared_ptr<ThunderEgg::PatchInfo<D>>> coarser_map;
+		finer_domain = std::make_shared<ThunderEgg::Domain<D>>(0, ns, num_ghost, finer_patches.begin(), finer_patches.end());
+		std::deque<std::shared_ptr<ThunderEgg::PatchInfo<D>>> coarser_patches;
 		for (nlohmann::json &patch_j : j.at("levels")[1]) {
 			auto patch = parsePatch(patch_j);
 			if (patch->rank == rank)
-				coarser_map[patch->id] = patch;
+				coarser_patches.push_back(patch);
 		}
-		coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(coarser_map, ns, num_ghost);
+		coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(1, ns, num_ghost, coarser_patches.begin(), coarser_patches.end());
 	}
 	std::shared_ptr<ThunderEgg::Domain<D>> getCoarserDomain()
 	{

@@ -299,7 +299,6 @@ int main(int argc, char *argv[])
 	timer->start("Preconditioner Setup");
 
 	int domain_level = 0;
-	domain->setId(domain_level);
 	domain->setTimer(timer);
 	domain_level++;
 
@@ -338,7 +337,6 @@ int main(int argc, char *argv[])
 
 	//generate each of the middle levels
 	while (domain_generator->hasCoarserDomain()) {
-		current_domain->setId(domain_level);
 		current_domain->setTimer(timer);
 		domain_level++;
 
@@ -372,7 +370,6 @@ int main(int argc, char *argv[])
 		finer_domain   = current_domain;
 		current_domain = coarser_domain;
 	}
-	current_domain->setId(domain_level);
 	current_domain->setTimer(timer);
 
 	//add the coarsest level to the builder

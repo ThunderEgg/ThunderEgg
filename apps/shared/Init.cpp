@@ -23,7 +23,7 @@
 #include <algorithm>
 using namespace std;
 using namespace ThunderEgg;
-static void getXYZ(shared_ptr<PatchInfo<3>> pinfo, int xi, int yi, int zi, double &x, double &y,
+static void getXYZ(shared_ptr<const PatchInfo<3>> pinfo, int xi, int yi, int zi, double &x, double &y,
                    double &z)
 {
 	double h_x = pinfo->spacings[0];
@@ -52,7 +52,7 @@ static void getXYZ(shared_ptr<PatchInfo<3>> pinfo, int xi, int yi, int zi, doubl
 	}
 }
 
-inline int index(shared_ptr<PatchInfo<3>> pinfo, int xi, int yi, int zi)
+inline int index(shared_ptr<const PatchInfo<3>> pinfo, int xi, int yi, int zi)
 {
 	return xi + yi * pinfo->ns[0] + zi * pinfo->ns[0] * pinfo->ns[1];
 }

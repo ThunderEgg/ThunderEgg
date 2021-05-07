@@ -12,23 +12,23 @@ using namespace ThunderEgg;
 
 static Domain<2> GetDomain()
 {
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<shared_ptr<PatchInfo<2>>> pinfos(1);
 
 	int    n         = 10;
 	double spacing   = 0.01;
 	int    num_ghost = 1;
 
-	pinfo_map[0].reset(new PatchInfo<2>());
-	pinfo_map[0]->id = 0;
-	pinfo_map[0]->ns.fill(n);
-	pinfo_map[0]->spacings.fill(spacing);
-	pinfo_map[0]->num_ghost_cells = num_ghost;
+	pinfos[0].reset(new PatchInfo<2>());
+	pinfos[0]->id = 0;
+	pinfos[0]->ns.fill(n);
+	pinfos[0]->spacings.fill(spacing);
+	pinfos[0]->num_ghost_cells = num_ghost;
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	pinfo_map[0]->rank = rank;
+	pinfos[0]->rank = rank;
 
-	Domain<2> d(pinfo_map, {n, n}, num_ghost);
+	Domain<2> d(1, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 	return d;
 }
 static int occurrences(const std::string &s, const std::string &target)

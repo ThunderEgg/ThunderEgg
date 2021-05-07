@@ -296,7 +296,6 @@ int main(int argc, char *argv[])
 			auto curr_domain = domain;
 
 			int domain_level = 0;
-			curr_domain->setId(domain_level);
 			curr_domain->setTimer(timer);
 			domain_level++;
 
@@ -311,7 +310,6 @@ int main(int argc, char *argv[])
 			auto prev_domain = curr_domain;
 			curr_domain      = next_domain;
 			while (dcg->hasCoarserDomain()) {
-				curr_domain->setId(domain_level);
 				curr_domain->setTimer(timer);
 				domain_level++;
 
@@ -336,7 +334,6 @@ int main(int argc, char *argv[])
 				prev_domain = curr_domain;
 				curr_domain = next_domain;
 			}
-			curr_domain->setId(domain_level);
 			curr_domain->setTimer(timer);
 
 			auto interpolator

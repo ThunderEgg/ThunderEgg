@@ -54,11 +54,11 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 */
 	p8est_t *my_p8est;
 	/**
-	 * @brief List of the domains
+	 * @brief List of the domain patches
 	 *
 	 * Finesr domain is stored in back
 	 */
-	std::list<std::shared_ptr<Domain<3>>> domains;
+	std::list<std::vector<std::shared_ptr<PatchInfo<3>>>> domain_patches;
 
 	/**
 	 * @brief The dimensions of each patch
@@ -78,6 +78,11 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 * @brief The block Mapping function being used.
 	 */
 	BlockMapFunc bmf;
+
+	/**
+	 * @brief The id to set the next domain with
+	 */
+	int id = 0;
 
 	/**
 	 * @brief Get a new coarser level and add it to the end of domain_list
@@ -104,7 +109,7 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 *
 	 * @return the PatchInfo objects
 	 */
-	std::map<int, std::shared_ptr<PatchInfo<3>>> getPatchInfos();
+	std::vector<std::shared_ptr<PatchInfo<3>>> getPatchInfos();
 
 	/**
 	 * @brief update the parent_rank for the previous domain

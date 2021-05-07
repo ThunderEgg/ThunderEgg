@@ -75,22 +75,14 @@ template <int D> class Domain
 	 */
 	int num_cells_in_patch_with_ghost;
 	/**
-	 * @brief Map that goes form patch's id to the PatchInfo pointer
-	 */
-	std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_id_map;
-	/**
 	 * @brief Vector of PatchInfo pointers where index in the vector corresponds to the patch's
 	 * local index
 	 */
-	std::vector<std::shared_ptr<PatchInfo<D>>> pinfo_vector;
+	std::vector<std::shared_ptr<PatchInfo<D>>> pinfos;
 	/**
 	 * @brief The global number of patches
 	 */
 	int global_num_patches = 1;
-	/**
-	 * @brief local number of boundary conditions in vector
-	 */
-	int local_num_bc = 4;
 	/**
 	 * @brief Vector of patch ids. Index corresponds to the patch's local index.
 	 */
@@ -144,42 +136,27 @@ template <int D> class Domain
 	 *
 	 * @param local_id_set true if local indexes are set by user.
 	 */
-	void indexDomainsLocal(bool local_id_set = false);
+	void indexDomainsLocal();
 	/**
 	 * @brief Give the patches global indexes
 	 *
 	 * @param global_id_set true if global indexes are set by user.
 	 */
-	void indexDomainsGlobal(bool global_id_set = false);
-
-	/**
-	 * @brief Give patches new global and local indexes
-	 *
-	 * @param local_id_set true if local indexes are set by user
-	 * @param global_id_set true if global indexes are set by user
-	 */
-	void reIndex(bool local_id_set, bool global_id_set)
-	{
-		indexDomainsLocal(local_id_set);
-		if (!global_id_set) {
-			indexDomainsGlobal();
-		}
-	}
+	void indexDomainsGlobal();
 
 	public:
 	/**
 	 * @brief Construct a new Domain object with a given PatchInfo map.
 	 *
+	 * @param id the id of the domain should be unique within a multigrid cycle
+	 *
 	 * @param pinfo_map map that goes from patch id to the PatchInfo pointer
-	 * @param local_id_set true if local indexes are set by user
-	 * @param global_id_set true if global indexes are set by user
 	 */
-	Domain(std::map<int, std::shared_ptr<PatchInfo<D>>> pinfo_map,
-	       std::array<int, D>                           ns_in,
-	       int                                          num_ghost_cells_in,
-	       bool                                         local_id_set  = false,
-	       bool                                         global_id_set = false)
-	: ns(ns_in),
+	template <class InputIterator>
+	Domain(int id, std::array<int, D> ns_in, int num_ghost_cells_in, InputIterator first_pinfo, InputIterator last_pinfo)
+	: id(id),
+	  ns(ns_in),
+	  pinfos(first_pinfo, last_pinfo),
 	  num_ghost_cells(num_ghost_cells_in)
 	{
 		num_cells_in_patch            = 1;
@@ -189,20 +166,13 @@ template <int D> class Domain
 			num_cells_in_patch_with_ghost *= (ns[i] + 2 * num_ghost_cells);
 		}
 
-		pinfo_id_map = pinfo_map;
+		// pinfo_id_map = pinfo_map;
 
-		int num_local_domains = pinfo_id_map.size();
+		int num_local_domains = pinfos.size();
 		MPI_Allreduce(&num_local_domains, &global_num_patches, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-		reIndex(local_id_set, global_id_set);
-	}
-	/**
-	 * @brief Get a vector of PatchInfo pointers where index in the vector corresponds to the
-	 * patch's local index
-	 */
-	std::vector<std::shared_ptr<PatchInfo<D>>> &getPatchInfoVector()
-	{
-		return pinfo_vector;
+		indexDomainsLocal();
+		indexDomainsGlobal();
 	}
 	/**
 	 * @brief Get a vector of PatchInfo pointers where index in the vector corresponds to the
@@ -210,21 +180,7 @@ template <int D> class Domain
 	 */
 	std::vector<std::shared_ptr<const PatchInfo<D>>> getPatchInfoVector() const
 	{
-		return std::vector<std::shared_ptr<const PatchInfo<D>>>(pinfo_vector.cbegin(), pinfo_vector.cend());
-	}
-	/**
-	 * @brief Get map that goes form patch's id to the PatchInfo pointer
-	 */
-	std::map<int, std::shared_ptr<PatchInfo<D>>> &getPatchInfoMap()
-	{
-		return pinfo_id_map;
-	}
-	/**
-	 * @brief Get map that goes form patch's id to the PatchInfo pointer
-	 */
-	std::map<int, std::shared_ptr<const PatchInfo<D>>> getPatchInfoMap() const
-	{
-		return std::map<int, std::shared_ptr<const PatchInfo<D>>>(pinfo_id_map.cbegin(), pinfo_id_map.cend());
+		return std::vector<std::shared_ptr<const PatchInfo<D>>>(pinfos.cbegin(), pinfos.cend());
 	}
 	/**
 	 * @brief Get a vector of patch ids. Index in vector corresponds to the patch's local index.
@@ -232,14 +188,6 @@ template <int D> class Domain
 	const std::vector<int> &getIdMapVec() const
 	{
 		return patch_id_map_vec;
-	}
-	/**
-	 * @brief Get a vector of patch global indexes. Index in vector corresponds to the patch's
-	 * global index.
-	 */
-	const std::vector<int> &getGlobalIndexMapVec() const
-	{
-		return patch_global_index_map_vec;
 	}
 	/**
 	 * @brief Get the number of cells in each direction
@@ -261,7 +209,7 @@ template <int D> class Domain
 	 */
 	int getNumLocalPatches() const
 	{
-		return pinfo_vector.size();
+		return pinfos.size();
 	}
 	/**
 	 * @brief get the number of global cells
@@ -275,21 +223,14 @@ template <int D> class Domain
 	 */
 	int getNumLocalCells() const
 	{
-		return pinfo_id_map.size() * num_cells_in_patch;
+		return pinfos.size() * num_cells_in_patch;
 	}
 	/**
 	 * @brief Get get the number of local cells (including ghost cells)
 	 */
 	int getNumLocalCellsWithGhost() const
 	{
-		return pinfo_id_map.size() * num_cells_in_patch_with_ghost;
-	}
-	/**
-	 * @brief Get get the number of local boundary condition cells
-	 */
-	int getNumLocalBCCells() const
-	{
-		return local_num_bc * num_cells_in_patch / ns[0];
+		return pinfos.size() * num_cells_in_patch_with_ghost;
 	}
 	/**
 	 * @brief Get the number of cells in a patch
@@ -313,8 +254,8 @@ template <int D> class Domain
 	double volume() const
 	{
 		double sum = 0;
-		for (auto &p : pinfo_id_map) {
-			PatchInfo<D> &d         = *p.second;
+		for (auto &p : pinfos) {
+			PatchInfo<D> &d         = *p;
 			double        patch_vol = 1;
 			for (size_t i = 0; i < D; i++) {
 				patch_vol *= d.spacings[i] * d.ns[i];
@@ -335,8 +276,8 @@ template <int D> class Domain
 	{
 		double sum = 0;
 
-		for (auto &p : pinfo_id_map) {
-			PatchInfo<D> &d = *p.second;
+		for (auto &p : pinfos) {
+			PatchInfo<D> &d = *p;
 			for (int c = 0; c < u->getNumComponents(); c++) {
 				const LocalData<D> u_data = u->getLocalData(c, d.local_index);
 
@@ -381,15 +322,6 @@ template <int D> class Domain
 		return timer != nullptr;
 	}
 	/**
-	 * @brief Set the id of the domain
-	 *
-	 * @param new_id the new id of the domain
-	 */
-	void setId(int new_id)
-	{
-		id = new_id;
-	}
-	/**
 	 * @brief Get the domain's id
 	 *
 	 * @return int the id
@@ -400,90 +332,30 @@ template <int D> class Domain
 	}
 };
 
-template <int D> void Domain<D>::indexDomainsLocal(bool local_id_set)
+template <int D> void Domain<D>::indexDomainsLocal()
 {
-	std::vector<int>               map_vec;
+	int rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
 	std::vector<int>               in_off_proc_map_vec;
 	std::vector<int>               out_off_proc_map_vec;
 	std::set<std::tuple<int, int>> in_offs;
 	std::set<std::tuple<int, int>> out_offs;
-	std::map<int, int>             rev_map;
-	int                            curr_i = local_id_set ? pinfo_id_map.size() : 0;
-	if (local_id_set) {
-		if (!pinfo_id_map.empty()) {
-			std::set<int> todo;
-			map_vec.resize(pinfo_id_map.size());
-			for (auto &p : pinfo_id_map) {
-				todo.insert(p.first);
-				PatchInfo<D> &d        = *p.second;
-				map_vec[d.local_index] = d.id;
-			}
-			std::set<int> enqueued;
-			while (!todo.empty()) {
-				std::deque<int> queue;
-				queue.push_back(*todo.begin());
-				enqueued.insert(*todo.begin());
-				while (!queue.empty()) {
-					int i = queue.front();
-					todo.erase(i);
-					queue.pop_front();
-					PatchInfo<D> &d = *pinfo_id_map[i];
-					rev_map[i]      = d.local_index;
-					auto ranks      = d.getNbrRanks();
-					auto ids        = d.getNbrIds();
-					for (size_t idx = 0; idx < ranks.size(); idx++) {
-						int nbr_id = ids[idx];
-						int rank   = ranks[idx];
-						if (pinfo_id_map.count(nbr_id)) {
-							if (!enqueued.count(nbr_id)) {
-								enqueued.insert(nbr_id);
-								queue.push_back(nbr_id);
-							}
-						} else {
-							in_offs.insert(std::make_tuple(rank, nbr_id));
-							out_offs.insert(std::make_tuple(rank, i));
-						}
-					}
-				}
-			}
-		}
-	} else {
-		std::set<int> offs;
-		if (!pinfo_id_map.empty()) {
-			std::set<int> todo;
-			for (auto &p : pinfo_id_map) {
-				todo.insert(p.first);
-			}
-			std::set<int> enqueued;
-			while (!todo.empty()) {
-				std::deque<int> queue;
-				queue.push_back(*todo.begin());
-				enqueued.insert(*todo.begin());
-				while (!queue.empty()) {
-					int i = queue.front();
-					todo.erase(i);
-					queue.pop_front();
-					map_vec.push_back(i);
-					PatchInfo<D> &d = *pinfo_id_map[i];
-					rev_map[i]      = curr_i;
-					d.local_index   = curr_i;
-					curr_i++;
-					auto ranks = d.getNbrRanks();
-					auto ids   = d.getNbrIds();
-					for (size_t idx = 0; idx < ranks.size(); idx++) {
-						int nbr_id = ids[idx];
-						int rank   = ranks[idx];
-						if (pinfo_id_map.count(nbr_id)) {
-							if (!enqueued.count(nbr_id)) {
-								enqueued.insert(nbr_id);
-								queue.push_back(nbr_id);
-							}
-						} else {
-							in_offs.insert(std::make_tuple(rank, nbr_id));
-							out_offs.insert(std::make_tuple(rank, i));
-						}
-					}
-				}
+	std::map<int, int>             id_to_local_index_map;
+	int                            curr_i = 0;
+	for (auto &pinfo : pinfos) {
+		pinfo->local_index = curr_i;
+		curr_i++;
+		PatchInfo<D> &d             = *pinfo;
+		id_to_local_index_map[d.id] = d.local_index;
+		auto ranks                  = d.getNbrRanks();
+		auto ids                    = d.getNbrIds();
+		for (size_t idx = 0; idx < ranks.size(); idx++) {
+			int nbr_id   = ids[idx];
+			int nbr_rank = ranks[idx];
+			if (nbr_rank != rank) {
+				in_offs.insert(std::make_tuple(nbr_rank, nbr_id));
+				out_offs.insert(std::make_tuple(nbr_rank, d.id));
 			}
 		}
 	}
@@ -498,7 +370,7 @@ template <int D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 			in_off_proc_rank_size_vec.back()++;
 		}
 		in_off_proc_map_vec.push_back(id);
-		rev_map[id] = curr_i;
+		id_to_local_index_map[id] = curr_i;
 		curr_i++;
 	}
 	for (auto pair : out_offs) {
@@ -512,23 +384,19 @@ template <int D> void Domain<D>::indexDomainsLocal(bool local_id_set)
 		}
 		out_off_proc_map_vec.push_back(id);
 	}
-	// set local indexes
-	pinfo_vector.resize(pinfo_id_map.size());
-	for (auto &p : pinfo_id_map) {
-		p.second->setLocalNeighborIndexes(rev_map);
-		pinfo_vector[p.second->local_index] = p.second;
+	// set local indexes for neighbors
+	for (auto &pinfo : pinfos) {
+		pinfo->setNeighborLocalIndexes(id_to_local_index_map);
 	}
 	// domain_rev_map          = rev_map;
-	patch_global_index_map_vec          = map_vec;
-	patch_id_map_vec                    = map_vec;
 	this->in_off_proc_map_vec           = in_off_proc_map_vec;
 	this->out_off_proc_map_vec          = out_off_proc_map_vec;
 	patch_global_index_map_vec_off_proc = in_off_proc_map_vec;
 }
-template <int D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
+template <int D> void Domain<D>::indexDomainsGlobal()
 {
 	// global indices are going to be sequentially increasing with rank
-	int local_size = pinfo_id_map.size();
+	int local_size = pinfos.size();
 	int start_i;
 	MPI_Scan(&local_size, &start_i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 	start_i -= local_size;
@@ -538,7 +406,7 @@ template <int D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 	// prepare outgoing vector of data
 	std::vector<int> out_data = out_off_proc_map_vec;
 	for (size_t i = 0; i < out_data.size(); i++) {
-		out_data[i] = patch_global_index_map_vec[pinfo_id_map[out_data[i]]->local_index];
+		// out_data[i] = patch_global_index_map_vec[pinfo_id_map[out_data[i]]->local_index];
 	}
 	// send outgoing messages
 	using namespace std;
@@ -578,9 +446,9 @@ template <int D> void Domain<D>::indexDomainsGlobal(bool global_id_set)
 		rev_map[curr_pos] = i;
 		curr_pos++;
 	}
-	for (auto &p : pinfo_id_map) {
-		p.second->setGlobalNeighborIndexes(rev_map);
-	}
+	// for (auto &p : pinfo_id_map) {
+	// p.second->setNeighborGlobalIndexes(rev_map);
+	//}
 }
 template <int D> void to_json(nlohmann::json &j, const Domain<D> &domain)
 {

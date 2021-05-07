@@ -214,7 +214,7 @@ P8estDomainGenerator::~P8estDomainGenerator()
 
 void P8estDomainGenerator::extractLevel()
 {
-	if (domains.size() > 0) {
+	if (domain_patches.size() > 0) {
 		coarsenTree();
 	}
 
@@ -224,13 +224,9 @@ void P8estDomainGenerator::extractLevel()
 
 	linkNeighbors();
 
-	std::map<int, std::shared_ptr<PatchInfo<3>>> pinfo_map = getPatchInfos();
+	domain_patches.push_front(getPatchInfos());
 
-	std::shared_ptr<Domain<3>> domain = make_shared<Domain<3>>(pinfo_map, ns, num_ghost_cells, true);
-
-	domains.push_front(domain);
-
-	if (domains.size() == 2) {
+	if (domain_patches.size() == 2) {
 		updateParentRanksOfPreviousDomain();
 	}
 
@@ -736,35 +732,40 @@ void P8estDomainGenerator::linkNeighbors()
 	p8est_ghost_destroy(ghost);
 }
 
-std::map<int, std::shared_ptr<PatchInfo<3>>> P8estDomainGenerator::getPatchInfos()
+std::vector<std::shared_ptr<PatchInfo<3>>> P8estDomainGenerator::getPatchInfos()
 {
-	map<int, shared_ptr<PatchInfo<3>>> pinfo_map;
+	vector<shared_ptr<PatchInfo<3>>> pinfos(my_p8est->local_num_quadrants);
 	p8est_iterate_ext(
 	my_p8est,
 	nullptr,
 	[&](p8est_iter_volume_info_t *info) {
-		Data *data                 = (Data *) info->quad->p.user_data;
-		pinfo_map[data->pinfo->id] = shared_ptr<PatchInfo<3>>(data->pinfo);
+		Data *data           = (Data *) info->quad->p.user_data;
+		pinfos[info->quadid] = shared_ptr<PatchInfo<3>>(data->pinfo);
 	},
 	nullptr,
 	nullptr,
 	nullptr,
 	false);
 
-	return pinfo_map;
+	return pinfos;
 }
 
 void P8estDomainGenerator::updateParentRanksOfPreviousDomain()
 {
-	auto old_level = domains.back()->getPatchInfoMap();
-	auto new_level = domains.front()->getPatchInfoMap();
+	auto old_level = domain_patches.back();
+	auto new_level = domain_patches.front();
+
+	std::set<int> local_new_level_ids;
+	for (const auto &pinfo : new_level) {
+		local_new_level_ids.insert(pinfo->id);
+	}
+
 	// update parent ranks
 	std::map<int, int> id_rank_map;
 	// get outgoing information
 	std::map<int, std::set<int>> out_info;
-	for (auto pair : new_level) {
-		id_rank_map[pair.first] = my_p8est->mpirank;
-		const auto &pinfo       = pair.second;
+	for (const auto &pinfo : new_level) {
+		id_rank_map[pinfo->id] = my_p8est->mpirank;
 		for (int i = 0; i < 8; i++) {
 			if (pinfo->child_ranks[i] != -1 && pinfo->child_ranks[i] != my_p8est->mpirank) {
 				out_info[pinfo->child_ranks[i]].insert(pinfo->id);
@@ -773,9 +774,9 @@ void P8estDomainGenerator::updateParentRanksOfPreviousDomain()
 	}
 	// get incoming information
 	std::set<int> incoming_ids;
-	for (const auto &pair : old_level) {
-		if (!new_level.count(pair.second->parent_id)) {
-			incoming_ids.insert(pair.second->parent_id);
+	for (const auto &pinfo : old_level) {
+		if (!local_new_level_ids.count(pinfo->parent_id)) {
+			incoming_ids.insert(pinfo->parent_id);
 		}
 	}
 	// send info
@@ -809,8 +810,8 @@ void P8estDomainGenerator::updateParentRanksOfPreviousDomain()
 	// wait for all
 	MPI_Waitall(send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
 	// update rank info
-	for (auto &pair : old_level) {
-		pair.second->parent_rank = id_rank_map.at(pair.second->parent_id);
+	for (auto &pinfo : old_level) {
+		pinfo->parent_rank = id_rank_map.at(pinfo->parent_id);
 	}
 }
 
@@ -819,8 +820,9 @@ std::shared_ptr<Domain<3>> P8estDomainGenerator::getCoarserDomain()
 	if (curr_level >= 0) {
 		extractLevel();
 	}
-	shared_ptr<Domain<3>> domain = domains.back();
-	domains.pop_back();
+	std::shared_ptr<Domain<3>> domain = make_shared<Domain<3>>(id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
+	domain_patches.pop_back();
+	id++;
 	return domain;
 }
 
@@ -829,8 +831,9 @@ std::shared_ptr<Domain<3>> P8estDomainGenerator::getFinestDomain()
 	if (curr_level >= 0) {
 		extractLevel();
 	}
-	shared_ptr<Domain<3>> domain = domains.back();
-	domains.pop_back();
+	std::shared_ptr<Domain<3>> domain = make_shared<Domain<3>>(id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
+	domain_patches.pop_back();
+	id++;
 	return domain;
 }
 

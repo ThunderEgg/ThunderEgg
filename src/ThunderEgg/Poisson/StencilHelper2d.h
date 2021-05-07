@@ -48,7 +48,7 @@ class DirichletSH2d : public StencilHelper2d
 	int    stride;
 
 	public:
-	DirichletSH2d(PatchInfo<2> &d, Side<2> s)
+	DirichletSH2d(const PatchInfo<2> &d, Side<2> s)
 	{
 		double h   = 0;
 		int    idx = d.global_index * d.ns[0] * d.ns[1];
@@ -102,7 +102,7 @@ class NeumannSH2d : public StencilHelper2d
 	int    stride;
 
 	public:
-	NeumannSH2d(PatchInfo<2> &d, Side<2> s)
+	NeumannSH2d(const PatchInfo<2> &d, Side<2> s)
 	{
 		double h   = 0;
 		int    idx = d.global_index * d.ns[0] * d.ns[1];
@@ -157,7 +157,7 @@ class NormalSH2d : public StencilHelper2d
 	int    stride;
 
 	public:
-	NormalSH2d(PatchInfo<2> &d, Side<2> s)
+	NormalSH2d(const PatchInfo<2> &d, Side<2> s)
 	{
 		double h       = 0;
 		int    idx     = d.global_index * d.ns[0] * d.ns[1];
@@ -221,7 +221,7 @@ class CoarseSH2d : public StencilHelper2d
 	int                   stride;
 
 	public:
-	CoarseSH2d(PatchInfo<2> &d, Side<2> s)
+	CoarseSH2d(const PatchInfo<2> &d, Side<2> s)
 	{
 		double h             = 0;
 		int    idx           = d.global_index * d.ns[0] * d.ns[1];
@@ -338,7 +338,7 @@ class FineSH2d : public StencilHelper2d
 	bool                  end;
 
 	public:
-	FineSH2d(PatchInfo<2> &d, Side<2> s)
+	FineSH2d(const PatchInfo<2> &d, Side<2> s)
 	{
 		double h       = 0;
 		int    idx     = d.global_index * d.ns[0] * d.ns[1];
@@ -447,7 +447,7 @@ class FineSH2d : public StencilHelper2d
 	}
 };
 
-StencilHelper2d *getStencilHelper(PatchInfo<2> &d, Side<2> s, std::bitset<4> neumann)
+StencilHelper2d *getStencilHelper(const PatchInfo<2> &d, Side<2> s, std::bitset<4> neumann)
 {
 	StencilHelper2d *retval = nullptr;
 	if (d.hasNbr(s)) {

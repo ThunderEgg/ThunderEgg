@@ -3,8 +3,8 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/ValVectorGenerator.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
@@ -31,52 +31,52 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	};
 
 	/*
-	 *  3 | 4
+	 *  2 | 3
 	 *  --+---
-	 *  1 | 2
+	 *  0 | 1
 	 */
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<shared_ptr<PatchInfo<2>>> pinfos(4);
 
-	pinfo_map[1].reset(new PatchInfo<2>());
-	pinfo_map[1]->id              = 1;
-	pinfo_map[1]->ns              = {nx, ny};
-	pinfo_map[1]->spacings        = {lengthx / nx, lengthy / ny};
-	pinfo_map[1]->starts          = {startx, starty};
-	pinfo_map[1]->num_ghost_cells = num_ghost;
-	pinfo_map[1]->nbr_info[Side<2>::east().getIndex()].reset(new NormalNbrInfo<2>(2));
-	pinfo_map[1]->nbr_info[Side<2>::north().getIndex()].reset(new NormalNbrInfo<2>(3));
+	pinfos[0].reset(new PatchInfo<2>());
+	pinfos[0]->id              = 0;
+	pinfos[0]->ns              = {nx, ny};
+	pinfos[0]->spacings        = {lengthx / nx, lengthy / ny};
+	pinfos[0]->starts          = {startx, starty};
+	pinfos[0]->num_ghost_cells = num_ghost;
+	pinfos[0]->nbr_info[Side<2>::east().getIndex()].reset(new NormalNbrInfo<2>(1));
+	pinfos[0]->nbr_info[Side<2>::north().getIndex()].reset(new NormalNbrInfo<2>(2));
 
-	pinfo_map[2].reset(new PatchInfo<2>());
-	pinfo_map[2]->id              = 2;
-	pinfo_map[2]->ns              = {nx, ny};
-	pinfo_map[2]->spacings        = {lengthx / nx, lengthy / ny};
-	pinfo_map[2]->starts          = {startx + lengthx, starty};
-	pinfo_map[2]->num_ghost_cells = num_ghost;
-	pinfo_map[2]->nbr_info[Side<2>::west().getIndex()].reset(new NormalNbrInfo<2>(1));
-	pinfo_map[2]->nbr_info[Side<2>::north().getIndex()].reset(new NormalNbrInfo<2>(4));
+	pinfos[1].reset(new PatchInfo<2>());
+	pinfos[1]->id              = 1;
+	pinfos[1]->ns              = {nx, ny};
+	pinfos[1]->spacings        = {lengthx / nx, lengthy / ny};
+	pinfos[1]->starts          = {startx + lengthx, starty};
+	pinfos[1]->num_ghost_cells = num_ghost;
+	pinfos[1]->nbr_info[Side<2>::west().getIndex()].reset(new NormalNbrInfo<2>(0));
+	pinfos[1]->nbr_info[Side<2>::north().getIndex()].reset(new NormalNbrInfo<2>(3));
 
-	pinfo_map[3].reset(new PatchInfo<2>());
-	pinfo_map[3]->id              = 3;
-	pinfo_map[3]->ns              = {nx, ny};
-	pinfo_map[3]->spacings        = {lengthx / nx, lengthy / ny};
-	pinfo_map[3]->starts          = {startx, starty + lengthy};
-	pinfo_map[3]->num_ghost_cells = num_ghost;
-	pinfo_map[3]->nbr_info[Side<2>::east().getIndex()].reset(new NormalNbrInfo<2>(4));
-	pinfo_map[3]->nbr_info[Side<2>::south().getIndex()].reset(new NormalNbrInfo<2>(1));
+	pinfos[2].reset(new PatchInfo<2>());
+	pinfos[2]->id              = 2;
+	pinfos[2]->ns              = {nx, ny};
+	pinfos[2]->spacings        = {lengthx / nx, lengthy / ny};
+	pinfos[2]->starts          = {startx, starty + lengthy};
+	pinfos[2]->num_ghost_cells = num_ghost;
+	pinfos[2]->nbr_info[Side<2>::east().getIndex()].reset(new NormalNbrInfo<2>(3));
+	pinfos[2]->nbr_info[Side<2>::south().getIndex()].reset(new NormalNbrInfo<2>(0));
 
-	pinfo_map[4].reset(new PatchInfo<2>());
-	pinfo_map[4]->id              = 4;
-	pinfo_map[4]->ns              = {nx, ny};
-	pinfo_map[4]->spacings        = {lengthx / nx, lengthy / ny};
-	pinfo_map[4]->starts          = {startx + lengthx, starty + lengthy};
-	pinfo_map[4]->num_ghost_cells = num_ghost;
-	pinfo_map[4]->nbr_info[Side<2>::west().getIndex()].reset(new NormalNbrInfo<2>(3));
-	pinfo_map[4]->nbr_info[Side<2>::south().getIndex()].reset(new NormalNbrInfo<2>(2));
+	pinfos[3].reset(new PatchInfo<2>());
+	pinfos[3]->id              = 3;
+	pinfos[3]->ns              = {nx, ny};
+	pinfos[3]->spacings        = {lengthx / nx, lengthy / ny};
+	pinfos[3]->starts          = {startx + lengthx, starty + lengthy};
+	pinfos[3]->num_ghost_cells = num_ghost;
+	pinfos[3]->nbr_info[Side<2>::west().getIndex()].reset(new NormalNbrInfo<2>(2));
+	pinfos[3]->nbr_info[Side<2>::south().getIndex()].reset(new NormalNbrInfo<2>(1));
 
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[1]->ns, num_ghost, 1, 4));
+	new ValVector<2>(MPI_COMM_WORLD, pinfos[0]->ns, num_ghost, 1, 4));
 
 	DomainTools::SetValues<2>(d, vec, f);
 
@@ -86,10 +86,10 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	// patch 1
 	{
 		// check that center values weren't modified
-		auto patch_1 = vec->getLocalData(0, d->getPatchInfoMap()[1]->local_index);
+		auto patch_1 = vec->getLocalData(0, d->getPatchInfoVector()[0]->local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
-			DomainTools::GetRealCoord<2>(pinfo_map[1], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfos[1], coord, real_coord);
 			CHECK(patch_1[coord] == f(real_coord));
 		});
 		// check that west values are not modified
@@ -104,7 +104,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools::GetRealCoordGhost<2>(pinfo_map[1], {nx, coord[0]}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfos[1], {nx, coord[0]}, real_coord);
 				CHECK(east_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -120,7 +120,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools::GetRealCoordGhost<2>(pinfo_map[1], {coord[0], ny}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfos[1], {coord[0], ny}, real_coord);
 				CHECK(north_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -128,10 +128,10 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	// patch 2
 	{
 		// check that center values weren't modified
-		auto patch_2 = vec->getLocalData(0, d->getPatchInfoMap()[2]->local_index);
+		auto patch_2 = vec->getLocalData(0, d->getPatchInfoVector()[1]->local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
-			DomainTools::GetRealCoord<2>(pinfo_map[2], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfos[2], coord, real_coord);
 			CHECK(patch_2[coord] == f(real_coord));
 		});
 		// check that west values correct
@@ -140,7 +140,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools::GetRealCoordGhost<2>(pinfo_map[2], {-1, coord[0]}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfos[2], {-1, coord[0]}, real_coord);
 				CHECK(west_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -162,7 +162,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools::GetRealCoordGhost<2>(pinfo_map[2], {coord[0], ny}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfos[2], {coord[0], ny}, real_coord);
 				CHECK(north_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -170,10 +170,10 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	// patch 3
 	{
 		// check that center values weren't modified
-		auto patch_1 = vec->getLocalData(0, d->getPatchInfoMap()[3]->local_index);
+		auto patch_1 = vec->getLocalData(0, d->getPatchInfoVector()[2]->local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
-			DomainTools::GetRealCoord<2>(pinfo_map[3], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfos[3], coord, real_coord);
 			CHECK(patch_1[coord] == f(real_coord));
 		});
 		// check that west values are not modified
@@ -188,7 +188,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools::GetRealCoordGhost<2>(pinfo_map[3], {nx, coord[0]}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfos[3], {nx, coord[0]}, real_coord);
 				CHECK(east_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -198,7 +198,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools::GetRealCoordGhost<2>(pinfo_map[3], {coord[0], -1}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfos[3], {coord[0], -1}, real_coord);
 				CHECK(south_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -212,10 +212,10 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	// patch 4
 	{
 		// check that center values weren't modified
-		auto patch_2 = vec->getLocalData(0, d->getPatchInfoMap()[4]->local_index);
+		auto patch_2 = vec->getLocalData(0, d->getPatchInfoVector()[3]->local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
-			DomainTools::GetRealCoord<2>(pinfo_map[4], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfos[4], coord, real_coord);
 			CHECK(patch_2[coord] == f(real_coord));
 		});
 		// check that west values correct
@@ -224,7 +224,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools::GetRealCoordGhost<2>(pinfo_map[4], {-1, coord[0]}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfos[4], {-1, coord[0]}, real_coord);
 				CHECK(west_ghost[coord] == Approx(f(real_coord)));
 			});
 		}
@@ -240,7 +240,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 			nested_loop<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
-				DomainTools::GetRealCoordGhost<2>(pinfo_map[4], {coord[0], -1}, real_coord);
+				DomainTools::GetRealCoordGhost<2>(pinfos[4], {coord[0], -1}, real_coord);
 				CHECK(south_ghost[coord] == Approx(f(real_coord)));
 			});
 		}

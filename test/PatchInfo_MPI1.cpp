@@ -5,6 +5,551 @@
 using namespace std;
 using namespace ThunderEgg;
 
+TEST_CASE("PatchInfo getNbrIds NormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int> ids = pinfo.getNbrIds();
+
+	REQUIRE(ids.size() == 1);
+	CHECK(ids[0] == 2);
+}
+TEST_CASE("PatchInfo getNbrRanks NormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
+	nbr_info->rank             = 3;
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int> ranks = pinfo.getNbrRanks();
+
+	REQUIRE(ranks.size() == 1);
+	CHECK(ranks[0] == 3);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes exists NormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == 30);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist NormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[59] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == -1);
+}
+TEST_CASE("PatchInfo setNeighborGlobalIndexes exists NormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_global_index_map;
+	id_to_global_index_map[2] = 30;
+	pinfo.setNeighborGlobalIndexes(id_to_global_index_map);
+
+	CHECK(nbr_info->global_index == 30);
+}
+TEST_CASE("PatchInfo getNbrIds CoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int> ids = pinfo.getNbrIds();
+
+	REQUIRE(ids.size() == 1);
+	CHECK(ids[0] == 2);
+}
+TEST_CASE("PatchInfo getNbrRanks CoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
+	nbr_info->rank             = 3;
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int> ranks = pinfo.getNbrRanks();
+
+	REQUIRE(ranks.size() == 1);
+	CHECK(ranks[0] == 3);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes exists CoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == 30);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[59] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == -1);
+}
+TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_global_index_map;
+	id_to_global_index_map[2] = 30;
+	pinfo.setNeighborGlobalIndexes(id_to_global_index_map);
+
+	CHECK(nbr_info->global_index == 30);
+}
+TEST_CASE("PatchInfo getNbrIds FineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({1, 2, 3, 4});
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int> ids = pinfo.getNbrIds();
+
+	REQUIRE(ids.size() == 4);
+	CHECK(ids[0] == 1);
+	CHECK(ids[1] == 2);
+	CHECK(ids[2] == 3);
+	CHECK(ids[3] == 4);
+}
+TEST_CASE("PatchInfo getNbrRanks FineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({1, 2, 3, 4});
+	nbr_info->ranks          = {3, 4, 6, 7};
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int> ranks = pinfo.getNbrRanks();
+
+	REQUIRE(ranks.size() == 4);
+	CHECK(ranks[0] == 3);
+	CHECK(ranks[1] == 4);
+	CHECK(ranks[2] == 6);
+	CHECK(ranks[3] == 7);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes exists FineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({2, 3, 4, 5});
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2] = 30;
+	id_to_local_index_map[3] = 31;
+	id_to_local_index_map[4] = 32;
+	id_to_local_index_map[5] = 33;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_indexes[0] == 30);
+	CHECK(nbr_info->local_indexes[1] == 31);
+	CHECK(nbr_info->local_indexes[2] == 32);
+	CHECK(nbr_info->local_indexes[3] == 33);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist FineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({2, 3, 4, 5});
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2]  = 30;
+	id_to_local_index_map[3]  = 31;
+	id_to_local_index_map[4]  = 32;
+	id_to_local_index_map[59] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_indexes[0] == 30);
+	CHECK(nbr_info->local_indexes[1] == 31);
+	CHECK(nbr_info->local_indexes[2] == 32);
+	CHECK(nbr_info->local_indexes[3] == -1);
+}
+TEST_CASE("PatchInfo setNeighborGlobalIndexes exists FineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({2, 3, 4, 5});
+	pinfo.nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_global_index_map;
+	id_to_global_index_map[2] = 30;
+	id_to_global_index_map[3] = 31;
+	id_to_global_index_map[4] = 32;
+	id_to_global_index_map[5] = 33;
+	pinfo.setNeighborGlobalIndexes(id_to_global_index_map);
+
+	CHECK(nbr_info->global_indexes[0] == 30);
+	CHECK(nbr_info->global_indexes[1] == 31);
+	CHECK(nbr_info->global_indexes[2] == 32);
+	CHECK(nbr_info->global_indexes[3] == 33);
+}
+TEST_CASE("PatchInfo getNbrIds EdgeNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int> ids = pinfo.getNbrIds();
+
+	REQUIRE(ids.size() == 1);
+	CHECK(ids[0] == 2);
+}
+TEST_CASE("PatchInfo getNbrRanks EdgeNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	nbr_info->rank             = 3;
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int> ranks = pinfo.getNbrRanks();
+
+	REQUIRE(ranks.size() == 1);
+	CHECK(ranks[0] == 3);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes exists EdgeNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == 30);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist EdgeNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[59] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == -1);
+}
+TEST_CASE("PatchInfo setNeighborGlobalIndexes exists EdgeNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_global_index_map;
+	id_to_global_index_map[2] = 30;
+	pinfo.setNeighborGlobalIndexes(id_to_global_index_map);
+
+	CHECK(nbr_info->global_index == 30);
+}
+TEST_CASE("PatchInfo getNbrIds EdgeCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int> ids = pinfo.getNbrIds();
+
+	REQUIRE(ids.size() == 1);
+	CHECK(ids[0] == 2);
+}
+TEST_CASE("PatchInfo getNbrRanks EdgeCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
+	nbr_info->rank             = 3;
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int> ranks = pinfo.getNbrRanks();
+
+	REQUIRE(ranks.size() == 1);
+	CHECK(ranks[0] == 3);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes exists EdgeCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == 30);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist EdgeCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[59] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == -1);
+}
+TEST_CASE("PatchInfo setNeighborGlobalIndexes exists EdgeCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_global_index_map;
+	id_to_global_index_map[2] = 30;
+	pinfo.setNeighborGlobalIndexes(id_to_global_index_map);
+
+	CHECK(nbr_info->global_index == 30);
+}
+TEST_CASE("PatchInfo getNbrIds EdgeFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({1, 2});
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int> ids = pinfo.getNbrIds();
+
+	REQUIRE(ids.size() == 2);
+	CHECK(ids[0] == 1);
+	CHECK(ids[1] == 2);
+}
+TEST_CASE("PatchInfo getNbrRanks EdgeFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({1, 2});
+	nbr_info->ranks          = {3, 4};
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int> ranks = pinfo.getNbrRanks();
+
+	REQUIRE(ranks.size() == 2);
+	CHECK(ranks[0] == 3);
+	CHECK(ranks[1] == 4);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes exists EdgeFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({2, 3});
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2] = 30;
+	id_to_local_index_map[3] = 31;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_indexes[0] == 30);
+	CHECK(nbr_info->local_indexes[1] == 31);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist EdgeFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({2, 3});
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2]  = 30;
+	id_to_local_index_map[59] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_indexes[0] == 30);
+	CHECK(nbr_info->local_indexes[1] == -1);
+}
+TEST_CASE("PatchInfo setNeighborGlobalIndexes exists EdgeFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({2, 3});
+	pinfo.edge_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_global_index_map;
+	id_to_global_index_map[2] = 30;
+	id_to_global_index_map[3] = 31;
+	pinfo.setNeighborGlobalIndexes(id_to_global_index_map);
+
+	CHECK(nbr_info->global_indexes[0] == 30);
+	CHECK(nbr_info->global_indexes[1] == 31);
+}
+TEST_CASE("PatchInfo getNbrIds CornerNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int> ids = pinfo.getNbrIds();
+
+	REQUIRE(ids.size() == 1);
+	CHECK(ids[0] == 2);
+}
+TEST_CASE("PatchInfo getNbrRanks CornerNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	nbr_info->rank             = 3;
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int> ranks = pinfo.getNbrRanks();
+
+	REQUIRE(ranks.size() == 1);
+	CHECK(ranks[0] == 3);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes exists CornerNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == 30);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CornerNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[59] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == -1);
+}
+TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CornerNormalNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_global_index_map;
+	id_to_global_index_map[2] = 30;
+	pinfo.setNeighborGlobalIndexes(id_to_global_index_map);
+
+	CHECK(nbr_info->global_index == 30);
+}
+TEST_CASE("PatchInfo getNbrIds CornerCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int> ids = pinfo.getNbrIds();
+
+	REQUIRE(ids.size() == 1);
+	CHECK(ids[0] == 2);
+}
+TEST_CASE("PatchInfo getNbrRanks CornerCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
+	nbr_info->rank             = 3;
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int> ranks = pinfo.getNbrRanks();
+
+	REQUIRE(ranks.size() == 1);
+	CHECK(ranks[0] == 3);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes exists CornerCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == 30);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CornerCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[59] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_index == -1);
+}
+TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CornerCoarseNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>      pinfo;
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_global_index_map;
+	id_to_global_index_map[2] = 30;
+	pinfo.setNeighborGlobalIndexes(id_to_global_index_map);
+
+	CHECK(nbr_info->global_index == 30);
+}
+TEST_CASE("PatchInfo getNbrIds CornerFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({1});
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int> ids = pinfo.getNbrIds();
+
+	REQUIRE(ids.size() == 1);
+	CHECK(ids[0] == 1);
+}
+TEST_CASE("PatchInfo getNbrRanks CornerFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({1});
+	nbr_info->ranks          = {3};
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int> ranks = pinfo.getNbrRanks();
+
+	REQUIRE(ranks.size() == 1);
+	CHECK(ranks[0] == 3);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes exists CornerFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({2});
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[2] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_indexes[0] == 30);
+}
+TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CornerFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({2});
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_local_index_map;
+	id_to_local_index_map[59] = 30;
+	pinfo.setNeighborLocalIndexes(id_to_local_index_map);
+
+	CHECK(nbr_info->local_indexes[0] == -1);
+}
+TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CornerFineNbrInfo", "[PatchInfo]")
+{
+	PatchInfo<3>    pinfo;
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({2});
+	pinfo.corner_nbr_info[0].reset(nbr_info);
+	deque<int>    ranks = pinfo.getNbrRanks();
+	map<int, int> id_to_global_index_map;
+	id_to_global_index_map[2] = 30;
+	pinfo.setNeighborGlobalIndexes(id_to_global_index_map);
+
+	CHECK(nbr_info->global_indexes[0] == 30);
+}
 TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 {
 	PatchInfo<3> *d_ptr = new PatchInfo<3>;
