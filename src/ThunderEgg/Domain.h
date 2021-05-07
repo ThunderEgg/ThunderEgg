@@ -50,9 +50,6 @@ namespace ThunderEgg
  */
 template <int D> class Domain
 {
-	public:
-	std::vector<int> patch_id_bc_map_vec;
-
 	private:
 	/**
 	 * @brief The id of the domain
@@ -84,65 +81,127 @@ template <int D> class Domain
 	 */
 	int global_num_patches = 1;
 	/**
-	 * @brief Vector of patch ids. Index corresponds to the patch's local index.
-	 */
-	std::vector<int> patch_id_map_vec;
-	/**
-	 * @brief Vector of patch global_indexes. Index corresponds to the patch's global index.
-	 */
-	std::vector<int> patch_global_index_map_vec;
-	/**
-	 * @brief vector of neighboring ranks with incoming data in order of how they appear in the
-	 * vector
-	 */
-	std::vector<int> in_off_proc_rank_vec;
-	/**
-	 * @brief size of incoming data from neighbors
-	 */
-	std::vector<int> in_off_proc_rank_size_vec;
-	/**
-	 * @brief map of id to local index in incoming vector
-	 */
-	std::vector<int> in_off_proc_map_vec;
-	/**
-	 * @brief vector of neighboring ranks with outgoing data in order of how they appear in the
-	 * vector
-	 */
-	std::vector<int> out_off_proc_rank_vec;
-	/**
-	 * @brief size of outgoing data from neighbors
-	 */
-	std::vector<int> out_off_proc_rank_size_vec;
-	/**
-	 * @brief map of id to local index in outgoing vector
-	 */
-	std::vector<int> out_off_proc_map_vec;
-	/**
-	 * @brief Vector of ghost patch global_indexes. Index corresponds to the patch's local index in
-	 * the ghost vector.
-	 */
-	std::vector<int> patch_global_index_map_vec_off_proc;
-	/**
-	 * @brief mpi rank
-	 */
-	int rank;
-	/**
 	 * @brief The timer
 	 */
 	mutable std::shared_ptr<Timer> timer;
 
 	/**
 	 * @brief Give the patches local indexes.
-	 *
-	 * @param local_id_set true if local indexes are set by user.
 	 */
-	void indexDomainsLocal();
+	void indexPatchesLocal()
+	{
+		// index patches
+		int                curr_index = 0;
+		std::map<int, int> id_to_local_index;
+		for (const auto &pinfo : pinfos) {
+			pinfo->local_index           = curr_index;
+			id_to_local_index[pinfo->id] = pinfo->local_index;
+			curr_index++;
+		}
+
+		// set local index in nbrinfo objects
+		for (auto &pinfo : pinfos) {
+			pinfo->setNeighborLocalIndexes(id_to_local_index);
+		}
+	}
 	/**
 	 * @brief Give the patches global indexes
-	 *
-	 * @param global_id_set true if global indexes are set by user.
 	 */
-	void indexDomainsGlobal();
+	void indexPatchesGlobal()
+	{
+		int rank;
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+		// get starting global index
+		int num_local_patches = pinfos.size();
+		int curr_global_index;
+		MPI_Scan(&num_local_patches, &curr_global_index, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+		curr_global_index -= num_local_patches;
+
+		// index the patches
+		std::map<int, int> id_to_global_index;
+		for (const auto &pinfo : pinfos) {
+			pinfo->global_index           = curr_global_index;
+			id_to_global_index[pinfo->id] = pinfo->global_index;
+			curr_global_index++;
+		}
+
+		std::map<int, std::set<std::pair<int, int>>> ranks_to_ids_and_global_indexes_outgoing;
+		std::map<int, std::set<int>>                 ranks_to_ids_incoming;
+		for (auto &pinfo : pinfos) {
+			PatchInfo<D> &d     = *pinfo;
+			auto          ranks = d.getNbrRanks();
+			auto          ids   = d.getNbrIds();
+			for (size_t idx = 0; idx < ranks.size(); idx++) {
+				int nbr_id   = ids[idx];
+				int nbr_rank = ranks[idx];
+				if (nbr_rank != rank) {
+					ranks_to_ids_and_global_indexes_outgoing[nbr_rank].insert(std::make_pair(d.id, d.global_index));
+					ranks_to_ids_incoming[nbr_rank].insert(nbr_id);
+				}
+			}
+		}
+
+		// prepare to recieve data
+		std::vector<MPI_Request> recv_requests;
+
+		// allocate incoming vectors and post recvs
+		std::map<int, std::vector<int>> rank_to_incoming_data;
+		for (const auto &pair : ranks_to_ids_incoming) {
+			int               source_rank   = pair.first;
+			std::vector<int> &incoming_data = rank_to_incoming_data[source_rank];
+			incoming_data.resize(pair.second.size());
+
+			MPI_Request request;
+			MPI_Irecv(incoming_data.data(), incoming_data.size(), MPI_INT, source_rank, 0, MPI_COMM_WORLD, &request);
+			recv_requests.push_back(request);
+		}
+
+		// prepare outgoing vector of data and send it
+		std::vector<MPI_Request> send_requests;
+
+		// post sends
+		std::map<int, std::vector<int>> rank_to_outgoing_data;
+		for (const auto &pair : ranks_to_ids_and_global_indexes_outgoing) {
+			int dest_rank = pair.first;
+			// allocate and fill vector
+			std::vector<int> &data = rank_to_outgoing_data[dest_rank];
+			data.reserve(pair.second.size());
+			for (const auto &id_and_global_index : pair.second) {
+				data.push_back(id_and_global_index.second);
+			}
+			MPI_Request request;
+			MPI_Isend(data.data(), data.size(), MPI_INT, dest_rank, 0, MPI_COMM_WORLD, &request);
+			send_requests.push_back(request);
+		}
+
+		// add global indexes to map as recvs come in
+		for (int i = 0; i < recv_requests.size(); i++) {
+			MPI_Status status;
+			int        request_index;
+			MPI_Waitany(recv_requests.size(), recv_requests.data(), &request_index, &status);
+
+			int                     source_rank  = status.MPI_SOURCE;
+			const std::set<int> &   incoming_ids = ranks_to_ids_incoming[source_rank];
+			const std::vector<int> &data         = rank_to_incoming_data[source_rank];
+
+			auto curr_id           = incoming_ids.cbegin();
+			auto curr_global_index = data.cbegin();
+			while (curr_id != incoming_ids.cend()) {
+				id_to_global_index[*curr_id] = *curr_global_index;
+				curr_id++;
+				curr_global_index++;
+			}
+		}
+
+		// wait for all the sends to finsh
+		MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUSES_IGNORE);
+
+		// update global indexes in nbrinfo objects
+		for (auto &pinfo : pinfos) {
+			pinfo->setNeighborGlobalIndexes(id_to_global_index);
+		}
+	}
 
 	public:
 	/**
@@ -171,8 +230,8 @@ template <int D> class Domain
 		int num_local_domains = pinfos.size();
 		MPI_Allreduce(&num_local_domains, &global_num_patches, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-		indexDomainsLocal();
-		indexDomainsGlobal();
+		indexPatchesLocal();
+		indexPatchesGlobal();
 	}
 	/**
 	 * @brief Get a vector of PatchInfo pointers where index in the vector corresponds to the
@@ -181,13 +240,6 @@ template <int D> class Domain
 	std::vector<std::shared_ptr<const PatchInfo<D>>> getPatchInfoVector() const
 	{
 		return std::vector<std::shared_ptr<const PatchInfo<D>>>(pinfos.cbegin(), pinfos.cend());
-	}
-	/**
-	 * @brief Get a vector of patch ids. Index in vector corresponds to the patch's local index.
-	 */
-	const std::vector<int> &getIdMapVec() const
-	{
-		return patch_id_map_vec;
 	}
 	/**
 	 * @brief Get the number of cells in each direction
@@ -332,124 +384,6 @@ template <int D> class Domain
 	}
 };
 
-template <int D> void Domain<D>::indexDomainsLocal()
-{
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-	std::vector<int>               in_off_proc_map_vec;
-	std::vector<int>               out_off_proc_map_vec;
-	std::set<std::tuple<int, int>> in_offs;
-	std::set<std::tuple<int, int>> out_offs;
-	std::map<int, int>             id_to_local_index_map;
-	int                            curr_i = 0;
-	for (auto &pinfo : pinfos) {
-		pinfo->local_index = curr_i;
-		curr_i++;
-		PatchInfo<D> &d             = *pinfo;
-		id_to_local_index_map[d.id] = d.local_index;
-		auto ranks                  = d.getNbrRanks();
-		auto ids                    = d.getNbrIds();
-		for (size_t idx = 0; idx < ranks.size(); idx++) {
-			int nbr_id   = ids[idx];
-			int nbr_rank = ranks[idx];
-			if (nbr_rank != rank) {
-				in_offs.insert(std::make_tuple(nbr_rank, nbr_id));
-				out_offs.insert(std::make_tuple(nbr_rank, d.id));
-			}
-		}
-	}
-	// map off proc
-	for (auto pair : in_offs) {
-		int rank = std::get<0>(pair);
-		int id   = std::get<1>(pair);
-		if (in_off_proc_rank_vec.size() == 0 || rank != in_off_proc_rank_vec.back()) {
-			in_off_proc_rank_vec.push_back(rank);
-			in_off_proc_rank_size_vec.push_back(1);
-		} else {
-			in_off_proc_rank_size_vec.back()++;
-		}
-		in_off_proc_map_vec.push_back(id);
-		id_to_local_index_map[id] = curr_i;
-		curr_i++;
-	}
-	for (auto pair : out_offs) {
-		int rank = std::get<0>(pair);
-		int id   = std::get<1>(pair);
-		if (out_off_proc_rank_vec.size() == 0 || rank != out_off_proc_rank_vec.back()) {
-			out_off_proc_rank_vec.push_back(rank);
-			out_off_proc_rank_size_vec.push_back(1);
-		} else {
-			out_off_proc_rank_size_vec.back()++;
-		}
-		out_off_proc_map_vec.push_back(id);
-	}
-	// set local indexes for neighbors
-	for (auto &pinfo : pinfos) {
-		pinfo->setNeighborLocalIndexes(id_to_local_index_map);
-	}
-	// domain_rev_map          = rev_map;
-	this->in_off_proc_map_vec           = in_off_proc_map_vec;
-	this->out_off_proc_map_vec          = out_off_proc_map_vec;
-	patch_global_index_map_vec_off_proc = in_off_proc_map_vec;
-}
-template <int D> void Domain<D>::indexDomainsGlobal()
-{
-	// global indices are going to be sequentially increasing with rank
-	int local_size = pinfos.size();
-	int start_i;
-	MPI_Scan(&local_size, &start_i, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-	start_i -= local_size;
-	patch_global_index_map_vec.resize(local_size);
-	iota(patch_global_index_map_vec.begin(), patch_global_index_map_vec.end(), start_i);
-
-	// prepare outgoing vector of data
-	std::vector<int> out_data = out_off_proc_map_vec;
-	for (size_t i = 0; i < out_data.size(); i++) {
-		// out_data[i] = patch_global_index_map_vec[pinfo_id_map[out_data[i]]->local_index];
-	}
-	// send outgoing messages
-	using namespace std;
-	vector<MPI_Request> requests;
-
-	// recv info
-	int curr_pos = 0;
-	for (size_t i = 0; i < in_off_proc_rank_vec.size(); i++) {
-		int         source = in_off_proc_rank_vec[i];
-		int         size   = in_off_proc_rank_size_vec[i];
-		MPI_Request request;
-		MPI_Irecv(&patch_global_index_map_vec_off_proc[curr_pos], size, MPI_INT, source, 0, MPI_COMM_WORLD, &request);
-		requests.push_back(request);
-		curr_pos += size;
-	}
-	// send info
-	curr_pos = 0;
-	requests.reserve(out_off_proc_rank_vec.size() + in_off_proc_rank_vec.size());
-	for (size_t i = 0; i < out_off_proc_rank_vec.size(); i++) {
-		int         dest = out_off_proc_rank_vec[i];
-		int         size = out_off_proc_rank_size_vec[i];
-		MPI_Request request;
-		MPI_Isend(&out_data[curr_pos], size, MPI_INT, dest, 0, MPI_COMM_WORLD, &request);
-		requests.push_back(request);
-		curr_pos += size;
-	}
-	// wait for all
-	MPI_Waitall(requests.size(), &requests[0], MPI_STATUSES_IGNORE);
-
-	curr_pos = 0;
-	std::map<int, int> rev_map;
-	for (int i : patch_global_index_map_vec) {
-		rev_map[curr_pos] = i;
-		curr_pos++;
-	}
-	for (int i : patch_global_index_map_vec_off_proc) {
-		rev_map[curr_pos] = i;
-		curr_pos++;
-	}
-	// for (auto &p : pinfo_id_map) {
-	// p.second->setNeighborGlobalIndexes(rev_map);
-	//}
-}
 template <int D> void to_json(nlohmann::json &j, const Domain<D> &domain)
 {
 	for (auto pinfo : domain.getPatchInfoVector()) {
