@@ -62,7 +62,7 @@ TEST_CASE(
 
 		Schur::Interface<2>::SideTypePiinfo *coarse_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == coarse_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == coarse_piinfo->pinfo.id) {
 				coarse_patch = &patch;
 				break;
 			}
@@ -74,8 +74,8 @@ TEST_CASE(
 
 		Schur::Interface<2>::SideTypePiinfo *ref_se_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id
-			    == coarse_piinfo->pinfo->getFineNbrInfo(Side<2>::east()).ids[0]) {
+			if (patch.piinfo->pinfo.id
+			    == coarse_piinfo->pinfo.getFineNbrInfo(Side<2>::east()).ids[0]) {
 				ref_se_patch = &patch;
 				break;
 			}
@@ -87,8 +87,8 @@ TEST_CASE(
 
 		Schur::Interface<2>::SideTypePiinfo *ref_ne_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id
-			    == coarse_piinfo->pinfo->getFineNbrInfo(Side<2>::east()).ids[1]) {
+			if (patch.piinfo->pinfo.id
+			    == coarse_piinfo->pinfo.getFineNbrInfo(Side<2>::east()).ids[1]) {
 				ref_ne_patch = &patch;
 				break;
 			}
@@ -101,8 +101,8 @@ TEST_CASE(
 		REQUIRE(off_proc_piinfos.size() == 2);
 
 		for (auto piinfo : off_proc_piinfos) {
-			CHECK((piinfo->pinfo->id == ref_ne_patch->piinfo->pinfo->id
-			       || piinfo->pinfo->id == ref_se_patch->piinfo->pinfo->id));
+			CHECK((piinfo->pinfo.id == ref_ne_patch->piinfo->pinfo.id
+			       || piinfo->pinfo.id == ref_se_patch->piinfo->pinfo.id));
 		}
 
 		// CHECK off proc ifaces
@@ -113,7 +113,7 @@ TEST_CASE(
 		CHECK(ifaces[1].at(8)->patches.size() == 1);
 		CHECK(ifaces[1].at(8)->patches[0].type.isCoarseToFine());
 		CHECK(ifaces[1].at(8)->patches[0].type.getOrthant() == Orthant<1>::lower());
-		CHECK(ifaces[1].at(8)->patches[0].piinfo->pinfo->id == 0);
+		CHECK(ifaces[1].at(8)->patches[0].piinfo->pinfo.id == 0);
 		CHECK(ifaces[1].at(8)->patches[0].side == Side<2>::east());
 
 		CHECK(ifaces[1].count(16) == 1);
@@ -121,14 +121,14 @@ TEST_CASE(
 		CHECK(ifaces[1].at(16)->patches.size() == 1);
 		CHECK(ifaces[1].at(16)->patches[0].type.isCoarseToFine());
 		CHECK(ifaces[1].at(16)->patches[0].type.getOrthant() == Orthant<1>::upper());
-		CHECK(ifaces[1].at(16)->patches[0].piinfo->pinfo->id == 0);
+		CHECK(ifaces[1].at(16)->patches[0].piinfo->pinfo.id == 0);
 		CHECK(ifaces[1].at(16)->patches[0].side == Side<2>::east());
 	} else {
 		CHECK(ifaces[1].size() == 6);
 		std::shared_ptr<const Schur::PatchIfaceInfo<2>> ref_sw_piinfo;
 		for (auto piinfo : piinfos) {
-			double x = piinfo->pinfo->starts[0];
-			double y = piinfo->pinfo->starts[1];
+			double x = piinfo->pinfo.starts[0];
+			double y = piinfo->pinfo.starts[1];
 			if (x == Catch::Approx(1) && y == Catch::Approx(0)) {
 				ref_sw_piinfo = piinfo;
 				break;
@@ -137,8 +137,8 @@ TEST_CASE(
 		REQUIRE(ref_sw_piinfo != nullptr);
 		std::shared_ptr<const Schur::PatchIfaceInfo<2>> ref_se_piinfo;
 		for (auto piinfo : piinfos) {
-			double x = piinfo->pinfo->starts[0];
-			double y = piinfo->pinfo->starts[1];
+			double x = piinfo->pinfo.starts[0];
+			double y = piinfo->pinfo.starts[1];
 			if (x == Catch::Approx(1.5) && y == Catch::Approx(0)) {
 				ref_se_piinfo = piinfo;
 				break;
@@ -147,8 +147,8 @@ TEST_CASE(
 		REQUIRE(ref_se_piinfo != nullptr);
 		std::shared_ptr<const Schur::PatchIfaceInfo<2>> ref_nw_piinfo;
 		for (auto piinfo : piinfos) {
-			double x = piinfo->pinfo->starts[0];
-			double y = piinfo->pinfo->starts[1];
+			double x = piinfo->pinfo.starts[0];
+			double y = piinfo->pinfo.starts[1];
 			if (x == Catch::Approx(1) && y == Catch::Approx(.5)) {
 				ref_nw_piinfo = piinfo;
 				break;
@@ -157,8 +157,8 @@ TEST_CASE(
 		REQUIRE(ref_nw_piinfo != nullptr);
 		std::shared_ptr<const Schur::PatchIfaceInfo<2>> ref_ne_piinfo;
 		for (auto piinfo : piinfos) {
-			double x = piinfo->pinfo->starts[0];
-			double y = piinfo->pinfo->starts[1];
+			double x = piinfo->pinfo.starts[0];
+			double y = piinfo->pinfo.starts[1];
 			if (x == Catch::Approx(1.5) && y == Catch::Approx(.5)) {
 				ref_ne_piinfo = piinfo;
 				break;
@@ -177,8 +177,8 @@ TEST_CASE(
 
 			Schur::Interface<2>::SideTypePiinfo *coarse_patch = nullptr;
 			for (auto &patch : iface->patches) {
-				if (patch.piinfo->pinfo->id
-				    == ref_sw_piinfo->pinfo->getCoarseNbrInfo(Side<2>::west()).id) {
+				if (patch.piinfo->pinfo.id
+				    == ref_sw_piinfo->pinfo.getCoarseNbrInfo(Side<2>::west()).id) {
 					coarse_patch = &patch;
 					break;
 				}
@@ -191,7 +191,7 @@ TEST_CASE(
 
 			Schur::Interface<2>::SideTypePiinfo *ref_se_patch = nullptr;
 			for (auto &patch : iface->patches) {
-				if (patch.piinfo->pinfo->id == ref_sw_piinfo->pinfo->id) {
+				if (patch.piinfo->pinfo.id == ref_sw_piinfo->pinfo.id) {
 					ref_se_patch = &patch;
 					break;
 				}
@@ -210,8 +210,8 @@ TEST_CASE(
 
 			Schur::Interface<2>::SideTypePiinfo *coarse_patch = nullptr;
 			for (auto &patch : iface->patches) {
-				if (patch.piinfo->pinfo->id
-				    == ref_nw_piinfo->pinfo->getCoarseNbrInfo(Side<2>::west()).id) {
+				if (patch.piinfo->pinfo.id
+				    == ref_nw_piinfo->pinfo.getCoarseNbrInfo(Side<2>::west()).id) {
 					coarse_patch = &patch;
 					break;
 				}
@@ -224,7 +224,7 @@ TEST_CASE(
 
 			Schur::Interface<2>::SideTypePiinfo *ref_ne_patch = nullptr;
 			for (auto &patch : iface->patches) {
-				if (patch.piinfo->pinfo->id == ref_nw_piinfo->pinfo->id) {
+				if (patch.piinfo->pinfo.id == ref_nw_piinfo->pinfo.id) {
 					ref_ne_patch = &patch;
 					break;
 				}
@@ -243,7 +243,7 @@ TEST_CASE(
 
 			Schur::Interface<2>::SideTypePiinfo *ref_se_patch = nullptr;
 			for (auto &patch : iface->patches) {
-				if (patch.piinfo->pinfo->id == ref_se_piinfo->pinfo->id) {
+				if (patch.piinfo->pinfo.id == ref_se_piinfo->pinfo.id) {
 					ref_se_patch = &patch;
 					break;
 				}
@@ -255,7 +255,7 @@ TEST_CASE(
 
 			Schur::Interface<2>::SideTypePiinfo *ref_ne_patch = nullptr;
 			for (auto &patch : iface->patches) {
-				if (patch.piinfo->pinfo->id == ref_ne_piinfo->pinfo->id) {
+				if (patch.piinfo->pinfo.id == ref_ne_piinfo->pinfo.id) {
 					ref_ne_patch = &patch;
 					break;
 				}
@@ -271,7 +271,7 @@ TEST_CASE(
 		CHECK(off_proc_piinfos[0] == sw_coarse_piinfo);
 
 		for (auto piinfo : off_proc_piinfos) {
-			CHECK(piinfo->pinfo->id == ref_nw_piinfo->pinfo->getCoarseNbrInfo(Side<2>::west()).id);
+			CHECK(piinfo->pinfo.id == ref_nw_piinfo->pinfo.getCoarseNbrInfo(Side<2>::west()).id);
 		}
 
 		// CHECK off proc ifaces
@@ -293,12 +293,12 @@ TEST_CASE(
 
 		REQUIRE(lower_patch != nullptr);
 		CHECK(lower_patch->type.isFineToCoarse());
-		CHECK(lower_patch->piinfo->pinfo->id == 2);
+		CHECK(lower_patch->piinfo->pinfo.id == 2);
 		CHECK(lower_patch->side == Side<2>::west());
 
 		REQUIRE(upper_patch != nullptr);
 		CHECK(upper_patch->type.isFineToCoarse());
-		CHECK(upper_patch->piinfo->pinfo->id == 4);
+		CHECK(upper_patch->piinfo->pinfo.id == 4);
 		CHECK(upper_patch->side == Side<2>::west());
 	}
 }
@@ -331,7 +331,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
 
 		Schur::Interface<2>::SideTypePiinfo *coarse_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == west_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == west_piinfo->pinfo.id) {
 				coarse_patch = &patch;
 				break;
 			}
@@ -343,8 +343,8 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
 
 		Schur::Interface<2>::SideTypePiinfo *east_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id
-			    == west_piinfo->pinfo->getNormalNbrInfo(Side<2>::east()).id) {
+			if (patch.piinfo->pinfo.id
+			    == west_piinfo->pinfo.getNormalNbrInfo(Side<2>::east()).id) {
 				east_patch = &patch;
 				break;
 			}
@@ -354,8 +354,8 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
 		CHECK(east_patch->type.isNormal());
 		CHECK(east_patch->side == Side<2>::west());
 		REQUIRE(off_proc_piinfos.size() == 1);
-		CHECK(off_proc_piinfos[0]->pinfo->id
-		      == west_piinfo->pinfo->getNormalNbrInfo(Side<2>::east()).id);
+		CHECK(off_proc_piinfos[0]->pinfo.id
+		      == west_piinfo->pinfo.getNormalNbrInfo(Side<2>::east()).id);
 	} else {
 		CHECK(ifaces.size() == 1);
 		CHECK(ifaces[0].size() == 1);
@@ -365,7 +365,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
 		CHECK(ifaces[0].at(1)->patches.size() == 1);
 
 		CHECK(ifaces[0].at(1)->patches[0].type.isNormal());
-		CHECK(ifaces[0].at(1)->patches[0].piinfo->pinfo->id == 1);
+		CHECK(ifaces[0].at(1)->patches[0].piinfo->pinfo.id == 1);
 		CHECK(ifaces[0].at(1)->patches[0].side == Side<2>::west());
 	}
 }
@@ -391,7 +391,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh", "
 		CHECK(off_proc_piinfos.size() == 4);
 		set<int> off_proc_patch_ids;
 		for (auto piinfo : off_proc_piinfos) {
-			off_proc_patch_ids.insert(piinfo->pinfo->id);
+			off_proc_patch_ids.insert(piinfo->pinfo.id);
 		}
 		CHECK(off_proc_patch_ids.count(22) == 1);
 		CHECK(off_proc_patch_ids.count(20) == 1);
@@ -404,7 +404,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh", "
 		REQUIRE(off_proc_piinfos.size() == 7);
 		set<int> off_proc_patch_ids;
 		for (auto piinfo : off_proc_piinfos) {
-			off_proc_patch_ids.insert(piinfo->pinfo->id);
+			off_proc_patch_ids.insert(piinfo->pinfo.id);
 		}
 		CHECK(off_proc_patch_ids.count(23) == 1);
 		CHECK(off_proc_patch_ids.count(29) == 1);

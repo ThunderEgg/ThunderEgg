@@ -58,8 +58,7 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	 * @param fine the input vector that is restricted.
 	 * @param coarse the output vector that is restricted to.
 	 */
-	void restrict(std::shared_ptr<const Vector<D>> fine,
-	              std::shared_ptr<Vector<D>>       coarse) const override
+	void restrict(std::shared_ptr<const Vector<D>> fine, std::shared_ptr<Vector<D>> coarse) const override
 	{
 		std::shared_ptr<Vector<D>> coarse_ghost = ilc->getNewGhostVector();
 
@@ -86,14 +85,13 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	 * local values will be fill while MPI communication is happening.
 	 *
 	 * @param patches pairs where the first value is the index in the coarse vector and the second
-	 * value is a pointer to the PatchInfo object
+	 * value is a reference to the PatchInfo object
 	 * @param finer_vector the finer vector
 	 * @param coarser_vector the coaser vector
 	 */
-	virtual void
-	restrictPatches(const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
-	                std::shared_ptr<const Vector<D>> finer_vector,
-	                std::shared_ptr<Vector<D>>       coarser_vector) const = 0;
+	virtual void restrictPatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
+	                             std::shared_ptr<const Vector<D>>                                               finer_vector,
+	                             std::shared_ptr<Vector<D>>                                                     coarser_vector) const = 0;
 };
 } // namespace GMG
 } // namespace ThunderEgg

@@ -225,11 +225,10 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 		sol    = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1, 1);
 		// process patches
 		for (auto pinfo : this->domain->getPatchInfoVector()) {
-			addPatch(*pinfo);
+			addPatch(pinfo);
 		}
 	}
-	void
-	solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const std::vector<LocalData<D>> &fs, std::vector<LocalData<D>> &us) const override
+	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &fs, std::vector<LocalData<D>> &us) const override
 	{
 		LocalData<D> f_copy_ld = f_copy->getLocalData(0, 0);
 
@@ -238,15 +237,15 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 		std::vector<LocalData<D>> f_copy_lds = {f_copy_ld};
 		op->addGhostToRHS(pinfo, us, f_copy_lds);
 
-		fftw_execute(plan1.at(*pinfo));
+		fftw_execute(plan1.at(pinfo));
 
-		tmp->getValArray() /= eigen_vals.at(*pinfo);
+		tmp->getValArray() /= eigen_vals.at(pinfo);
 
-		if (neumann.all() && pinfo->nbr_info == std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::num_sides>()) {
+		if (neumann.all() && pinfo.nbr_info == std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::num_sides>()) {
 			tmp->getValArray()[0] = 0;
 		}
 
-		fftw_execute(plan2.at(*pinfo));
+		fftw_execute(plan2.at(pinfo));
 
 		LocalData<D> sol_ld = sol->getLocalData(0, 0);
 

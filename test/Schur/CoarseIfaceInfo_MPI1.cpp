@@ -36,14 +36,14 @@ bool contains(Container &deque, Value a)
 TEST_CASE("Schur::CoarseIfaceInfo constructor", "[Schur::CoarseIfaceInfo]")
 {
 	for (Side<2> s : Side<2>::getValues()) {
-		int  id                                   = 1;
-		int  nbr_id                               = 2;
-		auto pinfo                                = make_shared<PatchInfo<2>>();
-		pinfo->rank                               = 0;
-		pinfo->id                                 = id;
-		pinfo->nbr_info[s.getIndex()]             = make_unique<CoarseNbrInfo<2>>(nbr_id, Orthant<1>::upper());
-		pinfo->getCoarseNbrInfo(s).rank           = 1;
-		pinfo->getCoarseNbrInfo(s).orth_on_coarse = Orthant<1>::upper();
+		int          id     = 1;
+		int          nbr_id = 2;
+		PatchInfo<2> pinfo;
+		pinfo.rank                               = 0;
+		pinfo.id                                 = id;
+		pinfo.nbr_info[s.getIndex()]             = make_unique<CoarseNbrInfo<2>>(nbr_id, Orthant<1>::upper());
+		pinfo.getCoarseNbrInfo(s).rank           = 1;
+		pinfo.getCoarseNbrInfo(s).orth_on_coarse = Orthant<1>::upper();
 		Schur::CoarseIfaceInfo<2> iface_info(pinfo, s);
 		INFO("Side: " << s);
 		CHECK(iface_info.rank == 0);

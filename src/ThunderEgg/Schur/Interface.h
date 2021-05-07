@@ -125,7 +125,7 @@ template <int D> class Interface : public Serializable
 	 */
 	void insert(Side<D> s, std::shared_ptr<const PatchIfaceInfo<D>> piinfo)
 	{
-		NbrType nbr_type = piinfo->pinfo->getNbrType(s);
+		NbrType nbr_type = piinfo->pinfo.getNbrType(s);
 		if (nbr_type == NbrType::Normal) {
 			patches.emplace_back(s, IfaceType<D>::Normal(), piinfo);
 		} else if (nbr_type == NbrType::Fine) {
@@ -234,9 +234,9 @@ template <int D> class Interface : public Serializable
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		auto info     = piinfo->getNormalIfaceInfo(s);
-		auto nbr_info = piinfo->pinfo->getNormalNbrInfo(s);
+		auto nbr_info = piinfo->pinfo.getNormalNbrInfo(s);
 		InsertPatchToInterface(rank_id_iface_map, info->rank, info->id, s, piinfo);
-		if (info->rank == piinfo->pinfo->rank && nbr_info.rank != piinfo->pinfo->rank) {
+		if (info->rank == piinfo->pinfo.rank && nbr_info.rank != piinfo->pinfo.rank) {
 			incoming_procs.insert(nbr_info.rank);
 		}
 	}
@@ -261,7 +261,7 @@ template <int D> class Interface : public Serializable
 		for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
 			InsertPatchToInterface(rank_id_iface_map, info->fine_ranks[i], info->fine_ids[i], s, piinfo);
 
-			if (info->fine_ranks[i] != piinfo->pinfo->rank) {
+			if (info->fine_ranks[i] != piinfo->pinfo.rank) {
 				incoming_procs.insert(info->fine_ranks[i]);
 			}
 		}
@@ -285,7 +285,7 @@ template <int D> class Interface : public Serializable
 		InsertPatchToInterface(rank_id_iface_map, info->rank, info->id, s, piinfo);
 		InsertPatchToInterface(rank_id_iface_map, info->coarse_rank, info->coarse_id, s, piinfo);
 
-		if (info->coarse_rank != piinfo->pinfo->rank) {
+		if (info->coarse_rank != piinfo->pinfo.rank) {
 			incoming_procs.insert(info->coarse_rank);
 		}
 	}
@@ -311,8 +311,8 @@ template <int D> class Interface : public Serializable
 		std::set<int> incoming_procs;
 		for (auto piinfo : piinfos) {
 			for (Side<D> s : Side<D>::getValues()) {
-				if (piinfo->pinfo->hasNbr(s)) {
-					switch (piinfo->pinfo->getNbrType(s)) {
+				if (piinfo->pinfo.hasNbr(s)) {
+					switch (piinfo->pinfo.getNbrType(s)) {
 						case NbrType::Normal:
 							InsertInterfaceWithNormalNbr(rank_id_iface_map, incoming_procs, piinfo, s);
 							break;
@@ -370,7 +370,7 @@ template <int D> class Interface : public Serializable
 				Interface<D> ifs;
 				reader >> ifs;
 				for (auto &patch : ifs.patches) {
-					auto &ptr = id_to_off_proc_piinfo_map[patch.piinfo->pinfo->id];
+					auto &ptr = id_to_off_proc_piinfo_map[patch.piinfo->pinfo.id];
 					if (ptr == nullptr) {
 						// need to cast to remove const modifier
 						ptr = std::const_pointer_cast<PatchIfaceInfo<D>>(patch.piinfo);

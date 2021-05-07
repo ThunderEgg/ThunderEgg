@@ -55,7 +55,7 @@ TEST_CASE("Check number of local and ghost parents", "[GMG::InterLevelComm]")
 	size_t             num_local_parents = 0;
 	map<int, set<int>> my_local_parents_to_children;
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		if (pinfo->parent_rank == rank) {
+		if (pinfo.parent_rank == rank) {
 			num_local_parents++;
 		} else {
 			num_ghost_parents++;
@@ -84,14 +84,14 @@ TEST_CASE("Check that parents have unique local indexes", "[GMG::InterLevelComm]
 
 	map<int, set<int>> local_index_id_map;
 	for (auto pair : ilc->getPatchesWithLocalParent()) {
-		local_index_id_map[pair.first].insert(pair.second->parent_id);
+		local_index_id_map[pair.first].insert(pair.second.get().parent_id);
 	}
 	for (auto pair : local_index_id_map) {
 		CHECK(pair.second.size() == 1);
 	}
 	map<int, set<int>> ghost_local_index_id_map;
 	for (auto pair : ilc->getPatchesWithGhostParent()) {
-		ghost_local_index_id_map[pair.first].insert(pair.second->parent_id);
+		ghost_local_index_id_map[pair.first].insert(pair.second.get().parent_id);
 	}
 	for (auto pair : ghost_local_index_id_map) {
 		CHECK(pair.second.size() == 1);
@@ -107,7 +107,7 @@ TEST_CASE("2-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -130,7 +130,7 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
 
@@ -334,7 +334,7 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
 
@@ -607,7 +607,7 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -663,7 +663,7 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -722,7 +722,7 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -812,7 +812,7 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);

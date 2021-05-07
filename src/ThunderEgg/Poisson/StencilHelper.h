@@ -100,52 +100,52 @@ class DirichletSH : public StencilHelper
 	 * @param pinfo the domain
 	 * @param s the side of the boundary we are processing
 	 */
-	DirichletSH(std::shared_ptr<const PatchInfo<3>> pinfo, Side<3> s)
+	DirichletSH(const PatchInfo<3> &pinfo, Side<3> s)
 	{
 		double h   = 0;
-		int    idx = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		int    idx = pinfo.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
 		if (s == Side<3>::west()) {
-			h       = pinfo->spacings[0];
+			h       = pinfo.spacings[0];
 			start   = idx;
-			stridex = pinfo->ns[0];
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[1];
-			ny      = pinfo->ns[2];
+			stridex = pinfo.ns[0];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[1];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::east()) {
-			h       = pinfo->spacings[0];
-			start   = idx + (pinfo->ns[0] - 1);
-			stridex = pinfo->ns[0];
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[1];
-			ny      = pinfo->ns[2];
+			h       = pinfo.spacings[0];
+			start   = idx + (pinfo.ns[0] - 1);
+			stridex = pinfo.ns[0];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[1];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::south()) {
-			h       = pinfo->spacings[1];
+			h       = pinfo.spacings[1];
 			start   = idx;
 			stridex = 1;
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[2];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::north()) {
-			h       = pinfo->spacings[1];
-			start   = idx + (pinfo->ns[1] - 1) * pinfo->ns[0];
+			h       = pinfo.spacings[1];
+			start   = idx + (pinfo.ns[1] - 1) * pinfo.ns[0];
 			stridex = 1;
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[2];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::bottom()) {
-			h       = pinfo->spacings[2];
+			h       = pinfo.spacings[2];
 			start   = idx;
 			stridex = 1;
-			stridey = pinfo->ns[0];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[1];
+			stridey = pinfo.ns[0];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[1];
 		} else if (s == Side<3>::top()) {
-			h       = pinfo->spacings[2];
-			start   = idx + (pinfo->ns[2] - 1) * pinfo->ns[1] * pinfo->ns[0];
+			h       = pinfo.spacings[2];
+			start   = idx + (pinfo.ns[2] - 1) * pinfo.ns[1] * pinfo.ns[0];
 			stridex = 1;
-			stridey = pinfo->ns[0];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[1];
+			stridey = pinfo.ns[0];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[1];
 		}
 		coeff = -1.0 / (h * h);
 	}
@@ -186,52 +186,52 @@ class NeumannSH : public StencilHelper
 	 * @param pinfo the domain
 	 * @param s the side of the boundary we are processing
 	 */
-	NeumannSH(std::shared_ptr<const PatchInfo<3>> pinfo, Side<3> s)
+	NeumannSH(const PatchInfo<3> &pinfo, Side<3> s)
 	{
 		double h   = 0;
-		int    idx = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		int    idx = pinfo.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
 		if (s == Side<3>::west()) {
-			h       = pinfo->spacings[0];
+			h       = pinfo.spacings[0];
 			start   = idx;
-			stridex = pinfo->ns[0];
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[1];
-			ny      = pinfo->ns[2];
+			stridex = pinfo.ns[0];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[1];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::east()) {
-			h       = pinfo->spacings[0];
-			start   = idx + (pinfo->ns[0] - 1);
-			stridex = pinfo->ns[0];
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[1];
-			ny      = pinfo->ns[2];
+			h       = pinfo.spacings[0];
+			start   = idx + (pinfo.ns[0] - 1);
+			stridex = pinfo.ns[0];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[1];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::south()) {
-			h       = pinfo->spacings[1];
+			h       = pinfo.spacings[1];
 			start   = idx;
 			stridex = 1;
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[2];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::north()) {
-			h       = pinfo->spacings[1];
-			start   = idx + (pinfo->ns[1] - 1) * pinfo->ns[0];
+			h       = pinfo.spacings[1];
+			start   = idx + (pinfo.ns[1] - 1) * pinfo.ns[0];
 			stridex = 1;
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[2];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::bottom()) {
-			h       = pinfo->spacings[2];
+			h       = pinfo.spacings[2];
 			start   = idx;
 			stridex = 1;
-			stridey = pinfo->ns[0];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[1];
+			stridey = pinfo.ns[0];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[1];
 		} else if (s == Side<3>::top()) {
-			h       = pinfo->spacings[2];
-			start   = idx + (pinfo->ns[2] - 1) * pinfo->ns[1] * pinfo->ns[0];
+			h       = pinfo.spacings[2];
+			start   = idx + (pinfo.ns[2] - 1) * pinfo.ns[1] * pinfo.ns[0];
 			stridex = 1;
-			stridey = pinfo->ns[0];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[1];
+			stridey = pinfo.ns[0];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[1];
 		}
 		coeff = 1.0 / (h * h);
 	}
@@ -273,60 +273,60 @@ class NormalSH : public StencilHelper
 	 * @param pinfo the domain
 	 * @param s the side of the boundary we are processing
 	 */
-	NormalSH(std::shared_ptr<const PatchInfo<3>> pinfo, Side<3> s)
+	NormalSH(const PatchInfo<3> &pinfo, Side<3> s)
 	{
-		const NormalNbrInfo<3> &nbr_info = pinfo->getNormalNbrInfo(s);
+		const NormalNbrInfo<3> &nbr_info = pinfo.getNormalNbrInfo(s);
 		double                  h        = 0;
-		int                     idx      = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
-		int                     nbr_idx  = nbr_info.global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		int                     idx      = pinfo.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
+		int                     nbr_idx  = nbr_info.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
 		if (s == Side<3>::west()) {
-			h         = pinfo->spacings[0];
+			h         = pinfo.spacings[0];
 			start     = idx;
-			nbr_start = nbr_idx + (pinfo->ns[0] - 1);
-			stridex   = pinfo->ns[0];
-			stridey   = pinfo->ns[0] * pinfo->ns[1];
-			nx        = pinfo->ns[1];
-			ny        = pinfo->ns[2];
+			nbr_start = nbr_idx + (pinfo.ns[0] - 1);
+			stridex   = pinfo.ns[0];
+			stridey   = pinfo.ns[0] * pinfo.ns[1];
+			nx        = pinfo.ns[1];
+			ny        = pinfo.ns[2];
 		} else if (s == Side<3>::east()) {
-			h         = pinfo->spacings[0];
-			start     = idx + (pinfo->ns[0] - 1);
+			h         = pinfo.spacings[0];
+			start     = idx + (pinfo.ns[0] - 1);
 			nbr_start = nbr_idx;
-			stridex   = pinfo->ns[0];
-			stridey   = pinfo->ns[0] * pinfo->ns[1];
-			nx        = pinfo->ns[1];
-			ny        = pinfo->ns[2];
+			stridex   = pinfo.ns[0];
+			stridey   = pinfo.ns[0] * pinfo.ns[1];
+			nx        = pinfo.ns[1];
+			ny        = pinfo.ns[2];
 		} else if (s == Side<3>::south()) {
-			h         = pinfo->spacings[1];
+			h         = pinfo.spacings[1];
 			start     = idx;
-			nbr_start = nbr_idx + (pinfo->ns[1] - 1) * pinfo->ns[0];
+			nbr_start = nbr_idx + (pinfo.ns[1] - 1) * pinfo.ns[0];
 			stridex   = 1;
-			stridey   = pinfo->ns[0] * pinfo->ns[1];
-			nx        = pinfo->ns[0];
-			ny        = pinfo->ns[2];
+			stridey   = pinfo.ns[0] * pinfo.ns[1];
+			nx        = pinfo.ns[0];
+			ny        = pinfo.ns[2];
 		} else if (s == Side<3>::north()) {
-			h         = pinfo->spacings[1];
-			start     = idx + (pinfo->ns[1] - 1) * pinfo->ns[0];
+			h         = pinfo.spacings[1];
+			start     = idx + (pinfo.ns[1] - 1) * pinfo.ns[0];
 			nbr_start = nbr_idx;
 			stridex   = 1;
-			stridey   = pinfo->ns[0] * pinfo->ns[1];
-			nx        = pinfo->ns[0];
-			ny        = pinfo->ns[2];
+			stridey   = pinfo.ns[0] * pinfo.ns[1];
+			nx        = pinfo.ns[0];
+			ny        = pinfo.ns[2];
 		} else if (s == Side<3>::bottom()) {
-			h         = pinfo->spacings[2];
+			h         = pinfo.spacings[2];
 			start     = idx;
-			nbr_start = nbr_idx + (pinfo->ns[2] - 1) * pinfo->ns[1] * pinfo->ns[0];
+			nbr_start = nbr_idx + (pinfo.ns[2] - 1) * pinfo.ns[1] * pinfo.ns[0];
 			stridex   = 1;
-			stridey   = pinfo->ns[0];
-			nx        = pinfo->ns[0];
-			ny        = pinfo->ns[1];
+			stridey   = pinfo.ns[0];
+			nx        = pinfo.ns[0];
+			ny        = pinfo.ns[1];
 		} else if (s == Side<3>::top()) {
-			h         = pinfo->spacings[2];
-			start     = idx + (pinfo->ns[2] - 1) * pinfo->ns[1] * pinfo->ns[0];
+			h         = pinfo.spacings[2];
+			start     = idx + (pinfo.ns[2] - 1) * pinfo.ns[1] * pinfo.ns[0];
 			nbr_start = nbr_idx;
 			stridex   = 1;
-			stridey   = pinfo->ns[0];
-			nx        = pinfo->ns[0];
-			ny        = pinfo->ns[1];
+			stridey   = pinfo.ns[0];
+			nx        = pinfo.ns[0];
+			ny        = pinfo.ns[1];
 		}
 		coeff = 1.0 / (h * h);
 	}
@@ -369,61 +369,61 @@ class CoarseSH : public StencilHelper
 	 * @param pinfo the domain
 	 * @param s the side of the boundary we are processing
 	 */
-	CoarseSH(std::shared_ptr<const PatchInfo<3>> pinfo, Side<3> s)
+	CoarseSH(const PatchInfo<3> &pinfo, Side<3> s)
 	{
-		const CoarseNbrInfo<3> &nbr_info = pinfo->getCoarseNbrInfo(s);
+		const CoarseNbrInfo<3> &nbr_info = pinfo.getCoarseNbrInfo(s);
 		double                  h        = 0;
-		int                     idx      = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
-		int                     nbr_idx  = nbr_info.global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		int                     idx      = pinfo.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
+		int                     nbr_idx  = nbr_info.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
 		quad                             = (int) nbr_info.orth_on_coarse.getIndex();
 		if (s == Side<3>::west()) {
-			h         = pinfo->spacings[0];
+			h         = pinfo.spacings[0];
 			start     = idx;
-			nbr_start = nbr_idx + (pinfo->ns[0] - 1);
-			stridex   = pinfo->ns[0];
-			stridey   = pinfo->ns[0] * pinfo->ns[1];
-			nx        = pinfo->ns[1];
-			ny        = pinfo->ns[2];
+			nbr_start = nbr_idx + (pinfo.ns[0] - 1);
+			stridex   = pinfo.ns[0];
+			stridey   = pinfo.ns[0] * pinfo.ns[1];
+			nx        = pinfo.ns[1];
+			ny        = pinfo.ns[2];
 		} else if (s == Side<3>::east()) {
-			h         = pinfo->spacings[0];
-			start     = idx + (pinfo->ns[0] - 1);
+			h         = pinfo.spacings[0];
+			start     = idx + (pinfo.ns[0] - 1);
 			nbr_start = nbr_idx;
-			stridex   = pinfo->ns[0];
-			stridey   = pinfo->ns[0] * pinfo->ns[1];
-			nx        = pinfo->ns[1];
-			ny        = pinfo->ns[2];
+			stridex   = pinfo.ns[0];
+			stridey   = pinfo.ns[0] * pinfo.ns[1];
+			nx        = pinfo.ns[1];
+			ny        = pinfo.ns[2];
 		} else if (s == Side<3>::south()) {
-			h         = pinfo->spacings[1];
+			h         = pinfo.spacings[1];
 			start     = idx;
-			nbr_start = nbr_idx + (pinfo->ns[1] - 1) * pinfo->ns[0];
+			nbr_start = nbr_idx + (pinfo.ns[1] - 1) * pinfo.ns[0];
 			stridex   = 1;
-			stridey   = pinfo->ns[0] * pinfo->ns[1];
-			nx        = pinfo->ns[0];
-			ny        = pinfo->ns[2];
+			stridey   = pinfo.ns[0] * pinfo.ns[1];
+			nx        = pinfo.ns[0];
+			ny        = pinfo.ns[2];
 		} else if (s == Side<3>::north()) {
-			h         = pinfo->spacings[1];
-			start     = idx + (pinfo->ns[1] - 1) * pinfo->ns[0];
+			h         = pinfo.spacings[1];
+			start     = idx + (pinfo.ns[1] - 1) * pinfo.ns[0];
 			nbr_start = nbr_idx;
 			stridex   = 1;
-			stridey   = pinfo->ns[0] * pinfo->ns[1];
-			nx        = pinfo->ns[0];
-			ny        = pinfo->ns[2];
+			stridey   = pinfo.ns[0] * pinfo.ns[1];
+			nx        = pinfo.ns[0];
+			ny        = pinfo.ns[2];
 		} else if (s == Side<3>::bottom()) {
-			h         = pinfo->spacings[2];
+			h         = pinfo.spacings[2];
 			start     = idx;
-			nbr_start = nbr_idx + (pinfo->ns[2] - 1) * pinfo->ns[1] * pinfo->ns[0];
+			nbr_start = nbr_idx + (pinfo.ns[2] - 1) * pinfo.ns[1] * pinfo.ns[0];
 			stridex   = 1;
-			stridey   = pinfo->ns[0];
-			nx        = pinfo->ns[0];
-			ny        = pinfo->ns[1];
+			stridey   = pinfo.ns[0];
+			nx        = pinfo.ns[0];
+			ny        = pinfo.ns[1];
 		} else if (s == Side<3>::top()) {
-			h         = pinfo->spacings[2];
-			start     = idx + (pinfo->ns[2] - 1) * pinfo->ns[1] * pinfo->ns[0];
+			h         = pinfo.spacings[2];
+			start     = idx + (pinfo.ns[2] - 1) * pinfo.ns[1] * pinfo.ns[0];
 			nbr_start = nbr_idx;
 			stridex   = 1;
-			stridey   = pinfo->ns[0];
-			nx        = pinfo->ns[0];
-			ny        = pinfo->ns[1];
+			stridey   = pinfo.ns[0];
+			nx        = pinfo.ns[0];
+			ny        = pinfo.ns[1];
 		}
 		coeff /= (h * h);
 	}
@@ -493,76 +493,76 @@ class FineSH : public StencilHelper
 	 * @param pinfo the domain
 	 * @param s the side of the boundary we are processing
 	 */
-	FineSH(std::shared_ptr<const PatchInfo<3>> pinfo, Side<3> s)
+	FineSH(const PatchInfo<3> &pinfo, Side<3> s)
 	{
-		const FineNbrInfo<3> &nbr_info = pinfo->getFineNbrInfo(s);
+		const FineNbrInfo<3> &nbr_info = pinfo.getFineNbrInfo(s);
 		double                h        = 0;
-		int                   idx      = pinfo->global_index * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+		int                   idx      = pinfo.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
 		int                   nbr_idx[4];
 		for (int i = 0; i < 4; i++) {
-			nbr_idx[i] = nbr_info.global_indexes[i] * pinfo->ns[0] * pinfo->ns[1] * pinfo->ns[2];
+			nbr_idx[i] = nbr_info.global_indexes[i] * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
 		}
 		if (s == Side<3>::west()) {
-			h     = pinfo->spacings[0];
+			h     = pinfo.spacings[0];
 			start = idx;
 			for (int i = 0; i < 4; i++) {
-				nbr_start[i] = nbr_idx[i] + (pinfo->ns[0] - 1);
+				nbr_start[i] = nbr_idx[i] + (pinfo.ns[0] - 1);
 			}
-			stridex = pinfo->ns[0];
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[1];
-			ny      = pinfo->ns[2];
+			stridex = pinfo.ns[0];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[1];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::east()) {
-			h     = pinfo->spacings[0];
-			start = idx + (pinfo->ns[0] - 1);
+			h     = pinfo.spacings[0];
+			start = idx + (pinfo.ns[0] - 1);
 			for (int i = 0; i < 4; i++) {
 				nbr_start[i] = nbr_idx[i];
 			}
-			stridex = pinfo->ns[0];
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[1];
-			ny      = pinfo->ns[2];
+			stridex = pinfo.ns[0];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[1];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::south()) {
-			h     = pinfo->spacings[1];
+			h     = pinfo.spacings[1];
 			start = idx;
 			for (int i = 0; i < 4; i++) {
-				nbr_start[i] = nbr_idx[i] + (pinfo->ns[1] - 1) * pinfo->ns[0];
+				nbr_start[i] = nbr_idx[i] + (pinfo.ns[1] - 1) * pinfo.ns[0];
 			}
 			stridex = 1;
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[2];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::north()) {
-			h     = pinfo->spacings[1];
-			start = idx + (pinfo->ns[1] - 1) * pinfo->ns[0];
+			h     = pinfo.spacings[1];
+			start = idx + (pinfo.ns[1] - 1) * pinfo.ns[0];
 			for (int i = 0; i < 4; i++) {
 				nbr_start[i] = nbr_idx[i];
 			}
 			stridex = 1;
-			stridey = pinfo->ns[0] * pinfo->ns[1];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[2];
+			stridey = pinfo.ns[0] * pinfo.ns[1];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[2];
 		} else if (s == Side<3>::bottom()) {
-			h     = pinfo->spacings[2];
+			h     = pinfo.spacings[2];
 			start = idx;
 			for (int i = 0; i < 4; i++) {
-				nbr_start[i] = nbr_idx[i] + (pinfo->ns[2] - 1) * pinfo->ns[1] * pinfo->ns[0];
+				nbr_start[i] = nbr_idx[i] + (pinfo.ns[2] - 1) * pinfo.ns[1] * pinfo.ns[0];
 			}
 			stridex = 1;
-			stridey = pinfo->ns[0];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[1];
+			stridey = pinfo.ns[0];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[1];
 		} else if (s == Side<3>::top()) {
-			h     = pinfo->spacings[2];
-			start = idx + (pinfo->ns[2] - 1) * pinfo->ns[1] * pinfo->ns[0];
+			h     = pinfo.spacings[2];
+			start = idx + (pinfo.ns[2] - 1) * pinfo.ns[1] * pinfo.ns[0];
 			for (int i = 0; i < 4; i++) {
 				nbr_start[i] = nbr_idx[i];
 			}
 			stridex = 1;
 			stridex = 1;
-			stridey = pinfo->ns[0];
-			nx      = pinfo->ns[0];
-			ny      = pinfo->ns[1];
+			stridey = pinfo.ns[0];
+			nx      = pinfo.ns[0];
+			ny      = pinfo.ns[1];
 		}
 		coeff /= (h * h);
 	}
@@ -599,11 +599,11 @@ class FineSH : public StencilHelper
  * @param neumann neumann boundary conditions
  * @return std::unique_ptr<StencilHelper>
  */
-std::unique_ptr<StencilHelper> getStencilHelper(std::shared_ptr<const PatchInfo<3>> pinfo, Side<3> s, std::bitset<6> neumann)
+std::unique_ptr<StencilHelper> getStencilHelper(const PatchInfo<3> &pinfo, Side<3> s, std::bitset<6> neumann)
 {
 	StencilHelper *retval = nullptr;
-	if (pinfo->hasNbr(s)) {
-		switch (pinfo->getNbrType(s)) {
+	if (pinfo.hasNbr(s)) {
+		switch (pinfo.getNbrType(s)) {
 			case NbrType::Normal:
 				retval = new NormalSH(pinfo, s);
 				break;
@@ -618,7 +618,7 @@ std::unique_ptr<StencilHelper> getStencilHelper(std::shared_ptr<const PatchInfo<
 				break;
 		}
 	} else {
-		if (!pinfo->hasNbr(s) && neumann[s.getIndex()]) {
+		if (!pinfo.hasNbr(s) && neumann[s.getIndex()]) {
 			retval = new NeumannSH(pinfo, s);
 		} else {
 			retval = new DirichletSH(pinfo, s);

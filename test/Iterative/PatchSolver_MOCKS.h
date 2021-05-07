@@ -30,12 +30,14 @@ namespace ThunderEgg
 {
 namespace
 {
-template <int D> class MockGhostFiller : public GhostFiller<D>
+template <int D>
+class MockGhostFiller : public GhostFiller<D>
 {
 	public:
 	void fillGhost(std::shared_ptr<const Vector<D>> u) const override {}
 };
-template <int D> class MockPatchOperator : public PatchOperator<D>
+template <int D>
+class MockPatchOperator : public PatchOperator<D>
 {
 	private:
 	mutable bool rhs_was_modified   = false;
@@ -48,16 +50,16 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
-	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	void applySinglePatch(const PatchInfo<D> &             pinfo,
 	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
 	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
 		interior_dirichlet |= true;
 		num_apply_calls++;
 	}
-	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                   const std::vector<LocalData<D>> &   us,
-	                   std::vector<LocalData<D>> &         fs) const override
+	void addGhostToRHS(const PatchInfo<D> &             pinfo,
+	                   const std::vector<LocalData<D>> &us,
+	                   std::vector<LocalData<D>> &      fs) const override
 	{
 		rhs_was_modified = true;
 	}
@@ -74,7 +76,8 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 		return num_apply_calls;
 	}
 };
-template <int D> class NonLinMockPatchOperator : public PatchOperator<D>
+template <int D>
+class NonLinMockPatchOperator : public PatchOperator<D>
 {
 	private:
 	mutable bool rhs_was_modified   = false;
@@ -86,7 +89,7 @@ template <int D> class NonLinMockPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
-	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	void applySinglePatch(const PatchInfo<D> &             pinfo,
 	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
 	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
@@ -96,9 +99,9 @@ template <int D> class NonLinMockPatchOperator : public PatchOperator<D>
 			               [&](const std::array<int, D> &coord) { fs[c][coord] += 1; });
 		}
 	}
-	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                   const std::vector<LocalData<D>> &   us,
-	                   std::vector<LocalData<D>> &         fs) const override
+	void addGhostToRHS(const PatchInfo<D> &             pinfo,
+	                   const std::vector<LocalData<D>> &us,
+	                   std::vector<LocalData<D>> &      fs) const override
 	{
 		rhs_was_modified = true;
 	}
@@ -111,7 +114,8 @@ template <int D> class NonLinMockPatchOperator : public PatchOperator<D>
 		return interior_dirichlet;
 	}
 };
-template <int D> class MockSolver : public Iterative::Solver<D>
+template <int D>
+class MockSolver : public Iterative::Solver<D>
 {
 	private:
 	std::function<int(std::shared_ptr<VectorGenerator<D>>, std::shared_ptr<const Operator<D>>,

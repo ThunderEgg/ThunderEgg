@@ -75,7 +75,7 @@ template <int D> class Domain
 	 * @brief Vector of PatchInfo pointers where index in the vector corresponds to the patch's
 	 * local index
 	 */
-	std::vector<std::shared_ptr<PatchInfo<D>>> pinfos;
+	std::vector<PatchInfo<D>> pinfos;
 	/**
 	 * @brief The global number of patches
 	 */
@@ -93,15 +93,15 @@ template <int D> class Domain
 		// index patches
 		int                curr_index = 0;
 		std::map<int, int> id_to_local_index;
-		for (const auto &pinfo : pinfos) {
-			pinfo->local_index           = curr_index;
-			id_to_local_index[pinfo->id] = pinfo->local_index;
+		for (auto &pinfo : pinfos) {
+			pinfo.local_index           = curr_index;
+			id_to_local_index[pinfo.id] = pinfo.local_index;
 			curr_index++;
 		}
 
 		// set local index in nbrinfo objects
 		for (auto &pinfo : pinfos) {
-			pinfo->setNeighborLocalIndexes(id_to_local_index);
+			pinfo.setNeighborLocalIndexes(id_to_local_index);
 		}
 	}
 	/**
@@ -120,23 +120,22 @@ template <int D> class Domain
 
 		// index the patches
 		std::map<int, int> id_to_global_index;
-		for (const auto &pinfo : pinfos) {
-			pinfo->global_index           = curr_global_index;
-			id_to_global_index[pinfo->id] = pinfo->global_index;
+		for (auto &pinfo : pinfos) {
+			pinfo.global_index           = curr_global_index;
+			id_to_global_index[pinfo.id] = pinfo.global_index;
 			curr_global_index++;
 		}
 
 		std::map<int, std::set<std::pair<int, int>>> ranks_to_ids_and_global_indexes_outgoing;
 		std::map<int, std::set<int>>                 ranks_to_ids_incoming;
 		for (auto &pinfo : pinfos) {
-			PatchInfo<D> &d     = *pinfo;
-			auto          ranks = d.getNbrRanks();
-			auto          ids   = d.getNbrIds();
+			auto ranks = pinfo.getNbrRanks();
+			auto ids   = pinfo.getNbrIds();
 			for (size_t idx = 0; idx < ranks.size(); idx++) {
 				int nbr_id   = ids[idx];
 				int nbr_rank = ranks[idx];
 				if (nbr_rank != rank) {
-					ranks_to_ids_and_global_indexes_outgoing[nbr_rank].insert(std::make_pair(d.id, d.global_index));
+					ranks_to_ids_and_global_indexes_outgoing[nbr_rank].insert(std::make_pair(pinfo.id, pinfo.global_index));
 					ranks_to_ids_incoming[nbr_rank].insert(nbr_id);
 				}
 			}
@@ -199,7 +198,7 @@ template <int D> class Domain
 
 		// update global indexes in nbrinfo objects
 		for (auto &pinfo : pinfos) {
-			pinfo->setNeighborGlobalIndexes(id_to_global_index);
+			pinfo.setNeighborGlobalIndexes(id_to_global_index);
 		}
 	}
 
@@ -240,9 +239,9 @@ template <int D> class Domain
 	 * @brief Get a vector of PatchInfo pointers where index in the vector corresponds to the
 	 * patch's local index
 	 */
-	std::vector<std::shared_ptr<const PatchInfo<D>>> getPatchInfoVector() const
+	const std::vector<PatchInfo<D>> &getPatchInfoVector() const
 	{
-		return std::vector<std::shared_ptr<const PatchInfo<D>>>(pinfos.cbegin(), pinfos.cend());
+		return pinfos;
 	}
 	/**
 	 * @brief Get the number of cells in each direction
@@ -309,11 +308,10 @@ template <int D> class Domain
 	double volume() const
 	{
 		double sum = 0;
-		for (auto &p : pinfos) {
-			PatchInfo<D> &d         = *p;
-			double        patch_vol = 1;
+		for (auto &pinfo : pinfos) {
+			double patch_vol = 1;
 			for (size_t i = 0; i < D; i++) {
-				patch_vol *= d.spacings[i] * d.ns[i];
+				patch_vol *= pinfo.spacings[i] * pinfo.ns[i];
 			}
 			sum += patch_vol;
 		}
@@ -331,16 +329,15 @@ template <int D> class Domain
 	{
 		double sum = 0;
 
-		for (auto &p : pinfos) {
-			PatchInfo<D> &d = *p;
+		for (const auto &pinfo : pinfos) {
 			for (int c = 0; c < u->getNumComponents(); c++) {
-				const LocalData<D> u_data = u->getLocalData(c, d.local_index);
+				const LocalData<D> u_data = u->getLocalData(c, pinfo.local_index);
 
 				double patch_sum = 0;
 				nested_loop<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
 
 				for (size_t i = 0; i < D; i++) {
-					patch_sum *= d.spacings[i];
+					patch_sum *= pinfo.spacings[i];
 				}
 				sum += patch_sum;
 			}
@@ -390,7 +387,7 @@ template <int D> class Domain
 template <int D> void to_json(nlohmann::json &j, const Domain<D> &domain)
 {
 	for (auto pinfo : domain.getPatchInfoVector()) {
-		j.push_back(*pinfo);
+		j.push_back(pinfo);
 	}
 }
 

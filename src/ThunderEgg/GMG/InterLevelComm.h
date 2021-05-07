@@ -49,6 +49,14 @@ template <int D> class InterLevelComm
 {
 	private:
 	/**
+	 * @brief The coarser domain
+	 */
+	std::shared_ptr<const Domain<D>> coarser_domain;
+	/**
+	 * @brief The finer domain
+	 */
+	std::shared_ptr<const Domain<D>> finer_domain;
+	/**
 	 * @brief Dimensions of a patch
 	 */
 	std::array<int, D> ns;
@@ -74,14 +82,14 @@ template <int D> class InterLevelComm
 	 * First value: local index of coarser patch
 	 * Second value: the PatchInfo object
 	 */
-	std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> patches_with_local_parent;
+	std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> patches_with_local_parent;
 	/**
 	 * @brief Patches with a ghost parent
 	 *
 	 * First value: local index in the ghost vector of coarser patch
 	 * Second value: the PatchInfo object
 	 */
-	std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> patches_with_ghost_parent;
+	std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> patches_with_ghost_parent;
 	/**
 	 * @brief A vector of pairs where the first value is the rank, and the second vector is the
 	 * local_indexes of patches in the order that the other processor is expecting them.
@@ -112,7 +120,9 @@ template <int D> class InterLevelComm
 	 * @param fine_domain the finer DomainCollection.
 	 */
 	InterLevelComm(std::shared_ptr<const Domain<D>> coarser_domain, int num_coarser_components, std::shared_ptr<const Domain<D>> finer_domain)
-	: ns(finer_domain->getNs()),
+	: coarser_domain(coarser_domain),
+	  finer_domain(finer_domain),
+	  ns(finer_domain->getNs()),
 	  num_ghost_cells(finer_domain->getNumGhostCells()),
 	  num_components(num_coarser_components)
 	{
@@ -123,38 +133,39 @@ template <int D> class InterLevelComm
 		patch_size = my_patch_size;
 
 		// sort into patches with local parents and patches with ghost parents
-		std::deque<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> local_parents;
-		std::deque<std::shared_ptr<const PatchInfo<D>>>                 ghost_parents;
-		std::set<int>                                                   ghost_parents_ids;
+		std::deque<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> local_parents;
+		std::deque<std::reference_wrapper<const PatchInfo<D>>>                 ghost_parents;
+		std::set<int>                                                          ghost_parents_ids;
 
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		// TODO this has to be changed when domain class is updated
 		std::map<int, int> coarser_domain_id_to_local_index_map;
-		for (const auto &pinfo : coarser_domain->getPatchInfoVector()) {
-			coarser_domain_id_to_local_index_map[pinfo->id] = pinfo->local_index;
+		for (const PatchInfo<D> &pinfo : coarser_domain->getPatchInfoVector()) {
+			coarser_domain_id_to_local_index_map[pinfo.id] = pinfo.local_index;
 		}
-		for (auto patch : finer_domain->getPatchInfoVector()) {
-			if (patch->parent_rank == rank) {
-				local_parents.emplace_back(coarser_domain_id_to_local_index_map[patch->parent_id], patch);
+		for (const PatchInfo<D> &patch : finer_domain->getPatchInfoVector()) {
+			if (patch.parent_rank == rank) {
+				local_parents.emplace_back(coarser_domain_id_to_local_index_map[patch.parent_id], patch);
 			} else {
 				ghost_parents.push_back(patch);
-				ghost_parents_ids.insert(patch->parent_id);
+				ghost_parents_ids.insert(patch.parent_id);
 			}
 		}
 		num_ghost_patches = ghost_parents_ids.size();
 
 		// fill in local vector
-		patches_with_local_parent = std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>>(local_parents.begin(), local_parents.end());
+		patches_with_local_parent
+		= std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>(local_parents.begin(), local_parents.end());
 		// find local coarse patches that are ghost paches on other ranks
 		std::map<int, std::map<int, int>> ranks_and_local_patches; // map from rank -> (map of ids -> local
 		                                                           // indexes). The second map is for when
 		                                                           // local indexes are iterated over, they
 		                                                           // are sorted by their cooresponding id
-		for (auto pinfo : coarser_domain->getPatchInfoVector()) {
-			for (int child_rank : pinfo->child_ranks) {
+		for (const PatchInfo<D> &pinfo : coarser_domain->getPatchInfoVector()) {
+			for (int child_rank : pinfo.child_ranks) {
 				if (child_rank != -1 && child_rank != rank)
-					ranks_and_local_patches[child_rank][pinfo->id] = pinfo->local_index;
+					ranks_and_local_patches[child_rank][pinfo.id] = pinfo.local_index;
 			}
 		}
 
@@ -184,10 +195,11 @@ template <int D> class InterLevelComm
 		                                                           // local indexes are iterated over, they
 		                                                           // are sorted by their cooresponding id
 		patches_with_ghost_parent.reserve(ghost_parents.size());
-		for (auto patch : ghost_parents) {
-			int ghost_local_index = id_ghost_vector_local_index_map[patch->parent_id];
+		for (auto patch_ref_wrap : ghost_parents) {
+			const PatchInfo<D> &patch             = patch_ref_wrap.get();
+			int                 ghost_local_index = id_ghost_vector_local_index_map[patch.parent_id];
 
-			ranks_and_ghost_patches[patch->parent_rank][patch->parent_id] = ghost_local_index;
+			ranks_and_ghost_patches[patch.parent_rank][patch.parent_id] = ghost_local_index;
 
 			patches_with_ghost_parent.emplace_back(ghost_local_index, patch);
 		}
@@ -232,11 +244,11 @@ template <int D> class InterLevelComm
 	 *
 	 * The vector will consist of pair values:
 	 * 		- First value: the local index of the parent patch
-	 * 		- First value: the finer patch associated with that index
+	 * 		- Second value: the local index of the child patch
 	 *
-	 * @return const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>>& the vector
+	 * @return const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& the vector
 	 */
-	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &getPatchesWithLocalParent() const
+	const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &getPatchesWithLocalParent() const
 	{
 		return patches_with_local_parent;
 	}
@@ -246,11 +258,11 @@ template <int D> class InterLevelComm
 	 *
 	 * The vector will consist of pair values:
 	 * 		- First value: the local index in the ghost vector of the parent patch
-	 * 		- First value: the finer patch associated with that index
+	 * 		- Second value: the local index of the child patch
 	 *
-	 * @return const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>>& the vector
+	 * @return const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& the vector
 	 */
-	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &getPatchesWithGhostParent() const
+	const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &getPatchesWithGhostParent() const
 	{
 		return patches_with_ghost_parent;
 	}

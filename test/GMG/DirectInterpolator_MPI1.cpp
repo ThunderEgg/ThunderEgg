@@ -25,8 +25,8 @@
 #include <ThunderEgg/GMG/DirectInterpolator.h>
 #include <ThunderEgg/ValVector.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
@@ -50,19 +50,19 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		auto lds = coarse_vec->getLocalDatas(pinfo->local_index);
+		auto lds = coarse_vec->getLocalDatas(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 1 + pinfo->id * nx * ny + coord[0] + coord[1] * nx + c;
+				lds[c][coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + c;
 			});
 		}
 	}
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto lds = fine_expected->getLocalDatas(pinfo->local_index);
+		auto lds = fine_expected->getLocalDatas(pinfo.local_index);
 
-		Orthant<2>         orth = pinfo->orth_on_parent;
+		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
 		for (size_t i = 0; i < 2; i++) {
 			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : lds[0].getLengths()[i];
@@ -70,7 +70,7 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 1 + pinfo->parent_id * nx * ny + (coord[0] + starts[0]) / 2
+				lds[c][coord] = 1 + pinfo.parent_id * nx * ny + (coord[0] + starts[0]) / 2
 				                + (coord[1] + starts[1]) / 2 * nx + c;
 			});
 		}
@@ -82,13 +82,13 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 	interpolator->interpolate(coarse_vec, fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("c:     " << pinfo->ns[1]);
-		auto vec_lds      = fine_vec->getLocalDatas(pinfo->local_index);
-		auto expected_lds = fine_expected->getLocalDatas(pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("c:     " << pinfo.ns[1]);
+		auto vec_lds      = fine_vec->getLocalDatas(pinfo.local_index);
+		auto expected_lds = fine_expected->getLocalDatas(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:     " << c);
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
@@ -115,19 +115,19 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		auto lds = coarse_vec->getLocalDatas(pinfo->local_index);
+		auto lds = coarse_vec->getLocalDatas(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 1 + pinfo->id * nx * ny + coord[0] + coord[1] * nx + c;
+				lds[c][coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + c;
 			});
 		}
 	}
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto lds = fine_expected->getLocalDatas(pinfo->local_index);
+		auto lds = fine_expected->getLocalDatas(pinfo.local_index);
 
-		Orthant<2>         orth = pinfo->orth_on_parent;
+		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
 		for (size_t i = 0; i < 2; i++) {
 			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : lds[0].getLengths()[i];
@@ -135,7 +135,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 2 + pinfo->parent_id * nx * ny + (coord[0] + starts[0]) / 2
+				lds[c][coord] = 2 + pinfo.parent_id * nx * ny + (coord[0] + starts[0]) / 2
 				                + (coord[1] + starts[1]) / 2 * nx + c;
 			});
 		}
@@ -149,13 +149,13 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 	interpolator->interpolate(coarse_vec, fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		auto vec_lds      = fine_vec->getLocalDatas(pinfo->local_index);
-		auto expected_lds = fine_expected->getLocalDatas(pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		auto vec_lds      = fine_vec->getLocalDatas(pinfo.local_index);
+		auto expected_lds = fine_expected->getLocalDatas(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:     " << c);
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
@@ -181,20 +181,20 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		auto lds = coarse_vec->getLocalDatas(pinfo->local_index);
+		auto lds = coarse_vec->getLocalDatas(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 1 + pinfo->id * nx * ny + coord[0] + coord[1] * nx + c;
+				lds[c][coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + c;
 			});
 		}
 	}
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto lds = fine_expected->getLocalDatas(pinfo->local_index);
+		auto lds = fine_expected->getLocalDatas(pinfo.local_index);
 
-		if (pinfo->hasCoarseParent()) {
-			Orthant<2>         orth = pinfo->orth_on_parent;
+		if (pinfo.hasCoarseParent()) {
+			Orthant<2>         orth = pinfo.orth_on_parent;
 			std::array<int, 2> starts;
 			for (size_t i = 0; i < 2; i++) {
 				starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : lds[0].getLengths()[i];
@@ -202,14 +202,14 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-					lds[c][coord] = 1 + pinfo->parent_id * nx * ny + (coord[0] + starts[0]) / 2
+					lds[c][coord] = 1 + pinfo.parent_id * nx * ny + (coord[0] + starts[0]) / 2
 					                + (coord[1] + starts[1]) / 2 * nx + c;
 				});
 			}
 		} else {
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-					lds[c][coord] = 1 + pinfo->id * nx * ny + coord[0] + coord[1] * nx + c;
+					lds[c][coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + c;
 				});
 			}
 		}
@@ -221,13 +221,13 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 	interpolator->interpolate(coarse_vec, fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		auto vec_lds      = fine_vec->getLocalDatas(pinfo->local_index);
-		auto expected_lds = fine_expected->getLocalDatas(pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		auto vec_lds      = fine_vec->getLocalDatas(pinfo.local_index);
+		auto expected_lds = fine_expected->getLocalDatas(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:     " << c);
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),

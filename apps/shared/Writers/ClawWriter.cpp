@@ -46,7 +46,7 @@ void ClawWriter::write()
 	q_file.precision(10);
 	q_file << scientific;
 	for (auto &pinfo : domain->getPatchInfoVector()) {
-		writePatch(*pinfo, q_file);
+		writePatch(pinfo, q_file);
 	}
 	q_file.close();
 }

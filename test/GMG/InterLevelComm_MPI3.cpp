@@ -50,7 +50,7 @@ TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterL
 
 		map<int, set<int>> parents_to_children;
 		for (auto pair : ilc->getPatchesWithLocalParent()) {
-			parents_to_children[pair.first].insert(pair.second->id);
+			parents_to_children[pair.first].insert(pair.second.get().id);
 		}
 		CHECK(parents_to_children.count(0));
 		CHECK(parents_to_children[0].count(1));
@@ -61,7 +61,7 @@ TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterL
 
 		map<int, set<int>> parents_to_children;
 		for (auto pair : ilc->getPatchesWithGhostParent()) {
-			parents_to_children[pair.first].insert(pair.second->id);
+			parents_to_children[pair.first].insert(pair.second.get().id);
 		}
 		CHECK(parents_to_children.count(0) == 1);
 		CHECK(parents_to_children[0].count(3) == 1);
@@ -71,7 +71,7 @@ TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterL
 
 		map<int, set<int>> parents_to_children;
 		for (auto pair : ilc->getPatchesWithGhostParent()) {
-			parents_to_children[pair.first].insert(pair.second->id);
+			parents_to_children[pair.first].insert(pair.second.get().id);
 		}
 		CHECK(parents_to_children.count(0) == 1);
 		CHECK(parents_to_children[0].count(4) == 1);
@@ -86,7 +86,7 @@ TEST_CASE("3-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -108,7 +108,7 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
 
@@ -261,7 +261,7 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
 

@@ -79,10 +79,9 @@ template <int D> class InterfaceDomain
 	 * @param interfaces (output) this will be updated with a new vector of Interface objects, the
 	 * position in the vector cooresponds to the Interface's local index
 	 */
-	static void
-	IndexIfacesLocal(const std::map<int, std::shared_ptr<Interface<D>>> &   id_to_iface_map,
-	                 const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
-	                 std::vector<std::shared_ptr<Interface<D>>> &           interfaces)
+	static void IndexIfacesLocal(const std::map<int, std::shared_ptr<Interface<D>>> &   id_to_iface_map,
+	                             const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
+	                             std::vector<std::shared_ptr<Interface<D>>> &           interfaces)
 	{
 		int curr_local_index = 0;
 
@@ -96,19 +95,12 @@ template <int D> class InterfaceDomain
 			interfaces.push_back(iface);
 
 			for (auto patch : iface->patches) {
-				if (patch.type.isNormal() || patch.type.isFineToFine()
-				    || patch.type.isCoarseToCoarse()) {
-					patch.getNonConstPiinfo()->getIfaceInfo(patch.side)->patch_local_index
-					= curr_local_index;
-					patch.getNonConstPiinfo()->getIfaceInfo(patch.side)->col_local_index
-					= curr_local_index;
-					patch.getNonConstPiinfo()->getIfaceInfo(patch.side)->row_local_index
-					= curr_local_index;
+				if (patch.type.isNormal() || patch.type.isFineToFine() || patch.type.isCoarseToCoarse()) {
+					patch.getNonConstPiinfo()->getIfaceInfo(patch.side)->patch_local_index = curr_local_index;
+					patch.getNonConstPiinfo()->getIfaceInfo(patch.side)->col_local_index   = curr_local_index;
+					patch.getNonConstPiinfo()->getIfaceInfo(patch.side)->row_local_index   = curr_local_index;
 				} else if (patch.type.isFineToCoarse()) {
-					patch.getNonConstPiinfo()
-					->getCoarseIfaceInfo(patch.side)
-					->coarse_col_local_index
-					= curr_local_index;
+					patch.getNonConstPiinfo()->getCoarseIfaceInfo(patch.side)->coarse_col_local_index = curr_local_index;
 				} else if (patch.type.isCoarseToFine()) {
 					auto iface_info = patch.getNonConstPiinfo()->getFineIfaceInfo(patch.side);
 					for (size_t i = 0; i < iface_info->fine_col_local_indexes.size(); i++) {
@@ -134,31 +126,28 @@ template <int D> class InterfaceDomain
 	 * @param piinfo the PatchIfaceInfo object
 	 * @param id_to_local_indexes_to_set map from id to pointer to local index to set
 	 */
-	static void
-	GetRemainginColIfacesLocalForPatch(std::shared_ptr<PatchIfaceInfo<D>> piinfo,
-	                                   std::map<int, std::set<int *>> &id_to_local_indexes_to_set)
+	static void GetRemainginColIfacesLocalForPatch(std::shared_ptr<PatchIfaceInfo<D>> piinfo,
+	                                               std::map<int, std::set<int *>> &   id_to_local_indexes_to_set)
 	{
 		for (Side<D> s : Side<D>::getValues()) {
-			if (piinfo->pinfo->hasNbr(s)) {
+			if (piinfo->pinfo.hasNbr(s)) {
 				auto iface_info = piinfo->getIfaceInfo(s);
 				if (iface_info->col_local_index == -1) {
 					id_to_local_indexes_to_set[iface_info->id].insert(&iface_info->col_local_index);
 				}
 
-				NbrType nbr_type = piinfo->pinfo->getNbrType(s);
+				NbrType nbr_type = piinfo->pinfo.getNbrType(s);
 
 				if (nbr_type == NbrType::Coarse) {
 					auto coarse_iface_info = piinfo->getCoarseIfaceInfo(s);
 					if (coarse_iface_info->coarse_col_local_index == -1) {
-						id_to_local_indexes_to_set[coarse_iface_info->coarse_id].insert(
-						&coarse_iface_info->coarse_col_local_index);
+						id_to_local_indexes_to_set[coarse_iface_info->coarse_id].insert(&coarse_iface_info->coarse_col_local_index);
 					}
 				} else if (nbr_type == NbrType::Fine) {
 					auto fine_iface_info = piinfo->getFineIfaceInfo(s);
 					for (size_t i = 0; i < fine_iface_info->fine_col_local_indexes.size(); i++) {
 						if (fine_iface_info->fine_col_local_indexes[i] == -1) {
-							id_to_local_indexes_to_set[fine_iface_info->fine_ids[i]].insert(
-							&fine_iface_info->fine_col_local_indexes[i]);
+							id_to_local_indexes_to_set[fine_iface_info->fine_ids[i]].insert(&fine_iface_info->fine_col_local_indexes[i]);
 						}
 					}
 				}
@@ -171,17 +160,14 @@ template <int D> class InterfaceDomain
 	 * @param curr_local_index the current index
 	 * @param interfaces the vector Interface objects
 	 */
-	static void
-	IndexRemainingColIfacesLocal(int                                               curr_local_index,
-	                             const std::vector<std::shared_ptr<Interface<D>>> &interfaces)
+	static void IndexRemainingColIfacesLocal(int curr_local_index, const std::vector<std::shared_ptr<Interface<D>>> &interfaces)
 	{
 		std::map<int, std::set<int *>> id_to_local_indexes_to_set;
 		for (auto iface : interfaces) {
 			for (auto patch : iface->patches) {
 				auto piinfo = patch.getNonConstPiinfo();
 
-				if (patch.type.isNormal() || patch.type.isFineToFine()
-				    || patch.type.isCoarseToCoarse()) {
+				if (patch.type.isNormal() || patch.type.isFineToFine() || patch.type.isCoarseToCoarse()) {
 					GetRemainginColIfacesLocalForPatch(piinfo, id_to_local_indexes_to_set);
 				}
 			}
@@ -199,9 +185,7 @@ template <int D> class InterfaceDomain
 	 * @param curr_local_index the current index
 	 * @param interfaces the vector Interface objects
 	 */
-	static void
-	IndexRemainingRowIfacesLocal(int                                               curr_local_index,
-	                             const std::vector<std::shared_ptr<Interface<D>>> &interfaces)
+	static void IndexRemainingRowIfacesLocal(int curr_local_index, const std::vector<std::shared_ptr<Interface<D>>> &interfaces)
 	{
 		std::map<int, std::set<int *>> id_to_local_indexes_to_set;
 		for (auto iface : interfaces) {
@@ -209,12 +193,11 @@ template <int D> class InterfaceDomain
 				auto piinfo = patch.getNonConstPiinfo();
 
 				for (Side<D> s : Side<D>::getValues()) {
-					if (piinfo->pinfo->hasNbr(s)) {
+					if (piinfo->pinfo.hasNbr(s)) {
 						auto iface_info = piinfo->getIfaceInfo(s);
 
 						if (iface_info->row_local_index == -1) {
-							id_to_local_indexes_to_set[iface_info->id].insert(
-							&iface_info->row_local_index);
+							id_to_local_indexes_to_set[iface_info->id].insert(&iface_info->row_local_index);
 						}
 					}
 				}
@@ -233,13 +216,11 @@ template <int D> class InterfaceDomain
 	 * @param curr_local_index the current index
 	 * @param interfaces the vector PatchIfaceInfo objects
 	 */
-	static void
-	IndexRemainingPatchIfacesLocal(int curr_local_index,
-	                               const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos)
+	static void IndexRemainingPatchIfacesLocal(int curr_local_index, const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos)
 	{
 		for (auto piinfo : piinfos) {
 			for (Side<D> s : Side<D>::getValues()) {
-				if (piinfo->pinfo->hasNbr(s)) {
+				if (piinfo->pinfo.hasNbr(s)) {
 					auto iface_info = piinfo->getIfaceInfo(s);
 
 					if (iface_info->patch_local_index == -1) {
@@ -262,8 +243,7 @@ template <int D> class InterfaceDomain
 		// get starting global index for this rank
 		int starting_global_index;
 		int num_local_interfaces = (int) interfaces.size();
-		MPI_Scan(&num_local_interfaces, &starting_global_index, 1, MPI_INT, MPI_SUM,
-		         MPI_COMM_WORLD);
+		MPI_Scan(&num_local_interfaces, &starting_global_index, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 		starting_global_index -= num_local_interfaces;
 
 		// index local interfaces first
@@ -271,12 +251,11 @@ template <int D> class InterfaceDomain
 			iface->global_index = starting_global_index + iface->local_index;
 
 			for (auto patch : iface->patches) {
-				if (patch.type.isNormal() || patch.type.isFineToFine()
-				    || patch.type.isCoarseToCoarse()) {
+				if (patch.type.isNormal() || patch.type.isFineToFine() || patch.type.isCoarseToCoarse()) {
 					auto iface_info          = patch.getNonConstPiinfo()->getIfaceInfo(patch.side);
 					iface_info->global_index = iface->global_index;
 				} else if (patch.type.isFineToCoarse()) {
-					auto iface_info = patch.getNonConstPiinfo()->getCoarseIfaceInfo(patch.side);
+					auto iface_info                 = patch.getNonConstPiinfo()->getCoarseIfaceInfo(patch.side);
 					iface_info->coarse_global_index = iface->global_index;
 				} else if (patch.type.isCoarseToFine()) {
 					auto iface_info = patch.getNonConstPiinfo()->getFineIfaceInfo(patch.side);
@@ -297,15 +276,13 @@ template <int D> class InterfaceDomain
 	 * @param interfaces the set of Interface objects
 	 * @param piinfos  the set of PatchIfaceInfo objects
 	 */
-	static void
-	SendAndReceiveGlobalIndexes(const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
-	                            const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos)
+	static void SendAndReceiveGlobalIndexes(const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
+	                                        const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos)
 	{
 		std::map<int, std::map<int, std::set<int *>>> rank_to_id_to_global_indexes_to_set;
 		std::deque<std::vector<int>>                  recv_buffers;
 		std::vector<MPI_Request>                      recv_requests;
-		SetupGlobalIndexRecvRequests(interfaces, piinfos, rank_to_id_to_global_indexes_to_set,
-		                             recv_buffers, recv_requests);
+		SetupGlobalIndexRecvRequests(interfaces, piinfos, rank_to_id_to_global_indexes_to_set, recv_buffers, recv_requests);
 
 		std::deque<std::vector<int>> send_buffers;
 		std::vector<MPI_Request>     send_requests;
@@ -316,9 +293,8 @@ template <int D> class InterfaceDomain
 			int        index;
 			MPI_Status status;
 			MPI_Waitany(recv_requests.size(), recv_requests.data(), &index, &status);
-			const std::vector<int> &buffer = recv_buffers[index];
-			const auto &            id_to_global_indexes_to_set
-			= rank_to_id_to_global_indexes_to_set[status.MPI_SOURCE];
+			const std::vector<int> &buffer                      = recv_buffers[index];
+			const auto &            id_to_global_indexes_to_set = rank_to_id_to_global_indexes_to_set[status.MPI_SOURCE];
 
 			// set the global indexes
 			size_t curr_index = 0;
@@ -343,19 +319,18 @@ template <int D> class InterfaceDomain
 	 * global index values will by sorted by the interface's id.
 	 * @param recv_requests (output) MPI_Irecv request status, one for each incoming rank.
 	 */
-	static void SetupGlobalIndexRecvRequests(
-	const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
-	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
-	std::map<int, std::map<int, std::set<int *>>> &        rank_to_id_to_global_indexes_to_set,
-	std::deque<std::vector<int>> &recv_buffers, std::vector<MPI_Request> &recv_requests)
+	static void SetupGlobalIndexRecvRequests(const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
+	                                         const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
+	                                         std::map<int, std::map<int, std::set<int *>>> &        rank_to_id_to_global_indexes_to_set,
+	                                         std::deque<std::vector<int>> &                         recv_buffers,
+	                                         std::vector<MPI_Request> &                             recv_requests)
 	{
 		GetGlobalIndexesToSet(interfaces, piinfos, rank_to_id_to_global_indexes_to_set);
 
 		for (auto pair : rank_to_id_to_global_indexes_to_set) {
 			recv_buffers.emplace_back(pair.second.size());
 			MPI_Request request;
-			MPI_Irecv(recv_buffers.back().data(), (int) recv_buffers.back().size(), MPI_INT,
-			          pair.first, 0, MPI_COMM_WORLD, &request);
+			MPI_Irecv(recv_buffers.back().data(), (int) recv_buffers.back().size(), MPI_INT, pair.first, 0, MPI_COMM_WORLD, &request);
 			recv_requests.push_back(request);
 		}
 	}
@@ -366,30 +341,25 @@ template <int D> class InterfaceDomain
 	 * @param rank_to_id_to_global_indexes_to_set (output) Map from rank of incoming process to
 	 * id of interface to pointers to global index values that have to be set
 	 */
-	static void GetGlobalIndexesToSetForOuterInterfaces(
-	std::shared_ptr<PatchIfaceInfo<D>>             piinfo,
-	std::map<int, std::map<int, std::set<int *>>> &rank_to_id_to_global_indexes_to_set)
+	static void GetGlobalIndexesToSetForOuterInterfaces(std::shared_ptr<PatchIfaceInfo<D>>             piinfo,
+	                                                    std::map<int, std::map<int, std::set<int *>>> &rank_to_id_to_global_indexes_to_set)
 	{
 		for (Side<D> s : Side<D>::getValues()) {
-			if (piinfo->pinfo->hasNbr(s)) {
-				NbrType nbr_type = piinfo->pinfo->getNbrType(s);
+			if (piinfo->pinfo.hasNbr(s)) {
+				NbrType nbr_type = piinfo->pinfo.getNbrType(s);
 
 				if (nbr_type == NbrType::Coarse) {
 					auto coarse_iface_info = piinfo->getCoarseIfaceInfo(s);
 					if (coarse_iface_info->coarse_global_index == -1) {
-						rank_to_id_to_global_indexes_to_set[coarse_iface_info->coarse_rank]
-						                                   [coarse_iface_info->coarse_id]
-						                                   .insert(
-						                                   &coarse_iface_info->coarse_global_index);
+						rank_to_id_to_global_indexes_to_set[coarse_iface_info->coarse_rank][coarse_iface_info->coarse_id].insert(
+						&coarse_iface_info->coarse_global_index);
 					}
 				} else if (nbr_type == NbrType::Fine) {
 					auto fine_iface_info = piinfo->getFineIfaceInfo(s);
 					for (size_t i = 0; i < fine_iface_info->fine_global_indexes.size(); i++) {
 						if (fine_iface_info->fine_global_indexes[i] == -1) {
-							rank_to_id_to_global_indexes_to_set[fine_iface_info->fine_ranks[i]]
-							                                   [fine_iface_info->fine_ids[i]]
-							                                   .insert(&fine_iface_info
-							                                            ->fine_global_indexes[i]);
+							rank_to_id_to_global_indexes_to_set[fine_iface_info->fine_ranks[i]][fine_iface_info->fine_ids[i]].insert(
+							&fine_iface_info->fine_global_indexes[i]);
 						}
 					}
 				}
@@ -404,10 +374,9 @@ template <int D> class InterfaceDomain
 	 * @param rank_to_id_to_global_indexes_to_set (output) Map from rank of incoming process to
 	 * id of interface to pointers to global index values that have to be set
 	 */
-	static void GetGlobalIndexesToSet(
-	const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
-	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
-	std::map<int, std::map<int, std::set<int *>>> &        rank_to_id_to_global_indexes_to_set)
+	static void GetGlobalIndexesToSet(const std::vector<std::shared_ptr<Interface<D>>> &     interfaces,
+	                                  const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
+	                                  std::map<int, std::map<int, std::set<int *>>> &        rank_to_id_to_global_indexes_to_set)
 	{
 		// patch interfaces
 		GetGlobalIndexesToSetForPatchInterfaces(piinfos, rank_to_id_to_global_indexes_to_set);
@@ -420,21 +389,18 @@ template <int D> class InterfaceDomain
 				// row
 				for (Side<D> s : Side<D>::getValues()) {
 					// the inner interfaces of this patch will affect this interface
-					if (piinfo->pinfo->hasNbr(s)) {
+					if (piinfo->pinfo.hasNbr(s)) {
 						auto iface_info = piinfo->getIfaceInfo(s);
 
 						if (iface_info->global_index == -1) {
-							rank_to_id_to_global_indexes_to_set[iface_info->rank][iface_info->id]
-							.insert(&iface_info->global_index);
+							rank_to_id_to_global_indexes_to_set[iface_info->rank][iface_info->id].insert(&iface_info->global_index);
 						}
 					}
 				}
 				// column
-				if (patch.type.isNormal() || patch.type.isFineToFine()
-				    || patch.type.isCoarseToCoarse()) {
+				if (patch.type.isNormal() || patch.type.isFineToFine() || patch.type.isCoarseToCoarse()) {
 					// this interface will affect the values of the outer interfaces
-					GetGlobalIndexesToSetForOuterInterfaces(piinfo,
-					                                        rank_to_id_to_global_indexes_to_set);
+					GetGlobalIndexesToSetForOuterInterfaces(piinfo, rank_to_id_to_global_indexes_to_set);
 				}
 			}
 		}
@@ -446,18 +412,16 @@ template <int D> class InterfaceDomain
 	 * @param rank_to_id_to_global_indexes_to_set (output) Map from rank of incoming process to
 	 * id of interface to pointers to global index values that have to be set
 	 */
-	static void GetGlobalIndexesToSetForPatchInterfaces(
-	const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
-	std::map<int, std::map<int, std::set<int *>>> &        rank_to_id_to_global_indexes_to_set)
+	static void GetGlobalIndexesToSetForPatchInterfaces(const std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &piinfos,
+	                                                    std::map<int, std::map<int, std::set<int *>>> &        rank_to_id_to_global_indexes_to_set)
 	{
 		for (auto piinfo : piinfos) {
 			for (Side<D> s : Side<D>::getValues()) {
-				if (piinfo->pinfo->hasNbr(s)) {
+				if (piinfo->pinfo.hasNbr(s)) {
 					auto iface_info = piinfo->getIfaceInfo(s);
 
 					if (iface_info->global_index == -1) {
-						rank_to_id_to_global_indexes_to_set[iface_info->rank][iface_info->id]
-						.insert(&iface_info->global_index);
+						rank_to_id_to_global_indexes_to_set[iface_info->rank][iface_info->id].insert(&iface_info->global_index);
 					}
 				}
 			}
@@ -471,10 +435,9 @@ template <int D> class InterfaceDomain
 	 * until sends are done.
 	 * @param send_requests (output) MPI_Isend request status, one for each outgoing rank
 	 */
-	static void
-	SetupGlobalIndexSendRequests(const std::vector<std::shared_ptr<Interface<D>>> &interfaces,
-	                             std::deque<std::vector<int>> &                    send_buffers,
-	                             std::vector<MPI_Request> &                        send_requests)
+	static void SetupGlobalIndexSendRequests(const std::vector<std::shared_ptr<Interface<D>>> &interfaces,
+	                                         std::deque<std::vector<int>> &                    send_buffers,
+	                                         std::vector<MPI_Request> &                        send_requests)
 	{
 		std::map<int, std::set<std::pair<int, int>>> rank_to_id_and_global_index_pairs;
 		GetGlobalIndexesToSend(interfaces, rank_to_id_and_global_index_pairs);
@@ -489,8 +452,7 @@ template <int D> class InterfaceDomain
 			}
 
 			MPI_Request request;
-			MPI_Isend(send_buffer.data(), (int) send_buffer.size(), MPI_INT, pair.first, 0,
-			          MPI_COMM_WORLD, &request);
+			MPI_Isend(send_buffer.data(), (int) send_buffer.size(), MPI_INT, pair.first, 0, MPI_COMM_WORLD, &request);
 			send_requests.push_back(request);
 		}
 	}
@@ -501,9 +463,8 @@ template <int D> class InterfaceDomain
 	 * @param rank_to_id_and_global_index_pairs (output) Map from rank of incoming process to set
 	 * of pairs of ids and global indexes
 	 */
-	static void GetGlobalIndexesToSend(
-	const std::vector<std::shared_ptr<Interface<D>>> &interfaces,
-	std::map<int, std::set<std::pair<int, int>>> &    rank_to_id_and_global_index_pairs)
+	static void GetGlobalIndexesToSend(const std::vector<std::shared_ptr<Interface<D>>> &interfaces,
+	                                   std::map<int, std::set<std::pair<int, int>>> &    rank_to_id_and_global_index_pairs)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -511,28 +472,24 @@ template <int D> class InterfaceDomain
 			for (auto patch : iface->patches) {
 				auto piinfo = patch.piinfo;
 				// patch interfaces
-				if (piinfo->pinfo->rank != rank) {
-					rank_to_id_and_global_index_pairs[piinfo->pinfo->rank].emplace(
-					iface->id, iface->global_index);
+				if (piinfo->pinfo.rank != rank) {
+					rank_to_id_and_global_index_pairs[piinfo->pinfo.rank].emplace(iface->id, iface->global_index);
 				}
 				// cols
 				for (Side<D> s : Side<D>::getValues()) {
 					// the inner interfaces of this patch will affect this interface
-					if (piinfo->pinfo->hasNbr(s)) {
+					if (piinfo->pinfo.hasNbr(s)) {
 						auto iface_info = piinfo->getIfaceInfo(s);
 
 						if (iface_info->rank != rank) {
-							rank_to_id_and_global_index_pairs[iface_info->rank].emplace(
-							iface->id, iface->global_index);
+							rank_to_id_and_global_index_pairs[iface_info->rank].emplace(iface->id, iface->global_index);
 						}
 					}
 				}
 				// row
-				if (patch.type.isNormal() || patch.type.isCoarseToCoarse()
-				    || patch.type.isFineToFine()) {
+				if (patch.type.isNormal() || patch.type.isCoarseToCoarse() || patch.type.isFineToFine()) {
 					// this interface will affect the values of the outer interfaces
-					GetGlobalIndexesToSendForOuterInterfaces(iface, piinfo,
-					                                         rank_to_id_and_global_index_pairs);
+					GetGlobalIndexesToSendForOuterInterfaces(iface, piinfo, rank_to_id_and_global_index_pairs);
 				}
 			}
 		}
@@ -545,28 +502,26 @@ template <int D> class InterfaceDomain
 	 * @param rank_to_id_to_global_indexes_to_set (output) Map from rank of incoming process to
 	 * id of interface to pointers to global index values that have to be set
 	 */
-	static void GetGlobalIndexesToSendForOuterInterfaces(
-	std::shared_ptr<const Interface<D>> interface, std::shared_ptr<const PatchIfaceInfo<D>> piinfo,
-	std::map<int, std::set<std::pair<int, int>>> &rank_to_id_and_global_index_pairs)
+	static void GetGlobalIndexesToSendForOuterInterfaces(std::shared_ptr<const Interface<D>>           interface,
+	                                                     std::shared_ptr<const PatchIfaceInfo<D>>      piinfo,
+	                                                     std::map<int, std::set<std::pair<int, int>>> &rank_to_id_and_global_index_pairs)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		for (Side<D> s : Side<D>::getValues()) {
-			if (piinfo->pinfo->hasNbr(s)) {
-				NbrType nbr_type = piinfo->pinfo->getNbrType(s);
+			if (piinfo->pinfo.hasNbr(s)) {
+				NbrType nbr_type = piinfo->pinfo.getNbrType(s);
 
 				if (nbr_type == NbrType::Coarse) {
 					auto coarse_iface_info = piinfo->getCoarseIfaceInfo(s);
 					if (coarse_iface_info->coarse_rank != rank) {
-						rank_to_id_and_global_index_pairs[coarse_iface_info->coarse_rank].emplace(
-						interface->id, interface->global_index);
+						rank_to_id_and_global_index_pairs[coarse_iface_info->coarse_rank].emplace(interface->id, interface->global_index);
 					}
 				} else if (nbr_type == NbrType::Fine) {
 					auto fine_iface_info = piinfo->getFineIfaceInfo(s);
 					for (size_t i = 0; i < fine_iface_info->fine_col_local_indexes.size(); i++) {
 						if (fine_iface_info->fine_ranks[i] != rank) {
-							rank_to_id_and_global_index_pairs[fine_iface_info->fine_ranks[i]]
-							.emplace(interface->id, interface->global_index);
+							rank_to_id_and_global_index_pairs[fine_iface_info->fine_ranks[i]].emplace(interface->id, interface->global_index);
 						}
 					}
 				}
@@ -589,7 +544,7 @@ template <int D> class InterfaceDomain
 		std::vector<std::shared_ptr<PatchIfaceInfo<D>>> piinfos_non_const;
 		piinfos.reserve(domain->getNumLocalPatches());
 		piinfos_non_const.reserve(domain->getNumLocalPatches());
-		for (auto &pinfo : domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
 			piinfos_non_const.emplace_back(new PatchIfaceInfo<D>(pinfo));
 			piinfos.push_back(piinfos_non_const.back());
 		}

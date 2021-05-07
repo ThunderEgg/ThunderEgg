@@ -106,7 +106,7 @@ TEST_CASE("Domain<3> local indexes match position in pinfo vector",
 
 	auto pinfo_vector = domain->getPatchInfoVector();
 	for (int i = 0; i < pinfo_vector.size(); i++) {
-		CHECK(pinfo_vector[i]->local_index == i);
+		CHECK(pinfo_vector[i].local_index == i);
 	}
 }
 TEST_CASE("Schur::InterfaceDomain<3> local indexes in neighbor info are consistent",
@@ -118,7 +118,7 @@ TEST_CASE("Schur::InterfaceDomain<3> local indexes in neighbor info are consiste
 	map<int, int> id_to_local_index_map;
 
 	for (auto pinfo : domain->getPatchInfoVector()) {
-		id_to_local_index_map[pinfo->id] = pinfo->local_index;
+		id_to_local_index_map[pinfo.id] = pinfo.local_index;
 	}
 
 	auto checkIdAndLocalIndex = [&](int id, int local_index) {
@@ -131,52 +131,52 @@ TEST_CASE("Schur::InterfaceDomain<3> local indexes in neighbor info are consiste
 	};
 	for (auto pinfo : domain->getPatchInfoVector()) {
 		for (Side<3> s : Side<3>::getValues()) {
-			if (pinfo->hasNbr(s)) {
-				NbrType type = pinfo->getNbrType(s);
+			if (pinfo.hasNbr(s)) {
+				NbrType type = pinfo.getNbrType(s);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<3> &info = pinfo->getNormalNbrInfo(s);
+					const NormalNbrInfo<3> &info = pinfo.getNormalNbrInfo(s);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<3> &info = pinfo->getFineNbrInfo(s);
+					const FineNbrInfo<3> &info = pinfo.getFineNbrInfo(s);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.local_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<3> &info = pinfo->getCoarseNbrInfo(s);
+					const CoarseNbrInfo<3> &info = pinfo.getCoarseNbrInfo(s);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				}
 			}
 		}
 		for (Edge<3> e : Edge<3>::getValues()) {
-			if (pinfo->hasEdgeNbr(e)) {
-				NbrType type = pinfo->getEdgeNbrType(e);
+			if (pinfo.hasEdgeNbr(e)) {
+				NbrType type = pinfo.getEdgeNbrType(e);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<2> &info = pinfo->getEdgeNormalNbrInfo(e);
+					const NormalNbrInfo<2> &info = pinfo.getEdgeNormalNbrInfo(e);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<2> &info = pinfo->getEdgeFineNbrInfo(e);
+					const FineNbrInfo<2> &info = pinfo.getEdgeFineNbrInfo(e);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.local_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<2> &info = pinfo->getEdgeCoarseNbrInfo(e);
+					const CoarseNbrInfo<2> &info = pinfo.getEdgeCoarseNbrInfo(e);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				}
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			if (pinfo->hasCornerNbr(c)) {
-				NbrType type = pinfo->getCornerNbrType(c);
+			if (pinfo.hasCornerNbr(c)) {
+				NbrType type = pinfo.getCornerNbrType(c);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<1> &info = pinfo->getCornerNormalNbrInfo(c);
+					const NormalNbrInfo<1> &info = pinfo.getCornerNormalNbrInfo(c);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<1> &info = pinfo->getCornerFineNbrInfo(c);
+					const FineNbrInfo<1> &info = pinfo.getCornerFineNbrInfo(c);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.local_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<1> &info = pinfo->getCornerCoarseNbrInfo(c);
+					const CoarseNbrInfo<1> &info = pinfo.getCornerCoarseNbrInfo(c);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				}
 			}
@@ -199,7 +199,7 @@ TEST_CASE("Domain<3> global indexes match position in pinfo vector",
 	}
 	auto pinfo_vector = domain->getPatchInfoVector();
 	for (int i = 0; i < pinfo_vector.size(); i++) {
-		CHECK(pinfo_vector[i]->global_index == start_i + i);
+		CHECK(pinfo_vector[i].global_index == start_i + i);
 	}
 }
 TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
@@ -212,7 +212,7 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 	std::vector<int> global_index_to_id_out(domain->getNumGlobalPatches());
 
 	for (auto pinfo : domain->getPatchInfoVector()) {
-		global_index_to_id_in[pinfo->global_index] = pinfo->id;
+		global_index_to_id_in[pinfo.global_index] = pinfo.id;
 	}
 
 	MPI_Allreduce(global_index_to_id_in.data(), global_index_to_id_out.data(), global_index_to_id_in.size(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
@@ -227,52 +227,52 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 	};
 	for (auto pinfo : domain->getPatchInfoVector()) {
 		for (Side<3> s : Side<3>::getValues()) {
-			if (pinfo->hasNbr(s)) {
-				NbrType type = pinfo->getNbrType(s);
+			if (pinfo.hasNbr(s)) {
+				NbrType type = pinfo.getNbrType(s);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<3> &info = pinfo->getNormalNbrInfo(s);
+					const NormalNbrInfo<3> &info = pinfo.getNormalNbrInfo(s);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<3> &info = pinfo->getFineNbrInfo(s);
+					const FineNbrInfo<3> &info = pinfo.getFineNbrInfo(s);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.global_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<3> &info = pinfo->getCoarseNbrInfo(s);
+					const CoarseNbrInfo<3> &info = pinfo.getCoarseNbrInfo(s);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				}
 			}
 		}
 		for (Edge<3> e : Edge<3>::getValues()) {
-			if (pinfo->hasEdgeNbr(e)) {
-				NbrType type = pinfo->getEdgeNbrType(e);
+			if (pinfo.hasEdgeNbr(e)) {
+				NbrType type = pinfo.getEdgeNbrType(e);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<2> &info = pinfo->getEdgeNormalNbrInfo(e);
+					const NormalNbrInfo<2> &info = pinfo.getEdgeNormalNbrInfo(e);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<2> &info = pinfo->getEdgeFineNbrInfo(e);
+					const FineNbrInfo<2> &info = pinfo.getEdgeFineNbrInfo(e);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.global_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<2> &info = pinfo->getEdgeCoarseNbrInfo(e);
+					const CoarseNbrInfo<2> &info = pinfo.getEdgeCoarseNbrInfo(e);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				}
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			if (pinfo->hasCornerNbr(c)) {
-				NbrType type = pinfo->getCornerNbrType(c);
+			if (pinfo.hasCornerNbr(c)) {
+				NbrType type = pinfo.getCornerNbrType(c);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<1> &info = pinfo->getCornerNormalNbrInfo(c);
+					const NormalNbrInfo<1> &info = pinfo.getCornerNormalNbrInfo(c);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<1> &info = pinfo->getCornerFineNbrInfo(c);
+					const FineNbrInfo<1> &info = pinfo.getCornerFineNbrInfo(c);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.global_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<1> &info = pinfo->getCornerCoarseNbrInfo(c);
+					const CoarseNbrInfo<1> &info = pinfo.getCornerCoarseNbrInfo(c);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				}
 			}

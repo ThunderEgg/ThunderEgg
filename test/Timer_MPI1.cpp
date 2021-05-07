@@ -12,17 +12,16 @@ using namespace ThunderEgg;
 
 static Domain<2> GetDomain()
 {
-	vector<shared_ptr<PatchInfo<2>>> pinfos(1);
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
 	double spacing   = 0.01;
 	int    num_ghost = 1;
 
-	pinfos[0].reset(new PatchInfo<2>());
-	pinfos[0]->id = 0;
-	pinfos[0]->ns.fill(n);
-	pinfos[0]->spacings.fill(spacing);
-	pinfos[0]->num_ghost_cells = num_ghost;
+	pinfos[0].id = 0;
+	pinfos[0].ns.fill(n);
+	pinfos[0].spacings.fill(spacing);
+	pinfos[0].num_ghost_cells = num_ghost;
 	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 	return d;
 }

@@ -4,8 +4,8 @@
 #include <ThunderEgg/TriLinearGhostFiller.h>
 #include <ThunderEgg/ValVectorGenerator.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
@@ -43,24 +43,24 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("z:     " << pinfo->starts[2]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		INFO("nz:    " << pinfo->ns[2]);
-		LocalData<3> vec_ld      = vec->getLocalData(0, pinfo->local_index);
-		LocalData<3> expected_ld = expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("z:     " << pinfo.starts[2]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		INFO("nz:    " << pinfo.ns[2]);
+		LocalData<3> vec_ld      = vec->getLocalData(0, pinfo.local_index);
+		LocalData<3> expected_ld = expected->getLocalData(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<2> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
@@ -106,26 +106,26 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("z:     " << pinfo->starts[2]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		INFO("nz:    " << pinfo->ns[2]);
-		LocalData<3> vec_ld       = vec->getLocalData(0, pinfo->local_index);
-		LocalData<3> expected_ld  = expected->getLocalData(0, pinfo->local_index);
-		LocalData<3> vec_ld2      = vec->getLocalData(1, pinfo->local_index);
-		LocalData<3> expected_ld2 = expected->getLocalData(1, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("z:     " << pinfo.starts[2]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		INFO("nz:    " << pinfo.ns[2]);
+		LocalData<3> vec_ld       = vec->getLocalData(0, pinfo.local_index);
+		LocalData<3> expected_ld  = expected->getLocalData(0, pinfo.local_index);
+		LocalData<3> vec_ld2      = vec->getLocalData(1, pinfo.local_index);
+		LocalData<3> expected_ld2 = expected->getLocalData(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<2> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
@@ -139,9 +139,9 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld2.getGhostSliceOnSide(s, 1);
 			LocalData<2> expected_ghost = expected_ld2.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
@@ -187,26 +187,26 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("z:     " << pinfo->starts[2]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		INFO("nz:    " << pinfo->ns[2]);
-		LocalData<3> vec_ld       = vec->getLocalData(0, pinfo->local_index);
-		LocalData<3> expected_ld  = expected->getLocalData(0, pinfo->local_index);
-		LocalData<3> vec_ld2      = vec->getLocalData(1, pinfo->local_index);
-		LocalData<3> expected_ld2 = expected->getLocalData(1, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("z:     " << pinfo.starts[2]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		INFO("nz:    " << pinfo.ns[2]);
+		LocalData<3> vec_ld       = vec->getLocalData(0, pinfo.local_index);
+		LocalData<3> expected_ld  = expected->getLocalData(0, pinfo.local_index);
+		LocalData<3> vec_ld2      = vec->getLocalData(1, pinfo.local_index);
+		LocalData<3> expected_ld2 = expected->getLocalData(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<2> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
@@ -220,9 +220,9 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld2.getGhostSliceOnSide(s, 1);
 			LocalData<2> expected_ghost = expected_ld2.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);
@@ -262,24 +262,24 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("z:     " << pinfo->starts[2]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		INFO("nz:    " << pinfo->ns[2]);
-		LocalData<3> vec_ld      = vec->getLocalData(0, pinfo->local_index);
-		LocalData<3> expected_ld = expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("z:     " << pinfo.starts[2]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		INFO("nz:    " << pinfo.ns[2]);
+		LocalData<3> vec_ld      = vec->getLocalData(0, pinfo.local_index);
+		LocalData<3> expected_ld = expected->getLocalData(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
 			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<2> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 2> &coord) {
 					               INFO("coord:  " << coord[0] << ", " << coord[1]);

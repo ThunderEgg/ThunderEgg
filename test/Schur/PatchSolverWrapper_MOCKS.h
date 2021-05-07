@@ -23,14 +23,15 @@
 #include <ThunderEgg/PatchSolver.h>
 #include <set>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 namespace ThunderEgg
 {
 namespace
 {
-template <int D> class MockGhostFiller : public GhostFiller<D>
+template <int D>
+class MockGhostFiller : public GhostFiller<D>
 {
 	private:
 	mutable bool called = false;
@@ -45,14 +46,16 @@ template <int D> class MockGhostFiller : public GhostFiller<D>
 		return called;
 	}
 };
-template <int D> class PatchFillingGhostFiller : public GhostFiller<D>
+template <int D>
+class PatchFillingGhostFiller : public GhostFiller<D>
 {
 	private:
 	mutable bool called = false;
 	double       fill_value;
 
 	public:
-	PatchFillingGhostFiller(double fill_value) : fill_value(fill_value) {}
+	PatchFillingGhostFiller(double fill_value)
+	: fill_value(fill_value) {}
 	void fillGhost(std::shared_ptr<const Vector<D>> u) const override
 	{
 		std::const_pointer_cast<Vector<D>>(u)->setWithGhost(fill_value);
@@ -63,10 +66,11 @@ template <int D> class PatchFillingGhostFiller : public GhostFiller<D>
 		return called;
 	}
 };
-template <int D> class MockPatchSolver : public PatchSolver<D>
+template <int D>
+class MockPatchSolver : public PatchSolver<D>
 {
 	private:
-	mutable std::set<std::shared_ptr<const PatchInfo<D>>> patches_to_be_called;
+	mutable std::set<int> patch_ids_to_be_called;
 
 	public:
 	MockPatchSolver(std::shared_ptr<const Domain<D>>      domain_in,
@@ -74,24 +78,25 @@ template <int D> class MockPatchSolver : public PatchSolver<D>
 	: PatchSolver<D>(domain_in, ghost_filler_in)
 	{
 		{
-			for (auto pinfo : this->domain->getPatchInfoVector()) {
-				patches_to_be_called.insert(pinfo);
+			for (const PatchInfo<D> &pinfo : this->domain->getPatchInfoVector()) {
+				patch_ids_to_be_called.insert(pinfo.id);
 			}
 		}
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                      const std::vector<LocalData<D>> &   fs,
-	                      std::vector<LocalData<D>> &         us) const override
+	void solveSinglePatch(const PatchInfo<D> &             pinfo,
+	                      const std::vector<LocalData<D>> &fs,
+	                      std::vector<LocalData<D>> &      us) const override
 	{
-		CHECK(patches_to_be_called.count(pinfo) == 1);
-		patches_to_be_called.erase(pinfo);
+		CHECK(patch_ids_to_be_called.count(pinfo.id) == 1);
+		patch_ids_to_be_called.erase(pinfo.id);
 	}
 	bool allPatchesCalled()
 	{
-		return patches_to_be_called.empty();
+		return patch_ids_to_be_called.empty();
 	}
 };
-template <int D> class RHSGhostCheckingPatchSolver : public PatchSolver<D>
+template <int D>
+class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 {
 	private:
 	double       schur_fill_value;
@@ -104,13 +109,13 @@ template <int D> class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 	: PatchSolver<D>(domain_in, ghost_filler_in), schur_fill_value(schur_fill_value)
 	{
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                      const std::vector<LocalData<D>> &   fs,
-	                      std::vector<LocalData<D>> &         us) const override
+	void solveSinglePatch(const PatchInfo<D> &             pinfo,
+	                      const std::vector<LocalData<D>> &fs,
+	                      std::vector<LocalData<D>> &      us) const override
 	{
 		was_called = true;
 		for (Side<D> s : Side<D>::getValues()) {
-			if (pinfo->hasNbr(s)) {
+			if (pinfo.hasNbr(s)) {
 				auto ghosts = us[0].getGhostSliceOnSide(s, 1);
 				auto inner  = us[0].getSliceOnSide(s);
 				nested_loop<D - 1>(

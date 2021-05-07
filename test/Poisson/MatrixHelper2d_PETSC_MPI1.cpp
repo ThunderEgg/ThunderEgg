@@ -75,15 +75,15 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		INFO("dx:    " << pinfo->spacings[0]);
-		INFO("dy:    " << pinfo->spacings[1]);
-		LocalData<2> f_vec_ld          = f_vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		INFO("dx:    " << pinfo.spacings[0]);
+		INFO("dy:    " << pinfo.spacings[1]);
+		LocalData<2> f_vec_ld          = f_vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(0, pinfo.local_index);
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -129,15 +129,15 @@ TEST_CASE(
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		INFO("dx:    " << pinfo->spacings[0]);
-		INFO("dy:    " << pinfo->spacings[1]);
-		LocalData<2> f_vec_ld          = f_vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		INFO("dx:    " << pinfo.spacings[0]);
+		INFO("dy:    " << pinfo.spacings[1]);
+		LocalData<2> f_vec_ld          = f_vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> f_vec_expected_ld = f_vec_expected->getLocalData(0, pinfo.local_index);
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

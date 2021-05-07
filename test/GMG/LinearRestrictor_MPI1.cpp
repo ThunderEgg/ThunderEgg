@@ -25,8 +25,8 @@
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/ValVector.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
@@ -64,14 +64,14 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		INFO("Patch:          " << pinfo->id);
-		INFO("x:              " << pinfo->starts[0]);
-		INFO("y:              " << pinfo->starts[1]);
-		INFO("nx:             " << pinfo->ns[0]);
-		INFO("ny:             " << pinfo->ns[1]);
-		INFO("parent_orth:    " << pinfo->orth_on_parent);
-		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch:          " << pinfo.id);
+		INFO("x:              " << pinfo.starts[0]);
+		INFO("y:              " << pinfo.starts[1]);
+		INFO("nx:             " << pinfo.ns[0]);
+		INFO("ny:             " << pinfo.ns[1]);
+		INFO("parent_orth:    " << pinfo.orth_on_parent);
+		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -79,7 +79,7 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
 			INFO("side:      " << s);
-			if (!pinfo->hasNbr(s)) {
+			if (!pinfo.hasNbr(s)) {
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               INFO("coord:  " << coord[0]);
@@ -129,16 +129,16 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		INFO("Patch:          " << pinfo->id);
-		INFO("x:              " << pinfo->starts[0]);
-		INFO("y:              " << pinfo->starts[1]);
-		INFO("nx:             " << pinfo->ns[0]);
-		INFO("ny:             " << pinfo->ns[1]);
-		INFO("parent_orth:    " << pinfo->orth_on_parent);
-		LocalData<2> vec_ld       = coarse_vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> expected_ld  = coarse_expected->getLocalData(0, pinfo->local_index);
-		LocalData<2> vec_ld2      = coarse_vec->getLocalData(1, pinfo->local_index);
-		LocalData<2> expected_ld2 = coarse_expected->getLocalData(1, pinfo->local_index);
+		INFO("Patch:          " << pinfo.id);
+		INFO("x:              " << pinfo.starts[0]);
+		INFO("y:              " << pinfo.starts[1]);
+		INFO("nx:             " << pinfo.ns[0]);
+		INFO("ny:             " << pinfo.ns[1]);
+		INFO("parent_orth:    " << pinfo.orth_on_parent);
+		LocalData<2> vec_ld       = coarse_vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld  = coarse_expected->getLocalData(0, pinfo.local_index);
+		LocalData<2> vec_ld2      = coarse_vec->getLocalData(1, pinfo.local_index);
+		LocalData<2> expected_ld2 = coarse_expected->getLocalData(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
@@ -149,7 +149,7 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 			LocalData<1> vec_ghost2      = vec_ld2.getGhostSliceOnSide(s, 1);
 			LocalData<1> expected_ghost2 = expected_ld2.getGhostSliceOnSide(s, 1);
 			INFO("side:      " << s);
-			if (!pinfo->hasNbr(s)) {
+			if (!pinfo.hasNbr(s)) {
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               INFO("coord:  " << coord[0]);
@@ -196,14 +196,14 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		INFO("Patch:          " << pinfo->id);
-		INFO("x:              " << pinfo->starts[0]);
-		INFO("y:              " << pinfo->starts[1]);
-		INFO("nx:             " << pinfo->ns[0]);
-		INFO("ny:             " << pinfo->ns[1]);
-		INFO("parent_orth:    " << pinfo->orth_on_parent);
-		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch:          " << pinfo.id);
+		INFO("x:              " << pinfo.starts[0]);
+		INFO("y:              " << pinfo.starts[1]);
+		INFO("nx:             " << pinfo.ns[0]);
+		INFO("ny:             " << pinfo.ns[1]);
+		INFO("parent_orth:    " << pinfo.orth_on_parent);
+		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -254,16 +254,16 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		INFO("Patch:          " << pinfo->id);
-		INFO("x:              " << pinfo->starts[0]);
-		INFO("y:              " << pinfo->starts[1]);
-		INFO("nx:             " << pinfo->ns[0]);
-		INFO("ny:             " << pinfo->ns[1]);
-		INFO("parent_orth:    " << pinfo->orth_on_parent);
-		LocalData<2> vec_ld       = coarse_vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> expected_ld  = coarse_expected->getLocalData(0, pinfo->local_index);
-		LocalData<2> vec_ld2      = coarse_vec->getLocalData(1, pinfo->local_index);
-		LocalData<2> expected_ld2 = coarse_expected->getLocalData(1, pinfo->local_index);
+		INFO("Patch:          " << pinfo.id);
+		INFO("x:              " << pinfo.starts[0]);
+		INFO("y:              " << pinfo.starts[1]);
+		INFO("nx:             " << pinfo.ns[0]);
+		INFO("ny:             " << pinfo.ns[1]);
+		INFO("parent_orth:    " << pinfo.orth_on_parent);
+		LocalData<2> vec_ld       = coarse_vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld  = coarse_expected->getLocalData(0, pinfo.local_index);
+		LocalData<2> vec_ld2      = coarse_vec->getLocalData(1, pinfo.local_index);
+		LocalData<2> expected_ld2 = coarse_expected->getLocalData(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));

@@ -35,14 +35,14 @@ bool contains(Container &deque, Value a)
 TEST_CASE("Schur::FineIfaceInfo constructor", "[Schur::FineIfaceInfo]")
 {
 	for (Side<2> s : Side<2>::getValues()) {
-		int           id                  = 1;
-		array<int, 2> nbr_ids             = {2, 3};
-		auto          pinfo               = make_shared<PatchInfo<2>>();
-		pinfo->rank                       = 0;
-		pinfo->id                         = id;
-		pinfo->nbr_info[s.getIndex()]     = make_unique<FineNbrInfo<2>>(nbr_ids);
-		pinfo->getFineNbrInfo(s).ranks[0] = 1;
-		pinfo->getFineNbrInfo(s).ranks[1] = 2;
+		int           id      = 1;
+		array<int, 2> nbr_ids = {2, 3};
+		PatchInfo<2>  pinfo;
+		pinfo.rank                       = 0;
+		pinfo.id                         = id;
+		pinfo.nbr_info[s.getIndex()]     = make_unique<FineNbrInfo<2>>(nbr_ids);
+		pinfo.getFineNbrInfo(s).ranks[0] = 1;
+		pinfo.getFineNbrInfo(s).ranks[1] = 2;
 		Schur::FineIfaceInfo<2> iface_info(pinfo, s);
 		INFO("Side: " << s);
 		CHECK(iface_info.rank == 0);

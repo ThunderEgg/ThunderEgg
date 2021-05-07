@@ -58,7 +58,7 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 *
 	 * Finesr domain is stored in back
 	 */
-	std::list<std::vector<std::shared_ptr<PatchInfo<3>>>> domain_patches;
+	std::list<std::vector<PatchInfo<3>>> domain_patches;
 
 	/**
 	 * @brief The dimensions of each patch
@@ -103,13 +103,6 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 * @brief Add NbrInfo objects to PatchInfo objects
 	 */
 	void linkNeighbors();
-
-	/**
-	 * @brief Get the patchinfos at the current leaves
-	 *
-	 * @return the PatchInfo objects
-	 */
-	std::vector<std::shared_ptr<PatchInfo<3>>> getPatchInfos();
 
 	/**
 	 * @brief update the parent_rank for the previous domain

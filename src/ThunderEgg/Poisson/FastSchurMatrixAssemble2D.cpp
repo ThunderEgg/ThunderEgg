@@ -119,10 +119,10 @@ class Block
  * @param side  the side that the ghost cells are on
  * @return LocalData<D> the LocalData object
  */
-LocalData<2> getLocalDataForBuffer(double *buffer_ptr, shared_ptr<const PatchInfo<2>> pinfo, const Side<2> side)
+LocalData<2> getLocalDataForBuffer(double *buffer_ptr, const PatchInfo<2> &pinfo, const Side<2> side)
 {
-	auto ns              = pinfo->ns;
-	int  num_ghost_cells = pinfo->num_ghost_cells;
+	auto ns              = pinfo.ns;
+	int  num_ghost_cells = pinfo.num_ghost_cells;
 	// determine striding
 	std::array<int, 2> strides;
 	strides[0] = 1;
@@ -174,14 +174,14 @@ void FillBlockColumnForCoarseToCoarseInterface(int                              
                                                const LocalData<2> &                     u,
                                                Side<2>                                  s,
                                                std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
-                                               std::shared_ptr<const PatchInfo<2>>      pinfo,
+                                               const PatchInfo<2> &                     pinfo,
                                                std::vector<double> &                    block)
 {
-	int  n                            = pinfo->ns[0];
-	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
-	new_pinfo->nbr_info[0]            = nullptr;
-	new_pinfo->nbr_info[s.getIndex()] = make_unique<FineNbrInfo<2>>();
-	std::vector<LocalData<2>> us      = {u};
+	int          n                   = pinfo.ns[0];
+	PatchInfo<2> new_pinfo           = pinfo;
+	new_pinfo.nbr_info[0]            = nullptr;
+	new_pinfo.nbr_info[s.getIndex()] = make_unique<FineNbrInfo<2>>();
+	std::vector<LocalData<2>> us     = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
 	auto slice       = u.getSliceOnSide(s);
 	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
@@ -205,15 +205,15 @@ void FillBlockColumnForFineToFineInterface(int                                  
                                            const LocalData<2> &                     u,
                                            Side<2>                                  s,
                                            std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
-                                           std::shared_ptr<const PatchInfo<2>>      pinfo,
+                                           const PatchInfo<2> &                     pinfo,
                                            IfaceType<2>                             type,
                                            std::vector<double> &                    block)
 {
-	int  n                            = pinfo->ns[0];
-	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
-	new_pinfo->nbr_info[0]            = nullptr;
-	new_pinfo->nbr_info[s.getIndex()] = make_unique<CoarseNbrInfo<2>>(100, type.getOrthant());
-	std::vector<LocalData<2>> us      = {u};
+	int          n                   = pinfo.ns[0];
+	PatchInfo<2> new_pinfo           = pinfo;
+	new_pinfo.nbr_info[0]            = nullptr;
+	new_pinfo.nbr_info[s.getIndex()] = make_unique<CoarseNbrInfo<2>>(100, type.getOrthant());
+	std::vector<LocalData<2>> us     = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
 	auto slice       = u.getSliceOnSide(s);
 	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
@@ -237,14 +237,14 @@ void FillBlockColumnForCoarseToFineInterface(int                                
                                              const LocalData<2> &                     u,
                                              Side<2>                                  s,
                                              std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
-                                             std::shared_ptr<const PatchInfo<2>>      pinfo,
+                                             const PatchInfo<2> &                     pinfo,
                                              IfaceType<2>                             type,
                                              std::vector<double> &                    block)
 {
-	int  n                            = pinfo->ns[0];
-	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
-	new_pinfo->nbr_info[0]            = nullptr;
-	new_pinfo->nbr_info[s.getIndex()] = make_unique<FineNbrInfo<2>>();
+	int          n                   = pinfo.ns[0];
+	PatchInfo<2> new_pinfo           = pinfo;
+	new_pinfo.nbr_info[0]            = nullptr;
+	new_pinfo.nbr_info[s.getIndex()] = make_unique<FineNbrInfo<2>>();
 	vector<double>            ghosts(n);
 	std::vector<LocalData<2>> us        = {u};
 	std::vector<LocalData<2>> nbr_datas = {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
@@ -268,14 +268,14 @@ void FillBlockColumnForFineToCoarseInterface(int                                
                                              const LocalData<2> &                     u,
                                              Side<2>                                  s,
                                              std::shared_ptr<const MPIGhostFiller<2>> ghost_filler,
-                                             std::shared_ptr<const PatchInfo<2>>      pinfo,
+                                             const PatchInfo<2> &                     pinfo,
                                              IfaceType<2>                             type,
                                              std::vector<double> &                    block)
 {
-	int  n                            = pinfo->ns[0];
-	auto new_pinfo                    = make_shared<PatchInfo<2>>(*pinfo);
-	new_pinfo->nbr_info[0]            = nullptr;
-	new_pinfo->nbr_info[s.getIndex()] = make_unique<CoarseNbrInfo<2>>(100, type.getOrthant());
+	int          n                   = pinfo.ns[0];
+	PatchInfo<2> new_pinfo           = pinfo;
+	new_pinfo.nbr_info[0]            = nullptr;
+	new_pinfo.nbr_info[s.getIndex()] = make_unique<CoarseNbrInfo<2>>(100, type.getOrthant());
 	vector<double>            ghosts(n);
 	std::vector<LocalData<2>> us        = {u};
 	std::vector<LocalData<2>> nbr_datas = {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
@@ -300,11 +300,11 @@ vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<2>> iface_domain, 
 			const PatchIfaceInfo<2> &sinfo = *patch.piinfo;
 			IfaceType<2>             type  = patch.type;
 			for (Side<2> s : Side<2>::getValues()) {
-				if (sinfo.pinfo->hasNbr(s)) {
+				if (sinfo.pinfo.hasNbr(s)) {
 					int            j = sinfo.getIfaceInfo(s)->global_index;
 					std::bitset<4> patch_neumann;
 					for (Side<2> s : Side<2>::getValues()) {
-						patch_neumann[s.getIndex()] = neumann[s.getIndex()] && !sinfo.pinfo->hasNbr(s);
+						patch_neumann[s.getIndex()] = neumann[s.getIndex()] && !sinfo.pinfo.hasNbr(s);
 					}
 					Block block(s, j, aux, i, patch_neumann, type);
 					bc_to_blocks[block.non_dirichlet_boundary.to_ulong()].insert(block);
@@ -327,8 +327,7 @@ vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<2>> iface_domain, 
  * @param pinfo the patchinfo that has to be solved on
  * @param solver the patch solver
  */
-template <class CoeffMap>
-void FillBlockCoeffs(CoeffMap coeffs, std::shared_ptr<const PatchInfo<2>> pinfo, std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver)
+template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<2> &pinfo, std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver)
 {
 	auto ns           = solver->getDomain()->getNs();
 	int  n            = ns[0];
@@ -394,22 +393,21 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>> iface_domain, std:
 
 	for (const set<Block> &blocks : GetBlocks(iface_domain, solver->getNeumann())) {
 		// create domain representing curr_type
-		auto pinfo             = make_shared<PatchInfo<2>>();
-		pinfo->nbr_info[0]     = make_unique<NormalNbrInfo<2>>();
-		pinfo->num_ghost_cells = 1;
-		auto piinfo            = make_shared<PatchIfaceInfo<2>>(pinfo);
-		piinfo->pinfo          = pinfo;
-		pinfo->ns.fill(n);
-		pinfo->spacings.fill(1.0 / n);
+		PatchInfo<2> pinfo;
+		pinfo.nbr_info[0]     = make_unique<NormalNbrInfo<2>>();
+		pinfo.num_ghost_cells = 1;
+		auto piinfo           = make_shared<PatchIfaceInfo<2>>(pinfo);
+		pinfo.ns.fill(n);
+		pinfo.spacings.fill(1.0 / n);
 		piinfo->setIfaceInfo(Side<2>::west(), make_shared<NormalIfaceInfo<2>>(pinfo, Side<2>::west()));
 
 		for (Side<2> s : Side<2>::getValues()) {
 			if (!blocks.begin()->non_dirichlet_boundary[s.getIndex()]) {
-				pinfo->nbr_info[s.getIndex()] = make_unique<NormalNbrInfo<2>>();
+				pinfo.nbr_info[s.getIndex()] = make_unique<NormalNbrInfo<2>>();
 			}
 		}
 
-		solver->addPatch(*pinfo);
+		solver->addPatch(pinfo);
 
 		std::vector<std::shared_ptr<PatchIfaceInfo<2>>> single_domain;
 		single_domain.push_back(piinfo);

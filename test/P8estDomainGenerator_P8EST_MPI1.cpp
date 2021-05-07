@@ -47,44 +47,44 @@ TEST_CASE("P8est SinglePatch", "[P8estDomainGenerator]")
 	CHECK(domain->getNumGlobalPatches() == 1);
 	auto patch = domain->getPatchInfoVector()[0];
 
-	CHECK_FALSE(patch->hasNbr(Side<3>::west()));
-	CHECK_FALSE(patch->hasNbr(Side<3>::east()));
-	CHECK_FALSE(patch->hasNbr(Side<3>::south()));
-	CHECK_FALSE(patch->hasNbr(Side<3>::north()));
-	CHECK_FALSE(patch->hasNbr(Side<3>::bottom()));
-	CHECK_FALSE(patch->hasNbr(Side<3>::top()));
+	CHECK_FALSE(patch.hasNbr(Side<3>::west()));
+	CHECK_FALSE(patch.hasNbr(Side<3>::east()));
+	CHECK_FALSE(patch.hasNbr(Side<3>::south()));
+	CHECK_FALSE(patch.hasNbr(Side<3>::north()));
+	CHECK_FALSE(patch.hasNbr(Side<3>::bottom()));
+	CHECK_FALSE(patch.hasNbr(Side<3>::top()));
 
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::bs()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::tn()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::bn()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::ts()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::bw()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::te()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::be()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::tw()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::sw()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::ne()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::se()));
-	CHECK_FALSE(patch->hasEdgeNbr(Edge<3>::nw()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::bs()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::tn()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::bn()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::ts()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::bw()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::te()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::be()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::tw()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::sw()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::ne()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::se()));
+	CHECK_FALSE(patch.hasEdgeNbr(Edge<3>::nw()));
 
-	CHECK_FALSE(patch->hasCornerNbr(Corner<3>::bsw()));
-	CHECK_FALSE(patch->hasCornerNbr(Corner<3>::bse()));
-	CHECK_FALSE(patch->hasCornerNbr(Corner<3>::bnw()));
-	CHECK_FALSE(patch->hasCornerNbr(Corner<3>::bne()));
-	CHECK_FALSE(patch->hasCornerNbr(Corner<3>::tsw()));
-	CHECK_FALSE(patch->hasCornerNbr(Corner<3>::tse()));
-	CHECK_FALSE(patch->hasCornerNbr(Corner<3>::tnw()));
-	CHECK_FALSE(patch->hasCornerNbr(Corner<3>::tne()));
+	CHECK_FALSE(patch.hasCornerNbr(Corner<3>::bsw()));
+	CHECK_FALSE(patch.hasCornerNbr(Corner<3>::bse()));
+	CHECK_FALSE(patch.hasCornerNbr(Corner<3>::bnw()));
+	CHECK_FALSE(patch.hasCornerNbr(Corner<3>::bne()));
+	CHECK_FALSE(patch.hasCornerNbr(Corner<3>::tsw()));
+	CHECK_FALSE(patch.hasCornerNbr(Corner<3>::tse()));
+	CHECK_FALSE(patch.hasCornerNbr(Corner<3>::tnw()));
+	CHECK_FALSE(patch.hasCornerNbr(Corner<3>::tne()));
 
-	CHECK(patch->spacings[0] == Catch::Approx(1.0 / 10));
-	CHECK(patch->spacings[1] == Catch::Approx(1.0 / 10));
-	CHECK(patch->spacings[2] == Catch::Approx(1.0 / 10));
-	CHECK(patch->starts[0] == Catch::Approx(0));
-	CHECK(patch->starts[1] == Catch::Approx(0));
-	CHECK(patch->starts[2] == Catch::Approx(0));
-	CHECK(patch->ns[0] == 10);
-	CHECK(patch->ns[1] == 10);
-	CHECK(patch->ns[2] == 10);
+	CHECK(patch.spacings[0] == Catch::Approx(1.0 / 10));
+	CHECK(patch.spacings[1] == Catch::Approx(1.0 / 10));
+	CHECK(patch.spacings[2] == Catch::Approx(1.0 / 10));
+	CHECK(patch.starts[0] == Catch::Approx(0));
+	CHECK(patch.starts[1] == Catch::Approx(0));
+	CHECK(patch.starts[2] == Catch::Approx(0));
+	CHECK(patch.ns[0] == 10);
+	CHECK(patch.ns[1] == 10);
+	CHECK(patch.ns[2] == 10);
 
 	CHECK_FALSE(dg.hasCoarserDomain());
 }
@@ -134,119 +134,117 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 	}
 	SECTION("patches have correct spacings")
 	{
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-			CHECK(patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-			CHECK(patch->spacings[2] == Catch::Approx(scale_z * 0.5 / nz));
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
+			CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
+			CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.5 / nz));
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-		CHECK(patch->spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
-		CHECK(patch->spacings[2] == Catch::Approx(scale_z * 1.0 / nz));
+		CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
+		CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
+		CHECK(patch.spacings[2] == Catch::Approx(scale_z * 1.0 / nz));
 	}
 	SECTION("patches have correct ns")
 	{
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->ns[0] == nx);
-			CHECK(patch->ns[1] == ny);
-			CHECK(patch->ns[2] == nz);
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.ns[0] == nx);
+			CHECK(patch.ns[1] == ny);
+			CHECK(patch.ns[2] == nz);
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->ns[0] == nx);
-		CHECK(patch->ns[1] == ny);
-		CHECK(patch->ns[2] == nz);
+		CHECK(patch.ns[0] == nx);
+		CHECK(patch.ns[1] == ny);
+		CHECK(patch.ns[2] == nz);
 	}
 	SECTION("patches have ranks set")
 	{
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->rank == 0);
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.rank == 0);
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->rank == 0);
+		CHECK(patch.rank == 0);
 	}
 	SECTION("patches have refine_level set")
 	{
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->refine_level == 1);
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.refine_level == 1);
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->refine_level == 0);
+		CHECK(patch.refine_level == 0);
 	}
 	SECTION("patches have num_ghost_cells set")
 	{
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->num_ghost_cells == num_ghost_cells);
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->num_ghost_cells == num_ghost_cells);
+		CHECK(patch.num_ghost_cells == num_ghost_cells);
 	}
-	std::shared_ptr<const PatchInfo<3>> domain_1_bsw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_bse_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_bnw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_bne_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_tsw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_tse_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_tnw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_tne_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_0_coarser_patch;
+	const PatchInfo<3> *domain_1_bsw_patch     = nullptr;
+	const PatchInfo<3> *domain_1_bse_patch     = nullptr;
+	const PatchInfo<3> *domain_1_bnw_patch     = nullptr;
+	const PatchInfo<3> *domain_1_bne_patch     = nullptr;
+	const PatchInfo<3> *domain_1_tsw_patch     = nullptr;
+	const PatchInfo<3> *domain_1_tse_patch     = nullptr;
+	const PatchInfo<3> *domain_1_tnw_patch     = nullptr;
+	const PatchInfo<3> *domain_1_tne_patch     = nullptr;
+	const PatchInfo<3> *domain_0_coarser_patch = nullptr;
 
-	for (auto patch : domain_1->getPatchInfoVector()) {
-		double x = patch->starts[0];
-		double y = patch->starts[1];
-		double z = patch->starts[2];
+	for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+		double x = patch.starts[0];
+		double y = patch.starts[1];
+		double z = patch.starts[2];
 		if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
-			domain_1_bsw_patch = patch;
+			domain_1_bsw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
-			domain_1_bse_patch = patch;
+			domain_1_bse_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0)) {
-			domain_1_bnw_patch = patch;
+			domain_1_bnw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0)) {
-			domain_1_bne_patch = patch;
+			domain_1_bne_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_1_tsw_patch = patch;
+			domain_1_tsw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_1_tse_patch = patch;
+			domain_1_tse_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_1_tnw_patch = patch;
+			domain_1_tnw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_1_tne_patch = patch;
+			domain_1_tne_patch = &patch;
 		}
 	}
 
-	domain_0_coarser_patch = domain_0->getPatchInfoVector()[0];
+	domain_0_coarser_patch = &domain_0->getPatchInfoVector()[0];
 
-	SECTION("patches have starts set")
-	{
-		REQUIRE(domain_1_bsw_patch != nullptr);
-		REQUIRE(domain_1_bse_patch != nullptr);
-		REQUIRE(domain_1_bnw_patch != nullptr);
-		REQUIRE(domain_1_bne_patch != nullptr);
-		REQUIRE(domain_1_tsw_patch != nullptr);
-		REQUIRE(domain_1_tse_patch != nullptr);
-		REQUIRE(domain_1_tnw_patch != nullptr);
-		REQUIRE(domain_1_tne_patch != nullptr);
+	REQUIRE(domain_1_bsw_patch != nullptr);
+	REQUIRE(domain_1_bse_patch != nullptr);
+	REQUIRE(domain_1_bnw_patch != nullptr);
+	REQUIRE(domain_1_bne_patch != nullptr);
+	REQUIRE(domain_1_tsw_patch != nullptr);
+	REQUIRE(domain_1_tse_patch != nullptr);
+	REQUIRE(domain_1_tnw_patch != nullptr);
+	REQUIRE(domain_1_tne_patch != nullptr);
 
-		CHECK(domain_0_coarser_patch->starts[0] == Catch::Approx(0.0));
-		CHECK(domain_0_coarser_patch->starts[1] == Catch::Approx(0.0));
-		CHECK(domain_0_coarser_patch->starts[2] == Catch::Approx(0.0));
-	}
+	CHECK(domain_0_coarser_patch->starts[0] == Catch::Approx(0.0));
+	CHECK(domain_0_coarser_patch->starts[1] == Catch::Approx(0.0));
+	CHECK(domain_0_coarser_patch->starts[2] == Catch::Approx(0.0));
+
 	SECTION("parent ids are set correctly")
 	{
 		CHECK(domain_1_bsw_patch->parent_id == domain_0_coarser_patch->id);
@@ -970,163 +968,163 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 
 	SECTION("patches have correct ns")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
-			CHECK(patch->ns[0] == nx);
-			CHECK(patch->ns[1] == ny);
-			CHECK(patch->ns[2] == nz);
+		for (const PatchInfo<3> &patch : domain_2->getPatchInfoVector()) {
+			CHECK(patch.ns[0] == nx);
+			CHECK(patch.ns[1] == ny);
+			CHECK(patch.ns[2] == nz);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->ns[0] == nx);
-			CHECK(patch->ns[1] == ny);
-			CHECK(patch->ns[2] == nz);
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.ns[0] == nx);
+			CHECK(patch.ns[1] == ny);
+			CHECK(patch.ns[2] == nz);
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->ns[0] == nx);
-		CHECK(patch->ns[1] == ny);
-		CHECK(patch->ns[2] == nz);
+		CHECK(patch.ns[0] == nx);
+		CHECK(patch.ns[1] == ny);
+		CHECK(patch.ns[2] == nz);
 	}
 	SECTION("patches have ranks set")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
-			CHECK(patch->rank == 0);
+		for (const PatchInfo<3> &patch : domain_2->getPatchInfoVector()) {
+			CHECK(patch.rank == 0);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->rank == 0);
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.rank == 0);
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->rank == 0);
+		CHECK(patch.rank == 0);
 	}
 
 	SECTION("patches have num_ghost_cells set")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
-			CHECK(patch->num_ghost_cells == num_ghost_cells);
+		for (const PatchInfo<3> &patch : domain_2->getPatchInfoVector()) {
+			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->num_ghost_cells == num_ghost_cells);
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->num_ghost_cells == num_ghost_cells);
+		CHECK(patch.num_ghost_cells == num_ghost_cells);
 	}
 
-	std::shared_ptr<const PatchInfo<3>> domain_2_bsw_bsw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bsw_bse_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bsw_bnw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bsw_bne_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bsw_tsw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bsw_tse_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bsw_tnw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bsw_tne_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bse_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bnw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_bne_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_tsw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_tse_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_tnw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_2_tne_patch;
+	const PatchInfo<3> *domain_2_bsw_bsw_patch = nullptr;
+	const PatchInfo<3> *domain_2_bsw_bse_patch = nullptr;
+	const PatchInfo<3> *domain_2_bsw_bnw_patch = nullptr;
+	const PatchInfo<3> *domain_2_bsw_bne_patch = nullptr;
+	const PatchInfo<3> *domain_2_bsw_tsw_patch = nullptr;
+	const PatchInfo<3> *domain_2_bsw_tse_patch = nullptr;
+	const PatchInfo<3> *domain_2_bsw_tnw_patch = nullptr;
+	const PatchInfo<3> *domain_2_bsw_tne_patch = nullptr;
+	const PatchInfo<3> *domain_2_bse_patch     = nullptr;
+	const PatchInfo<3> *domain_2_bnw_patch     = nullptr;
+	const PatchInfo<3> *domain_2_bne_patch     = nullptr;
+	const PatchInfo<3> *domain_2_tsw_patch     = nullptr;
+	const PatchInfo<3> *domain_2_tse_patch     = nullptr;
+	const PatchInfo<3> *domain_2_tnw_patch     = nullptr;
+	const PatchInfo<3> *domain_2_tne_patch     = nullptr;
 
-	std::shared_ptr<const PatchInfo<3>> domain_1_bsw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_bse_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_bnw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_bne_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_tsw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_tse_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_tnw_patch;
-	std::shared_ptr<const PatchInfo<3>> domain_1_tne_patch;
+	const PatchInfo<3> *domain_1_bsw_patch = nullptr;
+	const PatchInfo<3> *domain_1_bse_patch = nullptr;
+	const PatchInfo<3> *domain_1_bnw_patch = nullptr;
+	const PatchInfo<3> *domain_1_bne_patch = nullptr;
+	const PatchInfo<3> *domain_1_tsw_patch = nullptr;
+	const PatchInfo<3> *domain_1_tse_patch = nullptr;
+	const PatchInfo<3> *domain_1_tnw_patch = nullptr;
+	const PatchInfo<3> *domain_1_tne_patch = nullptr;
 
-	std::shared_ptr<const PatchInfo<3>> domain_0_patch;
+	const PatchInfo<3> *domain_0_patch = nullptr;
 
-	for (auto patch : domain_2->getPatchInfoVector()) {
-		double x = patch->starts[0];
-		double y = patch->starts[1];
-		double z = patch->starts[2];
+	for (const PatchInfo<3> &patch : domain_2->getPatchInfoVector()) {
+		double x = patch.starts[0];
+		double y = patch.starts[1];
+		double z = patch.starts[2];
 		if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
-			domain_2_bsw_bsw_patch = patch;
+			domain_2_bsw_bsw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
-			domain_2_bsw_bse_patch = patch;
+			domain_2_bsw_bse_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0.25 * scale_y) && z == Catch::Approx(0)) {
-			domain_2_bsw_bnw_patch = patch;
+			domain_2_bsw_bnw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.25 * scale_y) && z == Catch::Approx(0)) {
-			domain_2_bsw_bne_patch = patch;
+			domain_2_bsw_bne_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0.25 * scale_z)) {
-			domain_2_bsw_tsw_patch = patch;
+			domain_2_bsw_tsw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0) && z == Catch::Approx(0.25 * scale_z)) {
-			domain_2_bsw_tse_patch = patch;
+			domain_2_bsw_tse_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0.25 * scale_y) && z == Catch::Approx(0.25 * scale_z)) {
-			domain_2_bsw_tnw_patch = patch;
+			domain_2_bsw_tnw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.25 * scale_y) && z == Catch::Approx(0.25 * scale_z)) {
-			domain_2_bsw_tne_patch = patch;
+			domain_2_bsw_tne_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
-			domain_2_bse_patch = patch;
+			domain_2_bse_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0)) {
-			domain_2_bnw_patch = patch;
+			domain_2_bnw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0)) {
-			domain_2_bne_patch = patch;
+			domain_2_bne_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_2_tsw_patch = patch;
+			domain_2_tsw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_2_tse_patch = patch;
+			domain_2_tse_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_2_tnw_patch = patch;
+			domain_2_tnw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_2_tne_patch = patch;
+			domain_2_tne_patch = &patch;
 		}
 	}
 
-	for (auto patch : domain_1->getPatchInfoVector()) {
-		double x = patch->starts[0];
-		double y = patch->starts[1];
-		double z = patch->starts[2];
+	for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+		double x = patch.starts[0];
+		double y = patch.starts[1];
+		double z = patch.starts[2];
 		if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
-			domain_1_bsw_patch = patch;
+			domain_1_bsw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
-			domain_1_bse_patch = patch;
+			domain_1_bse_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0)) {
-			domain_1_bnw_patch = patch;
+			domain_1_bnw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0)) {
-			domain_1_bne_patch = patch;
+			domain_1_bne_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_1_tsw_patch = patch;
+			domain_1_tsw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_1_tse_patch = patch;
+			domain_1_tse_patch = &patch;
 		}
 		if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_1_tnw_patch = patch;
+			domain_1_tnw_patch = &patch;
 		}
 		if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y) && z == Catch::Approx(0.5 * scale_z)) {
-			domain_1_tne_patch = patch;
+			domain_1_tne_patch = &patch;
 		}
 	}
 
-	domain_0_patch = domain_0->getPatchInfoVector()[0];
+	domain_0_patch = &domain_0->getPatchInfoVector()[0];
 
 	REQUIRE(domain_2_bsw_bsw_patch != nullptr);
 	REQUIRE(domain_2_bsw_bse_patch != nullptr);
@@ -1206,17 +1204,17 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(domain_2_tne_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
 		CHECK(domain_2_tne_patch->spacings[2] == Catch::Approx(scale_z * 0.5 / nz));
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-			CHECK(patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-			CHECK(patch->spacings[2] == Catch::Approx(scale_z * 0.5 / nz));
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
+			CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
+			CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.5 / nz));
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-		CHECK(patch->spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
-		CHECK(patch->spacings[2] == Catch::Approx(scale_z * 1.0 / nz));
+		CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
+		CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
+		CHECK(patch.spacings[2] == Catch::Approx(scale_z * 1.0 / nz));
 	}
 
 	SECTION("patches have refine_level set")
@@ -1238,13 +1236,13 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(domain_2_tnw_patch->refine_level == 1);
 		CHECK(domain_2_tne_patch->refine_level == 1);
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
-			CHECK(patch->refine_level == 1);
+		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
+			CHECK(patch.refine_level == 1);
 		}
 
 		auto patch = domain_0->getPatchInfoVector()[0];
 
-		CHECK(patch->refine_level == 0);
+		CHECK(patch.refine_level == 0);
 	}
 
 	SECTION("parent ids are set correctly")
@@ -3117,37 +3115,37 @@ TEST_CASE("p8est 2x1x1 brick", "[P8estDomainGenerator]")
 	auto                 domain = dg.getFinestDomain();
 	CHECK(domain->getNumGlobalPatches() == 2);
 	auto patch1 = domain->getPatchInfoVector()[0];
-	CHECK_FALSE(patch1->hasNbr(Side<3>::west()));
-	CHECK(patch1->hasNbr(Side<3>::east()));
-	CHECK_FALSE(patch1->hasNbr(Side<3>::south()));
-	CHECK_FALSE(patch1->hasNbr(Side<3>::north()));
-	CHECK_FALSE(patch1->hasNbr(Side<3>::bottom()));
-	CHECK_FALSE(patch1->hasNbr(Side<3>::top()));
-	CHECK(patch1->spacings[0] == Catch::Approx(1.0 / 10));
-	CHECK(patch1->spacings[1] == Catch::Approx(1.0 / 10));
-	CHECK(patch1->spacings[2] == Catch::Approx(1.0 / 10));
-	CHECK(patch1->starts[0] == Catch::Approx(0));
-	CHECK(patch1->starts[1] == Catch::Approx(0));
-	CHECK(patch1->starts[2] == Catch::Approx(0));
-	CHECK(patch1->ns[0] == 10);
-	CHECK(patch1->ns[1] == 10);
-	CHECK(patch1->ns[2] == 10);
+	CHECK_FALSE(patch1.hasNbr(Side<3>::west()));
+	CHECK(patch1.hasNbr(Side<3>::east()));
+	CHECK_FALSE(patch1.hasNbr(Side<3>::south()));
+	CHECK_FALSE(patch1.hasNbr(Side<3>::north()));
+	CHECK_FALSE(patch1.hasNbr(Side<3>::bottom()));
+	CHECK_FALSE(patch1.hasNbr(Side<3>::top()));
+	CHECK(patch1.spacings[0] == Catch::Approx(1.0 / 10));
+	CHECK(patch1.spacings[1] == Catch::Approx(1.0 / 10));
+	CHECK(patch1.spacings[2] == Catch::Approx(1.0 / 10));
+	CHECK(patch1.starts[0] == Catch::Approx(0));
+	CHECK(patch1.starts[1] == Catch::Approx(0));
+	CHECK(patch1.starts[2] == Catch::Approx(0));
+	CHECK(patch1.ns[0] == 10);
+	CHECK(patch1.ns[1] == 10);
+	CHECK(patch1.ns[2] == 10);
 	auto patch2 = domain->getPatchInfoVector()[1];
-	CHECK(patch2->hasNbr(Side<3>::west()));
-	CHECK_FALSE(patch2->hasNbr(Side<3>::east()));
-	CHECK_FALSE(patch2->hasNbr(Side<3>::south()));
-	CHECK_FALSE(patch2->hasNbr(Side<3>::north()));
-	CHECK_FALSE(patch2->hasNbr(Side<3>::bottom()));
-	CHECK_FALSE(patch2->hasNbr(Side<3>::top()));
-	CHECK(patch2->spacings[0] == Catch::Approx(1.0 / 10));
-	CHECK(patch2->spacings[1] == Catch::Approx(1.0 / 10));
-	CHECK(patch2->spacings[2] == Catch::Approx(1.0 / 10));
-	CHECK(patch2->starts[0] == Catch::Approx(0));
-	CHECK(patch2->starts[1] == Catch::Approx(0));
-	CHECK(patch2->starts[2] == Catch::Approx(0));
-	CHECK(patch2->ns[0] == 10);
-	CHECK(patch2->ns[1] == 10);
-	CHECK(patch2->ns[2] == 10);
+	CHECK(patch2.hasNbr(Side<3>::west()));
+	CHECK_FALSE(patch2.hasNbr(Side<3>::east()));
+	CHECK_FALSE(patch2.hasNbr(Side<3>::south()));
+	CHECK_FALSE(patch2.hasNbr(Side<3>::north()));
+	CHECK_FALSE(patch2.hasNbr(Side<3>::bottom()));
+	CHECK_FALSE(patch2.hasNbr(Side<3>::top()));
+	CHECK(patch2.spacings[0] == Catch::Approx(1.0 / 10));
+	CHECK(patch2.spacings[1] == Catch::Approx(1.0 / 10));
+	CHECK(patch2.spacings[2] == Catch::Approx(1.0 / 10));
+	CHECK(patch2.starts[0] == Catch::Approx(0));
+	CHECK(patch2.starts[1] == Catch::Approx(0));
+	CHECK(patch2.starts[2] == Catch::Approx(0));
+	CHECK(patch2.ns[0] == 10);
+	CHECK(patch2.ns[1] == 10);
+	CHECK(patch2.ns[2] == 10);
 
 	CHECK_FALSE(dg.hasCoarserDomain());
 }

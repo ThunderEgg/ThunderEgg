@@ -393,11 +393,10 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		}
 		// process patches
 		for (auto pinfo : this->domain->getPatchInfoVector()) {
-			addPatch(*pinfo);
+			addPatch(pinfo);
 		}
 	}
-	void
-	solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo, const std::vector<LocalData<D>> &fs, std::vector<LocalData<D>> &us) const override
+	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &fs, std::vector<LocalData<D>> &us) const override
 	{
 		LocalData<D> f_copy_ld = f_copy->getLocalData(0, 0);
 		LocalData<D> tmp_ld    = tmp->getLocalData(0, 0);
@@ -407,15 +406,15 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		std::vector<LocalData<D>> f_copy_lds = {f_copy_ld};
 		op->addGhostToRHS(pinfo, us, f_copy_lds);
 
-		executePlan(plan1.at(*pinfo), f_copy_ld, tmp_ld);
+		executePlan(plan1.at(pinfo), f_copy_ld, tmp_ld);
 
-		tmp->getValArray() /= eigen_vals.at(*pinfo);
+		tmp->getValArray() /= eigen_vals.at(pinfo);
 
-		if (neumann.all() && pinfo->nbr_info == std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::num_sides>()) {
+		if (neumann.all() && pinfo.nbr_info == std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::num_sides>()) {
 			tmp->getValArray()[0] = 0;
 		}
 
-		executePlan(plan2.at(*pinfo), tmp_ld, us[0]);
+		executePlan(plan2.at(pinfo), tmp_ld, us[0]);
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {

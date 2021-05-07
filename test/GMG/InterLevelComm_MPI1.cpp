@@ -23,8 +23,8 @@
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/ValVector.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace ThunderEgg;
@@ -49,7 +49,7 @@ TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLe
 
 	map<int, set<int>> parents_to_children;
 	for (auto pair : ilc->getPatchesWithLocalParent()) {
-		parents_to_children[pair.first].insert(pair.second->id);
+		parents_to_children[pair.first].insert(pair.second.get().id);
 	}
 	CHECK(parents_to_children.size() == 4);
 	CHECK(parents_to_children.count(0) == 1);
@@ -86,7 +86,7 @@ TEST_CASE("1-processor getNewGhostVector on uniform 4x4", "[GMG::InterLevelComm]
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -102,7 +102,7 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
 	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, num_components);
 	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, num_components);

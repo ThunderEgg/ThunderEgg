@@ -114,12 +114,12 @@ void FillGhostForFineNbrUpper(const std::vector<LocalData<2>> &local_datas, cons
 }
 } // namespace
 
-void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-                                                       const std::vector<LocalData<2>> &   local_datas,
-                                                       const std::vector<LocalData<2>> &   nbr_datas,
-                                                       Side<2>                             side,
-                                                       NbrType                             nbr_type,
-                                                       Orthant<1>                          orthant) const
+void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
+                                                       const std::vector<LocalData<2>> &local_datas,
+                                                       const std::vector<LocalData<2>> &nbr_datas,
+                                                       Side<2>                          side,
+                                                       NbrType                          nbr_type,
+                                                       Orthant<1>                       orthant) const
 {
 	switch (nbr_type) {
 		case NbrType::Normal:
@@ -144,13 +144,12 @@ void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const Pat
 	}
 }
 
-void BiQuadraticGhostFiller::fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-                                                         const std::vector<LocalData<2>> &   local_datas) const
+void BiQuadraticGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, const std::vector<LocalData<2>> &local_datas) const
 {
 	for (const auto &local_data : local_datas) {
 		for (Side<2> side : Side<2>::getValues()) {
-			if (pinfo->hasNbr(side)) {
-				switch (pinfo->getNbrType(side)) {
+			if (pinfo.hasNbr(side)) {
+				switch (pinfo.getNbrType(side)) {
 					case NbrType::Normal:
 						// nothing need to be done
 						break;

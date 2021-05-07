@@ -39,31 +39,31 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	 */
 	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain_in) : MPIGhostFiller<2>(domain_in, 1) {}
 
-	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                               const std::vector<LocalData<2>> &   local_datas,
-	                               const std::vector<LocalData<2>> &   nbr_datas,
-	                               Side<2>                             side,
-	                               NbrType                             nbr_type,
-	                               Orthant<1>                          orthant_on_coarse) const override;
+	void fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
+	                               const std::vector<LocalData<2>> &local_datas,
+	                               const std::vector<LocalData<2>> &nbr_datas,
+	                               Side<2>                          side,
+	                               NbrType                          nbr_type,
+	                               Orthant<1>                       orthant_on_coarse) const override;
 
-	void fillGhostCellsForEdgeNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                                   const std::vector<LocalData<2>> &   local_datas,
-	                                   const std::vector<LocalData<2>> &   nbr_datas,
-	                                   Edge<2>                             edge,
-	                                   NbrType                             nbr_type,
-	                                   Orthant<1>                          orthant_on_coarse) const override
+	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<2> &             pinfo,
+	                                   const std::vector<LocalData<2>> &local_datas,
+	                                   const std::vector<LocalData<2>> &nbr_datas,
+	                                   Edge<2>                          edge,
+	                                   NbrType                          nbr_type,
+	                                   Orthant<1>                       orthant_on_coarse) const override
 	{
 	}
 
-	void fillGhostCellsForCornerNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-	                                     const std::vector<LocalData<2>> &   local_datas,
-	                                     const std::vector<LocalData<2>> &   nbr_datas,
-	                                     Corner<2>                           corner,
-	                                     NbrType                             nbr_type) const override
+	void fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &             pinfo,
+	                                     const std::vector<LocalData<2>> &local_datas,
+	                                     const std::vector<LocalData<2>> &nbr_datas,
+	                                     Corner<2>                        corner,
+	                                     NbrType                          nbr_type) const override
 	{
 	}
 
-	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<2>> pinfo, const std::vector<LocalData<2>> &local_datas) const override;
+	void fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, const std::vector<LocalData<2>> &local_datas) const override;
 };
 } // namespace ThunderEgg
 #endif

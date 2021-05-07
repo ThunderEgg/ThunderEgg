@@ -33,7 +33,8 @@ namespace ThunderEgg
 {
 namespace
 {
-template <int D> class MockGhostFiller : public GhostFiller<D>
+template <int D>
+class MockGhostFiller : public GhostFiller<D>
 {
 	private:
 	mutable bool called = false;
@@ -48,12 +49,13 @@ template <int D> class MockGhostFiller : public GhostFiller<D>
 		return called;
 	}
 };
-template <int D> class MockPatchOperator : public PatchOperator<D>
+template <int D>
+class MockPatchOperator : public PatchOperator<D>
 {
 	private:
-	std::shared_ptr<Vector<D>>                            u_vec;
-	std::shared_ptr<Vector<D>>                            f_vec;
-	mutable std::set<std::shared_ptr<const PatchInfo<D>>> patches_to_be_called;
+	std::shared_ptr<Vector<D>>             u_vec;
+	std::shared_ptr<Vector<D>>             f_vec;
+	mutable std::set<const PatchInfo<D> *> patches_to_be_called;
 
 	public:
 	MockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
@@ -61,30 +63,30 @@ template <int D> class MockPatchOperator : public PatchOperator<D>
 	                  std::shared_ptr<Vector<D>> u, std::shared_ptr<Vector<D>> f)
 	: PatchOperator<D>(domain, ghost_filler), u_vec(u), f_vec(f)
 	{
-		for (auto pinfo : this->domain->getPatchInfoVector()) {
-			patches_to_be_called.insert(pinfo);
+		for (const PatchInfo<D> &pinfo : this->domain->getPatchInfoVector()) {
+			patches_to_be_called.insert(&pinfo);
 		}
 	}
-	void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
+	void applySinglePatch(const PatchInfo<D> &             pinfo,
 	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
 	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
 		CHECK_FALSE(treat_interior_boundary_as_dirichlet);
-		CHECK(patches_to_be_called.count(pinfo) == 1);
-		patches_to_be_called.erase(pinfo);
-		INFO("LOCAL_INDEX: " << pinfo->local_index);
+		CHECK(patches_to_be_called.count(&pinfo) == 1);
+		patches_to_be_called.erase(&pinfo);
+		INFO("LOCAL_INDEX: " << pinfo.local_index);
 		for (int c = 0; c < u_vec->getNumComponents(); c++) {
 			INFO("c: " << c);
-			CHECK(u_vec->getLocalData(c, pinfo->local_index).getPtr() == us[c].getPtr());
+			CHECK(u_vec->getLocalData(c, pinfo.local_index).getPtr() == us[c].getPtr());
 		}
 		for (int c = 0; c < f_vec->getNumComponents(); c++) {
 			INFO("c: " << c);
-			CHECK(f_vec->getLocalData(c, pinfo->local_index).getPtr() == fs[c].getPtr());
+			CHECK(f_vec->getLocalData(c, pinfo.local_index).getPtr() == fs[c].getPtr());
 		}
 	}
-	void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                   const std::vector<LocalData<D>> &   us,
-	                   std::vector<LocalData<D>> &         fs) const override
+	void addGhostToRHS(const PatchInfo<D> &             pinfo,
+	                   const std::vector<LocalData<D>> &us,
+	                   std::vector<LocalData<D>> &      fs) const override
 	{
 	}
 	bool allPatchesCalled()

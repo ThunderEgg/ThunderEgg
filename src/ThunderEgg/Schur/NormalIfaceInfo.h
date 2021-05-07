@@ -42,15 +42,15 @@ template <int D> class NormalIfaceInfo : public IfaceInfo<D>
 	 * @param s the side
 	 * @return int the rank
 	 */
-	static int GetRank(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
+	static int GetRank(const PatchInfo<D> &pinfo, Side<D> s)
 	{
 		if (s.isLowerOnAxis()) {
 			// lower axis interface belongs to neighboring rank
-			auto nbr_info = pinfo->getNormalNbrInfo(s);
+			auto nbr_info = pinfo.getNormalNbrInfo(s);
 			return nbr_info.rank;
 		} else {
 			// higher axis interafce belongs to this patch's rank
-			return pinfo->rank;
+			return pinfo.rank;
 		}
 	}
 
@@ -61,15 +61,15 @@ template <int D> class NormalIfaceInfo : public IfaceInfo<D>
 	 * @param s the side
 	 * @return int the id
 	 */
-	static int GetId(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
+	static int GetId(const PatchInfo<D> &pinfo, Side<D> s)
 	{
 		if (s.isLowerOnAxis()) {
 			// lower axis interface belongs to neighboring rank
-			auto nbr_info = pinfo->getNormalNbrInfo(s);
+			auto nbr_info = pinfo.getNormalNbrInfo(s);
 			return (int) (nbr_info.id * Side<D>::num_sides + s.opposite().getIndex());
 		} else {
 			// higher axis interafce belongs to this patch's rank
-			return (int) (pinfo->id * Side<D>::num_sides + s.getIndex());
+			return (int) (pinfo.id * Side<D>::num_sides + s.getIndex());
 		}
 	}
 
@@ -80,7 +80,7 @@ template <int D> class NormalIfaceInfo : public IfaceInfo<D>
 	 * @param pinfo the associated PatchInfo object
 	 * @param s the side of the patch that the interface is on
 	 */
-	NormalIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s) : IfaceInfo<D>(GetRank(pinfo, s), GetId(pinfo, s)) {}
+	NormalIfaceInfo(const PatchInfo<D> &pinfo, Side<D> s) : IfaceInfo<D>(GetRank(pinfo, s), GetId(pinfo, s)) {}
 };
 } // namespace Schur
 } // namespace ThunderEgg

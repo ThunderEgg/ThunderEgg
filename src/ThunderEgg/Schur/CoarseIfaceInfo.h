@@ -45,9 +45,9 @@ template <int D> class CoarseIfaceInfo : public IfaceInfo<D>
 	 * @param s the side
 	 * @return int the id
 	 */
-	static int GetId(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
+	static int GetId(const PatchInfo<D> &pinfo, Side<D> s)
 	{
-		return (int) (pinfo->id * Side<D>::num_sides + s.getIndex());
+		return (int) (pinfo.id * Side<D>::num_sides + s.getIndex());
 	}
 
 	public:
@@ -79,10 +79,10 @@ template <int D> class CoarseIfaceInfo : public IfaceInfo<D>
 	 * @param pinfo the cooresponding PatchInfo object
 	 * @param s the side that the interface is on
 	 */
-	CoarseIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s) : IfaceInfo<D>(pinfo->rank, GetId(pinfo, s))
+	CoarseIfaceInfo(const PatchInfo<D> &pinfo, Side<D> s) : IfaceInfo<D>(pinfo.rank, GetId(pinfo, s))
 	{
 		// fine and coarse interfaces always belong to their patches
-		auto nbr_info  = pinfo->getCoarseNbrInfo(s);
+		auto nbr_info  = pinfo.getCoarseNbrInfo(s);
 		orth_on_coarse = nbr_info.orth_on_coarse;
 		coarse_rank    = nbr_info.rank;
 		coarse_id      = nbr_info.id * Side<D>::num_sides + s.opposite().getIndex();

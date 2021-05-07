@@ -81,11 +81,11 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 	auto f_expected = ValVector<2>::GetNewVector(d_fine, 1);
 	f_expected->copy(f_vec);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto u = g_vec->getLocalData(0, pinfo->local_index);
-		auto f = f_expected->getLocalData(0, pinfo->local_index);
+		auto u = g_vec->getLocalData(0, pinfo.local_index);
+		auto f = f_expected->getLocalData(0, pinfo.local_index);
 		for (Side<2> s : Side<2>::getValues()) {
-			if (pinfo->hasNbr(s)) {
-				double h2      = std::pow(pinfo->spacings[s.getAxisIndex()], 2);
+			if (pinfo.hasNbr(s)) {
+				double h2      = std::pow(pinfo.spacings[s.getAxisIndex()], 2);
 				auto   f_slice = f.getSliceOnSide(s);
 				auto   u_inner = u.getSliceOnSide(s);
 				auto   u_ghost = u.getSliceOnSide(s, -1);
@@ -97,19 +97,19 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto gs = g_vec->getLocalDatas(pinfo->local_index);
-		auto fs = f_vec->getLocalDatas(pinfo->local_index);
+		auto gs = g_vec->getLocalDatas(pinfo.local_index);
+		auto fs = f_vec->getLocalDatas(pinfo.local_index);
 		p_operator->addGhostToRHS(pinfo, gs, fs);
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = f_vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> expected_ld = f_expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		LocalData<2> vec_ld      = f_vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld = f_expected->getLocalData(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -149,13 +149,13 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
 	p_operator->apply(g_vec, f_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld          = f_vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> expected_vec_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		LocalData<2> vec_ld          = f_vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_vec_ld = f_vec_expected->getLocalData(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -197,13 +197,13 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 	p_operator->apply(g_vec, f_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld           = f_vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> exptected_vec_ld = f_vec_expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		LocalData<2> vec_ld           = f_vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> exptected_vec_ld = f_vec_expected->getLocalData(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

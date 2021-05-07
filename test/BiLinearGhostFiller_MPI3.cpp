@@ -3,8 +3,8 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/ValVector.h>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
@@ -40,13 +40,13 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
@@ -54,9 +54,9 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               ///
@@ -95,13 +95,13 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo->id);
-		INFO("x:     " << pinfo->starts[0]);
-		INFO("y:     " << pinfo->starts[1]);
-		INFO("nx:    " << pinfo->ns[0]);
-		INFO("ny:    " << pinfo->ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo->local_index);
-		LocalData<2> expected_ld = expected->getLocalData(0, pinfo->local_index);
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
@@ -109,9 +109,9 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 		for (Side<2> s : Side<2>::getValues()) {
 			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
 			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
-			if (pinfo->hasNbr(s)) {
+			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
-				INFO("nbr-type:  " << pinfo->getNbrType(s));
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 				               [&](const array<int, 1> &coord) {
 					               ///

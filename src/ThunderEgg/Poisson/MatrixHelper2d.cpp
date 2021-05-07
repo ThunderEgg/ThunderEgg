@@ -39,9 +39,9 @@ Mat MatrixHelper2d::formCRSMatrix(double lambda)
 	MatMPIAIJSetPreallocation(A, 19, nullptr, 19, nullptr);
 
 	for (auto &pinfo : domain->getPatchInfoVector()) {
-		double h_x   = pinfo->spacings[0];
-		double h_y   = pinfo->spacings[1];
-		int    start = nx * ny * pinfo->global_index;
+		double h_x   = pinfo.spacings[0];
+		double h_y   = pinfo.spacings[1];
+		int    start = nx * ny * pinfo.global_index;
 
 		// center coeffs
 		double coeff = -2.0 / (h_x * h_x) - 2.0 / (h_y * h_y) + lambda;
@@ -87,7 +87,7 @@ Mat MatrixHelper2d::formCRSMatrix(double lambda)
 		}
 		// boundaries
 		for (Side<2> s : Side<2>::getValues()) {
-			StencilHelper2d *sh = getStencilHelper(*pinfo, s, neumann);
+			StencilHelper2d *sh = getStencilHelper(pinfo, s, neumann);
 			for (int i = 0; i < sh->n; i++) {
 				int     row    = sh->row(i);
 				int     size   = sh->size(i);

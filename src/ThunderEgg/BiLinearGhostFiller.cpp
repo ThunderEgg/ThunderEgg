@@ -33,16 +33,16 @@ void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, const s
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 	}
 }
-void FillGhostForCoarseNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
-                           const std::vector<LocalData<2>> &   local_datas,
-                           const std::vector<LocalData<2>> &   nbr_datas,
-                           const Side<2>                       side,
-                           const Orthant<1>                    orthant)
+void FillGhostForCoarseNbr(const PatchInfo<2> &             pinfo,
+                           const std::vector<LocalData<2>> &local_datas,
+                           const std::vector<LocalData<2>> &nbr_datas,
+                           const Side<2>                    side,
+                           const Orthant<1>                 orthant)
 {
-	auto nbr_info = pinfo->getCoarseNbrInfo(side);
+	auto nbr_info = pinfo.getCoarseNbrInfo(side);
 	int  offset   = 0;
 	if (orthant == Orthant<1>::upper()) {
-		offset = pinfo->ns[!side.getAxisIndex()];
+		offset = pinfo.ns[!side.getAxisIndex()];
 	}
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOnSide(side);
@@ -52,16 +52,16 @@ void FillGhostForCoarseNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
 		});
 	}
 }
-void FillGhostForFineNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
-                         const std::vector<LocalData<2>> &   local_datas,
-                         const std::vector<LocalData<2>> &   nbr_datas,
-                         const Side<2>                       side,
-                         const Orthant<1>                    orthant)
+void FillGhostForFineNbr(const PatchInfo<2> &             pinfo,
+                         const std::vector<LocalData<2>> &local_datas,
+                         const std::vector<LocalData<2>> &nbr_datas,
+                         const Side<2>                    side,
+                         const Orthant<1>                 orthant)
 {
-	auto nbr_info = pinfo->getFineNbrInfo(side);
+	auto nbr_info = pinfo.getFineNbrInfo(side);
 	int  offset   = 0;
 	if (orthant == Orthant<1>::upper()) {
-		offset = pinfo->ns[!side.getAxisIndex()];
+		offset = pinfo.ns[!side.getAxisIndex()];
 	}
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOnSide(side);
@@ -71,13 +71,13 @@ void FillGhostForFineNbr(std::shared_ptr<const PatchInfo<2>> pinfo,
 		});
 	}
 }
-void FillLocalGhostsForCoarseNbr(std::shared_ptr<const PatchInfo<2>> pinfo, const LocalData<2> &local_data, const Side<2> side)
+void FillLocalGhostsForCoarseNbr(const PatchInfo<2> &pinfo, const LocalData<2> &local_data, const Side<2> side)
 {
 	auto local_slice  = local_data.getSliceOnSide(side);
 	auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
 	int  offset       = 0;
-	if (pinfo->getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper()) {
-		offset = pinfo->ns[!side.getAxisIndex()];
+	if (pinfo.getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper()) {
+		offset = pinfo.ns[!side.getAxisIndex()];
 	}
 	nested_loop<1>(local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
 		local_ghosts[coord] += 2.0 / 3.0 * local_slice[coord];
@@ -96,12 +96,12 @@ void FillLocalGhostsForFineNbr(const LocalData<2> &local_data, const Side<2> sid
 	local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
 }
 } // namespace
-void BiLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<2>> pinfo,
-                                                    const std::vector<LocalData<2>> &   local_datas,
-                                                    const std::vector<LocalData<2>> &   nbr_datas,
-                                                    Side<2>                             side,
-                                                    NbrType                             nbr_type,
-                                                    Orthant<1>                          orthant_on_coarse) const
+void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
+                                                    const std::vector<LocalData<2>> &local_datas,
+                                                    const std::vector<LocalData<2>> &nbr_datas,
+                                                    Side<2>                          side,
+                                                    NbrType                          nbr_type,
+                                                    Orthant<1>                       orthant_on_coarse) const
 {
 	switch (nbr_type) {
 		case NbrType::Normal:
@@ -118,12 +118,12 @@ void BiLinearGhostFiller::fillGhostCellsForNbrPatch(std::shared_ptr<const PatchI
 	}
 }
 
-void BiLinearGhostFiller::fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<2>> pinfo, const std::vector<LocalData<2>> &local_datas) const
+void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, const std::vector<LocalData<2>> &local_datas) const
 {
 	for (auto &local_data : local_datas) {
 		for (Side<2> side : Side<2>::getValues()) {
-			if (pinfo->hasNbr(side)) {
-				switch (pinfo->getNbrType(side)) {
+			if (pinfo.hasNbr(side)) {
+				switch (pinfo.getNbrType(side)) {
 					case NbrType::Normal:
 						// nothing needs to be done
 						break;

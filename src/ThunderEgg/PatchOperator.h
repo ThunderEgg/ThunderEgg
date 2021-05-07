@@ -54,9 +54,9 @@ template <int D> class PatchOperator : public Operator<D>
 	 * @param domain_in  the Domain
 	 * @param ghost_filler_in the GhostFiller
 	 */
-	PatchOperator(std::shared_ptr<const Domain<D>>      domain_in,
-	              std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
-	: domain(domain_in), ghost_filler(ghost_filler_in)
+	PatchOperator(std::shared_ptr<const Domain<D>> domain_in, std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
+	: domain(domain_in),
+	  ghost_filler(ghost_filler_in)
 	{
 	}
 	/**
@@ -76,10 +76,10 @@ template <int D> class PatchOperator : public Operator<D>
 	 * modified so that the interior boundaries are assumed to be zero, and the ghost values should
 	 * not be used
 	 */
-	virtual void applySinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                              const std::vector<LocalData<D>> &   us,
-	                              std::vector<LocalData<D>> &         fs,
-	                              bool treat_interior_boundary_as_dirichlet) const = 0;
+	virtual void applySinglePatch(const PatchInfo<D> &             pinfo,
+	                              const std::vector<LocalData<D>> &us,
+	                              std::vector<LocalData<D>> &      fs,
+	                              bool                             treat_interior_boundary_as_dirichlet) const = 0;
 	/**
 	 * @brief Treat the internal patch boundaries as an dirichlet boundary condition, and modify the
 	 * RHS accordingly.
@@ -90,9 +90,7 @@ template <int D> class PatchOperator : public Operator<D>
 	 * @param us the left hand side
 	 * @param fs the right hand side
 	 */
-	virtual void addGhostToRHS(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                           const std::vector<LocalData<D>> &   us,
-	                           std::vector<LocalData<D>> &         fs) const = 0;
+	virtual void addGhostToRHS(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs) const = 0;
 
 	/**
 	 * @brief Apply the operator
@@ -105,9 +103,9 @@ template <int D> class PatchOperator : public Operator<D>
 	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f) const override
 	{
 		ghost_filler->fillGhost(u);
-		for (auto pinfo : domain->getPatchInfoVector()) {
-			auto us = u->getLocalDatas(pinfo->local_index);
-			auto fs = f->getLocalDatas(pinfo->local_index);
+		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
+			auto us = u->getLocalDatas(pinfo.local_index);
+			auto fs = f->getLocalDatas(pinfo.local_index);
 			applySinglePatch(pinfo, us, fs, false);
 		}
 	}

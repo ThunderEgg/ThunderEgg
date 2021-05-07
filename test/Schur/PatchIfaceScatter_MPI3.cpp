@@ -25,8 +25,8 @@
 
 #include <limits>
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
@@ -173,7 +173,7 @@ TEST_CASE(
 
 	for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
 		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo->hasNbr(s)) {
+			if (piinfo->pinfo.hasNbr(s)) {
 				auto iface_info = piinfo->getIfaceInfo(s);
 				patch_iface_interfaces.insert(iface_info->id);
 			}
@@ -272,9 +272,9 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
 	scatter.scatterStart(global_vector, local_vector);
 	scatter.scatterFinish(global_vector, local_vector);
 	for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
-		INFO("PATCH_ID: " << piinfo->pinfo->id);
+		INFO("PATCH_ID: " << piinfo->pinfo.id);
 		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo->hasNbr(s)) {
+			if (piinfo->pinfo.hasNbr(s)) {
 				INFO("Side: " << s);
 				auto iface_info = piinfo->getIfaceInfo(s);
 				auto local_data = local_vector->getLocalData(0, iface_info->patch_local_index);
@@ -316,9 +316,9 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice", "[Schur::PatchIfaceScatte
 	scatter.scatterStart(global_vector, local_vector);
 	scatter.scatterFinish(global_vector, local_vector);
 	for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
-		INFO("PATCH_ID: " << piinfo->pinfo->id);
+		INFO("PATCH_ID: " << piinfo->pinfo.id);
 		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo->hasNbr(s)) {
+			if (piinfo->pinfo.hasNbr(s)) {
 				INFO("Side: " << s);
 				auto iface_info = piinfo->getIfaceInfo(s);
 				auto local_data = local_vector->getLocalData(0, iface_info->patch_local_index);
@@ -360,9 +360,9 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled"
 	scatter.scatterStart(global_vector, local_vector);
 	scatter.scatterFinish(global_vector, local_vector);
 	for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
-		INFO("PATCH_ID: " << piinfo->pinfo->id);
+		INFO("PATCH_ID: " << piinfo->pinfo.id);
 		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo->hasNbr(s)) {
+			if (piinfo->pinfo.hasNbr(s)) {
 				INFO("Side: " << s);
 				auto iface_info = piinfo->getIfaceInfo(s);
 				auto local_data = local_vector->getLocalData(0, iface_info->patch_local_index);

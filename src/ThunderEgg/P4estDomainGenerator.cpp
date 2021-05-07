@@ -209,8 +209,6 @@ void P4estDomainGenerator::extractLevel()
 
 	linkNeighbors();
 
-	domain_patches.push_front(getPatchInfos());
-
 	if (domain_patches.size() == 2) {
 		updateParentRanksOfPreviousDomain();
 	}
@@ -275,16 +273,16 @@ void P4estDomainGenerator::coarsenTree()
 
 void P4estDomainGenerator::createPatchInfos()
 {
+	domain_patches.emplace_front(my_p4est->local_num_quadrants);
 	p4est_iterate_ext(
 	my_p4est,
 	nullptr,
 	[&](p4est_iter_volume_info_t *info) {
 		Data *data  = (Data *) info->quad->p.user_data;
-		data->pinfo = new PatchInfo<2>();
+		data->pinfo = &domain_patches.front()[info->quadid + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset];
 
 		data->pinfo->rank            = info->p4est->mpirank;
 		data->pinfo->id              = data->id;
-		data->pinfo->local_index     = info->quadid + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset;
 		data->pinfo->ns              = ns;
 		data->pinfo->num_ghost_cells = num_ghost_cells;
 		data->pinfo->refine_level    = info->quad->level;
@@ -548,51 +546,33 @@ void P4estDomainGenerator::linkNeighbors()
 	p4est_ghost_destroy(ghost);
 }
 
-std::vector<std::shared_ptr<PatchInfo<2>>> P4estDomainGenerator::getPatchInfos()
-{
-	vector<shared_ptr<PatchInfo<2>>> pinfos(my_p4est->local_num_quadrants);
-
-	p4est_iterate_ext(
-	my_p4est,
-	nullptr,
-	[&](p4est_iter_volume_info_t *info) {
-		Data *data                                                                                        = (Data *) info->quad->p.user_data;
-		pinfos[p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset + info->quadid] = shared_ptr<PatchInfo<2>>(data->pinfo);
-	},
-	nullptr,
-	nullptr,
-	false);
-
-	return pinfos;
-}
-
 void P4estDomainGenerator::updateParentRanksOfPreviousDomain()
 {
-	auto old_level = domain_patches.back();
-	auto new_level = domain_patches.front();
+	std::vector<PatchInfo<2>> &old_level = domain_patches.back();
+	std::vector<PatchInfo<2>> &new_level = domain_patches.front();
 
 	std::set<int> local_new_level_ids;
-	for (const auto &pinfo : new_level) {
-		local_new_level_ids.insert(pinfo->id);
+	for (const PatchInfo<2> &pinfo : new_level) {
+		local_new_level_ids.insert(pinfo.id);
 	}
 
 	// update parent ranks
 	std::map<int, int> id_rank_map;
 	// get outgoing information
 	std::map<int, std::set<int>> out_info;
-	for (const auto &pinfo : new_level) {
-		id_rank_map[pinfo->id] = my_p4est->mpirank;
+	for (const PatchInfo<2> &pinfo : new_level) {
+		id_rank_map[pinfo.id] = my_p4est->mpirank;
 		for (int i = 0; i < 4; i++) {
-			if (pinfo->child_ranks[i] != -1 && pinfo->child_ranks[i] != my_p4est->mpirank) {
-				out_info[pinfo->child_ranks[i]].insert(pinfo->id);
+			if (pinfo.child_ranks[i] != -1 && pinfo.child_ranks[i] != my_p4est->mpirank) {
+				out_info[pinfo.child_ranks[i]].insert(pinfo.id);
 			}
 		}
 	}
 	// get incoming information
 	std::set<int> incoming_ids;
-	for (const auto &pinfo : old_level) {
-		if (!local_new_level_ids.count(pinfo->parent_id)) {
-			incoming_ids.insert(pinfo->parent_id);
+	for (const PatchInfo<2> &pinfo : old_level) {
+		if (!local_new_level_ids.count(pinfo.parent_id)) {
+			incoming_ids.insert(pinfo.parent_id);
 		}
 	}
 	// send info
@@ -626,8 +606,8 @@ void P4estDomainGenerator::updateParentRanksOfPreviousDomain()
 	// wait for all
 	MPI_Waitall(send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
 	// update rank info
-	for (auto &pinfo : old_level) {
-		pinfo->parent_rank = id_rank_map.at(pinfo->parent_id);
+	for (PatchInfo<2> &pinfo : old_level) {
+		pinfo.parent_rank = id_rank_map.at(pinfo.parent_id);
 	}
 }
 

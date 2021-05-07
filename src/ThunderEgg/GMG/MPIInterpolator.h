@@ -58,14 +58,13 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	 * interpolated from last.
 	 *
 	 * @param patches pairs where the first value is the index in the coarse vector and the second
-	 * value is a pointer to the PatchInfo object
+	 * value is a reference to the PatchInfo object
 	 * @param finer_vector the finer vector
 	 * @param coarser_vector the coaser vector
 	 */
-	virtual void interpolatePatches(
-	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
-	std::shared_ptr<const Vector<D>>                                        coarser_vector,
-	std::shared_ptr<Vector<D>>                                              finer_vector) const = 0;
+	virtual void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
+	                                std::shared_ptr<const Vector<D>>                                               coarser_vector,
+	                                std::shared_ptr<Vector<D>>                                                     finer_vector) const = 0;
 
 	/**
 	 * @brief interpolation function

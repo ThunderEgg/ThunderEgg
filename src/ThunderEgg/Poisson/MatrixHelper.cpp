@@ -38,15 +38,15 @@ MatrixHelper::MatrixHelper(std::shared_ptr<Domain<3>> domain, std::bitset<6> neu
  * @param A the matrix
  * @param pinfo the patch we are processing
  */
-static void addCenterCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
+static void addCenterCoefficients(Mat A, const PatchInfo<3> &pinfo)
 {
-	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[1];
-	int    nz    = pinfo->ns[2];
-	double h_x   = pinfo->spacings[0];
-	double h_y   = pinfo->spacings[1];
-	double h_z   = pinfo->spacings[2];
-	int    start = nx * ny * nz * pinfo->global_index;
+	int    nx    = pinfo.ns[0];
+	int    ny    = pinfo.ns[1];
+	int    nz    = pinfo.ns[2];
+	double h_x   = pinfo.spacings[0];
+	double h_y   = pinfo.spacings[1];
+	double h_z   = pinfo.spacings[2];
+	int    start = nx * ny * nz * pinfo.global_index;
 	// center coeffs
 	double coeff = -2.0 / (h_x * h_x) - 2.0 / (h_y * h_y) - 2.0 / (h_z * h_z);
 	for (int z_i = 0; z_i < nz; z_i++) {
@@ -65,13 +65,13 @@ static void addCenterCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pin
  * @param A the matrix
  * @param pinfo the patch we are processing
  */
-static void addWestCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
+static void addWestCoefficients(Mat A, const PatchInfo<3> &pinfo)
 {
-	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[1];
-	int    nz    = pinfo->ns[2];
-	double h_x   = pinfo->spacings[0];
-	int    start = nx * ny * nz * pinfo->global_index;
+	int    nx    = pinfo.ns[0];
+	int    ny    = pinfo.ns[1];
+	int    nz    = pinfo.ns[2];
+	double h_x   = pinfo.spacings[0];
+	int    start = nx * ny * nz * pinfo.global_index;
 	// west coeffs
 	double coeff = 1.0 / (h_x * h_x);
 	for (int z_i = 0; z_i < nz; z_i++) {
@@ -91,13 +91,13 @@ static void addWestCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo
  * @param A the matrix
  * @param pinfo the patch we are processing
  */
-static void addEastCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
+static void addEastCoefficients(Mat A, const PatchInfo<3> &pinfo)
 {
-	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[1];
-	int    nz    = pinfo->ns[2];
-	double h_x   = pinfo->spacings[0];
-	int    start = nx * ny * nz * pinfo->global_index;
+	int    nx    = pinfo.ns[0];
+	int    ny    = pinfo.ns[1];
+	int    nz    = pinfo.ns[2];
+	double h_x   = pinfo.spacings[0];
+	int    start = nx * ny * nz * pinfo.global_index;
 	// east coeffs
 	double coeff = 1.0 / (h_x * h_x);
 	for (int z_i = 0; z_i < nz; z_i++) {
@@ -117,13 +117,13 @@ static void addEastCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo
  * @param A the matrix
  * @param pinfo the patch we are processing
  */
-static void addNorthCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
+static void addNorthCoefficients(Mat A, const PatchInfo<3> &pinfo)
 {
-	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[1];
-	int    nz    = pinfo->ns[2];
-	double h_y   = pinfo->spacings[1];
-	int    start = nx * ny * nz * pinfo->global_index;
+	int    nx    = pinfo.ns[0];
+	int    ny    = pinfo.ns[1];
+	int    nz    = pinfo.ns[2];
+	double h_y   = pinfo.spacings[1];
+	int    start = nx * ny * nz * pinfo.global_index;
 	// north coeffs
 	double coeff = 1.0 / (h_y * h_y);
 	for (int z_i = 0; z_i < nz; z_i++) {
@@ -143,13 +143,13 @@ static void addNorthCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinf
  * @param A the matrix
  * @param pinfo the patch we are processing
  */
-static void addSouthCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
+static void addSouthCoefficients(Mat A, const PatchInfo<3> &pinfo)
 {
-	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[1];
-	int    nz    = pinfo->ns[2];
-	double h_y   = pinfo->spacings[1];
-	int    start = nx * ny * nz * pinfo->global_index;
+	int    nx    = pinfo.ns[0];
+	int    ny    = pinfo.ns[1];
+	int    nz    = pinfo.ns[2];
+	double h_y   = pinfo.spacings[1];
+	int    start = nx * ny * nz * pinfo.global_index;
 	// south coeffs
 	double coeff = 1.0 / (h_y * h_y);
 	for (int z_i = 0; z_i < nz; z_i++) {
@@ -169,13 +169,13 @@ static void addSouthCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinf
  * @param A the matrix
  * @param pinfo the patch we are processing
  */
-static void addTopCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
+static void addTopCoefficients(Mat A, const PatchInfo<3> &pinfo)
 {
-	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[1];
-	int    nz    = pinfo->ns[2];
-	double h_z   = pinfo->spacings[2];
-	int    start = nx * ny * nz * pinfo->global_index;
+	int    nx    = pinfo.ns[0];
+	int    ny    = pinfo.ns[1];
+	int    nz    = pinfo.ns[2];
+	double h_z   = pinfo.spacings[2];
+	int    start = nx * ny * nz * pinfo.global_index;
 	// top coeffs
 	double coeff = 1.0 / (h_z * h_z);
 	for (int z_i = 0; z_i < nz - 1; z_i++) {
@@ -195,13 +195,13 @@ static void addTopCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
  * @param A the matrix
  * @param pinfo the patch we are processing
  */
-static void addBottomCoefficients(Mat A, std::shared_ptr<const PatchInfo<3>> pinfo)
+static void addBottomCoefficients(Mat A, const PatchInfo<3> &pinfo)
 {
-	int    nx    = pinfo->ns[0];
-	int    ny    = pinfo->ns[1];
-	int    nz    = pinfo->ns[2];
-	double h_z   = pinfo->spacings[2];
-	int    start = nx * ny * nz * pinfo->global_index;
+	int    nx    = pinfo.ns[0];
+	int    ny    = pinfo.ns[1];
+	int    nz    = pinfo.ns[2];
+	double h_z   = pinfo.spacings[2];
+	int    start = nx * ny * nz * pinfo.global_index;
 	// top coeffs
 	double coeff = 1.0 / (h_z * h_z);
 	for (int z_i = 1; z_i < nz; z_i++) {

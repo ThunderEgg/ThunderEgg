@@ -11,17 +11,16 @@ using namespace ThunderEgg;
 
 TEST_CASE("Domain constructors work", "[Domain]")
 {
-	vector<shared_ptr<PatchInfo<2>>> pinfos(1);
+	vector<PatchInfo<2>> pinfos(1);
 
 	auto n         = GENERATE(1, 2, 10, 13);
 	auto spacing   = GENERATE(0.01, 1.0, 3.14);
 	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfos[0].reset(new PatchInfo<2>());
-	pinfos[0]->id = 0;
-	pinfos[0]->ns.fill(n);
-	pinfos[0]->spacings.fill(spacing);
-	pinfos[0]->num_ghost_cells = num_ghost;
+	pinfos[0].id = 0;
+	pinfos[0].ns.fill(n);
+	pinfos[0].spacings.fill(spacing);
+	pinfos[0].num_ghost_cells = num_ghost;
 	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	// check getters
@@ -40,17 +39,16 @@ TEST_CASE("Domain constructors work", "[Domain]")
 }
 TEST_CASE("Domain setTimer", "[Domain]")
 {
-	vector<shared_ptr<PatchInfo<2>>> pinfos(1);
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
 	double spacing   = 0.01;
 	int    num_ghost = 1;
 
-	pinfos[0].reset(new PatchInfo<2>());
-	pinfos[0]->id = 0;
-	pinfos[0]->ns.fill(n);
-	pinfos[0]->spacings.fill(spacing);
-	pinfos[0]->num_ghost_cells = num_ghost;
+	pinfos[0].id = 0;
+	pinfos[0].ns.fill(n);
+	pinfos[0].spacings.fill(spacing);
+	pinfos[0].num_ghost_cells = num_ghost;
 	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	auto timer = make_shared<Timer>(MPI_COMM_WORLD);
@@ -60,17 +58,16 @@ TEST_CASE("Domain setTimer", "[Domain]")
 }
 TEST_CASE("Domain setTimer adds domain to timer", "[Domain]")
 {
-	vector<shared_ptr<PatchInfo<2>>> pinfos(1);
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
 	double spacing   = 0.01;
 	int    num_ghost = 1;
 
-	pinfos[0].reset(new PatchInfo<2>());
-	pinfos[0]->id = 0;
-	pinfos[0]->ns.fill(n);
-	pinfos[0]->spacings.fill(spacing);
-	pinfos[0]->num_ghost_cells = num_ghost;
+	pinfos[0].id = 0;
+	pinfos[0].ns.fill(n);
+	pinfos[0].spacings.fill(spacing);
+	pinfos[0].num_ghost_cells = num_ghost;
 	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	auto timer = make_shared<Timer>(MPI_COMM_WORLD);
@@ -81,17 +78,16 @@ TEST_CASE("Domain setTimer adds domain to timer", "[Domain]")
 }
 TEST_CASE("Domain getTimer default is no timer", "[Domain]")
 {
-	vector<shared_ptr<PatchInfo<2>>> pinfos(1);
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
 	double spacing   = 0.01;
 	int    num_ghost = 1;
 
-	pinfos[0].reset(new PatchInfo<2>());
-	pinfos[0]->id = 0;
-	pinfos[0]->ns.fill(n);
-	pinfos[0]->spacings.fill(spacing);
-	pinfos[0]->num_ghost_cells = num_ghost;
+	pinfos[0].id = 0;
+	pinfos[0].ns.fill(n);
+	pinfos[0].spacings.fill(spacing);
+	pinfos[0].num_ghost_cells = num_ghost;
 	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	CHECK(d.getTimer() == nullptr);
@@ -99,35 +95,33 @@ TEST_CASE("Domain getTimer default is no timer", "[Domain]")
 }
 TEST_CASE("Domain id in constructor", "[Domain]")
 {
-	vector<shared_ptr<PatchInfo<2>>> pinfos(1);
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
 	double spacing   = 0.01;
 	int    num_ghost = 1;
 
-	pinfos[0].reset(new PatchInfo<2>());
-	pinfos[0]->id = 0;
-	pinfos[0]->ns.fill(n);
-	pinfos[0]->spacings.fill(spacing);
-	pinfos[0]->num_ghost_cells = num_ghost;
-	auto      id               = GENERATE(1, 2, 9);
+	pinfos[0].id = 0;
+	pinfos[0].ns.fill(n);
+	pinfos[0].spacings.fill(spacing);
+	pinfos[0].num_ghost_cells = num_ghost;
+	auto      id              = GENERATE(1, 2, 9);
 	Domain<2> d(id, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	CHECK(d.getId() == id);
 }
 TEST_CASE("Domain to_json", "[Domain]")
 {
-	vector<shared_ptr<PatchInfo<2>>> pinfos(1);
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
 	double spacing   = 0.01;
 	int    num_ghost = 1;
 
-	pinfos[0].reset(new PatchInfo<2>());
-	pinfos[0]->id = 0;
-	pinfos[0]->ns.fill(n);
-	pinfos[0]->spacings.fill(spacing);
-	pinfos[0]->num_ghost_cells = num_ghost;
+	pinfos[0].id = 0;
+	pinfos[0].ns.fill(n);
+	pinfos[0].spacings.fill(spacing);
+	pinfos[0].num_ghost_cells = num_ghost;
 	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	nlohmann::json j = d;
@@ -206,7 +200,7 @@ TEST_CASE("Domain<3> local indexes match position in pinfo vector",
 
 	auto pinfo_vector = domain->getPatchInfoVector();
 	for (int i = 0; i < pinfo_vector.size(); i++) {
-		CHECK(pinfo_vector[i]->local_index == i);
+		CHECK(pinfo_vector[i].local_index == i);
 	}
 }
 TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consistent",
@@ -218,7 +212,7 @@ TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consiste
 	map<int, int> id_to_local_index_map;
 
 	for (auto pinfo : domain->getPatchInfoVector()) {
-		id_to_local_index_map[pinfo->id] = pinfo->local_index;
+		id_to_local_index_map[pinfo.id] = pinfo.local_index;
 	}
 
 	auto checkIdAndLocalIndex = [&](int id, int local_index) {
@@ -231,52 +225,52 @@ TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consiste
 	};
 	for (auto pinfo : domain->getPatchInfoVector()) {
 		for (Side<3> s : Side<3>::getValues()) {
-			if (pinfo->hasNbr(s)) {
-				NbrType type = pinfo->getNbrType(s);
+			if (pinfo.hasNbr(s)) {
+				NbrType type = pinfo.getNbrType(s);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<3> &info = pinfo->getNormalNbrInfo(s);
+					const NormalNbrInfo<3> &info = pinfo.getNormalNbrInfo(s);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<3> &info = pinfo->getFineNbrInfo(s);
+					const FineNbrInfo<3> &info = pinfo.getFineNbrInfo(s);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.local_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<3> &info = pinfo->getCoarseNbrInfo(s);
+					const CoarseNbrInfo<3> &info = pinfo.getCoarseNbrInfo(s);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				}
 			}
 		}
 		for (Edge<3> e : Edge<3>::getValues()) {
-			if (pinfo->hasEdgeNbr(e)) {
-				NbrType type = pinfo->getEdgeNbrType(e);
+			if (pinfo.hasEdgeNbr(e)) {
+				NbrType type = pinfo.getEdgeNbrType(e);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<2> &info = pinfo->getEdgeNormalNbrInfo(e);
+					const NormalNbrInfo<2> &info = pinfo.getEdgeNormalNbrInfo(e);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<2> &info = pinfo->getEdgeFineNbrInfo(e);
+					const FineNbrInfo<2> &info = pinfo.getEdgeFineNbrInfo(e);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.local_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<2> &info = pinfo->getEdgeCoarseNbrInfo(e);
+					const CoarseNbrInfo<2> &info = pinfo.getEdgeCoarseNbrInfo(e);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				}
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			if (pinfo->hasCornerNbr(c)) {
-				NbrType type = pinfo->getCornerNbrType(c);
+			if (pinfo.hasCornerNbr(c)) {
+				NbrType type = pinfo.getCornerNbrType(c);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<1> &info = pinfo->getCornerNormalNbrInfo(c);
+					const NormalNbrInfo<1> &info = pinfo.getCornerNormalNbrInfo(c);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<1> &info = pinfo->getCornerFineNbrInfo(c);
+					const FineNbrInfo<1> &info = pinfo.getCornerFineNbrInfo(c);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.local_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<1> &info = pinfo->getCornerCoarseNbrInfo(c);
+					const CoarseNbrInfo<1> &info = pinfo.getCornerCoarseNbrInfo(c);
 					checkIdAndLocalIndex(info.id, info.local_index);
 				}
 			}
@@ -291,7 +285,7 @@ TEST_CASE("Domain<3> global indexes match position in pinfo vector",
 
 	auto pinfo_vector = domain->getPatchInfoVector();
 	for (int i = 0; i < pinfo_vector.size(); i++) {
-		CHECK(pinfo_vector[i]->global_index == i);
+		CHECK(pinfo_vector[i].global_index == i);
 	}
 }
 TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
@@ -303,7 +297,7 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 	map<int, int> id_to_global_index_map;
 
 	for (auto pinfo : domain->getPatchInfoVector()) {
-		id_to_global_index_map[pinfo->id] = pinfo->local_index;
+		id_to_global_index_map[pinfo.id] = pinfo.local_index;
 	}
 
 	auto checkIdAndLocalIndex = [&](int id, int global_index) {
@@ -311,52 +305,52 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 	};
 	for (auto pinfo : domain->getPatchInfoVector()) {
 		for (Side<3> s : Side<3>::getValues()) {
-			if (pinfo->hasNbr(s)) {
-				NbrType type = pinfo->getNbrType(s);
+			if (pinfo.hasNbr(s)) {
+				NbrType type = pinfo.getNbrType(s);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<3> &info = pinfo->getNormalNbrInfo(s);
+					const NormalNbrInfo<3> &info = pinfo.getNormalNbrInfo(s);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<3> &info = pinfo->getFineNbrInfo(s);
+					const FineNbrInfo<3> &info = pinfo.getFineNbrInfo(s);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.global_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<3> &info = pinfo->getCoarseNbrInfo(s);
+					const CoarseNbrInfo<3> &info = pinfo.getCoarseNbrInfo(s);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				}
 			}
 		}
 		for (Edge<3> e : Edge<3>::getValues()) {
-			if (pinfo->hasEdgeNbr(e)) {
-				NbrType type = pinfo->getEdgeNbrType(e);
+			if (pinfo.hasEdgeNbr(e)) {
+				NbrType type = pinfo.getEdgeNbrType(e);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<2> &info = pinfo->getEdgeNormalNbrInfo(e);
+					const NormalNbrInfo<2> &info = pinfo.getEdgeNormalNbrInfo(e);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<2> &info = pinfo->getEdgeFineNbrInfo(e);
+					const FineNbrInfo<2> &info = pinfo.getEdgeFineNbrInfo(e);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.global_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<2> &info = pinfo->getEdgeCoarseNbrInfo(e);
+					const CoarseNbrInfo<2> &info = pinfo.getEdgeCoarseNbrInfo(e);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				}
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			if (pinfo->hasCornerNbr(c)) {
-				NbrType type = pinfo->getCornerNbrType(c);
+			if (pinfo.hasCornerNbr(c)) {
+				NbrType type = pinfo.getCornerNbrType(c);
 				if (type == NbrType::Normal) {
-					const NormalNbrInfo<1> &info = pinfo->getCornerNormalNbrInfo(c);
+					const NormalNbrInfo<1> &info = pinfo.getCornerNormalNbrInfo(c);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				} else if (type == NbrType::Fine) {
-					const FineNbrInfo<1> &info = pinfo->getCornerFineNbrInfo(c);
+					const FineNbrInfo<1> &info = pinfo.getCornerFineNbrInfo(c);
 					for (int i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.global_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
-					const CoarseNbrInfo<1> &info = pinfo->getCornerCoarseNbrInfo(c);
+					const CoarseNbrInfo<1> &info = pinfo.getCornerCoarseNbrInfo(c);
 					checkIdAndLocalIndex(info.id, info.global_index);
 				}
 			}
