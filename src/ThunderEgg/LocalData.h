@@ -21,14 +21,12 @@
 
 #ifndef THUNDEREGG_LOCALDATA_H
 #define THUNDEREGG_LOCALDATA_H
+#include <ThunderEgg/Corner.h>
+#include <ThunderEgg/Edge.h>
 #include <ThunderEgg/LocalDataManager.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/Side.h>
-#include <algorithm>
-#include <cmath>
 #include <memory>
-#include <mpi.h>
-#include <numeric>
 namespace ThunderEgg
 {
 /**
@@ -110,6 +108,31 @@ template <int D> class LocalData
 		}
 	}
 
+	/**
+	 * @brief Get a slice for a slide
+	 *
+	 * @param s the side of patch for the slice
+	 * @param offset the offset, with {0, 0} being the first slice of non-ghost cell values, and {-1, -1} being
+	 * the first slice of ghost cell values
+	 * @return LocalData<1> the resulting slice
+	 */
+	LocalData<1> getSliceOnEdgePriv(Edge<D> e, const std::array<int, 2> &offset) const
+	{
+		size_t                 axis        = e.getAxisIndex();
+		std::array<int, 1>     new_strides = {strides[axis]};
+		std::array<int, 1>     new_lengths = {lengths[axis]};
+		double *               new_data    = data;
+		std::array<Side<D>, 2> sides       = e.getSides();
+		for (size_t i = 0; i < 2; i++) {
+			if (sides[i].isLowerOnAxis()) {
+				new_data += offset[i] * strides[sides[i].getAxisIndex()];
+			} else {
+				new_data += (lengths[sides[i].getAxisIndex()] - 1 - offset[i]) * strides[sides[i].getAxisIndex()];
+			}
+		}
+		return LocalData<1>(new_data, new_strides, new_lengths, 0, ldm);
+	}
+
 	template <int idx, class Type, class... Types> int getIndex(Type t, Types... args) const
 	{
 		return strides[idx] * t + getIndex<idx + 1>(args...);
@@ -130,10 +153,15 @@ template <int D> class LocalData
 	 * @param num_ghost_cells_in the number of ghost cells on each side of the patch
 	 * @param ldm_in the local data manager for the data
 	 */
-	LocalData(double *data_in, const std::array<int, D> &strides_in,
-	          const std::array<int, D> &lengths_in, int num_ghost_cells_in,
+	LocalData(double *                          data_in,
+	          const std::array<int, D> &        strides_in,
+	          const std::array<int, D> &        lengths_in,
+	          int                               num_ghost_cells_in,
 	          std::shared_ptr<LocalDataManager> ldm_in = nullptr)
-	: data(data_in), strides(strides_in), lengths(lengths_in), ldm(ldm_in),
+	: data(data_in),
+	  strides(strides_in),
+	  lengths(lengths_in),
+	  ldm(ldm_in),
 	  num_ghost_cells(num_ghost_cells_in)
 	{
 		start.fill(0);
@@ -243,6 +271,70 @@ template <int D> class LocalData
 	const LocalData<D - 1> getGhostSliceOnSide(Side<D> s, int offset) const
 	{
 		return getSliceOnSidePriv(s, -offset);
+	}
+	/**
+	 * @brief Get a slice of ghost cells with dimension 1 on the specified edge of a patch
+	 *
+	 * @param e the edge
+	 * @param offset the offset of the slice {0,0} is the non ghost cells touching the edge, {-1,-1} is the first layer of ghost cells touching that
+	 * edge
+	 * @return LocalData<1> the slice
+	 */
+	LocalData<1> getSliceOnEdge(Edge<D> e, const std::array<int, 2> &offset)
+	{
+		return getSliceOnEdgePriv(e, offset);
+	}
+	/**
+	 * @brief Get a slice of ghost cells with dimension 1 on the specified edge of a patch
+	 *
+	 * @param e the edge
+	 * @param offset the offset of the slice {0,0} is the non ghost cells touching the edge, {-1,-1} is the first layer of ghost cells touching that
+	 * edge
+	 * @return LocalData<1> the slice
+	 */
+	const LocalData<1> getSliceOnEdge(Edge<D> e, const std::array<int, 2> &offset) const
+	{
+		return getSliceOnEdgePriv(e, offset);
+	}
+	/**
+	 * @brief Get a value in a given corner
+	 *
+	 * @param c the corner
+	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
+	 * corner
+	 * @return double& the value
+	 */
+	double &getValueOnCorner(Corner<D> c, const std::array<int, D> &offset)
+	{
+		double *value = data;
+		for (int i = 0; i < D; i++) {
+			if (c.isLowerOnAxis(i)) {
+				value += offset[i] * strides[i];
+			} else {
+				value += (lengths[i] - 1 - offset[i]) * strides[i];
+			}
+		}
+		return *value;
+	}
+	/**
+	 * @brief Get a value in a given corner
+	 *
+	 * @param c the corner
+	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
+	 * corner
+	 * @return double& the value
+	 */
+	const double &getValueOnCorner(Corner<D> c, const std::array<int, D> &offset) const
+	{
+		const double *value = data;
+		for (int i = 0; i < D; i++) {
+			if (c.isLowerOnAxis(i)) {
+				value += offset[i] * strides[i];
+			} else {
+				value += (lengths[i] - 1 - offset[i]) * strides[i];
+			}
+		}
+		return *value;
 	}
 	/**
 	 * @brief Get the Lengths of the patch in each direction

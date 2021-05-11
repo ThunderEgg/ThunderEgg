@@ -61,6 +61,74 @@ TEST_CASE("Edge<3> named constructors give expected index values", "[Edge]")
 	CHECK(Edge<3>::nw().getIndex() == 11);
 	CHECK(Edge<3>::null().getIndex() == 12);
 }
+TEST_CASE("Edge<3> opposite", "[Edge]")
+{
+	CHECK(Edge<3>::bs().opposite() == Edge<3>::tn());
+	CHECK(Edge<3>::tn().opposite() == Edge<3>::bs());
+	CHECK(Edge<3>::bn().opposite() == Edge<3>::ts());
+	CHECK(Edge<3>::ts().opposite() == Edge<3>::bn());
+	CHECK(Edge<3>::bw().opposite() == Edge<3>::te());
+	CHECK(Edge<3>::te().opposite() == Edge<3>::bw());
+	CHECK(Edge<3>::be().opposite() == Edge<3>::tw());
+	CHECK(Edge<3>::tw().opposite() == Edge<3>::be());
+	CHECK(Edge<3>::sw().opposite() == Edge<3>::ne());
+	CHECK(Edge<3>::ne().opposite() == Edge<3>::sw());
+	CHECK(Edge<3>::se().opposite() == Edge<3>::nw());
+	CHECK(Edge<3>::nw().opposite() == Edge<3>::se());
+}
+TEST_CASE("Edge<3> getAxisIndex", "[Edge]")
+{
+	CHECK(Edge<3>::bs().getAxisIndex() == 0);
+	CHECK(Edge<3>::tn().getAxisIndex() == 0);
+	CHECK(Edge<3>::bn().getAxisIndex() == 0);
+	CHECK(Edge<3>::ts().getAxisIndex() == 0);
+	CHECK(Edge<3>::bw().getAxisIndex() == 1);
+	CHECK(Edge<3>::te().getAxisIndex() == 1);
+	CHECK(Edge<3>::be().getAxisIndex() == 1);
+	CHECK(Edge<3>::tw().getAxisIndex() == 1);
+	CHECK(Edge<3>::sw().getAxisIndex() == 2);
+	CHECK(Edge<3>::ne().getAxisIndex() == 2);
+	CHECK(Edge<3>::se().getAxisIndex() == 2);
+	CHECK(Edge<3>::nw().getAxisIndex() == 2);
+}
+TEST_CASE("Edge<3> getSides", "[Edge]")
+{
+	CHECK(Edge<3>::bs().getSides()[0] == Side<3>::south());
+	CHECK(Edge<3>::bs().getSides()[1] == Side<3>::bottom());
+
+	CHECK(Edge<3>::tn().getSides()[0] == Side<3>::north());
+	CHECK(Edge<3>::tn().getSides()[1] == Side<3>::top());
+
+	CHECK(Edge<3>::bn().getSides()[0] == Side<3>::north());
+	CHECK(Edge<3>::bn().getSides()[1] == Side<3>::bottom());
+
+	CHECK(Edge<3>::ts().getSides()[0] == Side<3>::south());
+	CHECK(Edge<3>::ts().getSides()[1] == Side<3>::top());
+
+	CHECK(Edge<3>::bw().getSides()[0] == Side<3>::west());
+	CHECK(Edge<3>::bw().getSides()[1] == Side<3>::bottom());
+
+	CHECK(Edge<3>::te().getSides()[0] == Side<3>::east());
+	CHECK(Edge<3>::te().getSides()[1] == Side<3>::top());
+
+	CHECK(Edge<3>::be().getSides()[0] == Side<3>::east());
+	CHECK(Edge<3>::be().getSides()[1] == Side<3>::bottom());
+
+	CHECK(Edge<3>::tw().getSides()[0] == Side<3>::west());
+	CHECK(Edge<3>::tw().getSides()[1] == Side<3>::top());
+
+	CHECK(Edge<3>::sw().getSides()[0] == Side<3>::west());
+	CHECK(Edge<3>::sw().getSides()[1] == Side<3>::south());
+
+	CHECK(Edge<3>::ne().getSides()[0] == Side<3>::east());
+	CHECK(Edge<3>::ne().getSides()[1] == Side<3>::north());
+
+	CHECK(Edge<3>::se().getSides()[0] == Side<3>::east());
+	CHECK(Edge<3>::se().getSides()[1] == Side<3>::south());
+
+	CHECK(Edge<3>::nw().getSides()[0] == Side<3>::west());
+	CHECK(Edge<3>::nw().getSides()[1] == Side<3>::north());
+}
 TEST_CASE("Edge<1> ==", "[Edge]")
 {
 	CHECK(Edge<1>::null() == Edge<1>::null());

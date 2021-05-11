@@ -254,6 +254,15 @@ template <int D> class Edge
 		return Range();
 	}
 	/**
+	 * @brief Get the edge on the opposite side
+	 *
+	 * @return Edge<D> the edge on the opposite side
+	 */
+	Edge<D> opposite()
+	{
+		return Edge<D>(val ^ 0b1);
+	}
+	/**
 	 * @brief Get the integer value of the edge.
 	 *
 	 * @return The integer value.
@@ -261,6 +270,50 @@ template <int D> class Edge
 	size_t getIndex() const
 	{
 		return val;
+	}
+	/**
+	 * @brief Get the axis that the edge lies along
+	 *
+	 * @return The axis
+	 */
+	size_t getAxisIndex() const
+	{
+		return val / 4;
+	}
+	/**
+	 * @brief Get the Sides that the edge lies along
+	 *
+	 * @return std::array<Side<D>, 2>  the sides that the edge lies along
+	 */
+	std::array<Side<D>, 2> getSides() const
+	{
+		if (val == bs().getIndex()) {
+			return {Side<D>::south(), Side<D>::bottom()};
+		} else if (val == tn().getIndex()) {
+			return {Side<D>::north(), Side<D>::top()};
+		} else if (val == bn().getIndex()) {
+			return {Side<D>::north(), Side<D>::bottom()};
+		} else if (val == ts().getIndex()) {
+			return {Side<D>::south(), Side<D>::top()};
+		} else if (val == bw().getIndex()) {
+			return {Side<D>::west(), Side<D>::bottom()};
+		} else if (val == te().getIndex()) {
+			return {Side<D>::east(), Side<D>::top()};
+		} else if (val == be().getIndex()) {
+			return {Side<D>::east(), Side<D>::bottom()};
+		} else if (val == tw().getIndex()) {
+			return {Side<D>::west(), Side<D>::top()};
+		} else if (val == sw().getIndex()) {
+			return {Side<D>::west(), Side<D>::south()};
+		} else if (val == ne().getIndex()) {
+			return {Side<D>::east(), Side<D>::north()};
+		} else if (val == se().getIndex()) {
+			return {Side<D>::east(), Side<D>::south()};
+		} else if (val == nw().getIndex()) {
+			return {Side<D>::west(), Side<D>::north()};
+		} else {
+			return {Side<D>::null(), Side<D>::null()};
+		}
 	}
 	/**
 	 * @brief Equals operator.

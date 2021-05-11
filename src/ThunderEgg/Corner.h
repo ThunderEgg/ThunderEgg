@@ -31,7 +31,7 @@ namespace ThunderEgg
 /**
  * @brief An enum-style class that represents the corners of a patch
  *
- * The octants are named in the following way:
+ * The corners are named in the following way:
  *
  * bse means Bottom-South-West, which is in the corner of where the bottom, south, and west sides
  * meet.
@@ -92,56 +92,56 @@ template <int D> class Corner
 		return Corner<2>(0b11);
 	}
 	/**
-	 * @brief Bottom-South-West octant of cube.
+	 * @brief Bottom-South-West corner of cube.
 	 */
 	static Corner<3> bsw()
 	{
 		return Corner<3>(0b000);
 	}
 	/**
-	 * @brief Bottom-South-East octant of cube.
+	 * @brief Bottom-South-East corner of cube.
 	 */
 	static Corner<3> bse()
 	{
 		return Corner<3>(0b001);
 	}
 	/**
-	 * @brief Bottom-North-West octant of cube.
+	 * @brief Bottom-North-West corner of cube.
 	 */
 	static Corner<3> bnw()
 	{
 		return Corner<3>(0b010);
 	}
 	/**
-	 * @brief Bottom-North-East octant of cube.
+	 * @brief Bottom-North-East corner of cube.
 	 */
 	static Corner<3> bne()
 	{
 		return Corner<3>(0b011);
 	}
 	/**
-	 * @brief Top-South-West octant of cube.
+	 * @brief Top-South-West corner of cube.
 	 */
 	static Corner<3> tsw()
 	{
 		return Corner<3>(0b100);
 	}
 	/**
-	 * @brief Top-South-East octant of cube.
+	 * @brief Top-South-East corner of cube.
 	 */
 	static Corner<3> tse()
 	{
 		return Corner<3>(0b101);
 	}
 	/**
-	 * @brief Top-North-West octant of cube.
+	 * @brief Top-North-West corner of cube.
 	 */
 	static Corner<3> tnw()
 	{
 		return Corner<3>(0b110);
 	}
 	/**
-	 * @brief Top-North-East octant of cube.
+	 * @brief Top-North-East corner of cube.
 	 */
 	static Corner<3> tne()
 	{
@@ -253,7 +253,7 @@ template <int D> class Corner
 		return Range();
 	}
 	/**
-	 * @brief Get the integer value of the octant.
+	 * @brief Get the integer value of the corner.
 	 *
 	 * @return The integer value.
 	 */
@@ -262,11 +262,11 @@ template <int D> class Corner
 		return val;
 	}
 	/**
-	 * @brief Return the octant that neighbors this octant on a particular side.
+	 * @brief Return the corner that neighbors this corner on a particular side.
 	 *
-	 * @param s the side of the octant that you want the neighbor of.
+	 * @param s the side of the corner that you want the neighbor of.
 	 *
-	 * @return  The octant that neighbors on that side.
+	 * @return  The corner that neighbors on that side.
 	 */
 	Corner<D> getNbrOnSide(Side<D> s) const
 	{
@@ -276,9 +276,9 @@ template <int D> class Corner
 		return retval;
 	}
 	/**
-	 * @brief Get the sides of the octant that are on the interior of the cube.
+	 * @brief Get the sides of the corner that are on the interior of the cube.
 	 *
-	 * @return The sides of the octant that are on the interior of the cube.
+	 * @return The sides of the corner that are on the interior of the cube.
 	 */
 	std::array<Side<D>, D> getInteriorSides() const
 	{
@@ -293,9 +293,9 @@ template <int D> class Corner
 		return retval;
 	}
 	/**
-	 * @brief Get the sides of the octant that are on the exterior of the cube.
+	 * @brief Get the sides of the corner that are on the exterior of the cube.
 	 *
-	 * @return The sides of the octant that are on the exterior of the cube.
+	 * @return The sides of the corner that are on the exterior of the cube.
 	 */
 	std::array<Side<D>, D> getExteriorSides() const
 	{
@@ -310,7 +310,7 @@ template <int D> class Corner
 		return retval;
 	}
 	/**
-	 * @brief Return whether or not the octant lies on a particular side of a cube.
+	 * @brief Return whether or not the corner lies on a particular side of a cube.
 	 *
 	 * @param s the side of the cube.j
 	 *
@@ -322,6 +322,26 @@ template <int D> class Corner
 		int  remainder  = s.getIndex() % 2;
 		bool is_bit_set = val & (0x1 << idx);
 		return is_bit_set == remainder;
+	}
+	/**
+	 * @brief Return if the corner is lower on a given axis
+	 *
+	 * @param axis the axis
+	 * @return if corner is lower on a given axis
+	 */
+	bool isLowerOnAxis(size_t axis) const
+	{
+		return !(val & (0b1 << axis));
+	}
+	/**
+	 * @brief Return if the corner is higher on a given axis
+	 *
+	 * @param axis the axis
+	 * @return if corner is higher on a given axis
+	 */
+	bool isHigherOnAxis(size_t axis) const
+	{
+		return val & (0b1 << axis);
 	}
 	/**
 	 * @brief From the point of view of an axis, get corner that this corner lies on in the D-1
@@ -348,7 +368,7 @@ template <int D> class Corner
 	/**
 	 * @brief Get an array of all Corner<D> values that lie on a particular side of the cube.
 	 *
-	 * When the two axis that the side lies on are arranged in the following way, the octants are
+	 * When the two axis that the side lies on are arranged in the following way, the corners are
 	 * returned in the following order:
 	 *
 	 *   ^
@@ -379,9 +399,9 @@ template <int D> class Corner
 	/**
 	 * @brief Equals operator.
 	 *
-	 * @param other The other octant.
+	 * @param other The other corner.
 	 *
-	 * @return Whether or not the value of this octant equals the value other octant.
+	 * @return Whether or not the value of this corner equals the value other corner.
 	 */
 	bool operator==(const Corner<D> &other) const
 	{
@@ -390,9 +410,9 @@ template <int D> class Corner
 	/**
 	 * @brief Not Equals operator.
 	 *
-	 * @param other The other octant.
+	 * @param other The other corner.
 	 *
-	 * @return Whether or not the value of this octant is not equal the value other octant.
+	 * @return Whether or not the value of this corner is not equal the value other corner.
 	 */
 	bool operator!=(const Corner<D> &other) const
 	{
@@ -401,9 +421,9 @@ template <int D> class Corner
 	/**
 	 * @brief Less Tan operator.
 	 *
-	 * @param other The other octant.
+	 * @param other The other corner.
 	 *
-	 * @return Whether or not the value of this octant is less than the value other octant.
+	 * @return Whether or not the value of this corner is less than the value other corner.
 	 */
 	bool operator<(const Corner<D> &other) const
 	{

@@ -7,7 +7,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(catch2)
-add_executable(unit_tests_mpiany test.cpp OctTree.cpp LocalData.cpp 
+add_executable(unit_tests_mpiany test.cpp OctTree.cpp 
                                  utils/DomainReader.cpp)
 target_include_directories(unit_tests_mpiany
                            PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -159,6 +159,96 @@ TEST_CASE("Corner<3> getNbrOnSide is as expected", "[Corner]")
 	CHECK(Corner<3>::tne().getNbrOnSide(Side<3>::bottom()) == Corner<3>::bne());
 	CHECK(Corner<3>::tne().getNbrOnSide(Side<3>::top()) == Corner<3>::bne());
 }
+TEST_CASE("Corner<2> isLowerOnAxis ", "[Corner]")
+{
+	CHECK(Corner<2>::sw().isLowerOnAxis(0));
+	CHECK(Corner<2>::sw().isLowerOnAxis(1));
+	CHECK_FALSE(Corner<2>::se().isLowerOnAxis(0));
+	CHECK(Corner<2>::se().isLowerOnAxis(1));
+	CHECK(Corner<2>::nw().isLowerOnAxis(0));
+	CHECK_FALSE(Corner<2>::nw().isLowerOnAxis(1));
+	CHECK_FALSE(Corner<2>::ne().isLowerOnAxis(0));
+	CHECK_FALSE(Corner<2>::ne().isLowerOnAxis(1));
+}
+TEST_CASE("Corner<3> isLowerOnAxis ", "[Corner]")
+{
+	CHECK(Corner<3>::bsw().isLowerOnAxis(0));
+	CHECK(Corner<3>::bsw().isLowerOnAxis(1));
+	CHECK(Corner<3>::bsw().isLowerOnAxis(2));
+
+	CHECK_FALSE(Corner<3>::bse().isLowerOnAxis(0));
+	CHECK(Corner<3>::bse().isLowerOnAxis(1));
+	CHECK(Corner<3>::bse().isLowerOnAxis(2));
+
+	CHECK(Corner<3>::bnw().isLowerOnAxis(0));
+	CHECK_FALSE(Corner<3>::bnw().isLowerOnAxis(1));
+	CHECK(Corner<3>::bnw().isLowerOnAxis(2));
+
+	CHECK_FALSE(Corner<3>::bne().isLowerOnAxis(0));
+	CHECK_FALSE(Corner<3>::bne().isLowerOnAxis(1));
+	CHECK(Corner<3>::bne().isLowerOnAxis(2));
+
+	CHECK(Corner<3>::tsw().isLowerOnAxis(0));
+	CHECK(Corner<3>::tsw().isLowerOnAxis(1));
+	CHECK_FALSE(Corner<3>::tsw().isLowerOnAxis(2));
+
+	CHECK_FALSE(Corner<3>::tse().isLowerOnAxis(0));
+	CHECK(Corner<3>::tse().isLowerOnAxis(1));
+	CHECK_FALSE(Corner<3>::tse().isLowerOnAxis(2));
+
+	CHECK(Corner<3>::tnw().isLowerOnAxis(0));
+	CHECK_FALSE(Corner<3>::tnw().isLowerOnAxis(1));
+	CHECK_FALSE(Corner<3>::tnw().isLowerOnAxis(2));
+
+	CHECK_FALSE(Corner<3>::tne().isLowerOnAxis(0));
+	CHECK_FALSE(Corner<3>::tne().isLowerOnAxis(1));
+	CHECK_FALSE(Corner<3>::tne().isLowerOnAxis(2));
+}
+TEST_CASE("Corner<2> isHigherOnAxis ", "[Corner]")
+{
+	CHECK_FALSE(Corner<2>::sw().isHigherOnAxis(0));
+	CHECK_FALSE(Corner<2>::sw().isHigherOnAxis(1));
+	CHECK(Corner<2>::se().isHigherOnAxis(0));
+	CHECK_FALSE(Corner<2>::se().isHigherOnAxis(1));
+	CHECK_FALSE(Corner<2>::nw().isHigherOnAxis(0));
+	CHECK(Corner<2>::nw().isHigherOnAxis(1));
+	CHECK(Corner<2>::ne().isHigherOnAxis(0));
+	CHECK(Corner<2>::ne().isHigherOnAxis(1));
+}
+TEST_CASE("Corner<3> isHigherOnAxis ", "[Corner]")
+{
+	CHECK_FALSE(Corner<3>::bsw().isHigherOnAxis(0));
+	CHECK_FALSE(Corner<3>::bsw().isHigherOnAxis(1));
+	CHECK_FALSE(Corner<3>::bsw().isHigherOnAxis(2));
+
+	CHECK(Corner<3>::bse().isHigherOnAxis(0));
+	CHECK_FALSE(Corner<3>::bse().isHigherOnAxis(1));
+	CHECK_FALSE(Corner<3>::bse().isHigherOnAxis(2));
+
+	CHECK_FALSE(Corner<3>::bnw().isHigherOnAxis(0));
+	CHECK(Corner<3>::bnw().isHigherOnAxis(1));
+	CHECK_FALSE(Corner<3>::bnw().isHigherOnAxis(2));
+
+	CHECK(Corner<3>::bne().isHigherOnAxis(0));
+	CHECK(Corner<3>::bne().isHigherOnAxis(1));
+	CHECK_FALSE(Corner<3>::bne().isHigherOnAxis(2));
+
+	CHECK_FALSE(Corner<3>::tsw().isHigherOnAxis(0));
+	CHECK_FALSE(Corner<3>::tsw().isHigherOnAxis(1));
+	CHECK(Corner<3>::tsw().isHigherOnAxis(2));
+
+	CHECK(Corner<3>::tse().isHigherOnAxis(0));
+	CHECK_FALSE(Corner<3>::tse().isHigherOnAxis(1));
+	CHECK(Corner<3>::tse().isHigherOnAxis(2));
+
+	CHECK_FALSE(Corner<3>::tnw().isHigherOnAxis(0));
+	CHECK(Corner<3>::tnw().isHigherOnAxis(1));
+	CHECK(Corner<3>::tnw().isHigherOnAxis(2));
+
+	CHECK(Corner<3>::tne().isHigherOnAxis(0));
+	CHECK(Corner<3>::tne().isHigherOnAxis(1));
+	CHECK(Corner<3>::tne().isHigherOnAxis(2));
+}
 TEST_CASE("Corner<2> getInteriorSides is as expected", "[Corner]")
 {
 	{
