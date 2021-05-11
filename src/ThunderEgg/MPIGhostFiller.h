@@ -24,6 +24,7 @@
 
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/GhostFillingType.h>
 #include <mpi.h>
 namespace ThunderEgg
 {
@@ -218,9 +219,10 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				double *buffer_ptr  = buffers[i].data() + call.offset * u->getNumComponents();
 
 				// create LocalData objects for the buffer
-				std::vector<LocalData<D>> buffer_datas(u->getNumComponents());
+				std::vector<LocalData<D>> buffer_datas;
+				buffer_datas.reserve(u->getNumComponents());
 				for (int c = 0; c < u->getNumComponents(); c++) {
-					buffer_datas[c] = getLocalDataForBuffer(buffer_ptr, side, c);
+					buffer_datas.push_back(getLocalDataForBuffer(buffer_ptr, side, c));
 				}
 
 				// make the call
@@ -237,18 +239,18 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	std::shared_ptr<const Domain<D>> domain;
 	/**
-	 * @brief Number of sides to address
+	 * @brief the fill type to use
 	 */
-	int side_cases;
+	GhostFillingType fill_type;
 
 	public:
 	/**
 	 * @brief Construct a new MPIGhostFiller object
 	 *
-	 * @param domain_in  the domain being used
-	 * @param side_cases_in  the number of side cases to address
+	 * @param domain  the domain being used
+	 * @param fill_type  the number of side cases to address
 	 */
-	MPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in) : domain(domain_in), side_cases(side_cases_in)
+	MPIGhostFiller(std::shared_ptr<const Domain<D>> domain, GhostFillingType fill_type) : domain(domain), fill_type(fill_type)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -324,14 +326,14 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		std::tuple<int, Side<D>> prev_id_side;
 		send_buff_lengths.resize(ranks.size());
 		remote_calls.resize(ranks.size());
-		for (auto call : remote_call_set) {
-			int  local_buffer_index = rank_index_map[std::get<0>(call)];
-			int  id                 = std::get<1>(call);
-			auto side               = std::get<2>(call).opposite();
-			auto orthant            = std::get<3>(call);
-			auto nbr_type           = std::get<4>(call);
-			auto pinfo              = std::get<5>(call);
-			auto local_index        = std::get<6>(call);
+		for (const auto &call : remote_call_set) {
+			int                                        local_buffer_index = rank_index_map[std::get<0>(call)];
+			int                                        id                 = std::get<1>(call);
+			Side<D>                                    side               = std::get<2>(call).opposite();
+			Orthant<D - 1>                             orthant            = std::get<3>(call);
+			NbrType                                    nbr_type           = std::get<4>(call);
+			std::reference_wrapper<const PatchInfo<D>> pinfo              = std::get<5>(call);
+			int                                        local_index        = std::get<6>(call);
 
 			size_t offset = send_buff_lengths[local_buffer_index];
 
@@ -377,7 +379,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	virtual void fillGhostCellsForNbrPatch(const PatchInfo<D> &             pinfo,
 	                                       const std::vector<LocalData<D>> &local_datas,
-	                                       const std::vector<LocalData<D>> &nbr_datas,
+	                                       std::vector<LocalData<D>> &      nbr_datas,
 	                                       Side<D>                          side,
 	                                       NbrType                          nbr_type,
 	                                       Orthant<D - 1>                   orthant_on_coarse) const = 0;
@@ -394,7 +396,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	virtual void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D> &             pinfo,
 	                                           const std::vector<LocalData<D>> &local_datas,
-	                                           const std::vector<LocalData<D>> &nbr_datas,
+	                                           std::vector<LocalData<D>> &      nbr_datas,
 	                                           Edge<D>                          edge,
 	                                           NbrType                          nbr_type,
 	                                           Orthant<1>                       orthant_on_coarse) const = 0;
@@ -410,7 +412,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	virtual void fillGhostCellsForCornerNbrPatch(const PatchInfo<D> &             pinfo,
 	                                             const std::vector<LocalData<D>> &local_datas,
-	                                             const std::vector<LocalData<D>> &nbr_datas,
+	                                             std::vector<LocalData<D>> &      nbr_datas,
 	                                             Corner<D>                        corner,
 	                                             NbrType                          nbr_type) const = 0;
 
@@ -423,7 +425,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param pinfo the patch
 	 * @param local_datas the LocalData for the patch
 	 */
-	virtual void fillGhostCellsForLocalPatch(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &local_datas) const = 0;
+	virtual void fillGhostCellsForLocalPatch(const PatchInfo<D> &pinfo, std::vector<LocalData<D>> &local_datas) const = 0;
 
 	/**
 	 * @brief Fill ghost cells on a vector
@@ -462,7 +464,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		std::vector<MPI_Request> send_requests = postSends(out_buffers, u);
 
 		// perform local operations
-		for (auto pinfo : domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
 			auto datas = u->getLocalDatas(pinfo.local_index);
 			fillGhostCellsForLocalPatch(pinfo, datas);
 		}

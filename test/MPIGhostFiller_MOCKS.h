@@ -50,7 +50,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 	public:
 	void fillGhostCellsForNbrPatch(const PatchInfo<D> &             pinfo,
 	                               const std::vector<LocalData<D>> &local_datas,
-	                               const std::vector<LocalData<D>> &nbr_datas, Side<D> side,
+	                               std::vector<LocalData<D>> &nbr_datas, Side<D> side,
 	                               NbrType nbr_type, Orthant<D - 1> orth_on_coarse) const override
 	{
 		called = true;
@@ -59,32 +59,35 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D> &             pinfo,
 	                                   const std::vector<LocalData<D>> &local_datas,
-	                                   const std::vector<LocalData<D>> &nbr_datas, Edge<D> edge,
+	                                   std::vector<LocalData<D>> &nbr_datas, Edge<D> edge,
 	                                   NbrType nbr_type, Orthant<1> orth_on_coarse) const override
 	{
+		called = true;
 		edge_nbr_calls.emplace_back(&pinfo, edge, nbr_type, orth_on_coarse, local_datas.size(), nbr_datas.size());
 	}
 
 	void fillGhostCellsForCornerNbrPatch(const PatchInfo<D> &             pinfo,
 	                                     const std::vector<LocalData<D>> &local_datas,
-	                                     const std::vector<LocalData<D>> &nbr_datas, Corner<D> corner,
+	                                     std::vector<LocalData<D>> &nbr_datas, Corner<D> corner,
 	                                     NbrType nbr_type) const override
 	{
+		called = true;
 		corner_nbr_calls.emplace_back(&pinfo, corner, nbr_type, local_datas.size(), nbr_datas.size());
 	}
 
-	void fillGhostCellsForLocalPatch(const PatchInfo<D> &             pinfo,
-	                                 const std::vector<LocalData<D>> &local_datas) const override
+	void fillGhostCellsForLocalPatch(const PatchInfo<D> &       pinfo,
+	                                 std::vector<LocalData<D>> &local_datas) const override
 	{
 		called = true;
 		local_calls.emplace_back(&pinfo, local_datas.size());
 	}
 
-	CallMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int num_components,
-	                       int side_cases_in)
-	: MPIGhostFiller<D>(domain_in, side_cases_in), num_components(num_components)
+	CallMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain, int num_components,
+	                       GhostFillingType fill_type)
+	: MPIGhostFiller<D>(domain, fill_type), num_components(num_components)
 	{
 	}
+
 	/**
 	 * @brief was any of the functions called
 	 */
@@ -108,7 +111,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 				  remaining_nbr_calls.erase(found_call);
 			  }
 		  };
-		for (auto patch : this->domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
 			INFO("id: " << patch.id);
 			std::string starts = "starts: ";
 			for (size_t i = 0; i < D; i++) {
@@ -201,7 +204,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 				  remaining_nbr_calls.erase(found_call);
 			  }
 		  };
-		for (auto patch : this->domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
 			INFO("id: " << patch.id);
 			std::string starts = "starts: ";
 			for (size_t i = 0; i < D; i++) {
@@ -223,7 +226,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 						case NbrType::Fine: {
 							INFO("NbrType: Fine");
 
-							for (auto orthant : Orthant<D - 1>::getValues()) {
+							for (auto orthant : Orthant<1>::getValues()) {
 								INFO("Orthant: " << orthant.getIndex());
 								auto call = std::make_tuple(&patch, edge, NbrType::Fine, orthant, num_components, num_components);
 								check_for_nbr_call(call);
@@ -294,7 +297,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 				  remaining_nbr_calls.erase(found_call);
 			  }
 		  };
-		for (auto patch : this->domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
 			INFO("id: " << patch.id);
 			std::string starts = "starts: ";
 			for (size_t i = 0; i < D; i++) {
@@ -366,7 +369,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		// remove from this collection the calls
 		auto remaining_local_calls = local_calls;
 
-		for (auto patch : this->domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
 			INFO("id: " << patch.id);
 			std::string starts = "starts: ";
 			for (size_t i = 0; i < D; i++) {
@@ -391,10 +394,15 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		INFO("NumLocalPatches: " << this->domain->getNumLocalPatches());
 		INFO("NumGlobalPatches: " << this->domain->getNumGlobalPatches());
 
+		switch (this->fill_type) {
+			case GhostFillingType::Corners:
+				checkCornerNbrCalls();
+			case GhostFillingType::Edges:
+				checkEdgeNbrCalls();
+			case GhostFillingType::Faces:
+				checkNbrCalls();
+		}
 		checkLocalCalls();
-		checkNbrCalls();
-		checkEdgeNbrCalls();
-		checkCornerNbrCalls();
 	}
 };
 template <int D>
@@ -403,7 +411,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 	public:
 	void fillGhostCellsForNbrPatch(const PatchInfo<D> &             pinfo,
 	                               const std::vector<LocalData<D>> &local_datas,
-	                               const std::vector<LocalData<D>> &nbr_datas, Side<D> side,
+	                               std::vector<LocalData<D>> &nbr_datas, Side<D> side,
 	                               NbrType nbr_type, Orthant<D - 1> orthant) const override
 	{
 		for (size_t c = 0; c < nbr_datas.size(); c++) {
@@ -421,28 +429,49 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D> &             pinfo,
 	                                   const std::vector<LocalData<D>> &local_datas,
-	                                   const std::vector<LocalData<D>> &nbr_datas, Edge<D> edge,
+	                                   std::vector<LocalData<D>> &nbr_datas, Edge<D> edge,
 	                                   NbrType nbr_type, Orthant<1> orthant) const override
 	{
+		for (size_t c = 0; c < nbr_datas.size(); c++) {
+			int index = 0;
+			for (int j = 0; j < pinfo.num_ghost_cells; j++) {
+				for (int i = 0; i < pinfo.num_ghost_cells; i++) {
+					LocalData<1> slice = nbr_datas[c].getSliceOnEdge(edge.opposite(), {-1 - i, -1 - j});
+					nested_loop<1>(slice.getStart(), slice.getEnd(),
+					               [&](const std::array<int, 1> &coord) {
+						               slice[coord] += pinfo.id + index + c;
+						               index++;
+					               });
+				}
+			}
+		}
 	}
 
 	void fillGhostCellsForCornerNbrPatch(const PatchInfo<D> &             pinfo,
 	                                     const std::vector<LocalData<D>> &local_datas,
-	                                     const std::vector<LocalData<D>> &nbr_datas, Corner<D> corner,
+	                                     std::vector<LocalData<D>> &nbr_datas, Corner<D> corner,
 	                                     NbrType nbr_type) const override
 	{
+		for (size_t c = 0; c < nbr_datas.size(); c++) {
+			int                index = 0;
+			std::array<int, D> start = nbr_datas[c].getGhostStart();
+			std::array<int, D> end;
+			end.fill(-1);
+			nested_loop<D>(start, end, [&](const std::array<int, D> &offset) {
+				nbr_datas[c].getValueOnCorner(corner.opposite(), offset) += pinfo.id + index + c;
+				index++;
+			});
+		}
 	}
 
-	void fillGhostCellsForLocalPatch(const PatchInfo<D> &             pinfo,
-	                                 const std::vector<LocalData<D>> &local_data) const override {}
+	void fillGhostCellsForLocalPatch(const PatchInfo<D> &       pinfo,
+	                                 std::vector<LocalData<D>> &local_data) const override {}
 
-	ExchangeMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, int side_cases_in)
-	: MPIGhostFiller<D>(domain_in, side_cases_in) {}
+	ExchangeMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, GhostFillingType fill_type)
+	: MPIGhostFiller<D>(domain_in, fill_type) {}
 
-	void checkVector(std::shared_ptr<const Vector<D>> vec)
+	void checkInterior(std::shared_ptr<const Vector<D>> vec)
 	{
-		INFO("NumLocalPatches: " << this->domain->getNumLocalPatches());
-		INFO("NumGlobalPatches: " << this->domain->getNumGlobalPatches());
 		for (auto pinfo : this->domain->getPatchInfoVector()) {
 			INFO("id: " << pinfo.id);
 			std::string starts = "start: ";
@@ -469,6 +498,257 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 					               INFO(coord_str);
 					               CHECK(data[coord] == pinfo.id);
 				               });
+			}
+		}
+	}
+	void checkCorners(std::shared_ptr<const Vector<D>> vec)
+	{
+		for (auto pinfo : this->domain->getPatchInfoVector()) {
+			INFO("id: " << pinfo.id);
+			std::string starts = "start: ";
+			for (size_t i = 0; i < D; i++) {
+				starts += " " + std::to_string(pinfo.starts[i]);
+			}
+			INFO(starts);
+			std::string ns = "ns: ";
+			for (size_t i = 0; i < D; i++) {
+				ns += " " + std::to_string(pinfo.ns[i]);
+			}
+			INFO(ns);
+			INFO("num_ghost_cells: " << pinfo.num_ghost_cells);
+			for (int c = 0; c < vec->getNumComponents(); c++) {
+				INFO("c: " << c);
+				auto data = vec->getLocalData(c, pinfo.local_index);
+				// check the ghost cells
+				for (Corner<D> corner : Corner<D>::getValues()) {
+					INFO("Corner: " << corner);
+
+					if (pinfo.hasCornerNbr(corner)) {
+						switch (pinfo.getCornerNbrType(corner)) {
+							case NbrType::Normal: {
+								INFO("NbrType: Normal");
+
+								// value should be id of neighbor + index +c
+								int  index   = 0;
+								auto nbrinfo = pinfo.getCornerNormalNbrInfo(corner);
+								//
+								std::array<int, D> start = data.getGhostStart();
+								std::array<int, D> end;
+								end.fill(-1);
+								nested_loop<D>(start, end, [&](std::array<int, D> &coord) {
+									std::string coord_str = "coord: ";
+									for (size_t i = 0; i < D; i++) {
+										coord_str += " " + std::to_string(coord[i]);
+									}
+									INFO(coord_str);
+									CHECK(data.getValueOnCorner(corner, coord) == nbrinfo.id + index + c);
+									index++;
+								});
+							} break;
+							case NbrType::Fine: {
+								INFO("NbrType: Fine");
+
+								int  ids     = 0;
+								auto nbrinfo = pinfo.getCornerFineNbrInfo(corner);
+
+								// value should be id of neighbors + index
+								int index = 0;
+
+								std::array<int, D> start = data.getGhostStart();
+								std::array<int, D> end;
+								end.fill(-1);
+								nested_loop<D>(start, end, [&](std::array<int, D> &coord) {
+									std::string coord_str = "coord: ";
+									for (size_t i = 0; i < D; i++) {
+										coord_str += " " + std::to_string(coord[i]);
+									}
+									INFO(coord_str);
+									CHECK(data.getValueOnCorner(corner, coord) == nbrinfo.ids[0] + index + c);
+									index++;
+								});
+							} break;
+							case NbrType::Coarse: {
+								INFO("NbrType: Coarse");
+
+								// value should be id of neighbor + index
+								int  index   = 0;
+								auto nbrinfo = pinfo.getCornerCoarseNbrInfo(corner);
+
+								std::array<int, D> start = data.getGhostStart();
+								std::array<int, D> end;
+								end.fill(-1);
+								nested_loop<D>(start, end, [&](std::array<int, D> &coord) {
+									std::string coord_str = "coord: ";
+									for (size_t i = 0; i < D; i++) {
+										coord_str += " " + std::to_string(coord[i]);
+									}
+									INFO(coord_str);
+									CHECK(data.getValueOnCorner(corner, coord) == nbrinfo.id + index + c);
+									index++;
+								});
+
+							} break;
+						}
+					} else {
+						// values should be zero on ghost cells
+						INFO("Physical Boundary");
+
+						std::array<int, D> start = data.getGhostStart();
+						std::array<int, D> end;
+						end.fill(-1);
+						nested_loop<D>(start, end, [&](std::array<int, D> &coord) {
+							std::string coord_str = "coord: ";
+							for (size_t i = 0; i < D; i++) {
+								coord_str += " " + std::to_string(coord[i]);
+							}
+							INFO(coord_str);
+							CHECK(data.getValueOnCorner(corner, coord) == 0);
+						});
+					}
+				}
+			}
+		}
+	}
+
+	void
+	checkEdges(std::shared_ptr<const Vector<D>> vec)
+	{
+		for (auto pinfo : this->domain->getPatchInfoVector()) {
+			INFO("id: " << pinfo.id);
+			std::string starts = "start: ";
+			for (size_t i = 0; i < D; i++) {
+				starts += " " + std::to_string(pinfo.starts[i]);
+			}
+			INFO(starts);
+			std::string ns = "ns: ";
+			for (size_t i = 0; i < D; i++) {
+				ns += " " + std::to_string(pinfo.ns[i]);
+			}
+			INFO(ns);
+			INFO("num_ghost_cells: " << pinfo.num_ghost_cells);
+			for (int c = 0; c < vec->getNumComponents(); c++) {
+				INFO("c: " << c);
+				auto data = vec->getLocalData(c, pinfo.local_index);
+				// check the ghost cells
+				for (Edge<D> e : Edge<D>::getValues()) {
+					INFO("Edge: " << e);
+
+					if (pinfo.hasEdgeNbr(e)) {
+						switch (pinfo.getEdgeNbrType(e)) {
+							case NbrType::Normal: {
+								INFO("NbrType: Normal");
+
+								// value should be id of neighbor + index +c
+								int  index   = 0;
+								auto nbrinfo = pinfo.getEdgeNormalNbrInfo(e);
+								for (int j = 0; j < pinfo.num_ghost_cells; j++) {
+									for (int i = 0; i < pinfo.num_ghost_cells; i++) {
+										auto slice = data.getSliceOnEdge(e, {-i - 1, -j - 1});
+
+										nested_loop<1>(
+										slice.getStart(), slice.getEnd(),
+										[&](std::array<int, 1> &coord) {
+											std::string coord_str = "coord: ";
+											for (size_t i = 0; i < 1; i++) {
+												coord_str += " " + std::to_string(coord[i]);
+											}
+											INFO(coord_str);
+											CHECK(slice[coord] == nbrinfo.id + index + c);
+											index++;
+										});
+									}
+								}
+
+							} break;
+							case NbrType::Fine: {
+								INFO("NbrType: Fine");
+
+								int  ids     = 0;
+								auto nbrinfo = pinfo.getEdgeFineNbrInfo(e);
+								for (size_t i = 0; i < nbrinfo.ids.size(); i++) {
+									ids += nbrinfo.ids[i];
+								}
+
+								// value should be id of neighbors + index
+								int index = 0;
+								for (int j = 0; j < pinfo.num_ghost_cells; j++) {
+									for (int i = 0; i < pinfo.num_ghost_cells; i++) {
+										auto slice = data.getSliceOnEdge(e, {-1 - i, -1 - j});
+										nested_loop<1>(slice.getStart(), slice.getEnd(), [&](std::array<int, 1> &coord) {
+											std::string coord_str = "coord: ";
+											for (size_t i = 0; i < 1; i++) {
+												coord_str += " " + std::to_string(coord[i]);
+											}
+											INFO(coord_str);
+											CHECK(slice[coord] == ids + 2 * (index + c));
+											index++;
+										});
+									}
+								}
+							} break;
+							case NbrType::Coarse: {
+								INFO("NbrType: Coarse");
+
+								// value should be id of neighbor + index
+								int  index   = 0;
+								auto nbrinfo = pinfo.getEdgeCoarseNbrInfo(e);
+								for (int j = 0; j < pinfo.num_ghost_cells; j++) {
+									for (int i = 0; i < pinfo.num_ghost_cells; i++) {
+										auto slice = data.getSliceOnEdge(e, {-1 - i, -1 - j});
+										nested_loop<1>(slice.getStart(), slice.getEnd(), [&](std::array<int, 1> &coord) {
+											std::string coord_str = "coord: ";
+											for (size_t i = 0; i < 1; i++) {
+												coord_str += " " + std::to_string(coord[i]);
+											}
+											INFO(coord_str);
+											CHECK(slice[coord] == nbrinfo.id + index + c);
+											index++;
+										});
+									}
+								}
+
+							} break;
+						}
+					} else {
+						// values should be zero on ghost cells
+						INFO("Physical Boundary");
+
+						for (int j = 0; j < pinfo.num_ghost_cells; j++) {
+							for (int i = 0; i < pinfo.num_ghost_cells; i++) {
+								auto slice = data.getSliceOnEdge(e, {-1 - i, -i - j});
+								nested_loop<1>(slice.getStart(), slice.getEnd(), [&](std::array<int, 1> &coord) {
+									INFO("coord: ");
+									for (size_t i = 0; i < 1; i++) {
+										INFO(coord[i]);
+									}
+									CHECK(slice[coord] == 0);
+								});
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void checkFaces(std::shared_ptr<const Vector<D>> vec)
+	{
+		for (auto pinfo : this->domain->getPatchInfoVector()) {
+			INFO("id: " << pinfo.id);
+			std::string starts = "start: ";
+			for (size_t i = 0; i < D; i++) {
+				starts += " " + std::to_string(pinfo.starts[i]);
+			}
+			INFO(starts);
+			std::string ns = "ns: ";
+			for (size_t i = 0; i < D; i++) {
+				ns += " " + std::to_string(pinfo.ns[i]);
+			}
+			INFO(ns);
+			INFO("num_ghost_cells: " << pinfo.num_ghost_cells);
+			for (int c = 0; c < vec->getNumComponents(); c++) {
+				INFO("c: " << c);
+				auto data = vec->getLocalData(c, pinfo.local_index);
 				// check the ghost cells
 				for (Side<D> s : Side<D>::getValues()) {
 					INFO("Side: " << s);
@@ -568,6 +848,21 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 					}
 				}
 			}
+		}
+	}
+
+	void checkVector(std::shared_ptr<const Vector<D>> vec)
+	{
+		INFO("NumLocalPatches: " << this->domain->getNumLocalPatches());
+		INFO("NumGlobalPatches: " << this->domain->getNumGlobalPatches());
+		checkInterior(vec);
+		switch (this->fill_type) {
+			case GhostFillingType::Corners:
+				checkCorners(vec);
+			case GhostFillingType::Edges:
+				checkEdges(vec);
+			case GhostFillingType::Faces:
+				checkFaces(vec);
 		}
 	}
 };

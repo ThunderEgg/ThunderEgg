@@ -98,7 +98,7 @@ void FillLocalGhostsForFineNbr(const LocalData<2> &local_data, const Side<2> sid
 } // namespace
 void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
                                                     const std::vector<LocalData<2>> &local_datas,
-                                                    const std::vector<LocalData<2>> &nbr_datas,
+                                                    std::vector<LocalData<2>> &      nbr_datas,
                                                     Side<2>                          side,
                                                     NbrType                          nbr_type,
                                                     Orthant<1>                       orthant_on_coarse) const
@@ -118,7 +118,7 @@ void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &        
 	}
 }
 
-void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, const std::vector<LocalData<2>> &local_datas) const
+void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, std::vector<LocalData<2>> &local_datas) const
 {
 	for (auto &local_data : local_datas) {
 		for (Side<2> side : Side<2>::getValues()) {

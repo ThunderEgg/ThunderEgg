@@ -47,7 +47,7 @@ static std::array<int, 2> getOffset(const std::array<int, 3> ns, Side<3> s, Orth
 }
 void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3> &             pinfo,
                                                      const std::vector<LocalData<3>> &local_datas,
-                                                     const std::vector<LocalData<3>> &nbr_datas,
+                                                     std::vector<LocalData<3>> &      nbr_datas,
                                                      Side<3>                          side,
                                                      NbrType                          nbr_type,
                                                      Orthant<2>                       orthant) const
@@ -90,7 +90,7 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3> &       
 	}
 }
 
-void TriLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo, const std::vector<LocalData<3>> &local_datas) const
+void TriLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo, std::vector<LocalData<3>> &local_datas) const
 {
 	for (auto &local_data : local_datas) {
 		for (Side<3> side : Side<3>::getValues()) {
@@ -126,7 +126,7 @@ void TriLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo
 		}
 	}
 }
-TriLinearGhostFiller::TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain) : MPIGhostFiller<3>(domain, 1)
+TriLinearGhostFiller::TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain) : MPIGhostFiller<3>(domain, GhostFillingType::Faces)
 {
 	for (int n : domain->getNs()) {
 		if (n % 2 != 0) {
