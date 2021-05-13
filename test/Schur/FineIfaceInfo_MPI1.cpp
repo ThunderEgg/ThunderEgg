@@ -49,13 +49,13 @@ TEST_CASE("Schur::FineIfaceInfo constructor", "[Schur::FineIfaceInfo]")
 		CHECK(iface_info.fine_ranks[0] == 1);
 		CHECK(iface_info.fine_ranks[1] == 2);
 		// check that the id is encoded as expected
-		CHECK(iface_info.id / (int) Side<2>::num_sides == id);
-		CHECK(iface_info.id % Side<2>::num_sides == s.getIndex());
+		CHECK(iface_info.id / (int) Side<2>::number_of == id);
+		CHECK(iface_info.id % Side<2>::number_of == s.getIndex());
 		// check that iface belongs to nbr
-		CHECK(iface_info.fine_ids[0] / (int) Side<2>::num_sides == nbr_ids[0]);
-		CHECK(iface_info.fine_ids[0] % Side<2>::num_sides == s.opposite().getIndex());
-		CHECK(iface_info.fine_ids[1] / (int) Side<2>::num_sides == nbr_ids[1]);
-		CHECK(iface_info.fine_ids[1] % Side<2>::num_sides == s.opposite().getIndex());
+		CHECK(iface_info.fine_ids[0] / (int) Side<2>::number_of == nbr_ids[0]);
+		CHECK(iface_info.fine_ids[0] % Side<2>::number_of == s.opposite().getIndex());
+		CHECK(iface_info.fine_ids[1] / (int) Side<2>::number_of == nbr_ids[1]);
+		CHECK(iface_info.fine_ids[1] % Side<2>::number_of == s.opposite().getIndex());
 		// local and global index should be set to -1
 		CHECK(iface_info.patch_local_index == -1);
 		CHECK(iface_info.row_local_index == -1);

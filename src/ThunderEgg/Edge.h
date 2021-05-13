@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_EDGE_H
 #define THUNDEREGG_EDGE_H
-#include <ThunderEgg/Side.h>
+#include <ThunderEgg/Face.h>
 #include <array>
 #include <iostream>
 #include <numeric>
@@ -415,6 +415,8 @@ inline std::ostream &operator<<(std::ostream &os, const Edge<3> &o)
 		os << "Edge<3>::bn()";
 	} else if (o == Edge<3>::ts()) {
 		os << "Edge<3>::ts()";
+	} else if (o == Edge<3>::tn()) {
+		os << "Edge<3>::tn()";
 	} else if (o == Edge<3>::tw()) {
 		os << "Edge<3>::tw()";
 	} else if (o == Edge<3>::bw()) {

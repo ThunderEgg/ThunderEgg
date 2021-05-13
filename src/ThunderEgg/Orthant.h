@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_ORTHANT_H
 #define THUNDEREGG_ORTHANT_H
-#include <ThunderEgg/Side.h>
+#include <ThunderEgg/Face.h>
 #include <array>
 #include <iostream>
 #include <numeric>
@@ -336,6 +336,14 @@ template <int D> class Orthant
 		int  remainder  = s.getIndex() % 2;
 		bool is_bit_set = val & (0x1 << idx);
 		return is_bit_set == remainder;
+	}
+	bool isHigherOnAxis(int axis) const
+	{
+		return val & (0b1 << axis);
+	}
+	bool isLowerOnAxis(int axis) const
+	{
+		return !(val & (0b1 << axis));
 	}
 	/**
 	 * @brief From the point of view of an axis, get orthant that this orthant lies on in the D-1

@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_CORNER_H
 #define THUNDEREGG_CORNER_H
-#include <ThunderEgg/Side.h>
+#include <ThunderEgg/Face.h>
 #include <array>
 #include <iostream>
 #include <numeric>

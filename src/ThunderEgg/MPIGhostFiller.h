@@ -624,13 +624,15 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 						}
 					}
 				}
-				for (Edge<D> e : Edge<D>::getValues()) {
-					if (pinfo.hasNbr(e)) {
-						for (int j = 0; j < pinfo.num_ghost_cells; j++) {
-							for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-								auto this_ghost = this_patch.getSliceOnEdge(e, {-1 - i, -1 - j});
-								nested_loop<1>(
-								this_ghost.getStart(), this_ghost.getEnd(), [&](const std::array<int, 1> &coord) { this_ghost[coord] = 0; });
+				if constexpr (D == 3) {
+					for (Edge<D> e : Edge<D>::getValues()) {
+						if (pinfo.hasNbr(e)) {
+							for (int j = 0; j < pinfo.num_ghost_cells; j++) {
+								for (int i = 0; i < pinfo.num_ghost_cells; i++) {
+									auto this_ghost = this_patch.getSliceOnEdge(e, {-1 - i, -1 - j});
+									nested_loop<1>(
+									this_ghost.getStart(), this_ghost.getEnd(), [&](const std::array<int, 1> &coord) { this_ghost[coord] = 0; });
+								}
 							}
 						}
 					}

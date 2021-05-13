@@ -118,7 +118,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @brief Nbr info objects for each side.
 	 * If there is no neighbor, it should be set to nullptr.
 	 */
-	std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::num_sides> nbr_info;
+	std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::number_of> nbr_info;
 	/**
 	 * @brief Nbr info objects for each edge
 	 * If there is no neighbor, it should be set to nullptr.
@@ -593,8 +593,8 @@ template <int D> struct PatchInfo : public Serializable {
 		writer << orth_on_parent;
 		writer << starts;
 		writer << spacings;
-		std::bitset<Side<D>::num_sides> has_nbr;
-		for (size_t i = 0; i < Side<D>::num_sides; i++) {
+		std::bitset<Side<D>::number_of> has_nbr;
+		for (size_t i = 0; i < Side<D>::number_of; i++) {
 			has_nbr[i] = nbr_info[i] != nullptr;
 		}
 		writer << has_nbr;
@@ -690,9 +690,9 @@ template <int D> struct PatchInfo : public Serializable {
 		reader >> orth_on_parent;
 		reader >> starts;
 		reader >> spacings;
-		std::bitset<Side<D>::num_sides> has_nbr;
+		std::bitset<Side<D>::number_of> has_nbr;
 		reader >> has_nbr;
-		for (size_t i = 0; i < Side<D>::num_sides; i++) {
+		for (size_t i = 0; i < Side<D>::number_of; i++) {
 			if (has_nbr[i]) {
 				NbrType type;
 				reader >> type;

@@ -21,8 +21,8 @@
 
 #ifndef THUNDEREGG_VECTORGENERATOR_H
 #define THUNDEREGG_VECTORGENERATOR_H
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
-#include <ThunderEgg/Side.h>
 #include <ThunderEgg/Vector.h>
 #include <algorithm>
 #include <cmath>

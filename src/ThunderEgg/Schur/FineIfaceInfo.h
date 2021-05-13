@@ -47,7 +47,7 @@ template <int D> class FineIfaceInfo : public IfaceInfo<D>
 	 */
 	static int GetId(const PatchInfo<D> &pinfo, Side<D> s)
 	{
-		return (int) (pinfo.id * Side<D>::num_sides + s.getIndex());
+		return (int) (pinfo.id * Side<D>::number_of + s.getIndex());
 	}
 
 	public:
@@ -79,7 +79,7 @@ template <int D> class FineIfaceInfo : public IfaceInfo<D>
 	{
 		auto nbr_info = pinfo.getFineNbrInfo(s);
 		for (size_t i = 0; i < fine_ids.size(); i++) {
-			fine_ids[i]   = nbr_info.ids[i] * Side<D>::num_sides + s.opposite().getIndex();
+			fine_ids[i]   = nbr_info.ids[i] * Side<D>::number_of + s.opposite().getIndex();
 			fine_ranks[i] = nbr_info.ranks[i];
 		}
 		fine_col_local_indexes.fill(-1);

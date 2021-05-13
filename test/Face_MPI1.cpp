@@ -7,39 +7,39 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Test num_faces for Face<1,0>", "[Face]")
+TEST_CASE("Test number_of for Face<1,0>", "[Face]")
 {
-	size_t faces = Face<1, 0>::num_faces;
+	size_t faces = Face<1, 0>::number_of;
 	CHECK(faces == 2);
 }
 
-TEST_CASE("Test num_faces for Face<2,0>", "[Face]")
+TEST_CASE("Test number_of for Face<2,0>", "[Face]")
 {
-	size_t faces = Face<2, 0>::num_faces;
+	size_t faces = Face<2, 0>::number_of;
 	CHECK(faces == 4);
 }
 
-TEST_CASE("Test num_faces for Face<2,1>", "[Face]")
+TEST_CASE("Test number_of for Face<2,1>", "[Face]")
 {
-	size_t faces = Face<2, 1>::num_faces;
+	size_t faces = Face<2, 1>::number_of;
 	CHECK(faces == 4);
 }
 
-TEST_CASE("Test num_faces for Face<3,0>", "[Face]")
+TEST_CASE("Test number_of for Face<3,0>", "[Face]")
 {
-	size_t faces = Face<3, 0>::num_faces;
+	size_t faces = Face<3, 0>::number_of;
 	CHECK(faces == 8);
 }
 
-TEST_CASE("Test num_faces for Face<3,1>", "[Face]")
+TEST_CASE("Test number_of for Face<3,1>", "[Face]")
 {
-	size_t faces = Face<3, 1>::num_faces;
+	size_t faces = Face<3, 1>::number_of;
 	CHECK(faces == 12);
 }
 
-TEST_CASE("Test num_faces for Face<3,2>", "[Face]")
+TEST_CASE("Test number_of for Face<3,2>", "[Face]")
 {
-	size_t faces = Face<3, 2>::num_faces;
+	size_t faces = Face<3, 2>::number_of;
 	CHECK(faces == 6);
 }
 

@@ -44,7 +44,7 @@ template <int D> class PatchIfaceInfo : public Serializable
 	/**
 	 * @brief Array of IfaceInfo objects
 	 */
-	std::array<std::shared_ptr<IfaceInfo<D>>, Side<D>::num_sides> iface_info;
+	std::array<std::shared_ptr<IfaceInfo<D>>, Side<D>::number_of> iface_info;
 	/**
 	 * @brief Construct a new PatchIfaceInfo object
 	 */

@@ -76,8 +76,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 
 		loop<0, D - 1>([&](int axis) {
-			Side<D>                lower_side = Side<D>::LowerSideOnAxis(axis);
-			Side<D>                upper_side = Side<D>::HigherSideOnAxis(axis);
+			Side<D>                lower_side = LowerSideOnAxis<D>(axis);
+			Side<D>                upper_side = HigherSideOnAxis<D>(axis);
 			LocalData<D - 1>       lower      = us[0].getGhostSliceOnSide(lower_side, 1);
 			const LocalData<D - 1> lower_mid  = us[0].getSliceOnSide(lower_side);
 			if (!pinfo.hasNbr(lower_side) && neumann) {

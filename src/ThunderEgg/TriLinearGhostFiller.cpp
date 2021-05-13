@@ -34,12 +34,12 @@ static std::array<int, 2> getOffset(const std::array<int, 3> ns, Side<3> s, Orth
 {
 	std::array<int, 2> offset = {0, 0};
 	for (size_t i = 0; i < s.getAxisIndex(); i++) {
-		if (orth.isOnSide(Side<2>::HigherSideOnAxis(i))) {
+		if (orth.isHigherOnAxis(i)) {
 			offset[i] = ns[i];
 		}
 	}
 	for (size_t i = s.getAxisIndex() + 1; i < 3; i++) {
-		if (orth.isOnSide(Side<2>::HigherSideOnAxis(i - 1))) {
+		if (orth.isHigherOnAxis(i - 1)) {
 			offset[i - 1] = ns[i];
 		}
 	}

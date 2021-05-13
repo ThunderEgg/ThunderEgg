@@ -21,9 +21,9 @@
 
 #ifndef THUNDEREGG_VECTOR_H
 #define THUNDEREGG_VECTOR_H
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/LocalData.h>
 #include <ThunderEgg/Loops.h>
-#include <ThunderEgg/Side.h>
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -67,8 +67,10 @@ template <int D> class Vector
 	 * @param num_local_cells the number of local (non-ghost) cells in this vector
 	 */
 	explicit Vector(MPI_Comm comm, int num_components, int num_local_patches, int num_local_cells)
-	: num_components(num_components), num_local_patches(num_local_patches),
-	  num_local_cells(num_local_cells), comm(comm)
+	: num_components(num_components),
+	  num_local_patches(num_local_patches),
+	  num_local_cells(num_local_cells),
+	  comm(comm)
 	{
 	}
 	/**
@@ -163,8 +165,7 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
 			for (auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] = alpha; });
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] = alpha; });
 			}
 		}
 	}
@@ -178,8 +179,7 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
 			for (auto &ld : lds) {
-				nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] = alpha; });
+				nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, D> coord) { ld[coord] = alpha; });
 			}
 		}
 	}
@@ -193,8 +193,7 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
 			for (auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] *= alpha; });
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] *= alpha; });
 			}
 		}
 	}
@@ -208,8 +207,7 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
 			for (auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { ld[coord] += delta; });
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] += delta; });
 			}
 		}
 	}
@@ -224,8 +222,7 @@ template <int D> class Vector
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
 			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(),
-				               [&](std::array<int, D> coord) { lds[c][coord] = lds_b[c][coord]; });
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] = lds_b[c][coord]; });
 			}
 		}
 	}
@@ -240,8 +237,7 @@ template <int D> class Vector
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
 			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(),
-				               [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord]; });
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord]; });
 			}
 		}
 	}
@@ -254,17 +250,14 @@ template <int D> class Vector
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
 			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
-					lds[c][coord] += lds_b[c][coord] * alpha;
-				});
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord] * alpha; });
 			}
 		}
 	}
 	/**
 	 * @brief `this = this + alpha * a + beta * b`
 	 */
-	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> a, double beta,
-	                       std::shared_ptr<const Vector<D>> b)
+	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> a, double beta, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
@@ -286,9 +279,8 @@ template <int D> class Vector
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
 			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
-					lds[c][coord] = alpha * lds[c][coord] + lds_b[c][coord];
-				});
+				nested_loop<D>(
+				lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] = alpha * lds[c][coord] + lds_b[c][coord]; });
 			}
 		}
 	}
@@ -310,18 +302,15 @@ template <int D> class Vector
 	/**
 	 * @brief `this = alpha * this + beta * b + gamma * c`
 	 */
-	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b,
-	                                double gamma, std::shared_ptr<const Vector<D>> c)
+	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b, double gamma, std::shared_ptr<const Vector<D>> c)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_c = c->getLocalDatas(i);
 			for (int comp = 0; comp < num_components; comp++) {
-				nested_loop<D>(
-				lds[comp].getStart(), lds[comp].getEnd(), [&](std::array<int, D> coord) {
-					lds[comp][coord] = alpha * lds[comp][coord] + beta * lds_b[comp][coord]
-					                   + gamma * lds_c[comp][coord];
+				nested_loop<D>(lds[comp].getStart(), lds[comp].getEnd(), [&](std::array<int, D> coord) {
+					lds[comp][coord] = alpha * lds[comp][coord] + beta * lds_b[comp][coord] + gamma * lds_c[comp][coord];
 				});
 			}
 		}
@@ -335,8 +324,7 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			const std::vector<LocalData<D>> lds = getLocalDatas(i);
 			for (const auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { sum += ld[coord] * ld[coord]; });
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { sum += ld[coord] * ld[coord]; });
 			}
 		}
 		double global_sum;
@@ -352,8 +340,7 @@ template <int D> class Vector
 		for (int i = 0; i < num_local_patches; i++) {
 			std::vector<LocalData<D>> lds = getLocalDatas(i);
 			for (const auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(),
-				               [&](std::array<int, D> coord) { max = fmax(fabs(ld[coord]), max); });
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { max = fmax(fabs(ld[coord]), max); });
 			}
 		}
 		double global_max;
@@ -370,9 +357,7 @@ template <int D> class Vector
 			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
 			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
 			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
-					retval += lds[c][coord] * lds_b[c][coord];
-				});
+				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { retval += lds[c][coord] * lds_b[c][coord]; });
 			}
 		}
 		double global_retval;

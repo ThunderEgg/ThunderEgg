@@ -55,12 +55,12 @@ TEST_CASE("Schur::NormalIfaceInfo constructor", "[Schur::NormalIfaceInfo]")
 		// check that the id is encoded as expected
 		if (s.isHigherOnAxis()) {
 			// check that iface belongs to this
-			CHECK(iface_info.id / (int) Side<2>::num_sides == id);
-			CHECK(iface_info.id % Side<2>::num_sides == s.getIndex());
+			CHECK(iface_info.id / (int) Side<2>::number_of == id);
+			CHECK(iface_info.id % Side<2>::number_of == s.getIndex());
 		} else {
 			// check that iface belongs to nbr
-			CHECK(iface_info.id / (int) Side<2>::num_sides == nbr_id);
-			CHECK(iface_info.id % Side<2>::num_sides == s.opposite().getIndex());
+			CHECK(iface_info.id / (int) Side<2>::number_of == nbr_id);
+			CHECK(iface_info.id % Side<2>::number_of == s.opposite().getIndex());
 		}
 		// local and global index should be set to -1
 		CHECK(iface_info.patch_local_index == -1);

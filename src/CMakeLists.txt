@@ -31,6 +31,7 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/Edge.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Edge.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Face.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Face.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/FineNbrInfo.h)
 
@@ -83,9 +84,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Side.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Side.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Timer.cpp)

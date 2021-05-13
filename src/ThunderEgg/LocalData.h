@@ -23,9 +23,9 @@
 #define THUNDEREGG_LOCALDATA_H
 #include <ThunderEgg/Corner.h>
 #include <ThunderEgg/Edge.h>
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/LocalDataManager.h>
 #include <ThunderEgg/Loops.h>
-#include <ThunderEgg/Side.h>
 #include <memory>
 namespace ThunderEgg
 {
@@ -116,7 +116,8 @@ template <int D> class LocalData
 	 * the first slice of ghost cell values
 	 * @return LocalData<1> the resulting slice
 	 */
-	LocalData<1> getSliceOnEdgePriv(Edge<D> e, const std::array<int, 2> &offset) const
+	template <int N = 0>
+	auto getSliceOnEdgePriv(Edge<D> e, const std::array<int, 2> &offset) const -> typename std::enable_if<D == 3 && N == N, LocalData<1>>::type
 	{
 		size_t                 axis        = e.getAxisIndex();
 		std::array<int, 1>     new_strides = {strides[axis]};
@@ -280,10 +281,12 @@ template <int D> class LocalData
 	 * edge
 	 * @return LocalData<1> the slice
 	 */
-	LocalData<1> getSliceOnEdge(Edge<D> e, const std::array<int, 2> &offset)
+	template <int N = 0>
+	auto getSliceOnEdge(Edge<D> e, const std::array<int, 2> &offset) -> typename std::enable_if<D == 3 && N == N, LocalData<1>>::type
 	{
 		return getSliceOnEdgePriv(e, offset);
 	}
+
 	/**
 	 * @brief Get a slice of ghost cells with dimension 1 on the specified edge of a patch
 	 *
@@ -292,7 +295,8 @@ template <int D> class LocalData
 	 * edge
 	 * @return LocalData<1> the slice
 	 */
-	const LocalData<1> getSliceOnEdge(Edge<D> e, const std::array<int, 2> &offset) const
+	template <int N = 0>
+	auto getSliceOnEdge(Edge<D> e, const std::array<int, 2> &offset) const -> typename std::enable_if<D == 3 && N == N, const LocalData<1>>::type
 	{
 		return getSliceOnEdgePriv(e, offset);
 	}

@@ -47,7 +47,7 @@ template <int D> class CoarseIfaceInfo : public IfaceInfo<D>
 	 */
 	static int GetId(const PatchInfo<D> &pinfo, Side<D> s)
 	{
-		return (int) (pinfo.id * Side<D>::num_sides + s.getIndex());
+		return (int) (pinfo.id * Side<D>::number_of + s.getIndex());
 	}
 
 	public:
@@ -85,7 +85,7 @@ template <int D> class CoarseIfaceInfo : public IfaceInfo<D>
 		auto nbr_info  = pinfo.getCoarseNbrInfo(s);
 		orth_on_coarse = nbr_info.orth_on_coarse;
 		coarse_rank    = nbr_info.rank;
-		coarse_id      = nbr_info.id * Side<D>::num_sides + s.opposite().getIndex();
+		coarse_id      = nbr_info.id * Side<D>::number_of + s.opposite().getIndex();
 	}
 };
 } // namespace Schur

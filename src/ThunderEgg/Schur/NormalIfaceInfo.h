@@ -66,10 +66,10 @@ template <int D> class NormalIfaceInfo : public IfaceInfo<D>
 		if (s.isLowerOnAxis()) {
 			// lower axis interface belongs to neighboring rank
 			auto nbr_info = pinfo.getNormalNbrInfo(s);
-			return (int) (nbr_info.id * Side<D>::num_sides + s.opposite().getIndex());
+			return (int) (nbr_info.id * Side<D>::number_of + s.opposite().getIndex());
 		} else {
 			// higher axis interafce belongs to this patch's rank
-			return (int) (pinfo.id * Side<D>::num_sides + s.getIndex());
+			return (int) (pinfo.id * Side<D>::number_of + s.getIndex());
 		}
 	}
 

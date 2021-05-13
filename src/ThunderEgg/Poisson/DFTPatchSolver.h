@@ -88,7 +88,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	/**
 	 * @brief Neumann boundary conditions for domain
 	 */
-	std::bitset<Side<D>::num_sides> neumann;
+	std::bitset<Side<D>::number_of> neumann;
 
 	/**
 	 * @brief Return if a patch has a neumann boundary condition on a particular side
@@ -254,11 +254,11 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		// get transform types for each axis
 		std::array<DftType, D> transforms;
 		for (size_t axis = 0; axis < D; axis++) {
-			if (patchIsNeumannOnSide(pinfo, Side<D>::LowerSideOnAxis(axis)) && patchIsNeumannOnSide(pinfo, Side<D>::HigherSideOnAxis(axis))) {
+			if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				transforms[axis] = DftType::DCT_II;
-			} else if (patchIsNeumannOnSide(pinfo, Side<D>::LowerSideOnAxis(axis))) {
+			} else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis))) {
 				transforms[axis] = DftType::DCT_IV;
-			} else if (patchIsNeumannOnSide(pinfo, Side<D>::HigherSideOnAxis(axis))) {
+			} else if (patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				transforms[axis] = DftType::DST_IV;
 			} else {
 				transforms[axis] = DftType::DST_II;
@@ -277,11 +277,11 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		// get transform types for each axis
 		std::array<DftType, D> transforms_inv;
 		for (size_t axis = 0; axis < D; axis++) {
-			if (patchIsNeumannOnSide(pinfo, Side<D>::LowerSideOnAxis(axis)) && patchIsNeumannOnSide(pinfo, Side<D>::HigherSideOnAxis(axis))) {
+			if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				transforms_inv[axis] = DftType::DCT_III;
-			} else if (patchIsNeumannOnSide(pinfo, Side<D>::LowerSideOnAxis(axis))) {
+			} else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis))) {
 				transforms_inv[axis] = DftType::DCT_IV;
-			} else if (patchIsNeumannOnSide(pinfo, Side<D>::HigherSideOnAxis(axis))) {
+			} else if (patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				transforms_inv[axis] = DftType::DST_IV;
 			} else {
 				transforms_inv[axis] = DftType::DST_III;
@@ -328,11 +328,11 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 			std::valarray<double> ones(ones_size);
 			ones = 1;
 
-			if (patchIsNeumannOnSide(pinfo, Side<D>::LowerSideOnAxis(axis)) && patchIsNeumannOnSide(pinfo, Side<D>::HigherSideOnAxis(axis))) {
+			if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				for (int xi = 0; xi < n; xi++) {
 					retval[std::gslice(xi * input_stride, sizes, strides)] -= 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2) * ones;
 				}
-			} else if (patchIsNeumannOnSide(pinfo, Side<D>::LowerSideOnAxis(axis)) || patchIsNeumannOnSide(pinfo, Side<D>::HigherSideOnAxis(axis))) {
+			} else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) || patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				for (int xi = 0; xi < n; xi++) {
 					retval[std::gslice(xi * input_stride, sizes, strides)] -= 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2) * ones;
 				}
@@ -367,14 +367,14 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @param op_in the Poisson PatchOperator that cooresponds to this DFTPatchSolver
 	 * @param neumann true if domain has neumann boundary conditions on a side
 	 */
-	DFTPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in, std::bitset<Side<D>::num_sides> neumann)
+	DFTPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in, std::bitset<Side<D>::number_of> neumann)
 	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()),
 	  op(op_in),
 	  neumann(neumann)
 	{
 		CompareFunction compare = [&](const PatchInfo<D> &a, const PatchInfo<D> &b) -> bool {
-			std::bitset<Side<D>::num_sides> a_neumann;
-			std::bitset<Side<D>::num_sides> b_neumann;
+			std::bitset<Side<D>::number_of> a_neumann;
+			std::bitset<Side<D>::number_of> b_neumann;
 			for (Side<D> s : Side<D>::getValues()) {
 				a_neumann[s.getIndex()] = patchIsNeumannOnSide(a, s);
 				b_neumann[s.getIndex()] = patchIsNeumannOnSide(b, s);
@@ -410,7 +410,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 
 		tmp->getValArray() /= eigen_vals.at(pinfo);
 
-		if (neumann.all() && pinfo.nbr_info == std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::num_sides>()) {
+		if (neumann.all() && pinfo.nbr_info == std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::number_of>()) {
 			tmp->getValArray()[0] = 0;
 		}
 

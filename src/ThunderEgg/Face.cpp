@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <ThunderEgg/Side.h>
+#include <ThunderEgg/Face.h>
 namespace ThunderEgg
 {
 void to_json(nlohmann::json &j, const Side<1> &s)
@@ -105,5 +105,56 @@ void from_json(const nlohmann::json &j, Side<3> &s)
 	} else {
 		s = Side<3>::null();
 	}
+}
+std::ostream &operator<<(std::ostream &os, const Side<1> &s)
+{
+	if (s == Side<1>::east()) {
+		os << "Side<1>::east()";
+	} else if (s == Side<1>::west()) {
+		os << "Side<1>::west()";
+	} else if (s == Side<1>::null()) {
+		os << "Side<1>::null()";
+	} else {
+		os << "Side<1> undefined value: " << s.getIndex();
+	}
+	return os;
+}
+std::ostream &operator<<(std::ostream &os, const Side<2> &s)
+{
+	if (s == Side<2>::east()) {
+		os << "Side<2>::east()";
+	} else if (s == Side<2>::west()) {
+		os << "Side<2>::west()";
+	} else if (s == Side<2>::south()) {
+		os << "Side<2>::south()";
+	} else if (s == Side<2>::north()) {
+		os << "Side<2>::north()";
+	} else if (s == Side<2>::null()) {
+		os << "Side<2>::null()";
+	} else {
+		os << "Side<2> undefined value: " << s.getIndex();
+	}
+	return os;
+}
+std::ostream &operator<<(std::ostream &os, const Side<3> &s)
+{
+	if (s == Side<3>::east()) {
+		os << "Side<3>::east()";
+	} else if (s == Side<3>::west()) {
+		os << "Side<3>::west()";
+	} else if (s == Side<3>::south()) {
+		os << "Side<3>::south()";
+	} else if (s == Side<3>::north()) {
+		os << "Side<3>::north()";
+	} else if (s == Side<3>::bottom()) {
+		os << "Side<3>::bottom()";
+	} else if (s == Side<3>::top()) {
+		os << "Side<3>::top()";
+	} else if (s == Side<3>::null()) {
+		os << "Side<3>::null()";
+	} else {
+		os << "Side<3> undefined value: " << s.getIndex();
+	}
+	return os;
 }
 } // namespace ThunderEgg
