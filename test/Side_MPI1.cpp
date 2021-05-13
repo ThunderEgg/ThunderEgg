@@ -20,6 +20,21 @@ TEST_CASE("Test num_sides for Side<3>", "[Side]")
 	size_t sides = Side<3>::num_sides;
 	CHECK(sides == 6);
 }
+TEST_CASE("Test dimensionality for Side<1>", "[Side]")
+{
+	size_t dimensionality = Side<1>::dimensionality;
+	CHECK(dimensionality == 0);
+}
+TEST_CASE("Test dimensionality for Side<2>", "[Side]")
+{
+	size_t dimensionality = Side<2>::dimensionality;
+	CHECK(dimensionality == 1);
+}
+TEST_CASE("Test dimensionality for Side<3>", "[Side]")
+{
+	size_t dimensionality = Side<3>::dimensionality;
+	CHECK(dimensionality == 2);
+}
 TEST_CASE("Test that named constructors for Side<1> give expected index values", "[Side]")
 {
 	CHECK(Side<1>::west().getIndex() == 0);

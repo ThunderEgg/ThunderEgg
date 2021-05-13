@@ -55,6 +55,12 @@ template <int D> class Side
 	 *
 	 */
 	static constexpr size_t num_sides = 2 * D;
+
+	/**
+	 * @brief The dimensionality of the side
+	 */
+	static constexpr size_t dimensionality = D - 1;
+
 	/**
 	 * @brief Default constructor that sets the value to null()
 	 */

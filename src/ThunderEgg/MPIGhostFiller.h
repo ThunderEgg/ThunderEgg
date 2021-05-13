@@ -39,15 +39,15 @@ namespace ThunderEgg
 template <int D> class MPIGhostFiller : public GhostFiller<D>
 {
 	private:
-	struct RemoteCallPrototype {
+	template <class Face> struct RemoteCallPrototype {
 		/**
 		 * @brief The id of the neighboring patch
 		 */
 		int id;
 		/**
-		 * @brief The side of the local patch that the neighboring patch is on
+		 * @brief The face of the local patch that the neighboring patch is on
 		 */
-		Side<D> side;
+		Face face;
 		/**
 		 * @brief The type of neighbor
 		 */
@@ -55,14 +55,14 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		/**
 		 * @brief The orthant on the on the coarse patch, or null
 		 */
-		Orthant<D - 1> orthant;
+		Orthant<Face::dimensionality> orthant;
 		/**
 		 * @brief The local index of the local patch the we are ghost filling from
 		 */
 		int local_index;
-		RemoteCallPrototype(int id, Side<D> side, NbrType nbr_type, Orthant<D - 1> orthant, int local_index)
+		RemoteCallPrototype(int id, Face face, NbrType nbr_type, Orthant<Face::dimensionality> orthant, int local_index)
 		: id(id),
-		  side(side),
+		  face(face),
 		  nbr_type(nbr_type),
 		  orthant(orthant),
 		  local_index(local_index)
@@ -70,12 +70,12 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 		bool operator<(const RemoteCallPrototype &other) const
 		{
-			return std::forward_as_tuple(id, side.opposite(), nbr_type, orthant, local_index)
-			       < std::forward_as_tuple(other.id, other.side.opposite(), other.nbr_type, other.orthant, other.local_index);
+			return std::forward_as_tuple(id, face.opposite(), nbr_type, orthant, local_index)
+			       < std::forward_as_tuple(other.id, other.face.opposite(), other.nbr_type, other.orthant, other.local_index);
 		}
 	};
 
-	struct IncomingGhostPrototype {
+	template <class Face> struct IncomingGhostPrototype {
 		/**
 		 * @brief The id of the patch that is being filled
 		 */
@@ -83,26 +83,26 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		/**
 		 * @brief The side of the patch that ghosts are on
 		 */
-		Side<D> side;
+		Face face;
 		/**
 		 * @brief the local index of the patch being filled
 		 */
 		int local_index;
-		IncomingGhostPrototype(int id, Side<D> side, int local_index) : id(id), side(side), local_index(local_index) {}
+		IncomingGhostPrototype(int id, Face face, int local_index) : id(id), face(face), local_index(local_index) {}
 		bool operator<(const IncomingGhostPrototype &other) const
 		{
-			return std::forward_as_tuple(id, side, local_index) < std::forward_as_tuple(other.id, other.side, other.local_index);
+			return std::forward_as_tuple(id, face, local_index) < std::forward_as_tuple(other.id, other.face, other.local_index);
 		}
 	};
 
 	/**
 	 * @brief Struct for remote call
 	 */
-	struct RemoteCall {
+	template <class Face> struct RemoteCall {
 		/**
 		 * @brief The side of the patch that the neighboring patch is on
 		 */
-		Side<D> side;
+		Face face;
 		/**
 		 * @brief The type of neighbor
 		 */
@@ -110,7 +110,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		/**
 		 * @brief The orthant on the coarse patch, or null
 		 */
-		Orthant<D - 1> orthant;
+		Orthant<Face::dimensionality> orthant;
 		/**
 		 * @brief The local index of the patch that we are filling from
 		 *
@@ -120,8 +120,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 * @brief offset in buffer
 		 */
 		size_t offset;
-		RemoteCall(const RemoteCallPrototype &prototype, size_t offset)
-		: side(prototype.side),
+		RemoteCall(const RemoteCallPrototype<Face> &prototype, size_t offset)
+		: face(prototype.face),
 		  nbr_type(prototype.nbr_type),
 		  orthant(prototype.orthant),
 		  local_index(prototype.local_index),
@@ -130,11 +130,11 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	};
 
-	struct IncomingGhost {
+	template <class Face> struct IncomingGhost {
 		/**
 		 * @brief The side of the patch that the ghosts are on
 		 */
-		Side<D> side;
+		Face face;
 		/**
 		 * @brief The local index of the patch that is being filled
 		 */
@@ -143,8 +143,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 * @brief The offset in the buffer
 		 */
 		size_t offset;
-		IncomingGhost(const IncomingGhostPrototype &prototype, size_t offset)
-		: side(prototype.side),
+		IncomingGhost(const IncomingGhostPrototype<Face> &prototype, size_t offset)
+		: face(prototype.face),
 		  local_index(prototype.local_index),
 		  offset(offset)
 		{
@@ -154,11 +154,11 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	/**
 	 * @brief Struct for local call
 	 */
-	struct LocalCall {
+	template <class Face> struct LocalCall {
 		/**
 		 * @brief The side that the neighbor is on
 		 */
-		Side<D> side;
+		Face face;
 		/**
 		 * @brief The neighbor
 		 *
@@ -167,7 +167,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		/**
 		 * @brief The orthant on the coarse patch
 		 */
-		Orthant<D - 1> orthant;
+		Orthant<Face::dimensionality> orthant;
 		/**
 		 * @brief The local index of the patch that is being filled from
 		 */
@@ -176,8 +176,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 * @brief The local index of the patch that is being filled
 		 */
 		int nbr_local_index;
-		LocalCall(Side<D> side, NbrType nbr_type, Orthant<D - 1> orthant, int local_index, size_t nbr_local_index)
-		: side(side),
+		LocalCall(Face face, NbrType nbr_type, Orthant<Face::dimensionality> orthant, int local_index, size_t nbr_local_index)
+		: face(face),
 		  nbr_type(nbr_type),
 		  orthant(orthant),
 		  local_index(local_index),
@@ -198,18 +198,17 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		/**
 		 * @brief A vector of RemoteCall deques, one sperate deque for each rank
 		 */
-		std::deque<RemoteCall> remote_calls;
+		std::deque<RemoteCall<Side<D>>> remote_calls;
+		std::deque<RemoteCall<Edge<D>>> edge_remote_calls;
 		/**
 		 * @brief the length of the recv buffer;
 		 */
 		size_t recv_buffer_length = 0;
 		/**
-		 * @brief vector of deques for incoming ghost cells, one deque for each rank
-		 *
-		 * the deques contain a tuple with the local index of the patch, the side that the ghost cells
-		 * are on, and the offset in the buffer for those ghost cells
+		 * @brief deque for incoming ghost calls
 		 */
-		std::deque<IncomingGhost> incoming_ghosts;
+		std::deque<IncomingGhost<Side<D>>> incoming_ghosts;
+		std::deque<IncomingGhost<Edge<D>>> edge_incoming_ghosts;
 
 		explicit RemoteCallSet(int rank) : rank(rank) {}
 	};
@@ -218,7 +217,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	/**
 	 * @brief deque of local calls to be made
 	 */
-	std::deque<LocalCall> local_calls;
+	std::deque<LocalCall<Side<D>>> local_calls;
+	std::deque<LocalCall<Edge<D>>> edge_local_calls;
 
 	/**
 	 * @brief Get the LocalData object for the buffer
@@ -281,9 +281,9 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		for (size_t i = 0; i < num_requests; i++) {
 			int finished_index;
 			MPI_Waitany(requests.size(), requests.data(), &finished_index, MPI_STATUS_IGNORE);
-			for (const IncomingGhost &incoming_ghost : remote_call_sets[finished_index].incoming_ghosts) {
+			for (const IncomingGhost<Side<D>> &incoming_ghost : remote_call_sets[finished_index].incoming_ghosts) {
 				int     local_index   = incoming_ghost.local_index;
-				Side<D> side          = incoming_ghost.side;
+				Side<D> side          = incoming_ghost.face;
 				size_t  buffer_offset = incoming_ghost.offset;
 
 				for (int c = 0; c < u->getNumComponents(); c++) {
@@ -312,9 +312,9 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	{
 		std::vector<MPI_Request> send_requests(remote_call_sets.size());
 		for (size_t i = 0; i < remote_call_sets.size(); i++) {
-			for (const RemoteCall &call : remote_call_sets[i].remote_calls) {
+			for (const RemoteCall<Side<D>> &call : remote_call_sets[i].remote_calls) {
 				const PatchInfo<D> &pinfo       = domain->getPatchInfoVector()[call.local_index];
-				Side<D>             side        = call.side.opposite();
+				Side<D>             side        = call.face.opposite();
 				auto                local_datas = u->getLocalDatas(call.local_index);
 				double *            buffer_ptr  = buffers[i].data() + call.offset * u->getNumComponents();
 
@@ -326,94 +326,134 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				}
 
 				// make the call
-				fillGhostCellsForNbrPatch(pinfo, local_datas, buffer_datas, call.side, call.nbr_type, call.orthant);
+				fillGhostCellsForNbrPatch(pinfo, local_datas, buffer_datas, call.face, call.nbr_type, call.orthant);
 			}
 			MPI_Isend(buffers[i].data(), buffers[i].size(), MPI_DOUBLE, remote_call_sets[i].rank, 0, MPI_COMM_WORLD, &send_requests[i]);
 		}
 		return send_requests;
 	}
-	const void addNormalNbrCalls(const PatchInfo<D> &                             pinfo,
-	                             Side<D>                                          s,
-	                             std::deque<LocalCall> &                          my_local_calls,
-	                             std::map<int, std::set<RemoteCallPrototype>> &   rank_to_remote_call_prototypes,
-	                             std::map<int, std::set<IncomingGhostPrototype>> &rank_to_incoming_ghost_prototypes)
+
+	template <class Face>
+	static void addNormalNbrCalls(const PatchInfo<D> &                                   pinfo,
+	                              Face                                                   f,
+	                              std::deque<LocalCall<Face>> &                          my_local_calls,
+	                              std::map<int, std::set<RemoteCallPrototype<Face>>> &   rank_to_remote_call_prototypes,
+	                              std::map<int, std::set<IncomingGhostPrototype<Face>>> &rank_to_incoming_ghost_prototypes)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		auto nbrinfo = pinfo.getNormalNbrInfo(s);
+		auto nbrinfo = pinfo.getNormalNbrInfo(f);
 		if (nbrinfo.rank == rank) {
-			local_calls.emplace_back(s, NbrType::Normal, Orthant<D - 1>::null(), pinfo.local_index, nbrinfo.local_index);
+			my_local_calls.emplace_back(f, NbrType::Normal, Orthant<Face::dimensionality>::null(), pinfo.local_index, nbrinfo.local_index);
 		} else {
-			rank_to_remote_call_prototypes[nbrinfo.rank].emplace(nbrinfo.id, s, NbrType::Normal, Orthant<D - 1>::null(), pinfo.local_index);
-			rank_to_incoming_ghost_prototypes[nbrinfo.rank].emplace(pinfo.id, s, pinfo.local_index);
+			rank_to_remote_call_prototypes[nbrinfo.rank].emplace(
+			nbrinfo.id, f, NbrType::Normal, Orthant<Face::dimensionality>::null(), pinfo.local_index);
+			rank_to_incoming_ghost_prototypes[nbrinfo.rank].emplace(pinfo.id, f, pinfo.local_index);
 		}
 	}
-	const void addFineNbrCalls(const PatchInfo<D> &                             pinfo,
-	                           Side<D>                                          s,
-	                           std::deque<LocalCall> &                          my_local_calls,
-	                           std::map<int, std::set<RemoteCallPrototype>> &   rank_to_remote_call_prototypes,
-	                           std::map<int, std::set<IncomingGhostPrototype>> &rank_to_incoming_ghost_prototypes)
+
+	template <class Face>
+	static void addFineNbrCalls(const PatchInfo<D> &                                   pinfo,
+	                            Face                                                   f,
+	                            std::deque<LocalCall<Face>> &                          my_local_calls,
+	                            std::map<int, std::set<RemoteCallPrototype<Face>>> &   rank_to_remote_call_prototypes,
+	                            std::map<int, std::set<IncomingGhostPrototype<Face>>> &rank_to_incoming_ghost_prototypes)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		auto nbrinfo = pinfo.getFineNbrInfo(s);
-		for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
+		auto nbrinfo = pinfo.getFineNbrInfo(f);
+		for (size_t i = 0; i < Orthant<Face::dimensionality>::num_orthants; i++) {
 			if (nbrinfo.ranks[i] == rank) {
-				local_calls.emplace_back(s, NbrType::Fine, Orthant<D - 1>(i), pinfo.local_index, nbrinfo.local_indexes[i]);
+				my_local_calls.emplace_back(f, NbrType::Fine, Orthant<Face::dimensionality>(i), pinfo.local_index, nbrinfo.local_indexes[i]);
 			} else {
-				rank_to_remote_call_prototypes[nbrinfo.ranks[i]].emplace(nbrinfo.ids[i], s, NbrType::Fine, Orthant<D - 1>(i), pinfo.local_index);
-				rank_to_incoming_ghost_prototypes[nbrinfo.ranks[i]].emplace(pinfo.id, s, pinfo.local_index);
+				rank_to_remote_call_prototypes[nbrinfo.ranks[i]].emplace(
+				nbrinfo.ids[i], f, NbrType::Fine, Orthant<Face::dimensionality>(i), pinfo.local_index);
+				rank_to_incoming_ghost_prototypes[nbrinfo.ranks[i]].emplace(pinfo.id, f, pinfo.local_index);
 			}
 		}
 	}
 
-	const void addCoarseNbrCalls(const PatchInfo<D> &                             pinfo,
-	                             Side<D>                                          s,
-	                             std::deque<LocalCall> &                          my_local_calls,
-	                             std::map<int, std::set<RemoteCallPrototype>> &   rank_to_remote_call_prototypes,
-	                             std::map<int, std::set<IncomingGhostPrototype>> &rank_to_incoming_ghost_prototypes)
+	template <class Face>
+	static void addCoarseNbrCalls(const PatchInfo<D> &                                   pinfo,
+	                              Face                                                   f,
+	                              std::deque<LocalCall<Face>> &                          my_local_calls,
+	                              std::map<int, std::set<RemoteCallPrototype<Face>>> &   rank_to_remote_call_prototypes,
+	                              std::map<int, std::set<IncomingGhostPrototype<Face>>> &rank_to_incoming_ghost_prototypes)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		auto nbrinfo = pinfo.getCoarseNbrInfo(s);
+		auto nbrinfo = pinfo.getCoarseNbrInfo(f);
 		if (nbrinfo.rank == rank) {
-			local_calls.emplace_back(s, NbrType::Coarse, nbrinfo.orth_on_coarse, pinfo.local_index, nbrinfo.local_index);
+			my_local_calls.emplace_back(f, NbrType::Coarse, nbrinfo.orth_on_coarse, pinfo.local_index, nbrinfo.local_index);
 		} else {
-			rank_to_remote_call_prototypes[nbrinfo.rank].emplace(nbrinfo.id, s, NbrType::Coarse, nbrinfo.orth_on_coarse, pinfo.local_index);
-			rank_to_incoming_ghost_prototypes[nbrinfo.rank].emplace(pinfo.id, s, pinfo.local_index);
+			rank_to_remote_call_prototypes[nbrinfo.rank].emplace(nbrinfo.id, f, NbrType::Coarse, nbrinfo.orth_on_coarse, pinfo.local_index);
+			rank_to_incoming_ghost_prototypes[nbrinfo.rank].emplace(pinfo.id, f, pinfo.local_index);
 		}
 	}
-	void enumerateFaceCalls(std::map<int, RemoteCallSet> &rank_to_remote_call_sets)
+	template <class Face> std::vector<size_t> getGhostLengths() const
+	{
+		std::vector<size_t> ghost_lengths;
+		if constexpr (std::is_same<Face, Side<D>>::value) {
+			ghost_lengths.resize(D);
+			for (size_t axis = 0; axis < D; axis++) {
+				size_t length = 1;
+				for (size_t i = 0; i < D; i++) {
+					if (i == axis) {
+						length *= domain->getNumGhostCells();
+					} else {
+						length *= domain->getNs()[i];
+					}
+				}
+				ghost_lengths[axis] = length;
+			}
+		} else if constexpr (std::is_same<Face, Edge<D>>::value) {
+			ghost_lengths.resize(D);
+			for (size_t axis = 0; axis < D; axis++) {
+				size_t length = 1;
+				for (size_t i = 0; i < D; i++) {
+					if (i == axis) {
+						length *= domain->getNs()[i];
+					} else {
+						length *= domain->getNumGhostCells();
+					}
+				}
+				ghost_lengths[axis] = length;
+			}
+		} else {
+			static_assert(std::is_same_v<Face *, void>, "Unsupported type");
+		}
+		return ghost_lengths;
+	}
+	template <class Face> size_t getGhostLength(const std::vector<size_t> &ghost_lengths, Face face) const
+	{
+		size_t length;
+		if constexpr (std::is_same<Face, Side<D>>::value || std::is_same<Face, Edge<D>>::value) {
+			length = ghost_lengths[face.getAxisIndex()];
+		} else {
+			static_assert(std::is_same_v<Face *, void>, "Unsupported type");
+		}
+		return length;
+	}
+	template <class Face>
+	void enumerateCalls(std::deque<LocalCall<Face>> &my_local_calls, std::map<int, RemoteCallSet> &rank_to_remote_call_sets) const
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		std::map<int, std::set<RemoteCallPrototype>>    rank_to_remote_call_prototypes;
-		std::map<int, std::set<IncomingGhostPrototype>> rank_to_incoming_ghost_prototypes;
+		std::map<int, std::set<RemoteCallPrototype<Face>>>    rank_to_remote_call_prototypes;
+		std::map<int, std::set<IncomingGhostPrototype<Face>>> rank_to_incoming_ghost_prototypes;
 
-		std::array<size_t, D> axis_ghost_lengths;
-		for (size_t axis = 0; axis < D; axis++) {
-			size_t length = 1;
-			for (size_t i = 0; i < D; i++) {
-				if (i == axis) {
-					length *= domain->getNumGhostCells();
-				} else {
-					length *= domain->getNs()[i];
-				}
-			}
-			axis_ghost_lengths[axis] = length;
-		}
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			for (Side<D> s : Side<D>::getValues()) {
-				if (pinfo.hasNbr(s)) {
-					switch (pinfo.getNbrType(s)) {
+			for (Face f : Face::getValues()) {
+				if (pinfo.hasNbr(f)) {
+					switch (pinfo.getNbrType(f)) {
 						case NbrType::Normal:
-							addNormalNbrCalls(pinfo, s, local_calls, rank_to_remote_call_prototypes, rank_to_incoming_ghost_prototypes);
+							addNormalNbrCalls(pinfo, f, my_local_calls, rank_to_remote_call_prototypes, rank_to_incoming_ghost_prototypes);
 							break;
 						case NbrType::Fine:
-							addFineNbrCalls(pinfo, s, local_calls, rank_to_remote_call_prototypes, rank_to_incoming_ghost_prototypes);
+							addFineNbrCalls(pinfo, f, my_local_calls, rank_to_remote_call_prototypes, rank_to_incoming_ghost_prototypes);
 							break;
 						case NbrType::Coarse:
-							addCoarseNbrCalls(pinfo, s, local_calls, rank_to_remote_call_prototypes, rank_to_incoming_ghost_prototypes);
+							addCoarseNbrCalls(pinfo, f, my_local_calls, rank_to_remote_call_prototypes, rank_to_incoming_ghost_prototypes);
 							break;
 						default:
 							throw RuntimeError("Unsupported NbrType");
@@ -421,38 +461,46 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				}
 			}
 		}
+		std::vector<size_t> ghost_lengths = getGhostLengths<Face>();
 		for (const auto &pair : rank_to_remote_call_prototypes) {
 			int rank = pair.first;
 			rank_to_remote_call_sets.emplace(rank, rank);
-			RemoteCallSet &          remote_call_set = rank_to_remote_call_sets.at(rank);
-			std::tuple<int, Side<D>> prev_id_side;
-			for (const RemoteCallPrototype &call : pair.second) {
+			RemoteCallSet &       remote_call_set = rank_to_remote_call_sets.at(rank);
+			std::tuple<int, Face> prev_id_side;
+			for (const RemoteCallPrototype<Face> &call : pair.second) {
 				size_t offset = remote_call_set.send_buffer_length;
 
 				// calculate length in buffer need for ghost cells
-				size_t length = axis_ghost_lengths[call.side.getAxisIndex()];
+				size_t length = getGhostLength(ghost_lengths, call.face);
 				// add length to buffer length
 				// if its the same side of the patch, resuse the previous buffer space
-				if (std::make_tuple(call.id, call.side) == prev_id_side) {
+				if (std::make_tuple(call.id, call.face) == prev_id_side) {
 					offset -= length;
 				} else {
 					remote_call_set.send_buffer_length += length;
 				}
-
-				remote_call_set.remote_calls.emplace_back(call, offset);
-				prev_id_side = std::make_tuple(call.id, call.side);
+				if constexpr (std::is_same<Face, Side<D>>::value) {
+					remote_call_set.remote_calls.emplace_back(call, offset);
+				} else if constexpr (std::is_same<Face, Edge<D>>::value) {
+					remote_call_set.edge_remote_calls.emplace_back(call, offset);
+				}
+				prev_id_side = std::make_tuple(call.id, call.face);
 			}
 		}
 		for (const auto &pair : rank_to_incoming_ghost_prototypes) {
 			RemoteCallSet &remote_call_set = rank_to_remote_call_sets.at(pair.first);
-			for (const IncomingGhostPrototype &prototype : pair.second) {
+			for (const IncomingGhostPrototype<Face> &prototype : pair.second) {
 				// add length for ghosts to buffer length
-				size_t length = axis_ghost_lengths[prototype.side.getAxisIndex()];
+				size_t length = getGhostLength(ghost_lengths, prototype.face);
 				size_t offset = remote_call_set.recv_buffer_length;
 				remote_call_set.recv_buffer_length += length;
 
 				// add ghost to incoming ghosts
-				remote_call_set.incoming_ghosts.emplace_back(prototype, offset);
+				if constexpr (std::is_same<Face, Side<D>>::value) {
+					remote_call_set.incoming_ghosts.emplace_back(prototype, offset);
+				} else if constexpr (std::is_same<Face, Edge<D>>::value) {
+					remote_call_set.edge_incoming_ghosts.emplace_back(prototype, offset);
+				}
 			}
 		}
 	}
@@ -477,7 +525,20 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	MPIGhostFiller(std::shared_ptr<const Domain<D>> domain, GhostFillingType fill_type) : domain(domain), fill_type(fill_type)
 	{
 		std::map<int, RemoteCallSet> rank_to_remote_call_sets;
-		enumerateFaceCalls(rank_to_remote_call_sets);
+
+		switch (fill_type) {
+			case GhostFillingType::Corners:
+			case GhostFillingType::Edges:
+				if constexpr (D == 3) {
+					enumerateCalls<Edge<D>>(edge_local_calls, rank_to_remote_call_sets);
+				}
+			case GhostFillingType::Faces:
+				enumerateCalls<Side<D>>(local_calls, rank_to_remote_call_sets);
+				break;
+			default:
+				throw RuntimeError("Unsupported GhostFilling Type");
+		}
+
 		remote_call_sets.reserve(rank_to_remote_call_sets.size());
 		for (const auto &pair : rank_to_remote_call_sets) {
 			remote_call_sets.push_back(pair.second);
@@ -563,6 +624,17 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 						}
 					}
 				}
+				for (Edge<D> e : Edge<D>::getValues()) {
+					if (pinfo.hasNbr(e)) {
+						for (int j = 0; j < pinfo.num_ghost_cells; j++) {
+							for (int i = 0; i < pinfo.num_ghost_cells; i++) {
+								auto this_ghost = this_patch.getSliceOnEdge(e, {-1 - i, -1 - j});
+								nested_loop<1>(
+								this_ghost.getStart(), this_ghost.getEnd(), [&](const std::array<int, 1> &coord) { this_ghost[coord] = 0; });
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -585,11 +657,19 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			auto datas = u->getLocalDatas(pinfo.local_index);
 			fillGhostCellsForLocalPatch(pinfo, datas);
 		}
-		for (const LocalCall &call : local_calls) {
+		for (const LocalCall<Side<D>> &call : local_calls) {
 			const PatchInfo<D> &pinfo       = domain->getPatchInfoVector()[call.local_index];
 			auto                local_datas = u->getLocalDatas(call.local_index);
 			auto                nbr_datas   = u->getLocalDatas(call.nbr_local_index);
-			fillGhostCellsForNbrPatch(pinfo, local_datas, nbr_datas, call.side, call.nbr_type, call.orthant);
+			fillGhostCellsForNbrPatch(pinfo, local_datas, nbr_datas, call.face, call.nbr_type, call.orthant);
+		}
+		if constexpr (D == 3) {
+			for (const LocalCall<Edge<D>> &call : edge_local_calls) {
+				const PatchInfo<D> &pinfo       = domain->getPatchInfoVector()[call.local_index];
+				auto                local_datas = u->getLocalDatas(call.local_index);
+				auto                nbr_datas   = u->getLocalDatas(call.nbr_local_index);
+				fillGhostCellsForEdgeNbrPatch(pinfo, local_datas, nbr_datas, call.face, call.nbr_type, call.orthant);
+			}
 		}
 
 		processRecvs(recv_requests, recv_buffers, u);

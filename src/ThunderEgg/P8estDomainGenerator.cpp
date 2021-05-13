@@ -508,10 +508,10 @@ void addEdgeCoarseNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_
 
 			Edge<3> edge = getEdge(side1.edge);
 
-			data->pinfo->edge_nbr_info[edge.getIndex()]            = make_unique<CoarseNbrInfo<2>>();
-			data->pinfo->getEdgeCoarseNbrInfo(edge).id             = nbr_data->id;
-			data->pinfo->getEdgeCoarseNbrInfo(edge).rank           = nbr_data->rank;
-			data->pinfo->getEdgeCoarseNbrInfo(edge).orth_on_coarse = Orthant<1>(i);
+			data->pinfo->edge_nbr_info[edge.getIndex()]        = make_unique<CoarseNbrInfo<2>>();
+			data->pinfo->getCoarseNbrInfo(edge).id             = nbr_data->id;
+			data->pinfo->getCoarseNbrInfo(edge).rank           = nbr_data->rank;
+			data->pinfo->getCoarseNbrInfo(edge).orth_on_coarse = Orthant<1>(i);
 		}
 	}
 }
@@ -540,8 +540,8 @@ void addEdgeFineNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_ed
 
 		data->pinfo->edge_nbr_info[edge.getIndex()] = make_unique<FineNbrInfo<2>>();
 		for (int i = 0; i < 2; i++) {
-			data->pinfo->getEdgeFineNbrInfo(edge).ids[i]   = nbr_datas[i]->id;
-			data->pinfo->getEdgeFineNbrInfo(edge).ranks[i] = nbr_datas[i]->rank;
+			data->pinfo->getFineNbrInfo(edge).ids[i]   = nbr_datas[i]->id;
+			data->pinfo->getFineNbrInfo(edge).ranks[i] = nbr_datas[i]->rank;
 		}
 	}
 }
@@ -566,8 +566,8 @@ void addEdgeNormalNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_
 
 		Edge<3> edge = getEdge(side1.edge);
 
-		data->pinfo->edge_nbr_info[edge.getIndex()]  = make_unique<NormalNbrInfo<2>>(nbr_data->id);
-		data->pinfo->getEdgeNormalNbrInfo(edge).rank = nbr_data->rank;
+		data->pinfo->edge_nbr_info[edge.getIndex()] = make_unique<NormalNbrInfo<2>>(nbr_data->id);
+		data->pinfo->getNormalNbrInfo(edge).rank    = nbr_data->rank;
 	}
 }
 
@@ -609,9 +609,9 @@ void addCornerFineNbrInfo(const p8est_iter_corner_side_t &side1, const p8est_ite
 
 		Corner<3> corner(side1.corner);
 
-		data->pinfo->corner_nbr_info[corner.getIndex()]    = make_unique<FineNbrInfo<1>>();
-		data->pinfo->getCornerFineNbrInfo(corner).ids[0]   = nbr_data->id;
-		data->pinfo->getCornerFineNbrInfo(corner).ranks[0] = nbr_data->rank;
+		data->pinfo->corner_nbr_info[corner.getIndex()] = make_unique<FineNbrInfo<1>>();
+		data->pinfo->getFineNbrInfo(corner).ids[0]      = nbr_data->id;
+		data->pinfo->getFineNbrInfo(corner).ranks[0]    = nbr_data->rank;
 	}
 }
 
@@ -635,9 +635,9 @@ void addCornerCoarseNbrInfo(const p8est_iter_corner_side_t &side1, const p8est_i
 
 		Corner<3> corner(side1.corner);
 
-		data->pinfo->corner_nbr_info[corner.getIndex()]  = make_unique<CoarseNbrInfo<1>>();
-		data->pinfo->getCornerCoarseNbrInfo(corner).id   = nbr_data->id;
-		data->pinfo->getCornerCoarseNbrInfo(corner).rank = nbr_data->rank;
+		data->pinfo->corner_nbr_info[corner.getIndex()] = make_unique<CoarseNbrInfo<1>>();
+		data->pinfo->getCoarseNbrInfo(corner).id        = nbr_data->id;
+		data->pinfo->getCoarseNbrInfo(corner).rank      = nbr_data->rank;
 	}
 }
 
@@ -661,8 +661,8 @@ void addCornerNormalNbrInfo(const p8est_iter_corner_side_t &side1, const p8est_i
 
 		Corner<3> corner(side1.corner);
 
-		data->pinfo->corner_nbr_info[corner.getIndex()]  = make_unique<NormalNbrInfo<1>>(nbr_data->id);
-		data->pinfo->getCornerNormalNbrInfo(corner).rank = nbr_data->rank;
+		data->pinfo->corner_nbr_info[corner.getIndex()] = make_unique<NormalNbrInfo<1>>(nbr_data->id);
+		data->pinfo->getNormalNbrInfo(corner).rank      = nbr_data->rank;
 	}
 }
 

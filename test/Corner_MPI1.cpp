@@ -7,6 +7,32 @@
 using namespace std;
 using namespace ThunderEgg;
 
+TEST_CASE("Corner<1> num_corners", "[Corner]")
+{
+	CHECK(Corner<1>::num_corners == 0);
+}
+TEST_CASE("Corner<2> num_corners", "[Corner]")
+{
+	CHECK(Corner<2>::num_corners == 4);
+}
+TEST_CASE("Corner<3> num_corners", "[Corner]")
+{
+	CHECK(Corner<3>::num_corners == 8);
+}
+
+TEST_CASE("Corner<1> dimensionality", "[Corner]")
+{
+	CHECK(Corner<1>::dimensionality == 0);
+}
+TEST_CASE("Corner<2> dimensionality", "[Corner]")
+{
+	CHECK(Corner<2>::dimensionality == 0);
+}
+TEST_CASE("Corner<3> dimensionality", "[Corner]")
+{
+	CHECK(Corner<3>::dimensionality == 0);
+}
+
 TEST_CASE("Corner<1> unsigned char constructor works", "[Corner]")
 {
 	Corner<1> o(13);

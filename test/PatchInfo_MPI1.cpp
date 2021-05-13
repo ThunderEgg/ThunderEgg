@@ -599,54 +599,54 @@ TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 
 	// Corners
 
-	REQUIRE(out.hasCornerNbr(Corner<3>::bsw()));
-	REQUIRE(out.getCornerNbrType(Corner<3>::bsw()) == NbrType::Normal);
-	REQUIRE(out.getCornerNormalNbrInfo(Corner<3>::bsw()).id == 1);
+	REQUIRE(out.hasNbr(Corner<3>::bsw()));
+	REQUIRE(out.getNbrType(Corner<3>::bsw()) == NbrType::Normal);
+	REQUIRE(out.getNormalNbrInfo(Corner<3>::bsw()).id == 1);
 
-	REQUIRE(!out.hasCornerNbr(Corner<3>::bse()));
+	REQUIRE(!out.hasNbr(Corner<3>::bse()));
 
-	REQUIRE(out.hasCornerNbr(Corner<3>::bnw()));
-	REQUIRE(out.getCornerNbrType(Corner<3>::bnw()) == NbrType::Fine);
-	REQUIRE(out.getCornerFineNbrInfo(Corner<3>::bnw()).ids[0] == 1);
+	REQUIRE(out.hasNbr(Corner<3>::bnw()));
+	REQUIRE(out.getNbrType(Corner<3>::bnw()) == NbrType::Fine);
+	REQUIRE(out.getFineNbrInfo(Corner<3>::bnw()).ids[0] == 1);
 
-	REQUIRE(!out.hasCornerNbr(Corner<3>::bne()));
-	REQUIRE(!out.hasCornerNbr(Corner<3>::tsw()));
+	REQUIRE(!out.hasNbr(Corner<3>::bne()));
+	REQUIRE(!out.hasNbr(Corner<3>::tsw()));
 
-	REQUIRE(out.hasCornerNbr(Corner<3>::tse()));
-	REQUIRE(out.getCornerNbrType(Corner<3>::tse()) == NbrType::Coarse);
-	REQUIRE(out.getCornerCoarseNbrInfo(Corner<3>::tse()).id == 2);
-	REQUIRE(out.getCornerCoarseNbrInfo(Corner<3>::tse()).orth_on_coarse == Orthant<0>::null());
+	REQUIRE(out.hasNbr(Corner<3>::tse()));
+	REQUIRE(out.getNbrType(Corner<3>::tse()) == NbrType::Coarse);
+	REQUIRE(out.getCoarseNbrInfo(Corner<3>::tse()).id == 2);
+	REQUIRE(out.getCoarseNbrInfo(Corner<3>::tse()).orth_on_coarse == Orthant<0>::null());
 
-	REQUIRE(!out.hasCornerNbr(Corner<3>::tnw()));
-	REQUIRE(!out.hasCornerNbr(Corner<3>::tne()));
+	REQUIRE(!out.hasNbr(Corner<3>::tnw()));
+	REQUIRE(!out.hasNbr(Corner<3>::tne()));
 
 	// Edges
 
-	REQUIRE(!out.hasEdgeNbr(Edge<3>::bs()));
-	REQUIRE(!out.hasEdgeNbr(Edge<3>::tn()));
+	REQUIRE(!out.hasNbr(Edge<3>::bs()));
+	REQUIRE(!out.hasNbr(Edge<3>::tn()));
 
-	REQUIRE(out.hasEdgeNbr(Edge<3>::bn()));
-	REQUIRE(out.getEdgeNbrType(Edge<3>::bn()) == NbrType::Coarse);
-	REQUIRE(out.getEdgeCoarseNbrInfo(Edge<3>::bn()).id == 2);
-	REQUIRE(out.getEdgeCoarseNbrInfo(Edge<3>::bn()).orth_on_coarse == Orthant<1>::lower());
+	REQUIRE(out.hasNbr(Edge<3>::bn()));
+	REQUIRE(out.getNbrType(Edge<3>::bn()) == NbrType::Coarse);
+	REQUIRE(out.getCoarseNbrInfo(Edge<3>::bn()).id == 2);
+	REQUIRE(out.getCoarseNbrInfo(Edge<3>::bn()).orth_on_coarse == Orthant<1>::lower());
 
-	REQUIRE(!out.hasEdgeNbr(Edge<3>::ts()));
-	REQUIRE(!out.hasEdgeNbr(Edge<3>::bw()));
-	REQUIRE(!out.hasEdgeNbr(Edge<3>::te()));
-	REQUIRE(!out.hasEdgeNbr(Edge<3>::be()));
+	REQUIRE(!out.hasNbr(Edge<3>::ts()));
+	REQUIRE(!out.hasNbr(Edge<3>::bw()));
+	REQUIRE(!out.hasNbr(Edge<3>::te()));
+	REQUIRE(!out.hasNbr(Edge<3>::be()));
 
-	REQUIRE(out.hasEdgeNbr(Edge<3>::tw()));
-	REQUIRE(out.getEdgeNbrType(Edge<3>::tw()) == NbrType::Fine);
-	REQUIRE(out.getEdgeFineNbrInfo(Edge<3>::tw()).ids[0] == 1);
-	REQUIRE(out.getEdgeFineNbrInfo(Edge<3>::tw()).ids[1] == 2);
+	REQUIRE(out.hasNbr(Edge<3>::tw()));
+	REQUIRE(out.getNbrType(Edge<3>::tw()) == NbrType::Fine);
+	REQUIRE(out.getFineNbrInfo(Edge<3>::tw()).ids[0] == 1);
+	REQUIRE(out.getFineNbrInfo(Edge<3>::tw()).ids[1] == 2);
 
-	REQUIRE(out.hasEdgeNbr(Edge<3>::sw()));
-	REQUIRE(out.getEdgeNbrType(Edge<3>::sw()) == NbrType::Normal);
-	REQUIRE(out.getEdgeNormalNbrInfo(Edge<3>::sw()).id == 1);
+	REQUIRE(out.hasNbr(Edge<3>::sw()));
+	REQUIRE(out.getNbrType(Edge<3>::sw()) == NbrType::Normal);
+	REQUIRE(out.getNormalNbrInfo(Edge<3>::sw()).id == 1);
 
-	REQUIRE(!out.hasEdgeNbr(Edge<3>::ne()));
-	REQUIRE(!out.hasEdgeNbr(Edge<3>::se()));
-	REQUIRE(!out.hasEdgeNbr(Edge<3>::nw()));
+	REQUIRE(!out.hasNbr(Edge<3>::ne()));
+	REQUIRE(!out.hasNbr(Edge<3>::se()));
+	REQUIRE(!out.hasNbr(Edge<3>::nw()));
 }
 TEST_CASE("PatchInfo Default Values", "[PatchInfo]")
 {
@@ -923,33 +923,33 @@ TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
 	CHECK_FALSE(d.hasNbr(Side<3>::bottom()));
 	CHECK_FALSE(d.hasNbr(Side<3>::top()));
 
-	CHECK(d.hasCornerNbr(Corner<3>::bsw()));
-	CHECK(d.getCornerNbrType(Corner<3>::bsw()) == NbrType::Normal);
-	CHECK_FALSE(d.hasCornerNbr(Corner<3>::bse()));
-	CHECK(d.hasCornerNbr(Corner<3>::bnw()));
-	CHECK(d.getCornerNbrType(Corner<3>::bnw()) == NbrType::Fine);
-	CHECK_FALSE(d.hasCornerNbr(Corner<3>::bne()));
-	CHECK_FALSE(d.hasCornerNbr(Corner<3>::tsw()));
-	CHECK(d.hasCornerNbr(Corner<3>::tse()));
-	CHECK(d.getCornerNbrType(Corner<3>::tse()) == NbrType::Coarse);
-	CHECK_FALSE(d.hasCornerNbr(Corner<3>::tnw()));
-	CHECK_FALSE(d.hasCornerNbr(Corner<3>::tne()));
+	CHECK(d.hasNbr(Corner<3>::bsw()));
+	CHECK(d.getNbrType(Corner<3>::bsw()) == NbrType::Normal);
+	CHECK_FALSE(d.hasNbr(Corner<3>::bse()));
+	CHECK(d.hasNbr(Corner<3>::bnw()));
+	CHECK(d.getNbrType(Corner<3>::bnw()) == NbrType::Fine);
+	CHECK_FALSE(d.hasNbr(Corner<3>::bne()));
+	CHECK_FALSE(d.hasNbr(Corner<3>::tsw()));
+	CHECK(d.hasNbr(Corner<3>::tse()));
+	CHECK(d.getNbrType(Corner<3>::tse()) == NbrType::Coarse);
+	CHECK_FALSE(d.hasNbr(Corner<3>::tnw()));
+	CHECK_FALSE(d.hasNbr(Corner<3>::tne()));
 
-	CHECK_FALSE(d.hasEdgeNbr(Edge<3>::bs()));
-	CHECK_FALSE(d.hasEdgeNbr(Edge<3>::tn()));
-	CHECK(d.hasEdgeNbr(Edge<3>::bn()));
-	CHECK(d.getEdgeNbrType(Edge<3>::bn()) == NbrType::Coarse);
-	CHECK_FALSE(d.hasEdgeNbr(Edge<3>::ts()));
-	CHECK_FALSE(d.hasEdgeNbr(Edge<3>::bw()));
-	CHECK_FALSE(d.hasEdgeNbr(Edge<3>::te()));
-	CHECK_FALSE(d.hasEdgeNbr(Edge<3>::be()));
-	CHECK(d.hasEdgeNbr(Edge<3>::tw()));
-	CHECK(d.getEdgeNbrType(Edge<3>::tw()) == NbrType::Fine);
-	CHECK(d.hasEdgeNbr(Edge<3>::sw()));
-	CHECK(d.getEdgeNbrType(Edge<3>::sw()) == NbrType::Normal);
-	CHECK_FALSE(d.hasEdgeNbr(Edge<3>::ne()));
-	CHECK_FALSE(d.hasEdgeNbr(Edge<3>::se()));
-	CHECK_FALSE(d.hasEdgeNbr(Edge<3>::nw()));
+	CHECK_FALSE(d.hasNbr(Edge<3>::bs()));
+	CHECK_FALSE(d.hasNbr(Edge<3>::tn()));
+	CHECK(d.hasNbr(Edge<3>::bn()));
+	CHECK(d.getNbrType(Edge<3>::bn()) == NbrType::Coarse);
+	CHECK_FALSE(d.hasNbr(Edge<3>::ts()));
+	CHECK_FALSE(d.hasNbr(Edge<3>::bw()));
+	CHECK_FALSE(d.hasNbr(Edge<3>::te()));
+	CHECK_FALSE(d.hasNbr(Edge<3>::be()));
+	CHECK(d.hasNbr(Edge<3>::tw()));
+	CHECK(d.getNbrType(Edge<3>::tw()) == NbrType::Fine);
+	CHECK(d.hasNbr(Edge<3>::sw()));
+	CHECK(d.getNbrType(Edge<3>::sw()) == NbrType::Normal);
+	CHECK_FALSE(d.hasNbr(Edge<3>::ne()));
+	CHECK_FALSE(d.hasNbr(Edge<3>::se()));
+	CHECK_FALSE(d.hasNbr(Edge<3>::nw()));
 }
 TEST_CASE("PatchInfo from_json with children", "[PatchInfo]")
 {
@@ -1071,35 +1071,35 @@ TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
 		}
 	}
 	for (Corner<3> c : Corner<3>::getValues()) {
-		REQUIRE(d.hasCornerNbr(c) == d2.hasCornerNbr(c));
-		if (d.hasCornerNbr(c)) {
+		REQUIRE(d.hasNbr(c) == d2.hasNbr(c));
+		if (d.hasNbr(c)) {
 			CHECK(d.corner_nbr_info[c.getIndex()] != d2.corner_nbr_info[c.getIndex()]);
-			switch (d.getCornerNbrType(c)) {
+			switch (d.getNbrType(c)) {
 				case NbrType::Normal:
-					CHECK(d.getCornerNormalNbrInfo(c).id == d2.getCornerNormalNbrInfo(c).id);
+					CHECK(d.getNormalNbrInfo(c).id == d2.getNormalNbrInfo(c).id);
 					break;
 				case NbrType::Fine:
-					CHECK(d.getCornerFineNbrInfo(c).ids[0] == d2.getCornerFineNbrInfo(c).ids[0]);
+					CHECK(d.getFineNbrInfo(c).ids[0] == d2.getFineNbrInfo(c).ids[0]);
 					break;
 				case NbrType::Coarse:
-					CHECK(d.getCornerCoarseNbrInfo(c).id == d2.getCornerCoarseNbrInfo(c).id);
+					CHECK(d.getCoarseNbrInfo(c).id == d2.getCoarseNbrInfo(c).id);
 					break;
 			}
 		}
 	}
 	for (Edge<3> c : Edge<3>::getValues()) {
-		REQUIRE(d.hasEdgeNbr(c) == d2.hasEdgeNbr(c));
-		if (d.hasEdgeNbr(c)) {
+		REQUIRE(d.hasNbr(c) == d2.hasNbr(c));
+		if (d.hasNbr(c)) {
 			CHECK(d.edge_nbr_info[c.getIndex()] != d2.edge_nbr_info[c.getIndex()]);
-			switch (d.getEdgeNbrType(c)) {
+			switch (d.getNbrType(c)) {
 				case NbrType::Normal:
-					CHECK(d.getEdgeNormalNbrInfo(c).id == d2.getEdgeNormalNbrInfo(c).id);
+					CHECK(d.getNormalNbrInfo(c).id == d2.getNormalNbrInfo(c).id);
 					break;
 				case NbrType::Fine:
-					CHECK(d.getEdgeFineNbrInfo(c).ids[0] == d2.getEdgeFineNbrInfo(c).ids[0]);
+					CHECK(d.getFineNbrInfo(c).ids[0] == d2.getFineNbrInfo(c).ids[0]);
 					break;
 				case NbrType::Coarse:
-					CHECK(d.getEdgeCoarseNbrInfo(c).id == d2.getEdgeCoarseNbrInfo(c).id);
+					CHECK(d.getCoarseNbrInfo(c).id == d2.getCoarseNbrInfo(c).id);
 					break;
 			}
 		}
@@ -1165,35 +1165,35 @@ TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 		}
 	}
 	for (Corner<3> c : Corner<3>::getValues()) {
-		REQUIRE(d.hasCornerNbr(c) == d2.hasCornerNbr(c));
-		if (d.hasCornerNbr(c)) {
+		REQUIRE(d.hasNbr(c) == d2.hasNbr(c));
+		if (d.hasNbr(c)) {
 			CHECK(d.corner_nbr_info[c.getIndex()] != d2.corner_nbr_info[c.getIndex()]);
-			switch (d.getCornerNbrType(c)) {
+			switch (d.getNbrType(c)) {
 				case NbrType::Normal:
-					CHECK(d.getCornerNormalNbrInfo(c).id == d2.getCornerNormalNbrInfo(c).id);
+					CHECK(d.getNormalNbrInfo(c).id == d2.getNormalNbrInfo(c).id);
 					break;
 				case NbrType::Fine:
-					CHECK(d.getCornerFineNbrInfo(c).ids[0] == d2.getCornerFineNbrInfo(c).ids[0]);
+					CHECK(d.getFineNbrInfo(c).ids[0] == d2.getFineNbrInfo(c).ids[0]);
 					break;
 				case NbrType::Coarse:
-					CHECK(d.getCornerCoarseNbrInfo(c).id == d2.getCornerCoarseNbrInfo(c).id);
+					CHECK(d.getCoarseNbrInfo(c).id == d2.getCoarseNbrInfo(c).id);
 					break;
 			}
 		}
 	}
 	for (Edge<3> c : Edge<3>::getValues()) {
-		REQUIRE(d.hasEdgeNbr(c) == d2.hasEdgeNbr(c));
-		if (d.hasEdgeNbr(c)) {
+		REQUIRE(d.hasNbr(c) == d2.hasNbr(c));
+		if (d.hasNbr(c)) {
 			CHECK(d.edge_nbr_info[c.getIndex()] != d2.edge_nbr_info[c.getIndex()]);
-			switch (d.getEdgeNbrType(c)) {
+			switch (d.getNbrType(c)) {
 				case NbrType::Normal:
-					CHECK(d.getEdgeNormalNbrInfo(c).id == d2.getEdgeNormalNbrInfo(c).id);
+					CHECK(d.getNormalNbrInfo(c).id == d2.getNormalNbrInfo(c).id);
 					break;
 				case NbrType::Fine:
-					CHECK(d.getEdgeFineNbrInfo(c).ids[0] == d2.getEdgeFineNbrInfo(c).ids[0]);
+					CHECK(d.getFineNbrInfo(c).ids[0] == d2.getFineNbrInfo(c).ids[0]);
 					break;
 				case NbrType::Coarse:
-					CHECK(d.getEdgeCoarseNbrInfo(c).id == d2.getEdgeCoarseNbrInfo(c).id);
+					CHECK(d.getCoarseNbrInfo(c).id == d2.getCoarseNbrInfo(c).id);
 					break;
 			}
 		}

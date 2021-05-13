@@ -214,8 +214,8 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 			for (auto edge : Edge<D>::getValues()) {
 				INFO("side: " << edge);
-				if (patch.hasEdgeNbr(edge)) {
-					switch (patch.getEdgeNbrType(edge)) {
+				if (patch.hasNbr(edge)) {
+					switch (patch.getNbrType(edge)) {
 						case NbrType::Normal: {
 							INFO("NbrType: Normal");
 
@@ -235,7 +235,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 						case NbrType::Coarse: {
 							INFO("NbrType: Coarse");
 
-							auto orthant = patch.getEdgeCoarseNbrInfo(edge).orth_on_coarse;
+							auto orthant = patch.getCoarseNbrInfo(edge).orth_on_coarse;
 
 							INFO("Orthant: " << orthant.getIndex());
 
@@ -307,8 +307,8 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 			for (auto corner : Corner<D>::getValues()) {
 				INFO("side: " << corner);
-				if (patch.hasCornerNbr(corner)) {
-					switch (patch.getCornerNbrType(corner)) {
+				if (patch.hasNbr(corner)) {
+					switch (patch.getNbrType(corner)) {
 						case NbrType::Normal: {
 							INFO("NbrType: Normal");
 
@@ -523,15 +523,15 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 				for (Corner<D> corner : Corner<D>::getValues()) {
 					INFO("Corner: " << corner);
 
-					if (pinfo.hasCornerNbr(corner)) {
-						switch (pinfo.getCornerNbrType(corner)) {
+					if (pinfo.hasNbr(corner)) {
+						switch (pinfo.getNbrType(corner)) {
 							case NbrType::Normal: {
 								INFO("NbrType: Normal");
 
 								// value should be id of neighbor + index +c
 								int  index   = 0;
-								auto nbrinfo = pinfo.getCornerNormalNbrInfo(corner);
-								//
+								auto nbrinfo = pinfo.getNormalNbrInfo(corner);
+
 								std::array<int, D> start = data.getGhostStart();
 								std::array<int, D> end;
 								end.fill(-1);
@@ -549,7 +549,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 								INFO("NbrType: Fine");
 
 								int  ids     = 0;
-								auto nbrinfo = pinfo.getCornerFineNbrInfo(corner);
+								auto nbrinfo = pinfo.getFineNbrInfo(corner);
 
 								// value should be id of neighbors + index
 								int index = 0;
@@ -572,7 +572,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 								// value should be id of neighbor + index
 								int  index   = 0;
-								auto nbrinfo = pinfo.getCornerCoarseNbrInfo(corner);
+								auto nbrinfo = pinfo.getCoarseNbrInfo(corner);
 
 								std::array<int, D> start = data.getGhostStart();
 								std::array<int, D> end;
@@ -633,14 +633,14 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 				for (Edge<D> e : Edge<D>::getValues()) {
 					INFO("Edge: " << e);
 
-					if (pinfo.hasEdgeNbr(e)) {
-						switch (pinfo.getEdgeNbrType(e)) {
+					if (pinfo.hasNbr(e)) {
+						switch (pinfo.getNbrType(e)) {
 							case NbrType::Normal: {
 								INFO("NbrType: Normal");
 
-								// value should be id of neighbor + index +c
+								// value should be id of neighbor + index + c
 								int  index   = 0;
-								auto nbrinfo = pinfo.getEdgeNormalNbrInfo(e);
+								auto nbrinfo = pinfo.getNormalNbrInfo(e);
 								for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 									for (int i = 0; i < pinfo.num_ghost_cells; i++) {
 										auto slice = data.getSliceOnEdge(e, {-i - 1, -j - 1});
@@ -664,7 +664,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 								INFO("NbrType: Fine");
 
 								int  ids     = 0;
-								auto nbrinfo = pinfo.getEdgeFineNbrInfo(e);
+								auto nbrinfo = pinfo.getFineNbrInfo(e);
 								for (size_t i = 0; i < nbrinfo.ids.size(); i++) {
 									ids += nbrinfo.ids[i];
 								}
@@ -691,7 +691,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 								// value should be id of neighbor + index
 								int  index   = 0;
-								auto nbrinfo = pinfo.getEdgeCoarseNbrInfo(e);
+								auto nbrinfo = pinfo.getCoarseNbrInfo(e);
 								for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 									for (int i = 0; i < pinfo.num_ghost_cells; i++) {
 										auto slice = data.getSliceOnEdge(e, {-1 - i, -1 - j});
@@ -715,7 +715,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 						for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 							for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-								auto slice = data.getSliceOnEdge(e, {-1 - i, -i - j});
+								auto slice = data.getSliceOnEdge(e, {-1 - i, -1 - j});
 								nested_loop<1>(slice.getStart(), slice.getEnd(), [&](std::array<int, 1> &coord) {
 									INFO("coord: ");
 									for (size_t i = 0; i < 1; i++) {

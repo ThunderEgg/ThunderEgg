@@ -7,6 +7,30 @@
 using namespace std;
 using namespace ThunderEgg;
 
+TEST_CASE("Edge<1> num_edges", "[Edge]")
+{
+	CHECK(Edge<1>::num_edges == 0);
+}
+TEST_CASE("Edge<2> num_edges", "[Edge]")
+{
+	CHECK(Edge<2>::num_edges == 0);
+}
+TEST_CASE("Edge<3> num_edges", "[Edge]")
+{
+	CHECK(Edge<3>::num_edges == 12);
+}
+TEST_CASE("Edge<1> dimensionality", "[Edge]")
+{
+	CHECK(Edge<1>::dimensionality == 0);
+}
+TEST_CASE("Edge<2> dimensionality", "[Edge]")
+{
+	CHECK(Edge<2>::dimensionality == 0);
+}
+TEST_CASE("Edge<3> dimensionality", "[Edge]")
+{
+	CHECK(Edge<3>::dimensionality == 1);
+}
 TEST_CASE("Edge<1> unsigned char constructor works", "[Edge]")
 {
 	Edge<1> o(13);
@@ -48,17 +72,17 @@ TEST_CASE("Edge<2> named constructors give expected index values", "[Edge]")
 TEST_CASE("Edge<3> named constructors give expected index values", "[Edge]")
 {
 	CHECK(Edge<3>::bs().getIndex() == 0);
-	CHECK(Edge<3>::tn().getIndex() == 1);
-	CHECK(Edge<3>::bn().getIndex() == 2);
-	CHECK(Edge<3>::ts().getIndex() == 3);
+	CHECK(Edge<3>::bn().getIndex() == 1);
+	CHECK(Edge<3>::ts().getIndex() == 2);
+	CHECK(Edge<3>::tn().getIndex() == 3);
 	CHECK(Edge<3>::bw().getIndex() == 4);
-	CHECK(Edge<3>::te().getIndex() == 5);
-	CHECK(Edge<3>::be().getIndex() == 6);
-	CHECK(Edge<3>::tw().getIndex() == 7);
+	CHECK(Edge<3>::be().getIndex() == 5);
+	CHECK(Edge<3>::tw().getIndex() == 6);
+	CHECK(Edge<3>::te().getIndex() == 7);
 	CHECK(Edge<3>::sw().getIndex() == 8);
-	CHECK(Edge<3>::ne().getIndex() == 9);
-	CHECK(Edge<3>::se().getIndex() == 10);
-	CHECK(Edge<3>::nw().getIndex() == 11);
+	CHECK(Edge<3>::se().getIndex() == 9);
+	CHECK(Edge<3>::nw().getIndex() == 10);
+	CHECK(Edge<3>::ne().getIndex() == 11);
 	CHECK(Edge<3>::null().getIndex() == 12);
 }
 TEST_CASE("Edge<3> opposite", "[Edge]")
@@ -79,9 +103,9 @@ TEST_CASE("Edge<3> opposite", "[Edge]")
 TEST_CASE("Edge<3> getAxisIndex", "[Edge]")
 {
 	CHECK(Edge<3>::bs().getAxisIndex() == 0);
-	CHECK(Edge<3>::tn().getAxisIndex() == 0);
 	CHECK(Edge<3>::bn().getAxisIndex() == 0);
 	CHECK(Edge<3>::ts().getAxisIndex() == 0);
+	CHECK(Edge<3>::tn().getAxisIndex() == 0);
 	CHECK(Edge<3>::bw().getAxisIndex() == 1);
 	CHECK(Edge<3>::te().getAxisIndex() == 1);
 	CHECK(Edge<3>::be().getAxisIndex() == 1);
@@ -523,187 +547,13 @@ TEST_CASE("Edge<2> <", "[Edge]")
 }
 TEST_CASE("Edge<3> <", "[Edge]")
 {
-	CHECK_FALSE(Edge<3>::bs() < Edge<3>::bs());
-	CHECK(Edge<3>::bs() < Edge<3>::tn());
-	CHECK(Edge<3>::bs() < Edge<3>::bn());
-	CHECK(Edge<3>::bs() < Edge<3>::ts());
-	CHECK(Edge<3>::bs() < Edge<3>::bw());
-	CHECK(Edge<3>::bs() < Edge<3>::te());
-	CHECK(Edge<3>::bs() < Edge<3>::be());
-	CHECK(Edge<3>::bs() < Edge<3>::tw());
-	CHECK(Edge<3>::bs() < Edge<3>::sw());
-	CHECK(Edge<3>::bs() < Edge<3>::ne());
-	CHECK(Edge<3>::bs() < Edge<3>::se());
-	CHECK(Edge<3>::bs() < Edge<3>::nw());
-	CHECK(Edge<3>::bs() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::tn() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::tn() < Edge<3>::tn());
-	CHECK(Edge<3>::tn() < Edge<3>::bn());
-	CHECK(Edge<3>::tn() < Edge<3>::ts());
-	CHECK(Edge<3>::tn() < Edge<3>::bw());
-	CHECK(Edge<3>::tn() < Edge<3>::te());
-	CHECK(Edge<3>::tn() < Edge<3>::be());
-	CHECK(Edge<3>::tn() < Edge<3>::tw());
-	CHECK(Edge<3>::tn() < Edge<3>::sw());
-	CHECK(Edge<3>::tn() < Edge<3>::ne());
-	CHECK(Edge<3>::tn() < Edge<3>::se());
-	CHECK(Edge<3>::tn() < Edge<3>::nw());
-	CHECK(Edge<3>::tn() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::bn() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::bn() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::bn() < Edge<3>::bn());
-	CHECK(Edge<3>::bn() < Edge<3>::ts());
-	CHECK(Edge<3>::bn() < Edge<3>::bw());
-	CHECK(Edge<3>::bn() < Edge<3>::te());
-	CHECK(Edge<3>::bn() < Edge<3>::be());
-	CHECK(Edge<3>::bn() < Edge<3>::tw());
-	CHECK(Edge<3>::bn() < Edge<3>::sw());
-	CHECK(Edge<3>::bn() < Edge<3>::ne());
-	CHECK(Edge<3>::bn() < Edge<3>::se());
-	CHECK(Edge<3>::bn() < Edge<3>::nw());
-	CHECK(Edge<3>::bn() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::ts() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::ts() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::ts() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::ts() < Edge<3>::ts());
-	CHECK(Edge<3>::ts() < Edge<3>::bw());
-	CHECK(Edge<3>::ts() < Edge<3>::te());
-	CHECK(Edge<3>::ts() < Edge<3>::be());
-	CHECK(Edge<3>::ts() < Edge<3>::tw());
-	CHECK(Edge<3>::ts() < Edge<3>::sw());
-	CHECK(Edge<3>::ts() < Edge<3>::ne());
-	CHECK(Edge<3>::ts() < Edge<3>::se());
-	CHECK(Edge<3>::ts() < Edge<3>::nw());
-	CHECK(Edge<3>::ts() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::bw() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::bw() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::bw() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::bw() < Edge<3>::ts());
-	CHECK_FALSE(Edge<3>::bw() < Edge<3>::bw());
-	CHECK(Edge<3>::bw() < Edge<3>::te());
-	CHECK(Edge<3>::bw() < Edge<3>::be());
-	CHECK(Edge<3>::bw() < Edge<3>::tw());
-	CHECK(Edge<3>::bw() < Edge<3>::sw());
-	CHECK(Edge<3>::bw() < Edge<3>::ne());
-	CHECK(Edge<3>::bw() < Edge<3>::se());
-	CHECK(Edge<3>::bw() < Edge<3>::nw());
-	CHECK(Edge<3>::bw() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::te() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::te() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::te() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::te() < Edge<3>::ts());
-	CHECK_FALSE(Edge<3>::te() < Edge<3>::bw());
-	CHECK_FALSE(Edge<3>::te() < Edge<3>::te());
-	CHECK(Edge<3>::te() < Edge<3>::be());
-	CHECK(Edge<3>::te() < Edge<3>::tw());
-	CHECK(Edge<3>::te() < Edge<3>::sw());
-	CHECK(Edge<3>::te() < Edge<3>::ne());
-	CHECK(Edge<3>::te() < Edge<3>::se());
-	CHECK(Edge<3>::te() < Edge<3>::nw());
-	CHECK(Edge<3>::te() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::be() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::be() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::be() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::be() < Edge<3>::ts());
-	CHECK_FALSE(Edge<3>::be() < Edge<3>::bw());
-	CHECK_FALSE(Edge<3>::be() < Edge<3>::te());
-	CHECK_FALSE(Edge<3>::be() < Edge<3>::be());
-	CHECK(Edge<3>::be() < Edge<3>::tw());
-	CHECK(Edge<3>::be() < Edge<3>::sw());
-	CHECK(Edge<3>::be() < Edge<3>::ne());
-	CHECK(Edge<3>::be() < Edge<3>::se());
-	CHECK(Edge<3>::be() < Edge<3>::nw());
-	CHECK(Edge<3>::be() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::tw() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::tw() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::tw() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::tw() < Edge<3>::ts());
-	CHECK_FALSE(Edge<3>::tw() < Edge<3>::bw());
-	CHECK_FALSE(Edge<3>::tw() < Edge<3>::te());
-	CHECK_FALSE(Edge<3>::tw() < Edge<3>::be());
-	CHECK_FALSE(Edge<3>::tw() < Edge<3>::tw());
-	CHECK(Edge<3>::tw() < Edge<3>::sw());
-	CHECK(Edge<3>::tw() < Edge<3>::ne());
-	CHECK(Edge<3>::tw() < Edge<3>::se());
-	CHECK(Edge<3>::tw() < Edge<3>::nw());
-	CHECK(Edge<3>::tw() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::sw() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::sw() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::sw() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::sw() < Edge<3>::ts());
-	CHECK_FALSE(Edge<3>::sw() < Edge<3>::bw());
-	CHECK_FALSE(Edge<3>::sw() < Edge<3>::te());
-	CHECK_FALSE(Edge<3>::sw() < Edge<3>::be());
-	CHECK_FALSE(Edge<3>::sw() < Edge<3>::tw());
-	CHECK_FALSE(Edge<3>::sw() < Edge<3>::sw());
-	CHECK(Edge<3>::sw() < Edge<3>::ne());
-	CHECK(Edge<3>::sw() < Edge<3>::se());
-	CHECK(Edge<3>::sw() < Edge<3>::nw());
-	CHECK(Edge<3>::sw() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::ts());
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::bw());
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::te());
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::be());
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::tw());
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::sw());
-	CHECK_FALSE(Edge<3>::ne() < Edge<3>::ne());
-	CHECK(Edge<3>::ne() < Edge<3>::se());
-	CHECK(Edge<3>::ne() < Edge<3>::nw());
-	CHECK(Edge<3>::ne() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::ts());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::bw());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::te());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::be());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::tw());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::sw());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::ne());
-	CHECK_FALSE(Edge<3>::se() < Edge<3>::se());
-	CHECK(Edge<3>::se() < Edge<3>::nw());
-	CHECK(Edge<3>::se() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::ts());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::bw());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::te());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::be());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::tw());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::sw());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::ne());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::se());
-	CHECK_FALSE(Edge<3>::nw() < Edge<3>::nw());
-	CHECK(Edge<3>::nw() < Edge<3>::null());
-
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::bs());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::tn());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::bn());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::ts());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::bw());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::te());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::be());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::tw());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::sw());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::ne());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::se());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::nw());
-	CHECK_FALSE(Edge<3>::null() < Edge<3>::null());
+	for (int val = 0; val <= Edge<3>::num_edges; val++) {
+		Edge<3> edge(val);
+		for (int other_val = 0; other_val <= Edge<3>::num_edges; other_val++) {
+			Edge<3> other_edge(other_val);
+			CHECK((edge < other_edge) == (val < other_val));
+		}
+	}
 }
 TEST_CASE("Test ostream for Edge<1>", "[Edge]")
 {
@@ -788,27 +638,27 @@ TEST_CASE("Test iterator for Edge<3>", "[Edge]")
 	CHECK(*iter == Edge<3>::bs());
 	++iter;
 	CHECK(iter->getIndex() == 1);
-	CHECK(*iter == Edge<3>::tn());
-	++iter;
 	CHECK(*iter == Edge<3>::bn());
 	++iter;
 	CHECK(*iter == Edge<3>::ts());
 	++iter;
-	CHECK(*iter == Edge<3>::bw());
+	CHECK(*iter == Edge<3>::tn());
 	++iter;
-	CHECK(*iter == Edge<3>::te());
+	CHECK(*iter == Edge<3>::bw());
 	++iter;
 	CHECK(*iter == Edge<3>::be());
 	++iter;
 	CHECK(*iter == Edge<3>::tw());
 	++iter;
-	CHECK(*iter == Edge<3>::sw());
+	CHECK(*iter == Edge<3>::te());
 	++iter;
-	CHECK(*iter == Edge<3>::ne());
+	CHECK(*iter == Edge<3>::sw());
 	++iter;
 	CHECK(*iter == Edge<3>::se());
 	++iter;
 	CHECK(*iter == Edge<3>::nw());
+	++iter;
+	CHECK(*iter == Edge<3>::ne());
 	++iter;
 	CHECK(*iter == Edge<3>::null());
 	CHECK(iter == Edge<3>::getValues().end());

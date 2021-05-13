@@ -30,6 +30,8 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/DomainTools.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/Edge.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Edge.cpp)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/Face.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/FineNbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/GhostFiller.h)

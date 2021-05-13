@@ -45,7 +45,16 @@ template <int D> class Edge
 	unsigned char val = num_edges;
 
 	public:
+	/**
+	 * @brief The number of edges
+	 */
 	static constexpr size_t num_edges = D > 2 ? 12 : 0;
+
+	/**
+	 * @brief Dimensionality
+	 */
+	static constexpr size_t dimensionality = D > 2 ? 1 : 0;
+
 	/**
 	 * @brief Create new Edge<D> with given value.
 	 *
@@ -71,23 +80,23 @@ template <int D> class Edge
 		return Edge<3>(0b0000);
 	}
 	/**
-	 * @brief Top-North edge of cube.
+	 * @brief Bottom-South edge of cube.
 	 */
-	static Edge<3> tn()
+	static Edge<3> bn()
 	{
 		return Edge<3>(0b0001);
 	}
 	/**
-	 * @brief Bottom-South edge of cube.
+	 * @brief Top-North edge of cube.
 	 */
-	static Edge<3> bn()
+	static Edge<3> ts()
 	{
 		return Edge<3>(0b0010);
 	}
 	/**
 	 * @brief Top-North edge of cube.
 	 */
-	static Edge<3> ts()
+	static Edge<3> tn()
 	{
 		return Edge<3>(0b0011);
 	}
@@ -99,23 +108,23 @@ template <int D> class Edge
 		return Edge<3>(0b0100);
 	}
 	/**
-	 * @brief Top-East edge of cube.
-	 */
-	static Edge<3> te()
-	{
-		return Edge<3>(0b0101);
-	}
-	/**
 	 * @brief Bottom-East edge of cube.
 	 */
 	static Edge<3> be()
 	{
-		return Edge<3>(0b0110);
+		return Edge<3>(0b0101);
 	}
 	/**
 	 * @brief Top-West edge of cube.
 	 */
 	static Edge<3> tw()
+	{
+		return Edge<3>(0b0110);
+	}
+	/**
+	 * @brief Top-East edge of cube.
+	 */
+	static Edge<3> te()
 	{
 		return Edge<3>(0b0111);
 	}
@@ -127,23 +136,23 @@ template <int D> class Edge
 		return Edge<3>(0b1000);
 	}
 	/**
-	 * @brief North-East edge of cube.
+	 * @brief South-West edge of cube.
 	 */
-	static Edge<3> ne()
+	static Edge<3> se()
 	{
 		return Edge<3>(0b1001);
 	}
 	/**
-	 * @brief South-West edge of cube.
+	 * @brief North-East edge of cube.
 	 */
-	static Edge<3> se()
+	static Edge<3> nw()
 	{
 		return Edge<3>(0b1010);
 	}
 	/**
 	 * @brief North-East edge of cube.
 	 */
-	static Edge<3> nw()
+	static Edge<3> ne()
 	{
 		return Edge<3>(0b1011);
 	}
@@ -258,9 +267,9 @@ template <int D> class Edge
 	 *
 	 * @return Edge<D> the edge on the opposite side
 	 */
-	Edge<D> opposite()
+	Edge<D> opposite() const
 	{
-		return Edge<D>(val ^ 0b1);
+		return Edge<D>(val ^ 0b11);
 	}
 	/**
 	 * @brief Get the integer value of the edge.
@@ -402,28 +411,28 @@ inline std::ostream &operator<<(std::ostream &os, const Edge<3> &o)
 {
 	if (o == Edge<3>::bs()) {
 		os << "Edge<3>::bs()";
-	} else if (o == Edge<3>::tn()) {
-		os << "Edge<3>::tn()";
 	} else if (o == Edge<3>::bn()) {
 		os << "Edge<3>::bn()";
 	} else if (o == Edge<3>::ts()) {
 		os << "Edge<3>::ts()";
+	} else if (o == Edge<3>::tw()) {
+		os << "Edge<3>::tw()";
 	} else if (o == Edge<3>::bw()) {
 		os << "Edge<3>::bw()";
-	} else if (o == Edge<3>::te()) {
-		os << "Edge<3>::te()";
 	} else if (o == Edge<3>::be()) {
 		os << "Edge<3>::be()";
 	} else if (o == Edge<3>::tw()) {
 		os << "Edge<3>::tw()";
+	} else if (o == Edge<3>::te()) {
+		os << "Edge<3>::te()";
 	} else if (o == Edge<3>::sw()) {
 		os << "Edge<3>::sw()";
-	} else if (o == Edge<3>::ne()) {
-		os << "Edge<3>::ne()";
 	} else if (o == Edge<3>::se()) {
 		os << "Edge<3>::se()";
 	} else if (o == Edge<3>::nw()) {
 		os << "Edge<3>::nw()";
+	} else if (o == Edge<3>::ne()) {
+		os << "Edge<3>::ne()";
 	} else if (o == Edge<3>::null()) {
 		os << "Edge<3>::null()";
 	} else {

@@ -45,7 +45,8 @@ template <int D> class Corner
 	unsigned char val = num_corners;
 
 	public:
-	static constexpr size_t num_corners = D > 1 ? 1 << D : 0;
+	static constexpr size_t num_corners    = D > 1 ? 1 << D : 0;
+	static constexpr size_t dimensionality = 0;
 	/**
 	 * @brief Create new Corner<D> with given value.
 	 *

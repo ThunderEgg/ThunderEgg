@@ -45,7 +45,7 @@ template <int D> class Orthant
 	unsigned char val = num_orthants;
 
 	public:
-	static constexpr size_t num_orthants = D > 0 ? 1 << D : 0;
+	static constexpr size_t num_orthants = 1 << D;
 	/**
 	 * @brief Create new Orthant<D> with given value.
 	 *

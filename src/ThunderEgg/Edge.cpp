@@ -34,28 +34,28 @@ void to_json(nlohmann::json &j, const Edge<3> &o)
 {
 	if (o == Edge<3>::bs()) {
 		j = "BS";
-	} else if (o == Edge<3>::tn()) {
-		j = "TN";
 	} else if (o == Edge<3>::bn()) {
 		j = "BN";
 	} else if (o == Edge<3>::ts()) {
 		j = "TS";
+	} else if (o == Edge<3>::tn()) {
+		j = "TN";
 	} else if (o == Edge<3>::bw()) {
 		j = "BW";
-	} else if (o == Edge<3>::te()) {
-		j = "TE";
 	} else if (o == Edge<3>::be()) {
 		j = "BE";
 	} else if (o == Edge<3>::tw()) {
 		j = "TW";
+	} else if (o == Edge<3>::te()) {
+		j = "TE";
 	} else if (o == Edge<3>::sw()) {
 		j = "SW";
-	} else if (o == Edge<3>::ne()) {
-		j = "NE";
 	} else if (o == Edge<3>::se()) {
 		j = "SE";
 	} else if (o == Edge<3>::nw()) {
 		j = "NW";
+	} else if (o == Edge<3>::ne()) {
+		j = "NE";
 	} else {
 		j = nullptr;
 	}
@@ -72,28 +72,28 @@ void from_json(const nlohmann::json &j, Edge<3> &o)
 {
 	if (j == "BS") {
 		o = Edge<3>::bs();
-	} else if (j == "TN") {
-		o = Edge<3>::tn();
 	} else if (j == "BN") {
 		o = Edge<3>::bn();
 	} else if (j == "TS") {
 		o = Edge<3>::ts();
+	} else if (j == "TN") {
+		o = Edge<3>::tn();
 	} else if (j == "BW") {
 		o = Edge<3>::bw();
-	} else if (j == "TE") {
-		o = Edge<3>::te();
 	} else if (j == "BE") {
 		o = Edge<3>::be();
 	} else if (j == "TW") {
 		o = Edge<3>::tw();
+	} else if (j == "TE") {
+		o = Edge<3>::te();
 	} else if (j == "SW") {
 		o = Edge<3>::sw();
-	} else if (j == "NE") {
-		o = Edge<3>::ne();
 	} else if (j == "SE") {
 		o = Edge<3>::se();
 	} else if (j == "NW") {
 		o = Edge<3>::nw();
+	} else if (j == "NE") {
+		o = Edge<3>::ne();
 	} else {
 		o = Edge<3>::null();
 	}
