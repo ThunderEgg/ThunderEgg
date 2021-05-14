@@ -22,7 +22,6 @@
 #ifndef THUNDEREGG_LOCALDATA_H
 #define THUNDEREGG_LOCALDATA_H
 #include <ThunderEgg/Corner.h>
-#include <ThunderEgg/Edge.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/LocalDataManager.h>
 #include <ThunderEgg/Loops.h>
@@ -117,20 +116,23 @@ template <int D> class LocalData
 	 * @return LocalData<1> the resulting slice
 	 */
 	template <int N = 0>
-	auto getSliceOnEdgePriv(Edge<D> e, const std::array<int, 2> &offset) const -> typename std::enable_if<D == 3 && N == N, LocalData<1>>::type
+	auto getSliceOnEdgePriv(Edge e, const std::array<int, 2> &offset) const -> typename std::enable_if<D == 3 && N == N, LocalData<1>>::type
 	{
-		size_t                 axis        = e.getAxisIndex();
-		std::array<int, 1>     new_strides = {strides[axis]};
-		std::array<int, 1>     new_lengths = {lengths[axis]};
-		double *               new_data    = data;
-		std::array<Side<D>, 2> sides       = e.getSides();
+		double *               new_data = data;
+		std::array<Side<D>, 2> sides    = e.getSides();
+		size_t                 axis     = 0;
 		for (size_t i = 0; i < 2; i++) {
+			if (sides[i].getAxisIndex() == axis) {
+				axis++;
+			}
 			if (sides[i].isLowerOnAxis()) {
 				new_data += offset[i] * strides[sides[i].getAxisIndex()];
 			} else {
 				new_data += (lengths[sides[i].getAxisIndex()] - 1 - offset[i]) * strides[sides[i].getAxisIndex()];
 			}
 		}
+		std::array<int, 1> new_strides = {strides[axis]};
+		std::array<int, 1> new_lengths = {lengths[axis]};
 		return LocalData<1>(new_data, new_strides, new_lengths, 0, ldm);
 	}
 
@@ -282,7 +284,7 @@ template <int D> class LocalData
 	 * @return LocalData<1> the slice
 	 */
 	template <int N = 0>
-	auto getSliceOnEdge(Edge<D> e, const std::array<int, 2> &offset) -> typename std::enable_if<D == 3 && N == N, LocalData<1>>::type
+	auto getSliceOnEdge(Edge e, const std::array<int, 2> &offset) -> typename std::enable_if<D == 3 && N == N, LocalData<1>>::type
 	{
 		return getSliceOnEdgePriv(e, offset);
 	}
@@ -296,7 +298,7 @@ template <int D> class LocalData
 	 * @return LocalData<1> the slice
 	 */
 	template <int N = 0>
-	auto getSliceOnEdge(Edge<D> e, const std::array<int, 2> &offset) const -> typename std::enable_if<D == 3 && N == N, const LocalData<1>>::type
+	auto getSliceOnEdge(Edge e, const std::array<int, 2> &offset) const -> typename std::enable_if<D == 3 && N == N, const LocalData<1>>::type
 	{
 		return getSliceOnEdgePriv(e, offset);
 	}

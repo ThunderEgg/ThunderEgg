@@ -49,7 +49,7 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<2> &             pinfo,
 	                                   const std::vector<LocalData<2>> &local_datas,
 	                                   std::vector<LocalData<2>> &      nbr_datas,
-	                                   Edge<2>                          edge,
+	                                   Edge                             edge,
 	                                   NbrType                          nbr_type,
 	                                   Orthant<1>                       orthant_on_coarse) const override
 	{

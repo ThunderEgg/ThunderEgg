@@ -70,7 +70,7 @@ template <int D, int M> class Face
 	 *
 	 * @param value the value of the face to give
 	 */
-	Face(unsigned char value) : value(value)
+	explicit Face(unsigned char value) : value(value)
 	{
 		static_assert(D <= 3 && D > 0, "Only up to 3 dimensions supported");
 		static_assert(M >= 0 && M < D, "Invalid M value");
@@ -114,6 +114,55 @@ template <int D, int M> class Face
 	template <int N = 0> static auto top() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b101);
+	}
+
+	template <int N = 0> static auto bs() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b0000);
+	}
+	template <int N = 0> static auto bn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b0001);
+	}
+	template <int N = 0> static auto ts() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b0010);
+	}
+	template <int N = 0> static auto tn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b0011);
+	}
+	template <int N = 0> static auto bw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b0100);
+	}
+	template <int N = 0> static auto be() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b0101);
+	}
+	template <int N = 0> static auto tw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b0110);
+	}
+	template <int N = 0> static auto te() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b0111);
+	}
+	template <int N = 0> static auto sw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b1000);
+	}
+	template <int N = 0> static auto se() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b1001);
+	}
+	template <int N = 0> static auto nw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b1010);
+	}
+	template <int N = 0> static auto ne() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b1011);
 	}
 
 	/**
@@ -273,7 +322,21 @@ template <int D, int M> class Face
 	 */
 	std::array<Face<D, D - 1>, D - M> getSides() const
 	{
-		return {Face<D, D - 1>(value)};
+		std::array<Face<D, D - 1>, D - M> sides;
+		if constexpr (D == 3 && M == 1) {
+			size_t not_axis   = value >> 2;
+			size_t curr_index = 0;
+			for (int i = 0; i < D; i++) {
+				if (i != not_axis) {
+					unsigned char bit = (value & (0b1 << curr_index)) >> curr_index;
+					sides[curr_index] = Face<D, D - 1>((i << 1) ^ bit);
+					curr_index++;
+				}
+			}
+		} else {
+			sides[0] = Face<D, D - 1>(value);
+		}
+		return sides;
 	}
 
 	/**
@@ -361,5 +424,20 @@ std::ostream &operator<<(std::ostream &os, const Side<2> &s);
  * @return  the ostream
  */
 std::ostream &operator<<(std::ostream &os, const Side<3> &s);
+
+using Edge = Face<3, 1>;
+/**
+ * @brief ostream operator that prints a string representation of edge enum.
+ *
+ * For example, Edge::sw() will print out "Edge::sw()".
+ *
+ * @param os the ostream
+ * @param o the edge
+ *
+ * @return  the ostream
+ */
+std::ostream &operator<<(std::ostream &os, const Edge &o);
+void          to_json(nlohmann::json &j, const Edge &o);
+void          from_json(const nlohmann::json &j, Edge &o);
 } // namespace ThunderEgg
 #endif

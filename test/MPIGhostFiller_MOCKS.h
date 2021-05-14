@@ -41,7 +41,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 	mutable std::list<std::tuple<const PatchInfo<D> *, Side<D>, const NbrType, const Orthant<D - 1>, int, int>> nbr_calls;
 
-	mutable std::list<std::tuple<const PatchInfo<D> *, Edge<D>, const NbrType, const Orthant<1>, int, int>> edge_nbr_calls;
+	mutable std::list<std::tuple<const PatchInfo<D> *, Edge, const NbrType, const Orthant<1>, int, int>> edge_nbr_calls;
 
 	mutable std::list<std::tuple<const PatchInfo<D> *, Corner<D>, const NbrType, int, int>> corner_nbr_calls;
 
@@ -59,7 +59,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 
 	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D> &             pinfo,
 	                                   const std::vector<LocalData<D>> &local_datas,
-	                                   std::vector<LocalData<D>> &nbr_datas, Edge<D> edge,
+	                                   std::vector<LocalData<D>> &nbr_datas, Edge edge,
 	                                   NbrType nbr_type, Orthant<1> orth_on_coarse) const override
 	{
 		called = true;
@@ -192,7 +192,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		auto remaining_nbr_calls = edge_nbr_calls;
 
 		auto check_for_nbr_call
-		= [&](const std::tuple<const PatchInfo<D> *, Edge<D>, const NbrType,
+		= [&](const std::tuple<const PatchInfo<D> *, Edge, const NbrType,
 		                       const Orthant<1>, int, int> &call) {
 			  // check if call was made for neighbor
 			  auto found_call
@@ -212,7 +212,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 			}
 			INFO(starts);
 
-			for (auto edge : Edge<D>::getValues()) {
+			for (auto edge : Edge::getValues()) {
 				INFO("side: " << edge);
 				if (patch.hasNbr(edge)) {
 					switch (patch.getNbrType(edge)) {
@@ -429,7 +429,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D> &             pinfo,
 	                                   const std::vector<LocalData<D>> &local_datas,
-	                                   std::vector<LocalData<D>> &nbr_datas, Edge<D> edge,
+	                                   std::vector<LocalData<D>> &nbr_datas, Edge edge,
 	                                   NbrType nbr_type, Orthant<1> orthant) const override
 	{
 		if constexpr (D == 3) {
@@ -633,7 +633,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 					INFO("c: " << c);
 					auto data = vec->getLocalData(c, pinfo.local_index);
 					// check the ghost cells
-					for (Edge<D> e : Edge<D>::getValues()) {
+					for (Edge e : Edge::getValues()) {
 						INFO("Edge: " << e);
 
 						if (pinfo.hasNbr(e)) {

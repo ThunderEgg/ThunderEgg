@@ -199,7 +199,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 * @brief A vector of RemoteCall deques, one sperate deque for each rank
 		 */
 		std::deque<RemoteCall<Side<D>>> remote_calls;
-		std::deque<RemoteCall<Edge<D>>> edge_remote_calls;
+		std::deque<RemoteCall<Edge>>    edge_remote_calls;
 		/**
 		 * @brief the length of the recv buffer;
 		 */
@@ -208,7 +208,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 * @brief deque for incoming ghost calls
 		 */
 		std::deque<IncomingGhost<Side<D>>> incoming_ghosts;
-		std::deque<IncomingGhost<Edge<D>>> edge_incoming_ghosts;
+		std::deque<IncomingGhost<Edge>>    edge_incoming_ghosts;
 
 		explicit RemoteCallSet(int rank) : rank(rank) {}
 	};
@@ -218,7 +218,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @brief deque of local calls to be made
 	 */
 	std::deque<LocalCall<Side<D>>> local_calls;
-	std::deque<LocalCall<Edge<D>>> edge_local_calls;
+	std::deque<LocalCall<Edge>>    edge_local_calls;
 
 	/**
 	 * @brief Get the LocalData object for the buffer
@@ -392,9 +392,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	}
 	template <class Face> std::vector<size_t> getGhostLengths() const
 	{
-		std::vector<size_t> ghost_lengths;
+		std::vector<size_t> ghost_lengths(12);
 		if constexpr (std::is_same<Face, Side<D>>::value) {
-			ghost_lengths.resize(D);
 			for (size_t axis = 0; axis < D; axis++) {
 				size_t length = 1;
 				for (size_t i = 0; i < D; i++) {
@@ -406,8 +405,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				}
 				ghost_lengths[axis] = length;
 			}
-		} else if constexpr (std::is_same<Face, Edge<D>>::value) {
-			ghost_lengths.resize(D);
+		} else if constexpr (std::is_same<Face, Edge>::value) {
 			for (size_t axis = 0; axis < D; axis++) {
 				size_t length = 1;
 				for (size_t i = 0; i < D; i++) {
@@ -426,11 +424,13 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	}
 	template <class Face> size_t getGhostLength(const std::vector<size_t> &ghost_lengths, Face face) const
 	{
-		size_t length;
-		if constexpr (std::is_same<Face, Side<D>>::value || std::is_same<Face, Edge<D>>::value) {
-			length = ghost_lengths[face.getAxisIndex()];
-		} else {
-			static_assert(std::is_same_v<Face *, void>, "Unsupported type");
+		size_t length = 0;
+		if constexpr (std::is_same<Face, Side<D>>::value) {
+			if constexpr (std::is_same<Face, Side<D>>::value || std::is_same<Face, Edge>::value) {
+				length = ghost_lengths[face.getAxisIndex()];
+			} else {
+				static_assert(std::is_same_v<Face *, void>, "Unsupported type");
+			}
 		}
 		return length;
 	}
@@ -481,7 +481,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				}
 				if constexpr (std::is_same<Face, Side<D>>::value) {
 					remote_call_set.remote_calls.emplace_back(call, offset);
-				} else if constexpr (std::is_same<Face, Edge<D>>::value) {
+				} else if constexpr (std::is_same<Face, Edge>::value) {
 					remote_call_set.edge_remote_calls.emplace_back(call, offset);
 				}
 				prev_id_side = std::make_tuple(call.id, call.face);
@@ -498,7 +498,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				// add ghost to incoming ghosts
 				if constexpr (std::is_same<Face, Side<D>>::value) {
 					remote_call_set.incoming_ghosts.emplace_back(prototype, offset);
-				} else if constexpr (std::is_same<Face, Edge<D>>::value) {
+				} else if constexpr (std::is_same<Face, Edge>::value) {
 					remote_call_set.edge_incoming_ghosts.emplace_back(prototype, offset);
 				}
 			}
@@ -530,7 +530,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			case GhostFillingType::Corners:
 			case GhostFillingType::Edges:
 				if constexpr (D == 3) {
-					enumerateCalls<Edge<D>>(edge_local_calls, rank_to_remote_call_sets);
+					enumerateCalls<Edge>(edge_local_calls, rank_to_remote_call_sets);
 				}
 			case GhostFillingType::Faces:
 				enumerateCalls<Side<D>>(local_calls, rank_to_remote_call_sets);
@@ -575,7 +575,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	virtual void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D> &             pinfo,
 	                                           const std::vector<LocalData<D>> &local_datas,
 	                                           std::vector<LocalData<D>> &      nbr_datas,
-	                                           Edge<D>                          edge,
+	                                           Edge                             edge,
 	                                           NbrType                          nbr_type,
 	                                           Orthant<1>                       orthant_on_coarse) const = 0;
 	/**
@@ -625,7 +625,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 					}
 				}
 				if constexpr (D == 3) {
-					for (Edge<D> e : Edge<D>::getValues()) {
+					for (Edge e : Edge::getValues()) {
 						if (pinfo.hasNbr(e)) {
 							for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 								for (int i = 0; i < pinfo.num_ghost_cells; i++) {
@@ -666,7 +666,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			fillGhostCellsForNbrPatch(pinfo, local_datas, nbr_datas, call.face, call.nbr_type, call.orthant);
 		}
 		if constexpr (D == 3) {
-			for (const LocalCall<Edge<D>> &call : edge_local_calls) {
+			for (const LocalCall<Edge> &call : edge_local_calls) {
 				const PatchInfo<D> &pinfo       = domain->getPatchInfoVector()[call.local_index];
 				auto                local_datas = u->getLocalDatas(call.local_index);
 				auto                nbr_datas   = u->getLocalDatas(call.nbr_local_index);

@@ -439,50 +439,50 @@ void addNbrInfo(const p8est_iter_face_side_t &side1, const p8est_iter_face_side_
  * @brief Get the Edge object from a given p8est edge index
  *
  * @param p8est_edge
- * @return Edge<3>
+ * @return Edge
  */
-Edge<3> getEdge(int p8est_edge)
+Edge getEdge(int p8est_edge)
 {
-	Edge<3> edge;
+	Edge edge;
 	switch (p8est_edge) {
 		case 0:
-			edge = Edge<3>::bs();
+			edge = Edge::bs();
 			break;
 		case 1:
-			edge = Edge<3>::bn();
+			edge = Edge::bn();
 			break;
 		case 2:
-			edge = Edge<3>::ts();
+			edge = Edge::ts();
 			break;
 		case 3:
-			edge = Edge<3>::tn();
+			edge = Edge::tn();
 			break;
 		case 4:
-			edge = Edge<3>::bw();
+			edge = Edge::bw();
 			break;
 		case 5:
-			edge = Edge<3>::be();
+			edge = Edge::be();
 			break;
 		case 6:
-			edge = Edge<3>::tw();
+			edge = Edge::tw();
 			break;
 		case 7:
-			edge = Edge<3>::te();
+			edge = Edge::te();
 			break;
 		case 8:
-			edge = Edge<3>::sw();
+			edge = Edge::sw();
 			break;
 		case 9:
-			edge = Edge<3>::se();
+			edge = Edge::se();
 			break;
 		case 10:
-			edge = Edge<3>::nw();
+			edge = Edge::nw();
 			break;
 		case 11:
-			edge = Edge<3>::ne();
+			edge = Edge::ne();
 			break;
 		default:
-			edge = Edge<3>::null();
+			edge = Edge::null();
 	}
 	return edge;
 }
@@ -506,7 +506,7 @@ void addEdgeCoarseNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_
 		if (!side1.is.hanging.is_ghost[i]) {
 			Data *data = (Data *) side1.is.hanging.quad[i]->p.user_data;
 
-			Edge<3> edge = getEdge(side1.edge);
+			Edge edge = getEdge(side1.edge);
 
 			data->pinfo->edge_nbr_info[edge.getIndex()]        = make_unique<CoarseNbrInfo<2>>();
 			data->pinfo->getCoarseNbrInfo(edge).id             = nbr_data->id;
@@ -536,7 +536,7 @@ void addEdgeFineNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_ed
 			}
 		}
 
-		Edge<3> edge = getEdge(side1.edge);
+		Edge edge = getEdge(side1.edge);
 
 		data->pinfo->edge_nbr_info[edge.getIndex()] = make_unique<FineNbrInfo<2>>();
 		for (int i = 0; i < 2; i++) {
@@ -564,7 +564,7 @@ void addEdgeNormalNbrInfo(const p8est_iter_edge_side_t &side1, const p8est_iter_
 			nbr_data = (Data *) side2.is.full.quad->p.user_data;
 		}
 
-		Edge<3> edge = getEdge(side1.edge);
+		Edge edge = getEdge(side1.edge);
 
 		data->pinfo->edge_nbr_info[edge.getIndex()] = make_unique<NormalNbrInfo<2>>(nbr_data->id);
 		data->pinfo->getNormalNbrInfo(edge).rank    = nbr_data->rank;

@@ -54,7 +54,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::bs(), {yi, zi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::bs(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&ld[{xi, yi, zi}] == &slice[{xi}]);
@@ -66,7 +66,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::tn(), {yi, zi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::tn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&ld[{xi, ny - 1 - yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -78,7 +78,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::bn(), {yi, zi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::bn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&ld[{xi, ny - 1 - yi, zi}] == &slice[{xi}]);
@@ -90,7 +90,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::ts(), {yi, zi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::ts(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&ld[{xi, yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -102,7 +102,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::bw(), {xi, zi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::bw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&ld[{xi, yi, zi}] == &slice[{yi}]);
@@ -114,7 +114,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::te(), {xi, zi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::te(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&ld[{nx - 1 - xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -126,7 +126,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::be(), {xi, zi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::be(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&ld[{nx - 1 - xi, yi, zi}] == &slice[{yi}]);
@@ -138,7 +138,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::tw(), {xi, zi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::tw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&ld[{xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -150,7 +150,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::sw(), {xi, yi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::sw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&ld[{xi, yi, zi}] == &slice[{zi}]);
@@ -162,7 +162,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::ne(), {xi, yi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::ne(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&ld[{nx - 1 - xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -174,7 +174,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::se(), {xi, yi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::se(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&ld[{nx - 1 - xi, yi, zi}] == &slice[{zi}]);
@@ -186,7 +186,7 @@ TEST_CASE("LocalData getEdgeSlice", "[LocalData]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::nw(), {xi, yi});
+			LocalData<1> slice = ld.getSliceOnEdge(Edge::nw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&ld[{xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -215,7 +215,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::bs(), {yi, zi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::bs(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&ld[{xi, yi, zi}] == &slice[{xi}]);
@@ -227,7 +227,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::tn(), {yi, zi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::tn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&ld[{xi, ny - 1 - yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -239,7 +239,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::bn(), {yi, zi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::bn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&ld[{xi, ny - 1 - yi, zi}] == &slice[{xi}]);
@@ -251,7 +251,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::ts(), {yi, zi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::ts(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&ld[{xi, yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -263,7 +263,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::bw(), {xi, zi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::bw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&ld[{xi, yi, zi}] == &slice[{yi}]);
@@ -275,7 +275,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::te(), {xi, zi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::te(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&ld[{nx - 1 - xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -287,7 +287,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::be(), {xi, zi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::be(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&ld[{nx - 1 - xi, yi, zi}] == &slice[{yi}]);
@@ -299,7 +299,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::tw(), {xi, zi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::tw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&ld[{xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -311,7 +311,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::sw(), {xi, yi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::sw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&ld[{xi, yi, zi}] == &slice[{zi}]);
@@ -323,7 +323,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::ne(), {xi, yi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::ne(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&ld[{nx - 1 - xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -335,7 +335,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::se(), {xi, yi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::se(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&ld[{nx - 1 - xi, yi, zi}] == &slice[{zi}]);
@@ -347,7 +347,7 @@ TEST_CASE("LocalData getEdgeSlice const", "[LocalData]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const LocalData<1> slice = ld.getSliceOnEdge(Edge<3>::nw(), {xi, yi});
+			const LocalData<1> slice = ld.getSliceOnEdge(Edge::nw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&ld[{xi, ny - 1 - yi, zi}] == &slice[{zi}]);

@@ -44,7 +44,7 @@ class TriLinearGhostFiller : public MPIGhostFiller<3>
 	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<3> &             pinfo,
 	                                   const std::vector<LocalData<3>> &local_datas,
 	                                   std::vector<LocalData<3>> &      nbr_datas,
-	                                   Edge<3>                          edge,
+	                                   Edge                             edge,
 	                                   NbrType                          nbr_type,
 	                                   Orthant<1>                       orthant_on_coarse) const override
 	{

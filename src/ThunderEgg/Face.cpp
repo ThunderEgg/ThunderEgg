@@ -157,4 +157,99 @@ std::ostream &operator<<(std::ostream &os, const Side<3> &s)
 	}
 	return os;
 }
+void to_json(nlohmann::json &j, const Edge &o)
+{
+	if (o == Edge::bs()) {
+		j = "BS";
+	} else if (o == Edge::bn()) {
+		j = "BN";
+	} else if (o == Edge::ts()) {
+		j = "TS";
+	} else if (o == Edge::tn()) {
+		j = "TN";
+	} else if (o == Edge::bw()) {
+		j = "BW";
+	} else if (o == Edge::be()) {
+		j = "BE";
+	} else if (o == Edge::tw()) {
+		j = "TW";
+	} else if (o == Edge::te()) {
+		j = "TE";
+	} else if (o == Edge::sw()) {
+		j = "SW";
+	} else if (o == Edge::se()) {
+		j = "SE";
+	} else if (o == Edge::nw()) {
+		j = "NW";
+	} else if (o == Edge::ne()) {
+		j = "NE";
+	} else {
+		j = nullptr;
+	}
+}
+void from_json(const nlohmann::json &j, Edge &o)
+{
+	if (j == "BS") {
+		o = Edge::bs();
+	} else if (j == "BN") {
+		o = Edge::bn();
+	} else if (j == "TS") {
+		o = Edge::ts();
+	} else if (j == "TN") {
+		o = Edge::tn();
+	} else if (j == "BW") {
+		o = Edge::bw();
+	} else if (j == "BE") {
+		o = Edge::be();
+	} else if (j == "TW") {
+		o = Edge::tw();
+	} else if (j == "TE") {
+		o = Edge::te();
+	} else if (j == "SW") {
+		o = Edge::sw();
+	} else if (j == "SE") {
+		o = Edge::se();
+	} else if (j == "NW") {
+		o = Edge::nw();
+	} else if (j == "NE") {
+		o = Edge::ne();
+	} else {
+		o = Edge::null();
+	}
+}
+std::ostream &operator<<(std::ostream &os, const Edge &o)
+{
+	if (o == Edge::bs()) {
+		os << "Edge::bs()";
+	} else if (o == Edge::bn()) {
+		os << "Edge::bn()";
+	} else if (o == Edge::ts()) {
+		os << "Edge::ts()";
+	} else if (o == Edge::tn()) {
+		os << "Edge::tn()";
+	} else if (o == Edge::tw()) {
+		os << "Edge::tw()";
+	} else if (o == Edge::bw()) {
+		os << "Edge::bw()";
+	} else if (o == Edge::be()) {
+		os << "Edge::be()";
+	} else if (o == Edge::tw()) {
+		os << "Edge::tw()";
+	} else if (o == Edge::te()) {
+		os << "Edge::te()";
+	} else if (o == Edge::sw()) {
+		os << "Edge::sw()";
+	} else if (o == Edge::se()) {
+		os << "Edge::se()";
+	} else if (o == Edge::nw()) {
+		os << "Edge::nw()";
+	} else if (o == Edge::ne()) {
+		os << "Edge::ne()";
+	} else if (o == Edge::null()) {
+		os << "Edge::null()";
+	} else {
+		os << "Edge invalid value: " << o.getIndex();
+	}
+	return os;
+}
 } // namespace ThunderEgg

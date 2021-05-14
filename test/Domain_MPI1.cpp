@@ -241,7 +241,7 @@ TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consiste
 				}
 			}
 		}
-		for (Edge<3> e : Edge<3>::getValues()) {
+		for (Edge e : Edge::getValues()) {
 			if (pinfo.hasNbr(e)) {
 				NbrType type = pinfo.getNbrType(e);
 				if (type == NbrType::Normal) {
@@ -321,7 +321,7 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 				}
 			}
 		}
-		for (Edge<3> e : Edge<3>::getValues()) {
+		for (Edge e : Edge::getValues()) {
 			if (pinfo.hasNbr(e)) {
 				NbrType type = pinfo.getNbrType(e);
 				if (type == NbrType::Normal) {

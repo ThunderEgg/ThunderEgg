@@ -22,7 +22,6 @@
 #define THUNDEREGG_PATCHINFO_H
 #include <ThunderEgg/CoarseNbrInfo.h>
 #include <ThunderEgg/Corner.h>
-#include <ThunderEgg/Edge.h>
 #include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NormalNbrInfo.h>
 #include <ThunderEgg/Orthant.h>
@@ -123,7 +122,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @brief Nbr info objects for each edge
 	 * If there is no neighbor, it should be set to nullptr.
 	 */
-	std::array<std::unique_ptr<NbrInfo<2>>, Edge<D>::num_edges> edge_nbr_info;
+	std::array<std::unique_ptr<NbrInfo<2>>, Edge::number_of> edge_nbr_info;
 	/**
 	 * @brief Nbr info objects for each corner
 	 * If there is no neighbor, it should be set to nullptr.
@@ -182,7 +181,7 @@ template <int D> struct PatchInfo : public Serializable {
 				}
 			}
 		}
-		for (Edge<D> e : Edge<D>::getValues()) {
+		for (Edge e : Edge::getValues()) {
 			if (other_pinfo.hasNbr(e)) {
 				switch (other_pinfo.getNbrType(e)) {
 					case NbrType::Normal:
@@ -261,7 +260,7 @@ template <int D> struct PatchInfo : public Serializable {
 				nbr_info[s.getIndex()] = nullptr;
 			}
 		}
-		for (Edge<D> e : Edge<D>::getValues()) {
+		for (Edge e : Edge::getValues()) {
 			if (other_pinfo.hasNbr(e)) {
 				switch (other_pinfo.getNbrType(e)) {
 					case NbrType::Normal:
@@ -429,7 +428,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @param e the edge
 	 * @return The NbrType
 	 */
-	NbrType getNbrType(Edge<D> e) const
+	NbrType getNbrType(Edge e) const
 	{
 		return edge_nbr_info[e.getIndex()]->getNbrType();
 	}
@@ -441,7 +440,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @param e the edge
 	 * @return NormalNbrInfo<2>& the object
 	 */
-	NormalNbrInfo<2> &getNormalNbrInfo(Edge<D> e) const
+	NormalNbrInfo<2> &getNormalNbrInfo(Edge e) const
 	{
 		return *dynamic_cast<NormalNbrInfo<2> *>(edge_nbr_info[e.getIndex()].get());
 	}
@@ -451,7 +450,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @param e the edge
 	 * @return CoarseNbrInfo<2>& the object
 	 */
-	CoarseNbrInfo<2> &getCoarseNbrInfo(Edge<D> e) const
+	CoarseNbrInfo<2> &getCoarseNbrInfo(Edge e) const
 	{
 		return *dynamic_cast<CoarseNbrInfo<2> *>(edge_nbr_info[e.getIndex()].get());
 	}
@@ -463,7 +462,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @param e the edge
 	 * @return FineNbrInfo<2>& the object
 	 */
-	FineNbrInfo<2> &getFineNbrInfo(Edge<D> e) const
+	FineNbrInfo<2> &getFineNbrInfo(Edge e) const
 	{
 		return *dynamic_cast<FineNbrInfo<2> *>(edge_nbr_info[e.getIndex()].get());
 	}
@@ -474,7 +473,7 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @return true if the is neighbor on the edge
 	 * @return false if not
 	 */
-	inline bool hasNbr(Edge<D> e) const
+	inline bool hasNbr(Edge e) const
 	{
 		return edge_nbr_info[e.getIndex()] != nullptr;
 	}
@@ -499,7 +498,7 @@ template <int D> struct PatchInfo : public Serializable {
 				nbr_info[s.getIndex()]->setLocalIndexes(id_to_local_index_map);
 			}
 		}
-		for (Edge<D> e : Edge<D>::getValues()) {
+		for (Edge e : Edge::getValues()) {
 			if (hasNbr(e)) {
 				edge_nbr_info[e.getIndex()]->setLocalIndexes(id_to_local_index_map);
 			}
@@ -522,7 +521,7 @@ template <int D> struct PatchInfo : public Serializable {
 				nbr_info[s.getIndex()]->setGlobalIndexes(id_to_global_index_map);
 			}
 		}
-		for (Edge<D> e : Edge<D>::getValues()) {
+		for (Edge e : Edge::getValues()) {
 			if (hasNbr(e)) {
 				edge_nbr_info[e.getIndex()]->setGlobalIndexes(id_to_global_index_map);
 			}
@@ -544,7 +543,7 @@ template <int D> struct PatchInfo : public Serializable {
 				nbr_info[s.getIndex()]->getNbrIds(retval);
 			}
 		}
-		for (Edge<D> e : Edge<D>::getValues()) {
+		for (Edge e : Edge::getValues()) {
 			if (hasNbr(e)) {
 				edge_nbr_info[e.getIndex()]->getNbrIds(retval);
 			}
@@ -567,7 +566,7 @@ template <int D> struct PatchInfo : public Serializable {
 				nbr_info[s.getIndex()]->getNbrRanks(retval);
 			}
 		}
-		for (Edge<D> e : Edge<D>::getValues()) {
+		for (Edge e : Edge::getValues()) {
 			if (hasNbr(e)) {
 				edge_nbr_info[e.getIndex()]->getNbrRanks(retval);
 			}
@@ -620,12 +619,12 @@ template <int D> struct PatchInfo : public Serializable {
 				}
 			}
 		}
-		std::bitset<Edge<D>::num_edges> has_edge_nbr;
-		for (size_t i = 0; i < Edge<D>::num_edges; i++) {
+		std::bitset<Edge::number_of> has_edge_nbr;
+		for (size_t i = 0; i < Edge::number_of; i++) {
 			has_edge_nbr[i] = edge_nbr_info[i] != nullptr;
 		}
 		writer << has_edge_nbr;
-		for (Edge<D> e : Edge<D>::getValues()) {
+		for (Edge e : Edge::getValues()) {
 			if (hasNbr(e)) {
 				NbrType type = getNbrType(e);
 				writer << type;
@@ -716,9 +715,9 @@ template <int D> struct PatchInfo : public Serializable {
 				nbr_info[i].reset(info);
 			}
 		}
-		std::bitset<Edge<D>::num_edges> has_edge_nbr;
+		std::bitset<Edge::number_of> has_edge_nbr;
 		reader >> has_edge_nbr;
-		for (size_t i = 0; i < Edge<D>::num_edges; i++) {
+		for (size_t i = 0; i < Edge::number_of; i++) {
 			if (has_edge_nbr[i]) {
 				NbrType type;
 				reader >> type;
@@ -805,7 +804,7 @@ template <int D> void to_json(nlohmann::json &j, const PatchInfo<D> &pinfo)
 		}
 	}
 	j["edge_nbrs"] = nlohmann::json::array();
-	for (Edge<D> e : Edge<D>::getValues()) {
+	for (Edge e : Edge::getValues()) {
 		if (pinfo.hasNbr(e)) {
 			switch (pinfo.getNbrType(e)) {
 				case NbrType::Normal:
@@ -885,7 +884,7 @@ template <int D> void from_json(const nlohmann::json &j, PatchInfo<D> &pinfo)
 	}
 	if (j.contains("edge_nbrs")) {
 		for (const auto &nbr_j : j["edge_nbrs"]) {
-			Edge<D> e = nbr_j["edge"].get<Edge<D>>();
+			Edge e = nbr_j["edge"].get<Edge>();
 			switch (nbr_j["type"].get<NbrType>()) {
 				case NbrType::Normal:
 					pinfo.edge_nbr_info[e.getIndex()] = std::make_unique<NormalNbrInfo<2>>();
