@@ -49,7 +49,7 @@ TEST_CASE("Orthant<3> Default constructor works", "[Orthant]")
 }
 TEST_CASE("Orthant<0> named constructors give expected index values", "[Orthant]")
 {
-	CHECK(Orthant<0>::null().getIndex() == 0);
+	CHECK(Orthant<0>::null().getIndex() == 1);
 }
 TEST_CASE("Orthant<1> named constructors give expected index values", "[Orthant]")
 {
@@ -1200,6 +1200,8 @@ TEST_CASE("Test ostream for Orthant<3>", "[Orthant]")
 TEST_CASE("Test iterator for Orthant<0>", "[Orthant]")
 {
 	auto iter = Orthant<0>::getValues().begin();
+	CHECK(*iter == Orthant<0>(0));
+	++iter;
 	CHECK(*iter == Orthant<0>::null());
 	CHECK(iter == Orthant<0>::getValues().end());
 }

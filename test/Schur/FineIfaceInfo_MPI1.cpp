@@ -38,9 +38,9 @@ TEST_CASE("Schur::FineIfaceInfo constructor", "[Schur::FineIfaceInfo]")
 		int           id      = 1;
 		array<int, 2> nbr_ids = {2, 3};
 		PatchInfo<2>  pinfo;
-		pinfo.rank                       = 0;
-		pinfo.id                         = id;
-		pinfo.nbr_info[s.getIndex()]     = make_unique<FineNbrInfo<2>>(nbr_ids);
+		pinfo.rank = 0;
+		pinfo.id   = id;
+		pinfo.setNbrInfo(s, new FineNbrInfo<1>(nbr_ids));
 		pinfo.getFineNbrInfo(s).ranks[0] = 1;
 		pinfo.getFineNbrInfo(s).ranks[1] = 2;
 		Schur::FineIfaceInfo<2> iface_info(pinfo, s);

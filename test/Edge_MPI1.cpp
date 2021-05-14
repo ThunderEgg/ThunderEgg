@@ -7,25 +7,25 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Edge num_edges", "[Edge]")
+TEST_CASE("Edge num_edges", "[Edge][Face]")
 {
 	CHECK(Edge::number_of == 12);
 }
-TEST_CASE("Edge dimensionality", "[Edge]")
+TEST_CASE("Edge dimensionality", "[Edge][Face]")
 {
 	CHECK(Edge::dimensionality == 1);
 }
-TEST_CASE("Edge unsigned char constructor works", "[Edge]")
+TEST_CASE("Edge unsigned char constructor works", "[Edge][Face]")
 {
 	Edge o(13);
 	CHECK(o.getIndex() == 13);
 }
-TEST_CASE("Edge Default constructor works", "[Edge]")
+TEST_CASE("Edge Default constructor works", "[Edge][Face]")
 {
 	Edge o;
 	CHECK(o == Edge::null());
 }
-TEST_CASE("Edge named constructors give expected index values", "[Edge]")
+TEST_CASE("Edge named constructors give expected index values", "[Edge][Face]")
 {
 	CHECK(Edge::bs().getIndex() == 0);
 	CHECK(Edge::bn().getIndex() == 1);
@@ -41,7 +41,7 @@ TEST_CASE("Edge named constructors give expected index values", "[Edge]")
 	CHECK(Edge::ne().getIndex() == 11);
 	CHECK(Edge::null().getIndex() == 12);
 }
-TEST_CASE("Edge opposite", "[Edge]")
+TEST_CASE("Edge opposite", "[Edge][Face]")
 {
 	CHECK(Edge::bs().opposite() == Edge::tn());
 	CHECK(Edge::tn().opposite() == Edge::bs());
@@ -56,7 +56,7 @@ TEST_CASE("Edge opposite", "[Edge]")
 	CHECK(Edge::se().opposite() == Edge::nw());
 	CHECK(Edge::nw().opposite() == Edge::se());
 }
-TEST_CASE("Edge getSides", "[Edge]")
+TEST_CASE("Edge getSides", "[Edge][Face]")
 {
 	CHECK(Edge::bs().getSides()[0] == Side<3>::south());
 	CHECK(Edge::bs().getSides()[1] == Side<3>::bottom());
@@ -94,7 +94,7 @@ TEST_CASE("Edge getSides", "[Edge]")
 	CHECK(Edge::nw().getSides()[0] == Side<3>::west());
 	CHECK(Edge::nw().getSides()[1] == Side<3>::north());
 }
-TEST_CASE("Edge ==", "[Edge]")
+TEST_CASE("Edge ==", "[Edge][Face]")
 {
 	CHECK(Edge::bs() == Edge::bs());
 	CHECK_FALSE(Edge::bs() == Edge::tn());
@@ -278,7 +278,7 @@ TEST_CASE("Edge ==", "[Edge]")
 	CHECK_FALSE(Edge::null() == Edge::nw());
 	CHECK(Edge::null() == Edge::null());
 }
-TEST_CASE("Edge !=", "[Edge]")
+TEST_CASE("Edge !=", "[Edge][Face]")
 {
 	CHECK_FALSE(Edge::bs() != Edge::bs());
 	CHECK(Edge::bs() != Edge::tn());
@@ -462,7 +462,7 @@ TEST_CASE("Edge !=", "[Edge]")
 	CHECK(Edge::null() != Edge::nw());
 	CHECK_FALSE(Edge::null() != Edge::null());
 }
-TEST_CASE("Edge <", "[Edge]")
+TEST_CASE("Edge <", "[Edge][Face]")
 {
 	for (int val = 0; val <= Edge::number_of; val++) {
 		Edge edge(val);
@@ -472,7 +472,7 @@ TEST_CASE("Edge <", "[Edge]")
 		}
 	}
 }
-TEST_CASE("Test ostream for Edge", "[Edge]")
+TEST_CASE("Test ostream for Edge", "[Edge][Face]")
 {
 	stringstream ss;
 	ss << Edge::bs();
@@ -517,7 +517,7 @@ TEST_CASE("Test ostream for Edge", "[Edge]")
 	ss << Edge(64);
 	CHECK(ss.str() == "Edge invalid value: 64");
 }
-TEST_CASE("Test iterator for Edge", "[Edge]")
+TEST_CASE("Test iterator for Edge", "[Edge][Face]")
 {
 	auto iter = Edge::getValues().begin();
 	CHECK(iter == Edge::getValues().begin());
@@ -550,7 +550,7 @@ TEST_CASE("Test iterator for Edge", "[Edge]")
 	CHECK(*iter == Edge::null());
 	CHECK(iter == Edge::getValues().end());
 }
-TEST_CASE("Test from_json for Edge", "[Edge]")
+TEST_CASE("Test from_json for Edge", "[Edge][Face]")
 {
 	nlohmann::json j;
 	j["null"] = nullptr;
@@ -579,7 +579,7 @@ TEST_CASE("Test from_json for Edge", "[Edge]")
 	CHECK(j["ne"].get<Edge>() == Edge::ne());
 	CHECK(j["nw"].get<Edge>() == Edge::nw());
 }
-TEST_CASE("Test to_json for Edge", "[Edge]")
+TEST_CASE("Test to_json for Edge", "[Edge][Face]")
 {
 	nlohmann::json j;
 	j["null"] = Edge::null();

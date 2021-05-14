@@ -64,42 +64,46 @@ template <int D> class NormalNbrInfo : public NbrInfo<D>
 	{
 		this->id = id;
 	}
-	NbrType getNbrType() const
+	NbrType getNbrType() const override
 	{
 		return NbrType::Normal;
 	}
-	void getNbrIds(std::deque<int> &nbr_ids) const
+	void getNbrIds(std::deque<int> &nbr_ids) const override
 	{
 		nbr_ids.push_back(id);
 	}
-	void getNbrRanks(std::deque<int> &nbr_ranks) const
+	void getNbrRanks(std::deque<int> &nbr_ranks) const override
 	{
 		nbr_ranks.push_back(rank);
 	}
-	void setGlobalIndexes(const std::map<int, int> &id_to_global_index_map)
+	void setGlobalIndexes(const std::map<int, int> &id_to_global_index_map) override
 	{
 		global_index = id_to_global_index_map.at(id);
 	}
-	void setLocalIndexes(const std::map<int, int> &id_to_local_index_map)
+	void setLocalIndexes(const std::map<int, int> &id_to_local_index_map) override
 	{
 		auto iter = id_to_local_index_map.find(id);
 		if (iter != id_to_local_index_map.end()) {
 			local_index = iter->second;
 		}
 	}
-	int serialize(char *buffer) const
+	int serialize(char *buffer) const override
 	{
 		BufferWriter writer(buffer);
 		writer << rank;
 		writer << id;
 		return writer.getPos();
 	}
-	int deserialize(char *buffer)
+	int deserialize(char *buffer) override
 	{
 		BufferReader reader(buffer);
 		reader >> rank;
 		reader >> id;
 		return reader.getPos();
+	}
+	std::unique_ptr<NbrInfoBase> clone() const override
+	{
+		return std::make_unique<NormalNbrInfo<D>>(*this);
 	}
 };
 template <int D> void to_json(nlohmann::json &j, const NormalNbrInfo<D> &n)

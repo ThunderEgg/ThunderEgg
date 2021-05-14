@@ -225,11 +225,11 @@ void FillBlockColumnForCoarseToCoarseInterface(int                              
                                                const PatchInfo<3> &                     pinfo,
                                                std::vector<double> &                    block)
 {
-	int          n                   = pinfo.ns[0];
-	PatchInfo<3> new_pinfo           = pinfo;
-	new_pinfo.nbr_info[0]            = nullptr;
-	new_pinfo.nbr_info[s.getIndex()] = make_unique<FineNbrInfo<3>>();
-	std::vector<LocalData<3>> us     = {u};
+	int          n         = pinfo.ns[0];
+	PatchInfo<3> new_pinfo = pinfo;
+	new_pinfo.setNbrInfo(Side<3>::west(), nullptr);
+	new_pinfo.setNbrInfo(s, new FineNbrInfo<2>());
+	std::vector<LocalData<3>> us = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
 	auto slice       = u.getSliceOnSide(s);
 	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
@@ -259,11 +259,11 @@ void FillBlockColumnForFineToFineInterface(int                                  
                                            IfaceType<3>                             type,
                                            std::vector<double> &                    block)
 {
-	int          n                   = pinfo.ns[0];
-	PatchInfo<3> new_pinfo           = pinfo;
-	new_pinfo.nbr_info[0]            = nullptr;
-	new_pinfo.nbr_info[s.getIndex()] = make_unique<CoarseNbrInfo<3>>(100, type.getOrthant());
-	std::vector<LocalData<3>> us     = {u};
+	int          n         = pinfo.ns[0];
+	PatchInfo<3> new_pinfo = pinfo;
+	new_pinfo.setNbrInfo(Side<3>::west(), nullptr);
+	new_pinfo.setNbrInfo(s, new CoarseNbrInfo<2>(100, type.getOrthant()));
+	std::vector<LocalData<3>> us = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
 	auto slice       = u.getSliceOnSide(s);
 	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
@@ -293,10 +293,10 @@ void FillBlockColumnForCoarseToFineInterface(int                                
                                              IfaceType<3>                             type,
                                              std::vector<double> &                    block)
 {
-	int          n                   = pinfo.ns[0];
-	PatchInfo<3> new_pinfo           = pinfo;
-	new_pinfo.nbr_info[0]            = nullptr;
-	new_pinfo.nbr_info[s.getIndex()] = make_unique<FineNbrInfo<3>>();
+	int          n         = pinfo.ns[0];
+	PatchInfo<3> new_pinfo = pinfo;
+	new_pinfo.setNbrInfo(Side<3>::west(), nullptr);
+	new_pinfo.setNbrInfo(s, new FineNbrInfo<2>());
 	vector<double>            ghosts(n * n);
 	std::vector<LocalData<3>> us        = {u};
 	std::vector<LocalData<3>> nbr_datas = {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
@@ -326,10 +326,10 @@ void FillBlockColumnForFineToCoarseInterface(int                                
                                              IfaceType<3>                             type,
                                              std::vector<double> &                    block)
 {
-	int          n                   = pinfo.ns[0];
-	PatchInfo<3> new_pinfo           = pinfo;
-	new_pinfo.nbr_info[0]            = nullptr;
-	new_pinfo.nbr_info[s.getIndex()] = make_unique<CoarseNbrInfo<3>>(100, type.getOrthant());
+	int          n         = pinfo.ns[0];
+	PatchInfo<3> new_pinfo = pinfo;
+	new_pinfo.setNbrInfo(Side<3>::west(), nullptr);
+	new_pinfo.setNbrInfo(s, new CoarseNbrInfo<2>(100, type.getOrthant()));
 	vector<double>            ghosts(n * n);
 	std::vector<LocalData<3>> us        = {u};
 	std::vector<LocalData<3>> nbr_datas = {getLocalDataForBuffer(ghosts.data(), pinfo, s.opposite())};
@@ -445,13 +445,13 @@ void AssembleMatrix(std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domai
 	for (const set<Block> &blocks : GetBlocks(iface_domain, solver->getNeumann())) {
 		// create domain representing curr_type
 		PatchInfo<3> pinfo;
-		pinfo.nbr_info[0] = make_unique<NormalNbrInfo<3>>();
+		pinfo.setNbrInfo(Side<3>::west(), new NormalNbrInfo<2>());
 		pinfo.ns.fill(n);
 		pinfo.spacings.fill(1.0 / n);
 		pinfo.num_ghost_cells = 1;
 		for (Side<3> s : Side<3>::getValues()) {
 			if (!blocks.begin()->non_dirichlet_boundary[s.getIndex()]) {
-				pinfo.nbr_info[s.getIndex()] = make_unique<NormalNbrInfo<3>>();
+				pinfo.setNbrInfo(s, new NormalNbrInfo<2>());
 			}
 		}
 		solver->addPatch(pinfo);

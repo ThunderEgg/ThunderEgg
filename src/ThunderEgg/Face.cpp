@@ -252,4 +252,118 @@ std::ostream &operator<<(std::ostream &os, const Edge &o)
 	}
 	return os;
 }
+std::ostream &operator<<(std::ostream &os, const Corner<2> &o)
+{
+	if (o == Corner<2>::sw()) {
+		os << "Corner<2>::sw()";
+	} else if (o == Corner<2>::se()) {
+		os << "Corner<2>::se()";
+	} else if (o == Corner<2>::nw()) {
+		os << "Corner<2>::nw()";
+	} else if (o == Corner<2>::ne()) {
+		os << "Corner<2>::ne()";
+	} else if (o == Corner<2>::null()) {
+		os << "Corner<2>::null()";
+	} else {
+		os << "Corner<2> invalid value: " << o.getIndex();
+	}
+	return os;
+}
+std::ostream &operator<<(std::ostream &os, const Corner<3> &o)
+{
+	if (o == Corner<3>::bsw()) {
+		os << "Corner<3>::bsw()";
+	} else if (o == Corner<3>::bse()) {
+		os << "Corner<3>::bse()";
+	} else if (o == Corner<3>::bnw()) {
+		os << "Corner<3>::bnw()";
+	} else if (o == Corner<3>::bne()) {
+		os << "Corner<3>::bne()";
+	} else if (o == Corner<3>::tsw()) {
+		os << "Corner<3>::tsw()";
+	} else if (o == Corner<3>::tse()) {
+		os << "Corner<3>::tse()";
+	} else if (o == Corner<3>::tnw()) {
+		os << "Corner<3>::tnw()";
+	} else if (o == Corner<3>::tne()) {
+		os << "Corner<3>::tne()";
+	} else if (o == Corner<3>::null()) {
+		os << "Corner<3>::null()";
+	} else {
+		os << "Corner<3> invalid value: " << o.getIndex();
+	}
+	return os;
+}
+void to_json(nlohmann::json &j, const Corner<2> &o)
+{
+	if (o == Corner<2>::sw()) {
+		j = "SW";
+	} else if (o == Corner<2>::se()) {
+		j = "SE";
+	} else if (o == Corner<2>::nw()) {
+		j = "NW";
+	} else if (o == Corner<2>::ne()) {
+		j = "NE";
+	} else {
+		j = nullptr;
+	}
+}
+void to_json(nlohmann::json &j, const Corner<3> &o)
+{
+	if (o == Corner<3>::bsw()) {
+		j = "BSW";
+	} else if (o == Corner<3>::bse()) {
+		j = "BSE";
+	} else if (o == Corner<3>::bnw()) {
+		j = "BNW";
+	} else if (o == Corner<3>::bne()) {
+		j = "BNE";
+	} else if (o == Corner<3>::tsw()) {
+		j = "TSW";
+	} else if (o == Corner<3>::tse()) {
+		j = "TSE";
+	} else if (o == Corner<3>::tnw()) {
+		j = "TNW";
+	} else if (o == Corner<3>::tne()) {
+		j = "TNE";
+	} else {
+		j = nullptr;
+	}
+}
+void from_json(const nlohmann::json &j, Corner<2> &o)
+{
+	if (j == "SW") {
+		o = Corner<2>::sw();
+	} else if (j == "SE") {
+		o = Corner<2>::se();
+	} else if (j == "NW") {
+		o = Corner<2>::nw();
+	} else if (j == "NE") {
+		o = Corner<2>::ne();
+	} else {
+		o = Corner<2>::null();
+	}
+}
+void from_json(const nlohmann::json &j, Corner<3> &o)
+{
+	if (j == "BSW") {
+		o = Corner<3>::bsw();
+	} else if (j == "BSE") {
+		o = Corner<3>::bse();
+	} else if (j == "BNW") {
+		o = Corner<3>::bnw();
+	} else if (j == "BNE") {
+		o = Corner<3>::bne();
+	} else if (j == "TSW") {
+		o = Corner<3>::tsw();
+	} else if (j == "TSE") {
+		o = Corner<3>::tse();
+	} else if (j == "TNW") {
+		o = Corner<3>::tnw();
+	} else if (j == "TNE") {
+		o = Corner<3>::tne();
+	} else {
+		o = Corner<3>::null();
+	}
+}
 } // namespace ThunderEgg

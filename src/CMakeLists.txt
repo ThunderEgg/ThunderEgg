@@ -15,9 +15,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/BufferWriter.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/CoarseNbrInfo.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Corner.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Corner.cpp)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/DivergenceError.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Domain.h)
@@ -47,6 +44,8 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/NormalNbrInfo.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/NbrType.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/NbrInfo.h)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/NbrInfoBase.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Operator.h)
 

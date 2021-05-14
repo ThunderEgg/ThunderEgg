@@ -21,7 +21,6 @@
 
 #ifndef THUNDEREGG_LOCALDATA_H
 #define THUNDEREGG_LOCALDATA_H
-#include <ThunderEgg/Corner.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/LocalDataManager.h>
 #include <ThunderEgg/Loops.h>
@@ -312,9 +311,10 @@ template <int D> class LocalData
 	 */
 	double &getValueOnCorner(Corner<D> c, const std::array<int, D> &offset)
 	{
-		double *value = data;
+		double *               value = data;
+		std::array<Side<D>, D> sides = c.getSides();
 		for (int i = 0; i < D; i++) {
-			if (c.isLowerOnAxis(i)) {
+			if (sides[i].isLowerOnAxis()) {
 				value += offset[i] * strides[i];
 			} else {
 				value += (lengths[i] - 1 - offset[i]) * strides[i];
@@ -332,9 +332,10 @@ template <int D> class LocalData
 	 */
 	const double &getValueOnCorner(Corner<D> c, const std::array<int, D> &offset) const
 	{
-		const double *value = data;
+		const double *         value = data;
+		std::array<Side<D>, D> sides = c.getSides();
 		for (int i = 0; i < D; i++) {
-			if (c.isLowerOnAxis(i)) {
+			if (sides[i].isLowerOnAxis()) {
 				value += offset[i] * strides[i];
 			} else {
 				value += (lengths[i] - 1 - offset[i]) * strides[i];

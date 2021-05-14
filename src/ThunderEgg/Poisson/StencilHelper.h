@@ -275,7 +275,7 @@ class NormalSH : public StencilHelper
 	 */
 	NormalSH(const PatchInfo<3> &pinfo, Side<3> s)
 	{
-		const NormalNbrInfo<3> &nbr_info = pinfo.getNormalNbrInfo(s);
+		const NormalNbrInfo<2> &nbr_info = pinfo.getNormalNbrInfo(s);
 		double                  h        = 0;
 		int                     idx      = pinfo.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
 		int                     nbr_idx  = nbr_info.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
@@ -371,7 +371,7 @@ class CoarseSH : public StencilHelper
 	 */
 	CoarseSH(const PatchInfo<3> &pinfo, Side<3> s)
 	{
-		const CoarseNbrInfo<3> &nbr_info = pinfo.getCoarseNbrInfo(s);
+		const CoarseNbrInfo<2> &nbr_info = pinfo.getCoarseNbrInfo(s);
 		double                  h        = 0;
 		int                     idx      = pinfo.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
 		int                     nbr_idx  = nbr_info.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
@@ -495,7 +495,7 @@ class FineSH : public StencilHelper
 	 */
 	FineSH(const PatchInfo<3> &pinfo, Side<3> s)
 	{
-		const FineNbrInfo<3> &nbr_info = pinfo.getFineNbrInfo(s);
+		const FineNbrInfo<2> &nbr_info = pinfo.getFineNbrInfo(s);
 		double                h        = 0;
 		int                   idx      = pinfo.global_index * pinfo.ns[0] * pinfo.ns[1] * pinfo.ns[2];
 		int                   nbr_idx[4];

@@ -21,7 +21,6 @@
 #ifndef THUNDEREGG_PATCHINFO_H
 #define THUNDEREGG_PATCHINFO_H
 #include <ThunderEgg/CoarseNbrInfo.h>
-#include <ThunderEgg/Corner.h>
 #include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NormalNbrInfo.h>
 #include <ThunderEgg/Orthant.h>
@@ -29,7 +28,6 @@
 #include <ThunderEgg/Serializable.h>
 #include <ThunderEgg/TypeDefs.h>
 #include <bitset>
-#include <memory>
 
 namespace ThunderEgg
 {
@@ -47,7 +45,16 @@ namespace ThunderEgg
  *
  * @tparam D the number of cartesian dimensions in the patch
  */
-template <int D> struct PatchInfo : public Serializable {
+template <int D> class PatchInfo : public Serializable
+{
+	private:
+	/**
+	 * @brief Nbr info objects for each side.
+	 * If there is no neighbor, it should be set to nullptr.
+	 */
+	std::array<std::unique_ptr<NbrInfoBase>, Face<D, D>::sum_of_faces> nbr_infos;
+
+	public:
 	/**
 	 * @brief The globally unique ID of the patch
 	 * This ID only needs to be unique within a Domain.
@@ -113,21 +120,6 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @brief The cell spacings in each direction
 	 */
 	std::array<double, D> spacings;
-	/**
-	 * @brief Nbr info objects for each side.
-	 * If there is no neighbor, it should be set to nullptr.
-	 */
-	std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::number_of> nbr_info;
-	/**
-	 * @brief Nbr info objects for each edge
-	 * If there is no neighbor, it should be set to nullptr.
-	 */
-	std::array<std::unique_ptr<NbrInfo<2>>, Edge::number_of> edge_nbr_info;
-	/**
-	 * @brief Nbr info objects for each corner
-	 * If there is no neighbor, it should be set to nullptr.
-	 */
-	std::array<std::unique_ptr<NbrInfo<1>>, Corner<D>::num_corners> corner_nbr_info;
 
 	/**
 	 * @brief Construct a new Patch Info object
@@ -163,58 +155,9 @@ template <int D> struct PatchInfo : public Serializable {
 	  starts(other_pinfo.starts),
 	  spacings(other_pinfo.spacings)
 	{
-		for (Side<D> s : Side<D>::getValues()) {
-			if (other_pinfo.hasNbr(s)) {
-				switch (other_pinfo.getNbrType(s)) {
-					case NbrType::Normal:
-						nbr_info[s.getIndex()] = std::make_unique<NormalNbrInfo<D>>(other_pinfo.getNormalNbrInfo(s));
-						break;
-					case NbrType::Fine:
-						nbr_info[s.getIndex()] = std::make_unique<FineNbrInfo<D>>(other_pinfo.getFineNbrInfo(s));
-						break;
-					case NbrType::Coarse:
-						nbr_info[s.getIndex()] = std::make_unique<CoarseNbrInfo<D>>(other_pinfo.getCoarseNbrInfo(s));
-						break;
-					default:
-						throw RuntimeError("Unknown NbrType");
-						break;
-				}
-			}
-		}
-		for (Edge e : Edge::getValues()) {
-			if (other_pinfo.hasNbr(e)) {
-				switch (other_pinfo.getNbrType(e)) {
-					case NbrType::Normal:
-						edge_nbr_info[e.getIndex()] = std::make_unique<NormalNbrInfo<2>>(other_pinfo.getNormalNbrInfo(e));
-						break;
-					case NbrType::Fine:
-						edge_nbr_info[e.getIndex()] = std::make_unique<FineNbrInfo<2>>(other_pinfo.getFineNbrInfo(e));
-						break;
-					case NbrType::Coarse:
-						edge_nbr_info[e.getIndex()] = std::make_unique<CoarseNbrInfo<2>>(other_pinfo.getCoarseNbrInfo(e));
-						break;
-					default:
-						throw RuntimeError("Unknown NbrType");
-						break;
-				}
-			}
-		}
-		for (Corner<D> c : Corner<D>::getValues()) {
-			if (other_pinfo.hasNbr(c)) {
-				switch (other_pinfo.getNbrType(c)) {
-					case NbrType::Normal:
-						corner_nbr_info[c.getIndex()] = std::make_unique<NormalNbrInfo<1>>(other_pinfo.getNormalNbrInfo(c));
-						break;
-					case NbrType::Fine:
-						corner_nbr_info[c.getIndex()] = std::make_unique<FineNbrInfo<1>>(other_pinfo.getFineNbrInfo(c));
-						break;
-					case NbrType::Coarse:
-						corner_nbr_info[c.getIndex()] = std::make_unique<CoarseNbrInfo<1>>(other_pinfo.getCoarseNbrInfo(c));
-						break;
-					default:
-						throw RuntimeError("Unknown NbrType");
-						break;
-				}
+		for (size_t i = 0; i < other_pinfo.nbr_infos.size(); i++) {
+			if (other_pinfo.nbr_infos[i] != nullptr) {
+				nbr_infos[i] = other_pinfo.nbr_infos[i]->clone();
 			}
 		}
 	}
@@ -240,60 +183,12 @@ template <int D> struct PatchInfo : public Serializable {
 		ns              = other_pinfo.ns;
 		starts          = other_pinfo.starts;
 		spacings        = other_pinfo.spacings;
-		for (Side<D> s : Side<D>::getValues()) {
-			if (other_pinfo.hasNbr(s)) {
-				switch (other_pinfo.getNbrType(s)) {
-					case NbrType::Normal:
-						nbr_info[s.getIndex()] = std::make_unique<NormalNbrInfo<D>>(other_pinfo.getNormalNbrInfo(s));
-						break;
-					case NbrType::Fine:
-						nbr_info[s.getIndex()] = std::make_unique<FineNbrInfo<D>>(other_pinfo.getFineNbrInfo(s));
-						break;
-					case NbrType::Coarse:
-						nbr_info[s.getIndex()] = std::make_unique<CoarseNbrInfo<D>>(other_pinfo.getCoarseNbrInfo(s));
-						break;
-					default:
-						throw RuntimeError("Unknown NbrType");
-						break;
-				}
+
+		for (size_t i = 0; i < other_pinfo.nbr_infos.size(); i++) {
+			if (other_pinfo.nbr_infos[i] != nullptr) {
+				nbr_infos[i] = other_pinfo.nbr_infos[i]->clone();
 			} else {
-				nbr_info[s.getIndex()] = nullptr;
-			}
-		}
-		for (Edge e : Edge::getValues()) {
-			if (other_pinfo.hasNbr(e)) {
-				switch (other_pinfo.getNbrType(e)) {
-					case NbrType::Normal:
-						edge_nbr_info[e.getIndex()] = std::make_unique<NormalNbrInfo<2>>(other_pinfo.getNormalNbrInfo(e));
-						break;
-					case NbrType::Fine:
-						edge_nbr_info[e.getIndex()] = std::make_unique<FineNbrInfo<2>>(other_pinfo.getFineNbrInfo(e));
-						break;
-					case NbrType::Coarse:
-						edge_nbr_info[e.getIndex()] = std::make_unique<CoarseNbrInfo<2>>(other_pinfo.getCoarseNbrInfo(e));
-						break;
-					default:
-						throw RuntimeError("Unknown NbrType");
-						break;
-				}
-			}
-		}
-		for (Corner<D> c : Corner<D>::getValues()) {
-			if (other_pinfo.hasNbr(c)) {
-				switch (other_pinfo.getNbrType(c)) {
-					case NbrType::Normal:
-						corner_nbr_info[c.getIndex()] = std::make_unique<NormalNbrInfo<1>>(other_pinfo.getNormalNbrInfo(c));
-						break;
-					case NbrType::Fine:
-						corner_nbr_info[c.getIndex()] = std::make_unique<FineNbrInfo<1>>(other_pinfo.getFineNbrInfo(c));
-						break;
-					case NbrType::Coarse:
-						corner_nbr_info[c.getIndex()] = std::make_unique<CoarseNbrInfo<1>>(other_pinfo.getCoarseNbrInfo(c));
-						break;
-					default:
-						throw RuntimeError("Unknown NbrType");
-						break;
-				}
+				nbr_infos[i] = nullptr;
 			}
 		}
 		return *this;
@@ -310,15 +205,30 @@ template <int D> struct PatchInfo : public Serializable {
 	{
 		return l.id < r.id;
 	}
+	template <int M> void setNbrInfo(Face<D, M> f, nullptr_t)
+	{
+		nbr_infos[Face<D, M>::sum_of_faces + f.getIndex()] = nullptr;
+	}
+	/**
+	 * @brief Set the Nbr Info object on a given face
+	 *
+	 * @tparam M the dimensionality of the face
+	 * @param s the face
+	 * @param nbr_info the neighbor info object, this patchinfo will take ownership of it
+	 */
+	template <int M> void setNbrInfo(Face<D, M> f, NbrInfo<M> *nbr_info)
+	{
+		nbr_infos[Face<D, M>::sum_of_faces + f.getIndex()].reset(nbr_info);
+	}
 	/**
 	 * @brief Get the NbrType for a side
 	 *
 	 * @param s the side
 	 * @return The NbrType
 	 */
-	NbrType getNbrType(Side<D> s) const
+	template <int M> NbrType getNbrType(Face<D, M> s) const
 	{
-		return nbr_info[s.getIndex()]->getNbrType();
+		return nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()]->getNbrType();
 	}
 	/**
 	 * @brief Get the NormalNbrInfo object for a side
@@ -328,9 +238,9 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @param s the side
 	 * @return NormalNbrInfo<D>& the object
 	 */
-	NormalNbrInfo<D> &getNormalNbrInfo(Side<D> s) const
+	template <int M> NormalNbrInfo<M> &getNormalNbrInfo(Face<D, M> s) const
 	{
-		return *dynamic_cast<NormalNbrInfo<D> *>(nbr_info[s.getIndex()].get());
+		return *dynamic_cast<NormalNbrInfo<M> *>(nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
 	}
 	/**
 	 * @brief Get the CoarseNbrInfo object
@@ -339,9 +249,9 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @param s the side
 	 * @return CoarseNbrInfo<D>& the object
 	*/
-	CoarseNbrInfo<D> &getCoarseNbrInfo(Side<D> s) const
+	template <int M> CoarseNbrInfo<M> &getCoarseNbrInfo(Face<D, M> s) const
 	{
-		return *dynamic_cast<CoarseNbrInfo<D> *>(nbr_info[s.getIndex()].get());
+		return *dynamic_cast<CoarseNbrInfo<M> *>(nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
 	}
 	/**
 	 * @brief Get the FineNbrInfo object
@@ -351,9 +261,9 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @param s the side
 	 * @return FineNbrInfo<D>& the object
 	 */
-	FineNbrInfo<D> &getFineNbrInfo(Side<D> s) const
+	template <int M> FineNbrInfo<M> &getFineNbrInfo(Face<D, M> s) const
 	{
-		return *dynamic_cast<FineNbrInfo<D> *>(nbr_info[s.getIndex()].get());
+		return *dynamic_cast<FineNbrInfo<M> *>(nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
 	}
 	/**
 	 * @brief Return whether the patch has a neighbor
@@ -362,120 +272,21 @@ template <int D> struct PatchInfo : public Serializable {
 	 * @return true if the is neighbor
 	 * @return false if at domain boundary
 	 */
-	inline bool hasNbr(Side<D> s) const
+	template <int M> inline bool hasNbr(Face<D, M> s) const
 	{
-		return nbr_info[s.getIndex()] != nullptr;
+		return nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()] != nullptr;
 	}
 	/**
-	 * @brief Get the NbrType for a corner
-	 *
-	 * @param c the corner
-	 * @return The NbrType
+	 * @brief Return if this patch has a neighbor
 	 */
-	NbrType getNbrType(Corner<D> c) const
+	inline bool hasNbr() const
 	{
-		return corner_nbr_info[c.getIndex()]->getNbrType();
-	}
-	/**
-	 * @brief Get the NormalNbrInfo object for a corner
-	 *
-	 * Neighbor must be of Normal type, otherwise behavior is undefined.
-	 *
-	 * @param c the corner
-	 * @return NormalNbrInfo<1>& the object
-	 */
-	NormalNbrInfo<1> &getNormalNbrInfo(Corner<D> c) const
-	{
-		return *dynamic_cast<NormalNbrInfo<1> *>(corner_nbr_info[c.getIndex()].get());
-	}
-	/**
-	 * @brief Get the CoarseNbrInfo object
-	 *
-
-	 * @param c the corner
-	 * @return CoarseNbrInfo<1>& the object
-	*/
-	CoarseNbrInfo<1> &getCoarseNbrInfo(Corner<D> c) const
-	{
-		return *dynamic_cast<CoarseNbrInfo<1> *>(corner_nbr_info[c.getIndex()].get());
-	}
-	/**
-	 * @brief Get the FineNbrInfo object
-	 *
-	 * Neighbor must be of Fine type, otherwise behavior is undefined.
-	 *
-	 * @param c the corner
-	 * @return FineNbrInfo<1>& the object
-	 */
-	FineNbrInfo<1> &getFineNbrInfo(Corner<D> c) const
-	{
-		return *dynamic_cast<FineNbrInfo<1> *>(corner_nbr_info[c.getIndex()].get());
-	}
-	/**
-	 * @brief Return whether the patch has a neighbor on it's corner
-	 *
-	 * @param c the corner
-	 * @return true if the is neighbor on the corner
-	 * @return false if not
-	 */
-	inline bool hasNbr(Corner<D> c) const
-	{
-		return corner_nbr_info[c.getIndex()] != nullptr;
-	}
-	/**
-	 * @brief Get the NbrType for a edge
-	 *
-	 * @param e the edge
-	 * @return The NbrType
-	 */
-	NbrType getNbrType(Edge e) const
-	{
-		return edge_nbr_info[e.getIndex()]->getNbrType();
-	}
-	/**
-	 * @brief Get the NormalNbrInfo object for a edge
-	 *
-	 * Neighbor must be of Normal type, otherwise behavior is undefined.
-	 *
-	 * @param e the edge
-	 * @return NormalNbrInfo<2>& the object
-	 */
-	NormalNbrInfo<2> &getNormalNbrInfo(Edge e) const
-	{
-		return *dynamic_cast<NormalNbrInfo<2> *>(edge_nbr_info[e.getIndex()].get());
-	}
-	/**
-	 * @brief Get the CoarseNbrInfo object
-	 *
-	 * @param e the edge
-	 * @return CoarseNbrInfo<2>& the object
-	 */
-	CoarseNbrInfo<2> &getCoarseNbrInfo(Edge e) const
-	{
-		return *dynamic_cast<CoarseNbrInfo<2> *>(edge_nbr_info[e.getIndex()].get());
-	}
-	/**
-	 * @brief Get the FineNbrInfo object
-	 *
-	 * Neighbor must be of Fine type, otherwise behavior is undefined.
-	 *
-	 * @param e the edge
-	 * @return FineNbrInfo<2>& the object
-	 */
-	FineNbrInfo<2> &getFineNbrInfo(Edge e) const
-	{
-		return *dynamic_cast<FineNbrInfo<2> *>(edge_nbr_info[e.getIndex()].get());
-	}
-	/**
-	 * @brief Return whether the patch has a neighbor on it's edge
-	 *
-	 * @param e the edge
-	 * @return true if the is neighbor on the edge
-	 * @return false if not
-	 */
-	inline bool hasNbr(Edge e) const
-	{
-		return edge_nbr_info[e.getIndex()] != nullptr;
+		for (const std::unique_ptr<NbrInfoBase> &nbr_info : nbr_infos) {
+			if (nbr_info != nullptr) {
+				return true;
+			}
+		}
+		return false;
 	}
 	/**
 	 * @brief Return whether the patch has a coarser parent
@@ -493,19 +304,9 @@ template <int D> struct PatchInfo : public Serializable {
 	 */
 	void setNeighborLocalIndexes(const std::map<int, int> &id_to_local_index_map)
 	{
-		for (Side<D> s : Side<D>::getValues()) {
-			if (hasNbr(s)) {
-				nbr_info[s.getIndex()]->setLocalIndexes(id_to_local_index_map);
-			}
-		}
-		for (Edge e : Edge::getValues()) {
-			if (hasNbr(e)) {
-				edge_nbr_info[e.getIndex()]->setLocalIndexes(id_to_local_index_map);
-			}
-		}
-		for (Corner<D> c : Corner<D>::getValues()) {
-			if (hasNbr(c)) {
-				corner_nbr_info[c.getIndex()]->setLocalIndexes(id_to_local_index_map);
+		for (size_t i = 0; i < nbr_infos.size(); i++) {
+			if (nbr_infos[i] != nullptr) {
+				nbr_infos[i]->setLocalIndexes(id_to_local_index_map);
 			}
 		}
 	}
@@ -516,19 +317,9 @@ template <int D> struct PatchInfo : public Serializable {
 	 */
 	void setNeighborGlobalIndexes(const std::map<int, int> &id_to_global_index_map)
 	{
-		for (Side<D> s : Side<D>::getValues()) {
-			if (hasNbr(s)) {
-				nbr_info[s.getIndex()]->setGlobalIndexes(id_to_global_index_map);
-			}
-		}
-		for (Edge e : Edge::getValues()) {
-			if (hasNbr(e)) {
-				edge_nbr_info[e.getIndex()]->setGlobalIndexes(id_to_global_index_map);
-			}
-		}
-		for (Corner<D> c : Corner<D>::getValues()) {
-			if (hasNbr(c)) {
-				corner_nbr_info[c.getIndex()]->setGlobalIndexes(id_to_global_index_map);
+		for (size_t i = 0; i < nbr_infos.size(); i++) {
+			if (nbr_infos[i] != nullptr) {
+				nbr_infos[i]->setGlobalIndexes(id_to_global_index_map);
 			}
 		}
 	}
@@ -538,19 +329,9 @@ template <int D> struct PatchInfo : public Serializable {
 	std::deque<int> getNbrIds() const
 	{
 		std::deque<int> retval;
-		for (Side<D> s : Side<D>::getValues()) {
-			if (hasNbr(s)) {
-				nbr_info[s.getIndex()]->getNbrIds(retval);
-			}
-		}
-		for (Edge e : Edge::getValues()) {
-			if (hasNbr(e)) {
-				edge_nbr_info[e.getIndex()]->getNbrIds(retval);
-			}
-		}
-		for (Corner<D> c : Corner<D>::getValues()) {
-			if (hasNbr(c)) {
-				corner_nbr_info[c.getIndex()]->getNbrIds(retval);
+		for (size_t i = 0; i < nbr_infos.size(); i++) {
+			if (nbr_infos[i] != nullptr) {
+				nbr_infos[i]->getNbrIds(retval);
 			}
 		}
 		return retval;
@@ -561,22 +342,78 @@ template <int D> struct PatchInfo : public Serializable {
 	std::deque<int> getNbrRanks() const
 	{
 		std::deque<int> retval;
-		for (Side<D> s : Side<D>::getValues()) {
-			if (hasNbr(s)) {
-				nbr_info[s.getIndex()]->getNbrRanks(retval);
-			}
-		}
-		for (Edge e : Edge::getValues()) {
-			if (hasNbr(e)) {
-				edge_nbr_info[e.getIndex()]->getNbrRanks(retval);
-			}
-		}
-		for (Corner<D> c : Corner<D>::getValues()) {
-			if (hasNbr(c)) {
-				corner_nbr_info[c.getIndex()]->getNbrRanks(retval);
+		for (size_t i = 0; i < nbr_infos.size(); i++) {
+			if (nbr_infos[i] != nullptr) {
+				nbr_infos[i]->getNbrRanks(retval);
 			}
 		}
 		return retval;
+	}
+	template <int M> void serializeNeighbors(BufferWriter &writer) const
+	{
+		std::bitset<Face<D, M>::number_of> has_nbr;
+		for (Face<D, M> f : Face<D, M>::getValues()) {
+			has_nbr[f.getIndex()] = hasNbr(f);
+		}
+		writer << has_nbr;
+		for (Face<D, M> f : Face<D, M>::getValues()) {
+			if (hasNbr(f)) {
+				NbrType type = getNbrType(f);
+				writer << type;
+				switch (type) {
+					case NbrType::Normal: {
+						NormalNbrInfo<M> tmp = getNormalNbrInfo(f);
+						writer << tmp;
+					} break;
+					case NbrType::Fine: {
+						FineNbrInfo<M> tmp = getFineNbrInfo(f);
+						writer << tmp;
+					} break;
+					case NbrType::Coarse: {
+						CoarseNbrInfo<M> tmp = getCoarseNbrInfo(f);
+						writer << tmp;
+					} break;
+					default:
+						throw RuntimeError("Unsupported NbrType");
+				}
+			}
+		}
+		if constexpr (M > 0) {
+			serializeNeighbors<M - 1>(writer);
+		}
+	}
+	template <int M> void deserializeNeighbors(BufferReader &reader)
+	{
+		std::bitset<Face<D, M>::number_of> has_nbr;
+		reader >> has_nbr;
+		for (Face<D, M> f : Face<D, M>::getValues()) {
+			if (has_nbr[f.getIndex()]) {
+				NbrType type;
+				reader >> type;
+				NbrInfo<M> *info;
+				switch (type) {
+					case NbrType::Normal:
+						info = new NormalNbrInfo<M>();
+						reader >> *static_cast<NormalNbrInfo<M> *>(info);
+						break;
+					case NbrType::Fine:
+						info = new FineNbrInfo<M>();
+						reader >> *static_cast<FineNbrInfo<M> *>(info);
+						break;
+					case NbrType::Coarse:
+						info = new CoarseNbrInfo<M>();
+						reader >> *static_cast<CoarseNbrInfo<M> *>(info);
+						break;
+					default:
+						throw RuntimeError("Unsupported NbrType");
+				}
+
+				setNbrInfo(f, info);
+			}
+		}
+		if constexpr (M > 0) {
+			deserializeNeighbors<M - 1>(reader);
+		}
 	}
 	int serialize(char *buffer) const
 	{
@@ -592,87 +429,9 @@ template <int D> struct PatchInfo : public Serializable {
 		writer << orth_on_parent;
 		writer << starts;
 		writer << spacings;
-		std::bitset<Side<D>::number_of> has_nbr;
-		for (size_t i = 0; i < Side<D>::number_of; i++) {
-			has_nbr[i] = nbr_info[i] != nullptr;
-		}
-		writer << has_nbr;
-		for (Side<D> s : Side<D>::getValues()) {
-			if (hasNbr(s)) {
-				NbrType type = getNbrType(s);
-				writer << type;
-				switch (type) {
-					case NbrType::Normal: {
-						NormalNbrInfo<D> tmp = getNormalNbrInfo(s);
-						writer << tmp;
-					} break;
-					case NbrType::Fine: {
-						FineNbrInfo<D> tmp = getFineNbrInfo(s);
-						writer << tmp;
-					} break;
-					case NbrType::Coarse: {
-						CoarseNbrInfo<D> tmp = getCoarseNbrInfo(s);
-						writer << tmp;
-					} break;
-					default:
-						throw RuntimeError("Unsupported NbrType");
-				}
-			}
-		}
-		std::bitset<Edge::number_of> has_edge_nbr;
-		for (size_t i = 0; i < Edge::number_of; i++) {
-			has_edge_nbr[i] = edge_nbr_info[i] != nullptr;
-		}
-		writer << has_edge_nbr;
-		for (Edge e : Edge::getValues()) {
-			if (hasNbr(e)) {
-				NbrType type = getNbrType(e);
-				writer << type;
-				switch (type) {
-					case NbrType::Normal: {
-						NormalNbrInfo<2> tmp = getNormalNbrInfo(e);
-						writer << tmp;
-					} break;
-					case NbrType::Fine: {
-						FineNbrInfo<2> tmp = getFineNbrInfo(e);
-						writer << tmp;
-					} break;
-					case NbrType::Coarse: {
-						CoarseNbrInfo<2> tmp = getCoarseNbrInfo(e);
-						writer << tmp;
-					} break;
-					default:
-						throw RuntimeError("Unsupported NbrType");
-				}
-			}
-		}
-		std::bitset<Corner<D>::num_corners> has_corner_nbr;
-		for (size_t i = 0; i < Corner<D>::num_corners; i++) {
-			has_corner_nbr[i] = corner_nbr_info[i] != nullptr;
-		}
-		writer << has_corner_nbr;
-		for (Corner<D> c : Corner<D>::getValues()) {
-			if (hasNbr(c)) {
-				NbrType type = getNbrType(c);
-				writer << type;
-				switch (type) {
-					case NbrType::Normal: {
-						NormalNbrInfo<1> tmp = getNormalNbrInfo(c);
-						writer << tmp;
-					} break;
-					case NbrType::Fine: {
-						FineNbrInfo<1> tmp = getFineNbrInfo(c);
-						writer << tmp;
-					} break;
-					case NbrType::Coarse: {
-						CoarseNbrInfo<1> tmp = getCoarseNbrInfo(c);
-						writer << tmp;
-					} break;
-					default:
-						throw RuntimeError("Unsupported NbrType");
-				}
-			}
-		}
+
+		serializeNeighbors<D - 1>(writer);
+
 		return writer.getPos();
 	}
 	int deserialize(char *buffer)
@@ -689,84 +448,9 @@ template <int D> struct PatchInfo : public Serializable {
 		reader >> orth_on_parent;
 		reader >> starts;
 		reader >> spacings;
-		std::bitset<Side<D>::number_of> has_nbr;
-		reader >> has_nbr;
-		for (size_t i = 0; i < Side<D>::number_of; i++) {
-			if (has_nbr[i]) {
-				NbrType type;
-				reader >> type;
-				NbrInfo<D> *info;
-				switch (type) {
-					case NbrType::Normal:
-						info = new NormalNbrInfo<D>();
-						reader >> *static_cast<NormalNbrInfo<D> *>(info);
-						break;
-					case NbrType::Fine:
-						info = new FineNbrInfo<D>();
-						reader >> *static_cast<FineNbrInfo<D> *>(info);
-						break;
-					case NbrType::Coarse:
-						info = new CoarseNbrInfo<D>();
-						reader >> *static_cast<CoarseNbrInfo<D> *>(info);
-						break;
-					default:
-						throw RuntimeError("Unsupported NbrType");
-				}
-				nbr_info[i].reset(info);
-			}
-		}
-		std::bitset<Edge::number_of> has_edge_nbr;
-		reader >> has_edge_nbr;
-		for (size_t i = 0; i < Edge::number_of; i++) {
-			if (has_edge_nbr[i]) {
-				NbrType type;
-				reader >> type;
-				NbrInfo<2> *info;
-				switch (type) {
-					case NbrType::Normal:
-						info = new NormalNbrInfo<2>();
-						reader >> *static_cast<NormalNbrInfo<2> *>(info);
-						break;
-					case NbrType::Fine:
-						info = new FineNbrInfo<2>();
-						reader >> *static_cast<FineNbrInfo<2> *>(info);
-						break;
-					case NbrType::Coarse:
-						info = new CoarseNbrInfo<2>();
-						reader >> *static_cast<CoarseNbrInfo<2> *>(info);
-						break;
-					default:
-						throw RuntimeError("Unsupported NbrType");
-				}
-				edge_nbr_info[i].reset(info);
-			}
-		}
-		std::bitset<Corner<D>::num_corners> has_corner_nbr;
-		reader >> has_corner_nbr;
-		for (size_t i = 0; i < Corner<D>::num_corners; i++) {
-			if (has_corner_nbr[i]) {
-				NbrType type;
-				reader >> type;
-				NbrInfo<1> *info;
-				switch (type) {
-					case NbrType::Normal:
-						info = new NormalNbrInfo<1>();
-						reader >> *static_cast<NormalNbrInfo<1> *>(info);
-						break;
-					case NbrType::Fine:
-						info = new FineNbrInfo<1>();
-						reader >> *static_cast<FineNbrInfo<1> *>(info);
-						break;
-					case NbrType::Coarse:
-						info = new CoarseNbrInfo<1>();
-						reader >> *static_cast<CoarseNbrInfo<1> *>(info);
-						break;
-					default:
-						throw RuntimeError("Unsupported NbrType");
-				}
-				corner_nbr_info[i].reset(info);
-			}
-		}
+
+		deserializeNeighbors<D - 1>(reader);
+
 		return reader.getPos();
 	}
 };
@@ -803,44 +487,48 @@ template <int D> void to_json(nlohmann::json &j, const PatchInfo<D> &pinfo)
 			j["nbrs"].back()["side"] = s;
 		}
 	}
-	j["edge_nbrs"] = nlohmann::json::array();
-	for (Edge e : Edge::getValues()) {
-		if (pinfo.hasNbr(e)) {
-			switch (pinfo.getNbrType(e)) {
-				case NbrType::Normal:
-					j["edge_nbrs"].push_back(pinfo.getNormalNbrInfo(e));
-					break;
-				case NbrType::Coarse:
-					j["edge_nbrs"].push_back(pinfo.getCoarseNbrInfo(e));
-					break;
-				case NbrType::Fine:
-					j["edge_nbrs"].push_back(pinfo.getFineNbrInfo(e));
-					break;
-				default:
-					throw RuntimeError("Unsupported NbrType");
+	if constexpr (D == 3) {
+		j["edge_nbrs"] = nlohmann::json::array();
+		for (Edge e : Edge::getValues()) {
+			if (pinfo.hasNbr(e)) {
+				switch (pinfo.getNbrType(e)) {
+					case NbrType::Normal:
+						j["edge_nbrs"].push_back(pinfo.getNormalNbrInfo(e));
+						break;
+					case NbrType::Coarse:
+						j["edge_nbrs"].push_back(pinfo.getCoarseNbrInfo(e));
+						break;
+					case NbrType::Fine:
+						j["edge_nbrs"].push_back(pinfo.getFineNbrInfo(e));
+						break;
+					default:
+						throw RuntimeError("Unsupported NbrType");
+				}
+				j["edge_nbrs"].back()["type"] = pinfo.getNbrType(e);
+				j["edge_nbrs"].back()["edge"] = e;
 			}
-			j["edge_nbrs"].back()["type"] = pinfo.getNbrType(e);
-			j["edge_nbrs"].back()["edge"] = e;
 		}
 	}
-	j["corner_nbrs"] = nlohmann::json::array();
-	for (Corner<D> c : Corner<D>::getValues()) {
-		if (pinfo.hasNbr(c)) {
-			switch (pinfo.getNbrType(c)) {
-				case NbrType::Normal:
-					j["corner_nbrs"].push_back(pinfo.getNormalNbrInfo(c));
-					break;
-				case NbrType::Coarse:
-					j["corner_nbrs"].push_back(pinfo.getCoarseNbrInfo(c));
-					break;
-				case NbrType::Fine:
-					j["corner_nbrs"].push_back(pinfo.getFineNbrInfo(c));
-					break;
-				default:
-					throw RuntimeError("Unsupported NbrType");
+	if constexpr (D >= 2) {
+		j["corner_nbrs"] = nlohmann::json::array();
+		for (Corner<D> c : Corner<D>::getValues()) {
+			if (pinfo.hasNbr(c)) {
+				switch (pinfo.getNbrType(c)) {
+					case NbrType::Normal:
+						j["corner_nbrs"].push_back(pinfo.getNormalNbrInfo(c));
+						break;
+					case NbrType::Coarse:
+						j["corner_nbrs"].push_back(pinfo.getCoarseNbrInfo(c));
+						break;
+					case NbrType::Fine:
+						j["corner_nbrs"].push_back(pinfo.getFineNbrInfo(c));
+						break;
+					default:
+						throw RuntimeError("Unsupported NbrType");
+				}
+				j["corner_nbrs"].back()["type"]   = pinfo.getNbrType(c);
+				j["corner_nbrs"].back()["corner"] = c;
 			}
-			j["corner_nbrs"].back()["type"]   = pinfo.getNbrType(c);
-			j["corner_nbrs"].back()["corner"] = c;
 		}
 	}
 	if (pinfo.child_ids[0] != -1) {
@@ -867,60 +555,64 @@ template <int D> void from_json(const nlohmann::json &j, PatchInfo<D> &pinfo)
 		Side<D> s = nbr_j["side"].get<Side<D>>();
 		switch (nbr_j["type"].get<NbrType>()) {
 			case NbrType::Normal:
-				pinfo.nbr_info[s.getIndex()] = std::make_unique<NormalNbrInfo<D>>();
-				pinfo.getNormalNbrInfo(s)    = nbr_j.get<NormalNbrInfo<D>>();
+				pinfo.setNbrInfo(s, new NormalNbrInfo<D - 1>());
+				pinfo.getNormalNbrInfo(s) = nbr_j.get<NormalNbrInfo<D - 1>>();
 				break;
 			case NbrType::Coarse:
-				pinfo.nbr_info[s.getIndex()] = std::make_unique<CoarseNbrInfo<D>>();
-				pinfo.getCoarseNbrInfo(s)    = nbr_j.get<CoarseNbrInfo<D>>();
+				pinfo.setNbrInfo(s, new CoarseNbrInfo<D - 1>());
+				pinfo.getCoarseNbrInfo(s) = nbr_j.get<CoarseNbrInfo<D - 1>>();
 				break;
 			case NbrType::Fine:
-				pinfo.nbr_info[s.getIndex()] = std::make_unique<FineNbrInfo<D>>();
-				pinfo.getFineNbrInfo(s)      = nbr_j.get<FineNbrInfo<D>>();
+				pinfo.setNbrInfo(s, new FineNbrInfo<D - 1>());
+				pinfo.getFineNbrInfo(s) = nbr_j.get<FineNbrInfo<D - 1>>();
 				break;
 			default:
 				throw RuntimeError("Unsupported NbrType");
 		}
 	}
-	if (j.contains("edge_nbrs")) {
-		for (const auto &nbr_j : j["edge_nbrs"]) {
-			Edge e = nbr_j["edge"].get<Edge>();
-			switch (nbr_j["type"].get<NbrType>()) {
-				case NbrType::Normal:
-					pinfo.edge_nbr_info[e.getIndex()] = std::make_unique<NormalNbrInfo<2>>();
-					pinfo.getNormalNbrInfo(e)         = nbr_j.get<NormalNbrInfo<2>>();
-					break;
-				case NbrType::Coarse:
-					pinfo.edge_nbr_info[e.getIndex()] = std::make_unique<CoarseNbrInfo<2>>();
-					pinfo.getCoarseNbrInfo(e)         = nbr_j.get<CoarseNbrInfo<2>>();
-					break;
-				case NbrType::Fine:
-					pinfo.edge_nbr_info[e.getIndex()] = std::make_unique<FineNbrInfo<2>>();
-					pinfo.getFineNbrInfo(e)           = nbr_j.get<FineNbrInfo<2>>();
-					break;
-				default:
-					throw RuntimeError("Unsupported NbrType");
+	if constexpr (D == 3) {
+		if (j.contains("edge_nbrs")) {
+			for (const auto &nbr_j : j["edge_nbrs"]) {
+				Edge e = nbr_j["edge"].get<Edge>();
+				switch (nbr_j["type"].get<NbrType>()) {
+					case NbrType::Normal:
+						pinfo.setNbrInfo(e, new NormalNbrInfo<1>());
+						pinfo.getNormalNbrInfo(e) = nbr_j.get<NormalNbrInfo<1>>();
+						break;
+					case NbrType::Coarse:
+						pinfo.setNbrInfo(e, new CoarseNbrInfo<1>());
+						pinfo.getCoarseNbrInfo(e) = nbr_j.get<CoarseNbrInfo<1>>();
+						break;
+					case NbrType::Fine:
+						pinfo.setNbrInfo(e, new FineNbrInfo<1>());
+						pinfo.getFineNbrInfo(e) = nbr_j.get<FineNbrInfo<1>>();
+						break;
+					default:
+						throw RuntimeError("Unsupported NbrType");
+				}
 			}
 		}
 	}
-	if (j.contains("corner_nbrs")) {
-		for (const auto &nbr_j : j["corner_nbrs"]) {
-			Corner<D> c = nbr_j["corner"].get<Corner<D>>();
-			switch (nbr_j["type"].get<NbrType>()) {
-				case NbrType::Normal:
-					pinfo.corner_nbr_info[c.getIndex()] = std::make_unique<NormalNbrInfo<1>>();
-					pinfo.getNormalNbrInfo(c)           = nbr_j.get<NormalNbrInfo<1>>();
-					break;
-				case NbrType::Coarse:
-					pinfo.corner_nbr_info[c.getIndex()] = std::make_unique<CoarseNbrInfo<1>>();
-					pinfo.getCoarseNbrInfo(c)           = nbr_j.get<CoarseNbrInfo<1>>();
-					break;
-				case NbrType::Fine:
-					pinfo.corner_nbr_info[c.getIndex()] = std::make_unique<FineNbrInfo<1>>();
-					pinfo.getFineNbrInfo(c)             = nbr_j.get<FineNbrInfo<1>>();
-					break;
-				default:
-					throw RuntimeError("Unsupported NbrType");
+	if constexpr (D >= 2) {
+		if (j.contains("corner_nbrs")) {
+			for (const auto &nbr_j : j["corner_nbrs"]) {
+				Corner<D> c = nbr_j["corner"].get<Corner<D>>();
+				switch (nbr_j["type"].get<NbrType>()) {
+					case NbrType::Normal:
+						pinfo.setNbrInfo(c, new NormalNbrInfo<0>());
+						pinfo.getNormalNbrInfo(c) = nbr_j.get<NormalNbrInfo<0>>();
+						break;
+					case NbrType::Coarse:
+						pinfo.setNbrInfo(c, new CoarseNbrInfo<0>());
+						pinfo.getCoarseNbrInfo(c) = nbr_j.get<CoarseNbrInfo<0>>();
+						break;
+					case NbrType::Fine:
+						pinfo.setNbrInfo(c, new FineNbrInfo<0>());
+						pinfo.getFineNbrInfo(c) = nbr_j.get<FineNbrInfo<0>>();
+						break;
+					default:
+						throw RuntimeError("Unsupported NbrType");
+				}
 			}
 		}
 	}

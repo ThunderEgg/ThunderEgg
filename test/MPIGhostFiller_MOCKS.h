@@ -188,95 +188,97 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 	}
 	void checkEdgeNbrCalls()
 	{
-		// remove from this collection the calls
-		auto remaining_nbr_calls = edge_nbr_calls;
+		if constexpr (D == 3) {
+			// remove from this collection the calls
+			auto remaining_nbr_calls = edge_nbr_calls;
 
-		auto check_for_nbr_call
-		= [&](const std::tuple<const PatchInfo<D> *, Edge, const NbrType,
-		                       const Orthant<1>, int, int> &call) {
-			  // check if call was made for neighbor
-			  auto found_call
-			  = std::find(remaining_nbr_calls.begin(), remaining_nbr_calls.end(), call);
+			auto check_for_nbr_call
+			= [&](const std::tuple<const PatchInfo<D> *, Edge, const NbrType,
+			                       const Orthant<1>, int, int> &call) {
+				  // check if call was made for neighbor
+				  auto found_call
+				  = std::find(remaining_nbr_calls.begin(), remaining_nbr_calls.end(), call);
 
-			  CHECK(found_call != remaining_nbr_calls.end());
+				  CHECK(found_call != remaining_nbr_calls.end());
 
-			  if (found_call != remaining_nbr_calls.end()) {
-				  remaining_nbr_calls.erase(found_call);
-			  }
-		  };
-		for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
-			INFO("id: " << patch.id);
-			std::string starts = "starts: ";
-			for (size_t i = 0; i < D; i++) {
-				starts = starts + " " + std::to_string(patch.starts[i]);
-			}
-			INFO(starts);
+				  if (found_call != remaining_nbr_calls.end()) {
+					  remaining_nbr_calls.erase(found_call);
+				  }
+			  };
+			for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
+				INFO("id: " << patch.id);
+				std::string starts = "starts: ";
+				for (size_t i = 0; i < D; i++) {
+					starts = starts + " " + std::to_string(patch.starts[i]);
+				}
+				INFO(starts);
 
-			for (auto edge : Edge::getValues()) {
-				INFO("side: " << edge);
-				if (patch.hasNbr(edge)) {
-					switch (patch.getNbrType(edge)) {
-						case NbrType::Normal: {
-							INFO("NbrType: Normal");
+				for (auto edge : Edge::getValues()) {
+					INFO("side: " << edge);
+					if (patch.hasNbr(edge)) {
+						switch (patch.getNbrType(edge)) {
+							case NbrType::Normal: {
+								INFO("NbrType: Normal");
 
-							auto call = std::make_tuple(&patch, edge, NbrType::Normal, Orthant<1>::null(), num_components, num_components);
-							check_for_nbr_call(call);
-
-						} break;
-						case NbrType::Fine: {
-							INFO("NbrType: Fine");
-
-							for (auto orthant : Orthant<1>::getValues()) {
-								INFO("Orthant: " << orthant.getIndex());
-								auto call = std::make_tuple(&patch, edge, NbrType::Fine, orthant, num_components, num_components);
+								auto call = std::make_tuple(&patch, edge, NbrType::Normal, Orthant<1>::null(), num_components, num_components);
 								check_for_nbr_call(call);
-							}
-						} break;
-						case NbrType::Coarse: {
-							INFO("NbrType: Coarse");
 
-							auto orthant = patch.getCoarseNbrInfo(edge).orth_on_coarse;
+							} break;
+							case NbrType::Fine: {
+								INFO("NbrType: Fine");
 
-							INFO("Orthant: " << orthant.getIndex());
+								for (auto orthant : Orthant<1>::getValues()) {
+									INFO("Orthant: " << orthant.getIndex());
+									auto call = std::make_tuple(&patch, edge, NbrType::Fine, orthant, num_components, num_components);
+									check_for_nbr_call(call);
+								}
+							} break;
+							case NbrType::Coarse: {
+								INFO("NbrType: Coarse");
 
-							auto call = std::make_tuple(&patch, edge, NbrType::Coarse, orthant, num_components, num_components);
-							check_for_nbr_call(call);
+								auto orthant = patch.getCoarseNbrInfo(edge).orth_on_coarse;
 
-						} break;
-						default:
-							CHECK(false);
+								INFO("Orthant: " << orthant.getIndex());
+
+								auto call = std::make_tuple(&patch, edge, NbrType::Coarse, orthant, num_components, num_components);
+								check_for_nbr_call(call);
+
+							} break;
+							default:
+								CHECK(false);
+						}
 					}
 				}
 			}
-		}
-		CHECK(remaining_nbr_calls.empty());
-		INFO("REMAINING CALL");
-		for (auto call : remaining_nbr_calls) {
-			auto patch = *std::get<0>(call);
-			INFO("id: " << patch.id);
-			std::string starts = "starts: ";
-			for (size_t i = 0; i < D; i++) {
-				starts = starts + " " + std::to_string(patch.starts[i]);
+			CHECK(remaining_nbr_calls.empty());
+			INFO("REMAINING CALL");
+			for (auto call : remaining_nbr_calls) {
+				auto patch = *std::get<0>(call);
+				INFO("id: " << patch.id);
+				std::string starts = "starts: ";
+				for (size_t i = 0; i < D; i++) {
+					starts = starts + " " + std::to_string(patch.starts[i]);
+				}
+				INFO(starts);
+				INFO("side: " << std::get<1>(call));
+				std::string nbrtype = "";
+				switch (std::get<2>(call)) {
+					case NbrType::Normal:
+						nbrtype = "normal";
+						break;
+					case NbrType::Fine:
+						nbrtype = "fine";
+						break;
+					case NbrType::Coarse:
+						nbrtype = "coarse";
+						break;
+					default:
+						nbrtype = "???";
+				}
+				INFO("nbrtype: " << nbrtype);
+				INFO("orthant: " << std::get<3>(call).getIndex());
+				CHECK(false);
 			}
-			INFO(starts);
-			INFO("side: " << std::get<1>(call));
-			std::string nbrtype = "";
-			switch (std::get<2>(call)) {
-				case NbrType::Normal:
-					nbrtype = "normal";
-					break;
-				case NbrType::Fine:
-					nbrtype = "fine";
-					break;
-				case NbrType::Coarse:
-					nbrtype = "coarse";
-					break;
-				default:
-					nbrtype = "???";
-			}
-			INFO("nbrtype: " << nbrtype);
-			INFO("orthant: " << std::get<3>(call).getIndex());
-			CHECK(false);
 		}
 	}
 	void checkCornerNbrCalls()

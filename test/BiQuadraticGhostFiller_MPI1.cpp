@@ -42,32 +42,32 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	pinfos[0].spacings        = {lengthx / nx, lengthy / ny};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	pinfos[0].nbr_info[Side<2>::east().getIndex()].reset(new NormalNbrInfo<2>(1));
-	pinfos[0].nbr_info[Side<2>::north().getIndex()].reset(new NormalNbrInfo<2>(2));
+	pinfos[0].setNbrInfo(Side<2>::east(), new NormalNbrInfo<1>(1));
+	pinfos[0].setNbrInfo(Side<2>::north(), new NormalNbrInfo<1>(2));
 
 	pinfos[1].id              = 1;
 	pinfos[1].ns              = {nx, ny};
 	pinfos[1].spacings        = {lengthx / nx, lengthy / ny};
 	pinfos[1].starts          = {startx + lengthx, starty};
 	pinfos[1].num_ghost_cells = num_ghost;
-	pinfos[1].nbr_info[Side<2>::west().getIndex()].reset(new NormalNbrInfo<2>(0));
-	pinfos[1].nbr_info[Side<2>::north().getIndex()].reset(new NormalNbrInfo<2>(3));
+	pinfos[1].setNbrInfo(Side<2>::west(), new NormalNbrInfo<1>(0));
+	pinfos[1].setNbrInfo(Side<2>::north(), new NormalNbrInfo<1>(3));
 
 	pinfos[2].id              = 2;
 	pinfos[2].ns              = {nx, ny};
 	pinfos[2].spacings        = {lengthx / nx, lengthy / ny};
 	pinfos[2].starts          = {startx, starty + lengthy};
 	pinfos[2].num_ghost_cells = num_ghost;
-	pinfos[2].nbr_info[Side<2>::east().getIndex()].reset(new NormalNbrInfo<2>(3));
-	pinfos[2].nbr_info[Side<2>::south().getIndex()].reset(new NormalNbrInfo<2>(0));
+	pinfos[2].setNbrInfo(Side<2>::east(), new NormalNbrInfo<1>(3));
+	pinfos[2].setNbrInfo(Side<2>::south(), new NormalNbrInfo<1>(0));
 
 	pinfos[3].id              = 3;
 	pinfos[3].ns              = {nx, ny};
 	pinfos[3].spacings        = {lengthx / nx, lengthy / ny};
 	pinfos[3].starts          = {startx + lengthx, starty + lengthy};
 	pinfos[3].num_ghost_cells = num_ghost;
-	pinfos[3].nbr_info[Side<2>::west().getIndex()].reset(new NormalNbrInfo<2>(2));
-	pinfos[3].nbr_info[Side<2>::south().getIndex()].reset(new NormalNbrInfo<2>(1));
+	pinfos[3].setNbrInfo(Side<2>::west(), new NormalNbrInfo<1>(2));
+	pinfos[3].setNbrInfo(Side<2>::south(), new NormalNbrInfo<1>(1));
 
 	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 

@@ -24,6 +24,7 @@
 
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/VectorGenerator.h>
+#include <iostream>
 
 namespace ThunderEgg
 {
@@ -54,10 +55,13 @@ template <int D> class Solver
 	 *
 	 * @return the number of iterations
 	 */
-	virtual int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
-	                  std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
-	                  std::shared_ptr<const Operator<D>> Mr = nullptr, bool output = false,
-	                  std::ostream &os = std::cout) const = 0;
+	virtual int solve(std::shared_ptr<VectorGenerator<D>> vg,
+	                  std::shared_ptr<const Operator<D>>  A,
+	                  std::shared_ptr<Vector<D>>          x,
+	                  std::shared_ptr<const Vector<D>>    b,
+	                  std::shared_ptr<const Operator<D>>  Mr     = nullptr,
+	                  bool                                output = false,
+	                  std::ostream &                      os     = std::cout) const = 0;
 };
 //
 } // namespace Iterative

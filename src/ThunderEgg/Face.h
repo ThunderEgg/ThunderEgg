@@ -58,6 +58,11 @@ template <int D, int M> class Face
 		return factorial(N) / (factorial(K) * factorial(N - K));
 	}
 
+	static constexpr size_t sum(int N)
+	{
+		return N == -1 ? 0 : (twopow(D - N) * choose(D, N) + sum(N - 1));
+	}
+
 	public:
 	static constexpr int dimensionality = M;
 	/**
@@ -65,6 +70,7 @@ template <int D, int M> class Face
 	 */
 	static constexpr size_t number_of = twopow(D - M) * choose(D, M);
 
+	static constexpr size_t sum_of_faces = M <= 0 ? 0 : sum(M - 1);
 	/**
 	 * @brief Construct a new Face object
 	 *
@@ -72,13 +78,13 @@ template <int D, int M> class Face
 	 */
 	explicit Face(unsigned char value) : value(value)
 	{
-		static_assert(D <= 3 && D > 0, "Only up to 3 dimensions supported");
+		static_assert(D <= 3 && D >= 0, "Only up to 3 dimensions supported");
 		static_assert(M >= 0 && M < D, "Invalid M value");
 	}
 
 	Face() : value(number_of)
 	{
-		static_assert(D <= 3 && D > 0, "Only up to 3 dimensions supported");
+		static_assert(D <= 3 && D >= 0, "Only up to 3 dimensions supported");
 		static_assert(M >= 0 && M < D, "Invalid M value");
 	}
 
@@ -114,6 +120,56 @@ template <int D, int M> class Face
 	template <int N = 0> static auto top() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b101);
+	}
+
+	template <int N = 0> static auto sw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b00);
+	}
+	template <int N = 0> static auto se() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b01);
+	}
+	template <int N = 0> static auto nw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b10);
+	}
+	template <int N = 0> static auto ne() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b11);
+	}
+
+	template <int N = 0> static auto bsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b000);
+	}
+	template <int N = 0> static auto bse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b001);
+	}
+	template <int N = 0> static auto bnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b010);
+	}
+	template <int N = 0> static auto bne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b011);
+	}
+	template <int N = 0> static auto tsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b100);
+	}
+	template <int N = 0> static auto tse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b101);
+	}
+	template <int N = 0> static auto tnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b110);
+	}
+	template <int N = 0> static auto tne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+	{
+		return Face<D, M>(0b111);
 	}
 
 	template <int N = 0> static auto bs() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
@@ -323,7 +379,15 @@ template <int D, int M> class Face
 	std::array<Face<D, D - 1>, D - M> getSides() const
 	{
 		std::array<Face<D, D - 1>, D - M> sides;
-		if constexpr (D == 3 && M == 1) {
+		if constexpr (D > 1 && M == 0) {
+			for (size_t i = 0; i < D; i++) {
+				size_t side = 2 * i;
+				if ((1 << i) & value) {
+					side |= 1;
+				}
+				sides[i] = Face<D, D - 1>(side);
+			}
+		} else if constexpr (D == 3 && M == 1) {
 			size_t not_axis   = value >> 2;
 			size_t curr_index = 0;
 			for (int i = 0; i < D; i++) {
@@ -439,5 +503,33 @@ using Edge = Face<3, 1>;
 std::ostream &operator<<(std::ostream &os, const Edge &o);
 void          to_json(nlohmann::json &j, const Edge &o);
 void          from_json(const nlohmann::json &j, Edge &o);
+
+template <int D> using Corner = Face<D, 0>;
+/**
+ * @brief ostream operator that prints a string representation of quadrant enum.
+ *
+ * For example, Corner<2>::sw() will print out "Corner<2>::sw()".
+ *
+ * @param os the ostream
+ * @param o the corner
+ *
+ * @return  the ostream
+ */
+std::ostream &operator<<(std::ostream &os, const Corner<2> &o);
+/**
+ * @brief ostream operator that prints a string representation of corner enum.
+ *
+ * For example, Corner<3>::bsw() will print out "Corner<3>::bsw()".
+ *
+ * @param os the ostream
+ * @param o the corner
+ *
+ * @return  the ostream
+ */
+std::ostream &operator<<(std::ostream &os, const Corner<3> &o);
+void          to_json(nlohmann::json &j, const Corner<2> &o);
+void          to_json(nlohmann::json &j, const Corner<3> &o);
+void          from_json(const nlohmann::json &j, Corner<2> &o);
+void          from_json(const nlohmann::json &j, Corner<3> &o);
 } // namespace ThunderEgg
 #endif

@@ -8,8 +8,8 @@ using namespace ThunderEgg;
 TEST_CASE("PatchInfo getNbrIds NormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
-	pinfo.nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int> ids = pinfo.getNbrIds();
 
 	REQUIRE(ids.size() == 1);
@@ -18,9 +18,9 @@ TEST_CASE("PatchInfo getNbrIds NormalNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo getNbrRanks NormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
 	nbr_info->rank             = 3;
-	pinfo.nbr_info[0].reset(nbr_info);
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int> ranks = pinfo.getNbrRanks();
 
 	REQUIRE(ranks.size() == 1);
@@ -29,8 +29,8 @@ TEST_CASE("PatchInfo getNbrRanks NormalNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes exists NormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
-	pinfo.nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2] = 30;
@@ -41,8 +41,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes exists NormalNbrInfo", "[PatchInfo]
 TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist NormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
-	pinfo.nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[59] = 30;
@@ -53,8 +53,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist NormalNbrInfo", "[Pa
 TEST_CASE("PatchInfo setNeighborGlobalIndexes exists NormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<3> *nbr_info = new NormalNbrInfo<3>(2);
-	pinfo.nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_global_index_map;
 	id_to_global_index_map[2] = 30;
@@ -65,8 +65,8 @@ TEST_CASE("PatchInfo setNeighborGlobalIndexes exists NormalNbrInfo", "[PatchInfo
 TEST_CASE("PatchInfo getNbrIds CoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
-	pinfo.nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<2>::sw());
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int> ids = pinfo.getNbrIds();
 
 	REQUIRE(ids.size() == 1);
@@ -75,9 +75,9 @@ TEST_CASE("PatchInfo getNbrIds CoarseNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo getNbrRanks CoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<2>::sw());
 	nbr_info->rank             = 3;
-	pinfo.nbr_info[0].reset(nbr_info);
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int> ranks = pinfo.getNbrRanks();
 
 	REQUIRE(ranks.size() == 1);
@@ -86,8 +86,8 @@ TEST_CASE("PatchInfo getNbrRanks CoarseNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes exists CoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
-	pinfo.nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<2>::sw());
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2] = 30;
@@ -98,8 +98,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes exists CoarseNbrInfo", "[PatchInfo]
 TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
-	pinfo.nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<2>::sw());
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[59] = 30;
@@ -110,8 +110,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CoarseNbrInfo", "[Pa
 TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<3> *nbr_info = new CoarseNbrInfo<3>(2, Orthant<2>::sw());
-	pinfo.nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<2>::sw());
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_global_index_map;
 	id_to_global_index_map[2] = 30;
@@ -122,8 +122,8 @@ TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CoarseNbrInfo", "[PatchInfo
 TEST_CASE("PatchInfo getNbrIds FineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({1, 2, 3, 4});
-	pinfo.nbr_info[0].reset(nbr_info);
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({1, 2, 3, 4});
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int> ids = pinfo.getNbrIds();
 
 	REQUIRE(ids.size() == 4);
@@ -135,9 +135,9 @@ TEST_CASE("PatchInfo getNbrIds FineNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo getNbrRanks FineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({1, 2, 3, 4});
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({1, 2, 3, 4});
 	nbr_info->ranks          = {3, 4, 6, 7};
-	pinfo.nbr_info[0].reset(nbr_info);
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int> ranks = pinfo.getNbrRanks();
 
 	REQUIRE(ranks.size() == 4);
@@ -149,8 +149,8 @@ TEST_CASE("PatchInfo getNbrRanks FineNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes exists FineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({2, 3, 4, 5});
-	pinfo.nbr_info[0].reset(nbr_info);
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({2, 3, 4, 5});
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2] = 30;
@@ -167,8 +167,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes exists FineNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist FineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({2, 3, 4, 5});
-	pinfo.nbr_info[0].reset(nbr_info);
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({2, 3, 4, 5});
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2]  = 30;
@@ -185,8 +185,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist FineNbrInfo", "[Patc
 TEST_CASE("PatchInfo setNeighborGlobalIndexes exists FineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<3> *nbr_info = new FineNbrInfo<3>({2, 3, 4, 5});
-	pinfo.nbr_info[0].reset(nbr_info);
+	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({2, 3, 4, 5});
+	pinfo.setNbrInfo(Side<3>::west(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_global_index_map;
 	id_to_global_index_map[2] = 30;
@@ -203,8 +203,8 @@ TEST_CASE("PatchInfo setNeighborGlobalIndexes exists FineNbrInfo", "[PatchInfo]"
 TEST_CASE("PatchInfo getNbrIds EdgeNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int> ids = pinfo.getNbrIds();
 
 	REQUIRE(ids.size() == 1);
@@ -213,9 +213,9 @@ TEST_CASE("PatchInfo getNbrIds EdgeNormalNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo getNbrRanks EdgeNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
 	nbr_info->rank             = 3;
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int> ranks = pinfo.getNbrRanks();
 
 	REQUIRE(ranks.size() == 1);
@@ -224,8 +224,8 @@ TEST_CASE("PatchInfo getNbrRanks EdgeNormalNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes exists EdgeNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2] = 30;
@@ -236,8 +236,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes exists EdgeNormalNbrInfo", "[PatchI
 TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist EdgeNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[59] = 30;
@@ -248,8 +248,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist EdgeNormalNbrInfo", 
 TEST_CASE("PatchInfo setNeighborGlobalIndexes exists EdgeNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<2> *nbr_info = new NormalNbrInfo<2>(2);
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_global_index_map;
 	id_to_global_index_map[2] = 30;
@@ -260,8 +260,8 @@ TEST_CASE("PatchInfo setNeighborGlobalIndexes exists EdgeNormalNbrInfo", "[Patch
 TEST_CASE("PatchInfo getNbrIds EdgeCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<1>::lower());
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int> ids = pinfo.getNbrIds();
 
 	REQUIRE(ids.size() == 1);
@@ -270,9 +270,9 @@ TEST_CASE("PatchInfo getNbrIds EdgeCoarseNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo getNbrRanks EdgeCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<1>::lower());
 	nbr_info->rank             = 3;
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int> ranks = pinfo.getNbrRanks();
 
 	REQUIRE(ranks.size() == 1);
@@ -281,8 +281,8 @@ TEST_CASE("PatchInfo getNbrRanks EdgeCoarseNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes exists EdgeCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<1>::lower());
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2] = 30;
@@ -293,8 +293,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes exists EdgeCoarseNbrInfo", "[PatchI
 TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist EdgeCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<1>::lower());
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[59] = 30;
@@ -305,8 +305,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist EdgeCoarseNbrInfo", 
 TEST_CASE("PatchInfo setNeighborGlobalIndexes exists EdgeCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<2> *nbr_info = new CoarseNbrInfo<2>(2, Orthant<1>::lower());
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<1>::lower());
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_global_index_map;
 	id_to_global_index_map[2] = 30;
@@ -317,8 +317,8 @@ TEST_CASE("PatchInfo setNeighborGlobalIndexes exists EdgeCoarseNbrInfo", "[Patch
 TEST_CASE("PatchInfo getNbrIds EdgeFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({1, 2});
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({1, 2});
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int> ids = pinfo.getNbrIds();
 
 	REQUIRE(ids.size() == 2);
@@ -328,9 +328,9 @@ TEST_CASE("PatchInfo getNbrIds EdgeFineNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo getNbrRanks EdgeFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({1, 2});
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({1, 2});
 	nbr_info->ranks          = {3, 4};
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int> ranks = pinfo.getNbrRanks();
 
 	REQUIRE(ranks.size() == 2);
@@ -340,8 +340,8 @@ TEST_CASE("PatchInfo getNbrRanks EdgeFineNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes exists EdgeFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({2, 3});
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({2, 3});
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2] = 30;
@@ -354,8 +354,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes exists EdgeFineNbrInfo", "[PatchInf
 TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist EdgeFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({2, 3});
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({2, 3});
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2]  = 30;
@@ -368,8 +368,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist EdgeFineNbrInfo", "[
 TEST_CASE("PatchInfo setNeighborGlobalIndexes exists EdgeFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<2> *nbr_info = new FineNbrInfo<2>({2, 3});
-	pinfo.edge_nbr_info[0].reset(nbr_info);
+	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({2, 3});
+	pinfo.setNbrInfo(Edge::bs(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_global_index_map;
 	id_to_global_index_map[2] = 30;
@@ -382,8 +382,8 @@ TEST_CASE("PatchInfo setNeighborGlobalIndexes exists EdgeFineNbrInfo", "[PatchIn
 TEST_CASE("PatchInfo getNbrIds CornerNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<0> *nbr_info = new NormalNbrInfo<0>(2);
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int> ids = pinfo.getNbrIds();
 
 	REQUIRE(ids.size() == 1);
@@ -392,9 +392,9 @@ TEST_CASE("PatchInfo getNbrIds CornerNormalNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo getNbrRanks CornerNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
+	NormalNbrInfo<0> *nbr_info = new NormalNbrInfo<0>(2);
 	nbr_info->rank             = 3;
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int> ranks = pinfo.getNbrRanks();
 
 	REQUIRE(ranks.size() == 1);
@@ -403,8 +403,8 @@ TEST_CASE("PatchInfo getNbrRanks CornerNormalNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes exists CornerNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<0> *nbr_info = new NormalNbrInfo<0>(2);
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2] = 30;
@@ -415,8 +415,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes exists CornerNormalNbrInfo", "[Patc
 TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CornerNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<0> *nbr_info = new NormalNbrInfo<0>(2);
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[59] = 30;
@@ -427,8 +427,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CornerNormalNbrInfo"
 TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CornerNormalNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	NormalNbrInfo<1> *nbr_info = new NormalNbrInfo<1>(2);
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	NormalNbrInfo<0> *nbr_info = new NormalNbrInfo<0>(2);
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_global_index_map;
 	id_to_global_index_map[2] = 30;
@@ -439,8 +439,8 @@ TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CornerNormalNbrInfo", "[Pat
 TEST_CASE("PatchInfo getNbrIds CornerCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<0> *nbr_info = new CoarseNbrInfo<0>(2, Orthant<0>::null());
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int> ids = pinfo.getNbrIds();
 
 	REQUIRE(ids.size() == 1);
@@ -449,9 +449,9 @@ TEST_CASE("PatchInfo getNbrIds CornerCoarseNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo getNbrRanks CornerCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
+	CoarseNbrInfo<0> *nbr_info = new CoarseNbrInfo<0>(2, Orthant<0>::null());
 	nbr_info->rank             = 3;
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int> ranks = pinfo.getNbrRanks();
 
 	REQUIRE(ranks.size() == 1);
@@ -460,8 +460,8 @@ TEST_CASE("PatchInfo getNbrRanks CornerCoarseNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes exists CornerCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<0> *nbr_info = new CoarseNbrInfo<0>(2, Orthant<0>::null());
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2] = 30;
@@ -472,8 +472,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes exists CornerCoarseNbrInfo", "[Patc
 TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CornerCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<0> *nbr_info = new CoarseNbrInfo<0>(2, Orthant<0>::null());
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[59] = 30;
@@ -484,8 +484,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CornerCoarseNbrInfo"
 TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CornerCoarseNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>      pinfo;
-	CoarseNbrInfo<1> *nbr_info = new CoarseNbrInfo<1>(2, Orthant<0>::null());
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	CoarseNbrInfo<0> *nbr_info = new CoarseNbrInfo<0>(2, Orthant<0>::null());
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_global_index_map;
 	id_to_global_index_map[2] = 30;
@@ -496,8 +496,8 @@ TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CornerCoarseNbrInfo", "[Pat
 TEST_CASE("PatchInfo getNbrIds CornerFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({1});
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	FineNbrInfo<0> *nbr_info = new FineNbrInfo<0>({1});
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int> ids = pinfo.getNbrIds();
 
 	REQUIRE(ids.size() == 1);
@@ -506,9 +506,9 @@ TEST_CASE("PatchInfo getNbrIds CornerFineNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo getNbrRanks CornerFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({1});
+	FineNbrInfo<0> *nbr_info = new FineNbrInfo<0>({1});
 	nbr_info->ranks          = {3};
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int> ranks = pinfo.getNbrRanks();
 
 	REQUIRE(ranks.size() == 1);
@@ -517,8 +517,8 @@ TEST_CASE("PatchInfo getNbrRanks CornerFineNbrInfo", "[PatchInfo]")
 TEST_CASE("PatchInfo setNeighborLocalIndexes exists CornerFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({2});
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	FineNbrInfo<0> *nbr_info = new FineNbrInfo<0>({2});
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[2] = 30;
@@ -529,8 +529,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes exists CornerFineNbrInfo", "[PatchI
 TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CornerFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({2});
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	FineNbrInfo<0> *nbr_info = new FineNbrInfo<0>({2});
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_local_index_map;
 	id_to_local_index_map[59] = 30;
@@ -541,8 +541,8 @@ TEST_CASE("PatchInfo setNeighborLocalIndexes does not exist CornerFineNbrInfo", 
 TEST_CASE("PatchInfo setNeighborGlobalIndexes exists CornerFineNbrInfo", "[PatchInfo]")
 {
 	PatchInfo<3>    pinfo;
-	FineNbrInfo<1> *nbr_info = new FineNbrInfo<1>({2});
-	pinfo.corner_nbr_info[0].reset(nbr_info);
+	FineNbrInfo<0> *nbr_info = new FineNbrInfo<0>({2});
+	pinfo.setNbrInfo(Corner<3>::bsw(), nbr_info);
 	deque<int>    ranks = pinfo.getNbrRanks();
 	map<int, int> id_to_global_index_map;
 	id_to_global_index_map[2] = 30;
@@ -555,15 +555,15 @@ TEST_CASE("PatchInfo Serialization/Deserialization", "[PatchInfo]")
 	PatchInfo<3> *d_ptr = new PatchInfo<3>;
 	PatchInfo<3> &d     = *d_ptr;
 	d.id                = 0;
-	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
-	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
-	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
-	d.corner_nbr_info[Corner<3>::bsw().getIndex()].reset(new NormalNbrInfo<1>(1));
-	d.corner_nbr_info[Corner<3>::tse().getIndex()].reset(new CoarseNbrInfo<1>(2, Orthant<0>::null()));
-	d.corner_nbr_info[Corner<3>::bnw().getIndex()].reset(new FineNbrInfo<1>({1}));
-	d.edge_nbr_info[Edge::sw().getIndex()].reset(new NormalNbrInfo<2>(1));
-	d.edge_nbr_info[Edge::bn().getIndex()].reset(new CoarseNbrInfo<2>(2, Orthant<1>::lower()));
-	d.edge_nbr_info[Edge::tw().getIndex()].reset(new FineNbrInfo<2>({1, 2}));
+	d.setNbrInfo(Side<3>::north(), new NormalNbrInfo<2>(1));
+	d.setNbrInfo(Side<3>::east(), new CoarseNbrInfo<2>(2, Orthant<2>::nw()));
+	d.setNbrInfo(Side<3>::south(), new FineNbrInfo<2>({3, 4, 5, 6}));
+	d.setNbrInfo(Corner<3>::bsw(), new NormalNbrInfo<0>(1));
+	d.setNbrInfo(Corner<3>::tse(), new CoarseNbrInfo<0>(2, Orthant<0>::null()));
+	d.setNbrInfo(Corner<3>::bnw(), new FineNbrInfo<0>({1}));
+	d.setNbrInfo(Edge::sw(), new NormalNbrInfo<1>(1));
+	d.setNbrInfo(Edge::bn(), new CoarseNbrInfo<1>(2, Orthant<1>::lower()));
+	d.setNbrInfo(Edge::tw(), new FineNbrInfo<1>({1, 2}));
 
 	// serialize and then deserialize
 	char *buff = new char[d.serialize(nullptr)];
@@ -675,15 +675,7 @@ TEST_CASE("PatchInfo Default Values", "[PatchInfo]")
 	for (double spacing : pinfo.spacings) {
 		CHECK(spacing == 1);
 	}
-	for (auto &nbr_info : pinfo.nbr_info) {
-		CHECK(nbr_info == nullptr);
-	}
-	for (auto &nbr_info : pinfo.corner_nbr_info) {
-		CHECK(nbr_info == nullptr);
-	}
-	for (auto &nbr_info : pinfo.edge_nbr_info) {
-		CHECK(nbr_info == nullptr);
-	}
+	CHECK_FALSE(pinfo.hasNbr());
 }
 TEST_CASE("PatchInfo to_json no children", "[PatchInfo]")
 {
@@ -696,15 +688,15 @@ TEST_CASE("PatchInfo to_json no children", "[PatchInfo]")
 	d.starts         = {1, 2, 3};
 	d.spacings       = {0.1, 0.2, 0.3};
 	d.ns             = {10, 20, 30};
-	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
-	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
-	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
-	d.corner_nbr_info[Corner<3>::bsw().getIndex()].reset(new NormalNbrInfo<1>(1));
-	d.corner_nbr_info[Corner<3>::tse().getIndex()].reset(new CoarseNbrInfo<1>(2, Orthant<0>(0)));
-	d.corner_nbr_info[Corner<3>::bnw().getIndex()].reset(new FineNbrInfo<1>({1}));
-	d.edge_nbr_info[Edge::sw().getIndex()].reset(new NormalNbrInfo<2>(1));
-	d.edge_nbr_info[Edge::bn().getIndex()].reset(new CoarseNbrInfo<2>(2, Orthant<1>::lower()));
-	d.edge_nbr_info[Edge::tw().getIndex()].reset(new FineNbrInfo<2>({1, 2}));
+	d.setNbrInfo(Side<3>::north(), new NormalNbrInfo<2>(1));
+	d.setNbrInfo(Side<3>::east(), new CoarseNbrInfo<2>(2, Orthant<2>::nw()));
+	d.setNbrInfo(Side<3>::south(), new FineNbrInfo<2>({3, 4, 5, 6}));
+	d.setNbrInfo(Corner<3>::bsw(), new NormalNbrInfo<0>(1));
+	d.setNbrInfo(Corner<3>::tse(), new CoarseNbrInfo<0>(2, Orthant<0>(0)));
+	d.setNbrInfo(Corner<3>::bnw(), new FineNbrInfo<0>({1}));
+	d.setNbrInfo(Edge::sw(), new NormalNbrInfo<1>(1));
+	d.setNbrInfo(Edge::bn(), new CoarseNbrInfo<1>(2, Orthant<1>::lower()));
+	d.setNbrInfo(Edge::tw(), new FineNbrInfo<1>({1, 2}));
 
 	nlohmann::json j = d;
 
@@ -815,9 +807,9 @@ TEST_CASE("PatchInfo to_json with children", "[PatchInfo]")
 	d.ns           = {10, 20, 30};
 	d.child_ids    = {3, 4, 5, 6, 7, 8, 9, 10};
 	d.child_ranks  = {1, 2, 3, 4, 5, 6, 7, 8};
-	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
-	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
-	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
+	d.setNbrInfo(Side<3>::north(), new NormalNbrInfo<2>(1));
+	d.setNbrInfo(Side<3>::east(), new CoarseNbrInfo<2>(2, Orthant<2>::nw()));
+	d.setNbrInfo(Side<3>::south(), new FineNbrInfo<2>({3, 4, 5, 6}));
 
 	nlohmann::json j = d;
 
@@ -883,15 +875,15 @@ TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
 	j["parent_rank"]              = 3;
 	j["starts"]                   = {1, 2, 3};
 	j["lengths"]                  = {10, 20, 30};
-	j["nbrs"]                     = {NormalNbrInfo<3>(1), CoarseNbrInfo<3>(2, Orthant<2>::nw()), FineNbrInfo<3>({3, 4, 5, 6})};
+	j["nbrs"]                     = {NormalNbrInfo<2>(1), CoarseNbrInfo<2>(2, Orthant<2>::nw()), FineNbrInfo<2>({3, 4, 5, 6})};
 	j["nbrs"][0]["side"]          = "NORTH";
 	j["nbrs"][1]["side"]          = "EAST";
 	j["nbrs"][2]["side"]          = "SOUTH";
-	j["corner_nbrs"]              = {NormalNbrInfo<1>(1), CoarseNbrInfo<1>(2, Orthant<0>(0)), FineNbrInfo<1>({1})};
+	j["corner_nbrs"]              = {NormalNbrInfo<0>(1), CoarseNbrInfo<0>(2, Orthant<0>(0)), FineNbrInfo<0>({1})};
 	j["corner_nbrs"][0]["corner"] = "BSW";
 	j["corner_nbrs"][1]["corner"] = "TSE";
 	j["corner_nbrs"][2]["corner"] = "BNW";
-	j["edge_nbrs"]                = {NormalNbrInfo<2>(1), CoarseNbrInfo<2>(2, Orthant<1>::lower()), FineNbrInfo<2>({1, 2})};
+	j["edge_nbrs"]                = {NormalNbrInfo<1>(1), CoarseNbrInfo<1>(2, Orthant<1>::lower()), FineNbrInfo<1>({1, 2})};
 	j["edge_nbrs"][0]["edge"]     = "SW";
 	j["edge_nbrs"][1]["edge"]     = "BN";
 	j["edge_nbrs"][2]["edge"]     = "TW";
@@ -965,7 +957,7 @@ TEST_CASE("PatchInfo from_json with children", "[PatchInfo]")
 	j["child_ids"]      = {1, 2, 3, 4, 5, 6, 7, 8};
 	j["child_ranks"]    = {0, 1, 2, 3, 4, 5, 6, 7};
 	j["nbrs"]
-	= {NormalNbrInfo<3>(1), CoarseNbrInfo<3>(2, Orthant<2>::nw()), FineNbrInfo<3>({3, 4, 5, 6})};
+	= {NormalNbrInfo<2>(1), CoarseNbrInfo<2>(2, Orthant<2>::nw()), FineNbrInfo<2>({3, 4, 5, 6})};
 	j["nbrs"][0]["side"] = "NORTH";
 	j["nbrs"][1]["side"] = "EAST";
 	j["nbrs"][2]["side"] = "SOUTH";
@@ -1028,15 +1020,15 @@ TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
 	d.ns              = {10, 20, 30};
 	d.child_ids       = {3, 4, 5, 6, 7, 8, 9, 10};
 	d.child_ranks     = {1, 2, 3, 4, 5, 6, 7, 8};
-	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
-	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
-	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
-	d.corner_nbr_info[Corner<3>::bsw().getIndex()].reset(new NormalNbrInfo<1>(1));
-	d.corner_nbr_info[Corner<3>::tse().getIndex()].reset(new CoarseNbrInfo<1>(2, Orthant<0>(0)));
-	d.corner_nbr_info[Corner<3>::bnw().getIndex()].reset(new FineNbrInfo<1>({1}));
-	d.edge_nbr_info[Edge::sw().getIndex()].reset(new NormalNbrInfo<2>(1));
-	d.edge_nbr_info[Edge::bn().getIndex()].reset(new CoarseNbrInfo<2>(2, Orthant<1>::lower()));
-	d.edge_nbr_info[Edge::tw().getIndex()].reset(new FineNbrInfo<2>({1, 2}));
+	d.setNbrInfo(Side<3>::north(), new NormalNbrInfo<2>(1));
+	d.setNbrInfo(Side<3>::east(), new CoarseNbrInfo<2>(2, Orthant<2>::nw()));
+	d.setNbrInfo(Side<3>::south(), new FineNbrInfo<2>({3, 4, 5, 6}));
+	d.setNbrInfo(Corner<3>::bsw(), new NormalNbrInfo<0>(1));
+	d.setNbrInfo(Corner<3>::tse(), new CoarseNbrInfo<0>(2, Orthant<0>(0)));
+	d.setNbrInfo(Corner<3>::bnw(), new FineNbrInfo<0>({1}));
+	d.setNbrInfo(Edge::sw(), new NormalNbrInfo<1>(1));
+	d.setNbrInfo(Edge::bn(), new CoarseNbrInfo<1>(2, Orthant<1>::lower()));
+	d.setNbrInfo(Edge::tw(), new FineNbrInfo<1>({1, 2}));
 
 	PatchInfo<3> d2(d);
 
@@ -1056,16 +1048,18 @@ TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
 	for (Side<3> s : Side<3>::getValues()) {
 		REQUIRE(d.hasNbr(s) == d2.hasNbr(s));
 		if (d.hasNbr(s)) {
-			CHECK(d.nbr_info[s.getIndex()] != d2.nbr_info[s.getIndex()]);
 			switch (d.getNbrType(s)) {
 				case NbrType::Normal:
 					CHECK(d.getNormalNbrInfo(s).id == d2.getNormalNbrInfo(s).id);
+					CHECK(&d.getNormalNbrInfo(s) != &d2.getNormalNbrInfo(s));
 					break;
 				case NbrType::Fine:
 					CHECK(d.getFineNbrInfo(s).ids[0] == d2.getFineNbrInfo(s).ids[0]);
+					CHECK(&d.getFineNbrInfo(s) != &d2.getFineNbrInfo(s));
 					break;
 				case NbrType::Coarse:
 					CHECK(d.getCoarseNbrInfo(s).id == d2.getCoarseNbrInfo(s).id);
+					CHECK(&d.getCoarseNbrInfo(s) != &d2.getCoarseNbrInfo(s));
 					break;
 			}
 		}
@@ -1073,16 +1067,18 @@ TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
 	for (Corner<3> c : Corner<3>::getValues()) {
 		REQUIRE(d.hasNbr(c) == d2.hasNbr(c));
 		if (d.hasNbr(c)) {
-			CHECK(d.corner_nbr_info[c.getIndex()] != d2.corner_nbr_info[c.getIndex()]);
 			switch (d.getNbrType(c)) {
 				case NbrType::Normal:
 					CHECK(d.getNormalNbrInfo(c).id == d2.getNormalNbrInfo(c).id);
+					CHECK(&d.getNormalNbrInfo(c) != &d2.getNormalNbrInfo(c));
 					break;
 				case NbrType::Fine:
 					CHECK(d.getFineNbrInfo(c).ids[0] == d2.getFineNbrInfo(c).ids[0]);
+					CHECK(&d.getFineNbrInfo(c) != &d2.getFineNbrInfo(c));
 					break;
 				case NbrType::Coarse:
 					CHECK(d.getCoarseNbrInfo(c).id == d2.getCoarseNbrInfo(c).id);
+					CHECK(&d.getCoarseNbrInfo(c) != &d2.getCoarseNbrInfo(c));
 					break;
 			}
 		}
@@ -1090,16 +1086,18 @@ TEST_CASE("PatchInfo copy constructor", "[PatchInfo]")
 	for (Edge c : Edge::getValues()) {
 		REQUIRE(d.hasNbr(c) == d2.hasNbr(c));
 		if (d.hasNbr(c)) {
-			CHECK(d.edge_nbr_info[c.getIndex()] != d2.edge_nbr_info[c.getIndex()]);
 			switch (d.getNbrType(c)) {
 				case NbrType::Normal:
 					CHECK(d.getNormalNbrInfo(c).id == d2.getNormalNbrInfo(c).id);
+					CHECK(&d.getNormalNbrInfo(c) != &d2.getNormalNbrInfo(c));
 					break;
 				case NbrType::Fine:
 					CHECK(d.getFineNbrInfo(c).ids[0] == d2.getFineNbrInfo(c).ids[0]);
+					CHECK(&d.getFineNbrInfo(c) != &d2.getFineNbrInfo(c));
 					break;
 				case NbrType::Coarse:
 					CHECK(d.getCoarseNbrInfo(c).id == d2.getCoarseNbrInfo(c).id);
+					CHECK(&d.getCoarseNbrInfo(c) != &d2.getCoarseNbrInfo(c));
 					break;
 			}
 		}
@@ -1121,15 +1119,15 @@ TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 	d.ns              = {10, 20, 30};
 	d.child_ids       = {3, 4, 5, 6, 7, 8, 9, 10};
 	d.child_ranks     = {1, 2, 3, 4, 5, 6, 7, 8};
-	d.nbr_info[Side<3>::north().getIndex()].reset(new NormalNbrInfo<3>(1));
-	d.nbr_info[Side<3>::east().getIndex()].reset(new CoarseNbrInfo<3>(2, Orthant<2>::nw()));
-	d.nbr_info[Side<3>::south().getIndex()].reset(new FineNbrInfo<3>({3, 4, 5, 6}));
-	d.corner_nbr_info[Corner<3>::bsw().getIndex()].reset(new NormalNbrInfo<1>(1));
-	d.corner_nbr_info[Corner<3>::tse().getIndex()].reset(new CoarseNbrInfo<1>(2, Orthant<0>(0)));
-	d.corner_nbr_info[Corner<3>::bnw().getIndex()].reset(new FineNbrInfo<1>({1}));
-	d.edge_nbr_info[Edge::sw().getIndex()].reset(new NormalNbrInfo<2>(1));
-	d.edge_nbr_info[Edge::bn().getIndex()].reset(new CoarseNbrInfo<2>(2, Orthant<1>::lower()));
-	d.edge_nbr_info[Edge::tw().getIndex()].reset(new FineNbrInfo<2>({1, 2}));
+	d.setNbrInfo(Side<3>::north(), new NormalNbrInfo<2>(1));
+	d.setNbrInfo(Side<3>::east(), new CoarseNbrInfo<2>(2, Orthant<2>::nw()));
+	d.setNbrInfo(Side<3>::south(), new FineNbrInfo<2>({3, 4, 5, 6}));
+	d.setNbrInfo(Corner<3>::bsw(), new NormalNbrInfo<0>(1));
+	d.setNbrInfo(Corner<3>::tse(), new CoarseNbrInfo<0>(2, Orthant<0>(0)));
+	d.setNbrInfo(Corner<3>::bnw(), new FineNbrInfo<0>({1}));
+	d.setNbrInfo(Edge::sw(), new NormalNbrInfo<1>(1));
+	d.setNbrInfo(Edge::bn(), new CoarseNbrInfo<1>(2, Orthant<1>::lower()));
+	d.setNbrInfo(Edge::tw(), new FineNbrInfo<1>({1, 2}));
 
 	PatchInfo<3> d2;
 	d2 = d;
@@ -1150,16 +1148,18 @@ TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 	for (Side<3> s : Side<3>::getValues()) {
 		REQUIRE(d.hasNbr(s) == d2.hasNbr(s));
 		if (d.hasNbr(s)) {
-			CHECK(d.nbr_info[s.getIndex()] != d2.nbr_info[s.getIndex()]);
 			switch (d.getNbrType(s)) {
 				case NbrType::Normal:
 					CHECK(d.getNormalNbrInfo(s).id == d2.getNormalNbrInfo(s).id);
+					CHECK(&d.getNormalNbrInfo(s) != &d2.getNormalNbrInfo(s));
 					break;
 				case NbrType::Fine:
 					CHECK(d.getFineNbrInfo(s).ids[0] == d2.getFineNbrInfo(s).ids[0]);
+					CHECK(&d.getFineNbrInfo(s) != &d2.getFineNbrInfo(s));
 					break;
 				case NbrType::Coarse:
 					CHECK(d.getCoarseNbrInfo(s).id == d2.getCoarseNbrInfo(s).id);
+					CHECK(&d.getCoarseNbrInfo(s) != &d2.getCoarseNbrInfo(s));
 					break;
 			}
 		}
@@ -1167,16 +1167,18 @@ TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 	for (Corner<3> c : Corner<3>::getValues()) {
 		REQUIRE(d.hasNbr(c) == d2.hasNbr(c));
 		if (d.hasNbr(c)) {
-			CHECK(d.corner_nbr_info[c.getIndex()] != d2.corner_nbr_info[c.getIndex()]);
 			switch (d.getNbrType(c)) {
 				case NbrType::Normal:
 					CHECK(d.getNormalNbrInfo(c).id == d2.getNormalNbrInfo(c).id);
+					CHECK(&d.getNormalNbrInfo(c) != &d2.getNormalNbrInfo(c));
 					break;
 				case NbrType::Fine:
 					CHECK(d.getFineNbrInfo(c).ids[0] == d2.getFineNbrInfo(c).ids[0]);
+					CHECK(&d.getFineNbrInfo(c) != &d2.getFineNbrInfo(c));
 					break;
 				case NbrType::Coarse:
 					CHECK(d.getCoarseNbrInfo(c).id == d2.getCoarseNbrInfo(c).id);
+					CHECK(&d.getCoarseNbrInfo(c) != &d2.getCoarseNbrInfo(c));
 					break;
 			}
 		}
@@ -1184,16 +1186,18 @@ TEST_CASE("PatchInfo copy assignment", "[PatchInfo]")
 	for (Edge c : Edge::getValues()) {
 		REQUIRE(d.hasNbr(c) == d2.hasNbr(c));
 		if (d.hasNbr(c)) {
-			CHECK(d.edge_nbr_info[c.getIndex()] != d2.edge_nbr_info[c.getIndex()]);
 			switch (d.getNbrType(c)) {
 				case NbrType::Normal:
 					CHECK(d.getNormalNbrInfo(c).id == d2.getNormalNbrInfo(c).id);
+					CHECK(&d.getNormalNbrInfo(c) != &d2.getNormalNbrInfo(c));
 					break;
 				case NbrType::Fine:
 					CHECK(d.getFineNbrInfo(c).ids[0] == d2.getFineNbrInfo(c).ids[0]);
+					CHECK(&d.getFineNbrInfo(c) != &d2.getFineNbrInfo(c));
 					break;
 				case NbrType::Coarse:
 					CHECK(d.getCoarseNbrInfo(c).id == d2.getCoarseNbrInfo(c).id);
+					CHECK(&d.getCoarseNbrInfo(c) != &d2.getCoarseNbrInfo(c));
 					break;
 			}
 		}

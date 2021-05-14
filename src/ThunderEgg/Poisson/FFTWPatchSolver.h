@@ -241,7 +241,7 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 
 		tmp->getValArray() /= eigen_vals.at(pinfo);
 
-		if (neumann.all() && pinfo.nbr_info == std::array<std::unique_ptr<NbrInfo<D>>, Side<D>::number_of>()) {
+		if (neumann.all() && !pinfo.hasNbr()) {
 			tmp->getValArray()[0] = 0;
 		}
 
