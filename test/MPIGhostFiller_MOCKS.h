@@ -419,7 +419,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 		for (size_t c = 0; c < nbr_datas.size(); c++) {
 			int index = 0;
 			for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-				LocalData<D - 1> slice = nbr_datas[c].getGhostSliceOnSide(side.opposite(), i + 1);
+				LocalData<D - 1> slice = nbr_datas[c].getSliceOn(side.opposite(), {-i - 1});
 				nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
 				                   [&](const std::array<int, D - 1> &coord) {
 					                   slice[coord] += pinfo.id + index + c;
@@ -439,7 +439,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 				int index = 0;
 				for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 					for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-						LocalData<1> slice = nbr_datas[c].getSliceOnEdge(edge.opposite(), {-1 - i, -1 - j});
+						LocalData<1> slice = nbr_datas[c].getSliceOn(edge.opposite(), {-1 - i, -1 - j});
 						nested_loop<1>(slice.getStart(), slice.getEnd(),
 						               [&](const std::array<int, 1> &coord) {
 							               slice[coord] += pinfo.id + index + c;
@@ -462,7 +462,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 			std::array<int, D> end;
 			end.fill(-1);
 			nested_loop<D>(start, end, [&](const std::array<int, D> &offset) {
-				nbr_datas[c].getValueOnCorner(corner.opposite(), offset) += pinfo.id + index + c;
+				nbr_datas[c].getSliceOn(corner.opposite(), offset)[{}] += pinfo.id + index + c;
 				index++;
 			});
 		}
@@ -545,7 +545,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 										coord_str += " " + std::to_string(coord[i]);
 									}
 									INFO(coord_str);
-									CHECK(data.getValueOnCorner(corner, coord) == nbrinfo.id + index + c);
+									CHECK(data.getSliceOn(corner, coord)[{}] == nbrinfo.id + index + c);
 									index++;
 								});
 							} break;
@@ -567,7 +567,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 										coord_str += " " + std::to_string(coord[i]);
 									}
 									INFO(coord_str);
-									CHECK(data.getValueOnCorner(corner, coord) == nbrinfo.ids[0] + index + c);
+									CHECK(data.getSliceOn(corner, coord)[{}] == nbrinfo.ids[0] + index + c);
 									index++;
 								});
 							} break;
@@ -587,7 +587,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 										coord_str += " " + std::to_string(coord[i]);
 									}
 									INFO(coord_str);
-									CHECK(data.getValueOnCorner(corner, coord) == nbrinfo.id + index + c);
+									CHECK(data.getSliceOn(corner, coord)[{}] == nbrinfo.id + index + c);
 									index++;
 								});
 
@@ -606,7 +606,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 								coord_str += " " + std::to_string(coord[i]);
 							}
 							INFO(coord_str);
-							CHECK(data.getValueOnCorner(corner, coord) == 0);
+							CHECK(data.getSliceOn(corner, coord)[{}] == 0);
 						});
 					}
 				}
@@ -648,7 +648,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									auto nbrinfo = pinfo.getNormalNbrInfo(e);
 									for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 										for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-											auto slice = data.getSliceOnEdge(e, {-i - 1, -j - 1});
+											auto slice = data.getSliceOn(e, {-i - 1, -j - 1});
 
 											nested_loop<1>(
 											slice.getStart(), slice.getEnd(),
@@ -678,7 +678,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									int index = 0;
 									for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 										for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-											auto slice = data.getSliceOnEdge(e, {-1 - i, -1 - j});
+											auto slice = data.getSliceOn(e, {-1 - i, -1 - j});
 											nested_loop<1>(slice.getStart(), slice.getEnd(), [&](std::array<int, 1> &coord) {
 												std::string coord_str = "coord: ";
 												for (size_t i = 0; i < 1; i++) {
@@ -699,7 +699,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									auto nbrinfo = pinfo.getCoarseNbrInfo(e);
 									for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 										for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-											auto slice = data.getSliceOnEdge(e, {-1 - i, -1 - j});
+											auto slice = data.getSliceOn(e, {-1 - i, -1 - j});
 											nested_loop<1>(slice.getStart(), slice.getEnd(), [&](std::array<int, 1> &coord) {
 												std::string coord_str = "coord: ";
 												for (size_t i = 0; i < 1; i++) {
@@ -720,7 +720,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 							for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 								for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-									auto slice = data.getSliceOnEdge(e, {-1 - i, -1 - j});
+									auto slice = data.getSliceOn(e, {-1 - i, -1 - j});
 									nested_loop<1>(slice.getStart(), slice.getEnd(), [&](std::array<int, 1> &coord) {
 										INFO("coord: ");
 										for (size_t i = 0; i < 1; i++) {
@@ -769,7 +769,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									int  index   = 0;
 									auto nbrinfo = pinfo.getNormalNbrInfo(s);
 									for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-										auto slice = data.getGhostSliceOnSide(s, i + 1);
+										auto slice = data.getSliceOn(s, {-i - 1});
 
 										nested_loop<D - 1>(
 										slice.getStart(), slice.getEnd(),
@@ -797,7 +797,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									// value should be id of neighbors + index
 									int index = 0;
 									for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-										auto slice = data.getGhostSliceOnSide(s, i + 1);
+										auto slice = data.getSliceOn(s, {-i - 1});
 
 										nested_loop<D - 1>(
 										slice.getStart(), slice.getEnd(),
@@ -819,7 +819,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									int  index   = 0;
 									auto nbrinfo = pinfo.getCoarseNbrInfo(s);
 									for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-										auto slice = data.getGhostSliceOnSide(s, i + 1);
+										auto slice = data.getSliceOn(s, {-i - 1});
 
 										nested_loop<D - 1>(
 										slice.getStart(), slice.getEnd(),
@@ -841,7 +841,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 							INFO("Physical Boundary");
 
 							for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-								auto slice = data.getGhostSliceOnSide(s, i + 1);
+								auto slice = data.getSliceOn(s, {-i - 1});
 
 								nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
 								                   [&](std::array<int, D - 1> &coord) {

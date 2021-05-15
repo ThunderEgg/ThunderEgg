@@ -86,9 +86,9 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 		for (Side<2> s : Side<2>::getValues()) {
 			if (pinfo.hasNbr(s)) {
 				double h2      = std::pow(pinfo.spacings[s.getAxisIndex()], 2);
-				auto   f_slice = f.getSliceOnSide(s);
-				auto   u_inner = u.getSliceOnSide(s);
-				auto   u_ghost = u.getSliceOnSide(s, -1);
+				auto   f_slice = f.getSliceOn(s, {0});
+				auto   u_inner = u.getSliceOn(s, {0});
+				auto   u_ghost = u.getSliceOn(s, {-1});
 				nested_loop<1>(f_slice.getStart(), f_slice.getEnd(), [&](std::array<int, 1> coord) {
 					f_slice[coord] += -(u_inner[coord] + u_ghost[coord]) / (h2);
 				});

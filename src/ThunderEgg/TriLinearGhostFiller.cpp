@@ -54,8 +54,8 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3> &       
 {
 	if (nbr_type == NbrType::Normal) {
 		for (size_t c = 0; c < local_datas.size(); c++) {
-			auto local_slice = local_datas[c].getSliceOnSide(side);
-			auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
+			auto local_slice = local_datas[c].getSliceOn(side, {0});
+			auto nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
 			nested_loop<2>(
 			nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 		}
@@ -63,8 +63,8 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3> &       
 		auto               nbr_info = pinfo.getCoarseNbrInfo(side);
 		std::array<int, 2> offset   = getOffset(pinfo.ns, side, orthant);
 		for (size_t c = 0; c < local_datas.size(); c++) {
-			auto local_slice = local_datas[c].getSliceOnSide(side);
-			auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
+			auto local_slice = local_datas[c].getSliceOn(side, {0});
+			auto nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
 			nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 2> &coord) {
 				std::array<int, 2> coarse_coord;
 				for (int i = 0; i < 2; i++) {
@@ -77,8 +77,8 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3> &       
 		auto               nbr_info = pinfo.getFineNbrInfo(side);
 		std::array<int, 2> offset   = getOffset(pinfo.ns, side, orthant);
 		for (size_t c = 0; c < local_datas.size(); c++) {
-			auto local_slice = local_datas[c].getSliceOnSide(side);
-			auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
+			auto local_slice = local_datas[c].getSliceOn(side, {0});
+			auto nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
 			nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 2> &coord) {
 				std::array<int, 2> coarse_coord;
 				for (int i = 0; i < 2; i++) {
@@ -87,6 +87,8 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3> &       
 				nbr_ghosts[coord] += 4.0 / 6.0 * local_slice[coarse_coord];
 			});
 		}
+	} else {
+		throw RuntimeError("Unsupported NbrType");
 	}
 }
 
@@ -97,8 +99,8 @@ void TriLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo
 			if (pinfo.hasNbr(side)) {
 				NbrType nbr_type = pinfo.getNbrType(side);
 				if (nbr_type == NbrType::Coarse) {
-					auto               local_slice  = local_data.getSliceOnSide(side);
-					auto               local_ghosts = local_data.getGhostSliceOnSide(side, 1);
+					auto               local_slice  = local_data.getSliceOn(side, {0});
+					auto               local_ghosts = local_data.getSliceOn(side, {-1});
 					auto               nbr_info     = pinfo.getCoarseNbrInfo(side);
 					std::array<int, 2> offset       = getOffset(pinfo.ns, side, nbr_info.orth_on_coarse);
 					nested_loop<2>(local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 2> &coord) {
@@ -116,8 +118,8 @@ void TriLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo
 						local_ghosts[coord] -= 1.0 / 6.0 * local_slice[offset_coord];
 					});
 				} else if (nbr_type == NbrType::Fine) {
-					auto local_slice  = local_data.getSliceOnSide(side);
-					auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
+					auto local_slice  = local_data.getSliceOn(side, {0});
+					auto local_ghosts = local_data.getSliceOn(side, {-1});
 					nested_loop<2>(local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 2> &coord) {
 						local_ghosts[coord] -= 1.0 / 3.0 * local_slice[coord];
 					});

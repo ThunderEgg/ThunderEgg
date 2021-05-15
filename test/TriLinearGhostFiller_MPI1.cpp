@@ -56,8 +56,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<2> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -121,8 +121,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<2> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -137,8 +137,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			LocalData<2> vec_ghost      = vec_ld2.getGhostSliceOnSide(s, 1);
-			LocalData<2> expected_ghost = expected_ld2.getGhostSliceOnSide(s, 1);
+			LocalData<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			LocalData<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -202,8 +202,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<2> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -218,8 +218,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			LocalData<2> vec_ghost      = vec_ld2.getGhostSliceOnSide(s, 1);
-			LocalData<2> expected_ghost = expected_ld2.getGhostSliceOnSide(s, 1);
+			LocalData<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			LocalData<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -275,8 +275,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			LocalData<2> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<2> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));

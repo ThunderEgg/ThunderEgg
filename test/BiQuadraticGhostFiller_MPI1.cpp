@@ -90,13 +90,13 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		});
 		// check that west values are not modified
 		{
-			auto west_ghost = patch_1.getGhostSliceOnSide(Side<2>::west(), 1);
+			auto west_ghost = patch_1.getSliceOn(Side<2>::west(), {-1});
 			nested_loop<1>(west_ghost.getStart(), west_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
 		}
 		// check that east values are correct
 		{
-			auto east_ghost = patch_1.getGhostSliceOnSide(Side<2>::east(), 1);
+			auto east_ghost = patch_1.getSliceOn(Side<2>::east(), {-1});
 			nested_loop<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -106,13 +106,13 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		}
 		// check that south values are not modified
 		{
-			auto south_ghost = patch_1.getGhostSliceOnSide(Side<2>::south(), 1);
+			auto south_ghost = patch_1.getSliceOn(Side<2>::south(), {-1});
 			nested_loop<1>(south_ghost.getStart(), south_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
 		}
 		// check that north values are correct
 		{
-			auto north_ghost = patch_1.getGhostSliceOnSide(Side<2>::north(), 1);
+			auto north_ghost = patch_1.getSliceOn(Side<2>::north(), {-1});
 			nested_loop<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -132,7 +132,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		});
 		// check that west values correct
 		{
-			auto west_ghost = patch_2.getGhostSliceOnSide(Side<2>::west(), 1);
+			auto west_ghost = patch_2.getSliceOn(Side<2>::west(), {-1});
 			nested_loop<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -142,19 +142,19 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		}
 		// check that east values are not modified
 		{
-			auto east_ghost = patch_2.getGhostSliceOnSide(Side<2>::east(), 1);
+			auto east_ghost = patch_2.getSliceOn(Side<2>::east(), {-1});
 			nested_loop<1>(east_ghost.getStart(), east_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
 		}
 		// check that south values are not modified
 		{
-			auto south_ghost = patch_2.getGhostSliceOnSide(Side<2>::south(), 1);
+			auto south_ghost = patch_2.getSliceOn(Side<2>::south(), {-1});
 			nested_loop<1>(south_ghost.getStart(), south_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
 		}
 		// check that north values are correct
 		{
-			auto north_ghost = patch_2.getGhostSliceOnSide(Side<2>::north(), 1);
+			auto north_ghost = patch_2.getSliceOn(Side<2>::north(), {-1});
 			nested_loop<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -174,13 +174,13 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		});
 		// check that west values are not modified
 		{
-			auto west_ghost = patch_3.getGhostSliceOnSide(Side<2>::west(), 1);
+			auto west_ghost = patch_3.getSliceOn(Side<2>::west(), {-1});
 			nested_loop<1>(west_ghost.getStart(), west_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
 		}
 		// check that east values are correct
 		{
-			auto east_ghost = patch_3.getGhostSliceOnSide(Side<2>::east(), 1);
+			auto east_ghost = patch_3.getSliceOn(Side<2>::east(), {-1});
 			nested_loop<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -190,7 +190,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		}
 		// check that south values are not modified
 		{
-			auto south_ghost = patch_3.getGhostSliceOnSide(Side<2>::south(), 1);
+			auto south_ghost = patch_3.getSliceOn(Side<2>::south(), {-1});
 			nested_loop<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -200,7 +200,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		}
 		// check that north values are correct
 		{
-			auto north_ghost = patch_3.getGhostSliceOnSide(Side<2>::north(), 1);
+			auto north_ghost = patch_3.getSliceOn(Side<2>::north(), {-1});
 			nested_loop<1>(north_ghost.getStart(), north_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
 		}
@@ -216,7 +216,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		});
 		// check that west values correct
 		{
-			auto west_ghost = patch_4.getGhostSliceOnSide(Side<2>::west(), 1);
+			auto west_ghost = patch_4.getSliceOn(Side<2>::west(), {-1});
 			nested_loop<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -226,13 +226,13 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		}
 		// check that east values are not modified
 		{
-			auto east_ghost = patch_4.getGhostSliceOnSide(Side<2>::east(), 1);
+			auto east_ghost = patch_4.getSliceOn(Side<2>::east(), {-1});
 			nested_loop<1>(east_ghost.getStart(), east_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
 		}
 		// check that south values are correct
 		{
-			auto south_ghost = patch_4.getGhostSliceOnSide(Side<2>::south(), 1);
+			auto south_ghost = patch_4.getSliceOn(Side<2>::south(), {-1});
 			nested_loop<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
@@ -242,7 +242,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		}
 		// check that north values are not modified
 		{
-			auto north_ghost = patch_4.getGhostSliceOnSide(Side<2>::north(), 1);
+			auto north_ghost = patch_4.getSliceOn(Side<2>::north(), {-1});
 			nested_loop<1>(north_ghost.getStart(), north_ghost.getEnd(),
 			               [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
 		}
@@ -288,8 +288,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller", "[BiQuadraticGhos
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -344,8 +344,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set",
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -407,8 +407,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components",
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -424,8 +424,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components",
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld2.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld2.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -486,8 +486,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -503,8 +503,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld2.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld2.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));

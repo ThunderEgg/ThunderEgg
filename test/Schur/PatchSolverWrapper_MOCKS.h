@@ -116,8 +116,8 @@ class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 		was_called = true;
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo.hasNbr(s)) {
-				auto ghosts = us[0].getGhostSliceOnSide(s, 1);
-				auto inner  = us[0].getSliceOnSide(s);
+				auto ghosts = us[0].getSliceOn(s, {-1});
+				auto inner  = us[0].getSliceOn(s, {0});
 				nested_loop<D - 1>(
 				ghosts.getStart(), ghosts.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					CHECK((ghosts[coord] + inner[coord]) / 2 == Catch::Approx(schur_fill_value));

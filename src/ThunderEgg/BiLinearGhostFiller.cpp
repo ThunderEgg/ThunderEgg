@@ -28,8 +28,8 @@ namespace
 void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		auto local_slice = local_datas[c].getSliceOnSide(side);
-		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
+		auto local_slice = local_datas[c].getSliceOn(side, {0});
+		auto nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 	}
 }
@@ -45,8 +45,8 @@ void FillGhostForCoarseNbr(const PatchInfo<2> &             pinfo,
 		offset = pinfo.ns[!side.getAxisIndex()];
 	}
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		auto local_slice = local_datas[c].getSliceOnSide(side);
-		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
+		auto local_slice = local_datas[c].getSliceOn(side, {0});
+		auto nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
 			nbr_ghosts[{(coord[0] + offset) / 2}] += 2.0 / 3.0 * local_slice[coord];
 		});
@@ -64,8 +64,8 @@ void FillGhostForFineNbr(const PatchInfo<2> &             pinfo,
 		offset = pinfo.ns[!side.getAxisIndex()];
 	}
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		auto local_slice = local_datas[c].getSliceOnSide(side);
-		auto nbr_ghosts  = nbr_datas[c].getGhostSliceOnSide(side.opposite(), 1);
+		auto local_slice = local_datas[c].getSliceOn(side, {0});
+		auto nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
 			nbr_ghosts[coord] += 2.0 / 3.0 * local_slice[{(coord[0] + offset) / 2}];
 		});
@@ -73,8 +73,8 @@ void FillGhostForFineNbr(const PatchInfo<2> &             pinfo,
 }
 void FillLocalGhostsForCoarseNbr(const PatchInfo<2> &pinfo, const LocalData<2> &local_data, const Side<2> side)
 {
-	auto local_slice  = local_data.getSliceOnSide(side);
-	auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
+	auto local_slice  = local_data.getSliceOn(side, {0});
+	auto local_ghosts = local_data.getSliceOn(side, {-1});
 	int  offset       = 0;
 	if (pinfo.getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper()) {
 		offset = pinfo.ns[!side.getAxisIndex()];
@@ -90,8 +90,8 @@ void FillLocalGhostsForCoarseNbr(const PatchInfo<2> &pinfo, const LocalData<2> &
 }
 void FillLocalGhostsForFineNbr(const LocalData<2> &local_data, const Side<2> side)
 {
-	auto local_slice  = local_data.getSliceOnSide(side);
-	auto local_ghosts = local_data.getGhostSliceOnSide(side, 1);
+	auto local_slice  = local_data.getSliceOn(side, {0});
+	auto local_ghosts = local_data.getSliceOn(side, {-1});
 	nested_loop<1>(
 	local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
 }

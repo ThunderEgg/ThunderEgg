@@ -55,9 +55,9 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 		// extrapolate ghost values
 		for (Side<D> s : pinfo.orth_on_parent.getExteriorSides()) {
 			if (!pinfo.hasNbr(s)) {
-				auto fine_ghost    = fine_data.getGhostSliceOnSide(s, 1);
-				auto fine_interior = fine_data.getSliceOnSide(s);
-				auto coarse_ghost  = coarse_data.getGhostSliceOnSide(s, 1);
+				auto fine_ghost    = fine_data.getSliceOn(s, {-1});
+				auto fine_interior = fine_data.getSliceOn(s, {0});
+				auto coarse_ghost  = coarse_data.getSliceOn(s, {-1});
 				nested_loop<D - 1>(fine_ghost.getStart(), fine_ghost.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					std::array<int, D - 1> coarse_coord;
 					for (size_t x = 0; x < s.getAxisIndex(); x++) {
@@ -133,8 +133,8 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 				// copy boundary ghost values
 				for (Side<D> s : Side<D>::getValues()) {
 					if (!pinfo.hasNbr(s)) {
-						auto fine_ghost   = fine_datas[c].getGhostSliceOnSide(s, 1);
-						auto coarse_ghost = coarse_local_datas[c].getGhostSliceOnSide(s, 1);
+						auto fine_ghost   = fine_datas[c].getSliceOn(s, {-1});
+						auto coarse_ghost = coarse_local_datas[c].getSliceOn(s, {-1});
 						nested_loop<D - 1>(fine_ghost.getStart(), fine_ghost.getEnd(), [&](const std::array<int, D - 1> &coord) {
 							coarse_ghost[coord] += fine_ghost[coord];
 						});

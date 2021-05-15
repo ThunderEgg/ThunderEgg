@@ -111,7 +111,6 @@ include(ThunderEgg/VarPoisson/CMakeLists.txt)
 include(ThunderEgg/Iterative/CMakeLists.txt)
 
 add_library(ThunderEgg ${ThunderEgg_SRCS} ${ThunderEgg_HDRS})
-target_compile_features(ThunderEgg PUBLIC cxx_std_11)
 
 # foreach(HDR ${ThunderEgg_HDRS}) get_filename_component(DIR ${HDR} PATH)
 # file(COPY ${HDR} DESTINATION include/${DIR}) endforeach()

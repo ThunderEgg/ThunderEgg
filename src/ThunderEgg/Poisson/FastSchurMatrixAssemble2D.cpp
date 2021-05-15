@@ -155,7 +155,7 @@ LocalData<2> getLocalDataForBuffer(double *buffer_ptr, const PatchInfo<2> &pinfo
 void FillBlockColumnForNormalInterface(int j, const LocalData<2> &u, Side<2> s, std::vector<double> &block)
 {
 	int  n     = u.getLengths()[0];
-	auto slice = u.getSliceOnSide(s);
+	auto slice = u.getSliceOn(s, {0});
 	for (int i = 0; i < n; i++) {
 		block[i * n + j] = -slice[{i}] / 2;
 	}
@@ -183,8 +183,8 @@ void FillBlockColumnForCoarseToCoarseInterface(int                              
 	new_pinfo.setNbrInfo(s, new FineNbrInfo<1>());
 	std::vector<LocalData<2>> us = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
-	auto slice       = u.getSliceOnSide(s);
-	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
+	auto slice       = u.getSliceOn(s, {0});
+	auto ghost_slice = u.getSliceOn(s, {-1});
 	for (int i = 0; i < n; i++) {
 		block[i * n + j] = -(slice[{i}] + ghost_slice[{i}]) / 2;
 		ghost_slice[{i}] = 0;
@@ -215,8 +215,8 @@ void FillBlockColumnForFineToFineInterface(int                                  
 	new_pinfo.setNbrInfo(s, new CoarseNbrInfo<1>(100, type.getOrthant()));
 	std::vector<LocalData<2>> us = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
-	auto slice       = u.getSliceOnSide(s);
-	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
+	auto slice       = u.getSliceOn(s, {0});
+	auto ghost_slice = u.getSliceOn(s, {-1});
 	for (int i = 0; i < n; i++) {
 		block[i * n + j] = -(slice[{i}] + ghost_slice[{i}]) / 2;
 		ghost_slice[{i}] = 0;
@@ -338,7 +338,7 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 		auto         f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1, 1);
 		LocalData<2> u_local_data  = u_vec->getLocalData(0, 0);
 		auto         u_local_datas = u_vec->getLocalDatas(0);
-		LocalData<1> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<2>::west(), 1);
+		LocalData<1> u_west_ghosts = u_local_data.getSliceOn(Side<2>::west(), {-1});
 		LocalData<2> f_local_data  = f_vec->getLocalData(0, 0);
 		auto         f_local_datas = f_vec->getLocalDatas(0);
 

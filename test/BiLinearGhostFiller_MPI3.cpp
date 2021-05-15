@@ -52,8 +52,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -107,8 +107,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));

@@ -76,63 +76,33 @@ template <int D> class LocalData
 	 * @brief Get a slice for a slide
 	 *
 	 * @param s the side of patch for the slice
-	 * @param offset the offset, with 0 being the first slice of non-ghost cell values, and -1 being
-	 * the first slice of ghost cell values
-	 * @return LocalData<D - 1> the resulting slice
-	 */
-	LocalData<D - 1> getSliceOnSidePriv(Side<D> s, int offset) const
-	{
-		size_t                 axis = s.getAxisIndex();
-		std::array<int, D - 1> new_strides;
-		for (size_t i = 0; i < axis; i++) {
-			new_strides[i] = strides[i];
-		}
-		for (size_t i = axis; i < D - 1; i++) {
-			new_strides[i] = strides[i + 1];
-		}
-		std::array<int, D - 1> new_lengths;
-		for (size_t i = 0; i < axis; i++) {
-			new_lengths[i] = lengths[i];
-		}
-		for (size_t i = axis; i < D - 1; i++) {
-			new_lengths[i] = lengths[i + 1];
-		}
-		if (s.isLowerOnAxis()) {
-			double *new_data = data + offset * strides[axis];
-			return LocalData<D - 1>(new_data, new_strides, new_lengths, 0, ldm);
-		} else {
-			double *new_data = data + (lengths[axis] - 1 - offset) * strides[axis];
-			return LocalData<D - 1>(new_data, new_strides, new_lengths, 0, ldm);
-		}
-	}
-
-	/**
-	 * @brief Get a slice for a slide
-	 *
-	 * @param s the side of patch for the slice
 	 * @param offset the offset, with {0, 0} being the first slice of non-ghost cell values, and {-1, -1} being
 	 * the first slice of ghost cell values
 	 * @return LocalData<1> the resulting slice
 	 */
-	template <int N = 0>
-	auto getSliceOnEdgePriv(Edge e, const std::array<int, 2> &offset) const -> typename std::enable_if<D == 3 && N == N, LocalData<1>>::type
+	template <int M> LocalData<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
-		double *               new_data = data;
-		std::array<Side<D>, 2> sides    = e.getSides();
-		size_t                 axis     = 0;
-		for (size_t i = 0; i < 2; i++) {
-			if (sides[i].getAxisIndex() == axis) {
-				axis++;
-			}
-			if (sides[i].isLowerOnAxis()) {
-				new_data += offset[i] * strides[sides[i].getAxisIndex()];
+		std::array<int, M>         new_strides;
+		std::array<int, M>         new_lengths;
+		double *                   new_data      = data;
+		std::array<Side<D>, D - M> sides         = f.getSides();
+		int                        lengths_index = 0;
+		int                        sides_index   = 0;
+		for (int axis = 0; axis < D; axis++) {
+			if (sides[sides_index].getAxisIndex() == axis) {
+				if (sides[sides_index].isLowerOnAxis()) {
+					new_data += offset[sides_index] * strides[axis];
+				} else {
+					new_data += (lengths[axis] - 1 - offset[sides_index]) * strides[axis];
+				}
+				sides_index++;
 			} else {
-				new_data += (lengths[sides[i].getAxisIndex()] - 1 - offset[i]) * strides[sides[i].getAxisIndex()];
+				new_lengths[lengths_index] = lengths[axis];
+				new_strides[lengths_index] = strides[axis];
+				lengths_index++;
 			}
 		}
-		std::array<int, 1> new_strides = {strides[axis]};
-		std::array<int, 1> new_lengths = {lengths[axis]};
-		return LocalData<1>(new_data, new_strides, new_lengths, 0, ldm);
+		return LocalData<M>(new_data, new_strides, new_lengths, 0, ldm);
 	}
 
 	template <int idx, class Type, class... Types> int getIndex(Type t, Types... args) const
@@ -242,106 +212,28 @@ template <int D> class LocalData
 		return data[getIndex<0>(args...)];
 	}
 	/**
-	 * @brief Get a slice with dimensions D-1 on the specified side of the patch
+	 * @brief Get a slice in a given face
 	 *
-	 * @param s the side
-	 * @param offset how far from the side the slice is
-	 * @return LocalData<D - 1>
-	 */
-	LocalData<D - 1> getSliceOnSide(Side<D> s, int offset = 0)
-	{
-		return getSliceOnSidePriv(s, offset);
-	}
-	/**
-	 * @brief Get a slice with dimensions D-1 on the specified side of the patch
-	 *
-	 * @param s the side
-	 * @param offset how far from the side the slice is
-	 * @return LocalData<D - 1>
-	 */
-	const LocalData<D - 1> getSliceOnSide(Side<D> s, int offset = 0) const
-	{
-		return getSliceOnSidePriv(s, offset);
-	}
-	/**
-	 * @brief Get a slice of ghost cells with dimensions D-1 on the specified side of the patch
-	 *
-	 * @param s the side
-	 * @param offset which layer of ghost cells to acess
-	 * @return LocalData<D - 1>
-	 */
-	const LocalData<D - 1> getGhostSliceOnSide(Side<D> s, int offset) const
-	{
-		return getSliceOnSidePriv(s, -offset);
-	}
-	/**
-	 * @brief Get a slice of ghost cells with dimension 1 on the specified edge of a patch
-	 *
-	 * @param e the edge
-	 * @param offset the offset of the slice {0,0} is the non ghost cells touching the edge, {-1,-1} is the first layer of ghost cells touching that
-	 * edge
-	 * @return LocalData<1> the slice
-	 */
-	template <int N = 0>
-	auto getSliceOnEdge(Edge e, const std::array<int, 2> &offset) -> typename std::enable_if<D == 3 && N == N, LocalData<1>>::type
-	{
-		return getSliceOnEdgePriv(e, offset);
-	}
-
-	/**
-	 * @brief Get a slice of ghost cells with dimension 1 on the specified edge of a patch
-	 *
-	 * @param e the edge
-	 * @param offset the offset of the slice {0,0} is the non ghost cells touching the edge, {-1,-1} is the first layer of ghost cells touching that
-	 * edge
-	 * @return LocalData<1> the slice
-	 */
-	template <int N = 0>
-	auto getSliceOnEdge(Edge e, const std::array<int, 2> &offset) const -> typename std::enable_if<D == 3 && N == N, const LocalData<1>>::type
-	{
-		return getSliceOnEdgePriv(e, offset);
-	}
-	/**
-	 * @brief Get a value in a given corner
-	 *
-	 * @param c the corner
+	 * @param f the face
 	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
-	 * corner
+	 * face
 	 * @return double& the value
 	 */
-	double &getValueOnCorner(Corner<D> c, const std::array<int, D> &offset)
+	template <int M> LocalData<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
 	{
-		double *               value = data;
-		std::array<Side<D>, D> sides = c.getSides();
-		for (int i = 0; i < D; i++) {
-			if (sides[i].isLowerOnAxis()) {
-				value += offset[i] * strides[i];
-			} else {
-				value += (lengths[i] - 1 - offset[i]) * strides[i];
-			}
-		}
-		return *value;
+		return getSliceOnPriv(f, offset);
 	}
 	/**
-	 * @brief Get a value in a given corner
+	 * @brief Get a slice in a given face
 	 *
-	 * @param c the corner
+	 * @param f the face
 	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
-	 * corner
+	 * face
 	 * @return double& the value
 	 */
-	const double &getValueOnCorner(Corner<D> c, const std::array<int, D> &offset) const
+	template <int M> const LocalData<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
-		const double *         value = data;
-		std::array<Side<D>, D> sides = c.getSides();
-		for (int i = 0; i < D; i++) {
-			if (sides[i].isLowerOnAxis()) {
-				value += offset[i] * strides[i];
-			} else {
-				value += (lengths[i] - 1 - offset[i]) * strides[i];
-			}
-		}
-		return *value;
+		return getSliceOnPriv(f, offset);
 	}
 	/**
 	 * @brief Get the Lengths of the patch in each direction

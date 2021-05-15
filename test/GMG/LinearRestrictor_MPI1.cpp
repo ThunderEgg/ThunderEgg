@@ -76,8 +76,8 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			if (!pinfo.hasNbr(s)) {
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
@@ -144,10 +144,10 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost       = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost  = expected_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> vec_ghost2      = vec_ld2.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost2 = expected_ld2.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost       = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost  = expected_ld.getSliceOn(s, {-1});
+			LocalData<1> vec_ghost2      = vec_ld2.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost2 = expected_ld2.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			if (!pinfo.hasNbr(s)) {
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
@@ -208,8 +208,8 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 			               [&](const array<int, 1> &coord) {
@@ -269,10 +269,10 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost       = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost  = expected_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> vec_ghost2      = vec_ld2.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost2 = expected_ld2.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost       = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost  = expected_ld.getSliceOn(s, {-1});
+			LocalData<1> vec_ghost2      = vec_ld2.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost2 = expected_ld2.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 			               [&](const array<int, 1> &coord) {

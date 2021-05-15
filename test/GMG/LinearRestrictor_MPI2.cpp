@@ -72,8 +72,8 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (!pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
@@ -125,8 +125,8 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getGhostSliceOnSide(s, 1);
-			LocalData<1> expected_ghost = expected_ld.getGhostSliceOnSide(s, 1);
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (!pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),

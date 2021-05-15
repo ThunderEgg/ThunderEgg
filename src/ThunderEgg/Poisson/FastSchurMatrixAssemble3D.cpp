@@ -201,7 +201,7 @@ LocalData<3> getLocalDataForBuffer(double *buffer_ptr, const PatchInfo<3> &pinfo
 void FillBlockColumnForNormalInterface(int j, const LocalData<3> &u, Side<3> s, std::vector<double> &block)
 {
 	int  n     = u.getLengths()[0];
-	auto slice = u.getSliceOnSide(s);
+	auto slice = u.getSliceOn(s, {0});
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			block[(xi + n * yi) * n * n + j] = -slice[{xi, yi}] / 2;
@@ -231,8 +231,8 @@ void FillBlockColumnForCoarseToCoarseInterface(int                              
 	new_pinfo.setNbrInfo(s, new FineNbrInfo<2>());
 	std::vector<LocalData<3>> us = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
-	auto slice       = u.getSliceOnSide(s);
-	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
+	auto slice       = u.getSliceOn(s, {0});
+	auto ghost_slice = u.getSliceOn(s, {-1});
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			block[(xi + yi * n) * n * n + j] = -(slice[{xi, yi}] + ghost_slice[{xi, yi}]) / 2;
@@ -265,8 +265,8 @@ void FillBlockColumnForFineToFineInterface(int                                  
 	new_pinfo.setNbrInfo(s, new CoarseNbrInfo<2>(100, type.getOrthant()));
 	std::vector<LocalData<3>> us = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
-	auto slice       = u.getSliceOnSide(s);
-	auto ghost_slice = u.getGhostSliceOnSide(s, 1);
+	auto slice       = u.getSliceOn(s, {0});
+	auto ghost_slice = u.getSliceOn(s, {-1});
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			block[(xi + yi * n) * n * n + j] = -(slice[{xi, yi}] + ghost_slice[{xi, yi}]) / 2;
@@ -396,7 +396,7 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 			auto         f_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1, 1);
 			LocalData<3> u_local_data  = u_vec->getLocalData(0, 0);
 			auto         u_local_datas = u_vec->getLocalDatas(0);
-			LocalData<2> u_west_ghosts = u_local_data.getGhostSliceOnSide(Side<3>::west(), 1);
+			LocalData<2> u_west_ghosts = u_local_data.getSliceOn(Side<3>::west(), {-1});
 			LocalData<3> f_local_data  = f_vec->getLocalData(0, 0);
 			auto         f_local_datas = f_vec->getLocalDatas(0);
 
