@@ -300,11 +300,36 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 						offset += -ns[side.getAxisIndex()] * strides[face.getIndex()][side.getAxisIndex()];
 					}
 				}
+				start_offsets[face.getIndex()] = offset;
+				/*
+				for (int axis = 0; axis < D; axis++) {
+				    if (sides[sides_index].getAxisIndex() == axis) {
+				        if (sides[sides_index].isLowerOnAxis()) {
+				            new_data += offset[sides_index] * strides[axis];
+				        } else {
+				            new_data += (lengths[axis] - 1 - offset[sides_index]) * strides[axis];
+				        }
+				        sides_index++;
+				    } else {
+				        new_lengths[lengths_index] = lengths[axis];
+				        new_strides[lengths_index] = strides[axis];
+				        lengths_index++;
+				    }
+				}
+				*/
 			}
 		}
 		size_t getSize(Face<D, M> face) const
 		{
 			return sizes[face.getIndex()];
+		}
+		const std::array<int, D> &getStrides(Face<D, M> face) const
+		{
+			return strides[face.getIndex()];
+		}
+		size_t getStartOffset(Face<D, M> face) const
+		{
+			return start_offsets[face.getIndex()];
 		}
 	};
 	DimensionalArray<D - 1, GhostLocalDataInfo> ghost_local_data_infos;
@@ -317,31 +342,13 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param component_index  the component index
 	 * @return LocalData<D> the LocalData object
 	 */
-	LocalData<D> getLocalDataForBuffer(double *buffer_ptr, Side<D> side, int component_index) const
+	template <int M> LocalData<D> getLocalDataForBuffer(double *buffer_ptr, Face<D, M> face, int component_index) const
 	{
-		auto ns              = domain->getNs();
-		int  num_ghost_cells = domain->getNumGhostCells();
-		// determine striding
-		std::array<int, D> strides;
-		strides[0] = 1;
-		for (size_t i = 1; i < D; i++) {
-			if (i - 1 == side.getAxisIndex()) {
-				strides[i] = num_ghost_cells * strides[i - 1];
-			} else {
-				strides[i] = ns[i - 1] * strides[i - 1];
-			}
-		}
-		int size = D - 1 == side.getAxisIndex() ? (num_ghost_cells * strides[D - 1]) : (ns[D - 1] * strides[D - 1]);
-		// transform buffer ptr so that it points to first non-ghost cell
-		double *transformed_buffer_ptr = buffer_ptr + size * component_index;
-		if (side.isLowerOnAxis()) {
-			transformed_buffer_ptr -= (-num_ghost_cells) * strides[side.getAxisIndex()];
-		} else {
-			transformed_buffer_ptr -= ns[side.getAxisIndex()] * strides[side.getAxisIndex()];
-		}
-
-		LocalData<D> buffer_data(transformed_buffer_ptr, strides, ns, num_ghost_cells);
-		return buffer_data;
+		const GhostLocalDataInfo<M> &gld_info = ghost_local_data_infos.template get<M>();
+		return LocalData<D>(buffer_ptr + gld_info.getSize(face) * component_index + gld_info.getStartOffset(face),
+		                    gld_info.getStrides(face),
+		                    domain->getNs(),
+		                    domain->getNumGhostCells());
 	}
 	/**
 	 * @brief Post send requests
@@ -357,6 +364,31 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 		return recv_requests;
 	}
+	template <int M> void addRecvBufferToGhost(const RemoteCallSet &remote_call_set, std::vector<double> &buffer, const Vector<D> &u) const
+	{
+		for (const IncomingGhost<M> &incoming_ghost : remote_call_set.incoming_ghosts.template get<M>()) {
+			int        local_index   = incoming_ghost.local_index;
+			Face<D, M> face          = incoming_ghost.face;
+			size_t     buffer_offset = incoming_ghost.offset;
+
+			for (int c = 0; c < u.getNumComponents(); c++) {
+				const LocalData<D>        local_data  = u.getLocalData(c, local_index);
+				double *                  buffer_ptr  = buffer.data() + buffer_offset * u.getNumComponents();
+				LocalData<D>              buffer_data = getLocalDataForBuffer(buffer_ptr, face, c);
+				std::array<size_t, D - M> start;
+				start.fill(0);
+				std::array<size_t, D - M> end;
+				end.fill(domain->getNumGhostCells() - 1);
+				nested_loop<D - M>(start, end, [&](const std::array<size_t, D - M> &offset) {
+					LocalData<M> local_slice  = local_data.getGhostSliceOn(face, offset);
+					LocalData<M> buffer_slice = buffer_data.getGhostSliceOn(face, offset);
+					nested_loop<M>(local_slice.getStart(), local_slice.getEnd(), [&](const std::array<int, M> &coord) {
+						local_slice[coord] += buffer_slice[coord];
+					});
+				});
+			}
+		}
+	}
 	/**
 	 * @brief process recv requests as they are ready
 	 *
@@ -370,26 +402,44 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		for (size_t i = 0; i < num_requests; i++) {
 			int finished_index;
 			MPI_Waitany(requests.size(), requests.data(), &finished_index, MPI_STATUS_IGNORE);
-			for (const IncomingGhost<D - 1> &incoming_ghost : remote_call_sets[finished_index].incoming_ghosts.template get<D - 1>()) {
-				int     local_index   = incoming_ghost.local_index;
-				Side<D> side          = incoming_ghost.face;
-				size_t  buffer_offset = incoming_ghost.offset;
-
-				for (int c = 0; c < u->getNumComponents(); c++) {
-					const LocalData<D> local_data  = u->getLocalData(c, local_index);
-					double *           buffer_ptr  = buffers[finished_index].data() + buffer_offset * u->getNumComponents();
-					LocalData<D>       buffer_data = getLocalDataForBuffer(buffer_ptr, side, c);
-					for (int ig = 0; ig < domain->getNumGhostCells(); ig++) {
-						LocalData<D - 1> local_slice  = local_data.getSliceOn(side, {-ig - 1});
-						LocalData<D - 1> buffer_slice = buffer_data.getSliceOn(side, {-ig - 1});
-						nested_loop<D - 1>(local_slice.getStart(), local_slice.getEnd(), [&](const std::array<int, D - 1> &coord) {
-							local_slice[coord] += buffer_slice[coord];
-						});
+			switch (fill_type) {
+				case GhostFillingType::Corners:
+					if constexpr (D >= 2) {
+						addRecvBufferToGhost<0>(remote_call_sets[finished_index], buffers[finished_index], *u);
 					}
-				}
+				case GhostFillingType::Edges:
+					if constexpr (D == 3) {
+						addRecvBufferToGhost<1>(remote_call_sets[finished_index], buffers[finished_index], *u);
+					}
+				case GhostFillingType::Faces:
+					addRecvBufferToGhost<D - 1>(remote_call_sets[finished_index], buffers[finished_index], *u);
+					break;
+				default:
+					throw RuntimeError("Unsupported GhostFilling Type");
 			}
 		}
 	}
+
+	template <int M> void fillSendBuffer(const RemoteCallSet &remote_call_set, std::vector<double> &buffer, const Vector<D> &u) const
+	{
+		for (const RemoteCall<M> &call : remote_call_set.remote_calls.template get<M>()) {
+			const PatchInfo<D> &pinfo       = domain->getPatchInfoVector()[call.local_index];
+			Face<D, M>          face        = call.face.opposite();
+			auto                local_datas = u.getLocalDatas(call.local_index);
+			double *            buffer_ptr  = buffer.data() + call.offset * u.getNumComponents();
+
+			// create LocalData objects for the buffer
+			std::vector<LocalData<D>> buffer_datas;
+			buffer_datas.reserve(u.getNumComponents());
+			for (int c = 0; c < u.getNumComponents(); c++) {
+				buffer_datas.push_back(getLocalDataForBuffer(buffer_ptr, face, c));
+			}
+
+			// make the call
+			fillGhostCellsForNbrPatchPriv(pinfo, local_datas, buffer_datas, call.face, call.nbr_type, call.orthant);
+		}
+	}
+
 	/**
 	 * @brief fill buffers and post send requests
 	 *
@@ -401,21 +451,20 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	{
 		std::vector<MPI_Request> send_requests(remote_call_sets.size());
 		for (size_t i = 0; i < remote_call_sets.size(); i++) {
-			for (const RemoteCall<D - 1> &call : remote_call_sets[i].remote_calls.template get<D - 1>()) {
-				const PatchInfo<D> &pinfo       = domain->getPatchInfoVector()[call.local_index];
-				Side<D>             side        = call.face.opposite();
-				auto                local_datas = u->getLocalDatas(call.local_index);
-				double *            buffer_ptr  = buffers[i].data() + call.offset * u->getNumComponents();
-
-				// create LocalData objects for the buffer
-				std::vector<LocalData<D>> buffer_datas;
-				buffer_datas.reserve(u->getNumComponents());
-				for (int c = 0; c < u->getNumComponents(); c++) {
-					buffer_datas.push_back(getLocalDataForBuffer(buffer_ptr, side, c));
-				}
-
-				// make the call
-				fillGhostCellsForNbrPatch(pinfo, local_datas, buffer_datas, call.face, call.nbr_type, call.orthant);
+			switch (fill_type) {
+				case GhostFillingType::Corners:
+					if constexpr (D >= 2) {
+						fillSendBuffer<0>(remote_call_sets[i], buffers[i], *u);
+					}
+				case GhostFillingType::Edges:
+					if constexpr (D == 3) {
+						fillSendBuffer<1>(remote_call_sets[i], buffers[i], *u);
+					}
+				case GhostFillingType::Faces:
+					fillSendBuffer<D - 1>(remote_call_sets[i], buffers[i], *u);
+					break;
+				default:
+					throw RuntimeError("Unsupported GhostFilling Type");
 			}
 			MPI_Isend(buffers[i].data(), buffers[i].size(), MPI_DOUBLE, remote_call_sets[i].rank, 0, MPI_COMM_WORLD, &send_requests[i]);
 		}
