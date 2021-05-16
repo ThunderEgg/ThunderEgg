@@ -581,6 +581,45 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 
+	template <int M> void zeroGhostCellsOnAllFaces(const PatchInfo<D> &pinfo, const LocalData<D> &data) const
+	{
+		for (Face<D, M> f : Face<D, M>::getValues()) {
+			if (pinfo.hasNbr(f)) {
+				std::array<size_t, D - M> start;
+				start.fill(0);
+				std::array<size_t, D - M> end;
+				end.fill(domain->getNumGhostCells() - 1);
+				nested_loop<D - M>(start, end, [&](const std::array<size_t, D - M> &offset) {
+					LocalData<M> this_ghost = data.getGhostSliceOn(f, offset);
+					nested_loop<M>(this_ghost.getStart(), this_ghost.getEnd(), [&](const std::array<int, M> &coord) { this_ghost[coord] = 0; });
+				});
+			}
+		}
+	}
+
+	void zeroGhostCells(std::shared_ptr<const Vector<D>> u) const
+	{
+		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
+			for (auto &this_patch : u->getLocalDatas(pinfo.local_index)) {
+				switch (fill_type) {
+					case GhostFillingType::Corners:
+						if constexpr (D >= 2) {
+							zeroGhostCellsOnAllFaces<0>(pinfo, this_patch);
+						}
+					case GhostFillingType::Edges:
+						if constexpr (D == 3) {
+							zeroGhostCellsOnAllFaces<1>(pinfo, this_patch);
+						}
+					case GhostFillingType::Faces:
+						zeroGhostCellsOnAllFaces<D - 1>(pinfo, this_patch);
+						break;
+					default:
+						throw RuntimeError("Unsupported GhostFilling Type");
+				}
+			}
+		}
+	}
+
 	protected:
 	/**
 	 * @brief The domain that this ghostfiller operates on
@@ -695,32 +734,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	void fillGhost(std::shared_ptr<const Vector<D>> u) const
 	{
 		// zero out ghost cells
-		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			for (auto &this_patch : u->getLocalDatas(pinfo.local_index)) {
-				for (Side<D> s : Side<D>::getValues()) {
-					if (pinfo.hasNbr(s)) {
-						for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-							auto this_ghost = this_patch.getSliceOn(s, {-i - 1});
-							nested_loop<D - 1>(
-							this_ghost.getStart(), this_ghost.getEnd(), [&](const std::array<int, D - 1> &coord) { this_ghost[coord] = 0; });
-						}
-					}
-				}
-				if constexpr (D == 3) {
-					for (Edge e : Edge::getValues()) {
-						if (pinfo.hasNbr(e)) {
-							for (int j = 0; j < pinfo.num_ghost_cells; j++) {
-								for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-									auto this_ghost = this_patch.getSliceOn(e, {-1 - i, -1 - j});
-									nested_loop<1>(
-									this_ghost.getStart(), this_ghost.getEnd(), [&](const std::array<int, 1> &coord) { this_ghost[coord] = 0; });
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		zeroGhostCells(u);
 
 		// allocate recv buffers and post recvs
 		std::vector<std::vector<double>> recv_buffers(remote_call_sets.size());

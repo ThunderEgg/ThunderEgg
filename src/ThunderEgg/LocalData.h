@@ -235,6 +235,30 @@ template <int D> class LocalData
 	{
 		return getSliceOnPriv(f, offset);
 	}
+	template <int M> LocalData<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
+	{
+		std::array<int, M>         new_strides;
+		std::array<int, M>         new_lengths;
+		double *                   new_data      = data;
+		std::array<Side<D>, D - M> sides         = f.getSides();
+		int                        lengths_index = 0;
+		int                        sides_index   = 0;
+		for (int axis = 0; axis < D; axis++) {
+			if (sides[sides_index].getAxisIndex() == axis) {
+				if (sides[sides_index].isLowerOnAxis()) {
+					new_data += (-1 - offset[sides_index]) * strides[axis];
+				} else {
+					new_data += (lengths[axis] + offset[sides_index]) * strides[axis];
+				}
+				sides_index++;
+			} else {
+				new_lengths[lengths_index] = lengths[axis];
+				new_strides[lengths_index] = strides[axis];
+				lengths_index++;
+			}
+		}
+		return LocalData<M>(new_data, new_strides, new_lengths, 0, ldm);
+	}
 	/**
 	 * @brief Get the Lengths of the patch in each direction
 	 */
