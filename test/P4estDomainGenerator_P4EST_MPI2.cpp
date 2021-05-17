@@ -125,13 +125,13 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 	auto domain_1 = dg.getCoarserDomain();
 	auto domain_0 = dg.getCoarserDomain();
 
-	SECTION("correct number of patches")
+	//SECTION("correct number of patches")
 	{
 		CHECK(domain_2->getNumGlobalPatches() == 16);
 		CHECK(domain_1->getNumGlobalPatches() == 4);
 		CHECK(domain_0->getNumGlobalPatches() == 1);
 	}
-	SECTION("patches have correct spacings")
+	//SECTION("patches have correct spacings")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
@@ -148,7 +148,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
 		}
 	}
-	SECTION("patches have correct ns")
+	//SECTION("patches have correct ns")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
@@ -166,7 +166,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 		}
 	}
 
-	SECTION("patches have refine_level set")
+	//SECTION("patches have refine_level set")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.refine_level == 2);
@@ -180,7 +180,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK(patch.refine_level == 0);
 		}
 	}
-	SECTION("patches have ranks set")
+	//SECTION("patches have ranks set")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
@@ -194,7 +194,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK(patch.rank == rank);
 		}
 	}
-	SECTION("patches have num_ghost_cells set")
+	//SECTION("patches have num_ghost_cells set")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
@@ -351,7 +351,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 		CHECK(domain_0_coarser_patch->starts[1] == Catch::Approx(0.0));
 	}
 
-	SECTION("parent ids are set correctly")
+	//SECTION("parent ids are set correctly")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->parent_id == domain_1_sw_patch->id);
@@ -382,7 +382,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->parent_id == -1);
 		}
 	}
-	SECTION("child ids are set correctly")
+	//SECTION("child ids are set correctly")
 	{
 		if (rank == 0) {
 			for (int i = 0; i < 4; i++) {
@@ -434,7 +434,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->child_ids[3] == domain_1_ne_patch->id);
 		}
 	}
-	SECTION("orth on parent is set correctly")
+	//SECTION("orth on parent is set correctly")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->orth_on_parent == Orthant<2>::sw());
@@ -465,7 +465,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->orth_on_parent == Orthant<2>::null());
 		}
 	}
-	SECTION("parent ranks are set correctly")
+	//SECTION("parent ranks are set correctly")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->parent_rank == domain_1_sw_patch->rank);
@@ -496,7 +496,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->parent_rank == -1);
 		}
 	}
-	SECTION("child ranks are set correctly")
+	//SECTION("child ranks are set correctly")
 	{
 		if (rank == 0) {
 			for (int i = 0; i < 4; i++) {
@@ -548,7 +548,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->child_ranks[3] == domain_1_ne_patch->rank);
 		}
 	}
-	SECTION("nbr_info ids are correct")
+	//SECTION("nbr_info ids are correct")
 	{
 		if (rank == 0) {
 			CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::west()));
@@ -657,7 +657,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::north()));
 		}
 	}
-	SECTION("nbr_info ranks are correct")
+	//SECTION("nbr_info ranks are correct")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_sw_se_patch->rank);
@@ -737,7 +737,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_se_patch->rank);
 		}
 	}
-	SECTION("corner_nbr_info ids are correct")
+	//SECTION("corner_nbr_info ids are correct")
 	{
 		if (rank == 0) {
 			CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::sw()));
@@ -886,7 +886,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 			CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::ne()));
 		}
 	}
-	SECTION("corner_nbr_info ranks are correct")
+	//SECTION("corner_nbr_info ranks are correct")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_sw_ne_patch->rank);
@@ -997,7 +997,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 	auto domain_1 = dg.getCoarserDomain();
 	auto domain_0 = dg.getCoarserDomain();
 
-	SECTION("patches have correct ns")
+	//SECTION("patches have correct ns")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
@@ -1014,7 +1014,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK(patch.ns[1] == ny);
 		}
 	}
-	SECTION("patches have ranks set")
+	//SECTION("patches have ranks set")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
@@ -1029,7 +1029,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 		}
 	}
 
-	SECTION("patches have num_ghost_cells set")
+	//SECTION("patches have num_ghost_cells set")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
@@ -1126,7 +1126,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 		CHECK(domain_0_patch->starts[1] == Catch::Approx(0.0));
 	}
 
-	SECTION("patches have correct spacings")
+	//SECTION("patches have correct spacings")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
@@ -1159,7 +1159,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 		}
 	}
 
-	SECTION("patches have refine_level set")
+	//SECTION("patches have refine_level set")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
@@ -1181,7 +1181,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 		}
 	}
 
-	SECTION("parent ids are set correctly")
+	//SECTION("parent ids are set correctly")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->parent_id == domain_1_sw_patch->id);
@@ -1201,7 +1201,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_patch->parent_id == -1);
 		}
 	}
-	SECTION("child ids are set correctly")
+	//SECTION("child ids are set correctly")
 	{
 		if (rank == 0) {
 			for (int i = 0; i < 4; i++) {
@@ -1235,7 +1235,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_patch->child_ids[3] == domain_1_ne_patch->id);
 		}
 	}
-	SECTION("orth on parent is set correctly")
+	//SECTION("orth on parent is set correctly")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->orth_on_parent == Orthant<2>::sw());
@@ -1254,7 +1254,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_patch->orth_on_parent == Orthant<2>::null());
 		}
 	}
-	SECTION("parent ranks are set correctly")
+	//SECTION("parent ranks are set correctly")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->parent_rank == domain_1_sw_patch->rank);
@@ -1274,7 +1274,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_patch->parent_rank == -1);
 		}
 	}
-	SECTION("child ranks are set correctly")
+	//SECTION("child ranks are set correctly")
 	{
 		if (rank == 0) {
 			for (int i = 0; i < 4; i++) {
@@ -1308,7 +1308,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_patch->child_ranks[3] == domain_1_ne_patch->rank);
 		}
 	}
-	SECTION("nbr_info ids are correct")
+	//SECTION("nbr_info ids are correct")
 	{
 		if (rank == 0) {
 			CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::west()));
@@ -1374,7 +1374,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK_FALSE(domain_0_patch->hasNbr(Side<2>::north()));
 		}
 	}
-	SECTION("nbr_info ranks are correct")
+	//SECTION("nbr_info ranks are correct")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_sw_se_patch->rank);
@@ -1417,7 +1417,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_se_patch->rank);
 		}
 	}
-	SECTION("nbr_info orth_on_coarse are correct")
+	//SECTION("nbr_info orth_on_coarse are correct")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).orth_on_coarse == Orthant<1>::lower());
@@ -1428,7 +1428,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).orth_on_coarse == Orthant<1>::upper());
 		}
 	}
-	SECTION("corner_nbr_info ids are correct")
+	//SECTION("corner_nbr_info ids are correct")
 	{
 		if (rank == 0) {
 			CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::sw()));
@@ -1504,7 +1504,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 			CHECK_FALSE(domain_0_patch->hasNbr(Corner<2>::ne()));
 		}
 	}
-	SECTION("corner_nbr_info ranks are correct")
+	//SECTION("corner_nbr_info ranks are correct")
 	{
 		if (rank == 0) {
 			CHECK(domain_2_sw_sw_patch->hasNbr(Corner<2>::ne()));
@@ -1594,7 +1594,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 	auto domain_1 = dg.getCoarserDomain();
 	auto domain_0 = dg.getCoarserDomain();
 
-	SECTION("correct number of patches")
+	//SECTION("correct number of patches")
 	{
 		CHECK(domain_3->getNumGlobalPatches() == 19);
 		CHECK(domain_2->getNumGlobalPatches() == 16);
@@ -1602,7 +1602,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 		CHECK(domain_0->getNumGlobalPatches() == 1);
 	}
 
-	SECTION("patches have correct ns")
+	//SECTION("patches have correct ns")
 	{
 		for (auto patch : domain_3->getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
@@ -1625,7 +1625,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 		}
 	}
 
-	SECTION("patches have ranks set")
+	//SECTION("patches have ranks set")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
@@ -1639,7 +1639,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK(patch.rank == rank);
 		}
 	}
-	SECTION("patches have num_ghost_cells set")
+	//SECTION("patches have num_ghost_cells set")
 	{
 		for (auto patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
@@ -1909,7 +1909,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 		CHECK(domain_0_coarser_patch->starts[1] == Catch::Approx(0.0));
 	}
 
-	SECTION("patches have correct spacings")
+	//SECTION("patches have correct spacings")
 	{
 		if (rank == 0) {
 			CHECK(domain_3_sw_sw_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.125 / nx));
@@ -1971,7 +1971,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 		}
 	}
 
-	SECTION("patches have refine_level set")
+	//SECTION("patches have refine_level set")
 	{
 		if (rank == 0) {
 			CHECK(domain_3_sw_sw_sw_patch->refine_level == 3);
@@ -2012,7 +2012,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 		}
 	}
 
-	SECTION("parent ids are set correctly")
+	//SECTION("parent ids are set correctly")
 	{
 		if (rank == 0) {
 			CHECK(domain_3_sw_sw_sw_patch->parent_id == domain_2_sw_sw_patch->id);
@@ -2067,7 +2067,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->parent_id == -1);
 		}
 	}
-	SECTION("child ids are set correctly")
+	//SECTION("child ids are set correctly")
 	{
 		if (rank == 0) {
 			for (int i = 0; i < 4; i++) {
@@ -2168,7 +2168,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->child_ids[3] == domain_1_ne_patch->id);
 		}
 	}
-	SECTION("orth on parent is set correctly")
+	//SECTION("orth on parent is set correctly")
 	{
 		if (rank == 0) {
 			CHECK(domain_3_sw_sw_sw_patch->orth_on_parent == Orthant<2>::sw());
@@ -2223,7 +2223,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->orth_on_parent == Orthant<2>::null());
 		}
 	}
-	SECTION("parent ranks are set correctly")
+	//SECTION("parent ranks are set correctly")
 	{
 		if (rank == 0) {
 			CHECK(domain_3_sw_sw_sw_patch->parent_rank == domain_2_sw_sw_patch->rank);
@@ -2278,7 +2278,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->parent_rank == -1);
 		}
 	}
-	SECTION("child ranks are set correctly")
+	//SECTION("child ranks are set correctly")
 	{
 		if (rank == 0) {
 			for (int i = 0; i < 4; i++) {
@@ -2379,7 +2379,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK(domain_0_coarser_patch->child_ranks[3] == domain_1_ne_patch->rank);
 		}
 	}
-	SECTION("nbr_info ids are correct")
+	//SECTION("nbr_info ids are correct")
 	{
 		if (rank == 0) {
 			CHECK_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Side<2>::west()));
@@ -2585,7 +2585,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::north()));
 		}
 	}
-	SECTION("nbr_info ranks are correct")
+	//SECTION("nbr_info ranks are correct")
 	{
 		if (rank == 0) {
 			CHECK(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_sw_sw_se_patch->rank);
@@ -2744,7 +2744,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_se_patch->rank);
 		}
 	}
-	SECTION("corner_nbr_info ids are correct")
+	//SECTION("corner_nbr_info ids are correct")
 	{
 		if (rank == 0) {
 			CHECK_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Corner<2>::sw()));
@@ -3028,7 +3028,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::ne()));
 		}
 	}
-	SECTION("corner_nbr_info ranks are correct")
+	//SECTION("corner_nbr_info ranks are correct")
 	{
 		if (rank == 0) {
 			CHECK(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_sw_sw_ne_patch->rank);

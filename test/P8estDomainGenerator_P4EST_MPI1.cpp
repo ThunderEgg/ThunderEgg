@@ -127,12 +127,12 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 	auto domain_1 = dg.getFinestDomain();
 	auto domain_0 = dg.getCoarserDomain();
 
-	SECTION("correct number of patches")
+	//SECTION("correct number of patches")
 	{
 		CHECK(domain_1->getNumGlobalPatches() == 8);
 		CHECK(domain_0->getNumGlobalPatches() == 1);
 	}
-	SECTION("patches have correct spacings")
+	//SECTION("patches have correct spacings")
 	{
 		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
 			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
@@ -146,7 +146,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
 		CHECK(patch.spacings[2] == Catch::Approx(scale_z * 1.0 / nz));
 	}
-	SECTION("patches have correct ns")
+	//SECTION("patches have correct ns")
 	{
 		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
@@ -160,7 +160,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK(patch.ns[1] == ny);
 		CHECK(patch.ns[2] == nz);
 	}
-	SECTION("patches have ranks set")
+	//SECTION("patches have ranks set")
 	{
 		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
 			CHECK(patch.rank == 0);
@@ -170,7 +170,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 
 		CHECK(patch.rank == 0);
 	}
-	SECTION("patches have refine_level set")
+	//SECTION("patches have refine_level set")
 	{
 		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
 			CHECK(patch.refine_level == 1);
@@ -180,7 +180,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 
 		CHECK(patch.refine_level == 0);
 	}
-	SECTION("patches have num_ghost_cells set")
+	//SECTION("patches have num_ghost_cells set")
 	{
 		for (const PatchInfo<3> &patch : domain_1->getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
@@ -245,7 +245,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 	CHECK(domain_0_coarser_patch->starts[1] == Catch::Approx(0.0));
 	CHECK(domain_0_coarser_patch->starts[2] == Catch::Approx(0.0));
 
-	SECTION("parent ids are set correctly")
+	//SECTION("parent ids are set correctly")
 	{
 		CHECK(domain_1_bsw_patch->parent_id == domain_0_coarser_patch->id);
 		CHECK(domain_1_bse_patch->parent_id == domain_0_coarser_patch->id);
@@ -258,7 +258,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 
 		CHECK(domain_0_coarser_patch->parent_id == -1);
 	}
-	SECTION("child ids are set correctly")
+	//SECTION("child ids are set correctly")
 	{
 		for (int i = 0; i < 8; i++) {
 			CHECK(domain_1_bsw_patch->child_ids[i] == -1);
@@ -280,7 +280,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK(domain_0_coarser_patch->child_ids[6] == domain_1_tnw_patch->id);
 		CHECK(domain_0_coarser_patch->child_ids[7] == domain_1_tne_patch->id);
 	}
-	SECTION("orth on parent is set correctly")
+	//SECTION("orth on parent is set correctly")
 	{
 		CHECK(domain_1_bsw_patch->orth_on_parent == Orthant<3>::bsw());
 		CHECK(domain_1_bse_patch->orth_on_parent == Orthant<3>::bse());
@@ -293,7 +293,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 
 		CHECK(domain_0_coarser_patch->orth_on_parent == Orthant<3>::null());
 	}
-	SECTION("parent ranks are set correctly")
+	//SECTION("parent ranks are set correctly")
 	{
 		CHECK(domain_1_bsw_patch->parent_rank == domain_0_coarser_patch->rank);
 		CHECK(domain_1_bse_patch->parent_rank == domain_0_coarser_patch->rank);
@@ -306,7 +306,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 
 		CHECK(domain_0_coarser_patch->parent_rank == -1);
 	}
-	SECTION("child ranks are set correctly")
+	//SECTION("child ranks are set correctly")
 	{
 		for (int i = 0; i < 8; i++) {
 			CHECK(domain_1_bsw_patch->child_ranks[i] == -1);
@@ -328,7 +328,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK(domain_0_coarser_patch->child_ranks[6] == domain_1_tnw_patch->rank);
 		CHECK(domain_0_coarser_patch->child_ranks[7] == domain_1_tne_patch->rank);
 	}
-	SECTION("nbr_info ids are correct")
+	//SECTION("nbr_info ids are correct")
 	{
 		CHECK_FALSE(domain_1_bsw_patch->hasNbr(Side<3>::west()));
 		CHECK(domain_1_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_1_bse_patch->id);
@@ -393,7 +393,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<3>::bottom()));
 		CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<3>::top()));
 	}
-	SECTION("nbr_info ranks are correct")
+	//SECTION("nbr_info ranks are correct")
 	{
 		CHECK_FALSE(domain_1_bsw_patch->hasNbr(Side<3>::west()));
 		CHECK(domain_1_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_1_bse_patch->rank);
@@ -451,7 +451,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK(domain_1_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_1_bne_patch->rank);
 		CHECK_FALSE(domain_1_tne_patch->hasNbr(Side<3>::top()));
 	}
-	SECTION("edge_nbr_info ids are correct")
+	//SECTION("edge_nbr_info ids are correct")
 	{
 		CHECK_FALSE(domain_1_bsw_patch->hasNbr(Edge::bs()));
 		CHECK(domain_1_bsw_patch->hasNbr(Edge::tn()));
@@ -594,7 +594,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_0_coarser_patch->hasNbr(Edge::se()));
 		CHECK_FALSE(domain_0_coarser_patch->hasNbr(Edge::nw()));
 	}
-	SECTION("edge_nbr_info ranks are correct")
+	//SECTION("edge_nbr_info ranks are correct")
 	{
 		CHECK_FALSE(domain_1_bsw_patch->hasNbr(Edge::bs()));
 		CHECK(domain_1_bsw_patch->hasNbr(Edge::tn()));
@@ -737,7 +737,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_0_coarser_patch->hasNbr(Edge::se()));
 		CHECK_FALSE(domain_0_coarser_patch->hasNbr(Edge::nw()));
 	}
-	SECTION("corner_nbr_info ids are correct")
+	//SECTION("corner_nbr_info ids are correct")
 	{
 		CHECK_FALSE(domain_1_bsw_patch->hasNbr(Corner<3>::bsw()));
 		CHECK_FALSE(domain_1_bsw_patch->hasNbr(Corner<3>::bse()));
@@ -828,7 +828,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2 Uniform", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<3>::tnw()));
 		CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<3>::tne()));
 	}
-	SECTION("corner_nbr_info ranks are correct")
+	//SECTION("corner_nbr_info ranks are correct")
 	{
 		CHECK_FALSE(domain_1_bsw_patch->hasNbr(Corner<3>::bsw()));
 		CHECK_FALSE(domain_1_bsw_patch->hasNbr(Corner<3>::bse()));
@@ -966,7 +966,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 	auto domain_1 = dg.getCoarserDomain();
 	auto domain_0 = dg.getCoarserDomain();
 
-	SECTION("patches have correct ns")
+	//SECTION("patches have correct ns")
 	{
 		for (const PatchInfo<3> &patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
@@ -986,7 +986,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(patch.ns[1] == ny);
 		CHECK(patch.ns[2] == nz);
 	}
-	SECTION("patches have ranks set")
+	//SECTION("patches have ranks set")
 	{
 		for (const PatchInfo<3> &patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.rank == 0);
@@ -1001,7 +1001,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(patch.rank == 0);
 	}
 
-	SECTION("patches have num_ghost_cells set")
+	//SECTION("patches have num_ghost_cells set")
 	{
 		for (const PatchInfo<3> &patch : domain_2->getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
@@ -1155,7 +1155,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 	CHECK(domain_0_patch->starts[1] == Catch::Approx(0.0));
 	CHECK(domain_0_patch->starts[2] == Catch::Approx(0.0));
 
-	SECTION("patches have correct spacings")
+	//SECTION("patches have correct spacings")
 	{
 		CHECK(domain_2_bsw_bsw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
 		CHECK(domain_2_bsw_bsw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
@@ -1217,7 +1217,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(patch.spacings[2] == Catch::Approx(scale_z * 1.0 / nz));
 	}
 
-	SECTION("patches have refine_level set")
+	//SECTION("patches have refine_level set")
 	{
 		CHECK(domain_2_bsw_bsw_patch->refine_level == 2);
 		CHECK(domain_2_bsw_bse_patch->refine_level == 2);
@@ -1245,7 +1245,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(patch.refine_level == 0);
 	}
 
-	SECTION("parent ids are set correctly")
+	//SECTION("parent ids are set correctly")
 	{
 		CHECK(domain_2_bsw_bsw_patch->parent_id == domain_1_bsw_patch->id);
 		CHECK(domain_2_bsw_bse_patch->parent_id == domain_1_bsw_patch->id);
@@ -1275,7 +1275,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 
 		CHECK(domain_0_patch->parent_id == -1);
 	}
-	SECTION("child ids are set correctly")
+	//SECTION("child ids are set correctly")
 	{
 		for (int i = 0; i < 8; i++) {
 			CHECK(domain_2_bsw_bsw_patch->child_ids[i] == -1);
@@ -1331,7 +1331,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(domain_0_patch->child_ids[6] == domain_1_tnw_patch->id);
 		CHECK(domain_0_patch->child_ids[7] == domain_1_tne_patch->id);
 	}
-	SECTION("orth on parent is set correctly")
+	//SECTION("orth on parent is set correctly")
 	{
 		CHECK(domain_2_bsw_bsw_patch->orth_on_parent == Orthant<3>::bsw());
 		CHECK(domain_2_bsw_bse_patch->orth_on_parent == Orthant<3>::bse());
@@ -1360,7 +1360,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 
 		CHECK(domain_0_patch->orth_on_parent == Orthant<3>::null());
 	}
-	SECTION("parent ranks are set correctly")
+	//SECTION("parent ranks are set correctly")
 	{
 		CHECK(domain_2_bsw_bsw_patch->parent_rank == domain_1_bsw_patch->rank);
 		CHECK(domain_2_bsw_bse_patch->parent_rank == domain_1_bsw_patch->rank);
@@ -1390,7 +1390,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 
 		CHECK(domain_0_patch->parent_rank == -1);
 	}
-	SECTION("child ranks are set correctly")
+	//SECTION("child ranks are set correctly")
 	{
 		for (int i = 0; i < 8; i++) {
 			CHECK(domain_2_bsw_bsw_patch->child_ranks[i] == -1);
@@ -1446,7 +1446,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(domain_0_patch->child_ranks[6] == domain_1_tnw_patch->rank);
 		CHECK(domain_0_patch->child_ranks[7] == domain_1_tne_patch->rank);
 	}
-	SECTION("nbr_info ids are correct")
+	//SECTION("nbr_info ids are correct")
 	{
 		CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Side<3>::west()));
 		CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bsw_bse_patch->id);
@@ -1625,7 +1625,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_0_patch->hasNbr(Side<3>::bottom()));
 		CHECK_FALSE(domain_0_patch->hasNbr(Side<3>::top()));
 	}
-	SECTION("nbr_info ranks are correct")
+	//SECTION("nbr_info ranks are correct")
 	{
 		CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Side<3>::west()));
 		CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bsw_bse_patch->rank);
@@ -1804,7 +1804,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_0_patch->hasNbr(Side<3>::bottom()));
 		CHECK_FALSE(domain_0_patch->hasNbr(Side<3>::top()));
 	}
-	SECTION("nbr_info orth_on_coarse are correct")
+	//SECTION("nbr_info orth_on_coarse are correct")
 	{
 		CHECK(domain_2_bsw_bse_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::sw());
 		CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::se());
@@ -1821,7 +1821,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::nw());
 		CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::ne());
 	}
-	SECTION("edge_nbr_info ids are correct")
+	//SECTION("edge_nbr_info ids are correct")
 	{
 		CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Edge::bs()));
 		CHECK(domain_2_bsw_bsw_patch->hasNbr(Edge::tn()));
@@ -2213,7 +2213,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_0_patch->hasNbr(Edge::se()));
 		CHECK_FALSE(domain_0_patch->hasNbr(Edge::nw()));
 	}
-	SECTION("edge_nbr_info ranks are correct")
+	//SECTION("edge_nbr_info ranks are correct")
 	{
 		CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Edge::bs()));
 		CHECK(domain_2_bsw_bsw_patch->hasNbr(Edge::tn()));
@@ -2605,7 +2605,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_0_patch->hasNbr(Edge::se()));
 		CHECK_FALSE(domain_0_patch->hasNbr(Edge::nw()));
 	}
-	SECTION("edge_nbr_info ranks are correct")
+	//SECTION("edge_nbr_info ranks are correct")
 	{
 		CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Edge::tn()).orth_on_coarse == Orthant<1>::lower());
 		CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::tn()).orth_on_coarse == Orthant<1>::upper());
@@ -2616,7 +2616,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Edge::ne()).orth_on_coarse == Orthant<1>::lower());
 		CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::ne()).orth_on_coarse == Orthant<1>::upper());
 	}
-	SECTION("corner_nbr_info ids are correct")
+	//SECTION("corner_nbr_info ids are correct")
 	{
 		CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Corner<3>::bsw()));
 		CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Corner<3>::bse()));
@@ -2858,7 +2858,7 @@ TEST_CASE("P8estDomainGenerator 2x2 Refined SW", "[P8estDomainGenerator]")
 		CHECK_FALSE(domain_0_patch->hasNbr(Corner<3>::tnw()));
 		CHECK_FALSE(domain_0_patch->hasNbr(Corner<3>::tne()));
 	}
-	SECTION("corner_nbr_info ranks are correct")
+	//SECTION("corner_nbr_info ranks are correct")
 	{
 		CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Corner<3>::bsw()));
 		CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Corner<3>::bse()));
