@@ -51,6 +51,13 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				construct<I - 1>();
 			}
 		}
+		template <int I> void copy(const DimensionalArray &other)
+		{
+			ts[I] = new T<I>(other.template get<I>());
+			if constexpr (I > 0) {
+				copy<I - 1>(other);
+			}
+		}
 		template <int I> void deconstruct()
 		{
 			T<I> *t = static_cast<T<I> *>(ts[I]);
@@ -64,6 +71,10 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		DimensionalArray()
 		{
 			construct<N - 1>();
+		}
+		DimensionalArray(const DimensionalArray &other)
+		{
+			copy<N - 1>(other);
 		}
 		~DimensionalArray()
 		{
