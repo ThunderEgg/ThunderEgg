@@ -42,50 +42,43 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	template <int N, template <int> class T> class DimensionalArray
 	{
 		private:
-		T<N>                       t;
-		DimensionalArray<N - 1, T> next;
+		std::array<void *, N> ts;
+
+		template <int I> void construct()
+		{
+			ts[I] = new T<I>();
+			if constexpr (I > 0) {
+				construct<I - 1>();
+			}
+		}
+		template <int I> void deconstruct()
+		{
+			T<I> *t = static_cast<T<I> *>(ts[I]);
+			delete t;
+			if constexpr (I > 0) {
+				deconstruct<I - 1>();
+			}
+		}
 
 		public:
+		DimensionalArray()
+		{
+			construct<N - 1>();
+		}
+		~DimensionalArray()
+		{
+			deconstruct<N - 1>();
+		}
 		template <int I> T<I> &get()
 		{
-			static_assert(I < N, "invalid index value");
-			return next.template get<I>();
-		}
-		template <> T<N> &get()
-		{
-			return t;
+			static_assert(I >= 0 && I < N, "invalid index value");
+			return *static_cast<T<I> *>(ts[I]);
 		}
 		template <int I> const T<I> &get() const
 		{
 			static_assert(I < N, "invalid index value");
-			return next.template get<I>();
-		}
-		template <> const T<N> &get() const
-		{
-			return t;
-		}
-	};
-	template <template <int> class T> class DimensionalArray<0, T>
-	{
-		private:
-		T<0> t;
-
-		public:
-		template <int I> T<I> &get()
-		{
-			static_assert(I == 0, "invalid index value");
-		}
-		template <> T<0> &get()
-		{
-			return t;
-		}
-		template <int I> const T<I> &get() const
-		{
-			static_assert(I == 0, "invalid index value");
-		}
-		template <> const T<0> &get() const
-		{
-			return t;
+			static_assert(I >= 0 && I < N, "invalid index value");
+			return *static_cast<T<I> *>(ts[I]);
 		}
 	};
 	template <int M> struct RemoteCallPrototype {
@@ -248,7 +241,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		/**
 		 * @brief A vector of RemoteCall deques, one sperate deque for each rank
 		 */
-		DimensionalArray<D - 1, RemoteCallDeque> remote_calls;
+		DimensionalArray<D, RemoteCallDeque> remote_calls;
 		/**
 		 * @brief the length of the recv buffer;
 		 */
@@ -257,7 +250,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		/**
 		 * @brief deque for incoming ghost calls
 		 */
-		DimensionalArray<D - 1, IncomingGhostDeque> incoming_ghosts;
+		DimensionalArray<D, IncomingGhostDeque> incoming_ghosts;
 
 		explicit RemoteCallSet(int rank) : rank(rank) {}
 	};
@@ -267,7 +260,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	/**
 	 * @brief deque of local calls to be made
 	 */
-	DimensionalArray<D - 1, LocalCallDeque> local_calls;
+	DimensionalArray<D, LocalCallDeque> local_calls;
 
 	template <int M> class GhostLocalDataInfo
 	{
@@ -332,7 +325,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			return start_offsets[face.getIndex()];
 		}
 	};
-	DimensionalArray<D - 1, GhostLocalDataInfo> ghost_local_data_infos;
+	DimensionalArray<D, GhostLocalDataInfo> ghost_local_data_infos;
 
 	/**
 	 * @brief Get the LocalData object for the buffer
