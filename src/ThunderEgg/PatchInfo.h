@@ -621,7 +621,7 @@ template <int D> void from_json(const nlohmann::json &j, PatchInfo<D> &pinfo)
 		pinfo.child_ranks = j["child_ranks"].get<std::array<int, Orthant<D>::num_orthants>>();
 	}
 }
-extern template struct PatchInfo<2>;
-extern template struct PatchInfo<3>;
+extern template class PatchInfo<2>;
+extern template class PatchInfo<3>;
 } // namespace ThunderEgg
 #endif

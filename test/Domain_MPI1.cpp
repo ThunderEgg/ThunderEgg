@@ -199,8 +199,8 @@ TEST_CASE("Domain<3> local indexes match position in pinfo vector",
 	auto            domain = domain_reader.getFinerDomain();
 
 	auto pinfo_vector = domain->getPatchInfoVector();
-	for (int i = 0; i < pinfo_vector.size(); i++) {
-		CHECK(pinfo_vector[i].local_index == i);
+	for (size_t i = 0; i < pinfo_vector.size(); i++) {
+		CHECK(pinfo_vector[i].local_index == (int) i);
 	}
 }
 TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consistent",
@@ -232,7 +232,7 @@ TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consiste
 					checkIdAndLocalIndex(info.id, info.local_index);
 				} else if (type == NbrType::Fine) {
 					const FineNbrInfo<2> &info = pinfo.getFineNbrInfo(s);
-					for (int i = 0; i < info.ids.size(); i++) {
+					for (size_t i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.local_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
@@ -249,7 +249,7 @@ TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consiste
 					checkIdAndLocalIndex(info.id, info.local_index);
 				} else if (type == NbrType::Fine) {
 					const FineNbrInfo<1> &info = pinfo.getFineNbrInfo(e);
-					for (int i = 0; i < info.ids.size(); i++) {
+					for (size_t i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.local_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
@@ -266,7 +266,7 @@ TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consiste
 					checkIdAndLocalIndex(info.id, info.local_index);
 				} else if (type == NbrType::Fine) {
 					const FineNbrInfo<0> &info = pinfo.getFineNbrInfo(c);
-					for (int i = 0; i < info.ids.size(); i++) {
+					for (size_t i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.local_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
@@ -284,8 +284,8 @@ TEST_CASE("Domain<3> global indexes match position in pinfo vector",
 	auto            domain = domain_reader.getFinerDomain();
 
 	auto pinfo_vector = domain->getPatchInfoVector();
-	for (int i = 0; i < pinfo_vector.size(); i++) {
-		CHECK(pinfo_vector[i].global_index == i);
+	for (size_t i = 0; i < pinfo_vector.size(); i++) {
+		CHECK(pinfo_vector[i].global_index == (int) i);
 	}
 }
 TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
@@ -312,7 +312,7 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 					checkIdAndLocalIndex(info.id, info.global_index);
 				} else if (type == NbrType::Fine) {
 					const FineNbrInfo<2> &info = pinfo.getFineNbrInfo(s);
-					for (int i = 0; i < info.ids.size(); i++) {
+					for (size_t i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.global_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
@@ -329,7 +329,7 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 					checkIdAndLocalIndex(info.id, info.global_index);
 				} else if (type == NbrType::Fine) {
 					const FineNbrInfo<1> &info = pinfo.getFineNbrInfo(e);
-					for (int i = 0; i < info.ids.size(); i++) {
+					for (size_t i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.global_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {
@@ -346,7 +346,7 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 					checkIdAndLocalIndex(info.id, info.global_index);
 				} else if (type == NbrType::Fine) {
 					const FineNbrInfo<0> &info = pinfo.getFineNbrInfo(c);
-					for (int i = 0; i < info.ids.size(); i++) {
+					for (size_t i = 0; i < info.ids.size(); i++) {
 						checkIdAndLocalIndex(info.ids[i], info.global_indexes[i]);
 					}
 				} else if (type == NbrType::Coarse) {

@@ -205,12 +205,10 @@ int main(int argc, char *argv[])
 		};
 		nfunx = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
 			return -10 * M_PI * sin(10 * M_PI * x) * exp(cos(10 * M_PI * x));
 		};
 
 		nfuny = [](const array<double, 2> &coord) {
-			double x = coord[0];
 			double y = coord[2];
 			return 11 * M_PI * sin(11 * M_PI * y) * exp(cos(11 * M_PI * y));
 		};
@@ -260,7 +258,7 @@ int main(int argc, char *argv[])
 
 	// A DomainGenerator will create domains for the Multigrid algorithm from a tree
 	int                            num_ghost_cells  = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
-	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<P4estDomainGenerator>(ttp.p4est, ns, 1, bmf);
+	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<P4estDomainGenerator>(ttp.p4est, ns, num_ghost_cells, bmf);
 
 	// Get the finest domain from the tree
 	shared_ptr<Domain<2>> domain = domain_generator->getFinestDomain();

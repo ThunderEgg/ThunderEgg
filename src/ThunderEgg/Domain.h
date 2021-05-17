@@ -175,7 +175,7 @@ template <int D> class Domain
 		}
 
 		// add global indexes to map as recvs come in
-		for (int i = 0; i < recv_requests.size(); i++) {
+		for (size_t i = 0; i < recv_requests.size(); i++) {
 			MPI_Status status;
 			int        request_index;
 			MPI_Waitany(recv_requests.size(), recv_requests.data(), &request_index, &status);
@@ -217,8 +217,8 @@ template <int D> class Domain
 	Domain(int id, std::array<int, D> ns, int num_ghost_cells, InputIterator first_pinfo, InputIterator last_pinfo)
 	: id(id),
 	  ns(ns),
-	  pinfos(first_pinfo, last_pinfo),
-	  num_ghost_cells(num_ghost_cells)
+	  num_ghost_cells(num_ghost_cells),
+	  pinfos(first_pinfo, last_pinfo)
 	{
 		num_cells_in_patch            = 1;
 		num_cells_in_patch_with_ghost = 1;

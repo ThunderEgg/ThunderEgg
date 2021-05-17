@@ -76,11 +76,6 @@ std::vector<PatchInfo<3>> GetAllPatchesOnRank0(std::shared_ptr<const Domain<3>> 
 	}
 	return all_patches;
 }
-std::string GetAllPatchesJSONString(const std::vector<PatchInfo<3>> &patches)
-{
-	nlohmann::json patches_j = patches;
-	return patches_j.dump(1);
-}
 } // namespace
 TEST_CASE("P8estDomainGenerator 4x4x4 Uniform", "[P8estDomainGenerator]")
 {

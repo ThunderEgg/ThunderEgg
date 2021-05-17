@@ -464,9 +464,9 @@ TEST_CASE("Edge !=", "[Edge][Face]")
 }
 TEST_CASE("Edge <", "[Edge][Face]")
 {
-	for (int val = 0; val <= Edge::number_of; val++) {
+	for (unsigned char val = 0; val <= Edge::number_of; val++) {
 		Edge edge(val);
-		for (int other_val = 0; other_val <= Edge::number_of; other_val++) {
+		for (unsigned char other_val = 0; other_val <= Edge::number_of; other_val++) {
 			Edge other_edge(other_val);
 			CHECK((edge < other_edge) == (val < other_val));
 		}

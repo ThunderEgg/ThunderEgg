@@ -232,10 +232,17 @@ class MockVector : public Vector<2>
 	public:
 	mutable int norm_calls = 0;
 	double      dot_value;
-	MockVector(double dot_value) : Vector<2>(MPI_COMM_WORLD, 1, 0, 10), dot_value(dot_value) {}
-	LocalData<2>       getLocalData(int, int) override {}
-	const LocalData<2> getLocalData(int, int) const override {}
-	double             dot(std::shared_ptr<const Vector<2>>) const override
+	MockVector(double dot_value)
+	: Vector<2>(MPI_COMM_WORLD, 1, 0, 10), dot_value(dot_value) {}
+	LocalData<2> getLocalData(int, int) override
+	{
+		return LocalData<2>();
+	}
+	const LocalData<2> getLocalData(int, int) const override
+	{
+		return LocalData<2>();
+	}
+	double dot(std::shared_ptr<const Vector<2>>) const override
 	{
 		return dot_value;
 	}
@@ -253,7 +260,8 @@ class MockVectorGenerator : public VectorGenerator<2>
 {
 	public:
 	std::shared_ptr<MockVector> vec;
-	MockVectorGenerator(std::shared_ptr<MockVector> vec) : vec(vec) {}
+	MockVectorGenerator(std::shared_ptr<MockVector> vec)
+	: vec(vec) {}
 	std::shared_ptr<Vector<2>> getNewVector() const override
 	{
 		return vec;
@@ -285,11 +293,6 @@ TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
 		double x = coord[0];
 		double y = coord[1];
 		return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
-	};
-	auto gfun = [](const std::array<double, 2> &coord) {
-		double x = coord[0];
-		double y = coord[1];
-		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
 	auto f_vec = ValVector<2>::GetNewVector(domain, 1);

@@ -552,7 +552,6 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 							case NbrType::Fine: {
 								INFO("NbrType: Fine");
 
-								int  ids     = 0;
 								auto nbrinfo = pinfo.getFineNbrInfo(corner);
 
 								// value should be id of neighbors + index

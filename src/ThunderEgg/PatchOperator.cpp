@@ -20,5 +20,5 @@
  ***************************************************************************/
 
 #include <ThunderEgg/PatchOperator.h>
-template struct ThunderEgg::PatchOperator<2>;
-template struct ThunderEgg::PatchOperator<3>;
+template class ThunderEgg::PatchOperator<2>;
+template class ThunderEgg::PatchOperator<3>;

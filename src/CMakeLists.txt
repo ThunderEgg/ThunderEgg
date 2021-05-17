@@ -64,9 +64,6 @@ if(TARGET P4EST::P4EST)
 
 endif(TARGET P4EST::P4EST)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/PatchHalo.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/PatchHalo.cpp)
-
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchInfo.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/PatchInfo.cpp)
 

@@ -390,7 +390,7 @@ template <int D, int M> class Face
 		} else if constexpr (D == 3 && M == 1) {
 			size_t not_axis   = value >> 2;
 			size_t curr_index = 0;
-			for (int i = 0; i < D; i++) {
+			for (unsigned char i = 0; i < D; i++) {
 				if (i != not_axis) {
 					unsigned char bit = (value & (0b1 << curr_index)) >> curr_index;
 					sides[curr_index] = Face<D, D - 1>((i << 1) ^ bit);
