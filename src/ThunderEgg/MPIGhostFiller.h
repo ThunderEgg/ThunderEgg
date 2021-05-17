@@ -22,6 +22,7 @@
 #ifndef THUNDEREGG_MPIGHOSTFILLER_H
 #define THUNDEREGG_MPIGHOSTFILLER_H
 
+#include <ThunderEgg/DimensionalArray.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/GhostFillingType.h>
@@ -39,59 +40,6 @@ namespace ThunderEgg
 template <int D> class MPIGhostFiller : public GhostFiller<D>
 {
 	private:
-	template <int N, template <int> class T> class DimensionalArray
-	{
-		private:
-		std::array<void *, N> ts;
-
-		template <int I> void construct()
-		{
-			ts[I] = new T<I>();
-			if constexpr (I > 0) {
-				construct<I - 1>();
-			}
-		}
-		template <int I> void copy(const DimensionalArray &other)
-		{
-			ts[I] = new T<I>(other.template get<I>());
-			if constexpr (I > 0) {
-				copy<I - 1>(other);
-			}
-		}
-		template <int I> void deconstruct()
-		{
-			T<I> *t = static_cast<T<I> *>(ts[I]);
-			delete t;
-			if constexpr (I > 0) {
-				deconstruct<I - 1>();
-			}
-		}
-
-		public:
-		DimensionalArray()
-		{
-			construct<N - 1>();
-		}
-		DimensionalArray(const DimensionalArray &other)
-		{
-			copy<N - 1>(other);
-		}
-		~DimensionalArray()
-		{
-			deconstruct<N - 1>();
-		}
-		template <int I> T<I> &get()
-		{
-			static_assert(I >= 0 && I < N, "invalid index value");
-			return *static_cast<T<I> *>(ts[I]);
-		}
-		template <int I> const T<I> &get() const
-		{
-			static_assert(I < N, "invalid index value");
-			static_assert(I >= 0 && I < N, "invalid index value");
-			return *static_cast<T<I> *>(ts[I]);
-		}
-	};
 	template <int M> struct RemoteCallPrototype {
 		/**
 		 * @brief The id of the neighboring patch

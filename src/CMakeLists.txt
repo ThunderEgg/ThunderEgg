@@ -17,6 +17,8 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/CoarseNbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/DivergenceError.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/DimensionalArray.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/Domain.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Domain.cpp)
 
