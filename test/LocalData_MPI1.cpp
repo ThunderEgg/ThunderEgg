@@ -5,9 +5,9 @@ using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("LocalData constructor", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 2> lengths = {nx, ny};
 	array<int, 2> strides = {1, nx + 2 * num_ghost};
@@ -35,9 +35,9 @@ TEST_CASE("LocalData constructor", "[LocalData]")
 }
 TEST_CASE("LocalData<2> getSliceOn<1>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 2> lengths = {nx, ny};
 	array<int, 2> strides = {1, nx + 2 * num_ghost};
@@ -87,9 +87,9 @@ TEST_CASE("LocalData<2> getSliceOn<1>", "[LocalData]")
 }
 TEST_CASE("LocalData<2> getSliceOn<1> const", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 2> lengths = {nx, ny};
 	array<int, 2> strides = {1, nx + 2 * num_ghost};
@@ -139,10 +139,10 @@ TEST_CASE("LocalData<2> getSliceOn<1> const", "[LocalData]")
 }
 TEST_CASE("LocalData<3> getSliceOn<2>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto nz        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto nz        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 3> lengths = {nx, ny, nz};
 	array<int, 3> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost)};
@@ -228,10 +228,10 @@ TEST_CASE("LocalData<3> getSliceOn<2>", "[LocalData]")
 }
 TEST_CASE("LocalData<3> getSliceOn<2> const", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto nz        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto nz        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 3> lengths = {nx, ny, nz};
 	array<int, 3> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost)};
@@ -317,10 +317,10 @@ TEST_CASE("LocalData<3> getSliceOn<2> const", "[LocalData]")
 }
 TEST_CASE("LocalData<3> getSliceOn<1>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto nz        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto nz        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 3> lengths = {nx, ny, nz};
 	array<int, 3> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost)};
@@ -478,10 +478,10 @@ TEST_CASE("LocalData<3> getSliceOn<1>", "[LocalData]")
 }
 TEST_CASE("LocalData<3> getSliceOn<1> const", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto nz        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto nz        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 3> lengths = {nx, ny, nz};
 	array<int, 3> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost)};
@@ -639,10 +639,10 @@ TEST_CASE("LocalData<3> getSliceOn<1> const", "[LocalData]")
 }
 TEST_CASE("LocalData<3> getSliceOn<0>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto nz        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto nz        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 3> lengths = {nx, ny, nz};
 	array<int, 3> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost)};
@@ -674,10 +674,10 @@ TEST_CASE("LocalData<3> getSliceOn<0>", "[LocalData]")
 }
 TEST_CASE("LocalData<3> getSliceOn<0> const", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto nz        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto nz        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 3> lengths = {nx, ny, nz};
 	array<int, 3> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost)};
@@ -709,9 +709,9 @@ TEST_CASE("LocalData<3> getSliceOn<0> const", "[LocalData]")
 }
 TEST_CASE("LocalData<2> getSliceOn<0>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 2> lengths = {nx, ny};
 	array<int, 2> strides = {1, nx + 2 * num_ghost};
@@ -736,9 +736,9 @@ TEST_CASE("LocalData<2> getSliceOn<0>", "[LocalData]")
 }
 TEST_CASE("LocalData<2> getSliceOn<0> const", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 2> lengths = {nx, ny};
 	array<int, 2> strides = {1, nx + 2 * num_ghost};
@@ -764,9 +764,9 @@ TEST_CASE("LocalData<2> getSliceOn<0> const", "[LocalData]")
 
 TEST_CASE("LocalData<2> getGhostSliceOn<1>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 2> lengths = {nx, ny};
 	array<int, 2> strides = {1, nx + 2 * num_ghost};
@@ -802,10 +802,10 @@ TEST_CASE("LocalData<2> getGhostSliceOn<1>", "[LocalData]")
 }
 TEST_CASE("LocalData<3> getGhostSliceOn<2>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto nz        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto nz        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 3> lengths = {nx, ny, nz};
 	array<int, 3> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost)};
@@ -861,10 +861,10 @@ TEST_CASE("LocalData<3> getGhostSliceOn<2>", "[LocalData]")
 }
 TEST_CASE("LocalData<3> getGhostSliceOn<1>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto nz        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto nz        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 3> lengths = {nx, ny, nz};
 	array<int, 3> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost)};
@@ -932,10 +932,10 @@ TEST_CASE("LocalData<3> getGhostSliceOn<1>", "[LocalData]")
 }
 TEST_CASE("LocalData<3> getGhostSliceOn<0>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto nz        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto nz        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 3> lengths = {nx, ny, nz};
 	array<int, 3> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost)};
@@ -967,9 +967,9 @@ TEST_CASE("LocalData<3> getGhostSliceOn<0>", "[LocalData]")
 }
 TEST_CASE("LocalData<2> getGhostSliceOn<0>", "[LocalData]")
 {
-	auto nx        = GENERATE(1, 2, 10, 13);
-	auto ny        = GENERATE(1, 2, 10, 13);
-	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
 
 	array<int, 2> lengths = {nx, ny};
 	array<int, 2> strides = {1, nx + 2 * num_ghost};

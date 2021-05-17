@@ -21,9 +21,9 @@ constexpr auto td_mid_refine = "mesh_inputs/3d_mid_refine_4x4x4_mpi1.json";
 
 TEST_CASE("No calls for 1 patch domain", "[MPIGhostFiller]")
 {
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 5);
-	auto                  ny             = GENERATE(2, 5);
+	auto                  num_components = GENERATE(1, 2);
+	auto                  nx             = GENERATE(2, 3);
+	auto                  ny             = GENERATE(2, 3);
 	int                   num_ghost      = 1;
 	GhostFillingType      fill_type      = GENERATE(GhostFillingType::Faces, GhostFillingType::Edges, GhostFillingType::Corners);
 	DomainReader<2>       domain_reader(single_mesh_file, {nx, ny}, num_ghost);
@@ -40,12 +40,12 @@ TEST_CASE("No calls for 1 patch domain", "[MPIGhostFiller]")
 }
 TEST_CASE("Calls for various domains 2d face cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
 	int                   num_ghost = 1;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
@@ -62,12 +62,12 @@ TEST_CASE("Calls for various domains 2d face cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Calls for various domains 2d corner cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
 	int                   num_ghost = 1;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
@@ -84,13 +84,13 @@ TEST_CASE("Calls for various domains 2d corner cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Calls for various domains 3d face cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file
 	= GENERATE(as<std::string>{}, td_uniform, td_refined, td_mid_refine);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	auto                  nz        = GENERATE(2, 5);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	auto                  nz        = GENERATE(2, 3);
 	int                   num_ghost = 1;
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
@@ -107,13 +107,13 @@ TEST_CASE("Calls for various domains 3d face cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Calls for various domains 3d edge cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file
 	= GENERATE(as<std::string>{}, td_uniform, td_refined, td_mid_refine);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	auto                  nz        = GENERATE(2, 5);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	auto                  nz        = GENERATE(2, 3);
 	int                   num_ghost = 1;
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
@@ -130,13 +130,13 @@ TEST_CASE("Calls for various domains 3d edge cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Calls for various domains 3d corner cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file
 	= GENERATE(as<std::string>{}, td_uniform, td_refined, td_mid_refine);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	auto                  nz        = GENERATE(2, 5);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	auto                  nz        = GENERATE(2, 3);
 	int                   num_ghost = 1;
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
@@ -153,13 +153,13 @@ TEST_CASE("Calls for various domains 3d corner cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Exchange for various domains 2d face cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
@@ -181,13 +181,13 @@ TEST_CASE("Exchange for various domains 2d face cases", "[MPIGhostFiller]")
 
 TEST_CASE("Exchange for various domains 2d corner cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
@@ -209,13 +209,13 @@ TEST_CASE("Exchange for various domains 2d corner cases", "[MPIGhostFiller]")
 
 TEST_CASE("Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file      = GENERATE(as<std::string>{}, td_uniform, td_refined, td_mid_refine);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	auto                  nz        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	auto                  nz        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
@@ -236,13 +236,13 @@ TEST_CASE("Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file      = GENERATE(as<std::string>{}, td_uniform, td_refined, td_mid_refine);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	auto                  nz        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	auto                  nz        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
@@ -263,13 +263,13 @@ TEST_CASE("Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Exchange for various domains 3d corner cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file      = GENERATE(as<std::string>{}, td_uniform, td_refined, td_mid_refine);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	auto                  nz        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	auto                  nz        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
@@ -291,13 +291,13 @@ TEST_CASE("Exchange for various domains 3d corner cases", "[MPIGhostFiller]")
 
 TEST_CASE("Two Exchanges for various domains 2d face cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
@@ -319,13 +319,13 @@ TEST_CASE("Two Exchanges for various domains 2d face cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Two Exchanges for various domains 2d corner cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
@@ -347,13 +347,13 @@ TEST_CASE("Two Exchanges for various domains 2d corner cases", "[MPIGhostFiller]
 }
 TEST_CASE("Two Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file      = GENERATE(as<std::string>{}, td_uniform, td_refined, td_mid_refine);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	auto                  nz        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	auto                  nz        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
@@ -375,13 +375,13 @@ TEST_CASE("Two Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Two Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file      = GENERATE(as<std::string>{}, td_uniform, td_refined, td_mid_refine);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	auto                  nz        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	auto                  nz        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
@@ -403,13 +403,13 @@ TEST_CASE("Two Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 }
 TEST_CASE("Two Exchange for various domains 3d corner cases", "[MPIGhostFiller]")
 {
-	auto num_components = GENERATE(1, 2, 3);
+	auto num_components = GENERATE(1, 2);
 	auto mesh_file      = GENERATE(as<std::string>{}, td_uniform, td_refined, td_mid_refine);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	auto                  nz        = GENERATE(2, 5);
-	int                   num_ghost = GENERATE(1, 2, 3);
+	auto                  nx        = GENERATE(2, 3);
+	auto                  ny        = GENERATE(2, 3);
+	auto                  nz        = GENERATE(2, 3);
+	int                   num_ghost = GENERATE(1, 2);
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
