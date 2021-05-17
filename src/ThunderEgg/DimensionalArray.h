@@ -40,10 +40,6 @@ template <int N, template <int> class T> class DimensionalArray
 			return next.template get<I>();
 		}
 	}
-	template <> T<N> &get()
-	{
-		return t;
-	}
 	template <int I> const T<I> &get() const
 	{
 		static_assert(I <= N, "invalid index value");
