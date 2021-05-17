@@ -34,7 +34,11 @@ template <int N, template <int> class T> class DimensionalArray
 	template <int I> T<I> &get()
 	{
 		static_assert(I < N, "invalid index value");
-		return next.template get<I>();
+		if constexpr (I == N) {
+			return t;
+		} else {
+			return next.template get<I>();
+		}
 	}
 	template <> T<N> &get()
 	{
@@ -42,12 +46,12 @@ template <int N, template <int> class T> class DimensionalArray
 	}
 	template <int I> const T<I> &get() const
 	{
-		static_assert(I < N, "invalid index value");
-		return next.template get<I>();
-	}
-	template <> const T<N> &get() const
-	{
-		return t;
+		static_assert(I <= N, "invalid index value");
+		if constexpr (I == N) {
+			return t;
+		} else {
+			return next.template get<I>();
+		}
 	}
 };
 template <template <int> class T> class DimensionalArray<0, T>
@@ -59,17 +63,11 @@ template <template <int> class T> class DimensionalArray<0, T>
 	template <int I> T<I> &get()
 	{
 		static_assert(I == 0, "invalid index value");
-	}
-	template <> T<0> &get()
-	{
 		return t;
 	}
 	template <int I> const T<I> &get() const
 	{
 		static_assert(I == 0, "invalid index value");
-	}
-	template <> const T<0> &get() const
-	{
 		return t;
 	}
 };
