@@ -26,26 +26,8 @@ find_package(BLAS)
 find_package(LAPACK)
 
 if(NOT TARGET P4EST::P4EST)
-  if(NOT p4est_external)
-    find_package(P4EST HINTS ${P4EST_DIR})
-  endif(NOT p4est_external)
-  if(p4est_external OR NOT TARGET P4EST::P4EST)
-    include(FetchContent)
-    FetchContent_Declare(
-      p4est
-      GIT_REPOSITORY https://github.com/cburstedde/p4est
-      GIT_TAG        feature-cmake
-    )
-    set(OLD_BUILD_TESTING ${BUILD_TESTING})
-    set(BUILD_TESTING OFF)
-    FetchContent_MakeAvailable(p4est)
-    set(BUILD_TESTING ${OLD_BUILD_TESTING})
-  endif()
+  include(cmake/p4est.cmake)
 endif(NOT TARGET P4EST::P4EST)
-if(TARGET P4EST::P4EST AND NOT TARGET SC::SC)
-  find_package(SC PATHS ${P4EST_DIR} ${SC_DIR} REQUIRED)
-  find_package(ZLIB REQUIRED)
-endif(TARGET P4EST::P4EST AND NOT TARGET SC::SC)
 
 add_subdirectory(tpl)
 add_subdirectory(src)

@@ -57,12 +57,8 @@ if(TARGET P4EST::P4EST)
   list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomainGenerator.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomainGenerator.cpp)
 
-  if(TARGET P4EST::P8EST)
-
-    list(APPEND ThunderEgg_HDRS ThunderEgg/P8estDomainGenerator.h)
-    list(APPEND ThunderEgg_SRCS ThunderEgg/P8estDomainGenerator.cpp)
-
-  endif(TARGET P4EST::P8EST)
+  list(APPEND ThunderEgg_HDRS ThunderEgg/P8estDomainGenerator.h)
+  list(APPEND ThunderEgg_SRCS ThunderEgg/P8estDomainGenerator.cpp)
 
 endif(TARGET P4EST::P4EST)
 
