@@ -86,10 +86,10 @@ template <int D> class LocalData
 		std::array<int, M>         new_lengths;
 		double *                   new_data      = data;
 		std::array<Side<D>, D - M> sides         = f.getSides();
-		int                        lengths_index = 0;
-		int                        sides_index   = 0;
-		for (size_t axis = 0; axis < D; axis++) {
-			if (sides[sides_index].getAxisIndex() == axis) {
+		size_t                     lengths_index = 0;
+		size_t                     sides_index   = 0;
+		for (size_t axis = 0; axis < (size_t) D; axis++) {
+			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
 				if (sides[sides_index].isLowerOnAxis()) {
 					new_data += offset[sides_index] * strides[axis];
 				} else {
@@ -241,10 +241,10 @@ template <int D> class LocalData
 		std::array<int, M>         new_lengths;
 		double *                   new_data      = data;
 		std::array<Side<D>, D - M> sides         = f.getSides();
-		int                        lengths_index = 0;
-		int                        sides_index   = 0;
-		for (size_t axis = 0; axis < D; axis++) {
-			if (sides[sides_index].getAxisIndex() == axis) {
+		size_t                     lengths_index = 0;
+		size_t                     sides_index   = 0;
+		for (size_t axis = 0; axis < (size_t) D; axis++) {
+			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
 				if (sides[sides_index].isLowerOnAxis()) {
 					new_data += (-1 - offset[sides_index]) * strides[axis];
 				} else {

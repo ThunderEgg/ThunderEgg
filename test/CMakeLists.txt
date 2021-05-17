@@ -1,4 +1,4 @@
-cmake_policy(SET CMP0110 NEW)
+#cmake_policy(SET CMP0110 NEW)
 include(FetchContent)
 FetchContent_Declare(
   catch2

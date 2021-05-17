@@ -705,7 +705,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 													coord_str += " " + std::to_string(coord[i]);
 												}
 												INFO(coord_str);
-												CHECK(slice[coord] == nbrinfo.id + index + c);
+												CHECK(slice[coord] == (double) (nbrinfo.id + index + c));
 												index++;
 											});
 										}
@@ -725,7 +725,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 										for (size_t i = 0; i < 1; i++) {
 											INFO(coord[i]);
 										}
-										CHECK(slice[coord] == 0);
+										CHECK(slice[coord] == 0.0);
 									});
 								}
 							}
@@ -848,7 +848,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									                   for (size_t i = 0; i < D - 1; i++) {
 										                   INFO(coord[i]);
 									                   }
-									                   CHECK(slice[coord] == 0);
+									                   CHECK(slice[coord] == 0.0);
 								                   });
 							}
 						}
