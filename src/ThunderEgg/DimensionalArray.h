@@ -33,7 +33,7 @@ template <int N, template <int> class T> class DimensionalArray
 	public:
 	template <int I> T<I> &get()
 	{
-		static_assert(I < N, "invalid index value");
+		static_assert(I <= N, "invalid index value");
 		if constexpr (I == N) {
 			return t;
 		} else {
