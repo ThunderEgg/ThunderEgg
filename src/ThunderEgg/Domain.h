@@ -184,12 +184,12 @@ template <int D> class Domain
 			const std::set<int> &   incoming_ids = ranks_to_ids_incoming[source_rank];
 			const std::vector<int> &data         = rank_to_incoming_data[source_rank];
 
-			auto curr_id           = incoming_ids.cbegin();
-			auto curr_global_index = data.cbegin();
+			auto curr_id                = incoming_ids.cbegin();
+			auto curr_global_index_iter = data.cbegin();
 			while (curr_id != incoming_ids.cend()) {
-				id_to_global_index[*curr_id] = *curr_global_index;
+				id_to_global_index[*curr_id] = *curr_global_index_iter;
 				curr_id++;
-				curr_global_index++;
+				curr_global_index_iter++;
 			}
 		}
 
@@ -275,14 +275,14 @@ template <int D> class Domain
 	 */
 	int getNumLocalCells() const
 	{
-		return pinfos.size() * num_cells_in_patch;
+		return ((int) pinfos.size()) * num_cells_in_patch;
 	}
 	/**
 	 * @brief Get get the number of local cells (including ghost cells)
 	 */
 	int getNumLocalCellsWithGhost() const
 	{
-		return pinfos.size() * num_cells_in_patch_with_ghost;
+		return ((int) pinfos.size()) * num_cells_in_patch_with_ghost;
 	}
 	/**
 	 * @brief Get the number of cells in a patch
