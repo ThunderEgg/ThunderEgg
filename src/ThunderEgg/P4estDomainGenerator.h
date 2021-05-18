@@ -119,6 +119,10 @@ class P4estDomainGenerator : public DomainGenerator<2>
 	 */
 	P4estDomainGenerator(p4est_t *p4est, const std::array<int, 2> &ns, int num_ghost_cells, const BlockMapFunc &bmf);
 	~P4estDomainGenerator();
+	P4estDomainGenerator(const P4estDomainGenerator &) = delete;
+	P4estDomainGenerator(P4estDomainGenerator &&)      = delete;
+	P4estDomainGenerator &     operator=(const P4estDomainGenerator &) = delete;
+	P4estDomainGenerator &     operator=(P4estDomainGenerator &&) = delete;
 	std::shared_ptr<Domain<2>> getFinestDomain();
 	bool                       hasCoarserDomain();
 	std::shared_ptr<Domain<2>> getCoarserDomain();

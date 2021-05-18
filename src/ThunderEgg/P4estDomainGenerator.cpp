@@ -52,12 +52,12 @@ void IterCornerWrap(p4est_iter_corner_info_t *info, void *user_data)
 	functions->iter_corner(info);
 }
 
-void p4est_iterate_ext(p4est_t *                                              p4est,
-                       p4est_ghost_t *                                        ghost_layer,
-                       const std::function<void(p4est_iter_volume_info_t *)> &iter_volume,
-                       const std::function<void(p4est_iter_face_info_t *)> &  iter_face,
-                       const std::function<void(p4est_iter_corner_info_t *)> &iter_corner,
-                       int                                                    remote)
+void p4est_iterate_ext(p4est_t *                                                    p4est,
+                       p4est_ghost_t *                                              ghost_layer,
+                       const std::function<void(const p4est_iter_volume_info_t *)> &iter_volume,
+                       const std::function<void(const p4est_iter_face_info_t *)> &  iter_face,
+                       const std::function<void(const p4est_iter_corner_info_t *)> &iter_corner,
+                       int                                                          remote)
 {
 	IterateFunctions functions = {iter_volume, iter_face, iter_corner};
 	p4est_iterate_ext(p4est,
@@ -100,7 +100,7 @@ void p4est_coarsen_ext(p4est_t *                                                
 {
 	CoarsenFunctions functions = {coarsen, replace};
 	p4est->user_pointer        = &functions;
-	p4est_coarsen_ext(p4est, coarsen_recursive, callback_orphans, coarsen ? CoarsenWrap : nullptr, init_fn, replace ? ReplaceWrap : nullptr);
+	p4est_coarsen_ext(p4est, coarsen_recursive, callback_orphans, coarsen ? &CoarsenWrap : nullptr, init_fn, replace ? &ReplaceWrap : nullptr);
 	p4est->user_pointer = nullptr;
 }
 
@@ -109,7 +109,7 @@ int GetMaxLevel(p4est_t *p4est)
 	int max_level = 0;
 
 	p4est_iterate_ext(
-	p4est, nullptr, [&](p4est_iter_volume_info_t *info) { max_level = max(max_level, (int) info->quad->level); }, nullptr, nullptr, false);
+	p4est, nullptr, [&](const p4est_iter_volume_info_t *info) { max_level = max(max_level, (int) info->quad->level); }, nullptr, nullptr, false);
 
 	int global_max_level;
 
@@ -125,7 +125,7 @@ struct Data {
 	PatchInfo<2> *     pinfo;
 };
 
-void InitData([[maybe_unused]] p4est_t *p4est, [[maybe_unused]] p4est_topidx_t which_tree, p4est_quadrant_t *quadrant)
+void InitData(p4est_t *, p4est_topidx_t, p4est_quadrant_t *quadrant)
 {
 	Data &data = *(Data *) quadrant->p.user_data;
 	data.id    = -1;
@@ -143,7 +143,7 @@ void SetRanks(p4est_t *p4est)
 	p4est_iterate_ext(
 	p4est,
 	nullptr,
-	[=](p4est_iter_volume_info_t *info) {
+	[=](const p4est_iter_volume_info_t *info) {
 		Data *data = (Data *) info->quad->p.user_data;
 		data->rank = rank;
 	},
@@ -161,7 +161,7 @@ void SetIds(p4est_t *p4est)
 	p4est_iterate_ext(
 	p4est,
 	nullptr,
-	[&](p4est_iter_volume_info_t *info) {
+	[&](const p4est_iter_volume_info_t *info) {
 		Data *data = (Data *) info->quad->p.user_data;
 		data->id   = curr_global_id;
 		curr_global_id++;
@@ -221,7 +221,7 @@ void P4estDomainGenerator::coarsenTree()
 	my_p4est,
 	false,
 	true,
-	[&]([[maybe_unused]] p4est_topidx_t which_tree, p4est_quadrant_t *quadrant[]) {
+	[&](p4est_topidx_t, p4est_quadrant_t *quadrant[]) {
 		if (quadrant[1] == nullptr) {
 			// update child data to point to self
 			Data *data                  = (Data *) quadrant[0]->p.user_data;
@@ -232,8 +232,8 @@ void P4estDomainGenerator::coarsenTree()
 			return false;
 		} else if (quadrant[0]->level > curr_level) {
 			// update child datas to point to parent
-			Data *bsw_data = (Data *) quadrant[0]->p.user_data;
-			for (int i = 0; i < 4; i++) {
+			const Data *bsw_data = (Data *) quadrant[0]->p.user_data;
+			for (unsigned char i = 0; i < 4; i++) {
 				Data *data                  = (Data *) quadrant[i]->p.user_data;
 				data->child_ids[0]          = data->id;
 				data->child_ranks[0]        = data->rank;
@@ -254,11 +254,7 @@ void P4estDomainGenerator::coarsenTree()
 		}
 	},
 	InitData,
-	[]([[maybe_unused]] p4est_topidx_t which_tree,
-	   [[maybe_unused]] int            num_outgoing,
-	   p4est_quadrant_t *              outgoing[],
-	   [[maybe_unused]] int            num_incoming,
-	   p4est_quadrant_t *              incoming[]) {
+	[](p4est_topidx_t, int, p4est_quadrant_t *outgoing[], int, p4est_quadrant_t *incoming[]) {
 		Data *      data         = (Data *) incoming[0]->p.user_data;
 		const Data *fine_sw_data = (Data *) outgoing[0]->p.user_data;
 		data->id                 = fine_sw_data->id;
@@ -277,7 +273,7 @@ void P4estDomainGenerator::createPatchInfos()
 	p4est_iterate_ext(
 	my_p4est,
 	nullptr,
-	[&](p4est_iter_volume_info_t *info) {
+	[&](const p4est_iter_volume_info_t *info) {
 		Data *data  = (Data *) info->quad->p.user_data;
 		data->pinfo = &domain_patches.front()[info->quadid + p4est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset];
 
@@ -322,7 +318,7 @@ namespace
  * @param side2
  * @param ghost_data
  */
-void addCoarseNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_side_t &side2, Data *ghost_data)
+void addCoarseNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_side_t &side2, const Data *ghost_data)
 {
 	const Data *nbr_data;
 	if (side2.is.full.is_ghost) {
@@ -352,11 +348,11 @@ void addCoarseNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face
  * @param side2
  * @param ghost_data
  */
-void addFineNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_side_t &side2, Data *ghost_data)
+void addFineNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_side_t &side2, const Data *ghost_data)
 {
 	if (!side1.is.full.is_ghost) {
-		Data *data = (Data *) side1.is.full.quad->p.user_data;
-		Data *nbr_datas[2];
+		Data *      data = (Data *) side1.is.full.quad->p.user_data;
+		const Data *nbr_datas[2];
 		for (int i = 0; i < 2; i++) {
 			if (side2.is.hanging.is_ghost[i]) {
 				nbr_datas[i] = ghost_data + side2.is.hanging.quadid[i];
@@ -383,11 +379,11 @@ void addFineNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_s
  * @param side2
  * @param ghost_data
  */
-void addNormalNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_side_t &side2, Data *ghost_data)
+void addNormalNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_side_t &side2, const Data *ghost_data)
 {
 	if (!side1.is.full.is_ghost) {
-		Data *data = (Data *) side1.is.full.quad->p.user_data;
-		Data *nbr_data;
+		Data *      data = (Data *) side1.is.full.quad->p.user_data;
+		const Data *nbr_data;
 		if (side2.is.full.is_ghost) {
 			nbr_data = ghost_data + side2.is.full.quadid;
 		} else {
@@ -409,7 +405,7 @@ void addNormalNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face
  * @param side2
  * @param ghost_data p4est ghost data array
  */
-void addNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_side_t &side2, Data *ghost_data)
+void addNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_side_t &side2, const Data *ghost_data)
 {
 	if (side1.is_hanging) {
 		addCoarseNbrInfo(side1, side2, ghost_data);
@@ -427,11 +423,11 @@ void addNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face_side_
  * @param side2
  * @param ghost_data
  */
-void addCornerFineNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_iter_corner_side_t &side2, Data *ghost_data)
+void addCornerFineNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_iter_corner_side_t &side2, const Data *ghost_data)
 {
 	if (!side1.is_ghost) {
-		Data *data = (Data *) side1.quad->p.user_data;
-		Data *nbr_data;
+		Data *      data = (Data *) side1.quad->p.user_data;
+		const Data *nbr_data;
 		if (side2.is_ghost) {
 			nbr_data = ghost_data + side2.quadid;
 		} else {
@@ -454,7 +450,7 @@ void addCornerFineNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_ite
  * @param side2
  * @param ghost_data
  */
-void addCornerCoarseNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_iter_corner_side_t &side2, Data *ghost_data)
+void addCornerCoarseNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_iter_corner_side_t &side2, const Data *ghost_data)
 {
 	if (!side1.is_ghost) {
 		const Data *nbr_data;
@@ -482,11 +478,11 @@ void addCornerCoarseNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_i
  * @param side2
  * @param ghost_data
  */
-void addCornerNormalNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_iter_corner_side_t &side2, Data *ghost_data)
+void addCornerNormalNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_iter_corner_side_t &side2, const Data *ghost_data)
 {
 	if (!side1.is_ghost) {
-		Data *data = (Data *) side1.quad->p.user_data;
-		Data *nbr_data;
+		Data *      data = (Data *) side1.quad->p.user_data;
+		const Data *nbr_data;
 		if (side2.is_ghost) {
 			nbr_data = ghost_data + side2.quadid;
 		} else {
@@ -508,7 +504,7 @@ void addCornerNormalNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_i
  * @param side2
  * @param ghost_data p4est ghost data array
  */
-void addCornerNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_iter_corner_side_t &side2, Data *ghost_data)
+void addCornerNbrInfo(const p4est_iter_corner_side_t &side1, const p4est_iter_corner_side_t &side2, const Data *ghost_data)
 {
 	if (side1.quad->level > side2.quad->level) {
 		addCornerCoarseNbrInfo(side1, side2, ghost_data);
@@ -531,7 +527,7 @@ void P4estDomainGenerator::linkNeighbors()
 	my_p4est,
 	ghost,
 	nullptr,
-	[&](p4est_iter_face_info_t *info) {
+	[&](const p4est_iter_face_info_t *info) {
 		if (info->sides.elem_count == 2) {
 			p4est_iter_face_side_t side1 = ((p4est_iter_face_side_t *) info->sides.array)[0];
 			p4est_iter_face_side_t side2 = ((p4est_iter_face_side_t *) info->sides.array)[1];
@@ -539,7 +535,7 @@ void P4estDomainGenerator::linkNeighbors()
 			addNbrInfo(side2, side1, ghost_data);
 		}
 	},
-	[&](p4est_iter_corner_info *info) {
+	[&](const p4est_iter_corner_info *info) {
 		if (info->sides.elem_count == 4) {
 			for (Corner<2> c : Corner<2>::getValues()) {
 				p4est_iter_corner_side_t side1 = ((p4est_iter_corner_side_t *) info->sides.array)[c.getIndex()];
@@ -555,8 +551,8 @@ void P4estDomainGenerator::linkNeighbors()
 
 void P4estDomainGenerator::updateParentRanksOfPreviousDomain()
 {
-	std::vector<PatchInfo<2>> &old_level = domain_patches.back();
-	std::vector<PatchInfo<2>> &new_level = domain_patches.front();
+	std::vector<PatchInfo<2>> &      old_level = domain_patches.back();
+	const std::vector<PatchInfo<2>> &new_level = domain_patches.front();
 
 	std::set<int> local_new_level_ids;
 	for (const PatchInfo<2> &pinfo : new_level) {
@@ -585,7 +581,7 @@ void P4estDomainGenerator::updateParentRanksOfPreviousDomain()
 	// send info
 	std::deque<std::vector<int>> buffers;
 	std::vector<MPI_Request>     send_requests;
-	for (auto &pair : out_info) {
+	for (const auto &pair : out_info) {
 		int              dest = pair.first;
 		std::vector<int> buffer(pair.second.begin(), pair.second.end());
 		buffers.push_back(buffer);
@@ -611,7 +607,7 @@ void P4estDomainGenerator::updateParentRanksOfPreviousDomain()
 		delete[] buffer;
 	}
 	// wait for all
-	MPI_Waitall(send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
+	MPI_Waitall((int) send_requests.size(), &send_requests[0], MPI_STATUSES_IGNORE);
 	// update rank info
 	for (PatchInfo<2> &pinfo : old_level) {
 		pinfo.parent_rank = id_rank_map.at(pinfo.parent_id);
