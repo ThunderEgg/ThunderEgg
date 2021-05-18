@@ -22,7 +22,7 @@
 #include <ThunderEgg/Orthant.h>
 namespace ThunderEgg
 {
-void to_json(nlohmann::json &j, const Orthant<0> &o)
+void to_json(nlohmann::json &j, const Orthant<0> &)
 {
 	j = nullptr;
 }
@@ -72,7 +72,7 @@ void to_json(nlohmann::json &j, const Orthant<3> &o)
 		j = nullptr;
 	}
 }
-void from_json(const nlohmann::json &j, Orthant<0> &o)
+void from_json(const nlohmann::json &, Orthant<0> &o)
 {
 	o = Orthant<0>::null();
 }
