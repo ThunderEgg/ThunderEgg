@@ -62,7 +62,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 	auto g_vec = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 	DomainTools::SetValues<2>(d_fine, g_vec, gfun);
 
-	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine);
+	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 	p_operator->apply(g_vec, f_vec_expected);
 
@@ -116,7 +116,7 @@ TEST_CASE(
 	auto g_vec = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
 	DomainTools::SetValues<2>(d_fine, g_vec, gfun);
 
-	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine);
+	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 	p_operator->apply(g_vec, f_vec_expected);
 

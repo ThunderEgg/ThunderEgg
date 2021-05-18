@@ -35,9 +35,9 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	/**
 	 * @brief Construct a new BiQuadraticGhostFiller object
 	 *
-	 * @param domain_in the domain that is being fill for
+	 * @param domain the domain that is being fill for
 	 */
-	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain_in);
+	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain, GhostFillingType fill_type);
 
 	void fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
 	                               const std::vector<LocalData<2>> &local_datas,

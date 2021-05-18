@@ -298,7 +298,7 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence with neuma
 		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValues<2>(d_fine, g_vec, gfun);
 
-		auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine);
+		auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 		p_operator->addNeumannBCToRHS(f_vec_expected, gfun, {gfun_x, gfun_y});
 

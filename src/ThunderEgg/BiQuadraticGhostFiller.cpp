@@ -23,11 +23,14 @@
 #include <ThunderEgg/RuntimeError.h>
 namespace ThunderEgg
 {
-BiQuadraticGhostFiller::BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain_in) : MPIGhostFiller<2>(domain_in, GhostFillingType::Faces) {}
+BiQuadraticGhostFiller::BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain, GhostFillingType fill_type)
+: MPIGhostFiller<2>(domain, fill_type)
+{
+}
 
 namespace
 {
-void FillGhostForLocalWithCoarseNbr(const LocalData<2> &local_data, const Side<2> side)
+void FillGhostForLocalWithCoarseNbr(const LocalData<2> &local_data, Side<2> side)
 {
 	auto inner_slice = local_data.getSliceOn(side, {1});
 	auto slice       = local_data.getSliceOn(side, {0});
@@ -37,7 +40,7 @@ void FillGhostForLocalWithCoarseNbr(const LocalData<2> &local_data, const Side<2
 		ghost[{idx}] += 2 * slice[{idx}] / 3 - inner_slice[{idx}] / 5;
 	}
 }
-void FillGhostForLocalWithFineNbr(const LocalData<2> &local_data, const Side<2> side)
+void FillGhostForLocalWithFineNbr(const LocalData<2> &local_data, Side<2> side)
 {
 	auto slice = local_data.getSliceOn(side, {0});
 	auto ghost = local_data.getSliceOn(side, {-1});
@@ -48,7 +51,7 @@ void FillGhostForLocalWithFineNbr(const LocalData<2> &local_data, const Side<2> 
 	}
 	ghost[{n - 1}] += -slice[{n - 1}] / 10 + slice[{n - 2}] / 15 - slice[{n - 3}] / 30;
 }
-void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
+void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOn(side, {0});
@@ -56,7 +59,7 @@ void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, std::ve
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 	}
 }
-void FillGhostForCoarseNbrLower(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
+void FillGhostForCoarseNbrLower(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice       = local_datas[c].getSliceOn(side, {0});
@@ -68,7 +71,7 @@ void FillGhostForCoarseNbrLower(const std::vector<LocalData<2>> &local_datas, st
 		}
 	}
 }
-void FillGhostForCoarseNbrUpper(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
+void FillGhostForCoarseNbrUpper(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice       = local_datas[c].getSliceOn(side, {0});
@@ -80,7 +83,7 @@ void FillGhostForCoarseNbrUpper(const std::vector<LocalData<2>> &local_datas, st
 		}
 	}
 }
-void FillGhostForFineNbrLower(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
+void FillGhostForFineNbrLower(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice = local_datas[c].getSliceOn(side, {0});
@@ -97,7 +100,7 @@ void FillGhostForFineNbrLower(const std::vector<LocalData<2>> &local_datas, std:
 		}
 	}
 }
-void FillGhostForFineNbrUpper(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
+void FillGhostForFineNbrUpper(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice = local_datas[c].getSliceOn(side, {0});
@@ -113,6 +116,45 @@ void FillGhostForFineNbrUpper(const std::vector<LocalData<2>> &local_datas, std:
 		ghost[{n - 2}] += 7 * slice[{n - 1}] / 20 + 7 * slice[{n - 2}] / 30 - slice[{n - 3}] / 20;
 		ghost[{n - 1}] += 3 * slice[{n - 1}] / 4 - 3 * slice[{n - 2}] / 10 + slice[{n - 3}] / 12;
 	}
+}
+
+void FillGhostForNormalCornerNbr(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
+{
+	for (size_t c = 0; c < local_datas.size(); c++) {
+		LocalData<0> local_slice = local_datas[c].getSliceOn(corner, {0, 0});
+		LocalData<0> nbr_ghosts  = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		nbr_ghosts[{}]           = local_slice[{}];
+	}
+}
+void FillGhostForCoarseCornerNbr(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
+{
+	for (size_t c = 0; c < local_datas.size(); c++) {
+		LocalData<0> slice       = local_datas[c].getSliceOn(corner, {0, 0});
+		LocalData<0> inner_slice = local_datas[c].getSliceOn(corner, {1, 1});
+		LocalData<0> ghost       = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		ghost[{}] += 2 * slice[{}] / 3 + 2 * inner_slice[{}] / 5;
+	}
+}
+void FillGhostForLocalWithFineCornerNbr(const LocalData<2> &local_data, Corner<2> corner)
+{
+	LocalData<0> slice = local_data.getSliceOn(corner, {0, 0});
+	LocalData<0> ghost = local_data.getSliceOn(corner, {-1, -1});
+	ghost[{}] += -slice[{}] / 15;
+}
+void FillGhostForFineCornerNbr(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
+{
+	for (size_t c = 0; c < local_datas.size(); c++) {
+		LocalData<0> slice = local_datas[c].getSliceOn(corner, {0, 0});
+		LocalData<0> ghost = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		ghost[{}] += 8 * slice[{}] / 15;
+	}
+}
+void FillGhostForLocalWithCoarseCornerNbr(const LocalData<2> &local_data, Corner<2> corner)
+{
+	LocalData<0> inner_slice = local_data.getSliceOn(corner, {1, 1});
+	LocalData<0> slice       = local_data.getSliceOn(corner, {0, 0});
+	LocalData<0> ghost       = local_data.getSliceOn(corner, {-1, -1});
+	ghost[{}] += 2 * slice[{}] / 3 - inner_slice[{}] / 5;
 }
 } // namespace
 
@@ -162,7 +204,19 @@ void BiQuadraticGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> 
                                                              Corner<2>                        corner,
                                                              NbrType                          nbr_type) const
 {
-	// corners not implimented
+	switch (nbr_type) {
+		case NbrType::Normal:
+			FillGhostForNormalCornerNbr(local_datas, nbr_datas, corner);
+			break;
+		case NbrType::Coarse:
+			FillGhostForCoarseCornerNbr(local_datas, nbr_datas, corner);
+			break;
+		case NbrType::Fine:
+			FillGhostForFineCornerNbr(local_datas, nbr_datas, corner);
+			break;
+		default:
+			throw RuntimeError("Unsupported NbrType");
+	}
 }
 
 void BiQuadraticGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, std::vector<LocalData<2>> &local_datas) const
@@ -179,6 +233,23 @@ void BiQuadraticGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pin
 						break;
 					case NbrType::Fine:
 						FillGhostForLocalWithFineNbr(local_data, side);
+						break;
+					default:
+						throw RuntimeError("Unsupported NbrType");
+				}
+			}
+		}
+		for (Corner<2> corner : Corner<2>::getValues()) {
+			if (pinfo.hasNbr(corner)) {
+				switch (pinfo.getNbrType(corner)) {
+					case NbrType::Normal:
+						// nothing need to be done
+						break;
+					case NbrType::Coarse:
+						FillGhostForLocalWithCoarseCornerNbr(local_data, corner);
+						break;
+					case NbrType::Fine:
+						FillGhostForLocalWithFineCornerNbr(local_data, corner);
 						break;
 					default:
 						throw RuntimeError("Unsupported NbrType");

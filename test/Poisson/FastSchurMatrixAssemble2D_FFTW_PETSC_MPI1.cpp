@@ -56,7 +56,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws exception for non-square pa
 	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
 
-	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine);
+	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 
@@ -224,7 +224,7 @@ TEST_CASE(
 	}
 	VecRestoreArray(g, &g_view);
 
-	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine);
+	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
@@ -276,7 +276,7 @@ TEST_CASE(
 	}
 	VecRestoreArray(g, &g_view);
 
-	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine);
+	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
