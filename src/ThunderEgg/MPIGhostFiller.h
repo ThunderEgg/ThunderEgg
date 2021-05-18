@@ -45,7 +45,9 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 *
 	 * @tparam M the dimension of the face that the call is on
 	 */
-	template <int M> struct RemoteCallPrototype {
+	template <int M> class RemoteCallPrototype
+	{
+		public:
 		/**
 		 * @brief The id of the neighboring patch
 		 */
@@ -101,7 +103,9 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 *
 	 * @tparam M the dimension of the face
 	 */
-	template <int M> struct IncomingGhostPrototype {
+	template <int M> class IncomingGhostPrototype
+	{
+		public:
 		/**
 		 * @brief The id of the patch that is being filled
 		 */
@@ -263,7 +267,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 */
 		int rank;
 		/**
-		 * @brief the length of the send buffer;
+		 * @brief the length of the send buffer
 		 */
 		size_t send_buffer_length = 0;
 		/**
@@ -277,7 +281,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 */
 		DimensionalArray<D, RemoteCallDeque> remote_calls;
 		/**
-		 * @brief the length of the recv buffer;
+		 * @brief the length of the recv buffer
 		 */
 		size_t recv_buffer_length = 0;
 		/**
