@@ -281,12 +281,7 @@ template <int D> class PatchInfo : public Serializable
 	 */
 	inline bool hasNbr() const
 	{
-		for (const std::unique_ptr<NbrInfoBase> &nbr_info : nbr_infos) {
-			if (nbr_info != nullptr) {
-				return true;
-			}
-		}
-		return false;
+		return std::any_of(nbr_infos.begin(), nbr_infos.end(), [](const std::unique_ptr<NbrInfoBase> &nbr_info) { return nbr_info != nullptr; });
 	}
 	/**
 	 * @brief Return whether the patch has a coarser parent
