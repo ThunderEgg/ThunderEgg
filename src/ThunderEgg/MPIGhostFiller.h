@@ -26,7 +26,7 @@
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/GhostFillingType.h>
-#include <mpi.h>
+
 namespace ThunderEgg
 {
 /**
