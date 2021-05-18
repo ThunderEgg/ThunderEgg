@@ -117,7 +117,7 @@ TEST_CASE(
 	}
 	VecRestoreArray(g_vec->getVec(), &g_view);
 
-	auto gf               = make_shared<BiLinearGhostFiller>(d_fine);
+	auto gf               = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
@@ -172,7 +172,7 @@ TEST_CASE(
 	}
 	VecRestoreArray(g, &g_view);
 
-	auto gf               = make_shared<BiLinearGhostFiller>(d_fine);
+	auto gf               = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);

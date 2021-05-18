@@ -73,7 +73,7 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 	auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
 	DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
-	shared_ptr<BiLinearGhostFiller>           gf(new BiLinearGhostFiller(d_fine));
+	shared_ptr<BiLinearGhostFiller>           gf(new BiLinearGhostFiller(d_fine, GhostFillingType::Faces));
 	shared_ptr<Poisson::StarPatchOperator<2>> p_operator(
 	new Poisson::StarPatchOperator<2>(d_fine, gf));
 	p_operator->addDrichletBCToRHS(f_vec, gfun);
@@ -142,7 +142,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
 	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
 	DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
 
-	auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+	auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 	p_operator->addDrichletBCToRHS(f_vec_expected, gfun);
 
@@ -190,7 +190,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
 	DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
 
-	auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+	auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 	p_operator->addNeumannBCToRHS(f_vec_expected, gfun, {gfun_x, gfun_y});
 
@@ -245,7 +245,7 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence",
 		auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
-		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 		p_operator->addDrichletBCToRHS(f_vec_expected, gfun);
 
@@ -322,7 +322,7 @@ TEST_CASE("Test Poisson::StarPatchOperator constructor throws exception with no 
 	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto gf = make_shared<BiLinearGhostFiller>(d_fine);
+	auto gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	CHECK_THROWS_AS(make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf),
 	                ThunderEgg::RuntimeError);
 }

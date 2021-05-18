@@ -23,7 +23,9 @@
 #include <ThunderEgg/RuntimeError.h>
 namespace ThunderEgg
 {
-BiLinearGhostFiller::BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain) : MPIGhostFiller<2>(domain, GhostFillingType::Faces) {}
+BiLinearGhostFiller::BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain, GhostFillingType fill_type) : MPIGhostFiller<2>(domain, fill_type)
+{
+}
 namespace
 {
 void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
@@ -96,6 +98,47 @@ void FillLocalGhostsForFineNbr(const LocalData<2> &local_data, const Side<2> sid
 	nested_loop<1>(
 	local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
 }
+void FillGhostForCornerNormalNbr(const std::vector<LocalData<2>> &local_datas, const std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
+{
+	for (size_t c = 0; c < local_datas.size(); c++) {
+		auto local_slice = local_datas[c].getSliceOn(corner, {0, 0});
+		auto nbr_ghost   = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		nbr_ghost[{}]    = local_slice[{}];
+	}
+}
+void FillGhostForCornerCoarseNbr(const PatchInfo<2> &             pinfo,
+                                 const std::vector<LocalData<2>> &local_datas,
+                                 const std::vector<LocalData<2>> &nbr_datas,
+                                 Corner<2>                        corner)
+{
+	for (size_t c = 0; c < local_datas.size(); c++) {
+		auto nbr_ghosts = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		nbr_ghosts[{}] += 4.0 * local_datas[c].getSliceOn(corner, {0, 0})[{}] / 3.0;
+	}
+}
+void FillGhostForCornerFineNbr(const PatchInfo<2> &             pinfo,
+                               const std::vector<LocalData<2>> &local_datas,
+                               const std::vector<LocalData<2>> &nbr_datas,
+                               Corner<2>                        corner)
+{
+	for (size_t c = 0; c < local_datas.size(); c++) {
+		auto local_slice = local_datas[c].getSliceOn(corner, {0, 0});
+		auto nbr_ghosts  = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		nbr_ghosts[{}] += 2.0 * local_slice[{}] / 3.0;
+	}
+}
+void FillLocalGhostsForCornerCoarseNbr(const PatchInfo<2> &pinfo, const LocalData<2> &local_data, Corner<2> corner)
+{
+	auto local_slice  = local_data.getSliceOn(corner, {0, 0});
+	auto local_ghosts = local_data.getSliceOn(corner, {-1, -1});
+	local_ghosts[{}] += local_slice[{}] / 3.0;
+}
+void FillLocalGhostsForCornerFineNbr(const LocalData<2> &local_data, Corner<2> corner)
+{
+	auto local_slice  = local_data.getSliceOn(corner, {0, 0});
+	auto local_ghosts = local_data.getSliceOn(corner, {-1, -1});
+	local_ghosts[{}] += -local_slice[{}] / 3.0;
+}
 } // namespace
 void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
                                                     const std::vector<LocalData<2>> &local_datas,
@@ -134,7 +177,19 @@ void BiLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &  
                                                           Corner<2>                        corner,
                                                           NbrType                          nbr_type) const
 {
-	// Corners not implimented
+	switch (nbr_type) {
+		case NbrType::Normal:
+			FillGhostForCornerNormalNbr(local_datas, nbr_datas, corner);
+			break;
+		case NbrType::Coarse:
+			FillGhostForCornerCoarseNbr(pinfo, local_datas, nbr_datas, corner);
+			break;
+		case NbrType::Fine:
+			FillGhostForCornerFineNbr(pinfo, local_datas, nbr_datas, corner);
+			break;
+		default:
+			throw RuntimeError("Unsupported Nbr Type");
+	}
 }
 void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, std::vector<LocalData<2>> &local_datas) const
 {
@@ -150,6 +205,23 @@ void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo,
 						break;
 					case NbrType::Fine:
 						FillLocalGhostsForFineNbr(local_data, side);
+						break;
+					default:
+						throw RuntimeError("Unsupported Nbr Type");
+				}
+			}
+		}
+		for (Corner<2> corner : Corner<2>::getValues()) {
+			if (pinfo.hasNbr(corner)) {
+				switch (pinfo.getNbrType(corner)) {
+					case NbrType::Normal:
+						// nothing needs to be done
+						break;
+					case NbrType::Coarse:
+						FillLocalGhostsForCornerCoarseNbr(pinfo, local_data, corner);
+						break;
+					case NbrType::Fine:
+						FillLocalGhostsForCornerFineNbr(local_data, corner);
 						break;
 					default:
 						throw RuntimeError("Unsupported Nbr Type");

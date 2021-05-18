@@ -36,8 +36,9 @@ class BiLinearGhostFiller : public MPIGhostFiller<2>
 	 * @brief Construct a new BiLinearGhostFiller object
 	 *
 	 * @param domain the domain to fill ghosts for
+	 * @param fill_type the GhostFillingType
 	 */
-	BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain);
+	BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain, GhostFillingType fill_type);
 
 	void fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
 	                               const std::vector<LocalData<2>> &local_datas,

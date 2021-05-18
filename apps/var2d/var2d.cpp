@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 		timer->stop("Domain Initialization");
 
 		// patch operator
-		auto gf         = make_shared<BiLinearGhostFiller>(domain);
+		auto gf         = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 		auto p_operator = make_shared<StarPatchOperator<2>>(h, domain, gf);
 		p_operator->addDrichletBCToRHS(f, gfun, hfun);
 
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
 
 				auto next_domain = dcg->getCoarserDomain();
 				auto new_vg      = make_shared<ValVectorGenerator<2>>(curr_domain, 1);
-				auto new_gf      = make_shared<BiLinearGhostFiller>(curr_domain);
+				auto new_gf      = make_shared<BiLinearGhostFiller>(curr_domain, GhostFillingType::Faces);
 				auto new_coeffs  = new_vg->getNewVector();
 
 				DomainTools::SetValuesWithGhost<2>(curr_domain, new_coeffs, hfun);
@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
 			auto interpolator
 			= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
 			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(curr_domain, 1);
-			auto coarse_gf     = make_shared<BiLinearGhostFiller>(curr_domain);
+			auto coarse_gf     = make_shared<BiLinearGhostFiller>(curr_domain, GhostFillingType::Faces);
 			auto coarse_coeffs = coarse_vg->getNewVector();
 			DomainTools::SetValuesWithGhost<2>(curr_domain, coarse_coeffs, hfun);
 

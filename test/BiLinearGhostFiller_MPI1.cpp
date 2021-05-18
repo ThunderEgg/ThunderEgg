@@ -76,7 +76,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 
 	DomainTools::SetValues<2>(d, vec, f);
 
-	BiLinearGhostFiller blgf(d);
+	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
 	blgf.fillGhost(vec);
 
 	// patch 1
@@ -272,7 +272,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 	DomainTools::SetValues<2>(d, vec, f);
 	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
-	BiLinearGhostFiller blgf(d);
+	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
 	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
@@ -328,7 +328,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 	DomainTools::SetValuesWithGhost<2>(d, vec, f);
 	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
-	BiLinearGhostFiller blgf(d);
+	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
 	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
@@ -388,7 +388,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components", "[BiL
 	DomainTools::SetValues<2>(d, vec, f, g);
 	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
 
-	BiLinearGhostFiller blgf(d);
+	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
 	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
@@ -467,7 +467,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 	DomainTools::SetValuesWithGhost<2>(d, vec, f, g);
 	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
 
-	BiLinearGhostFiller blgf(d);
+	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
 	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
@@ -510,6 +510,326 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 					               INFO("coord:  " << coord[0]);
 					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
 				               });
+			}
+		}
+	}
+}
+TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners", "[BiLinearGhostFiller]")
+{
+	auto mesh_file
+	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto nx        = GENERATE(2, 10);
+	auto ny        = GENERATE(2, 10);
+	int  num_ghost = 1;
+
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+
+	auto f = [&](const std::array<double, 2> coord) -> double {
+		double x = coord[0];
+		double y = coord[1];
+		return 1 + ((x * 0.3) + y);
+	};
+
+	DomainTools::SetValues<2>(d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f);
+
+	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
+	blgf.fillGhost(vec);
+
+	for (auto pinfo : d->getPatchInfoVector()) {
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo.local_index);
+		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+			///
+			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+		});
+		for (Side<2> s : Side<2>::getValues()) {
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			if (pinfo.hasNbr(s)) {
+				INFO("side:      " << s);
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
+				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				               [&](const array<int, 1> &coord) {
+					               ///
+					               INFO("coord:  " << coord[0]);
+					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				               });
+			}
+		}
+		for (Corner<2> c : Corner<2>::getValues()) {
+			LocalData<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			LocalData<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			if (pinfo.hasNbr(c)) {
+				INFO("corner:    " << c);
+				INFO("nbr-type:  " << pinfo.getNbrType(c));
+				CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+			}
+		}
+	}
+}
+TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corners",
+          "[BiLinearGhostFiller]")
+{
+	auto mesh_file
+	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto nx        = GENERATE(2, 10);
+	auto ny        = GENERATE(2, 10);
+	int  num_ghost = 1;
+
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+
+	auto f = [&](const std::array<double, 2> coord) -> double {
+		double x = coord[0];
+		double y = coord[0];
+		return 1 + ((x * 0.3) + y);
+	};
+
+	DomainTools::SetValuesWithGhost<2>(d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f);
+
+	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
+	blgf.fillGhost(vec);
+
+	for (auto pinfo : d->getPatchInfoVector()) {
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld = expected->getLocalData(0, pinfo.local_index);
+		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+			///
+			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+		});
+		for (Side<2> s : Side<2>::getValues()) {
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			if (pinfo.hasNbr(s)) {
+				INFO("side:      " << s);
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
+				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				               [&](const array<int, 1> &coord) {
+					               ///
+					               INFO("coord:  " << coord[0]);
+					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				               });
+			}
+		}
+		for (Corner<2> c : Corner<2>::getValues()) {
+			LocalData<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			LocalData<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			if (pinfo.hasNbr(c)) {
+				INFO("corner:    " << c);
+				INFO("nbr-type:  " << pinfo.getNbrType(c));
+				CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+			}
+		}
+	}
+}
+TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners", "[BiLinearGhostFiller]")
+{
+	auto mesh_file
+	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto nx        = GENERATE(2, 10);
+	auto ny        = GENERATE(2, 10);
+	int  num_ghost = 1;
+
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+
+	auto f = [&](const std::array<double, 2> coord) -> double {
+		double x = coord[0];
+		double y = coord[1];
+		return 1 + ((x * 0.3) + y);
+	};
+	auto g = [&](const std::array<double, 2> coord) -> double {
+		double x = coord[0];
+		double y = coord[0];
+		return 99 + ((x * 7) + y * 0.1);
+	};
+
+	DomainTools::SetValues<2>(d, vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
+
+	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
+	blgf.fillGhost(vec);
+
+	for (auto pinfo : d->getPatchInfoVector()) {
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		LocalData<2> vec_ld       = vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld  = expected->getLocalData(0, pinfo.local_index);
+		LocalData<2> vec_ld2      = vec->getLocalData(1, pinfo.local_index);
+		LocalData<2> expected_ld2 = expected->getLocalData(1, pinfo.local_index);
+		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+			///
+			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+		});
+		for (Side<2> s : Side<2>::getValues()) {
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			if (pinfo.hasNbr(s)) {
+				INFO("side:      " << s);
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
+				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				               [&](const array<int, 1> &coord) {
+					               ///
+					               INFO("coord:  " << coord[0]);
+					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				               });
+			}
+		}
+		for (Corner<2> c : Corner<2>::getValues()) {
+			LocalData<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			LocalData<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			if (pinfo.hasNbr(c)) {
+				INFO("corner:    " << c);
+				INFO("nbr-type:  " << pinfo.getNbrType(c));
+				CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+			}
+		}
+		nested_loop<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
+			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
+		});
+		for (Side<2> s : Side<2>::getValues()) {
+			LocalData<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			if (pinfo.hasNbr(s)) {
+				INFO("side:      " << s);
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
+				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				               [&](const array<int, 1> &coord) {
+					               INFO("coord:  " << coord[0]);
+					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				               });
+			}
+		}
+		for (Corner<2> c : Corner<2>::getValues()) {
+			LocalData<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
+			LocalData<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
+			if (pinfo.hasNbr(c)) {
+				INFO("corner:    " << c);
+				INFO("nbr-type:  " << pinfo.getNbrType(c));
+				CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+			}
+		}
+	}
+}
+TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two components corners",
+          "[BiLinearGhostFiller]")
+{
+	auto mesh_file
+	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
+	INFO("MESH: " << mesh_file);
+	auto nx        = GENERATE(2, 10);
+	auto ny        = GENERATE(2, 10);
+	int  num_ghost = 1;
+
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+
+	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
+	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+
+	auto f = [&](const std::array<double, 2> coord) -> double {
+		double x = coord[0];
+		double y = coord[0];
+		return 1 + ((x * 0.3) + y);
+	};
+	auto g = [&](const std::array<double, 2> coord) -> double {
+		double x = coord[0];
+		double y = coord[0];
+		return 99 + ((x * 7) + y * 0.1);
+	};
+
+	DomainTools::SetValuesWithGhost<2>(d, vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
+
+	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
+	blgf.fillGhost(vec);
+
+	for (auto pinfo : d->getPatchInfoVector()) {
+		INFO("Patch: " << pinfo.id);
+		INFO("x:     " << pinfo.starts[0]);
+		INFO("y:     " << pinfo.starts[1]);
+		INFO("nx:    " << pinfo.ns[0]);
+		INFO("ny:    " << pinfo.ns[1]);
+		LocalData<2> vec_ld       = vec->getLocalData(0, pinfo.local_index);
+		LocalData<2> expected_ld  = expected->getLocalData(0, pinfo.local_index);
+		LocalData<2> vec_ld2      = vec->getLocalData(1, pinfo.local_index);
+		LocalData<2> expected_ld2 = expected->getLocalData(1, pinfo.local_index);
+		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+		});
+		for (Side<2> s : Side<2>::getValues()) {
+			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			if (pinfo.hasNbr(s)) {
+				INFO("side:      " << s);
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
+				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				               [&](const array<int, 1> &coord) {
+					               INFO("coord:  " << coord[0]);
+					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				               });
+			}
+		}
+		for (Corner<2> c : Corner<2>::getValues()) {
+			LocalData<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			LocalData<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			if (pinfo.hasNbr(c)) {
+				INFO("corner:    " << c);
+				INFO("nbr-type:  " << pinfo.getNbrType(c));
+				CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+			}
+		}
+		nested_loop<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
+			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
+		});
+		for (Side<2> s : Side<2>::getValues()) {
+			LocalData<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			LocalData<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			if (pinfo.hasNbr(s)) {
+				INFO("side:      " << s);
+				INFO("nbr-type:  " << pinfo.getNbrType(s));
+				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				               [&](const array<int, 1> &coord) {
+					               INFO("coord:  " << coord[0]);
+					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				               });
+			}
+		}
+		for (Corner<2> c : Corner<2>::getValues()) {
+			LocalData<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
+			LocalData<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
+			if (pinfo.hasNbr(c)) {
+				INFO("corner:    " << c);
+				INFO("nbr-type:  " << pinfo.getNbrType(c));
+				CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
 			}
 		}
 	}

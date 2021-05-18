@@ -71,7 +71,7 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 	auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
 	DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
-	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine));
+	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine, GhostFillingType::Faces));
 	shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
 	new VarPoisson::StarPatchOperator<2>(h_vec, d_fine, gf));
 	p_operator->addDrichletBCToRHS(f_vec, gfun, hfun);
@@ -137,7 +137,7 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff",
 	auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
 	DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
-	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine));
+	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine, GhostFillingType::Faces));
 	shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
 	new VarPoisson::StarPatchOperator<2>(h_vec, d_fine, gf));
 	p_operator->apply(f_vec, g_vec);
@@ -190,7 +190,7 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff",
 		auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
-		auto gf = make_shared<BiLinearGhostFiller>(d_fine);
+		auto gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 
 		auto p_operator = make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf);
 		p_operator->addDrichletBCToRHS(f_vec_expected, gfun, hfun);
@@ -245,7 +245,7 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff",
 		auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
 
-		auto gf = make_shared<BiLinearGhostFiller>(d_fine);
+		auto gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 
 		auto p_operator = make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf);
 		p_operator->addDrichletBCToRHS(f_vec_expected, gfun, hfun);
@@ -273,7 +273,7 @@ TEST_CASE("Test VarPoisson::StarPatchOperator constructor throws exception with 
 	auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
 	h_vec->set(1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(d_fine);
+	auto gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	CHECK_THROWS_AS(make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf),
 	                ThunderEgg::RuntimeError);
 }

@@ -73,7 +73,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence",
 		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
-		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 		auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 		p_operator->addDrichletBCToRHS(f_vec, gfun);
@@ -133,7 +133,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
 		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
-		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 		auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
@@ -196,7 +196,7 @@ TEST_CASE(
 		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
-		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 		auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
