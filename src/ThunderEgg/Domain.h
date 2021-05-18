@@ -113,7 +113,7 @@ template <int D> class Domain
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 		// get starting global index
-		int num_local_patches = pinfos.size();
+		int num_local_patches = (int) pinfos.size();
 		int curr_global_index;
 		MPI_Scan(&num_local_patches, &curr_global_index, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 		curr_global_index -= num_local_patches;
@@ -152,7 +152,7 @@ template <int D> class Domain
 			incoming_data.resize(pair.second.size());
 
 			MPI_Request request;
-			MPI_Irecv(incoming_data.data(), incoming_data.size(), MPI_INT, source_rank, 0, MPI_COMM_WORLD, &request);
+			MPI_Irecv(incoming_data.data(), (int) incoming_data.size(), MPI_INT, source_rank, 0, MPI_COMM_WORLD, &request);
 			recv_requests.push_back(request);
 		}
 
@@ -170,7 +170,7 @@ template <int D> class Domain
 				data.push_back(id_and_global_index.second);
 			}
 			MPI_Request request;
-			MPI_Isend(data.data(), data.size(), MPI_INT, dest_rank, 0, MPI_COMM_WORLD, &request);
+			MPI_Isend(data.data(), (int) data.size(), MPI_INT, dest_rank, 0, MPI_COMM_WORLD, &request);
 			send_requests.push_back(request);
 		}
 
@@ -178,7 +178,7 @@ template <int D> class Domain
 		for (size_t i = 0; i < recv_requests.size(); i++) {
 			MPI_Status status;
 			int        request_index;
-			MPI_Waitany(recv_requests.size(), recv_requests.data(), &request_index, &status);
+			MPI_Waitany((int) recv_requests.size(), recv_requests.data(), &request_index, &status);
 
 			int                     source_rank  = status.MPI_SOURCE;
 			const std::set<int> &   incoming_ids = ranks_to_ids_incoming[source_rank];
@@ -194,7 +194,7 @@ template <int D> class Domain
 		}
 
 		// wait for all the sends to finsh
-		MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUSES_IGNORE);
+		MPI_Waitall((int) send_requests.size(), send_requests.data(), MPI_STATUSES_IGNORE);
 
 		// update global indexes in nbrinfo objects
 		for (auto &pinfo : pinfos) {
@@ -226,8 +226,6 @@ template <int D> class Domain
 			num_cells_in_patch *= ns[i];
 			num_cells_in_patch_with_ghost *= (ns[i] + 2 * num_ghost_cells);
 		}
-
-		// pinfo_id_map = pinfo_map;
 
 		int num_local_domains = pinfos.size();
 		MPI_Allreduce(&num_local_domains, &global_num_patches, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
@@ -263,7 +261,7 @@ template <int D> class Domain
 	 */
 	int getNumLocalPatches() const
 	{
-		return pinfos.size();
+		return (int) pinfos.size();
 	}
 	/**
 	 * @brief get the number of global cells
