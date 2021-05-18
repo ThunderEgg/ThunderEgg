@@ -34,9 +34,9 @@ jobs:
     - name: Cmake Configure
       run: cmake -Dunit_tests=ON -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ -GNinja .
     - name: Build
-      run: build-wrapper-linux-x86-64 --out-dir bw-output ninja
+      run: build-wrapper-linux-x86-64 --out-dir bw-output ninja -j2
     - name: Run Tests
-      run: ctest --output-on-failure
+      run: ctest -j2 --output-on-failure
     - name: Generate Coverage Report
       run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
     - name: Upload to codecov.io
