@@ -31,7 +31,7 @@ template <int D, int M> class Face
 	/**
 	 * @brief The value of the face
 	 */
-	unsigned char value;
+	unsigned char value = number_of;
 
 	/**
 	 * @brief 2^N
@@ -82,7 +82,7 @@ template <int D, int M> class Face
 		static_assert(M >= 0 && M < D, "Invalid M value");
 	}
 
-	Face() : value(number_of)
+	Face()
 	{
 		static_assert(D <= 3 && D >= 0, "Only up to 3 dimensions supported");
 		static_assert(M >= 0 && M < D, "Invalid M value");
