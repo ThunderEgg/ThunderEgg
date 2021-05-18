@@ -111,7 +111,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 				  remaining_nbr_calls.erase(found_call);
 			  }
 		  };
-		for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &patch : this->getDomain()->getPatchInfoVector()) {
 			INFO("id: " << patch.id);
 			std::string starts = "starts: ";
 			for (size_t i = 0; i < D; i++) {
@@ -205,7 +205,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 					  remaining_nbr_calls.erase(found_call);
 				  }
 			  };
-			for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
+			for (const PatchInfo<D> &patch : this->getDomain()->getPatchInfoVector()) {
 				INFO("id: " << patch.id);
 				std::string starts = "starts: ";
 				for (size_t i = 0; i < D; i++) {
@@ -299,7 +299,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 				  remaining_nbr_calls.erase(found_call);
 			  }
 		  };
-		for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &patch : this->getDomain()->getPatchInfoVector()) {
 			INFO("id: " << patch.id);
 			std::string starts = "starts: ";
 			for (size_t i = 0; i < D; i++) {
@@ -371,7 +371,7 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 		// remove from this collection the calls
 		auto remaining_local_calls = local_calls;
 
-		for (const PatchInfo<D> &patch : this->domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &patch : this->getDomain()->getPatchInfoVector()) {
 			INFO("id: " << patch.id);
 			std::string starts = "starts: ";
 			for (size_t i = 0; i < D; i++) {
@@ -393,10 +393,10 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 	}
 	void checkCalls()
 	{
-		INFO("NumLocalPatches: " << this->domain->getNumLocalPatches());
-		INFO("NumGlobalPatches: " << this->domain->getNumGlobalPatches());
+		INFO("NumLocalPatches: " << this->getDomain()->getNumLocalPatches());
+		INFO("NumGlobalPatches: " << this->getDomain()->getNumGlobalPatches());
 
-		switch (this->fill_type) {
+		switch (this->getFillType()) {
 			case GhostFillingType::Corners:
 				checkCornerNbrCalls();
 			case GhostFillingType::Edges:
@@ -476,7 +476,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 	void checkInterior(std::shared_ptr<const Vector<D>> vec)
 	{
-		for (auto pinfo : this->domain->getPatchInfoVector()) {
+		for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
 			INFO("id: " << pinfo.id);
 			std::string starts = "start: ";
 			for (size_t i = 0; i < D; i++) {
@@ -507,7 +507,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 	}
 	void checkCorners(std::shared_ptr<const Vector<D>> vec)
 	{
-		for (auto pinfo : this->domain->getPatchInfoVector()) {
+		for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
 			INFO("id: " << pinfo.id);
 			std::string starts = "start: ";
 			for (size_t i = 0; i < D; i++) {
@@ -617,7 +617,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 	checkEdges(std::shared_ptr<const Vector<D>> vec)
 	{
 		if constexpr (D == 3) {
-			for (auto pinfo : this->domain->getPatchInfoVector()) {
+			for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
 				INFO("id: " << pinfo.id);
 				std::string starts = "start: ";
 				for (size_t i = 0; i < D; i++) {
@@ -739,7 +739,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 	void checkFaces(std::shared_ptr<const Vector<D>> vec)
 	{
 		if constexpr (D == 3) {
-			for (auto pinfo : this->domain->getPatchInfoVector()) {
+			for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
 				INFO("id: " << pinfo.id);
 				std::string starts = "start: ";
 				for (size_t i = 0; i < D; i++) {
@@ -860,10 +860,10 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 	void checkVector(std::shared_ptr<const Vector<D>> vec)
 	{
-		INFO("NumLocalPatches: " << this->domain->getNumLocalPatches());
-		INFO("NumGlobalPatches: " << this->domain->getNumGlobalPatches());
+		INFO("NumLocalPatches: " << this->getDomain()->getNumLocalPatches());
+		INFO("NumGlobalPatches: " << this->getDomain()->getNumGlobalPatches());
 		checkInterior(vec);
-		switch (this->fill_type) {
+		switch (this->getFillType()) {
 			case GhostFillingType::Corners:
 				checkCorners(vec);
 			case GhostFillingType::Edges:

@@ -206,7 +206,7 @@ template <int D> class Domain
 	/**
 	 * @brief Construct a new Domain object
 	 *
-	 * @tparam InputIterator
+	 * @tparam InputIterator the iterator for PatchInfo objects
 	 * @param id the id of the domain should be unique within a multigrid cycle
 	 * @param ns the number of cells in each direction
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch

@@ -32,14 +32,19 @@ namespace ThunderEgg
 /**
  * @brief Parallell ghostfiller implimented with MPI
  *
- * There are two private functions that have to be overridden derived classes.
- * fillGhostCellsForNbrPatch, and fillGhostCellsForLocalPatch
+ * There are three functions that have to be overridden in derived classes.
+ * fillGhostCellsForNbrPatch, fillGhostCellsForEdgeNbrPatch, fillGhostCellsForCornerNbrPatch, and fillGhostCellsForLocalPatch
  *
  * @tparam D the number of Cartesian dimensions
  */
 template <int D> class MPIGhostFiller : public GhostFiller<D>
 {
 	private:
+	/**
+	 * @brief Structure fore remote call information used during construction.
+	 *
+	 * @tparam M the dimension of the face that the call is on
+	 */
 	template <int M> struct RemoteCallPrototype {
 		/**
 		 * @brief The id of the neighboring patch
@@ -61,6 +66,15 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 * @brief The local index of the local patch the we are ghost filling from
 		 */
 		int local_index;
+		/**
+		 * @brief Construct a new Remote Call Prototype object
+		 *
+		 * @param id the id of the patch
+		 * @param face the face of the neighboring patch is on
+		 * @param nbr_type the type of neighbor
+		 * @param orthant the orthant on the coarse patch, or null
+		 * @param local_index the lcoal index of the patch that is being filled from
+		 */
 		RemoteCallPrototype(int id, Face<D, M> face, NbrType nbr_type, Orthant<M> orthant, int local_index)
 		: id(id),
 		  face(face),
@@ -69,6 +83,12 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		  local_index(local_index)
 		{
 		}
+		/**
+		 * @brief Sort by id, face.opposite(), nbr_type, orthant, and then local_index
+		 *
+		 * @param other the other object to compare to
+		 * @return the comparison
+		 */
 		bool operator<(const RemoteCallPrototype &other) const
 		{
 			return std::forward_as_tuple(id, face.opposite(), nbr_type, orthant, local_index)
@@ -76,20 +96,38 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	};
 
+	/**
+	 * @brief Incoming ghost structure used in construction
+	 *
+	 * @tparam M the dimension of the face
+	 */
 	template <int M> struct IncomingGhostPrototype {
 		/**
 		 * @brief The id of the patch that is being filled
 		 */
 		int id;
 		/**
-		 * @brief The side of the patch that ghosts are on
+		 * @brief The face of the patch that ghosts are on
 		 */
 		Face<D, M> face;
 		/**
 		 * @brief the local index of the patch being filled
 		 */
 		int local_index;
+		/**
+		 * @brief Construct a new Incoming Ghost Prototype object
+		 *
+		 * @param id the id of the patch
+		 * @param face the face of the patch that the ghosts are on
+		 * @param local_index the local index of the patch
+		 */
 		IncomingGhostPrototype(int id, Face<D, M> face, int local_index) : id(id), face(face), local_index(local_index) {}
+		/**
+		 * @brief Sort by id, face, and then local_index
+		 *
+		 * @param other the other object to compare to
+		 * @return the comparison
+		 */
 		bool operator<(const IncomingGhostPrototype &other) const
 		{
 			return std::forward_as_tuple(id, face, local_index) < std::forward_as_tuple(other.id, other.face, other.local_index);
@@ -98,6 +136,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 
 	/**
 	 * @brief Struct for remote call
+	 *
+	 * @tparam M the dimension of the face
 	 */
 	template <int M> struct RemoteCall {
 		/**
@@ -118,9 +158,15 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 */
 		int local_index;
 		/**
-		 * @brief offset in buffer
+		 * @brief offset in buffer outgoing buffer
 		 */
 		size_t offset;
+		/**
+		 * @brief Construct a new Remote Call object
+		 *
+		 * @param prototype the protype call
+		 * @param offset the offset in the buffer
+		 */
 		RemoteCall(const RemoteCallPrototype<M> &prototype, size_t offset)
 		: face(prototype.face),
 		  nbr_type(prototype.nbr_type),
@@ -131,6 +177,11 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	};
 
+	/**
+	 * @brief The struct for incoming ghosts
+	 *
+	 * @tparam M the dimension of the face
+	 */
 	template <int M> struct IncomingGhost {
 		/**
 		 * @brief The side of the patch that the ghosts are on
@@ -141,9 +192,15 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 */
 		int local_index;
 		/**
-		 * @brief The offset in the buffer
+		 * @brief The offset in the incoming buffer
 		 */
 		size_t offset;
+		/**
+		 * @brief Construct a new Incoming Ghost object
+		 *
+		 * @param prototype the prototype object
+		 * @param offset the offset in the incoming buffer
+		 */
 		IncomingGhost(const IncomingGhostPrototype<M> &prototype, size_t offset)
 		: face(prototype.face),
 		  local_index(prototype.local_index),
@@ -154,15 +211,16 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 
 	/**
 	 * @brief Struct for local call
+	 *
+	 * @tparam M the dimension of the face
 	 */
 	template <int M> struct LocalCall {
 		/**
-		 * @brief The side that the neighbor is on
+		 * @brief The face that the neighbor is on
 		 */
 		Face<D, M> face;
 		/**
-		 * @brief The neighbor
-		 *
+		 * @brief The neighbor type
 		 */
 		NbrType nbr_type;
 		/**
@@ -177,6 +235,15 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		 * @brief The local index of the patch that is being filled
 		 */
 		int nbr_local_index;
+		/**
+		 * @brief Construct a new Local Call object
+		 *
+		 * @param face the face that the loca call is on
+		 * @param nbr_type the neighbor type
+		 * @param orthant the orthant on the coarse patch, or null
+		 * @param local_index the local index of the patch being filled from
+		 * @param nbr_local_index the local index of the patch being filled
+		 */
 		LocalCall(Face<D, M> face, NbrType nbr_type, Orthant<M> orthant, int local_index, size_t nbr_local_index)
 		: face(face),
 		  nbr_type(nbr_type),
@@ -187,6 +254,9 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	};
 
+	/**
+	 * @brief Data for a remote call
+	 */
 	struct RemoteCallSet {
 		/**
 		 * @brief The rank that we are communicating with
@@ -195,42 +265,88 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		/**
 		 * @brief the length of the send buffer;
 		 */
-		size_t send_buffer_length              = 0;
+		size_t send_buffer_length = 0;
+		/**
+		 * @brief deque of RemoteCall with dimension M
+		 *
+		 * @tparam M the dimension
+		 */
 		template <int M> using RemoteCallDeque = std::deque<RemoteCall<M>>;
 		/**
-		 * @brief A vector of RemoteCall deques, one sperate deque for each rank
+		 * @brief An array of RemoteCall deques
 		 */
 		DimensionalArray<D, RemoteCallDeque> remote_calls;
 		/**
 		 * @brief the length of the recv buffer;
 		 */
-		size_t recv_buffer_length                 = 0;
+		size_t recv_buffer_length = 0;
+		/**
+		 * @brief deque of IncomingGhost with dimension M
+		 *
+		 * @tparam M the dimension
+		 */
 		template <int M> using IncomingGhostDeque = std::deque<IncomingGhost<M>>;
 		/**
-		 * @brief deque for incoming ghost calls
+		 * @brief An array of IncomingGhost deques
 		 */
 		DimensionalArray<D, IncomingGhostDeque> incoming_ghosts;
 
+		/**
+		 * @brief Construct a new Remote Call Set object
+		 *
+		 * @param rank the rank that is being communicated with
+		 */
 		explicit RemoteCallSet(int rank) : rank(rank) {}
 	};
 
+	/**
+	 * @brief The vector of RemoteCallSet. one for each rank being communicated with
+	 */
 	std::vector<RemoteCallSet> remote_call_sets;
+
+	/**
+	 * @brief deque of LocalCall with dimension M
+	 *
+	 * @tparam M the dimension
+	 */
 	template <int M> using LocalCallDeque = std::deque<LocalCall<M>>;
 	/**
-	 * @brief deque of local calls to be made
+	 * @brief array of deques of local calls to be made
 	 */
 	DimensionalArray<D, LocalCallDeque> local_calls;
 
+	/**
+	 * @brief Information need for representing ghosts in the buffer as full LocalData object.
+	 *
+	 * @tparam M the dimension of the face
+	 */
 	template <int M> class GhostLocalDataInfo
 	{
 		private:
+		/**
+		 * @brief The strides for each face value
+		 */
 		std::array<std::array<int, D>, Face<D, M>::number_of> strides;
-		std::array<int, Face<D, M>::number_of>                start_offsets;
-		std::array<size_t, Face<D, M>::number_of>             sizes;
+		/**
+		 * @brief The offsets for each face value
+		 */
+		std::array<int, Face<D, M>::number_of> start_offsets;
+		/**
+		 * @brief The sizes for each face value
+		 */
+		std::array<size_t, Face<D, M>::number_of> sizes;
 
 		public:
+		/**
+		 * @brief Construct a new Ghost Local Data Info object
+		 */
 		GhostLocalDataInfo() = default;
-		GhostLocalDataInfo(const Domain<D> &domain)
+		/**
+		 * @brief Construct a new Ghost Local Data Info object for a given Domain
+		 *
+		 * @param domain the domain
+		 */
+		explicit GhostLocalDataInfo(const Domain<D> &domain)
 		{
 			std::array<int, D> ns              = domain.getNs();
 			int                num_ghost_cells = domain.getNumGhostCells();
@@ -253,38 +369,54 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 					}
 				}
 				start_offsets[face.getIndex()] = offset;
-				/*
-				for (int axis = 0; axis < D; axis++) {
-				    if (sides[sides_index].getAxisIndex() == axis) {
-				        if (sides[sides_index].isLowerOnAxis()) {
-				            new_data += offset[sides_index] * strides[axis];
-				        } else {
-				            new_data += (lengths[axis] - 1 - offset[sides_index]) * strides[axis];
-				        }
-				        sides_index++;
-				    } else {
-				        new_lengths[lengths_index] = lengths[axis];
-				        new_strides[lengths_index] = strides[axis];
-				        lengths_index++;
-				    }
-				}
-				*/
 			}
 		}
+		/**
+		 * @brief Get the the buffer size for ghosts on a given face
+		 *
+		 * @param face the face
+		 * @return size_t the size
+		 */
 		size_t getSize(Face<D, M> face) const
 		{
 			return sizes[face.getIndex()];
 		}
+		/**
+		 * @brief Get the strides for the ghosts in the buffer on a given face
+		 *
+		 * @param face the face
+		 * @return const std::array<int, D>& the strides
+		 */
 		const std::array<int, D> &getStrides(Face<D, M> face) const
 		{
 			return strides[face.getIndex()];
 		}
-		size_t getStartOffset(Face<D, M> face) const
+		/**
+		 * @brief Get the offset of the first non-ghost value in the LocalData object on a given face
+		 *
+		 * @param face the face
+		 * @return int the offset of the first non-ghost value
+		 */
+		int getStartOffset(Face<D, M> face) const
 		{
 			return start_offsets[face.getIndex()];
 		}
 	};
+
+	/**
+	 * @brief GhostLocalDatInfo for each face dimension
+	 */
 	DimensionalArray<D, GhostLocalDataInfo> ghost_local_data_infos;
+
+	/**
+	 * @brief The domain that this ghostfiller operates on
+	 */
+	std::shared_ptr<const Domain<D>> domain;
+
+	/**
+	 * @brief the fill type to use
+	 */
+	GhostFillingType fill_type;
 
 	/**
 	 * @brief Get the LocalData object for the buffer
@@ -316,6 +448,15 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 		return recv_requests;
 	}
+
+	/**
+	 * @brief A the values from the buffer to the ghost cells of patches
+	 *
+	 * @tparam M the dimension of the face
+	 * @param remote_call_set the remote calls
+	 * @param buffer the buffer
+	 * @param u the vector that the ghost values are being filled for
+	 */
 	template <int M> void addRecvBufferToGhost(const RemoteCallSet &remote_call_set, std::vector<double> &buffer, const Vector<D> &u) const
 	{
 		for (const IncomingGhost<M> &incoming_ghost : remote_call_set.incoming_ghosts.template get<M>()) {
@@ -342,7 +483,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 	/**
-	 * @brief process recv requests as they are ready
+	 * @brief process recv requests when they are ready
 	 *
 	 * @param requests the recv requests
 	 * @param buffers the recv buffers
@@ -372,6 +513,14 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 
+	/**
+	 * @brief Fill the ghost values in the send buffer
+	 *
+	 * @tparam M the dimension of the face
+	 * @param remote_call_set the remote calls to be made
+	 * @param buffer the buffer that is being fileld
+	 * @param u the vector that the ghost values are being filled for
+	 */
 	template <int M> void fillSendBuffer(const RemoteCallSet &remote_call_set, std::vector<double> &buffer, const Vector<D> &u) const
 	{
 		for (const RemoteCall<M> &call : remote_call_set.remote_calls.template get<M>()) {
@@ -451,6 +600,14 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 
+	/**
+	 * @brief Process local fill calls for a given face dimension.
+	 *
+	 * The will make the call for dimension M-1
+	 *
+	 * @tparam M the dimension
+	 * @param u the vector that the ghost are being filled for
+	 */
 	template <int M> void processLocalFills(std::shared_ptr<const Vector<D>> u) const
 	{
 		for (const LocalCall<M> &call : local_calls.template get<M>()) {
@@ -464,6 +621,16 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 
+	/**
+	 * @brief Add a normal neighbor call for given dimension
+	 *
+	 * @tparam M the dimension of the face
+	 * @param pinfo the PatchInfo object for the patch that is being filled from
+	 * @param f the the face
+	 * @param my_local_calls the local calls deque
+	 * @param rank_to_remote_call_prototypes the remote calls map
+	 * @param rank_to_incoming_ghost_prototypes the incoming ghosts map
+	 */
 	template <int M>
 	static void addNormalNbrCalls(const PatchInfo<D> &                                pinfo,
 	                              Face<D, M>                                          f,
@@ -482,6 +649,16 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 
+	/**
+	 * @brief Add a fine neighbor call for given dimension
+	 *
+	 * @tparam M the dimension of the face
+	 * @param pinfo the PatchInfo object for the patch that is being filled from
+	 * @param f the the face
+	 * @param my_local_calls the local calls deque
+	 * @param rank_to_remote_call_prototypes the remote calls map
+	 * @param rank_to_incoming_ghost_prototypes the incoming ghosts map
+	 */
 	template <int M>
 	static void addFineNbrCalls(const PatchInfo<D> &                                pinfo,
 	                            Face<D, M>                                          f,
@@ -502,6 +679,16 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 
+	/**
+	 * @brief Add a coarse neighbor call for given dimension
+	 *
+	 * @tparam M the dimension of the face
+	 * @param pinfo the PatchInfo object for the patch that is being filled from
+	 * @param f the the face
+	 * @param my_local_calls the local calls deque
+	 * @param rank_to_remote_call_prototypes the remote calls map
+	 * @param rank_to_incoming_ghost_prototypes the incoming ghosts map
+	 */
 	template <int M>
 	static void addCoarseNbrCalls(const PatchInfo<D> &                                pinfo,
 	                              Face<D, M>                                          f,
@@ -520,6 +707,13 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 
+	/**
+	 * @brief Enumerate calls on a given face dimension
+	 *
+	 * @tparam M the dimension of the faces
+	 * @param my_local_calls the local calls
+	 * @param rank_to_remote_call_sets a map from rank to RemoteCallSet objects
+	 */
 	template <int M> void enumerateCalls(std::deque<LocalCall<M>> &my_local_calls, std::map<int, RemoteCallSet> &rank_to_remote_call_sets) const
 	{
 		int rank;
@@ -582,6 +776,13 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 
+	/**
+	 * @brief Zero out the ghost cell values on all the faces that have neighbors
+	 *
+	 * @tparam M the dimension of the faces
+	 * @param pinfo the PatchInfo for the patch
+	 * @param data the patch that is being zeroed
+	 */
 	template <int M> void zeroGhostCellsOnAllFaces(const PatchInfo<D> &pinfo, const LocalData<D> &data) const
 	{
 		for (Face<D, M> f : Face<D, M>::getValues()) {
@@ -598,6 +799,11 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		}
 	}
 
+	/**
+	 * @brief Zero out the ghost cell values
+	 *
+	 * @param u the vector to zero out the ghost cells on
+	 */
 	void zeroGhostCells(std::shared_ptr<const Vector<D>> u) const
 	{
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
@@ -620,16 +826,6 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			}
 		}
 	}
-
-	protected:
-	/**
-	 * @brief The domain that this ghostfiller operates on
-	 */
-	std::shared_ptr<const Domain<D>> domain;
-	/**
-	 * @brief the fill type to use
-	 */
-	GhostFillingType fill_type;
 
 	public:
 	/**
@@ -762,6 +958,26 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 
 		// wait for sends for finish
 		MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUS_IGNORE);
+	}
+
+	/**
+	 * @brief Get the ghost filling type
+	 *
+	 * @return GhostFillingType the tyep
+	 */
+	GhostFillingType getFillType() const
+	{
+		return fill_type;
+	}
+
+	/**
+	 * @brief Get the domain that is being filled for
+	 *
+	 * @return std::shared_ptr<const Domain<D>>  the domain
+	 */
+	std::shared_ptr<const Domain<D>> getDomain() const
+	{
+		return domain;
 	}
 };
 extern template class MPIGhostFiller<1>;
