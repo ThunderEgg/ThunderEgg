@@ -23,6 +23,7 @@
 #include <ThunderEgg/RuntimeError.h>
 namespace ThunderEgg
 {
+BiLinearGhostFiller::BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain) : MPIGhostFiller<2>(domain, GhostFillingType::Faces) {}
 namespace
 {
 void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
@@ -117,10 +118,27 @@ void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &        
 			throw RuntimeError("Unsupported Nbr Type");
 	}
 }
+void BiLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<2> &             pinfo,
+                                                        const std::vector<LocalData<2>> &local_datas,
+                                                        std::vector<LocalData<2>> &      nbr_datas,
+                                                        Edge                             edge,
+                                                        NbrType                          nbr_type,
+                                                        Orthant<1>                       orthant_on_coarse) const
+{
+	// 2D, edges not needed
+}
 
+void BiLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &             pinfo,
+                                                          const std::vector<LocalData<2>> &local_datas,
+                                                          std::vector<LocalData<2>> &      nbr_datas,
+                                                          Corner<2>                        corner,
+                                                          NbrType                          nbr_type) const
+{
+	// Corners not implimented
+}
 void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, std::vector<LocalData<2>> &local_datas) const
 {
-	for (auto &local_data : local_datas) {
+	for (const LocalData<2> &local_data : local_datas) {
 		for (Side<2> side : Side<2>::getValues()) {
 			if (pinfo.hasNbr(side)) {
 				switch (pinfo.getNbrType(side)) {

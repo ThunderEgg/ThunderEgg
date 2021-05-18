@@ -46,17 +46,13 @@ class TriLinearGhostFiller : public MPIGhostFiller<3>
 	                                   std::vector<LocalData<3>> &      nbr_datas,
 	                                   Edge                             edge,
 	                                   NbrType                          nbr_type,
-	                                   Orthant<1>                       orthant_on_coarse) const override
-	{
-	}
+	                                   Orthant<1>                       orthant_on_coarse) const override;
 
 	void fillGhostCellsForCornerNbrPatch(const PatchInfo<3> &             pinfo,
 	                                     const std::vector<LocalData<3>> &local_datas,
 	                                     std::vector<LocalData<3>> &      nbr_datas,
 	                                     Corner<3>                        corner,
-	                                     NbrType                          nbr_type) const override
-	{
-	}
+	                                     NbrType                          nbr_type) const override;
 
 	void fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo, std::vector<LocalData<3>> &local_datas) const override;
 	/**

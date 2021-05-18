@@ -37,7 +37,7 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	 *
 	 * @param domain_in the domain that is being fill for
 	 */
-	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain_in) : MPIGhostFiller<2>(domain_in, GhostFillingType::Faces) {}
+	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain_in);
 
 	void fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
 	                               const std::vector<LocalData<2>> &local_datas,
@@ -51,17 +51,13 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	                                   std::vector<LocalData<2>> &      nbr_datas,
 	                                   Edge                             edge,
 	                                   NbrType                          nbr_type,
-	                                   Orthant<1>                       orthant_on_coarse) const override
-	{
-	}
+	                                   Orthant<1>                       orthant_on_coarse) const override;
 
 	void fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &             pinfo,
 	                                     const std::vector<LocalData<2>> &local_datas,
 	                                     std::vector<LocalData<2>> &      nbr_datas,
 	                                     Corner<2>                        corner,
-	                                     NbrType                          nbr_type) const override
-	{
-	}
+	                                     NbrType                          nbr_type) const override;
 
 	void fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, std::vector<LocalData<2>> &local_datas) const override;
 };

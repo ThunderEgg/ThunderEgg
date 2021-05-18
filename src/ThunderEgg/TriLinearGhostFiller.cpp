@@ -92,9 +92,28 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3> &       
 	}
 }
 
+void TriLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<3> &             pinfo,
+                                                         const std::vector<LocalData<3>> &local_datas,
+                                                         std::vector<LocalData<3>> &      nbr_datas,
+                                                         Edge                             edge,
+                                                         NbrType                          nbr_type,
+                                                         Orthant<1>                       orthant_on_coarse) const
+{
+	// not implimented yet
+}
+
+void TriLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<3> &             pinfo,
+                                                           const std::vector<LocalData<3>> &local_datas,
+                                                           std::vector<LocalData<3>> &      nbr_datas,
+                                                           Corner<3>                        corner,
+                                                           NbrType                          nbr_type) const
+{
+	// not implimented yet
+}
+
 void TriLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo, std::vector<LocalData<3>> &local_datas) const
 {
-	for (auto &local_data : local_datas) {
+	for (const LocalData<3> &local_data : local_datas) {
 		for (Side<3> side : Side<3>::getValues()) {
 			if (pinfo.hasNbr(side)) {
 				NbrType nbr_type = pinfo.getNbrType(side);
