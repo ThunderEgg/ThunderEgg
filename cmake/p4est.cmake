@@ -29,6 +29,7 @@ ExternalProject_Add(P4EST
 GIT_REPOSITORY https://github.com/cburstedde/p4est
 GIT_TAG        feature-cmake
 CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${P4EST_ROOT} -Dmpi:BOOL=TRUE -Dopenmp:BOOL=FALSE
+BUILD_BYPRODUCTS ${P4EST_LIBRARIES}
 )
 
 # --- imported target
