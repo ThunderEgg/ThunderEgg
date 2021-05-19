@@ -139,6 +139,46 @@ void FillLocalGhostsForCornerFineNbr(const LocalData<2> &local_data, Corner<2> c
 	auto local_ghosts = local_data.getSliceOn(corner, {-1, -1});
 	local_ghosts[{}] += -local_slice[{}] / 3.0;
 }
+void FillLocalGhostCellsOnSides(const PatchInfo<2> &pinfo, const LocalData<2> local_data)
+{
+	for (Side<2> side : Side<2>::getValues()) {
+		if (pinfo.hasNbr(side)) {
+			switch (pinfo.getNbrType(side)) {
+				case NbrType::Normal:
+					// nothing needs to be done
+					break;
+				case NbrType::Coarse:
+					FillLocalGhostsForCoarseNbr(pinfo, local_data, side);
+					break;
+				case NbrType::Fine:
+					FillLocalGhostsForFineNbr(local_data, side);
+					break;
+				default:
+					throw RuntimeError("Unsupported Nbr Type");
+			}
+		}
+	}
+}
+void FillLocalGhostCellsOnCorners(const PatchInfo<2> &pinfo, const LocalData<2> local_data)
+{
+	for (Corner<2> corner : Corner<2>::getValues()) {
+		if (pinfo.hasNbr(corner)) {
+			switch (pinfo.getNbrType(corner)) {
+				case NbrType::Normal:
+					// nothing needs to be done
+					break;
+				case NbrType::Coarse:
+					FillLocalGhostsForCornerCoarseNbr(pinfo, local_data, corner);
+					break;
+				case NbrType::Fine:
+					FillLocalGhostsForCornerFineNbr(local_data, corner);
+					break;
+				default:
+					throw RuntimeError("Unsupported Nbr Type");
+			}
+		}
+	}
+}
 } // namespace
 void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
                                                     const std::vector<LocalData<2>> &local_datas,
@@ -194,39 +234,15 @@ void BiLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &  
 void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, std::vector<LocalData<2>> &local_datas) const
 {
 	for (const LocalData<2> &local_data : local_datas) {
-		for (Side<2> side : Side<2>::getValues()) {
-			if (pinfo.hasNbr(side)) {
-				switch (pinfo.getNbrType(side)) {
-					case NbrType::Normal:
-						// nothing needs to be done
-						break;
-					case NbrType::Coarse:
-						FillLocalGhostsForCoarseNbr(pinfo, local_data, side);
-						break;
-					case NbrType::Fine:
-						FillLocalGhostsForFineNbr(local_data, side);
-						break;
-					default:
-						throw RuntimeError("Unsupported Nbr Type");
-				}
-			}
-		}
-		for (Corner<2> corner : Corner<2>::getValues()) {
-			if (pinfo.hasNbr(corner)) {
-				switch (pinfo.getNbrType(corner)) {
-					case NbrType::Normal:
-						// nothing needs to be done
-						break;
-					case NbrType::Coarse:
-						FillLocalGhostsForCornerCoarseNbr(pinfo, local_data, corner);
-						break;
-					case NbrType::Fine:
-						FillLocalGhostsForCornerFineNbr(local_data, corner);
-						break;
-					default:
-						throw RuntimeError("Unsupported Nbr Type");
-				}
-			}
+		switch (this->getFillType()) {
+			case GhostFillingType::Corners:
+				FillLocalGhostCellsOnCorners(pinfo, local_data);
+			case GhostFillingType::Edges:
+			case GhostFillingType::Faces:
+				FillLocalGhostCellsOnSides(pinfo, local_data);
+				break;
+			default:
+				throw RuntimeError("Unsupported GhostFillingType");
 		}
 	}
 }

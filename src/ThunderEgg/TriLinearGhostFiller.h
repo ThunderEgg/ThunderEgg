@@ -61,8 +61,9 @@ class TriLinearGhostFiller : public MPIGhostFiller<3>
 	 * Currently, this only supports an even number of cells on each axis of the patch
 	 *
 	 * @param domain the domain on which ghosts will be filled
+	 * @param fill_type the ghost filling type to perform
 	 */
-	explicit TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain);
+	TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain, GhostFillingType fill_type);
 };
 } // namespace ThunderEgg
 #endif
