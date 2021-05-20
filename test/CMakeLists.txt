@@ -7,40 +7,15 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(catch2)
-add_executable(unit_tests_mpiany test.cpp OctTree.cpp 
-                                 utils/DomainReader.cpp)
-target_include_directories(unit_tests_mpiany
-                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(unit_tests_mpiany ThunderEgg Catch2)
-if(VTK_FOUND)
-  target_link_libraries(unit_tests_mpiany VtkWriter)
-endif(VTK_FOUND)
 
 include(CTest)
 include(ParseAndAddCatchTests)
 
 set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
 
-foreach(ARG1 RANGE 1 1)
-  set(OptionalCatchTestLauncher ${MPIEXEC} "--oversubscribe" ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
-  set(AdditionalCatchParameters -a WORKING_DIRECTORY
-                                ${CMAKE_CURRENT_SOURCE_DIR})
-  parseandaddcatchtests(
-    unit_tests_mpiany
-    WORKING_DIRECTORY
-    ${PROJECT_SOURCE_DIR}/test
-    THUNDEREGG_TEST_EXECUTOR
-    ${MPIEXEC}
-    ${MPIEXEC_NUMPROC_FLAG}
-    ${ARG1}
-    THUNDEREGG_SINGLE_EXECUTOR
-    ${MPIEXEC}
-    ${MPIEXEC_NUMPROC_FLAG}
-    1
-    -q)
-  unset(OptionalCatchTestLauncher)
-  set(AdditionalCatchParameters)
-endforeach(ARG1 RANGE 3)
+file(GLOB_RECURSE TEST_SHARED_SRC ${PROJECT_SOURCE_DIR}/test *_SHARED.cpp)
+add_library(test_shared ${TEST_SHARED_SRC})
+ target_link_libraries(test_shared ThunderEgg Catch2)
 
 function(add_mpi_test ARG1)
   file(GLOB_RECURSE TEST_MPI${ARG1}_SRC ${PROJECT_SOURCE_DIR}/test
@@ -63,9 +38,8 @@ function(add_mpi_test ARG1)
                                 ${CMAKE_CURRENT_SOURCE_DIR})
 
   if(TEST_MPI${ARG1}_SRC)
-    add_executable(unit_tests_mpi${ARG1} ${TEST_MPI${ARG1}_SRC} test.cpp
-                                         utils/DomainReader.cpp)
-    target_link_libraries(unit_tests_mpi${ARG1} ThunderEgg Catch2)
+    add_executable(unit_tests_mpi${ARG1} ${TEST_MPI${ARG1}_SRC} test.cpp)
+    target_link_libraries(unit_tests_mpi${ARG1} test_shared)
     target_include_directories(unit_tests_mpi${ARG1}
                                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
     if(TARGET P4EST::P4EST)
@@ -76,9 +50,9 @@ function(add_mpi_test ARG1)
 
   if(TEST_MPI${ARG1}_PETSC_SRC AND PETSC_FOUND)
     add_executable(
-      unit_tests_petsc_mpi${ARG1} ${TEST_MPI${ARG1}_PETSC_SRC} test_PETSC.cpp
-                                  utils/DomainReader.cpp)
-    target_link_libraries(unit_tests_petsc_mpi${ARG1} ThunderEgg Catch2)
+      unit_tests_petsc_mpi${ARG1} ${TEST_MPI${ARG1}_PETSC_SRC} test_PETSC.cpp)
+    
+    target_link_libraries(unit_tests_petsc_mpi${ARG1} test_shared)
     target_include_directories(unit_tests_petsc_mpi${ARG1}
                                PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
     parseandaddcatchtests(unit_tests_petsc_mpi${ARG1})
