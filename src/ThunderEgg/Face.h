@@ -441,13 +441,27 @@ template <int D, int M> class Face
 };
 
 template <int D> using Side = Face<D, D - 1>;
-template <int D> Side<D> HigherSideOnAxis(int i)
+/**
+ * @brief Get the higher side on a given axis
+ *
+ * @tparam D the number of Cartesian dimensions
+ * @param axis the axis
+ * @return Side<D> the side
+ */
+template <int D> Side<D> HigherSideOnAxis(size_t axis)
 {
-	return Side<D>((i << 1) + 1);
+	return Side<D>((axis << 1) + 1);
 }
-template <int D> Side<D> LowerSideOnAxis(int i)
+/**
+ * @brief Get the lower side on a given axis
+ *
+ * @tparam D the number of Cartesian dimensions
+ * @param axis the axis
+ * @return Side<D> the side
+ */
+template <int D> Side<D> LowerSideOnAxis(size_t axis)
 {
-	return Side<D>(i << 1);
+	return Side<D>(axis << 1);
 }
 void to_json(nlohmann::json &j, const Side<1> &s);
 void to_json(nlohmann::json &j, const Side<2> &s);

@@ -326,7 +326,7 @@ void addCoarseNbrInfo(const p4est_iter_face_side_t &side1, const p4est_iter_face
 	} else {
 		nbr_data = (Data *) side2.is.full.quad->p.user_data;
 	}
-	for (int i = 0; i < 2; i++) {
+	for (unsigned char i = 0; i < 2; i++) {
 		if (!side1.is.hanging.is_ghost[i]) {
 			Data *data = (Data *) side1.is.hanging.quad[i]->p.user_data;
 

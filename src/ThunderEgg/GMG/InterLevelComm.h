@@ -368,7 +368,7 @@ template <int D> class InterLevelComm
 			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx, MPI_STATUS_IGNORE);
 
 			// get local indexes for the buffer that was received
-			std::vector<int> &local_indexes = rank_and_local_indexes_for_vector.at(finished_idx).second;
+			const std::vector<int> &local_indexes = rank_and_local_indexes_for_vector.at(finished_idx).second;
 
 			// add the values in the buffer to the vector
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
@@ -499,7 +499,7 @@ template <int D> class InterLevelComm
 			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx, MPI_STATUS_IGNORE);
 
 			// get local indexes for the buffer that was recieved
-			std::vector<int> &local_indexes = rank_and_local_indexes_for_ghost_vector.at(finished_idx).second;
+			const std::vector<int> &local_indexes = rank_and_local_indexes_for_ghost_vector.at(finished_idx).second;
 
 			// add the values in the buffer to the vector
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);

@@ -206,7 +206,7 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 	  op(op_in),
 	  neumann(neumann)
 	{
-		CompareFunction compare = [&](const PatchInfo<D> &a, const PatchInfo<D> &b) -> bool {
+		CompareFunction compare = [&](const PatchInfo<D> &a, const PatchInfo<D> &b) {
 			std::bitset<Side<D>::number_of> a_neumann;
 			std::bitset<Side<D>::number_of> b_neumann;
 			for (Side<D> s : Side<D>::getValues()) {

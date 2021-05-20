@@ -338,7 +338,7 @@ void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo,
 {
 	for (const LocalData<2> &local_data : local_datas) {
 		switch (this->getFillType()) {
-			case GhostFillingType::Corners:
+			case GhostFillingType::Corners: // Fill corners and faces
 				FillLocalGhostCellsOnCorners(pinfo, local_data);
 			case GhostFillingType::Faces:
 				FillLocalGhostCellsOnSides(pinfo, local_data);

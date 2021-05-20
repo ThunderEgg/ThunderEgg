@@ -253,8 +253,8 @@ void P8estDomainGenerator::coarsenTree()
 			return false;
 		} else if (quadrant[0]->level > curr_level) {
 			// update child datas to point to parent
-			Data *bsw_data = (Data *) quadrant[0]->p.user_data;
-			for (int i = 0; i < 8; i++) {
+			const Data *bsw_data = (Data *) quadrant[0]->p.user_data;
+			for (unsigned char i = 0; i < 8; i++) {
 				Data *data                  = (Data *) quadrant[i]->p.user_data;
 				data->child_ids[0]          = data->id;
 				data->child_ranks[0]        = data->rank;
@@ -264,7 +264,7 @@ void P8estDomainGenerator::coarsenTree()
 			return true;
 		} else {
 			// update child datas to point to self
-			for (int i = 0; i < 8; i++) {
+			for (unsigned char i = 0; i < 8; i++) {
 				Data *data                  = (Data *) quadrant[i]->p.user_data;
 				data->child_ids[0]          = data->id;
 				data->child_ranks[0]        = data->rank;
@@ -748,8 +748,8 @@ void P8estDomainGenerator::linkNeighbors()
 
 void P8estDomainGenerator::updateParentRanksOfPreviousDomain()
 {
-	std::vector<PatchInfo<3>> &old_level = domain_patches.back();
-	std::vector<PatchInfo<3>> &new_level = domain_patches.front();
+	std::vector<PatchInfo<3>> &      old_level = domain_patches.back();
+	const std::vector<PatchInfo<3>> &new_level = domain_patches.front();
 
 	std::set<int> local_new_level_ids;
 	for (const auto &pinfo : new_level) {

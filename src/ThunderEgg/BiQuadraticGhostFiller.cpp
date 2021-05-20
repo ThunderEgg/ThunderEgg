@@ -400,13 +400,11 @@ void BiQuadraticGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pin
 {
 	for (const LocalData<2> &local_data : local_datas) {
 		switch (this->getFillType()) {
-			case GhostFillingType::Corners:
+			case GhostFillingType::Corners: // Fill corners and faces
 				FillLocalGhostCellsOnCorners(pinfo, local_data);
 			case GhostFillingType::Faces:
 				FillLocalGhostCellsOnSides(pinfo, local_data);
 				break;
-			case GhostFillingType::Edges:
-				// No edges in 2d
 			default:
 				throw RuntimeError("Unsupported GhostFillingType");
 		}
