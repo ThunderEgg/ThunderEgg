@@ -337,11 +337,11 @@ template <int D> class Orthant
 		bool is_bit_set = val & (0x1 << idx);
 		return is_bit_set == remainder;
 	}
-	bool isHigherOnAxis(int axis) const
+	bool isHigherOnAxis(size_t axis) const
 	{
 		return val & (0b1 << axis);
 	}
-	bool isLowerOnAxis(int axis) const
+	bool isLowerOnAxis(size_t axis) const
 	{
 		return !(val & (0b1 << axis));
 	}

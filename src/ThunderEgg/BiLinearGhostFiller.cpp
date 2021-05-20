@@ -28,6 +28,13 @@ BiLinearGhostFiller::BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain
 }
 namespace
 {
+/**
+ * @brief This is just a simple copy of values
+ *
+ * @param local_datas the local pach
+ * @param nbr_datas the neighbor patch
+ * @param side the side that the neighbor patch is on
+ */
 void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, const std::vector<LocalData<2>> &nbr_datas, const Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
@@ -36,16 +43,26 @@ void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, const s
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 	}
 }
-void FillGhostForCoarseNbr(const PatchInfo<2> &             pinfo,
-                           const std::vector<LocalData<2>> &local_datas,
+/**
+ * @brief Fill the ghost values for a coarse neighbor
+ *
+ * This is only part of the value. Values from the interior of the coarse neighbor will also be needed.
+ *
+ * Those values are added in FillLocalGhostsForFineNbr
+ *
+ * @param local_datas the local patch
+ * @param nbr_datas the neighbor patch
+ * @param side the side that the neighbor patch is on
+ * @param orthant the orthant of the coarser neighbor face that this patch lies on
+ */
+void FillGhostForCoarseNbr(const std::vector<LocalData<2>> &local_datas,
                            const std::vector<LocalData<2>> &nbr_datas,
                            const Side<2>                    side,
                            const Orthant<1>                 orthant)
 {
-	auto nbr_info = pinfo.getCoarseNbrInfo(side);
-	int  offset   = 0;
+	int offset = 0;
 	if (orthant == Orthant<1>::upper()) {
-		offset = pinfo.ns[!side.getAxisIndex()];
+		offset = local_datas[0].getLengths()[!side.getAxisIndex()];
 	}
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOn(side, {0});
@@ -55,16 +72,26 @@ void FillGhostForCoarseNbr(const PatchInfo<2> &             pinfo,
 		});
 	}
 }
-void FillGhostForFineNbr(const PatchInfo<2> &             pinfo,
-                         const std::vector<LocalData<2>> &local_datas,
+/**
+ * @brief Fill the ghost values for a fine neighbor
+ *
+ * This is only part of the value. Values from the interior of the fine neighbor will also be needed.
+ *
+ * Those values are added in FillLocalGhostsForCoarseNbr
+ *
+ * @param local_datas the local patch
+ * @param nbr_datas the neighbor patch
+ * @param side the side that the neighbor patch is on
+ * @param orthant the orthant of the this patches face that the finer neighbor patch lies on
+ */
+void FillGhostForFineNbr(const std::vector<LocalData<2>> &local_datas,
                          const std::vector<LocalData<2>> &nbr_datas,
                          const Side<2>                    side,
                          const Orthant<1>                 orthant)
 {
-	auto nbr_info = pinfo.getFineNbrInfo(side);
-	int  offset   = 0;
+	int offset = 0;
 	if (orthant == Orthant<1>::upper()) {
-		offset = pinfo.ns[!side.getAxisIndex()];
+		offset = local_datas[0].getLengths()[!side.getAxisIndex()];
 	}
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOn(side, {0});
@@ -74,13 +101,24 @@ void FillGhostForFineNbr(const PatchInfo<2> &             pinfo,
 		});
 	}
 }
+/**
+ * @brief Fill in the extra information needed for this patches ghost cells when there is a coarser neighbor
+ *
+ * This is only part of the value.
+ *
+ * Those values compliment FillGhostForFineNbr
+ *
+ * @param pinfo the patchinfo object
+ * @param local_data the patch data
+ * @param side the side that the neighbor patch is on
+ */
 void FillLocalGhostsForCoarseNbr(const PatchInfo<2> &pinfo, const LocalData<2> &local_data, const Side<2> side)
 {
 	auto local_slice  = local_data.getSliceOn(side, {0});
 	auto local_ghosts = local_data.getSliceOn(side, {-1});
 	int  offset       = 0;
 	if (pinfo.getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper()) {
-		offset = pinfo.ns[!side.getAxisIndex()];
+		offset = local_data.getLengths()[!side.getAxisIndex()];
 	}
 	nested_loop<1>(local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
 		local_ghosts[coord] += 2.0 / 3.0 * local_slice[coord];
@@ -91,6 +129,16 @@ void FillLocalGhostsForCoarseNbr(const PatchInfo<2> &pinfo, const LocalData<2> &
 		}
 	});
 }
+/**
+ * @brief Fill in the extra information needed for this patches ghost cells when there is a finer neighbor
+ *
+ * This is only part of the value.
+ *
+ * Those values compliment FillGhostForCoarseNbr
+ *
+ * @param local_data the patch data
+ * @param side the side that the neighbor patch is on
+ */
 void FillLocalGhostsForFineNbr(const LocalData<2> &local_data, const Side<2> side)
 {
 	auto local_slice  = local_data.getSliceOn(side, {0});
@@ -98,6 +146,13 @@ void FillLocalGhostsForFineNbr(const LocalData<2> &local_data, const Side<2> sid
 	nested_loop<1>(
 	local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
 }
+/**
+ * @brief This is just a simple copy of values
+ *
+ * @param local_datas the local pach
+ * @param nbr_datas the neighbor patch
+ * @param corner the corner that the neighbor patch is on
+ */
 void FillGhostForCornerNormalNbr(const std::vector<LocalData<2>> &local_datas, const std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
@@ -106,20 +161,36 @@ void FillGhostForCornerNormalNbr(const std::vector<LocalData<2>> &local_datas, c
 		nbr_ghost[{}]    = local_slice[{}];
 	}
 }
-void FillGhostForCornerCoarseNbr(const PatchInfo<2> &             pinfo,
-                                 const std::vector<LocalData<2>> &local_datas,
-                                 const std::vector<LocalData<2>> &nbr_datas,
-                                 Corner<2>                        corner)
+/**
+ * @brief Fill the ghost values for a coarse neighbor
+ *
+ * This is only part of the value. Values from the interior of the coarse neighbor will also be needed.
+ *
+ * Those values are added in FillLocalGhostsForCornerFineNbr
+ *
+ * @param local_datas the local patch
+ * @param nbr_datas the neighbor patch
+ * @param corner the corner that the neighbor patch is on
+ */
+void FillGhostForCornerCoarseNbr(const std::vector<LocalData<2>> &local_datas, const std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto nbr_ghosts = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
 		nbr_ghosts[{}] += 4.0 * local_datas[c].getSliceOn(corner, {0, 0})[{}] / 3.0;
 	}
 }
-void FillGhostForCornerFineNbr(const PatchInfo<2> &             pinfo,
-                               const std::vector<LocalData<2>> &local_datas,
-                               const std::vector<LocalData<2>> &nbr_datas,
-                               Corner<2>                        corner)
+/**
+ * @brief Fill the ghost values for a fine neighbor
+ *
+ * This is only part of the value. Values from the interior of the fine neighbor will also be needed.
+ *
+ * Those values are added in FillLocalGhostsForCornerCoarseNbr
+ *
+ * @param local_datas the local patch
+ * @param nbr_datas the neighbor patch
+ * @param corner the corner that the neighbor patch is on
+ */
+void FillGhostForCornerFineNbr(const std::vector<LocalData<2>> &local_datas, const std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOn(corner, {0, 0});
@@ -127,19 +198,45 @@ void FillGhostForCornerFineNbr(const PatchInfo<2> &             pinfo,
 		nbr_ghosts[{}] += 2.0 * local_slice[{}] / 3.0;
 	}
 }
-void FillLocalGhostsForCornerCoarseNbr(const PatchInfo<2> &pinfo, const LocalData<2> &local_data, Corner<2> corner)
+/**
+ * @brief Fill in the extra information needed for this patches ghost cells when there is a coarser neighbor
+ *
+ * This is only part of the value. Values from the interior of the coarse neighbor will also be needed.
+ *
+ * Those values compliment FillGhostForCornerFineNbr
+ *
+ * @param local_data the patch data
+ * @param corner the corner that the neighbor patch is on
+ */
+void FillLocalGhostsForCornerCoarseNbr(const LocalData<2> &local_data, Corner<2> corner)
 {
 	auto local_slice  = local_data.getSliceOn(corner, {0, 0});
 	auto local_ghosts = local_data.getSliceOn(corner, {-1, -1});
 	local_ghosts[{}] += local_slice[{}] / 3.0;
 }
+/**
+ * @brief Fill in the extra information needed for this patches ghost cells when there is a finer neighbor
+ *
+ * This is only part of the value.
+ *
+ * Those values compliment FillGhostForCornerCoarseNbr
+ *
+ * @param local_data the patch data
+ * @param corner the corner that the neighbor patch is on
+ */
 void FillLocalGhostsForCornerFineNbr(const LocalData<2> &local_data, Corner<2> corner)
 {
 	auto local_slice  = local_data.getSliceOn(corner, {0, 0});
 	auto local_ghosts = local_data.getSliceOn(corner, {-1, -1});
 	local_ghosts[{}] += -local_slice[{}] / 3.0;
 }
-void FillLocalGhostCellsOnSides(const PatchInfo<2> &pinfo, const LocalData<2> local_data)
+/**
+ * @brief Add in extra information needed from the local patch on the sides
+ *
+ * @param pinfo the pinfo object
+ * @param local_data the patch data
+ */
+void FillLocalGhostCellsOnSides(const PatchInfo<2> &pinfo, const LocalData<2> &local_data)
 {
 	for (Side<2> side : Side<2>::getValues()) {
 		if (pinfo.hasNbr(side)) {
@@ -159,7 +256,13 @@ void FillLocalGhostCellsOnSides(const PatchInfo<2> &pinfo, const LocalData<2> lo
 		}
 	}
 }
-void FillLocalGhostCellsOnCorners(const PatchInfo<2> &pinfo, const LocalData<2> local_data)
+/**
+ * @brief Add in extra information needed from the local patch on the corner
+ *
+ * @param pinfo the pinfo object
+ * @param local_data the patch data
+ */
+void FillLocalGhostCellsOnCorners(const PatchInfo<2> &pinfo, const LocalData<2> &local_data)
 {
 	for (Corner<2> corner : Corner<2>::getValues()) {
 		if (pinfo.hasNbr(corner)) {
@@ -168,7 +271,7 @@ void FillLocalGhostCellsOnCorners(const PatchInfo<2> &pinfo, const LocalData<2> 
 					// nothing needs to be done
 					break;
 				case NbrType::Coarse:
-					FillLocalGhostsForCornerCoarseNbr(pinfo, local_data, corner);
+					FillLocalGhostsForCornerCoarseNbr(local_data, corner);
 					break;
 				case NbrType::Fine:
 					FillLocalGhostsForCornerFineNbr(local_data, corner);
@@ -192,10 +295,10 @@ void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &        
 			FillGhostForNormalNbr(local_datas, nbr_datas, side);
 			break;
 		case NbrType::Coarse:
-			FillGhostForCoarseNbr(pinfo, local_datas, nbr_datas, side, orthant_on_coarse);
+			FillGhostForCoarseNbr(local_datas, nbr_datas, side, orthant_on_coarse);
 			break;
 		case NbrType::Fine:
-			FillGhostForFineNbr(pinfo, local_datas, nbr_datas, side, orthant_on_coarse);
+			FillGhostForFineNbr(local_datas, nbr_datas, side, orthant_on_coarse);
 			break;
 		default:
 			throw RuntimeError("Unsupported Nbr Type");
@@ -222,10 +325,10 @@ void BiLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &  
 			FillGhostForCornerNormalNbr(local_datas, nbr_datas, corner);
 			break;
 		case NbrType::Coarse:
-			FillGhostForCornerCoarseNbr(pinfo, local_datas, nbr_datas, corner);
+			FillGhostForCornerCoarseNbr(local_datas, nbr_datas, corner);
 			break;
 		case NbrType::Fine:
-			FillGhostForCornerFineNbr(pinfo, local_datas, nbr_datas, corner);
+			FillGhostForCornerFineNbr(local_datas, nbr_datas, corner);
 			break;
 		default:
 			throw RuntimeError("Unsupported Nbr Type");
@@ -237,7 +340,6 @@ void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo,
 		switch (this->getFillType()) {
 			case GhostFillingType::Corners:
 				FillLocalGhostCellsOnCorners(pinfo, local_data);
-			case GhostFillingType::Edges:
 			case GhostFillingType::Faces:
 				FillLocalGhostCellsOnSides(pinfo, local_data);
 				break;
