@@ -523,8 +523,10 @@ void TriLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo
 		switch (this->getFillType()) {
 			case GhostFillingType::Corners: // Fill corners, edges, and faces
 				FillLocalGhostCellsOnCorners(pinfo, local_data);
+				[[fallthrough]];
 			case GhostFillingType::Edges: // Fill edges and faces
 				FillLocalGhostCellsOnEdges(pinfo, local_data);
+				[[fallthrough]];
 			case GhostFillingType::Faces: // Fill faces
 				FillLocalGhostCellsOnSides(pinfo, local_data);
 				break;

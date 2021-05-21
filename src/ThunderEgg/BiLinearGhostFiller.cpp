@@ -340,6 +340,7 @@ void BiLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo,
 		switch (this->getFillType()) {
 			case GhostFillingType::Corners: // Fill corners and faces
 				FillLocalGhostCellsOnCorners(pinfo, local_data);
+				[[fallthrough]];
 			case GhostFillingType::Faces:
 				FillLocalGhostCellsOnSides(pinfo, local_data);
 				break;
