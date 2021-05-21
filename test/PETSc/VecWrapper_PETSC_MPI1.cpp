@@ -20,13 +20,18 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/PETSc/VecWrapper.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+
 TEST_CASE("PETSc::VecWrapper<1> getNumGhostCells", "[PETSc::VecWrapper]")
 {
 	int           num_components    = GENERATE(1, 2, 3);

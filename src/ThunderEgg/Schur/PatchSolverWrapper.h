@@ -71,21 +71,22 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 	 * @param iface_domain the InterfaceDomain for the Schur compliment system
 	 * @param solver the PatchSolver to wrap
 	 */
-	PatchSolverWrapper(std::shared_ptr<const InterfaceDomain<D>> iface_domain,
-	                   std::shared_ptr<const PatchSolver<D>>     solver)
-	: iface_domain(iface_domain), solver(solver), scatter(iface_domain), vg(solver->getDomain(), 1)
+	PatchSolverWrapper(std::shared_ptr<const InterfaceDomain<D>> iface_domain, std::shared_ptr<const PatchSolver<D>> solver)
+	: iface_domain(iface_domain),
+	  solver(solver),
+	  scatter(iface_domain),
+	  vg(solver->getDomain(), 1)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
 			for (Side<D> s : Side<D>::getValues()) {
-				if (piinfo->pinfo->hasNbr(s) && piinfo->getIfaceInfo(s)->rank != rank) {
+				if (piinfo->pinfo.hasNbr(s) && piinfo->getIfaceInfo(s)->rank != rank) {
 					patches_with_ifaces_on_neighbor_rank.push_back(piinfo);
 					break;
 				}
 			}
-			if (patches_with_ifaces_on_neighbor_rank.empty()
-			    || patches_with_ifaces_on_neighbor_rank.back() != piinfo) {
+			if (patches_with_ifaces_on_neighbor_rank.empty() || patches_with_ifaces_on_neighbor_rank.back() != piinfo) {
 				patches_with_only_local_ifaces.push_back(piinfo);
 			}
 		}
@@ -96,8 +97,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 	 * @param x the input vector.
 	 * @param b the output vector.
 	 */
-	void apply(std::shared_ptr<const Vector<D - 1>> x,
-	           std::shared_ptr<Vector<D - 1>>       b) const override
+	void apply(std::shared_ptr<const Vector<D - 1>> x, std::shared_ptr<Vector<D - 1>> b) const override
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -112,22 +112,19 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		// interfaces
 		for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
 			for (Side<D> s : Side<D>::getValues()) {
-				auto local_data = u->getLocalData(0, piinfo->pinfo->local_index);
-				if (piinfo->pinfo->hasNbr(s) && piinfo->getIfaceInfo(s)->rank == rank) {
-					auto ghosts    = local_data.getGhostSliceOnSide(s, 1);
-					auto interface = local_x->getLocalData(
-					0, piinfo->getIfaceInfo(s)->patch_local_index);
-					nested_loop<D - 1>(interface.getStart(), interface.getEnd(),
-					                   [&](const std::array<int, D - 1> &coord) {
-						                   ghosts[coord] = 2 * interface[coord];
-					                   });
+				auto local_data = u->getLocalData(0, piinfo->pinfo.local_index);
+				if (piinfo->pinfo.hasNbr(s) && piinfo->getIfaceInfo(s)->rank == rank) {
+					auto ghosts    = local_data.getSliceOn(s, {-1});
+					auto interface = local_x->getLocalData(0, piinfo->getIfaceInfo(s)->patch_local_index);
+					nested_loop<D - 1>(
+					interface.getStart(), interface.getEnd(), [&](const std::array<int, D - 1> &coord) { ghosts[coord] = 2 * interface[coord]; });
 				}
 			}
 		}
 		// go ahead and solve for patches with only local interfaces
 		for (auto piinfo : patches_with_only_local_ifaces) {
-			auto us = u->getLocalDatas(piinfo->pinfo->local_index);
-			auto fs = f->getLocalDatas(piinfo->pinfo->local_index);
+			auto us = u->getLocalDatas(piinfo->pinfo.local_index);
+			auto fs = f->getLocalDatas(piinfo->pinfo.local_index);
 			solver->solveSinglePatch(piinfo->pinfo, fs, us);
 		}
 
@@ -136,22 +133,19 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		// set ghosts using interfaces that were on a neighboring rank
 		for (auto piinfo : patches_with_ifaces_on_neighbor_rank) {
 			for (Side<D> s : Side<D>::getValues()) {
-				auto local_data = u->getLocalData(0, piinfo->pinfo->local_index);
-				if (piinfo->pinfo->hasNbr(s) && piinfo->getIfaceInfo(s)->rank != rank) {
-					auto ghosts    = local_data.getGhostSliceOnSide(s, 1);
-					auto interface = local_x->getLocalData(
-					0, piinfo->getIfaceInfo(s)->patch_local_index);
-					nested_loop<D - 1>(interface.getStart(), interface.getEnd(),
-					                   [&](const std::array<int, D - 1> &coord) {
-						                   ghosts[coord] = 2 * interface[coord];
-					                   });
+				auto local_data = u->getLocalData(0, piinfo->pinfo.local_index);
+				if (piinfo->pinfo.hasNbr(s) && piinfo->getIfaceInfo(s)->rank != rank) {
+					auto ghosts    = local_data.getSliceOn(s, {-1});
+					auto interface = local_x->getLocalData(0, piinfo->getIfaceInfo(s)->patch_local_index);
+					nested_loop<D - 1>(
+					interface.getStart(), interface.getEnd(), [&](const std::array<int, D - 1> &coord) { ghosts[coord] = 2 * interface[coord]; });
 				}
 			}
 		}
 		// solve the remaining patches
 		for (auto piinfo : patches_with_ifaces_on_neighbor_rank) {
-			auto us = u->getLocalDatas(piinfo->pinfo->local_index);
-			auto fs = f->getLocalDatas(piinfo->pinfo->local_index);
+			auto us = u->getLocalDatas(piinfo->pinfo.local_index);
+			auto fs = f->getLocalDatas(piinfo->pinfo.local_index);
 			solver->solveSinglePatch(piinfo->pinfo, fs, us);
 		}
 
@@ -159,18 +153,14 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 
 		for (auto iface : iface_domain->getInterfaces()) {
 			for (auto patch : iface->patches) {
-				if (patch.piinfo->pinfo->rank == rank
-				    && (patch.type.isNormal() || patch.type.isCoarseToCoarse()
-				        || patch.type.isFineToFine())) {
-					auto local_data = u->getLocalData(0, patch.piinfo->pinfo->local_index);
-					auto ghosts     = local_data.getGhostSliceOnSide(patch.side, 1);
-					auto inner      = local_data.getSliceOnSide(patch.side);
-					auto interface  = b->getLocalData(
-                    0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
-					nested_loop<D - 1>(interface.getStart(), interface.getEnd(),
-					                   [&](const std::array<int, D - 1> &coord) {
-						                   interface[coord] = (ghosts[coord] + inner[coord]) / 2;
-					                   });
+				if (patch.piinfo->pinfo.rank == rank && (patch.type.isNormal() || patch.type.isCoarseToCoarse() || patch.type.isFineToFine())) {
+					auto local_data = u->getLocalData(0, patch.piinfo->pinfo.local_index);
+					auto ghosts     = local_data.getSliceOn(patch.side, {-1});
+					auto inner      = local_data.getSliceOn(patch.side, {0});
+					auto interface  = b->getLocalData(0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
+					nested_loop<D - 1>(interface.getStart(), interface.getEnd(), [&](const std::array<int, D - 1> &coord) {
+						interface[coord] = (ghosts[coord] + inner[coord]) / 2;
+					});
 					break;
 				}
 			}
@@ -183,8 +173,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 	 * @param domain_b the domain rhs
 	 * @param schur_b the Schur rhs
 	 */
-	void getSchurRHSFromDomainRHS(std::shared_ptr<const Vector<D>> domain_b,
-	                              std::shared_ptr<Vector<D - 1>>   schur_b) const
+	void getSchurRHSFromDomainRHS(std::shared_ptr<const Vector<D>> domain_b, std::shared_ptr<Vector<D - 1>> schur_b) const
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -193,19 +182,18 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 
 		for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
 			for (Side<D> s : Side<D>::getValues()) {
-				auto local_data = u->getLocalData(0, piinfo->pinfo->local_index);
-				if (piinfo->pinfo->hasNbr(s)) {
-					auto ghosts = local_data.getGhostSliceOnSide(s, 1);
-					auto inner  = local_data.getSliceOnSide(s);
+				auto local_data = u->getLocalData(0, piinfo->pinfo.local_index);
+				if (piinfo->pinfo.hasNbr(s)) {
+					auto ghosts = local_data.getSliceOn(s, {-1});
+					auto inner  = local_data.getSliceOn(s, {0});
 					nested_loop<D - 1>(
-					ghosts.getStart(), ghosts.getEnd(),
-					[&](const std::array<int, D - 1> &coord) { ghosts[coord] = -inner[coord]; });
+					ghosts.getStart(), ghosts.getEnd(), [&](const std::array<int, D - 1> &coord) { ghosts[coord] = -inner[coord]; });
 				}
 			}
 		}
 		for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
-			auto us = u->getLocalDatas(piinfo->pinfo->local_index);
-			auto fs = domain_b->getLocalDatas(piinfo->pinfo->local_index);
+			auto us = u->getLocalDatas(piinfo->pinfo.local_index);
+			auto fs = domain_b->getLocalDatas(piinfo->pinfo.local_index);
 			solver->solveSinglePatch(piinfo->pinfo, fs, us);
 		}
 
@@ -213,18 +201,14 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 
 		for (auto iface : iface_domain->getInterfaces()) {
 			for (auto patch : iface->patches) {
-				if (patch.piinfo->pinfo->rank == rank
-				    && (patch.type.isNormal() || patch.type.isCoarseToCoarse()
-				        || patch.type.isFineToFine())) {
-					auto local_data = u->getLocalData(0, patch.piinfo->pinfo->local_index);
-					auto ghosts     = local_data.getGhostSliceOnSide(patch.side, 1);
-					auto inner      = local_data.getSliceOnSide(patch.side);
-					auto interface  = schur_b->getLocalData(
-                    0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
-					nested_loop<D - 1>(interface.getStart(), interface.getEnd(),
-					                   [&](const std::array<int, D - 1> &coord) {
-						                   interface[coord] = (ghosts[coord] + inner[coord]) / 2;
-					                   });
+				if (patch.piinfo->pinfo.rank == rank && (patch.type.isNormal() || patch.type.isCoarseToCoarse() || patch.type.isFineToFine())) {
+					auto local_data = u->getLocalData(0, patch.piinfo->pinfo.local_index);
+					auto ghosts     = local_data.getSliceOn(patch.side, {-1});
+					auto inner      = local_data.getSliceOn(patch.side, {0});
+					auto interface  = schur_b->getLocalData(0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
+					nested_loop<D - 1>(interface.getStart(), interface.getEnd(), [&](const std::array<int, D - 1> &coord) {
+						interface[coord] = (ghosts[coord] + inner[coord]) / 2;
+					});
 					break;
 				}
 			}

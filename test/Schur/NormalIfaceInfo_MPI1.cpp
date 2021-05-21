@@ -19,26 +19,30 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "catch.hpp"
 #include <ThunderEgg/Schur/NormalIfaceInfo.h>
+
 #include <algorithm>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
-template <typename Container, typename Value> bool contains(Container &deque, Value a)
+template <typename Container, typename Value>
+bool contains(Container &deque, Value a)
 {
 	return find(deque.begin(), deque.end(), a) != deque.end();
 }
 TEST_CASE("Schur::NormalIfaceInfo constructor", "[Schur::NormalIfaceInfo]")
 {
 	for (Side<2> s : Side<2>::getValues()) {
-		int  id                         = 1;
-		int  nbr_id                     = 2;
-		auto pinfo                      = make_shared<PatchInfo<2>>();
-		pinfo->rank                     = 0;
-		pinfo->id                       = id;
-		pinfo->nbr_info[s.getIndex()]   = make_shared<NormalNbrInfo<2>>(nbr_id);
-		pinfo->getNormalNbrInfo(s).rank = 1;
+		int          id     = 1;
+		int          nbr_id = 2;
+		PatchInfo<2> pinfo;
+		pinfo.rank = 0;
+		pinfo.id   = id;
+		pinfo.setNbrInfo(s, new NormalNbrInfo<1>(nbr_id));
+		pinfo.getNormalNbrInfo(s).rank = 1;
 		Schur::NormalIfaceInfo<2> iface_info(pinfo, s);
 		INFO("Side: " << s);
 		if (s.isHigherOnAxis()) {
@@ -51,18 +55,17 @@ TEST_CASE("Schur::NormalIfaceInfo constructor", "[Schur::NormalIfaceInfo]")
 		// check that the id is encoded as expected
 		if (s.isHigherOnAxis()) {
 			// check that iface belongs to this
-			CHECK(iface_info.id / (int) Side<2>::num_sides == id);
-			CHECK(iface_info.id % Side<2>::num_sides == s.getIndex());
+			CHECK(iface_info.id / (int) Side<2>::number_of == id);
+			CHECK(iface_info.id % Side<2>::number_of == s.getIndex());
 		} else {
 			// check that iface belongs to nbr
-			CHECK(iface_info.id / (int) Side<2>::num_sides == nbr_id);
-			CHECK(iface_info.id % Side<2>::num_sides == s.opposite().getIndex());
+			CHECK(iface_info.id / (int) Side<2>::number_of == nbr_id);
+			CHECK(iface_info.id % Side<2>::number_of == s.opposite().getIndex());
 		}
 		// local and global index should be set to -1
 		CHECK(iface_info.patch_local_index == -1);
 		CHECK(iface_info.row_local_index == -1);
 		CHECK(iface_info.col_local_index == -1);
 		CHECK(iface_info.global_index == -1);
-		CHECK(iface_info.nbr_info == pinfo->nbr_info[s.getIndex()]);
 	}
 }

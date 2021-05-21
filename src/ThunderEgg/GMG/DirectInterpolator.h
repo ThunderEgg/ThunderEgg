@@ -45,46 +45,40 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 	 * @param fine_domain the finer Domain
 	 * @param num_components the number of components in each cell
 	 */
-	DirectInterpolator(std::shared_ptr<Domain<D>> coarse_domain,
-	                   std::shared_ptr<Domain<D>> fine_domain, int num_components)
-	: MPIInterpolator<D>(
-	  std::make_shared<InterLevelComm<D>>(coarse_domain, num_components, fine_domain))
+	DirectInterpolator(std::shared_ptr<Domain<D>> coarse_domain, std::shared_ptr<Domain<D>> fine_domain, int num_components)
+	: MPIInterpolator<D>(std::make_shared<InterLevelComm<D>>(coarse_domain, num_components, fine_domain))
 	{
 	}
-	void interpolatePatches(
-	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &patches,
-	std::shared_ptr<const Vector<D>>                                        coarser_vector,
-	std::shared_ptr<Vector<D>> finer_vector) const override
+	void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
+	                        std::shared_ptr<const Vector<D>>                                               coarser_vector,
+	                        std::shared_ptr<Vector<D>>                                                     finer_vector) const override
 	{
 		for (auto pair : patches) {
-			auto pinfo              = pair.second;
+			auto pinfo              = pair.second.get();
 			auto coarse_local_datas = coarser_vector->getLocalDatas(pair.first);
-			auto fine_datas         = finer_vector->getLocalDatas(pinfo->local_index);
+			auto fine_datas         = finer_vector->getLocalDatas(pinfo.local_index);
 
-			if (pinfo->hasCoarseParent()) {
-				Orthant<D>         orth = pinfo->orth_on_parent;
+			if (pinfo.hasCoarseParent()) {
+				Orthant<D>         orth = pinfo.orth_on_parent;
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
-					starts[i]
-					= orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_datas[0].getLengths()[i];
+					starts[i] = orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_datas[0].getLengths()[i];
 				}
 
 				for (size_t c = 0; c < fine_datas.size(); c++) {
-					nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               std::array<int, D> coarse_coord;
-						               for (size_t x = 0; x < D; x++) {
-							               coarse_coord[x] = (coord[x] + starts[x]) / 2;
-						               }
-						               fine_datas[c][coord] += coarse_local_datas[c][coarse_coord];
-					               });
+					nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(), [&](const std::array<int, D> &coord) {
+						std::array<int, D> coarse_coord;
+						for (size_t x = 0; x < D; x++) {
+							coarse_coord[x] = (coord[x] + starts[x]) / 2;
+						}
+						fine_datas[c][coord] += coarse_local_datas[c][coarse_coord];
+					});
 				}
 			} else {
 				for (size_t c = 0; c < fine_datas.size(); c++) {
-					nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               fine_datas[c][coord] += coarse_local_datas[c][coord];
-					               });
+					nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(), [&](const std::array<int, D> &coord) {
+						fine_datas[c][coord] += coarse_local_datas[c][coord];
+					});
 				}
 			}
 		}

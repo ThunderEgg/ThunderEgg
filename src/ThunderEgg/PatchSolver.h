@@ -56,9 +56,9 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @param domain the Domain
 	 * @param ghost_filler the GhostFiller
 	 */
-	PatchSolver(std::shared_ptr<const Domain<D>>      domain,
-	            std::shared_ptr<const GhostFiller<D>> ghost_filler)
-	: domain(domain), ghost_filler(ghost_filler)
+	PatchSolver(std::shared_ptr<const Domain<D>> domain, std::shared_ptr<const GhostFiller<D>> ghost_filler)
+	: domain(domain),
+	  ghost_filler(ghost_filler)
 	{
 	}
 	/**
@@ -90,28 +90,25 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @param us the left hand side
 	 * @param fs the right hand side
 	 */
-	virtual void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                              const std::vector<LocalData<D>> &   fs,
-	                              std::vector<LocalData<D>> &         us) const = 0;
+	virtual void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &fs, std::vector<LocalData<D>> &us) const = 0;
 	/**
 	 * @brief Solve all the patches in the domain, assuming zero boundary conditions for the patches
 	 *
 	 * @param f the rhs vector
 	 * @param u the lhs vector
 	 */
-	virtual void apply(std::shared_ptr<const Vector<D>> f,
-	                   std::shared_ptr<Vector<D>>       u) const override
+	virtual void apply(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const override
 	{
 		u->setWithGhost(0);
 		if (domain->hasTimer()) {
 			domain->getTimer()->startDomainTiming(domain->getId(), "Total Patch Solve");
 		}
-		for (std::shared_ptr<const PatchInfo<D>> pinfo : domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
 			if (domain->hasTimer()) {
 				domain->getTimer()->start("Single Patch Solve");
 			}
-			auto fs = f->getLocalDatas(pinfo->local_index);
-			auto us = u->getLocalDatas(pinfo->local_index);
+			auto fs = f->getLocalDatas(pinfo.local_index);
+			auto us = u->getLocalDatas(pinfo.local_index);
 			solveSinglePatch(pinfo, fs, us);
 			if (domain->hasTimer()) {
 				domain->getTimer()->stop("Single Patch Solve");
@@ -127,24 +124,21 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @param f the rhs vector
 	 * @param u the lhs vector
 	 */
-	virtual void smooth(std::shared_ptr<const Vector<D>> f,
-	                    std::shared_ptr<Vector<D>>       u) const override
+	virtual void smooth(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const override
 	{
 		if (domain->hasTimer()) {
 			domain->getTimer()->startDomainTiming(domain->getId(), "Total Patch Smooth");
 		}
 		ghost_filler->fillGhost(u);
-		for (std::shared_ptr<const PatchInfo<D>> pinfo : domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
 			if (domain->hasTimer()) {
-				domain->getTimer()->startPatchTiming(pinfo->id, domain->getId(),
-				                                     "Single Patch Solve");
+				domain->getTimer()->startPatchTiming(pinfo.id, domain->getId(), "Single Patch Solve");
 			}
-			auto fs = f->getLocalDatas(pinfo->local_index);
-			auto us = u->getLocalDatas(pinfo->local_index);
+			auto fs = f->getLocalDatas(pinfo.local_index);
+			auto us = u->getLocalDatas(pinfo.local_index);
 			solveSinglePatch(pinfo, fs, us);
 			if (domain->hasTimer()) {
-				domain->getTimer()->stopPatchTiming(pinfo->id, domain->getId(),
-				                                    "Single Patch Solve");
+				domain->getTimer()->stopPatchTiming(pinfo.id, domain->getId(), "Single Patch Solve");
 			}
 		}
 		if (domain->hasTimer()) {

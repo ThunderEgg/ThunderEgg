@@ -19,12 +19,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "catch.hpp"
 #include <ThunderEgg/GMG/CycleBuilder.h>
 #include <ThunderEgg/ValVector.h>
-#include <memory>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 class MockOperator : public Operator<2>
 {
 	public:

@@ -1,58 +1,156 @@
 {
-  "forest": {
-    "curr_id": 2,
-    "dimension": 2,
-    "nodes": {
-      "0": {
+  "levels": [
+    [
+      {
+        "id": 0,
+        "parent_id": -1,
+        "parent_rank": -1,
+        "rank": 0,
         "child_ids": [
           -1,
           -1,
           -1,
           -1
         ],
-        "dimension": 2,
-        "id": 0,
+        "child_ranks": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          0.0,
+          0.0
+        ],
         "lengths": [
           1.0,
           1.0
         ],
+        "nbrs": [
+          {
+            "side": "EAST",
+            "type": "NORMAL",
+            "ids": [
+              1
+            ],
+            "ranks": [
+              1
+            ]
+          }
+        ],
+        "edge_nbrs": [],
+        "corner_nbrs": []
+      },
+      {
+        "id": 1,
+        "parent_id": -1,
+        "parent_rank": -1,
+        "rank": 1,
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ranks": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "starts": [
+          1.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "nbrs": [
+          {
+            "side": "WEST",
+            "type": "NORMAL",
+            "ids": [
+              0
+            ],
+            "ranks": [
+              0
+            ]
+          }
+        ],
+        "edge_nbrs": [],
+        "corner_nbrs": []
+      }
+    ]
+  ],
+  "forest": {
+    "dimension": 2,
+    "curr_id": 2,
+    "nodes": {
+      "0": {
+        "dimension": 2,
         "level": 0,
+        "starts": [
+          0.0,
+          0.0
+        ],
+        "lengths": [
+          1.0,
+          1.0
+        ],
+        "id": 0,
+        "parent_id": -1,
         "nbr_ids": [
           -1,
           1,
           -1,
           -1
         ],
-        "parent_id": -1,
-        "starts": [
-          0.0,
-          0.0
-        ]
-      },
-      "1": {
-        "child_ids": [
+        "edge_nbr_ids": [],
+        "corner_nbr_ids": [
           -1,
           -1,
           -1,
           -1
         ],
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "1": {
         "dimension": 2,
-        "id": 1,
+        "level": 0,
+        "starts": [
+          1.0,
+          0.0
+        ],
         "lengths": [
           1.0,
           1.0
         ],
-        "level": 0,
+        "id": 1,
+        "parent_id": -1,
         "nbr_ids": [
           0,
           -1,
           -1,
           -1
         ],
-        "parent_id": -1,
-        "starts": [
-          1.0,
-          0.0
+        "edge_nbr_ids": [],
+        "corner_nbr_ids": [
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "child_ids": [
+          -1,
+          -1,
+          -1,
+          -1
         ]
       }
     },
@@ -60,85 +158,5 @@
       0,
       1
     ]
-  },
-  "levels": [
-    [
-      {
-        "child_ids": [
-          -1,
-          -1,
-          -1,
-          -1
-        ],
-        "child_ranks": [
-          -1,
-          -1,
-          -1,
-          -1
-        ],
-        "id": 0,
-        "lengths": [
-          1.0,
-          1.0
-        ],
-        "nbrs": [
-          {
-            "ids": [
-              1
-            ],
-            "ranks": [
-              1
-            ],
-            "side": "EAST",
-            "type": "NORMAL"
-          }
-        ],
-        "parent_id": -1,
-        "parent_rank": -1,
-        "rank": 0,
-        "starts": [
-          0.0,
-          0.0
-        ]
-      },
-      {
-        "child_ids": [
-          -1,
-          -1,
-          -1,
-          -1
-        ],
-        "child_ranks": [
-          -1,
-          -1,
-          -1,
-          -1
-        ],
-        "id": 1,
-        "lengths": [
-          1.0,
-          1.0
-        ],
-        "nbrs": [
-          {
-            "ids": [
-              0
-            ],
-            "ranks": [
-              0
-            ],
-            "side": "WEST",
-            "type": "NORMAL"
-          }
-        ],
-        "parent_id": -1,
-        "parent_rank": -1,
-        "rank": 1,
-        "starts": [
-          1.0,
-          0.0
-        ]
-      }
-    ]
-  ]
+  }
 }

@@ -20,11 +20,15 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/Schur/Interface.h>
+
 #include <algorithm>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 TEST_CASE("Schur::Interface id constructor", "[Schur::Interface]")
 {
 	Schur::Interface<2> iface(2);
@@ -35,8 +39,8 @@ TEST_CASE("Schur::Interface id constructor", "[Schur::Interface]")
 }
 TEST_CASE("Schur::Interface insert Normal interface", "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_uniform_1x2_mpi1.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                              domain_reader("mesh_inputs/2d_uniform_1x2_mpi1.json", {10, 10}, 0);
+	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -59,8 +63,8 @@ TEST_CASE("Schur::Interface insert Normal interface", "[Schur::Interface]")
 }
 TEST_CASE("Schur::Interface insert Coarse interface", "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -75,31 +79,31 @@ TEST_CASE("Schur::Interface insert Coarse interface", "[Schur::Interface]")
 	CHECK(iface.patches[0].piinfo == piinfos[0]);
 
 	iface.insert(Side<2>::west(),
-	             piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+	             piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 	REQUIRE(iface.patches.size() == 2);
 	CHECK(iface.patches[1].side == Side<2>::west());
 	CHECK(iface.patches[1].type.isFineToCoarse());
 	CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
 	CHECK(iface.patches[0].piinfo == piinfos[0]);
 	CHECK(iface.patches[1].piinfo
-	      == piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+	      == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 
 	iface.insert(Side<2>::west(),
-	             piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
+	             piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
 	REQUIRE(iface.patches.size() == 3);
 	CHECK(iface.patches[2].side == Side<2>::west());
 	CHECK(iface.patches[2].type.isFineToCoarse());
 	CHECK(iface.patches[2].type.getOrthant() == Orthant<1>::upper());
 	CHECK(iface.patches[0].piinfo == piinfos[0]);
 	CHECK(iface.patches[1].piinfo
-	      == piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+	      == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 	CHECK(iface.patches[2].piinfo
-	      == piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
+	      == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
 }
 TEST_CASE("Schur::Interface insert Fine interface", "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -115,19 +119,19 @@ TEST_CASE("Schur::Interface insert Fine interface", "[Schur::Interface]")
 	CHECK(iface.patches[0].piinfo == piinfos[0]);
 
 	iface.insert(Side<2>::west(),
-	             piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+	             piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 	REQUIRE(iface.patches.size() == 2);
 	CHECK(iface.patches[1].side == Side<2>::west());
 	CHECK(iface.patches[1].type.isFineToFine());
 	CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
 	CHECK(iface.patches[0].piinfo == piinfos[0]);
 	CHECK(iface.patches[1].piinfo
-	      == piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+	      == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 }
 TEST_CASE("Schur::Interface merge Fine interface", "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -139,7 +143,7 @@ TEST_CASE("Schur::Interface merge Fine interface", "[Schur::Interface]")
 
 	Schur::Interface<2> iface2(id);
 	iface2.insert(Side<2>::west(),
-	              piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+	              piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 
 	iface.merge(iface2);
 	REQUIRE(iface.patches.size() == 2);
@@ -151,12 +155,12 @@ TEST_CASE("Schur::Interface merge Fine interface", "[Schur::Interface]")
 	CHECK(iface.patches[1].type.isFineToFine());
 	CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
 	CHECK(iface.patches[1].piinfo
-	      == piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+	      == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 }
 TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                                    domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto                                               domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<const Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -171,13 +175,13 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 	auto coarse_piinfo = piinfos[0];
 	auto ref_sw_piinfo
-	= piinfos[coarse_piinfo->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]];
+	= piinfos[coarse_piinfo->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]];
 	auto ref_se_piinfo
-	= piinfos[ref_sw_piinfo->pinfo->getNormalNbrInfo(Side<2>::east()).local_index];
+	= piinfos[ref_sw_piinfo->pinfo.getNormalNbrInfo(Side<2>::east()).local_index];
 	auto ref_nw_piinfo
-	= piinfos[coarse_piinfo->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[1]];
+	= piinfos[coarse_piinfo->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]];
 	auto ref_ne_piinfo
-	= piinfos[ref_nw_piinfo->pinfo->getNormalNbrInfo(Side<2>::east()).local_index];
+	= piinfos[ref_nw_piinfo->pinfo.getNormalNbrInfo(Side<2>::east()).local_index];
 
 	// check coarse interface
 	{
@@ -188,7 +192,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 		Schur::Interface<2>::SideTypePiinfo *coarse_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == coarse_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == coarse_piinfo->pinfo.id) {
 				coarse_patch = &patch;
 				break;
 			}
@@ -200,7 +204,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 		Schur::Interface<2>::SideTypePiinfo *ref_sw_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == ref_sw_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == ref_sw_piinfo->pinfo.id) {
 				ref_sw_patch = &patch;
 				break;
 			}
@@ -212,7 +216,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 		Schur::Interface<2>::SideTypePiinfo *ref_nw_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == ref_nw_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == ref_nw_piinfo->pinfo.id) {
 				ref_nw_patch = &patch;
 				break;
 			}
@@ -231,7 +235,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 		Schur::Interface<2>::SideTypePiinfo *coarse_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == coarse_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == coarse_piinfo->pinfo.id) {
 				coarse_patch = &patch;
 				break;
 			}
@@ -243,7 +247,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 		Schur::Interface<2>::SideTypePiinfo *ref_sw_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == ref_sw_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == ref_sw_piinfo->pinfo.id) {
 				ref_sw_patch = &patch;
 				break;
 			}
@@ -262,7 +266,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 		Schur::Interface<2>::SideTypePiinfo *coarse_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == coarse_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == coarse_piinfo->pinfo.id) {
 				coarse_patch = &patch;
 				break;
 			}
@@ -274,7 +278,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 		Schur::Interface<2>::SideTypePiinfo *ref_nw_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == ref_nw_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == ref_nw_piinfo->pinfo.id) {
 				ref_nw_patch = &patch;
 				break;
 			}
@@ -293,7 +297,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 		Schur::Interface<2>::SideTypePiinfo *ref_se_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == ref_se_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == ref_se_piinfo->pinfo.id) {
 				ref_se_patch = &patch;
 				break;
 			}
@@ -305,7 +309,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 
 		Schur::Interface<2>::SideTypePiinfo *ref_ne_patch = nullptr;
 		for (auto &patch : iface->patches) {
-			if (patch.piinfo->pinfo->id == ref_ne_piinfo->pinfo->id) {
+			if (patch.piinfo->pinfo.id == ref_ne_piinfo->pinfo.id) {
 				ref_ne_patch = &patch;
 				break;
 			}
@@ -318,8 +322,8 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 }
 TEST_CASE("Schur::Interface serialize Normal interface", "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_uniform_1x2_mpi1.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                              domain_reader("mesh_inputs/2d_uniform_1x2_mpi1.json", {10, 10}, 0);
+	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -339,16 +343,16 @@ TEST_CASE("Schur::Interface serialize Normal interface", "[Schur::Interface]")
 
 	CHECK(iface.patches[0].side == Side<2>::east());
 	CHECK(iface.patches[0].type.isNormal());
-	CHECK(iface.patches[0].piinfo->pinfo->id == piinfos[0]->pinfo->id);
+	CHECK(iface.patches[0].piinfo->pinfo.id == piinfos[0]->pinfo.id);
 
 	CHECK(iface.patches[1].side == Side<2>::west());
 	CHECK(iface.patches[1].type.isNormal());
-	CHECK(iface.patches[1].piinfo->pinfo->id == piinfos[1]->pinfo->id);
+	CHECK(iface.patches[1].piinfo->pinfo.id == piinfos[1]->pinfo.id);
 }
 TEST_CASE("Schur::Interface serialize Coarse interface", "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -358,9 +362,9 @@ TEST_CASE("Schur::Interface serialize Coarse interface", "[Schur::Interface]")
 
 	iface_in.insert(Side<2>::east(), piinfos[0]);
 	iface_in.insert(Side<2>::west(),
-	                piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+	                piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 	iface_in.insert(Side<2>::west(),
-	                piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
+	                piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
 
 	char *buff = new char[iface_in.serialize(nullptr)];
 	iface_in.serialize(buff);
@@ -371,24 +375,24 @@ TEST_CASE("Schur::Interface serialize Coarse interface", "[Schur::Interface]")
 	REQUIRE(iface.patches.size() == 3);
 	CHECK(iface.patches[0].side == Side<2>::east());
 	CHECK(iface.patches[0].type.isCoarseToCoarse());
-	CHECK(iface.patches[0].piinfo->pinfo->id == piinfos[0]->pinfo->id);
+	CHECK(iface.patches[0].piinfo->pinfo.id == piinfos[0]->pinfo.id);
 
 	CHECK(iface.patches[1].side == Side<2>::west());
 	CHECK(iface.patches[1].type.isFineToCoarse());
 	CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
-	CHECK(iface.patches[1].piinfo->pinfo->id
-	      == piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).ids[0]);
+	CHECK(iface.patches[1].piinfo->pinfo.id
+	      == piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[0]);
 
 	CHECK(iface.patches[2].side == Side<2>::west());
 	CHECK(iface.patches[2].type.isFineToCoarse());
 	CHECK(iface.patches[2].type.getOrthant() == Orthant<1>::upper());
-	CHECK(iface.patches[2].piinfo->pinfo->id
-	      == piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).ids[1]);
+	CHECK(iface.patches[2].piinfo->pinfo.id
+	      == piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[1]);
 }
 TEST_CASE("Schur::Interface serialize Fine interface", "[Schur::Interface]")
 {
-	DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
-	auto            domain = domain_reader.getFinerDomain();
+	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
+	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
 	for (auto patch : domain->getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
@@ -398,7 +402,7 @@ TEST_CASE("Schur::Interface serialize Fine interface", "[Schur::Interface]")
 
 	iface_in.insert(Side<2>::east(), piinfos[0]);
 	iface_in.insert(Side<2>::west(),
-	                piinfos[piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+	                piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 
 	char *buff = new char[iface_in.serialize(nullptr)];
 	iface_in.serialize(buff);
@@ -411,11 +415,11 @@ TEST_CASE("Schur::Interface serialize Fine interface", "[Schur::Interface]")
 	CHECK(iface.patches[0].side == Side<2>::east());
 	CHECK(iface.patches[0].type.isCoarseToFine());
 	CHECK(iface.patches[0].type.getOrthant() == Orthant<1>::lower());
-	CHECK(iface.patches[0].piinfo->pinfo->id == piinfos[0]->pinfo->id);
+	CHECK(iface.patches[0].piinfo->pinfo.id == piinfos[0]->pinfo.id);
 
 	CHECK(iface.patches[1].side == Side<2>::west());
 	CHECK(iface.patches[1].type.isFineToFine());
 	CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
-	CHECK(iface.patches[1].piinfo->pinfo->id
-	      == piinfos[0]->pinfo->getFineNbrInfo(Side<2>::east()).ids[0]);
+	CHECK(iface.patches[1].piinfo->pinfo.id
+	      == piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[0]);
 }

@@ -1,85 +1,69 @@
-if(PETSC_FOUND)
-  add_executable(unit_tests_mpiany test.cpp OctTree.cpp LocalData.cpp Utils.cpp
-                                   utils/DomainReader.cpp)
-  target_include_directories(unit_tests_mpiany
-                             PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-  target_link_libraries(unit_tests_mpiany ThunderEgg)
-  if(VTK_FOUND)
-    target_link_libraries(unit_tests_mpiany VtkWriter)
-  endif(VTK_FOUND)
+#cmake_policy(SET CMP0110 NEW)
+include(FetchContent)
+FetchContent_Declare(
+  catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2
+  GIT_TAG        v3.0.0-preview3
+)
 
-  include(CTest)
-  include(ParseAndAddCatchTests)
+FetchContent_MakeAvailable(catch2)
 
-  set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
+include(CTest)
+include(ParseAndAddCatchTests)
 
-  foreach(ARG1 RANGE 1 1)
-    set(OptionalCatchTestLauncher ${MPIEXEC} "--oversubscribe" ${MPIEXEC_NUMPROC_FLAG} ${ARG1})
-    set(AdditionalCatchParameters -a WORKING_DIRECTORY
-                                  ${CMAKE_CURRENT_SOURCE_DIR})
-    parseandaddcatchtests(
-      unit_tests_mpiany
-      WORKING_DIRECTORY
-      ${PROJECT_SOURCE_DIR}/test
-      THUNDEREGG_TEST_EXECUTOR
-      ${MPIEXEC}
-      ${MPIEXEC_NUMPROC_FLAG}
-      ${ARG1}
-      THUNDEREGG_SINGLE_EXECUTOR
-      ${MPIEXEC}
-      ${MPIEXEC_NUMPROC_FLAG}
-      1
-      -q)
-    unset(OptionalCatchTestLauncher)
-    set(AdditionalCatchParameters)
-  endforeach(ARG1 RANGE 3)
+set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
 
-  function(add_mpi_test ARG1)
-    file(GLOB_RECURSE TEST_MPI${ARG1}_SRC ${PROJECT_SOURCE_DIR}/test
-         *_MPI${ARG1}.cpp)
-    set(TEST_MPI${ARG1}_PETSC_SRC ${TEST_MPI${ARG1}_SRC})
-    set(TEST_MPI${ARG1}_FFTW_SRC ${TEST_MPI${ARG1}_SRC})
+file(GLOB_RECURSE TEST_SHARED_SRC ${PROJECT_SOURCE_DIR}/test *_SHARED.cpp)
+add_library(test_shared ${TEST_SHARED_SRC})
+ target_link_libraries(test_shared ThunderEgg Catch2)
 
-    list(FILTER TEST_MPI${ARG1}_SRC EXCLUDE REGEX ".*_PETSC_.*")
-    if(NOT FFTW_FOUND)
-      list(FILTER TEST_MPI${ARG1}_SRC EXCLUDE REGEX ".*_FFTW_.*")
-    endif(NOT FFTW_FOUND)
-    if(NOT p4est_FOUND)
-      list(FILTER TEST_MPI${ARG1}_SRC EXCLUDE REGEX ".*_P4EST_.*")
-    endif(NOT p4est_FOUND)
+function(add_mpi_test ARG1)
+  file(GLOB_RECURSE TEST_MPI${ARG1}_SRC ${PROJECT_SOURCE_DIR}/test
+       *_MPI${ARG1}.cpp)
+  set(TEST_MPI${ARG1}_PETSC_SRC ${TEST_MPI${ARG1}_SRC})
+  set(TEST_MPI${ARG1}_FFTW_SRC ${TEST_MPI${ARG1}_SRC})
 
-    list(FILTER TEST_MPI${ARG1}_PETSC_SRC INCLUDE REGEX ".*_PETSC_.*")
+  list(FILTER TEST_MPI${ARG1}_SRC EXCLUDE REGEX ".*_PETSC_.*")
+  if(NOT FFTW_FOUND)
+    list(FILTER TEST_MPI${ARG1}_SRC EXCLUDE REGEX ".*_FFTW_.*")
+  endif(NOT FFTW_FOUND)
+  if(NOT TARGET P4EST::P4EST)
+    list(FILTER TEST_MPI${ARG1}_SRC EXCLUDE REGEX ".*_P4EST_.*")
+  endif(NOT TARGET P4EST::P4EST)
 
-    set(OptionalCatchTestLauncher ${MPIEXEC} "--oversubscribe" ${MPIEXEC_NUMPROC_FLAG}  ${ARG1})
-    set(AdditionalCatchParameters -a WORKING_DIRECTORY
-                                  ${CMAKE_CURRENT_SOURCE_DIR})
+  list(FILTER TEST_MPI${ARG1}_PETSC_SRC INCLUDE REGEX ".*_PETSC_.*")
 
-    if(TEST_MPI${ARG1}_SRC)
-      add_executable(unit_tests_mpi${ARG1} ${TEST_MPI${ARG1}_SRC} test.cpp
-                                           utils/DomainReader.cpp)
-      target_link_libraries(unit_tests_mpi${ARG1} ThunderEgg)
-      target_include_directories(unit_tests_mpi${ARG1}
-                                 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-      parseandaddcatchtests(unit_tests_mpi${ARG1})
-    endif()
+  set(OptionalCatchTestLauncher ${MPIEXEC} "--oversubscribe" ${MPIEXEC_NUMPROC_FLAG}  ${ARG1})
+  set(AdditionalCatchParameters -a WORKING_DIRECTORY
+                                ${CMAKE_CURRENT_SOURCE_DIR})
 
-    if(TEST_MPI${ARG1}_PETSC_SRC AND PETSC_FOUND)
-      add_executable(
-        unit_tests_petsc_mpi${ARG1} ${TEST_MPI${ARG1}_PETSC_SRC} test_PETSC.cpp
-                                    utils/DomainReader.cpp)
-      target_link_libraries(unit_tests_petsc_mpi${ARG1} ThunderEgg)
-      target_include_directories(unit_tests_petsc_mpi${ARG1}
-                                 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-      parseandaddcatchtests(unit_tests_petsc_mpi${ARG1})
-    endif()
+  if(TEST_MPI${ARG1}_SRC)
+    add_executable(unit_tests_mpi${ARG1} ${TEST_MPI${ARG1}_SRC} test.cpp)
+    target_link_libraries(unit_tests_mpi${ARG1} test_shared)
+    target_include_directories(unit_tests_mpi${ARG1}
+                               PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    if(TARGET P4EST::P4EST)
+      set_source_files_properties(test.cpp PROPERTIES COMPILE_FLAGS "-DTEST_P4EST")
+    ENDIF(TARGET P4EST::P4EST)
+    parseandaddcatchtests(unit_tests_mpi${ARG1})
+  endif()
 
-    unset(OptionalCatchTestLauncher)
-    set(AdditionalCatchParameters)
+  if(TEST_MPI${ARG1}_PETSC_SRC AND PETSC_FOUND)
+    add_executable(
+      unit_tests_petsc_mpi${ARG1} ${TEST_MPI${ARG1}_PETSC_SRC} test_PETSC.cpp)
+    
+    target_link_libraries(unit_tests_petsc_mpi${ARG1} test_shared)
+    target_include_directories(unit_tests_petsc_mpi${ARG1}
+                               PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    parseandaddcatchtests(unit_tests_petsc_mpi${ARG1})
+  endif()
 
-  endfunction(add_mpi_test)
+  unset(OptionalCatchTestLauncher)
+  set(AdditionalCatchParameters)
 
-  add_mpi_test(1)
-  add_mpi_test(2)
-  add_mpi_test(3)
+endfunction(add_mpi_test)
 
-endif(PETSC_FOUND)
+add_mpi_test(1)
+add_mpi_test(2)
+add_mpi_test(3)
+

@@ -46,15 +46,15 @@ template <int D> class CoarseNbrInfo : public NbrInfo<D>
 	/**
 	 * @brief The local index of the neighbor
 	 */
-	int local_index = 0;
+	int local_index = -1;
 	/**
 	 * @brief The global index of the neighbor
 	 */
-	int global_index = 0;
+	int global_index = -1;
 	/**
 	 * @brief The orthant that this patch in relation to the coarser patch's interface.
 	 */
-	Orthant<D - 1> orth_on_coarse;
+	Orthant<D> orth_on_coarse;
 	/**
 	 * @brief Construct a new empty CoarseNbrInfo object
 	 */
@@ -67,32 +67,35 @@ template <int D> class CoarseNbrInfo : public NbrInfo<D>
 	 * @param orth_on_coarse The orthant of the neighboring patch's interface that the this patch
 	 * lies along.
 	 */
-	CoarseNbrInfo(int id, Orthant<D - 1> orth_on_coarse)
+	CoarseNbrInfo(int id, Orthant<D> orth_on_coarse)
 	{
 		this->id             = id;
 		this->orth_on_coarse = orth_on_coarse;
 	}
-	NbrType getNbrType()
+	NbrType getNbrType() const override
 	{
 		return NbrType::Coarse;
 	}
-	void getNbrIds(std::deque<int> &nbr_ids)
+	void getNbrIds(std::deque<int> &nbr_ids) const override
 	{
 		nbr_ids.push_back(id);
 	};
-	void getNbrRanks(std::deque<int> &nbr_ranks)
+	void getNbrRanks(std::deque<int> &nbr_ranks) const override
 	{
 		nbr_ranks.push_back(rank);
 	}
-	void setGlobalIndexes(std::map<int, int> &rev_map)
+	void setGlobalIndexes(const std::map<int, int> &id_to_global_index_map) override
 	{
-		global_index = rev_map.at(local_index);
+		global_index = id_to_global_index_map.at(id);
 	}
-	void setLocalIndexes(std::map<int, int> &rev_map)
+	void setLocalIndexes(const std::map<int, int> &id_to_local_index_map) override
 	{
-		local_index = rev_map.at(id);
+		auto iter = id_to_local_index_map.find(id);
+		if (iter != id_to_local_index_map.end()) {
+			local_index = iter->second;
+		}
 	}
-	int serialize(char *buffer) const
+	int serialize(char *buffer) const override
 	{
 		BufferWriter writer(buffer);
 		writer << rank;
@@ -100,13 +103,17 @@ template <int D> class CoarseNbrInfo : public NbrInfo<D>
 		writer << orth_on_coarse;
 		return writer.getPos();
 	}
-	int deserialize(char *buffer)
+	int deserialize(char *buffer) override
 	{
 		BufferReader reader(buffer);
 		reader >> rank;
 		reader >> id;
 		reader >> orth_on_coarse;
 		return reader.getPos();
+	}
+	std::unique_ptr<NbrInfoBase> clone() const override
+	{
+		return std::make_unique<CoarseNbrInfo<D>>(*this);
 	}
 };
 template <int D> void to_json(nlohmann::json &j, const CoarseNbrInfo<D> &n)
@@ -118,9 +125,13 @@ template <int D> void to_json(nlohmann::json &j, const CoarseNbrInfo<D> &n)
 }
 template <int D> void from_json(const nlohmann::json &j, CoarseNbrInfo<D> &n)
 {
-	n.id             = j["ids"][0];
-	n.rank           = j["ranks"][0];
-	n.orth_on_coarse = j["orth_on_coarse"].get<Orthant<D - 1>>();
+	n.id   = j["ids"][0];
+	n.rank = j["ranks"][0];
+	if (j.contains("orth_on_coarse")) {
+		n.orth_on_coarse = j["orth_on_coarse"].get<Orthant<D>>();
+	} else {
+		n.orth_on_coarse = Orthant<D>::null();
+	}
 }
 } // namespace ThunderEgg
 #endif

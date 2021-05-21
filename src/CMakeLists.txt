@@ -17,12 +17,17 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/CoarseNbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/DivergenceError.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/DimensionalArray.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/Domain.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Domain.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/DomainGenerator.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/DomainTools.h)
+
+list(APPEND ThunderEgg_HDRS ThunderEgg/Face.h)
+list(APPEND ThunderEgg_SRCS ThunderEgg/Face.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/FineNbrInfo.h)
 
@@ -42,17 +47,22 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/NbrType.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/NbrInfo.h)
 
+list(APPEND ThunderEgg_HDRS ThunderEgg/NbrInfoBase.h)
+
 list(APPEND ThunderEgg_HDRS ThunderEgg/Operator.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Orthant.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Orthant.cpp)
 
-if(p4est_FOUND)
+if(TARGET P4EST::P4EST)
 
-  list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomGen.h)
-  list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomGen.cpp)
+  list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomainGenerator.h)
+  list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomainGenerator.cpp)
 
-endif(p4est_FOUND)
+  list(APPEND ThunderEgg_HDRS ThunderEgg/P8estDomainGenerator.h)
+  list(APPEND ThunderEgg_SRCS ThunderEgg/P8estDomainGenerator.cpp)
+
+endif(TARGET P4EST::P4EST)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/PatchInfo.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/PatchInfo.cpp)
@@ -65,9 +75,6 @@ list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
 list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Side.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Side.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Timer.cpp)
@@ -99,7 +106,6 @@ include(ThunderEgg/VarPoisson/CMakeLists.txt)
 include(ThunderEgg/Iterative/CMakeLists.txt)
 
 add_library(ThunderEgg ${ThunderEgg_SRCS} ${ThunderEgg_HDRS})
-target_compile_features(ThunderEgg PUBLIC cxx_std_11)
 
 # foreach(HDR ${ThunderEgg_HDRS}) get_filename_component(DIR ${HDR} PATH)
 # file(COPY ${HDR} DESTINATION include/${DIR}) endforeach()
@@ -110,13 +116,6 @@ target_include_directories(
                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 list(APPEND ThunderEgg_Includes ${MPI_C_INCLUDE_PATH})
 list(APPEND ThunderEgg_Includes ${PETSC_INCLUDES})
-if(Zoltan_FOUND)
-  list(APPEND ThunderEgg_Includes ${Zoltan_INCLUDES})
-endif(Zoltan_FOUND)
-if(p4est_FOUND)
-  list(APPEND ThunderEgg_Includes ${p4est_INCLUDES})
-  list(APPEND ThunderEgg_Includes ${sc_INCLUDES})
-endif()
 
 # set link list(APPEND ThunderEgg_Libs ${MPI_CXX_LIBRARIES})
 list(APPEND ThunderEgg_Libs ${PETSC_LIBRARIES})
@@ -124,15 +123,8 @@ if(FFTW_FOUND)
   list(APPEND ThunderEgg_Libs ${FFTW_LIBRARIES})
   list(APPEND ThunderEgg_Includes ${FFTW_INCLUDES})
 endif(FFTW_FOUND)
-if(Zoltan_FOUND)
-  list(APPEND ThunderEgg_Libs ${Zoltan_LIBRARIES})
-endif(Zoltan_FOUND)
 list(APPEND ThunderEgg_Libs ${BLAS_LIBRARIES})
 list(APPEND ThunderEgg_Libs ${LAPACK_LIBRARIES})
-if(p4est_FOUND)
-  list(APPEND ThunderEgg_Libs ${p4est_LIBRARIES})
-  list(APPEND ThunderEgg_Libs ${sc_LIBRARIES})
-endif()
 
 target_include_directories(ThunderEgg PUBLIC ${ThunderEgg_Includes})
 target_include_directories(ThunderEgg PUBLIC
@@ -142,6 +134,13 @@ target_include_directories(ThunderEgg PUBLIC
 target_link_libraries(ThunderEgg PUBLIC ${ThunderEgg_Libs})
 target_link_libraries(ThunderEgg PUBLIC ${MPI_C_LIBRARIES})
 target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
+
+if(TARGET P4EST::P4EST)
+  target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
+endif(TARGET P4EST::P4EST)
+if(TARGET P4EST::P8EST)
+  target_link_libraries(ThunderEgg PUBLIC P4EST::P8EST)
+endif(TARGET P4EST::P8EST)
 
 install(
   TARGETS ThunderEgg
@@ -171,3 +170,7 @@ include(PkgConfigHandler)
 configure_pc_file("ThunderEgg" "ThunderEgg.pc.in" "ThunderEgg.pc")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.pc"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+# imported target, for use from FetchContent
+add_library(THUNDEREGG::THUNDEREGG INTERFACE IMPORTED GLOBAL)
+target_link_libraries(THUNDEREGG::THUNDEREGG INTERFACE ThunderEgg)

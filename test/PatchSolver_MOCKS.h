@@ -21,15 +21,17 @@
 
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/PatchSolver.h>
+
 #include <set>
 
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 namespace ThunderEgg
 {
 namespace
 {
-template <int D> class MockGhostFiller : public GhostFiller<D>
+template <int D>
+class MockGhostFiller : public GhostFiller<D>
 {
 	private:
 	mutable bool called = false;
@@ -44,12 +46,13 @@ template <int D> class MockGhostFiller : public GhostFiller<D>
 		return called;
 	}
 };
-template <int D> class MockPatchSolver : public PatchSolver<D>
+template <int D>
+class MockPatchSolver : public PatchSolver<D>
 {
 	private:
-	std::shared_ptr<Vector<D>>                            u_vec;
-	std::shared_ptr<Vector<D>>                            f_vec;
-	mutable std::set<std::shared_ptr<const PatchInfo<D>>> patches_to_be_called;
+	std::shared_ptr<Vector<D>>             u_vec;
+	std::shared_ptr<Vector<D>>             f_vec;
+	mutable std::set<const PatchInfo<D> *> patches_to_be_called;
 
 	public:
 	MockPatchSolver(std::shared_ptr<const Domain<D>>      domain_in,
@@ -57,21 +60,21 @@ template <int D> class MockPatchSolver : public PatchSolver<D>
 	                std::shared_ptr<Vector<D>> u_in, std::shared_ptr<Vector<D>> f_in)
 	: PatchSolver<D>(domain_in, ghost_filler_in), u_vec(u_in), f_vec(f_in)
 	{
-		for (auto pinfo : this->domain->getPatchInfoVector()) {
-			patches_to_be_called.insert(pinfo);
+		for (const PatchInfo<D> &pinfo : this->domain->getPatchInfoVector()) {
+			patches_to_be_called.insert(&pinfo);
 		}
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                      const std::vector<LocalData<D>> &   fs,
-	                      std::vector<LocalData<D>> &         us) const override
+	void solveSinglePatch(const PatchInfo<D> &             pinfo,
+	                      const std::vector<LocalData<D>> &fs,
+	                      std::vector<LocalData<D>> &      us) const override
 	{
-		CHECK(patches_to_be_called.count(pinfo) == 1);
-		patches_to_be_called.erase(pinfo);
+		CHECK(patches_to_be_called.count(&pinfo) == 1);
+		patches_to_be_called.erase(&pinfo);
 		for (int c = 0; c < u_vec->getNumComponents(); c++) {
-			CHECK(u_vec->getLocalData(c, pinfo->local_index).getPtr() == us[c].getPtr());
+			CHECK(u_vec->getLocalData(c, pinfo.local_index).getPtr() == us[c].getPtr());
 		}
 		for (int c = 0; c < f_vec->getNumComponents(); c++) {
-			CHECK(f_vec->getLocalData(c, pinfo->local_index).getPtr() == fs[c].getPtr());
+			CHECK(f_vec->getLocalData(c, pinfo.local_index).getPtr() == fs[c].getPtr());
 		}
 	}
 	bool allPatchesCalled()

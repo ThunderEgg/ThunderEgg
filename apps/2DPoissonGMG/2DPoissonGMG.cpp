@@ -24,6 +24,7 @@
 #ifdef HAVE_VTK
 #include "Writers/VtkWriter.h"
 #endif
+#include "TreeToP4est.h"
 #include <cmath>
 
 // =========== //
@@ -204,12 +205,10 @@ int main(int argc, char *argv[])
 		};
 		nfunx = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
 			return -10 * M_PI * sin(10 * M_PI * x) * exp(cos(10 * M_PI * x));
 		};
 
 		nfuny = [](const array<double, 2> &coord) {
-			double x = coord[0];
 			double y = coord[2];
 			return 11 * M_PI * sin(11 * M_PI * y) * exp(cos(11 * M_PI * y));
 		};
@@ -245,6 +244,12 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < div; i++) {
 		t.refineLeaves();
 	}
+	TreeToP4est ttp(t);
+
+	auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
+		x = unit_x;
+		y = unit_y;
+	};
 
 	// Set the number of cells in the x, y and z direction.
 	std::array<int, 2> ns;
@@ -253,14 +258,14 @@ int main(int argc, char *argv[])
 
 	// A DomainGenerator will create domains for the Multigrid algorithm from a tree
 	int                            num_ghost_cells  = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
-	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<DomGen<2>>(t, ns, num_ghost_cells, neumann);
+	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<P4estDomainGenerator>(ttp.p4est, ns, num_ghost_cells, bmf);
 
 	// Get the finest domain from the tree
 	shared_ptr<Domain<2>> domain = domain_generator->getFinestDomain();
 
 	// A patch operator needs a GhostFiller object to define how to fill ghost cells for the patches.
 	// This one will use a tri-linear interpolation scheme at the refinement boundarys of the domain
-	shared_ptr<GhostFiller<2>> ghost_filler = make_shared<BiLinearGhostFiller>(domain);
+	shared_ptr<GhostFiller<2>> ghost_filler = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	// create patch operator that uses a typical 2nd order 7 point poisson stencil
 	shared_ptr<StarPatchOperator<2>> patch_operator = make_shared<StarPatchOperator<2>>(domain, ghost_filler, neumann);
@@ -306,7 +311,6 @@ int main(int argc, char *argv[])
 	timer->start("Preconditioner Setup");
 
 	int domain_level = 0;
-	domain->setId(domain_level);
 	domain->setTimer(timer);
 	domain_level++;
 
@@ -323,10 +327,11 @@ int main(int argc, char *argv[])
 
 	// Create a smoother for the finest level
 	shared_ptr<GMG::Smoother<2>> finest_smoother;
+	bitset<4>                    neumann_bitset = neumann ? 0xF : 0x0;
 	if (patch_solver == "dft") {
-		finest_smoother = make_shared<DFTPatchSolver<2>>(patch_operator);
+		finest_smoother = make_shared<DFTPatchSolver<2>>(patch_operator, neumann_bitset);
 	} else if (patch_solver == "fftw") {
-		finest_smoother = make_shared<FFTWPatchSolver<2>>(patch_operator);
+		finest_smoother = make_shared<FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
 	} else {
 		finest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, patch_operator);
 	}
@@ -344,7 +349,6 @@ int main(int argc, char *argv[])
 
 	//generate each of the middle levels
 	while (domain_generator->hasCoarserDomain()) {
-		current_domain->setId(domain_level);
 		current_domain->setTimer(timer);
 		domain_level++;
 
@@ -355,15 +359,15 @@ int main(int argc, char *argv[])
 		auto middle_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, num_components);
 
 		// create operator for middle domain
-		auto middle_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain);
+		auto middle_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
 		auto middle_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, middle_ghost_filler);
 
 		// smoother
 		shared_ptr<GMG::Smoother<2>> middle_smoother;
 		if (patch_solver == "dft") {
-			middle_smoother = make_shared<DFTPatchSolver<2>>(middle_patch_operator);
+			middle_smoother = make_shared<DFTPatchSolver<2>>(middle_patch_operator, neumann_bitset);
 		} else if (patch_solver == "fftw") {
-			middle_smoother = make_shared<FFTWPatchSolver<2>>(middle_patch_operator);
+			middle_smoother = make_shared<FFTWPatchSolver<2>>(middle_patch_operator, neumann_bitset);
 		} else {
 			middle_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, middle_patch_operator);
 		}
@@ -378,7 +382,6 @@ int main(int argc, char *argv[])
 		finer_domain   = current_domain;
 		current_domain = coarser_domain;
 	}
-	current_domain->setId(domain_level);
 	current_domain->setTimer(timer);
 
 	//add the coarsest level to the builder
@@ -387,15 +390,15 @@ int main(int argc, char *argv[])
 	shared_ptr<VectorGenerator<2>> coarsest_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, 1);
 
 	// patch operator
-	shared_ptr<GhostFiller<2>>   coarsest_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain);
+	shared_ptr<GhostFiller<2>>   coarsest_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
 	shared_ptr<PatchOperator<2>> coarsest_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, coarsest_ghost_filler);
 
 	// smoother
 	shared_ptr<GMG::Smoother<2>> coarsest_smoother;
 	if (patch_solver == "dft") {
-		coarsest_smoother = make_shared<DFTPatchSolver<2>>(coarsest_patch_operator);
+		coarsest_smoother = make_shared<DFTPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
 	} else if (patch_solver == "fftw") {
-		coarsest_smoother = make_shared<FFTWPatchSolver<2>>(coarsest_patch_operator);
+		coarsest_smoother = make_shared<FFTWPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
 	} else {
 		coarsest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, coarsest_patch_operator);
 	}

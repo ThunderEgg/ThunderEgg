@@ -1,17 +1,21 @@
-#include "catch.hpp"
 #include <ThunderEgg/PatchInfo.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 TEST_CASE("CoarseNbrInfo Serialization/Deserialization", "[CoarseNbrInfo]")
 {
-	CoarseNbrInfo<3> info;
+	CoarseNbrInfo<2> info;
 	info.id             = 5;
 	info.rank           = 1;
 	info.orth_on_coarse = Orthant<2>::nw();
 	// serialize and then deserialize
 	char *buff = new char[info.serialize(nullptr)];
 	info.serialize(buff);
-	CoarseNbrInfo<3> out;
+	CoarseNbrInfo<2> out;
 	out.deserialize(buff);
 	delete[] buff;
 	REQUIRE(out.id == 5);
@@ -20,7 +24,7 @@ TEST_CASE("CoarseNbrInfo Serialization/Deserialization", "[CoarseNbrInfo]")
 }
 TEST_CASE("CoarseNbrInfo to_json", "[CoarseNbrInfo]")
 {
-	CoarseNbrInfo<3> info;
+	CoarseNbrInfo<2> info;
 	info.id             = GENERATE(1, 2, 3);
 	info.rank           = GENERATE(0, 1, 2);
 	info.orth_on_coarse = GENERATE(Orthant<2>::sw(), Orthant<3>::se(), Orthant<2>::nw());
@@ -48,7 +52,7 @@ TEST_CASE("CoarseNbrInfo from_json", "[CoarseNbrInfo]")
 	j["ranks"]          = {rank};
 	j["orth_on_coarse"] = orth_on_coarse;
 
-	CoarseNbrInfo<3> info = j.get<CoarseNbrInfo<3>>();
+	CoarseNbrInfo<2> info = j.get<CoarseNbrInfo<2>>();
 	CHECK(info.id == id);
 	CHECK(info.rank == rank);
 	CHECK(info.orth_on_coarse == orth_on_coarse);

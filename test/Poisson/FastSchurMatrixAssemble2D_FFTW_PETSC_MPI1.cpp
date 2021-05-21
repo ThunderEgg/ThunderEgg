@@ -20,7 +20,6 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/BiQuadraticGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
@@ -32,11 +31,18 @@
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/Schur/PatchSolverWrapper.h>
 #include <ThunderEgg/Schur/VecWrapperGenerator.h>
+
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
-#define MESHES                                                                                     \
+
+#define MESHES \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+
 TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws exception for non-square patches",
           "[Poisson::FastSchurMatrixAssemble2D]")
 {
@@ -45,13 +51,14 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws exception for non-square pa
 	int                   nx        = GENERATE(5, 8);
 	int                   ny        = GENERATE(7, 10);
 	int                   num_ghost = 1;
+	bitset<4>             neumann;
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
 
-	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine);
+	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator);
+	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver), RuntimeError);
 }
@@ -59,7 +66,8 @@ namespace ThunderEgg
 {
 namespace
 {
-template <int D> class MockGhostFiller : public GhostFiller<D>
+template <int D>
+class MockGhostFiller : public GhostFiller<D>
 {
 	public:
 	void fillGhost(std::shared_ptr<const Vector<D>> u) const override {}
@@ -72,13 +80,14 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws with unsupported ghost fill
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
 	int                   num_ghost = 1;
+	bitset<4>             neumann;
 	DomainReader<2>       domain_reader(mesh_file, {10, 10}, num_ghost);
 	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
 
 	auto gf         = make_shared<MockGhostFiller<2>>();
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator);
+	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver), RuntimeError);
 }
@@ -90,6 +99,7 @@ TEST_CASE(
 	INFO("MESH FILE " << mesh_file);
 	int                   n         = 32;
 	int                   num_ghost = 1;
+	bitset<4>             neumann;
 	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
 	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
@@ -107,9 +117,9 @@ TEST_CASE(
 	}
 	VecRestoreArray(g_vec->getVec(), &g_view);
 
-	auto gf               = make_shared<BiLinearGhostFiller>(d_fine);
+	auto gf               = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator);
+	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
 	p_solver_wrapper->apply(g_vec, f_vec_expected);
 
@@ -118,8 +128,8 @@ TEST_CASE(
 	auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
 	m_operator->apply(g_vec, f_vec);
 
-	CHECK(f_vec->infNorm() == Approx(f_vec_expected->infNorm()));
-	CHECK(f_vec->twoNorm() == Approx(f_vec_expected->twoNorm()));
+	CHECK(f_vec->infNorm() == Catch::Approx(f_vec_expected->infNorm()));
+	CHECK(f_vec->twoNorm() == Catch::Approx(f_vec_expected->twoNorm()));
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (auto iface : iface_domain->getInterfaces()) {
@@ -130,7 +140,7 @@ TEST_CASE(
 		LocalData<1> f_vec_expected_ld = f_vec_expected->getLocalData(0, iface->local_index);
 		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
-			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
+			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
 	}
 	MatDestroy(&A);
@@ -143,57 +153,7 @@ TEST_CASE(
 	INFO("MESH FILE " << mesh_file);
 	int                   n         = 32;
 	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost, true);
-	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
-
-	Schur::VecWrapperGenerator<1> vg(iface_domain);
-	auto                          f_vec          = vg.getNewVecWrapper();
-	auto                          f_vec_expected = vg.getNewVecWrapper();
-
-	auto    g_vec = vg.getNewVecWrapper();
-	double *g_view;
-	Vec     g = g_vec->getVec();
-	VecGetArray(g, &g_view);
-	for (int i = 0; i < g_vec->getNumLocalCells(); i++) {
-		double x  = (i + 0.5) / g_vec->getNumLocalCells();
-		g_view[i] = sin(M_PI * x);
-	}
-	VecRestoreArray(g, &g_view);
-
-	auto gf               = make_shared<BiLinearGhostFiller>(d_fine);
-	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator);
-	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
-	p_solver_wrapper->apply(g_vec, f_vec_expected);
-
-	// generate matrix with matrix_helper
-	Mat  A          = Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver);
-	auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
-	m_operator->apply(g_vec, f_vec);
-
-	CHECK(f_vec->infNorm() == Approx(f_vec_expected->infNorm()));
-	CHECK(f_vec->twoNorm() == Approx(f_vec_expected->twoNorm()));
-	REQUIRE(f_vec->infNorm() > 0);
-
-	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
-		LocalData<1> f_vec_ld          = f_vec->getLocalData(0, i);
-		LocalData<1> f_vec_expected_ld = f_vec_expected->getLocalData(0, i);
-		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
-			INFO("xi:    " << coord[0]);
-			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
-		});
-	}
-	MatDestroy(&A);
-}
-TEST_CASE(
-"Poisson::FastSchurMatrixAssemble2D gives equivalent operator to Poisson::StarPatchOperator Biquadratic ghost filler",
-"[Poisson::FastSchurMatrixAssemble2D]")
-{
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 1;
+	bitset<4>             neumann   = 0xF;
 	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
 	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
@@ -212,9 +172,9 @@ TEST_CASE(
 	}
 	VecRestoreArray(g, &g_view);
 
-	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine);
-	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator);
+	auto gf               = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
+	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
 	p_solver_wrapper->apply(g_vec, f_vec_expected);
 
@@ -223,8 +183,8 @@ TEST_CASE(
 	auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
 	m_operator->apply(g_vec, f_vec);
 
-	CHECK(f_vec->infNorm() == Approx(f_vec_expected->infNorm()));
-	CHECK(f_vec->twoNorm() == Approx(f_vec_expected->twoNorm()));
+	CHECK(f_vec->infNorm() == Catch::Approx(f_vec_expected->infNorm()));
+	CHECK(f_vec->twoNorm() == Catch::Approx(f_vec_expected->twoNorm()));
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
@@ -232,20 +192,21 @@ TEST_CASE(
 		LocalData<1> f_vec_expected_ld = f_vec_expected->getLocalData(0, i);
 		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
-			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
+			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
 	}
 	MatDestroy(&A);
 }
 TEST_CASE(
-"Poisson::FastSchurMatrixAssemble2D gives equivalent operator to Poisson::StarPatchOperator with Neumann BC BiQuadratic ghost filler",
+"Poisson::FastSchurMatrixAssemble2D gives equivalent operator to Poisson::StarPatchOperator Biquadratic ghost filler",
 "[Poisson::FastSchurMatrixAssemble2D]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
 	int                   n         = 32;
 	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost, true);
+	bitset<4>             neumann;
+	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
 	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
 
@@ -263,9 +224,9 @@ TEST_CASE(
 	}
 	VecRestoreArray(g, &g_view);
 
-	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine);
-	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator);
+	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
+	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
 	p_solver_wrapper->apply(g_vec, f_vec_expected);
 
@@ -274,8 +235,8 @@ TEST_CASE(
 	auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
 	m_operator->apply(g_vec, f_vec);
 
-	CHECK(f_vec->infNorm() == Approx(f_vec_expected->infNorm()));
-	CHECK(f_vec->twoNorm() == Approx(f_vec_expected->twoNorm()));
+	CHECK(f_vec->infNorm() == Catch::Approx(f_vec_expected->infNorm()));
+	CHECK(f_vec->twoNorm() == Catch::Approx(f_vec_expected->twoNorm()));
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
@@ -283,7 +244,59 @@ TEST_CASE(
 		LocalData<1> f_vec_expected_ld = f_vec_expected->getLocalData(0, i);
 		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
-			CHECK(f_vec_ld[coord] == Approx(f_vec_expected_ld[coord]));
+			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
+		});
+	}
+	MatDestroy(&A);
+}
+TEST_CASE(
+"Poisson::FastSchurMatrixAssemble2D gives equivalent operator to Poisson::StarPatchOperator with Neumann BC BiQuadratic ghost filler",
+"[Poisson::FastSchurMatrixAssemble2D]")
+{
+	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+	INFO("MESH FILE " << mesh_file);
+	int                   n         = 32;
+	int                   num_ghost = 1;
+	bitset<4>             neumann   = 0xF;
+	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
+	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
+	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
+
+	Schur::VecWrapperGenerator<1> vg(iface_domain);
+	auto                          f_vec          = vg.getNewVecWrapper();
+	auto                          f_vec_expected = vg.getNewVecWrapper();
+
+	auto    g_vec = vg.getNewVecWrapper();
+	double *g_view;
+	Vec     g = g_vec->getVec();
+	VecGetArray(g, &g_view);
+	for (int i = 0; i < g_vec->getNumLocalCells(); i++) {
+		double x  = (i + 0.5) / g_vec->getNumLocalCells();
+		g_view[i] = sin(M_PI * x);
+	}
+	VecRestoreArray(g, &g_view);
+
+	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
+	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
+	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
+	p_solver_wrapper->apply(g_vec, f_vec_expected);
+
+	// generate matrix with matrix_helper
+	Mat  A          = Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver);
+	auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
+	m_operator->apply(g_vec, f_vec);
+
+	CHECK(f_vec->infNorm() == Catch::Approx(f_vec_expected->infNorm()));
+	CHECK(f_vec->twoNorm() == Catch::Approx(f_vec_expected->twoNorm()));
+	REQUIRE(f_vec->infNorm() > 0);
+
+	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
+		LocalData<1> f_vec_ld          = f_vec->getLocalData(0, i);
+		LocalData<1> f_vec_expected_ld = f_vec_expected->getLocalData(0, i);
+		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
+			INFO("xi:    " << coord[0]);
+			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
 	}
 	MatDestroy(&A);

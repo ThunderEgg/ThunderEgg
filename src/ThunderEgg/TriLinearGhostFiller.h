@@ -34,21 +34,36 @@ namespace ThunderEgg
 class TriLinearGhostFiller : public MPIGhostFiller<3>
 {
 	public:
-	void fillGhostCellsForNbrPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-	                               const std::vector<LocalData<3>> &   local_datas,
-	                               const std::vector<LocalData<3>> &nbr_datas, const Side<3> side,
-	                               const NbrType nbr_type, const Orthant<3> orthant) const override;
+	void fillGhostCellsForNbrPatch(const PatchInfo<3> &             pinfo,
+	                               const std::vector<LocalData<3>> &local_datas,
+	                               std::vector<LocalData<3>> &      nbr_datas,
+	                               Side<3>                          side,
+	                               NbrType                          nbr_type,
+	                               Orthant<2>                       orthant_on_coarse) const override;
 
-	void fillGhostCellsForLocalPatch(std::shared_ptr<const PatchInfo<3>> pinfo,
-	                                 const std::vector<LocalData<3>> &local_datas) const override;
+	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<3> &             pinfo,
+	                                   const std::vector<LocalData<3>> &local_datas,
+	                                   std::vector<LocalData<3>> &      nbr_datas,
+	                                   Edge                             edge,
+	                                   NbrType                          nbr_type,
+	                                   Orthant<1>                       orthant_on_coarse) const override;
+
+	void fillGhostCellsForCornerNbrPatch(const PatchInfo<3> &             pinfo,
+	                                     const std::vector<LocalData<3>> &local_datas,
+	                                     std::vector<LocalData<3>> &      nbr_datas,
+	                                     Corner<3>                        corner,
+	                                     NbrType                          nbr_type) const override;
+
+	void fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo, std::vector<LocalData<3>> &local_datas) const override;
 	/**
 	 * @brief Construct a new TriLinearGhostFiller object
 	 *
 	 * Currently, this only supports an even number of cells on each axis of the patch
 	 *
 	 * @param domain the domain on which ghosts will be filled
+	 * @param fill_type the ghost filling type to perform
 	 */
-	explicit TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain);
+	TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain, GhostFillingType fill_type);
 };
 } // namespace ThunderEgg
 #endif

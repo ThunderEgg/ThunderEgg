@@ -19,13 +19,17 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "catch.hpp"
 #include "utils/DomainReader.h"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/Iterative/BiCGStab.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/ValVectorGenerator.h>
+
 #include <sstream>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Iterative;
@@ -90,7 +94,7 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]
 
 	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain);
+	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
 	p_operator->addDrichletBCToRHS(f_vec, gfun);
@@ -117,7 +121,7 @@ TEST_CASE("BiCGStab handles zero rhs vector", "[BiCGStab]")
 
 	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain);
+	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
 
@@ -154,7 +158,7 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 
 	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain);
+	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
 	p_operator->addDrichletBCToRHS(f_vec, gfun);
@@ -173,7 +177,7 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 	int    prev_iteration;
 	double resid;
 	ss >> prev_iteration >> resid;
-	while (prev_iteration < 18) {
+	while (prev_iteration < 5) {
 		int iteration;
 		ss >> iteration >> resid;
 		CHECK(iteration == prev_iteration + 1);
@@ -204,7 +208,7 @@ TEST_CASE("giving a good initial guess reduces the iterations", "[BiCGStab]")
 
 	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain);
+	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
 	p_operator->addDrichletBCToRHS(f_vec, gfun);
@@ -228,10 +232,17 @@ class MockVector : public Vector<2>
 	public:
 	mutable int norm_calls = 0;
 	double      dot_value;
-	MockVector(double dot_value) : Vector<2>(MPI_COMM_WORLD, 1, 0, 10), dot_value(dot_value) {}
-	LocalData<2>       getLocalData(int, int) override {}
-	const LocalData<2> getLocalData(int, int) const override {}
-	double             dot(std::shared_ptr<const Vector<2>>) const override
+	MockVector(double dot_value)
+	: Vector<2>(MPI_COMM_WORLD, 1, 0, 10), dot_value(dot_value) {}
+	LocalData<2> getLocalData(int, int) override
+	{
+		return LocalData<2>();
+	}
+	const LocalData<2> getLocalData(int, int) const override
+	{
+		return LocalData<2>();
+	}
+	double dot(std::shared_ptr<const Vector<2>>) const override
 	{
 		return dot_value;
 	}
@@ -249,7 +260,8 @@ class MockVectorGenerator : public VectorGenerator<2>
 {
 	public:
 	std::shared_ptr<MockVector> vec;
-	MockVectorGenerator(std::shared_ptr<MockVector> vec) : vec(vec) {}
+	MockVectorGenerator(std::shared_ptr<MockVector> vec)
+	: vec(vec) {}
 	std::shared_ptr<Vector<2>> getNewVector() const override
 	{
 		return vec;
@@ -282,11 +294,6 @@ TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
 		double y = coord[1];
 		return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
 	};
-	auto gfun = [](const std::array<double, 2> &coord) {
-		double x = coord[0];
-		double y = coord[1];
-		return sin(M_PI * y) * cos(2 * M_PI * x);
-	};
 
 	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
 	DomainTools::SetValues<2>(domain, f_vec, ffun);
@@ -294,7 +301,7 @@ TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
 
 	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain);
+	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto op = make_shared<I2Operator>();
 

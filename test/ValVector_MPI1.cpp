@@ -19,14 +19,19 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "catch.hpp"
 #include "utils/DomainReader.h"
 #include <ThunderEgg/ValVector.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+
 TEST_CASE("ValVector<1> getNumGhostCells", "[ValVector]")
 {
 	int           num_components    = GENERATE(1, 2, 3);

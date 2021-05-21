@@ -21,14 +21,10 @@
 
 #ifndef THUNDEREGG_LOCALDATA_H
 #define THUNDEREGG_LOCALDATA_H
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/LocalDataManager.h>
 #include <ThunderEgg/Loops.h>
-#include <ThunderEgg/Side.h>
-#include <algorithm>
-#include <cmath>
 #include <memory>
-#include <mpi.h>
-#include <numeric>
 namespace ThunderEgg
 {
 /**
@@ -80,34 +76,33 @@ template <int D> class LocalData
 	 * @brief Get a slice for a slide
 	 *
 	 * @param s the side of patch for the slice
-	 * @param offset the offset, with 0 being the first slice of non-ghost cell values, and -1 being
+	 * @param offset the offset, with {0, 0} being the first slice of non-ghost cell values, and {-1, -1} being
 	 * the first slice of ghost cell values
-	 * @return LocalData<D - 1> the resulting slice
+	 * @return LocalData<1> the resulting slice
 	 */
-	LocalData<D - 1> getSliceOnSidePriv(Side<D> s, int offset) const
+	template <int M> LocalData<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
-		size_t                 axis = s.getAxisIndex();
-		std::array<int, D - 1> new_strides;
-		for (size_t i = 0; i < axis; i++) {
-			new_strides[i] = strides[i];
+		std::array<int, M>         new_strides;
+		std::array<int, M>         new_lengths;
+		double *                   new_data      = data;
+		std::array<Side<D>, D - M> sides         = f.getSides();
+		size_t                     lengths_index = 0;
+		size_t                     sides_index   = 0;
+		for (size_t axis = 0; axis < (size_t) D; axis++) {
+			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
+				if (sides[sides_index].isLowerOnAxis()) {
+					new_data += offset[sides_index] * strides[axis];
+				} else {
+					new_data += (lengths[axis] - 1 - offset[sides_index]) * strides[axis];
+				}
+				sides_index++;
+			} else {
+				new_lengths[lengths_index] = lengths[axis];
+				new_strides[lengths_index] = strides[axis];
+				lengths_index++;
+			}
 		}
-		for (size_t i = axis; i < D - 1; i++) {
-			new_strides[i] = strides[i + 1];
-		}
-		std::array<int, D - 1> new_lengths;
-		for (size_t i = 0; i < axis; i++) {
-			new_lengths[i] = lengths[i];
-		}
-		for (size_t i = axis; i < D - 1; i++) {
-			new_lengths[i] = lengths[i + 1];
-		}
-		if (s.isLowerOnAxis()) {
-			double *new_data = data + offset * strides[axis];
-			return LocalData<D - 1>(new_data, new_strides, new_lengths, 0, ldm);
-		} else {
-			double *new_data = data + (lengths[axis] - 1 - offset) * strides[axis];
-			return LocalData<D - 1>(new_data, new_strides, new_lengths, 0, ldm);
-		}
+		return LocalData<M>(new_data, new_strides, new_lengths, 0, ldm);
 	}
 
 	template <int idx, class Type, class... Types> int getIndex(Type t, Types... args) const
@@ -130,10 +125,15 @@ template <int D> class LocalData
 	 * @param num_ghost_cells_in the number of ghost cells on each side of the patch
 	 * @param ldm_in the local data manager for the data
 	 */
-	LocalData(double *data_in, const std::array<int, D> &strides_in,
-	          const std::array<int, D> &lengths_in, int num_ghost_cells_in,
+	LocalData(double *                          data_in,
+	          const std::array<int, D> &        strides_in,
+	          const std::array<int, D> &        lengths_in,
+	          int                               num_ghost_cells_in,
 	          std::shared_ptr<LocalDataManager> ldm_in = nullptr)
-	: data(data_in), strides(strides_in), lengths(lengths_in), ldm(ldm_in),
+	: data(data_in),
+	  strides(strides_in),
+	  lengths(lengths_in),
+	  ldm(ldm_in),
 	  num_ghost_cells(num_ghost_cells_in)
 	{
 		start.fill(0);
@@ -212,37 +212,52 @@ template <int D> class LocalData
 		return data[getIndex<0>(args...)];
 	}
 	/**
-	 * @brief Get a slice with dimensions D-1 on the specified side of the patch
+	 * @brief Get a slice in a given face
 	 *
-	 * @param s the side
-	 * @param offset how far from the side the slice is
-	 * @return LocalData<D - 1>
+	 * @param f the face
+	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
+	 * face
+	 * @return double& the value
 	 */
-	LocalData<D - 1> getSliceOnSide(Side<D> s, int offset = 0)
+	template <int M> LocalData<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
 	{
-		return getSliceOnSidePriv(s, offset);
+		return getSliceOnPriv(f, offset);
 	}
 	/**
-	 * @brief Get a slice with dimensions D-1 on the specified side of the patch
+	 * @brief Get a slice in a given face
 	 *
-	 * @param s the side
-	 * @param offset how far from the side the slice is
-	 * @return LocalData<D - 1>
+	 * @param f the face
+	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
+	 * face
+	 * @return double& the value
 	 */
-	const LocalData<D - 1> getSliceOnSide(Side<D> s, int offset = 0) const
+	template <int M> const LocalData<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
-		return getSliceOnSidePriv(s, offset);
+		return getSliceOnPriv(f, offset);
 	}
-	/**
-	 * @brief Get a slice of ghost cells with dimensions D-1 on the specified side of the patch
-	 *
-	 * @param s the side
-	 * @param offset which layer of ghost cells to acess
-	 * @return LocalData<D - 1>
-	 */
-	const LocalData<D - 1> getGhostSliceOnSide(Side<D> s, int offset) const
+	template <int M> LocalData<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
 	{
-		return getSliceOnSidePriv(s, -offset);
+		std::array<int, M>         new_strides;
+		std::array<int, M>         new_lengths;
+		double *                   new_data      = data;
+		std::array<Side<D>, D - M> sides         = f.getSides();
+		size_t                     lengths_index = 0;
+		size_t                     sides_index   = 0;
+		for (size_t axis = 0; axis < (size_t) D; axis++) {
+			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
+				if (sides[sides_index].isLowerOnAxis()) {
+					new_data += (-1 - offset[sides_index]) * strides[axis];
+				} else {
+					new_data += (lengths[axis] + offset[sides_index]) * strides[axis];
+				}
+				sides_index++;
+			} else {
+				new_lengths[lengths_index] = lengths[axis];
+				new_strides[lengths_index] = strides[axis];
+				lengths_index++;
+			}
+		}
+		return LocalData<M>(new_data, new_strides, new_lengths, 0, ldm);
 	}
 	/**
 	 * @brief Get the Lengths of the patch in each direction

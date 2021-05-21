@@ -38,13 +38,13 @@ template <int D> class PatchIfaceInfo : public Serializable
 {
 	public:
 	/**
-	 * @brief Pointer to associated PatchInfo object
+	 * @brief  associated PatchInfo object
 	 */
-	std::shared_ptr<const PatchInfo<D>> pinfo;
+	PatchInfo<D> pinfo;
 	/**
 	 * @brief Array of IfaceInfo objects
 	 */
-	std::array<std::shared_ptr<IfaceInfo<D>>, Side<D>::num_sides> iface_info;
+	std::array<std::shared_ptr<IfaceInfo<D>>, Side<D>::number_of> iface_info;
 	/**
 	 * @brief Construct a new PatchIfaceInfo object
 	 */
@@ -54,12 +54,12 @@ template <int D> class PatchIfaceInfo : public Serializable
 	 *
 	 * Fills in information from the given PatchInfo object.
 	 */
-	explicit PatchIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo) : pinfo(pinfo)
+	explicit PatchIfaceInfo(const PatchInfo<D> &pinfo) : pinfo(pinfo)
 	{
 		// create iface objects
 		for (Side<D> s : Side<D>::getValues()) {
-			if (pinfo->hasNbr(s)) {
-				switch (pinfo->getNbrType(s)) {
+			if (pinfo.hasNbr(s)) {
+				switch (pinfo.getNbrType(s)) {
 					case NbrType::Normal:
 						setIfaceInfo(s, std::make_shared<NormalIfaceInfo<D>>(pinfo, s));
 						break;
@@ -174,19 +174,18 @@ template <int D> class PatchIfaceInfo : public Serializable
 	int serialize(char *buffer) const
 	{
 		BufferWriter writer(buffer);
-		writer << *pinfo;
+		writer << pinfo;
 		return writer.getPos();
 	}
 	int deserialize(char *buffer)
 	{
 		BufferReader reader(buffer);
 		auto         pinfo_in = std::make_shared<PatchInfo<D>>();
-		reader >> *pinfo_in;
-		pinfo = pinfo_in;
+		reader >> pinfo;
 		// create iface objects
 		for (Side<D> s : Side<D>::getValues()) {
-			if (pinfo->hasNbr(s)) {
-				switch (pinfo->getNbrType(s)) {
+			if (pinfo.hasNbr(s)) {
+				switch (pinfo.getNbrType(s)) {
 					case NbrType::Normal:
 						setIfaceInfo(s, std::make_shared<NormalIfaceInfo<D>>(pinfo, s));
 						break;

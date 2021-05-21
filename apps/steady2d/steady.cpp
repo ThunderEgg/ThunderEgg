@@ -46,7 +46,7 @@
 #endif
 #ifdef HAVE_P4EST
 #include "TreeToP4est.h"
-#include <ThunderEgg/P4estDomGen.h>
+#include <ThunderEgg/P4estDomainGenerator.h>
 #endif
 #include "CLI11.hpp"
 #include <cmath>
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
 		auto inf
 		= [=](Side<2> s, const array<double, 2> &, const array<double, 2> &) { return neumann; };
 
-		dcg.reset(new P4estDomGen(ttp.p4est, ns, 1, inf, bmf));
+		dcg.reset(new P4estDomainGenerator(ttp.p4est, ns, 1, inf, bmf));
 #else
 	if (false) {
 #endif

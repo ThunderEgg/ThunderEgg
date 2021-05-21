@@ -38,19 +38,19 @@ template <int D> class FineNbrInfo : public NbrInfo<D>
 	/**
 	 * @brief The mpi rank that the neighbor resides on.
 	 */
-	std::array<int, Orthant<D - 1>::num_orthants> ranks;
+	std::array<int, Orthant<D>::num_orthants> ranks;
 	/**
 	 * @brief The ids of the neighbors
 	 */
-	std::array<int, Orthant<D - 1>::num_orthants> ids;
+	std::array<int, Orthant<D>::num_orthants> ids;
 	/**
 	 * @brief The global indexes of the neighbors
 	 */
-	std::array<int, Orthant<D - 1>::num_orthants> global_indexes;
+	std::array<int, Orthant<D>::num_orthants> global_indexes;
 	/**
 	 * @brief The local indexes of the neighbors
 	 */
-	std::array<int, Orthant<D - 1>::num_orthants> local_indexes;
+	std::array<int, Orthant<D>::num_orthants> local_indexes;
 	/**
 	 * @brief Construct a new empty FineNbrInfo object
 	 */
@@ -58,8 +58,8 @@ template <int D> class FineNbrInfo : public NbrInfo<D>
 	{
 		ranks.fill(0);
 		ids.fill(0);
-		global_indexes.fill(0);
-		local_indexes.fill(0);
+		local_indexes.fill(-1);
+		global_indexes.fill(-1);
 	}
 	~FineNbrInfo() = default;
 	/**
@@ -67,52 +67,60 @@ template <int D> class FineNbrInfo : public NbrInfo<D>
 	 *
 	 * @param ids the ids of the neighbors
 	 */
-	FineNbrInfo(std::array<int, Orthant<D - 1>::num_orthants> ids)
+	FineNbrInfo(std::array<int, Orthant<D>::num_orthants> ids) : ids(ids)
 	{
 		ranks.fill(0);
-		this->ids = ids;
+		local_indexes.fill(-1);
+		global_indexes.fill(-1);
 	}
-	NbrType getNbrType()
+	NbrType getNbrType() const override
 	{
 		return NbrType::Fine;
 	}
-	void getNbrIds(std::deque<int> &nbr_ids)
+	void getNbrIds(std::deque<int> &nbr_ids) const override
 	{
 		for (size_t i = 0; i < ids.size(); i++) {
 			nbr_ids.push_back(ids[i]);
 		}
 	};
-	void getNbrRanks(std::deque<int> &nbr_ranks)
+	void getNbrRanks(std::deque<int> &nbr_ranks) const override
 	{
 		for (size_t i = 0; i < ranks.size(); i++) {
 			nbr_ranks.push_back(ranks[i]);
 		}
 	}
-	void setGlobalIndexes(std::map<int, int> &rev_map)
+	void setGlobalIndexes(const std::map<int, int> &id_to_global_index_map) override
 	{
 		for (size_t i = 0; i < global_indexes.size(); i++) {
-			global_indexes[i] = rev_map.at(local_indexes[i]);
+			global_indexes[i] = id_to_global_index_map.at(ids[i]);
 		}
 	}
-	void setLocalIndexes(std::map<int, int> &rev_map)
+	void setLocalIndexes(const std::map<int, int> &id_to_local_index_map) override
 	{
 		for (size_t i = 0; i < local_indexes.size(); i++) {
-			local_indexes[i] = rev_map.at(ids[i]);
+			auto iter = id_to_local_index_map.find(ids[i]);
+			if (iter != id_to_local_index_map.end()) {
+				local_indexes[i] = iter->second;
+			}
 		}
 	}
-	int serialize(char *buffer) const
+	int serialize(char *buffer) const override
 	{
 		BufferWriter writer(buffer);
 		writer << ranks;
 		writer << ids;
 		return writer.getPos();
 	}
-	int deserialize(char *buffer)
+	int deserialize(char *buffer) override
 	{
 		BufferReader reader(buffer);
 		reader >> ranks;
 		reader >> ids;
 		return reader.getPos();
+	}
+	std::unique_ptr<NbrInfoBase> clone() const override
+	{
+		return std::make_unique<FineNbrInfo<D>>(*this);
 	}
 };
 template <int D> void to_json(nlohmann::json &j, const FineNbrInfo<D> &n)
@@ -123,8 +131,8 @@ template <int D> void to_json(nlohmann::json &j, const FineNbrInfo<D> &n)
 }
 template <int D> void from_json(const nlohmann::json &j, FineNbrInfo<D> &n)
 {
-	n.ids   = j["ids"].get<std::array<int, Orthant<D - 1>::num_orthants>>();
-	n.ranks = j["ranks"].get<std::array<int, Orthant<D - 1>::num_orthants>>();
+	n.ids   = j["ids"].get<std::array<int, Orthant<D>::num_orthants>>();
+	n.ranks = j["ranks"].get<std::array<int, Orthant<D>::num_orthants>>();
 }
 } // namespace ThunderEgg
 #endif

@@ -19,16 +19,18 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "catch.hpp"
 #include <ThunderEgg/Schur/PatchIfaceInfo.h>
+
 #include <algorithm>
+
+#include <catch2/catch_test_macros.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
 TEST_CASE("Schur::PatchIfaceInfo default constructor", "[Schur::PatchIfaceInfo]")
 {
 	Schur::PatchIfaceInfo<2> piinfo;
-	CHECK(piinfo.pinfo == nullptr);
 	for (Side<2> s : Side<2>::getValues()) {
 		CHECK(piinfo.iface_info[s.getIndex()] == nullptr);
 		CHECK(piinfo.getIfaceInfo(s) == nullptr);
@@ -41,21 +43,20 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with NormalIfaceInfo", "[Schur::Pa
 {
 	for (Side<2> side_to_set : Side<2>::getValues()) {
 		// setup
-		int  id                                   = 1;
-		int  nbr_id                               = 2;
-		auto pinfo                                = make_shared<PatchInfo<2>>();
-		pinfo->rank                               = 0;
-		pinfo->id                                 = id;
-		pinfo->nbr_info[side_to_set.getIndex()]   = make_shared<NormalNbrInfo<2>>(nbr_id);
-		pinfo->getNormalNbrInfo(side_to_set).rank = 1;
-		auto iface_info = make_shared<Schur::NormalIfaceInfo<2>>(pinfo, side_to_set);
+		int          id     = 1;
+		int          nbr_id = 2;
+		PatchInfo<2> pinfo;
+		pinfo.rank = 0;
+		pinfo.id   = id;
+		pinfo.setNbrInfo(side_to_set, new NormalNbrInfo<1>(nbr_id));
+		pinfo.getNormalNbrInfo(side_to_set).rank = 1;
+		auto iface_info                          = make_shared<Schur::NormalIfaceInfo<2>>(pinfo, side_to_set);
 
 		Schur::PatchIfaceInfo<2>        piinfo;
 		const Schur::PatchIfaceInfo<2> &const_piinfo = piinfo;
 
 		piinfo.setIfaceInfo(side_to_set, iface_info);
 
-		CHECK(piinfo.pinfo == nullptr);
 		for (Side<2> s : Side<2>::getValues()) {
 			if (s == side_to_set) {
 				CHECK(piinfo.iface_info[s.getIndex()] == iface_info);
@@ -77,21 +78,20 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with FineIfaceInfo", "[Schur::Patc
 {
 	for (Side<2> side_to_set : Side<2>::getValues()) {
 		// setup
-		int           id                            = 1;
-		array<int, 2> nbr_ids                       = {2, 3};
-		auto          pinfo                         = make_shared<PatchInfo<2>>();
-		pinfo->id                                   = id;
-		pinfo->nbr_info[side_to_set.getIndex()]     = make_shared<FineNbrInfo<2>>(nbr_ids);
-		pinfo->getFineNbrInfo(side_to_set).ranks[0] = 1;
-		pinfo->getFineNbrInfo(side_to_set).ranks[1] = 2;
-		auto iface_info = make_shared<Schur::FineIfaceInfo<2>>(pinfo, side_to_set);
+		int           id      = 1;
+		array<int, 2> nbr_ids = {2, 3};
+		PatchInfo<2>  pinfo;
+		pinfo.id = id;
+		pinfo.setNbrInfo(side_to_set, new FineNbrInfo<1>(nbr_ids));
+		pinfo.getFineNbrInfo(side_to_set).ranks[0] = 1;
+		pinfo.getFineNbrInfo(side_to_set).ranks[1] = 2;
+		auto iface_info                            = make_shared<Schur::FineIfaceInfo<2>>(pinfo, side_to_set);
 
 		Schur::PatchIfaceInfo<2>        piinfo;
 		const Schur::PatchIfaceInfo<2> &const_piinfo = piinfo;
 
 		piinfo.setIfaceInfo(side_to_set, iface_info);
 
-		CHECK(piinfo.pinfo == nullptr);
 		for (Side<2> s : Side<2>::getValues()) {
 			if (s == side_to_set) {
 				CHECK(piinfo.iface_info[s.getIndex()] == iface_info);
@@ -113,21 +113,19 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with CoarseIfaceInfo", "[Schur::Pa
 {
 	for (Side<2> side_to_set : Side<2>::getValues()) {
 		// setup
-		int  id     = 1;
-		int  nbr_id = 2;
-		auto pinfo  = make_shared<PatchInfo<2>>();
-		pinfo->id   = id;
-		pinfo->nbr_info[side_to_set.getIndex()]
-		= make_shared<CoarseNbrInfo<2>>(nbr_id, Orthant<1>::upper());
-		pinfo->getCoarseNbrInfo(side_to_set).rank = 1;
-		auto iface_info = make_shared<Schur::CoarseIfaceInfo<2>>(pinfo, side_to_set);
+		int          id     = 1;
+		int          nbr_id = 2;
+		PatchInfo<2> pinfo;
+		pinfo.id = id;
+		pinfo.setNbrInfo(side_to_set, new CoarseNbrInfo<1>(nbr_id, Orthant<1>::upper()));
+		pinfo.getCoarseNbrInfo(side_to_set).rank = 1;
+		auto iface_info                          = make_shared<Schur::CoarseIfaceInfo<2>>(pinfo, side_to_set);
 
 		Schur::PatchIfaceInfo<2>        piinfo;
 		const Schur::PatchIfaceInfo<2> &const_piinfo = piinfo;
 
 		piinfo.setIfaceInfo(side_to_set, iface_info);
 
-		CHECK(piinfo.pinfo == nullptr);
 		for (Side<2> s : Side<2>::getValues()) {
 			if (s == side_to_set) {
 				CHECK(piinfo.iface_info[s.getIndex()] == iface_info);
@@ -152,16 +150,15 @@ TEST_CASE("Schur::PatchIfaceInfo PatchInfo constructor", "[Schur::PatchIfaceInfo
 	int           nbr_id        = 2;
 	array<int, 2> fine_nbr_ids  = {3, 4};
 	int           coarse_nbr_id = 5;
-	auto          pinfo         = make_shared<PatchInfo<2>>();
-	pinfo->id                   = id;
-	pinfo->nbr_info[Side<2>::west().getIndex()]
-	= make_shared<CoarseNbrInfo<2>>(coarse_nbr_id, Orthant<1>::upper());
-	pinfo->nbr_info[Side<2>::south().getIndex()] = make_shared<FineNbrInfo<2>>(fine_nbr_ids);
-	pinfo->nbr_info[Side<2>::north().getIndex()] = make_shared<NormalNbrInfo<2>>(nbr_id);
+	PatchInfo<2>  pinfo;
+	pinfo.id = id;
+	pinfo.setNbrInfo(Side<2>::west(), new CoarseNbrInfo<1>(coarse_nbr_id, Orthant<1>::upper()));
+	pinfo.setNbrInfo(Side<2>::south(), new FineNbrInfo<1>(fine_nbr_ids));
+	pinfo.setNbrInfo(Side<2>::north(), new NormalNbrInfo<1>(nbr_id));
 
 	Schur::PatchIfaceInfo<2> piinfo(pinfo);
 
-	CHECK(piinfo.pinfo == pinfo);
+	CHECK(piinfo.pinfo.id == pinfo.id);
 
 	CHECK(piinfo.iface_info[Side<2>::west().getIndex()] != nullptr);
 	CHECK(piinfo.getIfaceInfo(Side<2>::west()) != nullptr);
@@ -194,12 +191,11 @@ TEST_CASE("Schur::PatchIfaceInfo serialization", "[Schur::PatchIfaceInfo]")
 	int           nbr_id        = 2;
 	array<int, 2> fine_nbr_ids  = {3, 4};
 	int           coarse_nbr_id = 5;
-	auto          pinfo         = make_shared<PatchInfo<2>>();
-	pinfo->id                   = id;
-	pinfo->nbr_info[Side<2>::west().getIndex()]
-	= make_shared<CoarseNbrInfo<2>>(coarse_nbr_id, Orthant<1>::upper());
-	pinfo->nbr_info[Side<2>::south().getIndex()] = make_shared<FineNbrInfo<2>>(fine_nbr_ids);
-	pinfo->nbr_info[Side<2>::north().getIndex()] = make_shared<NormalNbrInfo<2>>(nbr_id);
+	PatchInfo<2>  pinfo;
+	pinfo.id = id;
+	pinfo.setNbrInfo(Side<2>::west(), new CoarseNbrInfo<1>(coarse_nbr_id, Orthant<1>::upper()));
+	pinfo.setNbrInfo(Side<2>::south(), new FineNbrInfo<1>(fine_nbr_ids));
+	pinfo.setNbrInfo(Side<2>::north(), new NormalNbrInfo<1>(nbr_id));
 
 	Schur::PatchIfaceInfo<2> piinfo(pinfo);
 
@@ -208,7 +204,7 @@ TEST_CASE("Schur::PatchIfaceInfo serialization", "[Schur::PatchIfaceInfo]")
 	Schur::PatchIfaceInfo<2> out;
 	out.deserialize(buff);
 
-	CHECK(out.pinfo->id == pinfo->id);
+	CHECK(out.pinfo.id == pinfo.id);
 
 	CHECK(out.iface_info[Side<2>::west().getIndex()] != nullptr);
 	CHECK(out.getIfaceInfo(Side<2>::west()) != nullptr);

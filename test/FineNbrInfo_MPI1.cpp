@@ -1,10 +1,13 @@
-#include "catch.hpp"
 #include <ThunderEgg/PatchInfo.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("FineNbrInfo Serialization/Deserialization", "[FineNbrInfo]")
 {
-	FineNbrInfo<3> info;
+	FineNbrInfo<2> info;
 	info.ids[0]   = 1;
 	info.ids[1]   = 2;
 	info.ids[2]   = 3;
@@ -16,7 +19,7 @@ TEST_CASE("FineNbrInfo Serialization/Deserialization", "[FineNbrInfo]")
 	// serialize and then deserialize
 	char *buff = new char[info.serialize(nullptr)];
 	info.serialize(buff);
-	FineNbrInfo<3> out;
+	FineNbrInfo<2> out;
 	out.deserialize(buff);
 	delete[] buff;
 	REQUIRE(out.ids[0] == 1);
@@ -30,7 +33,7 @@ TEST_CASE("FineNbrInfo Serialization/Deserialization", "[FineNbrInfo]")
 }
 TEST_CASE("FineNbrInfo to_json", "[FineNbrInfo]")
 {
-	FineNbrInfo<3> info;
+	FineNbrInfo<2> info;
 	info.ids[0]   = GENERATE(1, 2);
 	info.ids[1]   = GENERATE(1, 2);
 	info.ids[2]   = GENERATE(1, 2);
@@ -72,7 +75,7 @@ TEST_CASE("FineNbrInfo from_json", "[FineNbrInfo]")
 	j["ids"]   = {id1, id2, id3, id4};
 	j["ranks"] = {rank1, rank2, rank3, rank4};
 
-	FineNbrInfo<3> info = j.get<FineNbrInfo<3>>();
+	FineNbrInfo<2> info = j.get<FineNbrInfo<2>>();
 	CHECK(info.ids[0] == id1);
 	CHECK(info.ids[1] == id2);
 	CHECK(info.ids[2] == id3);

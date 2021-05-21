@@ -20,12 +20,18 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/Schur/ValVectorGenerator.h>
+
 #include <limits>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 #define MESHES "mesh_inputs/2d_refined_east_1x2_mpi1.json", "mesh_inputs/2d_uniform_1x2_mpi1.json"
+
 TEST_CASE("Schur::ValVectorGenerator<2> works for various meshes", "[Schur::ValVectorGenerator]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);

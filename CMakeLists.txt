@@ -1,17 +1,17 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.14)
 project(ThunderEgg LANGUAGES C CXX)
 enable_testing()
 
 # set(CMAKE_CXX_EXTENSIONS OFF)
 include(GNUInstallDirs)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+include(cmake/options.cmake)
 
-# set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3") set
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -g -O0")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO
-    "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Wall -g -O3")
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+
+set(CMAKE_CXX_STANDARD 17)
+
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG true)
 
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
@@ -19,22 +19,26 @@ if(CCACHE_FOUND)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
 endif(CCACHE_FOUND)
-
 find_package(MPI REQUIRED)
 find_package(PETSc)
 find_package(FFTW)
-find_package(Zoltan)
-find_package(p4est)
 find_package(BLAS)
 find_package(LAPACK)
-if(p4est_FOUND)
-  find_package(sc REQUIRED)
-endif()
+
+if(NOT TARGET P4EST::P4EST)
+  include(cmake/p4est.cmake)
+endif(NOT TARGET P4EST::P4EST)
 
 add_subdirectory(tpl)
 add_subdirectory(src)
-add_subdirectory(apps)
-add_subdirectory(test)
+
+
+if(examples)
+  add_subdirectory(apps)
+endif(examples)
+if(unit_tests)
+  add_subdirectory(test)
+endif(unit_tests)
 
 find_package(Doxygen)
 if(Doxygen_FOUND)

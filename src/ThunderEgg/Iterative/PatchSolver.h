@@ -70,8 +70,9 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		 * @param pinfo the PatchInfo object for the patch
 		 * @param num_components the number of components for each cell
 		 */
-		SingleVG(std::shared_ptr<const PatchInfo<D>> pinfo, int num_components)
-		: lengths(pinfo->ns), num_ghost_cells(pinfo->num_ghost_cells),
+		SingleVG(const PatchInfo<D> &pinfo, int num_components)
+		: lengths(pinfo.ns),
+		  num_ghost_cells(pinfo.num_ghost_cells),
 		  num_components(num_components)
 		{
 		}
@@ -82,8 +83,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		 */
 		std::shared_ptr<Vector<D>> getNewVector() const override
 		{
-			return std::shared_ptr<Vector<D>>(
-			new ValVector<D>(MPI_COMM_SELF, lengths, num_ghost_cells, num_components, 1));
+			return std::shared_ptr<Vector<D>>(new ValVector<D>(MPI_COMM_SELF, lengths, num_ghost_cells, num_components, 1));
 		}
 	};
 	/**
@@ -118,10 +118,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		 *
 		 * @param ld_in the localdata for the patch
 		 */
-		SinglePatchVec(const std::vector<LocalData<D>> &lds)
-		: Vector<D>(MPI_COMM_SELF, lds.size(), 1, GetNumLocalCells(lds[0])), lds(lds)
-		{
-		}
+		SinglePatchVec(const std::vector<LocalData<D>> &lds) : Vector<D>(MPI_COMM_SELF, lds.size(), 1, GetNumLocalCells(lds[0])), lds(lds) {}
 		LocalData<D> getLocalData(int component_index, int local_patch_id) override
 		{
 			return lds[component_index];
@@ -145,7 +142,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		/**
 		 * @brief the PatchInfo object for the patch
 		 */
-		std::shared_ptr<const PatchInfo<D>> pinfo;
+		const PatchInfo<D> &pinfo;
 
 		public:
 		/**
@@ -154,11 +151,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		 * @param pinfo the patch that we want to operate on
 		 * @param op the operator
 		 */
-		SinglePatchOp(std::shared_ptr<const PatchInfo<D>>     pinfo,
-		              std::shared_ptr<const PatchOperator<D>> op)
-		: op(op), pinfo(pinfo)
-		{
-		}
+		SinglePatchOp(const PatchInfo<D> &pinfo, std::shared_ptr<const PatchOperator<D>> op) : op(op), pinfo(pinfo) {}
 		void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 		{
 			auto xs = x->getLocalDatas(0);
@@ -191,15 +184,14 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 	 * @param max_it_in the maximum number of iterations to use for patch solves
 	 * @param continue_on_breakdown continue on breakdown exception
 	 */
-	PatchSolver(std::shared_ptr<const Iterative::Solver<D>> solver,
-	            std::shared_ptr<const PatchOperator<D>> op_in, bool continue_on_breakdown = false)
-	: ThunderEgg::PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()), solver(solver),
-	  op(op_in), continue_on_breakdown(continue_on_breakdown)
+	PatchSolver(std::shared_ptr<const Iterative::Solver<D>> solver, std::shared_ptr<const PatchOperator<D>> op_in, bool continue_on_breakdown = false)
+	: ThunderEgg::PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()),
+	  solver(solver),
+	  op(op_in),
+	  continue_on_breakdown(continue_on_breakdown)
 	{
 	}
-	void solveSinglePatch(std::shared_ptr<const PatchInfo<D>> pinfo,
-	                      const std::vector<LocalData<D>> &   fs,
-	                      std::vector<LocalData<D>> &         us) const override
+	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &fs, std::vector<LocalData<D>> &us) const override
 	{
 		std::shared_ptr<SinglePatchOp>      single_op(new SinglePatchOp(pinfo, op));
 		std::shared_ptr<VectorGenerator<D>> vg(new SingleVG(pinfo, fs.size()));

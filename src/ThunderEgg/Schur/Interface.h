@@ -95,11 +95,7 @@ template <int D> class Interface : public Serializable
 		 * @param type the IfaceType of this interface on the cooresponding PatchIfaceInfo object.
 		 * @param piinfo the PatchIfaceInfo object
 		 */
-		SideTypePiinfo(Side<D> side, IfaceType<D> type,
-		               std::shared_ptr<const PatchIfaceInfo<D>> piinfo)
-		: side(side), type(type), piinfo(piinfo)
-		{
-		}
+		SideTypePiinfo(Side<D> side, IfaceType<D> type, std::shared_ptr<const PatchIfaceInfo<D>> piinfo) : side(side), type(type), piinfo(piinfo) {}
 	};
 	/**
 	 * @brief SideTypePiinfo structs associated with this interface.
@@ -129,7 +125,7 @@ template <int D> class Interface : public Serializable
 	 */
 	void insert(Side<D> s, std::shared_ptr<const PatchIfaceInfo<D>> piinfo)
 	{
-		NbrType nbr_type = piinfo->pinfo->getNbrType(s);
+		NbrType nbr_type = piinfo->pinfo.getNbrType(s);
 		if (nbr_type == NbrType::Normal) {
 			patches.emplace_back(s, IfaceType<D>::Normal(), piinfo);
 		} else if (nbr_type == NbrType::Fine) {
@@ -209,9 +205,11 @@ template <int D> class Interface : public Serializable
 	 * @param s the side of the patch that the interface is on
 	 * @param piinfo the PatchIfaceInfo object
 	 */
-	static void InsertPatchToInterface(
-	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map, int rank,
-	int id, Side<D> s, std::shared_ptr<const PatchIfaceInfo<D>> piinfo)
+	static void InsertPatchToInterface(std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
+	                                   int                                                          rank,
+	                                   int                                                          id,
+	                                   Side<D>                                                      s,
+	                                   std::shared_ptr<const PatchIfaceInfo<D>>                     piinfo)
 	{
 		std::shared_ptr<Interface<D>> &iface_ptr = rank_id_iface_map[rank][id];
 		if (iface_ptr == nullptr) {
@@ -228,16 +226,18 @@ template <int D> class Interface : public Serializable
 	 * @param piinfo the PatchIfaceInfo object
 	 * @param s the side of the patch that the interface is on
 	 */
-	static void InsertInterfaceWithNormalNbr(
-	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
-	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<D> s)
+	static void InsertInterfaceWithNormalNbr(std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
+	                                         std::set<int> &                                              incoming_procs,
+	                                         std::shared_ptr<const PatchIfaceInfo<D>>                     piinfo,
+	                                         Side<D>                                                      s)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		auto info = piinfo->getNormalIfaceInfo(s);
+		auto info     = piinfo->getNormalIfaceInfo(s);
+		auto nbr_info = piinfo->pinfo.getNormalNbrInfo(s);
 		InsertPatchToInterface(rank_id_iface_map, info->rank, info->id, s, piinfo);
-		if (info->rank == piinfo->pinfo->rank && info->nbr_info->rank != piinfo->pinfo->rank) {
-			incoming_procs.insert(info->nbr_info->rank);
+		if (info->rank == piinfo->pinfo.rank && nbr_info.rank != piinfo->pinfo.rank) {
+			incoming_procs.insert(nbr_info.rank);
 		}
 	}
 	/**
@@ -249,19 +249,19 @@ template <int D> class Interface : public Serializable
 	 * @param piinfo the PatchIfaceInfo object
 	 * @param s the side of the patch that the interface is on
 	 */
-	static void InsertInterfacesWithFineNbr(
-	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
-	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<D> s)
+	static void InsertInterfacesWithFineNbr(std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
+	                                        std::set<int> &                                              incoming_procs,
+	                                        std::shared_ptr<const PatchIfaceInfo<D>>                     piinfo,
+	                                        Side<D>                                                      s)
 	{
 		auto info = piinfo->getFineIfaceInfo(s);
 
 		InsertPatchToInterface(rank_id_iface_map, info->rank, info->id, s, piinfo);
 
 		for (size_t i = 0; i < Orthant<D - 1>::num_orthants; i++) {
-			InsertPatchToInterface(rank_id_iface_map, info->fine_ranks[i], info->fine_ids[i], s,
-			                       piinfo);
+			InsertPatchToInterface(rank_id_iface_map, info->fine_ranks[i], info->fine_ids[i], s, piinfo);
 
-			if (info->fine_ranks[i] != piinfo->pinfo->rank) {
+			if (info->fine_ranks[i] != piinfo->pinfo.rank) {
 				incoming_procs.insert(info->fine_ranks[i]);
 			}
 		}
@@ -275,16 +275,17 @@ template <int D> class Interface : public Serializable
 	 * @param piinfo the PatchIfaceInfo object
 	 * @param s the side of the patch that the interface is on
 	 */
-	static void InsertInterfacesWithCoarseNbr(
-	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
-	std::set<int> &incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<D> s)
+	static void InsertInterfacesWithCoarseNbr(std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
+	                                          std::set<int> &                                              incoming_procs,
+	                                          std::shared_ptr<const PatchIfaceInfo<D>>                     piinfo,
+	                                          Side<D>                                                      s)
 	{
 		auto info = piinfo->getCoarseIfaceInfo(s);
 
 		InsertPatchToInterface(rank_id_iface_map, info->rank, info->id, s, piinfo);
 		InsertPatchToInterface(rank_id_iface_map, info->coarse_rank, info->coarse_id, s, piinfo);
 
-		if (info->coarse_rank != piinfo->pinfo->rank) {
+		if (info->coarse_rank != piinfo->pinfo.rank) {
 			incoming_procs.insert(info->coarse_rank);
 		}
 	}
@@ -300,10 +301,9 @@ template <int D> class Interface : public Serializable
 	 * ranks will only contain the PatchIfaceInfo objects from this rank.
 	 * @param off_proc_piinfos a vector of piinfo objects received from other processors.
 	 */
-	static void EnumerateIfacesFromPiinfoVector(
-	std::vector<std::shared_ptr<const PatchIfaceInfo<D>>>        piinfos,
-	std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
-	std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &            off_proc_piinfos)
+	static void EnumerateIfacesFromPiinfoVector(std::vector<std::shared_ptr<const PatchIfaceInfo<D>>>        piinfos,
+	                                            std::map<int, std::map<int, std::shared_ptr<Interface<D>>>> &rank_id_iface_map,
+	                                            std::vector<std::shared_ptr<PatchIfaceInfo<D>>> &            off_proc_piinfos)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -311,19 +311,16 @@ template <int D> class Interface : public Serializable
 		std::set<int> incoming_procs;
 		for (auto piinfo : piinfos) {
 			for (Side<D> s : Side<D>::getValues()) {
-				if (piinfo->pinfo->hasNbr(s)) {
-					switch (piinfo->pinfo->getNbrType(s)) {
+				if (piinfo->pinfo.hasNbr(s)) {
+					switch (piinfo->pinfo.getNbrType(s)) {
 						case NbrType::Normal:
-							InsertInterfaceWithNormalNbr(rank_id_iface_map, incoming_procs, piinfo,
-							                             s);
+							InsertInterfaceWithNormalNbr(rank_id_iface_map, incoming_procs, piinfo, s);
 							break;
 						case NbrType::Fine:
-							InsertInterfacesWithFineNbr(rank_id_iface_map, incoming_procs, piinfo,
-							                            s);
+							InsertInterfacesWithFineNbr(rank_id_iface_map, incoming_procs, piinfo, s);
 							break;
 						case NbrType::Coarse:
-							InsertInterfacesWithCoarseNbr(rank_id_iface_map, incoming_procs, piinfo,
-							                              s);
+							InsertInterfacesWithCoarseNbr(rank_id_iface_map, incoming_procs, piinfo, s);
 							break;
 						default:
 							throw RuntimeError("Unsupported NbrType value");
@@ -366,15 +363,14 @@ template <int D> class Interface : public Serializable
 			MPI_Get_count(&status, MPI_BYTE, &size);
 			std::vector<char> buffer(size);
 
-			MPI_Recv(buffer.data(), size, MPI_BYTE, status.MPI_SOURCE, 0, MPI_COMM_WORLD,
-			         MPI_STATUS_IGNORE);
+			MPI_Recv(buffer.data(), size, MPI_BYTE, status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 			BufferReader reader(buffer.data());
 			while (reader.getPos() < size) {
 				Interface<D> ifs;
 				reader >> ifs;
 				for (auto &patch : ifs.patches) {
-					auto &ptr = id_to_off_proc_piinfo_map[patch.piinfo->pinfo->id];
+					auto &ptr = id_to_off_proc_piinfo_map[patch.piinfo->pinfo.id];
 					if (ptr == nullptr) {
 						// need to cast to remove const modifier
 						ptr = std::const_pointer_cast<PatchIfaceInfo<D>>(patch.piinfo);

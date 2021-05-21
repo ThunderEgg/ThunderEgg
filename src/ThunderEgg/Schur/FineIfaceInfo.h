@@ -45,16 +45,12 @@ template <int D> class FineIfaceInfo : public IfaceInfo<D>
 	 * @param s the side
 	 * @return int the id
 	 */
-	static int GetId(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
+	static int GetId(const PatchInfo<D> &pinfo, Side<D> s)
 	{
-		return (int) (pinfo->id * Side<D>::num_sides + s.getIndex());
+		return (int) (pinfo.id * Side<D>::number_of + s.getIndex());
 	}
 
 	public:
-	/**
-	 * @brief convenience pointer to associated NbrInfo object
-	 */
-	std::shared_ptr<FineNbrInfo<D>> nbr_info;
 	/**
 	 * @brief the ranks of the fine patches' interfaces
 	 */
@@ -79,12 +75,12 @@ template <int D> class FineIfaceInfo : public IfaceInfo<D>
 	 * @param pinfo the associated PatchInfo object
 	 * @param s the side of the patch that the interface is on
 	 */
-	FineIfaceInfo(std::shared_ptr<const PatchInfo<D>> pinfo, Side<D> s)
-	: IfaceInfo<D>(pinfo->rank, GetId(pinfo, s)), nbr_info(pinfo->getFineNbrInfoPtr(s))
+	FineIfaceInfo(const PatchInfo<D> &pinfo, Side<D> s) : IfaceInfo<D>(pinfo.rank, GetId(pinfo, s))
 	{
+		auto nbr_info = pinfo.getFineNbrInfo(s);
 		for (size_t i = 0; i < fine_ids.size(); i++) {
-			fine_ids[i]   = nbr_info->ids[i] * Side<D>::num_sides + s.opposite().getIndex();
-			fine_ranks[i] = nbr_info->ranks[i];
+			fine_ids[i]   = nbr_info.ids[i] * Side<D>::number_of + s.opposite().getIndex();
+			fine_ranks[i] = nbr_info.ranks[i];
 		}
 		fine_col_local_indexes.fill(-1);
 		fine_global_indexes.fill(-1);

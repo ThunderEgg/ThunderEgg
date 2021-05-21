@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_ORTHANT_H
 #define THUNDEREGG_ORTHANT_H
-#include <ThunderEgg/Side.h>
+#include <ThunderEgg/Face.h>
 #include <array>
 #include <iostream>
 #include <numeric>
@@ -337,6 +337,14 @@ template <int D> class Orthant
 		bool is_bit_set = val & (0x1 << idx);
 		return is_bit_set == remainder;
 	}
+	bool isHigherOnAxis(size_t axis) const
+	{
+		return val & (0b1 << axis);
+	}
+	bool isLowerOnAxis(size_t axis) const
+	{
+		return !(val & (0b1 << axis));
+	}
 	/**
 	 * @brief From the point of view of an axis, get orthant that this orthant lies on in the D-1
 	 * dimension
@@ -415,6 +423,25 @@ template <int D> class Orthant
 	}
 };
 
+/**
+ * @brief ostream operator that prints a string representation of Orthant<0> enum.
+ *
+ * For example, Orthant<0>::null() will print out "Orthant<0>::null()".
+ *
+ * @param os the ostream
+ * @param o the orthant
+ *
+ * @return  the ostream
+ */
+inline std::ostream &operator<<(std::ostream &os, const Orthant<0> &o)
+{
+	if (o == Orthant<0>::null()) {
+		os << "Orthant<0>::null()";
+	} else {
+		os << "Orthant<0> invalid value: " << o.getIndex();
+	}
+	return os;
+}
 /**
  * @brief ostream operator that prints a string representation of Orthant<1> enum.
  *
@@ -500,9 +527,11 @@ inline std::ostream &operator<<(std::ostream &os, const Orthant<3> &o)
 	}
 	return os;
 }
+void to_json(nlohmann::json &j, const Orthant<0> &o);
 void to_json(nlohmann::json &j, const Orthant<1> &o);
 void to_json(nlohmann::json &j, const Orthant<2> &o);
 void to_json(nlohmann::json &j, const Orthant<3> &o);
+void from_json(const nlohmann::json &j, Orthant<0> &o);
 void from_json(const nlohmann::json &j, Orthant<1> &o);
 void from_json(const nlohmann::json &j, Orthant<2> &o);
 void from_json(const nlohmann::json &j, Orthant<3> &o);

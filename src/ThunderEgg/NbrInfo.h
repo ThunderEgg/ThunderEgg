@@ -20,10 +20,7 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_NBRINFO_H
 #define THUNDEREGG_NBRINFO_H
-#include <ThunderEgg/NbrType.h>
-#include <ThunderEgg/Serializable.h>
-#include <deque>
-#include <map>
+#include <ThunderEgg/NbrInfoBase.h>
 
 namespace ThunderEgg
 {
@@ -31,40 +28,9 @@ namespace ThunderEgg
  * @brief Represents information about a patch's neighbor.
  *
  * Includes information like neighbor id and and indexes.
- *
- * @tparam D the number of Cartesian dimensions in a patch
  */
-template <int D> class NbrInfo : public Serializable
+template <int D> class NbrInfo : public NbrInfoBase
 {
-	public:
-	/**
-	 * @brief Destroy the NbrInfo object
-	 */
-	virtual ~NbrInfo() = default;
-	/**
-	 * @brief Get the NbrType
-	 */
-	virtual NbrType getNbrType() = 0;
-	/**
-	 * @brief Add to a deque of neighbor ids
-	 */
-	virtual void getNbrIds(std::deque<int> &nbr_ids) = 0;
-	/**
-	 * @brief Add to a deque of neighbor ranks
-	 */
-	virtual void getNbrRanks(std::deque<int> &nbr_ranks) = 0;
-	/**
-	 * @brief Set the local indexes in the NbrInfo objects
-	 *
-	 * @param rev_map map from id to local_index
-	 */
-	virtual void setGlobalIndexes(std::map<int, int> &rev_map) = 0;
-	/**
-	 * @brief Set the global indexes in the NbrInfo objects
-	 *
-	 * @param rev_map map from local_index to global_index
-	 */
-	virtual void setLocalIndexes(std::map<int, int> &rev_map) = 0;
 };
 } // namespace ThunderEgg
 #endif

@@ -21,16 +21,22 @@
 
 #include "../utils/DomainReader.h"
 #include "PatchSolverWrapper_MOCKS.h"
-#include "catch.hpp"
 #include <ThunderEgg/Schur/PatchSolverWrapper.h>
 #include <ThunderEgg/Schur/ValVectorGenerator.h>
 #include <ThunderEgg/ValVectorGenerator.h>
+
 #include <limits>
+
+#include <catch2/generators/catch_generators.hpp>
+#include <catch2/catch_approx.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+
 #define MESHES                                                                                     \
 	"mesh_inputs/2d_refined_east_1x2_east_on_1_mpi2.json",                                         \
 	"mesh_inputs/2d_uniform_1x2_east_on_1_mpi2.json"
+
 TEST_CASE("Schur::PatchSolverWrapper<2> throws exception for non-square patches",
           "[Schur::PatchSolverWrapper]")
 {
@@ -105,7 +111,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 		auto local_data = b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Approx(schur_fill_value - domain_fill_value));
+			               CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value));
 		               });
 	}
 }
@@ -141,7 +147,7 @@ TEST_CASE(
 		auto local_data = b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Approx(schur_fill_value - domain_fill_value));
+			               CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value));
 		               });
 	}
 }
@@ -201,7 +207,7 @@ TEST_CASE(
 		auto local_data = schur_b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Approx(domain_fill_value));
+			               CHECK(local_data[coord] == Catch::Approx(domain_fill_value));
 		               });
 	}
 }
@@ -236,7 +242,7 @@ TEST_CASE(
 		auto local_data = schur_b->getLocalData(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Approx(domain_fill_value));
+			               CHECK(local_data[coord] == Catch::Approx(domain_fill_value));
 		               });
 	}
 }

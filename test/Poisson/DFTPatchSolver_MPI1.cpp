@@ -20,18 +20,23 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include "catch.hpp"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/Poisson/DFTPatchSolver.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/ValVector.h>
+
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
-#define MESHES                                                                                     \
+
+#define MESHES \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
+
 TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::StarPatchOperator]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
@@ -40,8 +45,9 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::
 	auto ny = GENERATE(10, 13);
 	INFO("NX        " << nx);
 	INFO("NY        " << ny);
-	int    num_ghost = 1;
-	double errors[2];
+	int       num_ghost = 1;
+	bitset<4> neumann;
+	double    errors[2];
 	for (int i = 1; i <= 2; i++) {
 		INFO("MULT      " << i);
 		DomainReader<2>       domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
@@ -66,9 +72,9 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::
 		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
-		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-		auto p_solver   = make_shared<Poisson::DFTPatchSolver<2>>(p_operator);
+		auto p_solver   = make_shared<Poisson::DFTPatchSolver<2>>(p_operator, neumann);
 		p_operator->addDrichletBCToRHS(f_vec, gfun);
 
 		p_solver->smooth(f_vec, g_vec);
@@ -89,11 +95,12 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann 
 	auto ny = GENERATE(10, 13);
 	INFO("NX        " << nx);
 	INFO("NY        " << ny);
-	int    num_ghost = 1;
-	double errors[2];
+	int       num_ghost = 1;
+	bitset<4> neumann   = 0xF;
+	double    errors[2];
 	for (int i = 1; i <= 2; i++) {
 		INFO("MULT      " << i);
-		DomainReader<2>       domain_reader(mesh_file, {i * nx, i * ny}, num_ghost, true);
+		DomainReader<2>       domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
 		shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
 		auto ffun = [](const std::array<double, 2> &coord) {
@@ -125,9 +132,9 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann 
 		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
-		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-		auto p_solver   = make_shared<Poisson::DFTPatchSolver<2>>(p_operator);
+		auto p_solver   = make_shared<Poisson::DFTPatchSolver<2>>(p_operator, neumann);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
 		p_solver->smooth(f_vec, g_vec);
@@ -151,11 +158,12 @@ TEST_CASE(
 	auto ny = GENERATE(10, 13);
 	INFO("NX        " << nx);
 	INFO("NY        " << ny);
-	int    num_ghost = 1;
-	double errors[2];
+	int       num_ghost = 1;
+	bitset<4> neumann   = 0xF;
+	double    errors[2];
 	for (int i = 1; i <= 2; i++) {
 		INFO("MULT      " << i);
-		DomainReader<2>       domain_reader(mesh_file, {i * nx, i * ny}, num_ghost, true);
+		DomainReader<2>       domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
 		shared_ptr<Domain<2>> d_fine = domain_reader.getCoarserDomain();
 
 		auto ffun = [](const std::array<double, 2> &coord) {
@@ -187,9 +195,9 @@ TEST_CASE(
 		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
-		auto gf         = make_shared<BiLinearGhostFiller>(d_fine);
+		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-		auto p_solver   = make_shared<Poisson::DFTPatchSolver<2>>(p_operator);
+		auto p_solver   = make_shared<Poisson::DFTPatchSolver<2>>(p_operator, neumann);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
 		p_solver->smooth(f_vec, g_vec);

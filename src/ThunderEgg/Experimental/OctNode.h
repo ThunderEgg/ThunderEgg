@@ -56,7 +56,7 @@ template <int D> struct Node {
 	/**
 	 * @brief Array of neighbor ids, -1 if no neighbor
 	 */
-	std::array<int, Side<D>::num_sides> nbr_id;
+	std::array<int, Side<D>::number_of> nbr_id;
 	/**
 	 * @brief Array of child ids, -1 if no children
 	 */
@@ -86,8 +86,7 @@ template <int D> struct Node {
 		child_id.fill(-1);
 		for (size_t i = 0; i < D; i++) {
 			lengths[i] = parent.lengths[i] / 2;
-			starts[i]
-			= o.isOnSide(Side<D>(2 * i)) ? parent.starts[i] : (parent.starts[i] + this->lengths[i]);
+			starts[i]  = o.isOnSide(Side<D>(2 * i)) ? parent.starts[i] : (parent.starts[i] + this->lengths[i]);
 		}
 	}
 	/**

@@ -1,19 +1,25 @@
-#include "catch.hpp"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/ValVector.h>
+
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
+using namespace Catch;
+
 TEST_CASE("DomainTools::GetRealCoord 1D", "[getRealCoord][DomainTools]")
 {
-	std::shared_ptr<PatchInfo<1>> pinfo(new PatchInfo<1>());
+	PatchInfo<1> pinfo;
 
 	auto nx      = GENERATE(1, 2, 3, 10, 16, 17);
 	auto startx  = GENERATE(0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0);
 	auto lengthx = GENERATE(1.0, 0.23, 3.0);
 
-	pinfo->ns       = {nx};
-	pinfo->spacings = {lengthx / nx};
-	pinfo->starts   = {startx};
+	pinfo.ns       = {nx};
+	pinfo.spacings = {lengthx / nx};
+	pinfo.starts   = {startx};
 
 	for (int coordx = -1; coordx <= nx; coordx++) {
 		array<int, 1>    coord = {coordx};
@@ -34,7 +40,7 @@ TEST_CASE("DomainTools::GetRealCoord 1D", "[getRealCoord][DomainTools]")
 }
 TEST_CASE("DomainTools::GetRealCoord 2D", "[getRealCoord][DomainTools]")
 {
-	std::shared_ptr<PatchInfo<2>> pinfo(new PatchInfo<2>());
+	PatchInfo<2> pinfo;
 
 	auto nx      = 2;
 	auto ny      = GENERATE(1, 2, 3);
@@ -43,9 +49,9 @@ TEST_CASE("DomainTools::GetRealCoord 2D", "[getRealCoord][DomainTools]")
 	auto lengthx = 1.0;
 	auto lengthy = GENERATE(1.0, 0.23, 3.0);
 
-	pinfo->ns       = {nx, ny};
-	pinfo->spacings = {lengthx / nx, lengthy / ny};
-	pinfo->starts   = {startx, starty};
+	pinfo.ns       = {nx, ny};
+	pinfo.spacings = {lengthx / nx, lengthy / ny};
+	pinfo.starts   = {startx, starty};
 
 	for (int coordy = -1; coordy <= ny; coordy++) {
 		for (int coordx = -1; coordx <= nx; coordx++) {
@@ -76,7 +82,7 @@ TEST_CASE("DomainTools::GetRealCoord 2D", "[getRealCoord][DomainTools]")
 }
 TEST_CASE("DomainTools::GetRealCoord 3D", "[getRealCoord][DomainTools]")
 {
-	std::shared_ptr<PatchInfo<3>> pinfo(new PatchInfo<3>());
+	PatchInfo<3> pinfo;
 
 	auto nx      = 2;
 	auto ny      = 2;
@@ -88,9 +94,9 @@ TEST_CASE("DomainTools::GetRealCoord 3D", "[getRealCoord][DomainTools]")
 	auto lengthy = 1.0;
 	auto lengthz = GENERATE(1.0, 0.23, 3.0);
 
-	pinfo->ns       = {nx, ny, nz};
-	pinfo->spacings = {lengthx / nx, lengthy / ny, lengthz / nz};
-	pinfo->starts   = {startx, starty, startz};
+	pinfo.ns       = {nx, ny, nz};
+	pinfo.spacings = {lengthx / nx, lengthy / ny, lengthz / nz};
+	pinfo.starts   = {startx, starty, startz};
 
 	for (int coordz = -1; coordz <= nz; coordz++) {
 		for (int coordy = -1; coordy <= ny; coordy++) {
@@ -131,15 +137,15 @@ TEST_CASE("DomainTools::GetRealCoord 3D", "[getRealCoord][DomainTools]")
 }
 TEST_CASE("DomainTools::getRealCoordGhost 1D", "[getRealCoordGhost][DomainTools]")
 {
-	std::shared_ptr<PatchInfo<1>> pinfo(new PatchInfo<1>());
+	PatchInfo<1> pinfo;
 
 	auto nx      = GENERATE(1, 2, 3, 10, 16, 17);
 	auto startx  = GENERATE(0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0);
 	auto lengthx = GENERATE(1.0, 0.23, 3.0);
 
-	pinfo->ns       = {nx};
-	pinfo->spacings = {lengthx / nx};
-	pinfo->starts   = {startx};
+	pinfo.ns       = {nx};
+	pinfo.spacings = {lengthx / nx};
+	pinfo.starts   = {startx};
 
 	for (int coordx = -1; coordx <= nx; coordx++) {
 		array<int, 1>    coord = {coordx};
@@ -154,7 +160,7 @@ TEST_CASE("DomainTools::getRealCoordGhost 1D", "[getRealCoordGhost][DomainTools]
 }
 TEST_CASE("DomainTools::getRealCoordGhost 2D", "[getRealCoordGhost][DomainTools]")
 {
-	std::shared_ptr<PatchInfo<2>> pinfo(new PatchInfo<2>());
+	PatchInfo<2> pinfo;
 
 	auto nx      = 2;
 	auto ny      = GENERATE(1, 2, 3);
@@ -163,9 +169,9 @@ TEST_CASE("DomainTools::getRealCoordGhost 2D", "[getRealCoordGhost][DomainTools]
 	auto lengthx = 1.0;
 	auto lengthy = GENERATE(1.0, 0.23, 3.0);
 
-	pinfo->ns       = {nx, ny};
-	pinfo->spacings = {lengthx / nx, lengthy / ny};
-	pinfo->starts   = {startx, starty};
+	pinfo.ns       = {nx, ny};
+	pinfo.spacings = {lengthx / nx, lengthy / ny};
+	pinfo.starts   = {startx, starty};
 
 	for (int coordy = -1; coordy <= ny; coordy++) {
 		for (int coordx = -1; coordx <= nx; coordx++) {
@@ -184,7 +190,7 @@ TEST_CASE("DomainTools::getRealCoordGhost 2D", "[getRealCoordGhost][DomainTools]
 }
 TEST_CASE("DomainTools::getRealCoordGhost 3D", "[getRealCoordGhost][DomainTools]")
 {
-	std::shared_ptr<PatchInfo<3>> pinfo(new PatchInfo<3>());
+	PatchInfo<3> pinfo;
 
 	auto nx      = 2;
 	auto ny      = 2;
@@ -196,9 +202,9 @@ TEST_CASE("DomainTools::getRealCoordGhost 3D", "[getRealCoordGhost][DomainTools]
 	auto lengthy = 1.0;
 	auto lengthz = GENERATE(1.0, 0.23, 3.0);
 
-	pinfo->ns       = {nx, ny, nz};
-	pinfo->spacings = {lengthx / nx, lengthy / ny, lengthz / nz};
-	pinfo->starts   = {startx, starty, startz};
+	pinfo.ns       = {nx, ny, nz};
+	pinfo.spacings = {lengthx / nx, lengthy / ny, lengthz / nz};
+	pinfo.starts   = {startx, starty, startz};
 
 	for (int coordz = -1; coordz <= nz; coordz++) {
 		for (int coordy = -1; coordy <= ny; coordy++) {
@@ -221,15 +227,15 @@ TEST_CASE("DomainTools::getRealCoordGhost 3D", "[getRealCoordGhost][DomainTools]
 }
 TEST_CASE("DomainTools::GetRealCoordBound 1D", "[DomainTools]")
 {
-	std::shared_ptr<PatchInfo<1>> pinfo(new PatchInfo<1>());
+	PatchInfo<1> pinfo;
 
 	auto nx      = GENERATE(1, 2, 3, 10, 16, 17);
 	auto startx  = GENERATE(0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0);
 	auto lengthx = GENERATE(1.0, 0.23, 3.0);
 
-	pinfo->ns       = {nx};
-	pinfo->spacings = {lengthx / nx};
-	pinfo->starts   = {startx};
+	pinfo.ns       = {nx};
+	pinfo.spacings = {lengthx / nx};
+	pinfo.starts   = {startx};
 
 	std::array<int, 0>    coord;
 	std::array<double, 1> result;
@@ -240,7 +246,7 @@ TEST_CASE("DomainTools::GetRealCoordBound 1D", "[DomainTools]")
 }
 TEST_CASE("DomainTools::GetRealCoordBound 2D", "[getRealCoord][DomainTools]")
 {
-	std::shared_ptr<PatchInfo<2>> pinfo(new PatchInfo<2>());
+	PatchInfo<2> pinfo;
 
 	auto nx      = 2;
 	auto ny      = GENERATE(1, 2, 3);
@@ -249,9 +255,9 @@ TEST_CASE("DomainTools::GetRealCoordBound 2D", "[getRealCoord][DomainTools]")
 	auto lengthx = 1.0;
 	auto lengthy = GENERATE(1.0, 0.23, 3.0);
 
-	pinfo->ns       = {nx, ny};
-	pinfo->spacings = {lengthx / nx, lengthy / ny};
-	pinfo->starts   = {startx, starty};
+	pinfo.ns       = {nx, ny};
+	pinfo.spacings = {lengthx / nx, lengthy / ny};
+	pinfo.starts   = {startx, starty};
 
 	for (int coordx = -1; coordx <= nx; coordx++) {
 		array<double, 2> expected;
@@ -301,23 +307,22 @@ TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 1> coord) { return coord[0]; };
 
-	map<int, shared_ptr<PatchInfo<1>>> pinfo_map;
+	vector<PatchInfo<1>> pinfos(1);
 
 	auto nx        = GENERATE(1, 2, 10, 13);
 	auto startx    = GENERATE(0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0);
 	auto spacingx  = GENERATE(0.01, 1.0, 3.14);
 	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<1>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx};
-	pinfo_map[0]->spacings        = {spacingx};
-	pinfo_map[0]->starts          = {startx};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx};
+	pinfos[0].spacings        = {spacingx};
+	pinfos[0].starts          = {startx};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<1>> d(new Domain<1>(0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<1>> vec(
-	new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<1>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	DomainTools::SetValues<1>(d, vec, f);
 	auto ld = vec->getLocalData(0, 0);
@@ -326,7 +331,7 @@ TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
 			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
 		} else {
 			std::array<double, 1> real_coord;
-			DomainTools::GetRealCoord<1>(pinfo_map[0], coord, real_coord);
+			DomainTools::GetRealCoord<1>(pinfos[0], coord, real_coord);
 			CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 		}
 	});
@@ -335,23 +340,22 @@ TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 1> coord) { return coord[0] * coord[0]; };
 
-	map<int, shared_ptr<PatchInfo<1>>> pinfo_map;
+	vector<PatchInfo<1>> pinfos(1);
 
 	auto nx        = GENERATE(1, 2, 10, 13);
 	auto startx    = GENERATE(0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0);
 	auto spacingx  = GENERATE(0.01, 1.0, 3.14);
 	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<1>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx};
-	pinfo_map[0]->spacings        = {spacingx};
-	pinfo_map[0]->starts          = {startx};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx};
+	pinfos[0].spacings        = {spacingx};
+	pinfos[0].starts          = {startx};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<1>> d(new Domain<1>(0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<1>> vec(
-	new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<1>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	DomainTools::SetValues<1>(d, vec, f);
 	auto ld = vec->getLocalData(0, 0);
@@ -360,7 +364,7 @@ TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
 			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
 		} else {
 			std::array<double, 1> real_coord;
-			DomainTools::GetRealCoord<1>(pinfo_map[0], coord, real_coord);
+			DomainTools::GetRealCoord<1>(pinfos[0], coord, real_coord);
 			CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 		}
 	});
@@ -369,7 +373,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    nx        = 3;
 	auto   ny        = GENERATE(1, 2, 10, 13);
@@ -379,16 +383,15 @@ TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 	auto   spacingy  = GENERATE(0.01, 1.0, 3.14);
 	auto   num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<2>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx, ny};
-	pinfo_map[0]->spacings        = {spacingx, spacingy};
-	pinfo_map[0]->starts          = {startx, starty};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx, ny};
+	pinfos[0].spacings        = {spacingx, spacingy};
+	pinfos[0].starts          = {startx, starty};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	DomainTools::SetValues<2>(d, vec, f);
 	auto ld = vec->getLocalData(0, 0);
@@ -397,7 +400,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
 		} else {
 			std::array<double, 2> real_coord;
-			DomainTools::GetRealCoord<2>(pinfo_map[0], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
 			CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 		}
 	});
@@ -407,7 +410,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 	auto g = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    nx        = 3;
 	auto   ny        = GENERATE(1, 2, 10, 13);
@@ -417,16 +420,15 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
 	auto   spacingy  = GENERATE(0.01, 1.0, 3.14);
 	auto   num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<2>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx, ny};
-	pinfo_map[0]->spacings        = {spacingx, spacingy};
-	pinfo_map[0]->starts          = {startx, starty};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx, ny};
+	pinfos[0].spacings        = {spacingx, spacingy};
+	pinfos[0].starts          = {startx, starty};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 2, 1));
+	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 2, 1));
 
 	DomainTools::SetValues<2>(d, vec, f, g);
 	auto ld = vec->getLocalData(0, 0);
@@ -435,7 +437,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
 			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
 		} else {
 			std::array<double, 2> real_coord;
-			DomainTools::GetRealCoord<2>(pinfo_map[0], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
 			CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 		}
 	});
@@ -445,7 +447,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
 			CHECK(ld2[coord] + 100 == Approx(0.0 + 100));
 		} else {
 			std::array<double, 2> real_coord;
-			DomainTools::GetRealCoord<2>(pinfo_map[0], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
 			CHECK(ld2[coord] + 100 == Approx(g(real_coord) + 100));
 		}
 	});
@@ -454,7 +456,7 @@ TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    nx        = 3;
 	auto   ny        = GENERATE(1, 2, 10, 13);
@@ -464,16 +466,15 @@ TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 	auto   spacingy  = GENERATE(0.01, 1.0, 3.14);
 	auto   num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<2>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx, ny};
-	pinfo_map[0]->spacings        = {spacingx, spacingy};
-	pinfo_map[0]->starts          = {startx, starty};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx, ny};
+	pinfos[0].spacings        = {spacingx, spacingy};
+	pinfos[0].starts          = {startx, starty};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	DomainTools::SetValues<2>(d, vec, f);
 	auto ld = vec->getLocalData(0, 0);
@@ -482,7 +483,7 @@ TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 			CHECK(ld[coord] + 100 == Approx(0.0 + 100));
 		} else {
 			std::array<double, 2> real_coord;
-			DomainTools::GetRealCoord<2>(pinfo_map[0], coord, real_coord);
+			DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
 			CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 		}
 	});
@@ -491,29 +492,28 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 1> coord) { return coord[0]; };
 
-	map<int, shared_ptr<PatchInfo<1>>> pinfo_map;
+	vector<PatchInfo<1>> pinfos(1);
 
 	auto nx        = GENERATE(1, 2, 10, 13);
 	auto startx    = GENERATE(0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0);
 	auto spacingx  = GENERATE(0.01, 1.0, 3.14);
 	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<1>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx};
-	pinfo_map[0]->spacings        = {spacingx};
-	pinfo_map[0]->starts          = {startx};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx};
+	pinfos[0].spacings        = {spacingx};
+	pinfos[0].starts          = {startx};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<1>> d(new Domain<1>(0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<1>> vec(
-	new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<1>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	DomainTools::SetValuesWithGhost<1>(d, vec, f);
 	auto ld = vec->getLocalData(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		std::array<double, 1> real_coord;
-		DomainTools::GetRealCoordGhost<1>(pinfo_map[0], coord, real_coord);
+		DomainTools::GetRealCoordGhost<1>(pinfos[0], coord, real_coord);
 		CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 	});
 }
@@ -521,29 +521,28 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 1> coord) { return coord[0] * coord[0]; };
 
-	map<int, shared_ptr<PatchInfo<1>>> pinfo_map;
+	vector<PatchInfo<1>> pinfos(1);
 
 	auto nx        = GENERATE(1, 2, 10, 13);
 	auto startx    = GENERATE(0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0);
 	auto spacingx  = GENERATE(0.01, 1.0, 3.14);
 	auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<1>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx};
-	pinfo_map[0]->spacings        = {spacingx};
-	pinfo_map[0]->starts          = {startx};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(pinfo_map, {nx}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx};
+	pinfos[0].spacings        = {spacingx};
+	pinfos[0].starts          = {startx};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<1>> d(new Domain<1>(0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<1>> vec(
-	new ValVector<1>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<1>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	DomainTools::SetValuesWithGhost<1>(d, vec, f);
 	auto ld = vec->getLocalData(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		std::array<double, 1> real_coord;
-		DomainTools::GetRealCoordGhost<1>(pinfo_map[0], coord, real_coord);
+		DomainTools::GetRealCoordGhost<1>(pinfos[0], coord, real_coord);
 		CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 	});
 }
@@ -551,7 +550,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    nx        = 3;
 	auto   ny        = GENERATE(1, 2, 10, 13);
@@ -561,22 +560,21 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
 	auto   spacingy  = GENERATE(0.01, 1.0, 3.14);
 	auto   num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<2>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx, ny};
-	pinfo_map[0]->spacings        = {spacingx, spacingy};
-	pinfo_map[0]->starts          = {startx, starty};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx, ny};
+	pinfos[0].spacings        = {spacingx, spacingy};
+	pinfos[0].starts          = {startx, starty};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	DomainTools::SetValuesWithGhost<2>(d, vec, f);
 	auto ld = vec->getLocalData(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		std::array<double, 2> real_coord;
-		DomainTools::GetRealCoordGhost<2>(pinfo_map[0], coord, real_coord);
+		DomainTools::GetRealCoordGhost<2>(pinfos[0], coord, real_coord);
 		CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 	});
 }
@@ -585,7 +583,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y", "[DomainTools]")
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 	auto g = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    nx        = 3;
 	auto   ny        = GENERATE(1, 2, 10, 13);
@@ -595,28 +593,27 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y", "[DomainTools]")
 	auto   spacingy  = GENERATE(0.01, 1.0, 3.14);
 	auto   num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<2>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx, ny};
-	pinfo_map[0]->spacings        = {spacingx, spacingy};
-	pinfo_map[0]->starts          = {startx, starty};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx, ny};
+	pinfos[0].spacings        = {spacingx, spacingy};
+	pinfos[0].starts          = {startx, starty};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 2, 1));
+	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 2, 1));
 
 	DomainTools::SetValuesWithGhost<2>(d, vec, f, g);
 	auto ld = vec->getLocalData(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		std::array<double, 2> real_coord;
-		DomainTools::GetRealCoordGhost<2>(pinfo_map[0], coord, real_coord);
+		DomainTools::GetRealCoordGhost<2>(pinfos[0], coord, real_coord);
 		CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 	});
 	auto ld2 = vec->getLocalData(1, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		std::array<double, 2> real_coord;
-		DomainTools::GetRealCoordGhost<2>(pinfo_map[0], coord, real_coord);
+		DomainTools::GetRealCoordGhost<2>(pinfos[0], coord, real_coord);
 		CHECK(ld2[coord] + 100 == Approx(g(real_coord) + 100));
 	});
 }
@@ -626,7 +623,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D throws when too many functions are
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 	auto g = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    nx        = 3;
 	auto   ny        = GENERATE(1, 2, 10, 13);
@@ -636,16 +633,15 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D throws when too many functions are
 	auto   spacingy  = GENERATE(0.01, 1.0, 3.14);
 	auto   num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<2>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx, ny};
-	pinfo_map[0]->spacings        = {spacingx, spacingy};
-	pinfo_map[0]->starts          = {startx, starty};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx, ny};
+	pinfos[0].spacings        = {spacingx, spacingy};
+	pinfos[0].starts          = {startx, starty};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	CHECK_THROWS_AS(DomainTools::SetValuesWithGhost<2>(d, vec, f, g), RuntimeError);
 }
@@ -654,7 +650,7 @@ TEST_CASE("DomainTools::setValues 2D throws when too many functions are given", 
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 	auto g = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    nx        = 3;
 	auto   ny        = GENERATE(1, 2, 10, 13);
@@ -664,16 +660,15 @@ TEST_CASE("DomainTools::setValues 2D throws when too many functions are given", 
 	auto   spacingy  = GENERATE(0.01, 1.0, 3.14);
 	auto   num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<2>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx, ny};
-	pinfo_map[0]->spacings        = {spacingx, spacingy};
-	pinfo_map[0]->starts          = {startx, starty};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx, ny};
+	pinfos[0].spacings        = {spacingx, spacingy};
+	pinfos[0].starts          = {startx, starty};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	CHECK_THROWS_AS(DomainTools::SetValues<2>(d, vec, f, g), RuntimeError);
 }
@@ -681,7 +676,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
 {
 	auto f = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
-	map<int, shared_ptr<PatchInfo<2>>> pinfo_map;
+	vector<PatchInfo<2>> pinfos(1);
 
 	int    nx        = 3;
 	auto   ny        = GENERATE(1, 2, 10, 13);
@@ -691,22 +686,21 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
 	auto   spacingy  = GENERATE(0.01, 1.0, 3.14);
 	auto   num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
 
-	pinfo_map[0].reset(new PatchInfo<2>());
-	pinfo_map[0]->id              = 0;
-	pinfo_map[0]->ns              = {nx, ny};
-	pinfo_map[0]->spacings        = {spacingx, spacingy};
-	pinfo_map[0]->starts          = {startx, starty};
-	pinfo_map[0]->num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(pinfo_map, {nx, ny}, num_ghost));
+	pinfos[0].id              = 0;
+	pinfos[0].ns              = {nx, ny};
+	pinfos[0].spacings        = {spacingx, spacingy};
+	pinfos[0].starts          = {startx, starty};
+	pinfos[0].num_ghost_cells = num_ghost;
+	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfo_map[0]->ns, num_ghost, 1, 1));
+	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
 
 	DomainTools::SetValuesWithGhost<2>(d, vec, f);
 	auto ld = vec->getLocalData(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		std::array<double, 2> real_coord;
-		DomainTools::GetRealCoordGhost<2>(pinfo_map[0], coord, real_coord);
+		DomainTools::GetRealCoordGhost<2>(pinfos[0], coord, real_coord);
 		CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 	});
 }

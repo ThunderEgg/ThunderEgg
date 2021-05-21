@@ -49,6 +49,14 @@ template <int D> class InterLevelComm
 {
 	private:
 	/**
+	 * @brief The coarser domain
+	 */
+	std::shared_ptr<const Domain<D>> coarser_domain;
+	/**
+	 * @brief The finer domain
+	 */
+	std::shared_ptr<const Domain<D>> finer_domain;
+	/**
 	 * @brief Dimensions of a patch
 	 */
 	std::array<int, D> ns;
@@ -74,14 +82,14 @@ template <int D> class InterLevelComm
 	 * First value: local index of coarser patch
 	 * Second value: the PatchInfo object
 	 */
-	std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> patches_with_local_parent;
+	std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> patches_with_local_parent;
 	/**
 	 * @brief Patches with a ghost parent
 	 *
 	 * First value: local index in the ghost vector of coarser patch
 	 * Second value: the PatchInfo object
 	 */
-	std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> patches_with_ghost_parent;
+	std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> patches_with_ghost_parent;
 	/**
 	 * @brief A vector of pairs where the first value is the rank, and the second vector is the
 	 * local_indexes of patches in the order that the other processor is expecting them.
@@ -111,9 +119,11 @@ template <int D> class InterLevelComm
 	 * @param num_coarser_components the number of components for eac cell of the coarser domain
 	 * @param fine_domain the finer DomainCollection.
 	 */
-	InterLevelComm(std::shared_ptr<const Domain<D>> coarser_domain, int num_coarser_components,
-	               std::shared_ptr<const Domain<D>> finer_domain)
-	: ns(finer_domain->getNs()), num_ghost_cells(finer_domain->getNumGhostCells()),
+	InterLevelComm(std::shared_ptr<const Domain<D>> coarser_domain, int num_coarser_components, std::shared_ptr<const Domain<D>> finer_domain)
+	: coarser_domain(coarser_domain),
+	  finer_domain(finer_domain),
+	  ns(finer_domain->getNs()),
+	  num_ghost_cells(finer_domain->getNumGhostCells()),
 	  num_components(num_coarser_components)
 	{
 		int my_patch_size = num_components;
@@ -123,38 +133,39 @@ template <int D> class InterLevelComm
 		patch_size = my_patch_size;
 
 		// sort into patches with local parents and patches with ghost parents
-		std::deque<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> local_parents;
-		std::deque<std::shared_ptr<const PatchInfo<D>>>                 ghost_parents;
-		std::set<int>                                                   ghost_parents_ids;
+		std::deque<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> local_parents;
+		std::deque<std::reference_wrapper<const PatchInfo<D>>>                 ghost_parents;
+		std::set<int>                                                          ghost_parents_ids;
 
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		// TODO this has to be changed when domain class is updated
-		auto cd_map = coarser_domain->getPatchInfoMap();
-		for (auto patch : finer_domain->getPatchInfoVector()) {
-			if (patch->parent_rank == rank) {
-				local_parents.emplace_back(cd_map.at(patch->parent_id)->local_index, patch);
+		std::map<int, int> coarser_domain_id_to_local_index_map;
+		for (const PatchInfo<D> &pinfo : coarser_domain->getPatchInfoVector()) {
+			coarser_domain_id_to_local_index_map[pinfo.id] = pinfo.local_index;
+		}
+		for (const PatchInfo<D> &patch : finer_domain->getPatchInfoVector()) {
+			if (patch.parent_rank == rank) {
+				local_parents.emplace_back(coarser_domain_id_to_local_index_map[patch.parent_id], patch);
 			} else {
 				ghost_parents.push_back(patch);
-				ghost_parents_ids.insert(patch->parent_id);
+				ghost_parents_ids.insert(patch.parent_id);
 			}
 		}
 		num_ghost_patches = ghost_parents_ids.size();
 
 		// fill in local vector
 		patches_with_local_parent
-		= std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>>(local_parents.begin(),
-		                                                                   local_parents.end());
+		= std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>(local_parents.begin(), local_parents.end());
 		// find local coarse patches that are ghost paches on other ranks
-		std::map<int, std::map<int, int>>
-		ranks_and_local_patches; // map from rank -> (map of ids -> local
-		                         // indexes). The second map is for when
-		                         // local indexes are iterated over, they
-		                         // are sorted by their cooresponding id
-		for (auto pinfo : coarser_domain->getPatchInfoVector()) {
-			for (int child_rank : pinfo->child_ranks) {
+		std::map<int, std::map<int, int>> ranks_and_local_patches; // map from rank -> (map of ids -> local
+		                                                           // indexes). The second map is for when
+		                                                           // local indexes are iterated over, they
+		                                                           // are sorted by their cooresponding id
+		for (const PatchInfo<D> &pinfo : coarser_domain->getPatchInfoVector()) {
+			for (int child_rank : pinfo.child_ranks) {
 				if (child_rank != -1 && child_rank != rank)
-					ranks_and_local_patches[child_rank][pinfo->id] = pinfo->local_index;
+					ranks_and_local_patches[child_rank][pinfo.id] = pinfo.local_index;
 			}
 		}
 
@@ -179,16 +190,16 @@ template <int D> class InterLevelComm
 			index++;
 		}
 
-		std::map<int, std::map<int, int>>
-		ranks_and_ghost_patches; // map from rank -> (map of ids -> ghost
-		                         // indexes). The second map is for when
-		                         // local indexes are iterated over, they
-		                         // are sorted by their cooresponding id
+		std::map<int, std::map<int, int>> ranks_and_ghost_patches; // map from rank -> (map of ids -> ghost
+		                                                           // indexes). The second map is for when
+		                                                           // local indexes are iterated over, they
+		                                                           // are sorted by their cooresponding id
 		patches_with_ghost_parent.reserve(ghost_parents.size());
-		for (auto patch : ghost_parents) {
-			int ghost_local_index = id_ghost_vector_local_index_map[patch->parent_id];
+		for (auto patch_ref_wrap : ghost_parents) {
+			const PatchInfo<D> &patch             = patch_ref_wrap.get();
+			int                 ghost_local_index = id_ghost_vector_local_index_map[patch.parent_id];
 
-			ranks_and_ghost_patches[patch->parent_rank][patch->parent_id] = ghost_local_index;
+			ranks_and_ghost_patches[patch.parent_rank][patch.parent_id] = ghost_local_index;
 
 			patches_with_ghost_parent.emplace_back(ghost_local_index, patch);
 		}
@@ -225,8 +236,7 @@ template <int D> class InterLevelComm
 	 */
 	std::shared_ptr<Vector<D>> getNewGhostVector() const
 	{
-		return std::make_shared<ValVector<D>>(MPI_COMM_SELF, ns, num_ghost_cells, num_components,
-		                                      num_ghost_patches);
+		return std::make_shared<ValVector<D>>(MPI_COMM_SELF, ns, num_ghost_cells, num_components, num_ghost_patches);
 	}
 
 	/**
@@ -234,12 +244,11 @@ template <int D> class InterLevelComm
 	 *
 	 * The vector will consist of pair values:
 	 * 		- First value: the local index of the parent patch
-	 * 		- First value: the finer patch associated with that index
+	 * 		- Second value: the local index of the child patch
 	 *
-	 * @return const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>>& the vector
+	 * @return const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& the vector
 	 */
-	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &
-	getPatchesWithLocalParent() const
+	const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &getPatchesWithLocalParent() const
 	{
 		return patches_with_local_parent;
 	}
@@ -249,12 +258,11 @@ template <int D> class InterLevelComm
 	 *
 	 * The vector will consist of pair values:
 	 * 		- First value: the local index in the ghost vector of the parent patch
-	 * 		- First value: the finer patch associated with that index
+	 * 		- Second value: the local index of the child patch
 	 *
-	 * @return const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>>& the vector
+	 * @return const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& the vector
 	 */
-	const std::vector<std::pair<int, std::shared_ptr<const PatchInfo<D>>>> &
-	getPatchesWithGhostParent() const
+	const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &getPatchesWithGhostParent() const
 	{
 		return patches_with_ghost_parent;
 	}
@@ -271,16 +279,13 @@ template <int D> class InterLevelComm
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
 	 */
-	void sendGhostPatchesStart(std::shared_ptr<Vector<D>>       vector,
-	                           std::shared_ptr<const Vector<D>> ghost_vector)
+	void sendGhostPatchesStart(std::shared_ptr<Vector<D>> vector, std::shared_ptr<const Vector<D>> ghost_vector)
 	{
 		if (communicating) {
 			if (sending) {
-				throw RuntimeError(
-				"InterLevelComm has a sendGhostPatches posted that is unfinished");
+				throw RuntimeError("InterLevelComm has a sendGhostPatches posted that is unfinished");
 			} else {
-				throw RuntimeError(
-				"InterLevelComm has a getGhostPatches posted that is unfinished");
+				throw RuntimeError("InterLevelComm has a getGhostPatches posted that is unfinished");
 			}
 		}
 
@@ -298,8 +303,7 @@ template <int D> class InterLevelComm
 			// post the receive
 			int rank = rank_indexes_pair.first;
 			recv_requests.emplace_back();
-			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0,
-			          MPI_COMM_WORLD, &recv_requests.back());
+			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0, MPI_COMM_WORLD, &recv_requests.back());
 		}
 		send_buffers.reserve(rank_and_local_indexes_for_ghost_vector.size());
 		send_requests.reserve(rank_and_local_indexes_for_ghost_vector.size());
@@ -313,19 +317,17 @@ template <int D> class InterLevelComm
 			for (int local_index : rank_indexes_pair.second) {
 				auto local_datas = ghost_vector->getLocalDatas(local_index);
 				for (const auto &local_data : local_datas) {
-					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               send_buffers.back()[buffer_idx] = local_data[coord];
-						               buffer_idx++;
-					               });
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(), [&](const std::array<int, D> &coord) {
+						send_buffers.back()[buffer_idx] = local_data[coord];
+						buffer_idx++;
+					});
 				}
 			}
 
 			// post the send
 			int rank = rank_indexes_pair.first;
 			send_requests.emplace_back();
-			MPI_Isend(send_buffers.back().data(), send_buffers.back().size(), MPI_DOUBLE, rank, 0,
-			          MPI_COMM_WORLD, &send_requests.back());
+			MPI_Isend(send_buffers.back().data(), send_buffers.back().size(), MPI_DOUBLE, rank, 0, MPI_COMM_WORLD, &send_requests.back());
 		}
 
 		// set state
@@ -344,15 +346,12 @@ template <int D> class InterLevelComm
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
 	 */
-	void sendGhostPatchesFinish(std::shared_ptr<Vector<D>>       vector,
-	                            std::shared_ptr<const Vector<D>> ghost_vector)
+	void sendGhostPatchesFinish(std::shared_ptr<Vector<D>> vector, std::shared_ptr<const Vector<D>> ghost_vector)
 	{
 		if (!communicating) {
-			throw RuntimeError(
-			"InterLevelComm cannot finish sendGhostPatches since communication was not started");
+			throw RuntimeError("InterLevelComm cannot finish sendGhostPatches since communication was not started");
 		} else if (!sending) {
-			throw RuntimeError(
-			"InterLevelComm sendGhostPatchesFinish is being called after getGhostPatchesStart was called");
+			throw RuntimeError("InterLevelComm sendGhostPatchesFinish is being called after getGhostPatchesStart was called");
 		}
 		if (vector != current_vector) {
 			throw RuntimeError(
@@ -366,12 +365,10 @@ template <int D> class InterLevelComm
 		// finish recvs
 		for (size_t i = 0; i < rank_and_local_indexes_for_vector.size(); i++) {
 			int finished_idx;
-			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx,
-			            MPI_STATUS_IGNORE);
+			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx, MPI_STATUS_IGNORE);
 
 			// get local indexes for the buffer that was received
-			std::vector<int> &local_indexes
-			= rank_and_local_indexes_for_vector.at(finished_idx).second;
+			const std::vector<int> &local_indexes = rank_and_local_indexes_for_vector.at(finished_idx).second;
 
 			// add the values in the buffer to the vector
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
@@ -379,11 +376,10 @@ template <int D> class InterLevelComm
 			for (int local_index : local_indexes) {
 				auto local_datas = vector->getLocalDatas(local_index);
 				for (auto &local_data : local_datas) {
-					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               local_data[coord] += buffer[buffer_idx];
-						               buffer_idx++;
-					               });
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(), [&](const std::array<int, D> &coord) {
+						local_data[coord] += buffer[buffer_idx];
+						buffer_idx++;
+					});
 				}
 			}
 		}
@@ -414,16 +410,13 @@ template <int D> class InterLevelComm
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
 	 */
-	void getGhostPatchesStart(std::shared_ptr<const Vector<D>> vector,
-	                          std::shared_ptr<Vector<D>>       ghost_vector)
+	void getGhostPatchesStart(std::shared_ptr<const Vector<D>> vector, std::shared_ptr<Vector<D>> ghost_vector)
 	{
 		if (communicating) {
 			if (sending) {
-				throw RuntimeError(
-				"InterLevelComm has a sendGhostPatches posted that is unfinished");
+				throw RuntimeError("InterLevelComm has a sendGhostPatches posted that is unfinished");
 			} else {
-				throw RuntimeError(
-				"InterLevelComm has a getGhostPatches posted that is unfinished");
+				throw RuntimeError("InterLevelComm has a getGhostPatches posted that is unfinished");
 			}
 		}
 
@@ -441,8 +434,7 @@ template <int D> class InterLevelComm
 			// post the recieve
 			int rank = rank_indexes_pair.first;
 			recv_requests.emplace_back();
-			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0,
-			          MPI_COMM_WORLD, &recv_requests.back());
+			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0, MPI_COMM_WORLD, &recv_requests.back());
 		}
 		send_buffers.reserve(rank_and_local_indexes_for_vector.size());
 		send_requests.reserve(rank_and_local_indexes_for_vector.size());
@@ -456,19 +448,17 @@ template <int D> class InterLevelComm
 			for (int local_index : rank_indexes_pair.second) {
 				auto local_datas = vector->getLocalDatas(local_index);
 				for (const auto &local_data : local_datas) {
-					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               send_buffers.back()[buffer_idx] = local_data[coord];
-						               buffer_idx++;
-					               });
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(), [&](const std::array<int, D> &coord) {
+						send_buffers.back()[buffer_idx] = local_data[coord];
+						buffer_idx++;
+					});
 				}
 			}
 
 			// post the send
 			int rank = rank_indexes_pair.first;
 			send_requests.emplace_back();
-			MPI_Isend(send_buffers.back().data(), send_buffers.back().size(), MPI_DOUBLE, rank, 0,
-			          MPI_COMM_WORLD, &send_requests.back());
+			MPI_Isend(send_buffers.back().data(), send_buffers.back().size(), MPI_DOUBLE, rank, 0, MPI_COMM_WORLD, &send_requests.back());
 		}
 
 		// set state
@@ -487,15 +477,12 @@ template <int D> class InterLevelComm
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
 	 */
-	void getGhostPatchesFinish(std::shared_ptr<const Vector<D>> vector,
-	                           std::shared_ptr<Vector<D>>       ghost_vector)
+	void getGhostPatchesFinish(std::shared_ptr<const Vector<D>> vector, std::shared_ptr<Vector<D>> ghost_vector)
 	{
 		if (!communicating) {
-			throw RuntimeError(
-			"InterLevelComm cannot finish sendGhostPatches since communication was not started");
+			throw RuntimeError("InterLevelComm cannot finish sendGhostPatches since communication was not started");
 		} else if (sending) {
-			throw RuntimeError(
-			"InterLevelComm getGhostPatchesFinish is being called after sendGhostPatchesStart was called");
+			throw RuntimeError("InterLevelComm getGhostPatchesFinish is being called after sendGhostPatchesStart was called");
 		}
 		if (vector != current_vector) {
 			throw RuntimeError(
@@ -509,12 +496,10 @@ template <int D> class InterLevelComm
 		// finish recvs
 		for (size_t i = 0; i < rank_and_local_indexes_for_ghost_vector.size(); i++) {
 			int finished_idx;
-			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx,
-			            MPI_STATUS_IGNORE);
+			MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx, MPI_STATUS_IGNORE);
 
 			// get local indexes for the buffer that was recieved
-			std::vector<int> &local_indexes
-			= rank_and_local_indexes_for_ghost_vector.at(finished_idx).second;
+			const std::vector<int> &local_indexes = rank_and_local_indexes_for_ghost_vector.at(finished_idx).second;
 
 			// add the values in the buffer to the vector
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
@@ -522,11 +507,10 @@ template <int D> class InterLevelComm
 			for (int local_index : local_indexes) {
 				auto local_datas = ghost_vector->getLocalDatas(local_index);
 				for (auto &local_data : local_datas) {
-					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               local_data[coord] = buffer[buffer_idx];
-						               buffer_idx++;
-					               });
+					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(), [&](const std::array<int, D> &coord) {
+						local_data[coord] = buffer[buffer_idx];
+						buffer_idx++;
+					});
 				}
 			}
 		}
