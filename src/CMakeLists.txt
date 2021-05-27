@@ -122,8 +122,6 @@ if(FFTW_FOUND)
   list(APPEND ThunderEgg_Libs ${FFTW_LIBRARIES})
   list(APPEND ThunderEgg_Includes ${FFTW_INCLUDES})
 endif(FFTW_FOUND)
-list(APPEND ThunderEgg_Libs ${BLAS_LIBRARIES})
-list(APPEND ThunderEgg_Libs ${LAPACK_LIBRARIES})
 
 target_include_directories(ThunderEgg PUBLIC ${ThunderEgg_Includes})
 target_include_directories(ThunderEgg PUBLIC
@@ -137,7 +135,14 @@ if(TARGET P4EST::P4EST)
   target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
 endif(TARGET P4EST::P4EST)
 
+if(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
+  target_link_libraries(ThunderEgg PUBLIC LAPACK::LAPACK)
+  target_link_libraries(ThunderEgg PUBLIC BLAS::BLAS)
+endif(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
+
+
 target_link_libraries(ThunderEgg PUBLIC MPI::MPI_CXX)
+
 
 install(
   TARGETS ThunderEgg

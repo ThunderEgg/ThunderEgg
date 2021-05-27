@@ -1,8 +1,10 @@
 list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/StarPatchOperator.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/StarPatchOperator.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/DFTPatchSolver.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/DFTPatchSolver.cpp)
+if(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
+  list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/DFTPatchSolver.h)
+  list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/DFTPatchSolver.cpp)
+endif(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
 
 if(FFTW_FOUND)
 
