@@ -48,7 +48,7 @@ function(add_mpi_test ARG1)
     parseandaddcatchtests(unit_tests_mpi${ARG1})
   endif()
 
-  if(TEST_MPI${ARG1}_PETSC_SRC AND PETSC_FOUND)
+  if(TEST_MPI${ARG1}_PETSC_SRC AND TARGET PETSC::PETSC)
     add_executable(
       unit_tests_petsc_mpi${ARG1} ${TEST_MPI${ARG1}_PETSC_SRC} test_PETSC.cpp)
     

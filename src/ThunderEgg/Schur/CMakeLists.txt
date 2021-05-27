@@ -23,6 +23,6 @@ list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchSolverWrapper.cpp)
 
 list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/ValVectorGenerator.h)
 
-if(PETSC_FOUND)
+if(TARGET PETSC::PETSC)
   list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/VecWrapperGenerator.h)
-endif(PETSC_FOUND)
+endif(TARGET PETSC::PETSC)

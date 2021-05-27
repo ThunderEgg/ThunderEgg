@@ -13,7 +13,7 @@ if(TARGET FFTW::FFTW)
 
 endif(TARGET FFTW::FFTW)
 
-if(PETSC_FOUND)
+if(TARGET PETSC::PETSC)
   if(TARGET FFTW::FFTW)
     list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/FastSchurMatrixAssemble2D.h)
     list(APPEND ThunderEgg_SRCS
@@ -30,4 +30,4 @@ if(PETSC_FOUND)
   list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/MatrixHelper2d.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/MatrixHelper2d.cpp)
 
-endif(PETSC_FOUND)
+endif(TARGET PETSC::PETSC)

@@ -114,18 +114,6 @@ add_library(ThunderEgg ${ThunderEgg_SRCS} ${ThunderEgg_HDRS})
 target_include_directories(
   ThunderEgg PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-list(APPEND ThunderEgg_Includes ${PETSC_INCLUDES})
-
-# set link list(APPEND ThunderEgg_Libs ${MPI_CXX_LIBRARIES})
-list(APPEND ThunderEgg_Libs ${PETSC_LIBRARIES})
-
-target_include_directories(ThunderEgg PUBLIC ${ThunderEgg_Includes})
-target_include_directories(ThunderEgg PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-  $<INSTALL_INTERFACE:include>  
-)
-target_link_libraries(ThunderEgg PUBLIC ${ThunderEgg_Libs})
-target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
 
 if(TARGET P4EST::P4EST)
   target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
@@ -134,6 +122,10 @@ endif(TARGET P4EST::P4EST)
 if(TARGET FFTW::FFTW)
   target_link_libraries(ThunderEgg PUBLIC FFTW::FFTW)
 endif(TARGET FFTW::FFTW)
+
+if(TARGET PETSC::PETSC)
+  target_link_libraries(ThunderEgg PUBLIC PETSC::PETSC)
+endif(TARGET PETSC::PETSC)
 
 if(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
   target_link_libraries(ThunderEgg PUBLIC LAPACK::LAPACK)
