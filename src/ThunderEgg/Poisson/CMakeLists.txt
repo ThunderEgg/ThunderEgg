@@ -6,15 +6,15 @@ if(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
   list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/DFTPatchSolver.cpp)
 endif(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
 
-if(FFTW_FOUND)
+if(TARGET FFTW::FFTW)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/FFTWPatchSolver.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/FFTWPatchSolver.cpp)
 
-endif(FFTW_FOUND)
+endif(TARGET FFTW::FFTW)
 
 if(PETSC_FOUND)
-  if(FFTW_FOUND)
+  if(TARGET FFTW::FFTW)
     list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/FastSchurMatrixAssemble2D.h)
     list(APPEND ThunderEgg_SRCS
                 ThunderEgg/Poisson/FastSchurMatrixAssemble2D.cpp)
@@ -22,7 +22,7 @@ if(PETSC_FOUND)
     list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/FastSchurMatrixAssemble3D.h)
     list(APPEND ThunderEgg_SRCS
                 ThunderEgg/Poisson/FastSchurMatrixAssemble3D.cpp)
-  endif(FFTW_FOUND)
+  endif(TARGET FFTW::FFTW)
 
   list(APPEND ThunderEgg_HDRS ThunderEgg/Poisson/MatrixHelper.h)
   list(APPEND ThunderEgg_SRCS ThunderEgg/Poisson/MatrixHelper.cpp)

@@ -118,10 +118,6 @@ list(APPEND ThunderEgg_Includes ${PETSC_INCLUDES})
 
 # set link list(APPEND ThunderEgg_Libs ${MPI_CXX_LIBRARIES})
 list(APPEND ThunderEgg_Libs ${PETSC_LIBRARIES})
-if(FFTW_FOUND)
-  list(APPEND ThunderEgg_Libs ${FFTW_LIBRARIES})
-  list(APPEND ThunderEgg_Includes ${FFTW_INCLUDES})
-endif(FFTW_FOUND)
 
 target_include_directories(ThunderEgg PUBLIC ${ThunderEgg_Includes})
 target_include_directories(ThunderEgg PUBLIC
@@ -134,6 +130,10 @@ target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
 if(TARGET P4EST::P4EST)
   target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
 endif(TARGET P4EST::P4EST)
+
+if(TARGET FFTW::FFTW)
+  target_link_libraries(ThunderEgg PUBLIC FFTW::FFTW)
+endif(TARGET FFTW::FFTW)
 
 if(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
   target_link_libraries(ThunderEgg PUBLIC LAPACK::LAPACK)
