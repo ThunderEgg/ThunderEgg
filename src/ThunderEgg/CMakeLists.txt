@@ -30,6 +30,8 @@ list(APPEND ThunderEgg_HDRS FineNbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS GhostFiller.h)
 
+list(APPEND ThunderEgg_HDRS GhostFillingType.h)
+
 list(APPEND ThunderEgg_HDRS Loops.h)
 
 list(APPEND ThunderEgg_HDRS LocalData.h)
