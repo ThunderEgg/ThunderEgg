@@ -160,7 +160,7 @@ install(
 install(
   FILES ${ThunderEgg_HDRS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-}
+)
 
 install(EXPORT ThunderEggConfig DESTINATION share/ThunderEgg/cmake)
 
