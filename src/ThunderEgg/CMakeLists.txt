@@ -35,6 +35,8 @@ list(APPEND ThunderEgg_HDRS Loops.h)
 list(APPEND ThunderEgg_HDRS LocalData.h)
 target_sources(ThunderEgg PRIVATE LocalData.cpp)
 
+list(APPEND ThunderEgg_HDRS LocalDataManager.h)
+
 list(APPEND ThunderEgg_HDRS MPIGhostFiller.h)
 target_sources(ThunderEgg PRIVATE MPIGhostFiller.cpp)
 
