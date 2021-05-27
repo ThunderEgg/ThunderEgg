@@ -1,115 +1,13 @@
-# -- determine sources and public headers first
+# -- add library
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/BiLinearGhostFiller.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/BiLinearGhostFiller.cpp)
+add_library(ThunderEgg)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/BiQuadraticGhostFiller.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/BiQuadraticGhostFiller.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/BreakdownError.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/BufferReader.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/BufferWriter.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/CoarseNbrInfo.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/DivergenceError.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/DimensionalArray.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Domain.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Domain.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/DomainGenerator.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/DomainTools.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Face.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Face.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/FineNbrInfo.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/GhostFiller.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Loops.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/LocalData.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/LocalData.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/MPIGhostFiller.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/MPIGhostFiller.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/NormalNbrInfo.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/NbrType.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/NbrInfo.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/NbrInfoBase.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Operator.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Orthant.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Orthant.cpp)
-
-if(TARGET P4EST::P4EST)
-
-  list(APPEND ThunderEgg_HDRS ThunderEgg/P4estDomainGenerator.h)
-  list(APPEND ThunderEgg_SRCS ThunderEgg/P4estDomainGenerator.cpp)
-
-  list(APPEND ThunderEgg_HDRS ThunderEgg/P8estDomainGenerator.h)
-  list(APPEND ThunderEgg_SRCS ThunderEgg/P8estDomainGenerator.cpp)
-
-endif(TARGET P4EST::P4EST)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/PatchInfo.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/PatchInfo.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/PatchOperator.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/PatchOperator.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/PatchSolver.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/RuntimeError.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Serializable.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Timer.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Timer.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/TriLinearGhostFiller.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/TriLinearGhostFiller.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/TypeDefs.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/ValVector.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/ValVector.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/ValVectorGenerator.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/ValVectorGenerator.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/Vector.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Vector.cpp)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/VectorGenerator.h)
-
-list(APPEND ThunderEgg_HDRS ThunderEgg/tpl/json.hpp)
-
-include(ThunderEgg/Experimental/CMakeLists.txt)
-include(ThunderEgg/GMG/CMakeLists.txt)
-include(ThunderEgg/PETSc/CMakeLists.txt)
-include(ThunderEgg/Poisson/CMakeLists.txt)
-include(ThunderEgg/Schur/CMakeLists.txt)
-include(ThunderEgg/VarPoisson/CMakeLists.txt)
-include(ThunderEgg/Iterative/CMakeLists.txt)
-
-add_library(ThunderEgg ${ThunderEgg_SRCS})
+add_subdirectory(ThunderEgg)
 
 # -- generate the single header ThunderEgg.h
 
 set(ThunderEgg_HDRS_String "")
-foreach(HDR ${ThunderEgg_HDRS})
+foreach(HDR ${ALL_ThunderEgg_HDRS})
   set(ThunderEgg_HDRS_String "${ThunderEgg_HDRS_String}\n#include<${HDR}>")
 endforeach(HDR)
 configure_file("ThunderEgg.h.in" "ThunderEgg.h")
@@ -120,8 +18,9 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.h"
 # -- set include directories
 
 target_include_directories(
-  ThunderEgg INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-                       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  ThunderEgg PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+                    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 # -- link libraries
@@ -153,13 +52,6 @@ install(
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
-# -- install public headers
-
-install(
-  FILES ${ThunderEgg_HDRS}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(EXPORT ThunderEggConfig DESTINATION share/ThunderEgg/cmake)
