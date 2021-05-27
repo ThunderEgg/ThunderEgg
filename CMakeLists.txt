@@ -20,7 +20,11 @@ if(CCACHE_FOUND)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
 endif(CCACHE_FOUND)
 find_package(MPI REQUIRED)
-find_package(PETSc)
+
+if(NOT disable_petsc)
+  find_package(PETSc)
+endif(NOT disable_petsc)
+
 find_package(FFTW)
 find_package(BLAS)
 find_package(LAPACK)
