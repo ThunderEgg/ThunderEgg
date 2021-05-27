@@ -1,6 +1,5 @@
-project(ThunderEgg_Lib)
+# -- determine sources and public headers first
 
-# determine sources first
 list(APPEND ThunderEgg_HDRS ThunderEgg/BiLinearGhostFiller.h)
 list(APPEND ThunderEgg_SRCS ThunderEgg/BiLinearGhostFiller.cpp)
 
@@ -105,15 +104,27 @@ include(ThunderEgg/Schur/CMakeLists.txt)
 include(ThunderEgg/VarPoisson/CMakeLists.txt)
 include(ThunderEgg/Iterative/CMakeLists.txt)
 
-add_library(ThunderEgg ${ThunderEgg_SRCS} ${ThunderEgg_HDRS})
+add_library(ThunderEgg ${ThunderEgg_SRCS})
 
-# foreach(HDR ${ThunderEgg_HDRS}) get_filename_component(DIR ${HDR} PATH)
-# file(COPY ${HDR} DESTINATION include/${DIR}) endforeach()
+# -- generate the single header ThunderEgg.h
 
-# set include directories
+set(ThunderEgg_HDRS_String "")
+foreach(HDR ${ThunderEgg_HDRS})
+  set(ThunderEgg_HDRS_String "${ThunderEgg_HDRS_String}\n#include<${HDR}>")
+endforeach(HDR)
+configure_file("ThunderEgg.h.in" "ThunderEgg.h")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.h"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+
+# -- set include directories
+
 target_include_directories(
-  ThunderEgg PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-                    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+  ThunderEgg INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                       $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+# -- link libraries
 
 if(TARGET P4EST::P4EST)
   target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
@@ -132,39 +143,35 @@ if(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
   target_link_libraries(ThunderEgg PUBLIC BLAS::BLAS)
 endif(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
 
-
 target_link_libraries(ThunderEgg PUBLIC MPI::MPI_CXX)
 
+# -- install
 
 install(
   TARGETS ThunderEgg
   EXPORT ThunderEggConfig
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
 
+# -- install public headers
 
-set(ThunderEgg_HDRS_String "")
-foreach(HDR ${ThunderEgg_HDRS})
-  set(ThunderEgg_HDRS_String "${ThunderEgg_HDRS_String}\n#include<${HDR}>")
-endforeach(HDR)
-configure_file("ThunderEgg.h.in" "ThunderEgg.h")
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.h"
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(
-  DIRECTORY ThunderEgg/
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg
-  FILES_MATCHING
-  PATTERN "*.h"
-  PATTERN "*.hpp")
+  FILES ${ThunderEgg_HDRS}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+}
 
 install(EXPORT ThunderEggConfig DESTINATION share/ThunderEgg/cmake)
+
+# -- generate a pkgconfig file
 
 include(PkgConfigHandler)
 configure_pc_file("ThunderEgg" "ThunderEgg.pc.in" "ThunderEgg.pc")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.pc"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-# imported target, for use from FetchContent
+# -- imported target, for use from FetchContent
+
 add_library(ThunderEgg::ThunderEgg INTERFACE IMPORTED GLOBAL)
 target_link_libraries(ThunderEgg::ThunderEgg INTERFACE ThunderEgg)
