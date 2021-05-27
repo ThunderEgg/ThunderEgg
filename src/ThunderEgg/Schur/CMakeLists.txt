@@ -6,6 +6,8 @@ unset(ThunderEgg_HDRS)
 
 list(APPEND ThunderEgg_HDRS CoarseIfaceInfo.h)
 
+list(APPEND ThunderEgg_HDRS FineIfaceInfo.h)
+
 list(APPEND ThunderEgg_HDRS IfaceInfo.h)
 
 list(APPEND ThunderEgg_HDRS IfaceType.h)
@@ -13,10 +15,10 @@ list(APPEND ThunderEgg_HDRS IfaceType.h)
 list(APPEND ThunderEgg_HDRS Interface.h)
 target_sources(ThunderEgg PRIVATE Interface.cpp)
 
-list(APPEND ThunderEgg_HDRS NormalIfaceInfo.h)
-
 list(APPEND ThunderEgg_HDRS InterfaceDomain.h)
 target_sources(ThunderEgg PRIVATE InterfaceDomain.cpp)
+
+list(APPEND ThunderEgg_HDRS NormalIfaceInfo.h)
 
 list(APPEND ThunderEgg_HDRS PatchIfaceInfo.h)
 target_sources(ThunderEgg PRIVATE PatchIfaceInfo.cpp)

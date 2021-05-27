@@ -40,13 +40,13 @@ list(APPEND ThunderEgg_HDRS LocalDataManager.h)
 list(APPEND ThunderEgg_HDRS MPIGhostFiller.h)
 target_sources(ThunderEgg PRIVATE MPIGhostFiller.cpp)
 
-list(APPEND ThunderEgg_HDRS NormalNbrInfo.h)
-
-list(APPEND ThunderEgg_HDRS NbrType.h)
-
 list(APPEND ThunderEgg_HDRS NbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS NbrInfoBase.h)
+
+list(APPEND ThunderEgg_HDRS NbrType.h)
+
+list(APPEND ThunderEgg_HDRS NormalNbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS Operator.h)
 
