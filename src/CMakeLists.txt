@@ -114,7 +114,6 @@ add_library(ThunderEgg ${ThunderEgg_SRCS} ${ThunderEgg_HDRS})
 target_include_directories(
   ThunderEgg PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-list(APPEND ThunderEgg_Includes ${MPI_C_INCLUDE_PATH})
 list(APPEND ThunderEgg_Includes ${PETSC_INCLUDES})
 
 # set link list(APPEND ThunderEgg_Libs ${MPI_CXX_LIBRARIES})
@@ -132,15 +131,13 @@ target_include_directories(ThunderEgg PUBLIC
   $<INSTALL_INTERFACE:include>  
 )
 target_link_libraries(ThunderEgg PUBLIC ${ThunderEgg_Libs})
-target_link_libraries(ThunderEgg PUBLIC ${MPI_C_LIBRARIES})
 target_link_libraries(ThunderEgg PUBLIC ${CMAKE_DL_LIBS})
 
 if(TARGET P4EST::P4EST)
   target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
 endif(TARGET P4EST::P4EST)
-if(TARGET P4EST::P8EST)
-  target_link_libraries(ThunderEgg PUBLIC P4EST::P8EST)
-endif(TARGET P4EST::P8EST)
+
+target_link_libraries(ThunderEgg PUBLIC MPI::MPI_CXX)
 
 install(
   TARGETS ThunderEgg
@@ -172,5 +169,5 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.pc"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 # imported target, for use from FetchContent
-add_library(THUNDEREGG::THUNDEREGG INTERFACE IMPORTED GLOBAL)
-target_link_libraries(THUNDEREGG::THUNDEREGG INTERFACE ThunderEgg)
+add_library(ThunderEgg::ThunderEgg INTERFACE IMPORTED GLOBAL)
+target_link_libraries(ThunderEgg::ThunderEgg INTERFACE ThunderEgg)
