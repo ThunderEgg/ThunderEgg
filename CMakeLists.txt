@@ -71,6 +71,19 @@ endif()
 
 include(CMakePackageConfigHelpers)
 
+if(TARGET FFTW::FFTW)
+  set(THUNDEREGG_FFTW_ENABLED TRUE)
+endif()
+if(TARGET P4EST::P4EST)
+  set(THUNDEREGG_P4EST_ENABLED TRUE)
+endif()
+if(TARGET BLAS::BLAS AND TARGET LAPACK::LAPACK)
+  set(THUNDEREGG_LAPACK_ENABLED TRUE)
+endif()
+if(TARGET PETSC::PETSC)
+  set(THUNDEREGG_PETSC_ENABLED TRUE)
+endif()
+
 configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/Config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake
   INSTALL_DESTINATION lib)
