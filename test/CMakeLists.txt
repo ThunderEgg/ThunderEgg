@@ -12,11 +12,11 @@ FetchContent_MakeAvailable(catch2)
 include(CTest)
 include(ParseAndAddCatchTests)
 
-add_executable(unit_tests_mpi1 test.cpp)
-add_executable(unit_tests_mpi2 test.cpp)
-add_executable(unit_tests_mpi3 test.cpp)
+add_executable(unit_tests_mpi1)
+add_executable(unit_tests_mpi2)
+add_executable(unit_tests_mpi3)
 
-add_library(test_shared)
+add_library(test_shared test.cpp)
 
 # -- add subdirectories
 
