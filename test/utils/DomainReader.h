@@ -49,7 +49,7 @@ class DomainReader
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 		nlohmann::json j;
-		std::ifstream  input_stream(file_name);
+		std::ifstream  input_stream(TEST_DIRECTORY "/" + file_name);
 		if (!input_stream.good()) {
 			throw "could not open file";
 		}

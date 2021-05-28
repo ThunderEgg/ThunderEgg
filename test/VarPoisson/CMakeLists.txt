@@ -1,0 +1,1 @@
+target_sources(unit_tests_mpi1 PRIVATE StarPatchOperator_MPI1.cpp)

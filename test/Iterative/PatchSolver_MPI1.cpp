@@ -1,5 +1,5 @@
+#include "../utils/DomainReader.h"
 #include "PatchSolver_MOCKS.h"
-#include "utils/DomainReader.h"
 #include <ThunderEgg/Iterative/PatchSolver.h>
 #include <ThunderEgg/ValVector.h>
 
