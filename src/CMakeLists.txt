@@ -26,7 +26,7 @@ target_include_directories(
 # -- link libraries
 
 if(TARGET P4EST::P4EST)
-  target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST)
+  target_link_libraries(ThunderEgg PUBLIC P4EST::P4EST SC::SC)
 endif(TARGET P4EST::P4EST)
 
 if(TARGET FFTW::FFTW)

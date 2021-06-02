@@ -16,5 +16,6 @@ endif()
 if(@THUNDEREGG_PETSC_ENABLED@)
     find_dependency(PETSC)
 endif()
+find_dependency(MPI)
 
 check_required_components(@PROJECT_NAME@)
