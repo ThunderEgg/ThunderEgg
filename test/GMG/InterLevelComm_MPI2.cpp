@@ -146,7 +146,7 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 
 	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
+		auto local_datas = coarse_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -155,7 +155,7 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 		               });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
+		auto local_datas = ghost_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -168,7 +168,7 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
-		auto local_datas = coarse_vec->getLocalDatas(0);
+		auto local_datas = coarse_vec->getViews(0);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -345,7 +345,7 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 
 	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
+		auto local_datas = coarse_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -354,7 +354,7 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 		               });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
+		auto local_datas = ghost_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -368,7 +368,7 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
-		auto local_datas = ghost_vec->getLocalDatas(0);
+		auto local_datas = ghost_vec->getViews(0);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -620,7 +620,7 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 
 		// fill vectors with rank+c+1
 		for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-			auto local_datas = coarse_vec->getLocalDatas(i);
+			auto local_datas = coarse_vec->getViews(i);
 			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 			               [&](const std::array<int, 2> &coord) {
 				               for (int c = 0; c < num_components; c++) {
@@ -629,7 +629,7 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 			               });
 		}
 		for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-			auto local_datas = ghost_vec->getLocalDatas(i);
+			auto local_datas = ghost_vec->getViews(i);
 			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 			               [&](const std::array<int, 2> &coord) {
 				               for (int c = 0; c < num_components; c++) {
@@ -643,7 +643,7 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 		if (rank == 0) {
 		} else {
 			// the coarse vec should be filled with 1+c
-			auto local_datas = ghost_vec->getLocalDatas(0);
+			auto local_datas = ghost_vec->getViews(0);
 			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 			               [&](const std::array<int, 2> &coord) {
 				               for (int c = 0; c < num_components; c++) {
@@ -675,7 +675,7 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 
 		// fill vectors with rank+1
 		for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-			auto local_datas = coarse_vec->getLocalDatas(i);
+			auto local_datas = coarse_vec->getViews(i);
 			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 			               [&](const std::array<int, 2> &coord) {
 				               for (int c = 0; c < num_components; c++) {
@@ -684,7 +684,7 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 			               });
 		}
 		for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-			auto local_datas = ghost_vec->getLocalDatas(i);
+			auto local_datas = ghost_vec->getViews(i);
 			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 			               [&](const std::array<int, 2> &coord) {
 				               for (int c = 0; c < num_components; c++) {
@@ -697,7 +697,7 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 		ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 		if (rank == 0) {
 			// the coarse vec should be filled with 3+2*c
-			auto local_datas = coarse_vec->getLocalDatas(0);
+			auto local_datas = coarse_vec->getViews(0);
 			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 			               [&](const std::array<int, 2> &coord) {
 				               for (int c = 0; c < num_components; c++) {
@@ -732,7 +732,7 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 
 	// fill vectors with rank+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
+		auto local_datas = coarse_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -741,7 +741,7 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 		               });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
+		auto local_datas = ghost_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -754,7 +754,7 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
-		auto local_datas = coarse_vec->getLocalDatas(0);
+		auto local_datas = coarse_vec->getViews(0);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -769,7 +769,7 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 
 	// fill vectors with rank+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
+		auto local_datas = coarse_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -778,7 +778,7 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 		               });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
+		auto local_datas = ghost_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -792,7 +792,7 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
-		auto local_datas = ghost_vec->getLocalDatas(0);
+		auto local_datas = ghost_vec->getViews(0);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -822,7 +822,7 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 
 	// fill vectors with rank+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
+		auto local_datas = coarse_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -831,7 +831,7 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 		               });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
+		auto local_datas = ghost_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -845,7 +845,7 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
-		auto local_datas = ghost_vec->getLocalDatas(0);
+		auto local_datas = ghost_vec->getViews(0);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -856,7 +856,7 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 
 	// fill vectors with rank+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
+		auto local_datas = coarse_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -865,7 +865,7 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 		               });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
+		auto local_datas = ghost_vec->getViews(i);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {
@@ -878,7 +878,7 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
-		auto local_datas = coarse_vec->getLocalDatas(0);
+		auto local_datas = coarse_vec->getViews(0);
 		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
 		               [&](const std::array<int, 2> &coord) {
 			               for (int c = 0; c < num_components; c++) {

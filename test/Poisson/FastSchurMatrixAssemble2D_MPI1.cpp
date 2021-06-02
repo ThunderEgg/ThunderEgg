@@ -136,8 +136,8 @@ TEST_CASE(
 		INFO("ID: " << iface->id);
 		INFO("LOCAL_INDEX: " << iface->local_index);
 		INFO("type: " << iface->patches.size());
-		LocalData<1> f_vec_ld          = f_vec->getLocalData(0, iface->local_index);
-		LocalData<1> f_vec_expected_ld = f_vec_expected->getLocalData(0, iface->local_index);
+		View<1> f_vec_ld          = f_vec->getView(0, iface->local_index);
+		View<1> f_vec_expected_ld = f_vec_expected->getView(0, iface->local_index);
 		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
@@ -188,8 +188,8 @@ TEST_CASE(
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
-		LocalData<1> f_vec_ld          = f_vec->getLocalData(0, i);
-		LocalData<1> f_vec_expected_ld = f_vec_expected->getLocalData(0, i);
+		View<1> f_vec_ld          = f_vec->getView(0, i);
+		View<1> f_vec_expected_ld = f_vec_expected->getView(0, i);
 		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
@@ -240,8 +240,8 @@ TEST_CASE(
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
-		LocalData<1> f_vec_ld          = f_vec->getLocalData(0, i);
-		LocalData<1> f_vec_expected_ld = f_vec_expected->getLocalData(0, i);
+		View<1> f_vec_ld          = f_vec->getView(0, i);
+		View<1> f_vec_expected_ld = f_vec_expected->getView(0, i);
 		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
@@ -292,8 +292,8 @@ TEST_CASE(
 	REQUIRE(f_vec->infNorm() > 0);
 
 	for (int i = 0; i < f_vec->getNumLocalPatches(); i++) {
-		LocalData<1> f_vec_ld          = f_vec->getLocalData(0, i);
-		LocalData<1> f_vec_expected_ld = f_vec_expected->getLocalData(0, i);
+		View<1> f_vec_ld          = f_vec->getView(0, i);
+		View<1> f_vec_expected_ld = f_vec_expected->getView(0, i);
 		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));

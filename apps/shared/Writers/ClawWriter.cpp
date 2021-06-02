@@ -64,9 +64,9 @@ void ClawWriter::writePatch(const PatchInfo<2> &pinfo, std::ostream &os)
 	os << pinfo.spacings[0] << tab << "dx" << endl;
 	os << pinfo.spacings[1] << tab << "dy" << endl;
 	os << endl;
-	list<LocalData<2>> lds;
+	list<View<2>> lds;
 	for (auto vec : vectors) {
-		lds.push_back(vec->getLocalData(0, pinfo.local_index));
+		lds.push_back(vec->getView(0, pinfo.local_index));
 	}
 	for (int y = 0; y < pinfo.ns[1]; y++) {
 		for (int x = 0; x < pinfo.ns[0]; x++) {

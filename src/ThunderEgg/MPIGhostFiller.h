@@ -320,11 +320,11 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	DimensionalArray<D, LocalCallDeque> local_calls;
 
 	/**
-	 * @brief Information need for representing ghosts in the buffer as full LocalData object.
+	 * @brief Information need for representing ghosts in the buffer as full View object.
 	 *
 	 * @tparam M the dimension of the face
 	 */
-	template <int M> class GhostLocalDataInfo
+	template <int M> class GhostViewInfo
 	{
 		private:
 		/**
@@ -344,13 +344,13 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		/**
 		 * @brief Construct a new Ghost Local Data Info object
 		 */
-		GhostLocalDataInfo() = default;
+		GhostViewInfo() = default;
 		/**
 		 * @brief Construct a new Ghost Local Data Info object for a given Domain
 		 *
 		 * @param domain the domain
 		 */
-		explicit GhostLocalDataInfo(const Domain<D> &domain)
+		explicit GhostViewInfo(const Domain<D> &domain)
 		{
 			std::array<int, D> ns              = domain.getNs();
 			int                num_ghost_cells = domain.getNumGhostCells();
@@ -396,7 +396,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			return strides[face.getIndex()];
 		}
 		/**
-		 * @brief Get the offset of the first non-ghost value in the LocalData object on a given face
+		 * @brief Get the offset of the first non-ghost value in the View object on a given face
 		 *
 		 * @param face the face
 		 * @return int the offset of the first non-ghost value
@@ -410,7 +410,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	/**
 	 * @brief GhostLocalDatInfo for each face dimension
 	 */
-	DimensionalArray<D, GhostLocalDataInfo> ghost_local_data_infos;
+	DimensionalArray<D, GhostViewInfo> ghost_local_data_infos;
 
 	/**
 	 * @brief The domain that this ghostfiller operates on
@@ -423,20 +423,20 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	GhostFillingType fill_type;
 
 	/**
-	 * @brief Get the LocalData object for the buffer
+	 * @brief Get the View object for the buffer
 	 *
 	 * @param buffer_ptr pointer to the ghost cells position in the buffer
 	 * @param side  the side that the ghost cells are on
 	 * @param component_index  the component index
-	 * @return LocalData<D> the LocalData object
+	 * @return View<D> the View object
 	 */
-	template <int M> LocalData<D> getLocalDataForBuffer(double *buffer_ptr, Face<D, M> face, int component_index) const
+	template <int M> View<D> getViewForBuffer(double *buffer_ptr, Face<D, M> face, int component_index) const
 	{
-		const GhostLocalDataInfo<M> &gld_info = ghost_local_data_infos.template get<M>();
-		return LocalData<D>(buffer_ptr + gld_info.getSize(face) * component_index + gld_info.getStartOffset(face),
-		                    gld_info.getStrides(face),
-		                    domain->getNs(),
-		                    domain->getNumGhostCells());
+		const GhostViewInfo<M> &gld_info = ghost_local_data_infos.template get<M>();
+		return View<D>(buffer_ptr + gld_info.getSize(face) * component_index + gld_info.getStartOffset(face),
+		               gld_info.getStrides(face),
+		               domain->getNs(),
+		               domain->getNumGhostCells());
 	}
 	/**
 	 * @brief Post send requests
@@ -469,16 +469,16 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			size_t     buffer_offset = incoming_ghost.offset;
 
 			for (int c = 0; c < u.getNumComponents(); c++) {
-				const LocalData<D>        local_data  = u.getLocalData(c, local_index);
+				const View<D>             local_data  = u.getView(c, local_index);
 				double *                  buffer_ptr  = buffer.data() + buffer_offset * u.getNumComponents();
-				LocalData<D>              buffer_data = getLocalDataForBuffer(buffer_ptr, face, c);
+				View<D>                   buffer_data = getViewForBuffer(buffer_ptr, face, c);
 				std::array<size_t, D - M> start;
 				start.fill(0);
 				std::array<size_t, D - M> end;
 				end.fill(domain->getNumGhostCells() - 1);
 				nested_loop<D - M>(start, end, [&](const std::array<size_t, D - M> &offset) {
-					LocalData<M> local_slice  = local_data.getGhostSliceOn(face, offset);
-					LocalData<M> buffer_slice = buffer_data.getGhostSliceOn(face, offset);
+					View<M> local_slice  = local_data.getGhostSliceOn(face, offset);
+					View<M> buffer_slice = buffer_data.getGhostSliceOn(face, offset);
 					nested_loop<M>(local_slice.getStart(), local_slice.getEnd(), [&](const std::array<int, M> &coord) {
 						local_slice[coord] += buffer_slice[coord];
 					});
@@ -530,14 +530,14 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		for (const RemoteCall<M> &call : remote_call_set.remote_calls.template get<M>()) {
 			const PatchInfo<D> &pinfo       = domain->getPatchInfoVector()[call.local_index];
 			Face<D, M>          face        = call.face.opposite();
-			auto                local_datas = u.getLocalDatas(call.local_index);
+			auto                local_datas = u.getViews(call.local_index);
 			double *            buffer_ptr  = buffer.data() + call.offset * u.getNumComponents();
 
-			// create LocalData objects for the buffer
-			std::vector<LocalData<D>> buffer_datas;
+			// create View objects for the buffer
+			std::vector<View<D>> buffer_datas;
 			buffer_datas.reserve(u.getNumComponents());
 			for (int c = 0; c < u.getNumComponents(); c++) {
-				buffer_datas.push_back(getLocalDataForBuffer(buffer_ptr, face, c));
+				buffer_datas.push_back(getViewForBuffer(buffer_ptr, face, c));
 			}
 
 			// make the call
@@ -588,12 +588,12 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param orthant_on_coarse the orthant that the neighbors ghost cells lie on if the neighbor is coarser
 	 */
 	template <int M>
-	void fillGhostCellsForNbrPatchPriv(const PatchInfo<D> &             pinfo,
-	                                   const std::vector<LocalData<D>> &local_datas,
-	                                   std::vector<LocalData<D>> &      nbr_datas,
-	                                   Face<D, M>                       face,
-	                                   NbrType                          nbr_type,
-	                                   Orthant<M>                       orthant_on_coarse) const
+	void fillGhostCellsForNbrPatchPriv(const PatchInfo<D> &        pinfo,
+	                                   const std::vector<View<D>> &local_datas,
+	                                   std::vector<View<D>> &      nbr_datas,
+	                                   Face<D, M>                  face,
+	                                   NbrType                     nbr_type,
+	                                   Orthant<M>                  orthant_on_coarse) const
 	{
 		if constexpr (M == D - 1) {
 			fillGhostCellsForNbrPatch(pinfo, local_datas, nbr_datas, face, nbr_type, orthant_on_coarse);
@@ -616,8 +616,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	{
 		for (const LocalCall<M> &call : local_calls.template get<M>()) {
 			const PatchInfo<D> &pinfo       = domain->getPatchInfoVector()[call.local_index];
-			auto                local_datas = u->getLocalDatas(call.local_index);
-			auto                nbr_datas   = u->getLocalDatas(call.nbr_local_index);
+			auto                local_datas = u->getViews(call.local_index);
+			auto                nbr_datas   = u->getViews(call.nbr_local_index);
 			fillGhostCellsForNbrPatchPriv(pinfo, local_datas, nbr_datas, call.face, call.nbr_type, call.orthant);
 		}
 		if constexpr (M > 0) {
@@ -744,7 +744,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				}
 			}
 		}
-		const GhostLocalDataInfo<M> &ghost_local_data_info = ghost_local_data_infos.template get<M>();
+		const GhostViewInfo<M> &ghost_local_data_info = ghost_local_data_infos.template get<M>();
 		for (const auto &pair : rank_to_remote_call_prototypes) {
 			int rank = pair.first;
 			rank_to_remote_call_sets.emplace(rank, rank);
@@ -787,7 +787,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param pinfo the PatchInfo for the patch
 	 * @param data the patch that is being zeroed
 	 */
-	template <int M> void zeroGhostCellsOnAllFaces(const PatchInfo<D> &pinfo, const LocalData<D> &data) const
+	template <int M> void zeroGhostCellsOnAllFaces(const PatchInfo<D> &pinfo, const View<D> &data) const
 	{
 		for (Face<D, M> f : Face<D, M>::getValues()) {
 			if (pinfo.hasNbr(f)) {
@@ -796,7 +796,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				std::array<size_t, D - M> end;
 				end.fill(domain->getNumGhostCells() - 1);
 				nested_loop<D - M>(start, end, [&](const std::array<size_t, D - M> &offset) {
-					LocalData<M> this_ghost = data.getGhostSliceOn(f, offset);
+					View<M> this_ghost = data.getGhostSliceOn(f, offset);
 					nested_loop<M>(this_ghost.getStart(), this_ghost.getEnd(), [&](const std::array<int, M> &coord) { this_ghost[coord] = 0; });
 				});
 			}
@@ -811,7 +811,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	void zeroGhostCells(std::shared_ptr<const Vector<D>> u) const
 	{
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			for (auto &this_patch : u->getLocalDatas(pinfo.local_index)) {
+			for (auto &this_patch : u->getViews(pinfo.local_index)) {
 				switch (fill_type) {
 					case GhostFillingType::Corners:
 						if constexpr (D >= 2) {
@@ -845,16 +845,16 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		switch (fill_type) {
 			case GhostFillingType::Corners:
 				if constexpr (D >= 2) {
-					ghost_local_data_infos.template get<0>() = GhostLocalDataInfo<0>(*domain);
+					ghost_local_data_infos.template get<0>() = GhostViewInfo<0>(*domain);
 					enumerateCalls<0>(local_calls.template get<0>(), rank_to_remote_call_sets);
 				}
 			case GhostFillingType::Edges:
 				if constexpr (D == 3) {
-					ghost_local_data_infos.template get<1>() = GhostLocalDataInfo<1>(*domain);
+					ghost_local_data_infos.template get<1>() = GhostViewInfo<1>(*domain);
 					enumerateCalls<1>(local_calls.template get<1>(), rank_to_remote_call_sets);
 				}
 			case GhostFillingType::Faces:
-				ghost_local_data_infos.template get<D - 1>() = GhostLocalDataInfo<D - 1>(*domain);
+				ghost_local_data_infos.template get<D - 1>() = GhostViewInfo<D - 1>(*domain);
 				enumerateCalls<D - 1>(local_calls.template get<D - 1>(), rank_to_remote_call_sets);
 				break;
 			default:
@@ -877,12 +877,12 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param nbr_type the type of neighbor
 	 * @param orthant_on_coarse the orthant that the neighbors ghost cells lie on if the neighbor is coarser
 	 */
-	virtual void fillGhostCellsForNbrPatch(const PatchInfo<D> &             pinfo,
-	                                       const std::vector<LocalData<D>> &local_datas,
-	                                       std::vector<LocalData<D>> &      nbr_datas,
-	                                       Side<D>                          side,
-	                                       NbrType                          nbr_type,
-	                                       Orthant<D - 1>                   orthant_on_coarse) const = 0;
+	virtual void fillGhostCellsForNbrPatch(const PatchInfo<D> &        pinfo,
+	                                       const std::vector<View<D>> &local_datas,
+	                                       std::vector<View<D>> &      nbr_datas,
+	                                       Side<D>                     side,
+	                                       NbrType                     nbr_type,
+	                                       Orthant<D - 1>              orthant_on_coarse) const = 0;
 	/**
 	 * @brief Fill the edge ghost cells for the neighboring patch
 	 *
@@ -894,12 +894,12 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param nbr_type the type of neighbor
 	 * @param orthant_on_coarse the orthant that the neighbors ghost cells lie on if the neighbor is coarser
 	 */
-	virtual void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D> &             pinfo,
-	                                           const std::vector<LocalData<D>> &local_datas,
-	                                           std::vector<LocalData<D>> &      nbr_datas,
-	                                           Edge                             edge,
-	                                           NbrType                          nbr_type,
-	                                           Orthant<1>                       orthant_on_coarse) const = 0;
+	virtual void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D> &        pinfo,
+	                                           const std::vector<View<D>> &local_datas,
+	                                           std::vector<View<D>> &      nbr_datas,
+	                                           Edge                        edge,
+	                                           NbrType                     nbr_type,
+	                                           Orthant<1>                  orthant_on_coarse) const = 0;
 	/**
 	 * @brief Fill the corner ghost cells for the neighboring patch
 	 *
@@ -910,11 +910,11 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param corner the edge that the neighboring patch is on
 	 * @param nbr_type the type of neighbor
 	 */
-	virtual void fillGhostCellsForCornerNbrPatch(const PatchInfo<D> &             pinfo,
-	                                             const std::vector<LocalData<D>> &local_datas,
-	                                             std::vector<LocalData<D>> &      nbr_datas,
-	                                             Corner<D>                        corner,
-	                                             NbrType                          nbr_type) const = 0;
+	virtual void fillGhostCellsForCornerNbrPatch(const PatchInfo<D> &        pinfo,
+	                                             const std::vector<View<D>> &local_datas,
+	                                             std::vector<View<D>> &      nbr_datas,
+	                                             Corner<D>                   corner,
+	                                             NbrType                     nbr_type) const = 0;
 
 	/**
 	 * @brief Perform any on this patches ghost cells.
@@ -923,9 +923,9 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * the neighboring patch
 	 *
 	 * @param pinfo the patch
-	 * @param local_datas the LocalData for the patch
+	 * @param local_datas the View for the patch
 	 */
-	virtual void fillGhostCellsForLocalPatch(const PatchInfo<D> &pinfo, std::vector<LocalData<D>> &local_datas) const = 0;
+	virtual void fillGhostCellsForLocalPatch(const PatchInfo<D> &pinfo, std::vector<View<D>> &local_datas) const = 0;
 
 	/**
 	 * @brief Fill ghost cells on a vector
@@ -953,7 +953,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 
 		// perform local operations
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			auto datas = u->getLocalDatas(pinfo.local_index);
+			auto datas = u->getViews(pinfo.local_index);
 			fillGhostCellsForLocalPatch(pinfo, datas);
 		}
 		processLocalFills<D - 1>(u);

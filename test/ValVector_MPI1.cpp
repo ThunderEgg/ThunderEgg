@@ -28,7 +28,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-#define MESHES                                                                                     \
+#define MESHES \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
@@ -123,7 +123,7 @@ TEST_CASE("ValVector<1> getValArray", "[ValVector]")
 	int           nx                = GENERATE(1, 4, 5);
 	array<int, 1> ns                = {nx};
 	int           num_local_patches = GENERATE(1, 13);
-	size_t        size = (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
+	size_t        size              = (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -379,7 +379,7 @@ TEST_CASE("ValVector<3> getValArray", "[ValVector]")
 	CHECK(val_vector->getValArray().size() == size);
 }
 
-TEST_CASE("ValVector<1> getLocalData", "[ValVector]")
+TEST_CASE("ValVector<1> getView", "[ValVector]")
 {
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
@@ -401,14 +401,14 @@ TEST_CASE("ValVector<1> getLocalData", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			LocalData<1> ld = val_vector->getLocalData(c, i);
+			View<1> ld = val_vector->getView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + (patch_stride * i + c * component_stride));
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + (patch_stride * i + (c + 1) * component_stride) - 1);
 		}
 	}
 }
-TEST_CASE("ValVector<1> getLocalData const", "[ValVector]")
+TEST_CASE("ValVector<1> getView const", "[ValVector]")
 {
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
@@ -422,8 +422,8 @@ TEST_CASE("ValVector<1> getLocalData const", "[ValVector]")
 	INFO("nx:                " << nx);
 	INFO("num_local_patches: " << num_local_patches);
 
-	auto val_vector = make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_components,
-	                                            num_local_patches);
+	auto val_vector       = make_shared<ValVector<1>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_components,
+                                                num_local_patches);
 	auto const_val_vector = std::const_pointer_cast<const ValVector<1>>(val_vector);
 
 	double *view = &val_vector->getValArray()[0];
@@ -431,14 +431,14 @@ TEST_CASE("ValVector<1> getLocalData const", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const LocalData<1> ld = const_val_vector->getLocalData(c, i);
+			const View<1> ld = const_val_vector->getView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 }
-TEST_CASE("ValVector<2> getLocalData", "[ValVector]")
+TEST_CASE("ValVector<2> getView", "[ValVector]")
 {
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
@@ -462,14 +462,14 @@ TEST_CASE("ValVector<2> getLocalData", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			LocalData<2> ld = val_vector->getLocalData(c, i);
+			View<2> ld = val_vector->getView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 }
-TEST_CASE("ValVector<2> getLocalData const", "[ValVector]")
+TEST_CASE("ValVector<2> getView const", "[ValVector]")
 {
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
@@ -485,8 +485,8 @@ TEST_CASE("ValVector<2> getLocalData const", "[ValVector]")
 	INFO("ny:                " << ny);
 	INFO("num_local_patches: " << num_local_patches);
 
-	auto val_vector = make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_components,
-	                                            num_local_patches);
+	auto val_vector       = make_shared<ValVector<2>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_components,
+                                                num_local_patches);
 	auto const_val_vector = std::const_pointer_cast<const ValVector<2>>(val_vector);
 
 	double *view = &val_vector->getValArray()[0];
@@ -494,14 +494,14 @@ TEST_CASE("ValVector<2> getLocalData const", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const LocalData<2> ld = const_val_vector->getLocalData(c, i);
+			const View<2> ld = const_val_vector->getView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 }
-TEST_CASE("ValVector<3> getLocalData", "[ValVector]")
+TEST_CASE("ValVector<3> getView", "[ValVector]")
 {
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
@@ -527,14 +527,14 @@ TEST_CASE("ValVector<3> getLocalData", "[ValVector]")
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
-			LocalData<3> ld = val_vector->getLocalData(c, i);
+			View<3> ld = val_vector->getView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
 }
-TEST_CASE("ValVector<3> getLocalData const", "[ValVector]")
+TEST_CASE("ValVector<3> getView const", "[ValVector]")
 {
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
@@ -553,8 +553,8 @@ TEST_CASE("ValVector<3> getLocalData const", "[ValVector]")
 	INFO("nz:                " << nz);
 	INFO("num_local_patches: " << num_local_patches);
 
-	auto val_vector = make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_components,
-	                                            num_local_patches);
+	auto val_vector       = make_shared<ValVector<3>>(MPI_COMM_WORLD, ns, num_ghost_cells, num_components,
+                                                num_local_patches);
 	auto const_val_vector = std::const_pointer_cast<const ValVector<3>>(val_vector);
 
 	double *view = &val_vector->getValArray()[0];
@@ -562,7 +562,7 @@ TEST_CASE("ValVector<3> getLocalData const", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const LocalData<3> ld = const_val_vector->getLocalData(c, i);
+			const View<3> ld = const_val_vector->getView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -589,6 +589,6 @@ TEST_CASE("ValVector getNewVector works", "[ValVector]")
 	CHECK(val_vector->getNumComponents() == num_components);
 	CHECK(val_vector->getNumLocalPatches() == d_fine->getNumLocalPatches());
 	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
-	CHECK(val_vector->getLocalData(0, 0).getLengths()[0] == nx);
-	CHECK(val_vector->getLocalData(0, 0).getLengths()[1] == ny);
+	CHECK(val_vector->getView(0, 0).getLengths()[0] == nx);
+	CHECK(val_vector->getView(0, 0).getLengths()[1] == ny);
 }

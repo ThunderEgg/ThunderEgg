@@ -76,10 +76,10 @@ template <int D> class PatchOperator : public Operator<D>
 	 * modified so that the interior boundaries are assumed to be zero, and the ghost values should
 	 * not be used
 	 */
-	virtual void applySinglePatch(const PatchInfo<D> &             pinfo,
-	                              const std::vector<LocalData<D>> &us,
-	                              std::vector<LocalData<D>> &      fs,
-	                              bool                             treat_interior_boundary_as_dirichlet) const = 0;
+	virtual void applySinglePatch(const PatchInfo<D> &        pinfo,
+	                              const std::vector<View<D>> &us,
+	                              std::vector<View<D>> &      fs,
+	                              bool                        treat_interior_boundary_as_dirichlet) const = 0;
 	/**
 	 * @brief Treat the internal patch boundaries as an dirichlet boundary condition, and modify the
 	 * RHS accordingly.
@@ -90,7 +90,7 @@ template <int D> class PatchOperator : public Operator<D>
 	 * @param us the left hand side
 	 * @param fs the right hand side
 	 */
-	virtual void addGhostToRHS(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs) const = 0;
+	virtual void addGhostToRHS(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us, std::vector<View<D>> &fs) const = 0;
 
 	/**
 	 * @brief Apply the operator
@@ -104,8 +104,8 @@ template <int D> class PatchOperator : public Operator<D>
 	{
 		ghost_filler->fillGhost(u);
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			auto us = u->getLocalDatas(pinfo.local_index);
-			auto fs = f->getLocalDatas(pinfo.local_index);
+			auto us = u->getViews(pinfo.local_index);
+			auto fs = f->getViews(pinfo.local_index);
 			applySinglePatch(pinfo, us, fs, false);
 		}
 	}

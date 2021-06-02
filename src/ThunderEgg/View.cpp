@@ -19,20 +19,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_LOCALDATAMANAGER_H
-#define THUNDEREGG_LOCALDATAMANAGER_H
+#include "View.h"
 namespace ThunderEgg
 {
-/**
- * @brief This object does any necessary cleanup for the LocalData object when deleted
- */
-class LocalDataManager
-{
-	public:
-	/**
-	 * @brief Destroy the LocalDataManager object
-	 */
-	virtual ~LocalDataManager(){};
-};
+template class View<1>;
+template class View<2>;
+template class View<3>;
 } // namespace ThunderEgg
-#endif

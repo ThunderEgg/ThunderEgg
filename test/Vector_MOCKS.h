@@ -42,7 +42,8 @@ bool isGhost(const std::array<int, D> &coord, const std::array<int, D> &ns, int 
 	}
 	return false;
 }
-template <int D> class MockVector : public Vector<D>
+template <int D>
+class MockVector : public Vector<D>
 {
 	public:
 	int GetNumLocalCells(int num_local_patches, std::array<int, D> ns)
@@ -58,9 +59,9 @@ template <int D> class MockVector : public Vector<D>
 	 */
 	std::vector<double> data;
 	/**
-	 * @brief vector of LocalData objects
+	 * @brief vector of View objects
 	 */
-	std::vector<LocalData<D>> local_data;
+	std::vector<View<D>> local_data;
 	/**
 	 * @brief Construct a new MockVector object
 	 *
@@ -95,11 +96,11 @@ template <int D> class MockVector : public Vector<D>
 			}
 		}
 	}
-	LocalData<D> getLocalData(int component_index, int patch_local_index) override
+	View<D> getView(int component_index, int patch_local_index) override
 	{
 		return local_data[patch_local_index * this->getNumComponents() + component_index];
 	}
-	const LocalData<D> getLocalData(int component_index, int patch_local_index) const override
+	const View<D> getView(int component_index, int patch_local_index) const override
 	{
 		return local_data[patch_local_index * this->getNumComponents() + component_index];
 	}

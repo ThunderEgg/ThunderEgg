@@ -166,7 +166,7 @@ TEST_CASE("Exchange for various domains 2d face cases", "[MPIGhostFiller]")
 	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
@@ -194,7 +194,7 @@ TEST_CASE("Exchange for various domains 2d corner cases", "[MPIGhostFiller]")
 	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
@@ -222,7 +222,7 @@ TEST_CASE("Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -249,7 +249,7 @@ TEST_CASE("Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -276,7 +276,7 @@ TEST_CASE("Exchange for various domains 3d corner cases", "[MPIGhostFiller]")
 	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -304,7 +304,7 @@ TEST_CASE("Two Exchanges for various domains 2d face cases", "[MPIGhostFiller]")
 	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
@@ -332,7 +332,7 @@ TEST_CASE("Two Exchanges for various domains 2d corner cases", "[MPIGhostFiller]
 	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
@@ -360,7 +360,7 @@ TEST_CASE("Two Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -388,7 +388,7 @@ TEST_CASE("Two Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -416,7 +416,7 @@ TEST_CASE("Two Exchange for various domains 3d corner cases", "[MPIGhostFiller]"
 	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getLocalData(c, pinfo.local_index);
+			auto data = vec->getView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}

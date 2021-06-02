@@ -27,14 +27,14 @@
 
 #include <limits>
 
-#include <catch2/generators/catch_generators.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
 using namespace ThunderEgg;
 
-#define MESHES                                                                                     \
-	"mesh_inputs/2d_refined_east_1x2_east_on_1_mpi2.json",                                         \
+#define MESHES                                             \
+	"mesh_inputs/2d_refined_east_1x2_east_on_1_mpi2.json", \
 	"mesh_inputs/2d_uniform_1x2_east_on_1_mpi2.json"
 
 TEST_CASE("Schur::PatchSolverWrapper<2> throws exception for non-square patches",
@@ -108,7 +108,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < b->getNumLocalPatches(); i++) {
-		auto local_data = b->getLocalData(0, i);
+		auto local_data = b->getView(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value));
@@ -144,7 +144,7 @@ TEST_CASE(
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < b->getNumLocalPatches(); i++) {
-		auto local_data = b->getLocalData(0, i);
+		auto local_data = b->getView(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value));
@@ -163,7 +163,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in 
 	auto            domain       = domain_reader.getFinerDomain();
 	auto            iface_domain = make_shared<Schur::InterfaceDomain<2>>(domain);
 	auto            ghost_filler = make_shared<MockGhostFiller<2>>();
-	auto            solver = make_shared<RHSGhostCheckingPatchSolver<2>>(domain, ghost_filler, 0);
+	auto            solver       = make_shared<RHSGhostCheckingPatchSolver<2>>(domain, ghost_filler, 0);
 
 	Schur::ValVectorGenerator<1> vg(iface_domain);
 	ValVectorGenerator<2>        domain_vg(domain, 1);
@@ -204,7 +204,7 @@ TEST_CASE(
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < schur_b->getNumLocalPatches(); i++) {
-		auto local_data = schur_b->getLocalData(0, i);
+		auto local_data = schur_b->getView(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Catch::Approx(domain_fill_value));
@@ -239,7 +239,7 @@ TEST_CASE(
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < schur_b->getNumLocalPatches(); i++) {
-		auto local_data = schur_b->getLocalData(0, i);
+		auto local_data = schur_b->getView(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
 		               [&](const std::array<int, 1> &coord) {
 			               CHECK(local_data[coord] == Catch::Approx(domain_fill_value));

@@ -64,17 +64,17 @@ class MockPatchSolver : public PatchSolver<D>
 			patches_to_be_called.insert(&pinfo);
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &             pinfo,
-	                      const std::vector<LocalData<D>> &fs,
-	                      std::vector<LocalData<D>> &      us) const override
+	void solveSinglePatch(const PatchInfo<D> &        pinfo,
+	                      const std::vector<View<D>> &fs,
+	                      std::vector<View<D>> &      us) const override
 	{
 		CHECK(patches_to_be_called.count(&pinfo) == 1);
 		patches_to_be_called.erase(&pinfo);
 		for (int c = 0; c < u_vec->getNumComponents(); c++) {
-			CHECK(u_vec->getLocalData(c, pinfo.local_index).getPtr() == us[c].getPtr());
+			CHECK(u_vec->getView(c, pinfo.local_index).getPtr() == us[c].getPtr());
 		}
 		for (int c = 0; c < f_vec->getNumComponents(); c++) {
-			CHECK(f_vec->getLocalData(c, pinfo.local_index).getPtr() == fs[c].getPtr());
+			CHECK(f_vec->getView(c, pinfo.local_index).getPtr() == fs[c].getPtr());
 		}
 	}
 	bool allPatchesCalled()

@@ -40,7 +40,7 @@ namespace
  * @param local_data the patch data
  * @param side the side that the neighbor patch is on
  */
-void FillGhostForLocalWithCoarseNbr(const LocalData<2> &local_data, Side<2> side)
+void FillGhostForLocalWithCoarseNbr(const View<2> &local_data, Side<2> side)
 {
 	auto inner_slice = local_data.getSliceOn(side, {1});
 	auto slice       = local_data.getSliceOn(side, {0});
@@ -60,7 +60,7 @@ void FillGhostForLocalWithCoarseNbr(const LocalData<2> &local_data, Side<2> side
  * @param local_data the patch data
  * @param side the side that the neighbor patch is on
  */
-void FillGhostForLocalWithFineNbr(const LocalData<2> &local_data, Side<2> side)
+void FillGhostForLocalWithFineNbr(const View<2> &local_data, Side<2> side)
 {
 	auto slice = local_data.getSliceOn(side, {0});
 	auto ghost = local_data.getSliceOn(side, {-1});
@@ -78,7 +78,7 @@ void FillGhostForLocalWithFineNbr(const LocalData<2> &local_data, Side<2> side)
  * @param nbr_datas the neighbor patch
  * @param side the side that the neighbor patch is on
  */
-void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
+void FillGhostForNormalNbr(const std::vector<View<2>> &local_datas, std::vector<View<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto local_slice = local_datas[c].getSliceOn(side, {0});
@@ -98,7 +98,7 @@ void FillGhostForNormalNbr(const std::vector<LocalData<2>> &local_datas, std::ve
  * @param side the side that the neighbor patch is on
  * @param orthant the orthant of the coarser neighbor face that this patch lies on
  */
-void FillGhostForCoarseNbrLower(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
+void FillGhostForCoarseNbrLower(const std::vector<View<2>> &local_datas, std::vector<View<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice       = local_datas[c].getSliceOn(side, {0});
@@ -122,7 +122,7 @@ void FillGhostForCoarseNbrLower(const std::vector<LocalData<2>> &local_datas, st
  * @param side the side that the neighbor patch is on
  * @param orthant the orthant of the coarser neighbor face that this patch lies on
  */
-void FillGhostForCoarseNbrUpper(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
+void FillGhostForCoarseNbrUpper(const std::vector<View<2>> &local_datas, std::vector<View<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice       = local_datas[c].getSliceOn(side, {0});
@@ -146,7 +146,7 @@ void FillGhostForCoarseNbrUpper(const std::vector<LocalData<2>> &local_datas, st
  * @param side the side that the neighbor patch is on
  * @param orthant the orthant of the this patches face that the finer neighbor patch lies on
  */
-void FillGhostForFineNbrLower(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
+void FillGhostForFineNbrLower(const std::vector<View<2>> &local_datas, std::vector<View<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice = local_datas[c].getSliceOn(side, {0});
@@ -175,7 +175,7 @@ void FillGhostForFineNbrLower(const std::vector<LocalData<2>> &local_datas, std:
  * @param side the side that the neighbor patch is on
  * @param orthant the orthant of the this patches face that the finer neighbor patch lies on
  */
-void FillGhostForFineNbrUpper(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Side<2> side)
+void FillGhostForFineNbrUpper(const std::vector<View<2>> &local_datas, std::vector<View<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice = local_datas[c].getSliceOn(side, {0});
@@ -200,12 +200,12 @@ void FillGhostForFineNbrUpper(const std::vector<LocalData<2>> &local_datas, std:
  * @param nbr_datas the neighbor patch
  * @param corner the corner that the neighbor patch is on
  */
-void FillGhostForNormalCornerNbr(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
+void FillGhostForNormalCornerNbr(const std::vector<View<2>> &local_datas, std::vector<View<2>> &nbr_datas, Corner<2> corner)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		LocalData<0> local_slice = local_datas[c].getSliceOn(corner, {0, 0});
-		LocalData<0> nbr_ghosts  = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
-		nbr_ghosts[{}]           = local_slice[{}];
+		View<0> local_slice = local_datas[c].getSliceOn(corner, {0, 0});
+		View<0> nbr_ghosts  = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		nbr_ghosts[{}]      = local_slice[{}];
 	}
 }
 /**
@@ -219,12 +219,12 @@ void FillGhostForNormalCornerNbr(const std::vector<LocalData<2>> &local_datas, s
  * @param nbr_datas the neighbor patch
  * @param corner the corner that the neighbor patch is on
  */
-void FillGhostForCoarseCornerNbr(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
+void FillGhostForCoarseCornerNbr(const std::vector<View<2>> &local_datas, std::vector<View<2>> &nbr_datas, Corner<2> corner)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		LocalData<0> slice       = local_datas[c].getSliceOn(corner, {0, 0});
-		LocalData<0> inner_slice = local_datas[c].getSliceOn(corner, {1, 1});
-		LocalData<0> ghost       = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		View<0> slice       = local_datas[c].getSliceOn(corner, {0, 0});
+		View<0> inner_slice = local_datas[c].getSliceOn(corner, {1, 1});
+		View<0> ghost       = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
 		ghost[{}] += 2 * slice[{}] / 3 + 2 * inner_slice[{}] / 5;
 	}
 }
@@ -238,10 +238,10 @@ void FillGhostForCoarseCornerNbr(const std::vector<LocalData<2>> &local_datas, s
  * @param local_data the patch data
  * @param corner the corner that the neighbor patch is on
  */
-void FillGhostForLocalWithFineCornerNbr(const LocalData<2> &local_data, Corner<2> corner)
+void FillGhostForLocalWithFineCornerNbr(const View<2> &local_data, Corner<2> corner)
 {
-	LocalData<0> slice = local_data.getSliceOn(corner, {0, 0});
-	LocalData<0> ghost = local_data.getSliceOn(corner, {-1, -1});
+	View<0> slice = local_data.getSliceOn(corner, {0, 0});
+	View<0> ghost = local_data.getSliceOn(corner, {-1, -1});
 	ghost[{}] += -slice[{}] / 15;
 }
 
@@ -256,11 +256,11 @@ void FillGhostForLocalWithFineCornerNbr(const LocalData<2> &local_data, Corner<2
  * @param nbr_datas the neighbor patch
  * @param corner the corner that the neighbor patch is on
  */
-void FillGhostForFineCornerNbr(const std::vector<LocalData<2>> &local_datas, std::vector<LocalData<2>> &nbr_datas, Corner<2> corner)
+void FillGhostForFineCornerNbr(const std::vector<View<2>> &local_datas, std::vector<View<2>> &nbr_datas, Corner<2> corner)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		LocalData<0> slice = local_datas[c].getSliceOn(corner, {0, 0});
-		LocalData<0> ghost = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		View<0> slice = local_datas[c].getSliceOn(corner, {0, 0});
+		View<0> ghost = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
 		ghost[{}] += 8 * slice[{}] / 15;
 	}
 }
@@ -274,11 +274,11 @@ void FillGhostForFineCornerNbr(const std::vector<LocalData<2>> &local_datas, std
  * @param local_data the patch data
  * @param corner the corner that the neighbor patch is on
  */
-void FillGhostForLocalWithCoarseCornerNbr(const LocalData<2> &local_data, Corner<2> corner)
+void FillGhostForLocalWithCoarseCornerNbr(const View<2> &local_data, Corner<2> corner)
 {
-	LocalData<0> inner_slice = local_data.getSliceOn(corner, {1, 1});
-	LocalData<0> slice       = local_data.getSliceOn(corner, {0, 0});
-	LocalData<0> ghost       = local_data.getSliceOn(corner, {-1, -1});
+	View<0> inner_slice = local_data.getSliceOn(corner, {1, 1});
+	View<0> slice       = local_data.getSliceOn(corner, {0, 0});
+	View<0> ghost       = local_data.getSliceOn(corner, {-1, -1});
 	ghost[{}] += 2 * slice[{}] / 3 - inner_slice[{}] / 5;
 }
 /**
@@ -287,7 +287,7 @@ void FillGhostForLocalWithCoarseCornerNbr(const LocalData<2> &local_data, Corner
  * @param pinfo the patch
  * @param local_data the patch data
  */
-void FillLocalGhostCellsOnSides(const PatchInfo<2> &pinfo, const LocalData<2> &local_data)
+void FillLocalGhostCellsOnSides(const PatchInfo<2> &pinfo, const View<2> &local_data)
 {
 	for (Side<2> side : Side<2>::getValues()) {
 		if (pinfo.hasNbr(side)) {
@@ -313,7 +313,7 @@ void FillLocalGhostCellsOnSides(const PatchInfo<2> &pinfo, const LocalData<2> &l
  * @param pinfo the patch
  * @param local_data the patch data
  */
-void FillLocalGhostCellsOnCorners(const PatchInfo<2> &pinfo, const LocalData<2> &local_data)
+void FillLocalGhostCellsOnCorners(const PatchInfo<2> &pinfo, const View<2> &local_data)
 {
 	for (Corner<2> corner : Corner<2>::getValues()) {
 		if (pinfo.hasNbr(corner)) {
@@ -335,12 +335,12 @@ void FillLocalGhostCellsOnCorners(const PatchInfo<2> &pinfo, const LocalData<2> 
 }
 } // namespace
 
-void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &             pinfo,
-                                                       const std::vector<LocalData<2>> &local_datas,
-                                                       std::vector<LocalData<2>> &      nbr_datas,
-                                                       Side<2>                          side,
-                                                       NbrType                          nbr_type,
-                                                       Orthant<1>                       orthant) const
+void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &        pinfo,
+                                                       const std::vector<View<2>> &local_datas,
+                                                       std::vector<View<2>> &      nbr_datas,
+                                                       Side<2>                     side,
+                                                       NbrType                     nbr_type,
+                                                       Orthant<1>                  orthant) const
 {
 	switch (nbr_type) {
 		case NbrType::Normal:
@@ -365,21 +365,21 @@ void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &     
 	}
 }
 
-void BiQuadraticGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<2> &             pinfo,
-                                                           const std::vector<LocalData<2>> &local_datas,
-                                                           std::vector<LocalData<2>> &      nbr_datas,
-                                                           Edge                             edge,
-                                                           NbrType                          nbr_type,
-                                                           Orthant<1>                       orthant_on_coarse) const
+void BiQuadraticGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<2> &        pinfo,
+                                                           const std::vector<View<2>> &local_datas,
+                                                           std::vector<View<2>> &      nbr_datas,
+                                                           Edge                        edge,
+                                                           NbrType                     nbr_type,
+                                                           Orthant<1>                  orthant_on_coarse) const
 {
 	// no edges for 2d
 }
 
-void BiQuadraticGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &             pinfo,
-                                                             const std::vector<LocalData<2>> &local_datas,
-                                                             std::vector<LocalData<2>> &      nbr_datas,
-                                                             Corner<2>                        corner,
-                                                             NbrType                          nbr_type) const
+void BiQuadraticGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &        pinfo,
+                                                             const std::vector<View<2>> &local_datas,
+                                                             std::vector<View<2>> &      nbr_datas,
+                                                             Corner<2>                   corner,
+                                                             NbrType                     nbr_type) const
 {
 	switch (nbr_type) {
 		case NbrType::Normal:
@@ -396,9 +396,9 @@ void BiQuadraticGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> 
 	}
 }
 
-void BiQuadraticGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, std::vector<LocalData<2>> &local_datas) const
+void BiQuadraticGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<2> &pinfo, std::vector<View<2>> &local_datas) const
 {
-	for (const LocalData<2> &local_data : local_datas) {
+	for (const View<2> &local_data : local_datas) {
 		switch (this->getFillType()) {
 			case GhostFillingType::Corners: // Fill corners and faces
 				FillLocalGhostCellsOnCorners(pinfo, local_data);

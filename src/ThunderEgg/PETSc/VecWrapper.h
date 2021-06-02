@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_PETSC_VECWRAPPER_H
 #define THUNDEREGG_PETSC_VECWRAPPER_H
-#include <ThunderEgg/PETSc/VecLocalDataManager.h>
+#include <ThunderEgg/PETSc/VecViewManager.h>
 #include <ThunderEgg/Schur/InterfaceDomain.h>
 
 namespace ThunderEgg
@@ -79,8 +79,7 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param num_components the number of components for each cell
 	 * @return int the number of local patches
 	 */
-	static int GetNumLocalPatches(Vec vec, const std::array<int, D> &lengths, int num_ghost_cells,
-	                              int num_components)
+	static int GetNumLocalPatches(Vec vec, const std::array<int, D> &lengths, int num_ghost_cells, int num_components)
 	{
 		int patch_stride = num_components;
 		for (size_t i = 0; i < D; i++) {
@@ -100,15 +99,13 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param num_components the number of components for each cell
 	 * @return int the number of local cells
 	 */
-	static int GetNumLocalCells(Vec vec, const std::array<int, D> &lengths, int num_ghost_cells,
-	                            int num_components)
+	static int GetNumLocalCells(Vec vec, const std::array<int, D> &lengths, int num_ghost_cells, int num_components)
 	{
 		int num_cells_in_patch = 1;
 		for (size_t i = 0; i < D; i++) {
 			num_cells_in_patch *= lengths[i];
 		}
-		return num_cells_in_patch
-		       * GetNumLocalPatches(vec, lengths, num_ghost_cells, num_components);
+		return num_cells_in_patch * GetNumLocalPatches(vec, lengths, num_ghost_cells, num_components);
 	}
 
 	public:
@@ -121,12 +118,15 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param num_components the number of components for each cell
 	 * @param own whether or not to deallocate the PETSc vector when this object is destroyed.
 	 */
-	VecWrapper(Vec vec, const std::array<int, D> &lengths, int num_components, int num_ghost_cells,
-	           bool own)
-	: Vector<D>(MPI_COMM_WORLD, num_components,
+	VecWrapper(Vec vec, const std::array<int, D> &lengths, int num_components, int num_ghost_cells, bool own)
+	: Vector<D>(MPI_COMM_WORLD,
+	            num_components,
 	            GetNumLocalPatches(vec, lengths, num_ghost_cells, num_components),
 	            GetNumLocalCells(vec, lengths, num_ghost_cells, num_components)),
-	  vec(vec), num_ghost_cells(num_ghost_cells), own(own), lengths(lengths)
+	  vec(vec),
+	  num_ghost_cells(num_ghost_cells),
+	  own(own),
+	  lengths(lengths)
 	{
 		strides[0]          = 1;
 		int my_first_offset = num_ghost_cells;
@@ -149,14 +149,11 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param domain the Domain
 	 * @return std::shared_ptr<VecWrapper<D>> the resulting VecWrapper
 	 */
-	static std::shared_ptr<VecWrapper<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain,
-	                                                   int num_components)
+	static std::shared_ptr<VecWrapper<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain, int num_components)
 	{
 		Vec u;
-		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCellsWithGhost() * num_components,
-		             PETSC_DETERMINE, &u);
-		return std::make_shared<VecWrapper<D>>(u, domain->getNs(), num_components,
-		                                       domain->getNumGhostCells(), true);
+		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCellsWithGhost() * num_components, PETSC_DETERMINE, &u);
+		return std::make_shared<VecWrapper<D>>(u, domain->getNs(), num_components, domain->getNumGhostCells(), true);
 	}
 	/**
 	 * @brief Get a new boundary condition vector for a given Domain
@@ -183,20 +180,18 @@ template <int D> class VecWrapper : public Vector<D>
 			VecDestroy(&vec);
 		}
 	}
-	LocalData<D> getLocalData(int component_index, int patch_local_index) override
+	View<D> getView(int component_index, int patch_local_index) override
 	{
-		std::shared_ptr<VecLocalDataManager> ldm(new VecLocalDataManager(vec, false));
-		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset
-		               + component_index * component_stride;
-		return LocalData<D>(data, strides, lengths, num_ghost_cells, ldm);
+		std::shared_ptr<VecViewManager> ldm(new VecViewManager(vec, false));
+		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset + component_index * component_stride;
+		return View<D>(data, strides, lengths, num_ghost_cells, ldm);
 	}
 
-	const LocalData<D> getLocalData(int component_index, int patch_local_index) const override
+	const View<D> getView(int component_index, int patch_local_index) const override
 	{
-		std::shared_ptr<VecLocalDataManager> ldm(new VecLocalDataManager(vec, true));
-		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset
-		               + component_index * component_stride;
-		return LocalData<D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
+		std::shared_ptr<VecViewManager> ldm(new VecViewManager(vec, true));
+		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset + component_index * component_stride;
+		return View<D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
 	}
 	int getNumGhostCells() const
 	{

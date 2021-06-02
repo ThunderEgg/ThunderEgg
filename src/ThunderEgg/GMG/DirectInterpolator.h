@@ -55,8 +55,8 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 	{
 		for (auto pair : patches) {
 			auto pinfo              = pair.second.get();
-			auto coarse_local_datas = coarser_vector->getLocalDatas(pair.first);
-			auto fine_datas         = finer_vector->getLocalDatas(pinfo.local_index);
+			auto coarse_local_datas = coarser_vector->getViews(pair.first);
+			auto fine_datas         = finer_vector->getViews(pinfo.local_index);
 
 			if (pinfo.hasCoarseParent()) {
 				Orthant<D>         orth = pinfo.orth_on_parent;

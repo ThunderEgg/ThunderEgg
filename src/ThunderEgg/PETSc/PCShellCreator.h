@@ -55,11 +55,7 @@ template <int D> class PCShellCreator
 	 * @param vg_in the VectorGenerator we are wrapping
 	 * @param A_in the Mat associated with the preconditioner Operator
 	 */
-	PCShellCreator(std::shared_ptr<Operator<D>> op_in, std::shared_ptr<VectorGenerator<D>> vg_in,
-	               Mat A_in)
-	: op(op_in), vg(vg_in), A(A_in)
-	{
-	}
+	PCShellCreator(std::shared_ptr<Operator<D>> op_in, std::shared_ptr<VectorGenerator<D>> vg_in, Mat A_in) : op(op_in), vg(vg_in), A(A_in) {}
 	PCShellCreator(const PCShellCreator &) = delete;
 	PCShellCreator &operator=(const PCShellCreator &) = delete;
 	PCShellCreator(PCShellCreator &&) noexcept        = delete;
@@ -93,7 +89,7 @@ template <int D> class PCShellCreator
 		int index = 0;
 		for (int p_index = 0; p_index < te_x->getNumLocalPatches(); p_index++) {
 			for (int c = 0; c < te_x->getNumComponents(); c++) {
-				LocalData<D> ld = te_x->getLocalData(c, p_index);
+				View<D> ld = te_x->getView(c, p_index);
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					ld[coord] = x_view[index];
 					index++;
@@ -110,7 +106,7 @@ template <int D> class PCShellCreator
 		index = 0;
 		for (int p_index = 0; p_index < te_b->getNumLocalPatches(); p_index++) {
 			for (int c = 0; c < te_x->getNumComponents(); c++) {
-				const LocalData<D> ld = te_b->getLocalData(c, p_index);
+				const View<D> ld = te_b->getView(c, p_index);
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					b_view[index] = ld[coord];
 					index++;
@@ -144,8 +140,7 @@ template <int D> class PCShellCreator
 	 * @param vg the VectorGenerator associated with the operators
 	 * @return PC the wrapped PC, you are responsible for calling PCDestroy on this object
 	 */
-	static PC GetNewPCShell(std::shared_ptr<Operator<D>> prec, std::shared_ptr<Operator<D>> op,
-	                        std::shared_ptr<VectorGenerator<D>> vg)
+	static PC GetNewPCShell(std::shared_ptr<Operator<D>> prec, std::shared_ptr<Operator<D>> op, std::shared_ptr<VectorGenerator<D>> vg)
 	{
 		Mat                A   = MatShellCreator<D>::GetNewMatShell(op, vg);
 		PCShellCreator<D> *psc = new PCShellCreator(prec, vg, A);

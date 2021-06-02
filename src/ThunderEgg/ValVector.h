@@ -90,10 +90,10 @@ template <int D> class ValVector : public Vector<D>
 	 * @param num_components the number of components for each cell
 	 * @param num_patches the number of patches in this vector
 	 */
-	ValVector(MPI_Comm comm, const std::array<int, D> &lengths, int num_ghost_cells,
-	          int num_components, int num_patches)
+	ValVector(MPI_Comm comm, const std::array<int, D> &lengths, int num_ghost_cells, int num_components, int num_patches)
 	: Vector<D>(comm, num_components, num_patches, GetNumLocalCells(lengths, num_patches)),
-	  lengths(lengths), num_ghost_cells(num_ghost_cells)
+	  lengths(lengths),
+	  num_ghost_cells(num_ghost_cells)
 	{
 		int size            = 1;
 		int my_first_offset = 0;
@@ -116,24 +116,20 @@ template <int D> class ValVector : public Vector<D>
 	 * @param num_components the number of components for each cell
 	 * @return std::shared_ptr<ValVector<D>> the new Vector
 	 */
-	static std::shared_ptr<ValVector<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain,
-	                                                  int num_components)
+	static std::shared_ptr<ValVector<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain, int num_components)
 	{
 		return std::shared_ptr<ValVector<D>>(
-		new ValVector<D>(MPI_COMM_WORLD, domain->getNs(), domain->getNumGhostCells(),
-		                 num_components, domain->getNumLocalPatches()));
+		new ValVector<D>(MPI_COMM_WORLD, domain->getNs(), domain->getNumGhostCells(), num_components, domain->getNumLocalPatches()));
 	}
-	LocalData<D> getLocalData(int component_index, int local_patch_index) override
+	View<D> getView(int component_index, int local_patch_index) override
 	{
-		double *data = &vec[patch_stride * local_patch_index + first_offset
-		                    + component_stride * component_index];
-		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
+		double *data = &vec[patch_stride * local_patch_index + first_offset + component_stride * component_index];
+		return View<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
-	const LocalData<D> getLocalData(int component_index, int local_patch_index) const override
+	const View<D> getView(int component_index, int local_patch_index) const override
 	{
-		double *data = const_cast<double *>(
-		&vec[patch_stride * local_patch_index + first_offset + component_stride * component_index]);
-		return LocalData<D>(data, strides, lengths, num_ghost_cells, nullptr);
+		double *data = const_cast<double *>(&vec[patch_stride * local_patch_index + first_offset + component_stride * component_index]);
+		return View<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 
 	/**

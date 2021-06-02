@@ -49,7 +49,7 @@ target_sources(unit_tests_mpi1 PRIVATE Face_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE FineNbrInfo_MPI1.cpp)
 
-target_sources(unit_tests_mpi1 PRIVATE LocalData_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE View_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE MPIGhostFiller_MPI1.cpp)
 target_sources(unit_tests_mpi2 PRIVATE MPIGhostFiller_MPI2.cpp)

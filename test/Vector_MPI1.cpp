@@ -22,13 +22,13 @@
 #include "Vector_MOCKS.h"
 #include "utils/DomainReader.h"
 
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
 using namespace std;
 using namespace ThunderEgg;
-#define MESHES                                                                                     \
+#define MESHES \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 TEST_CASE("MockVector<3> getMPIComm", "[MockVector]")
@@ -115,7 +115,7 @@ TEST_CASE("Vector<3> getNumLocalCells", "[Vector]")
 
 	CHECK(vec.getNumLocalCells() == nx * ny * nz * num_local_patches);
 }
-TEST_CASE("Vector<3> getLocalDatas", "[Vector]")
+TEST_CASE("Vector<3> getViews", "[Vector]")
 {
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
@@ -135,14 +135,14 @@ TEST_CASE("Vector<3> getLocalDatas", "[Vector]")
 	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto lds = vec.getLocalDatas(i);
+		auto lds = vec.getViews(i);
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getLocalData(c, i);
+			auto ld = vec.getView(c, i);
 			CHECK(ld.getPtr() == lds[c].getPtr());
 		}
 	}
 }
-TEST_CASE("Vector<3> getLocalDatas const", "[Vector]")
+TEST_CASE("Vector<3> getViews const", "[Vector]")
 {
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
@@ -162,9 +162,9 @@ TEST_CASE("Vector<3> getLocalDatas const", "[Vector]")
 	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto lds = vec.getLocalDatas(i);
+		auto lds = vec.getViews(i);
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getLocalData(c, i);
+			auto ld = vec.getView(c, i);
 			CHECK(ld.getPtr() == lds[c].getPtr());
 		}
 	}
@@ -192,7 +192,7 @@ TEST_CASE("Vector<3> set", "[Vector]")
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getLocalData(c, i);
+			auto ld = vec.getView(c, i);
 			nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
 				if (isGhost(coord, ns, num_ghost_cells)) {
 					CHECK(ld[coord] == 0);
@@ -226,7 +226,7 @@ TEST_CASE("Vector<3> setWithGhost", "[Vector]")
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getLocalData(c, i);
+			auto ld = vec.getView(c, i);
 			nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) { CHECK(ld[coord] == 28); });
 		}
@@ -256,7 +256,7 @@ TEST_CASE("Vector<3> scale", "[Vector]")
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getLocalData(c, i);
+			auto ld = vec.getView(c, i);
 			nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
 				if (isGhost(coord, ns, num_ghost_cells)) {
 					CHECK(ld[coord] == 28);
@@ -291,7 +291,7 @@ TEST_CASE("Vector<3> shift", "[Vector]")
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getLocalData(c, i);
+			auto ld = vec.getView(c, i);
 			nested_loop<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3> &coord) {
 				if (isGhost(coord, ns, num_ghost_cells)) {
 					CHECK(ld[coord] == 1);
@@ -333,8 +333,8 @@ TEST_CASE("Vector<3> copy", "[Vector]")
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
 		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto a_ld = a->getLocalData(c, i);
-			auto b_ld = b->getLocalData(c, i);
+			auto a_ld = a->getView(c, i);
+			auto b_ld = b->getView(c, i);
 			nested_loop<3>(a_ld.getGhostStart(), a_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -391,9 +391,9 @@ TEST_CASE("Vector<3> add", "[Vector]")
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
 		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getLocalData(c, i);
-			auto b_ld        = b->getLocalData(c, i);
-			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			auto expected_ld = expected->getView(c, i);
+			auto b_ld        = b->getView(c, i);
+			auto b_copy_ld   = b_copy->getView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -450,9 +450,9 @@ TEST_CASE("Vector<3> addScaled", "[Vector]")
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
 		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getLocalData(c, i);
-			auto b_ld        = b->getLocalData(c, i);
-			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			auto expected_ld = expected->getView(c, i);
+			auto b_ld        = b->getView(c, i);
+			auto b_copy_ld   = b_copy->getView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -509,9 +509,9 @@ TEST_CASE("Vector<3> scaleThenAdd", "[Vector]")
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
 		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getLocalData(c, i);
-			auto b_ld        = b->getLocalData(c, i);
-			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			auto expected_ld = expected->getView(c, i);
+			auto b_ld        = b->getView(c, i);
+			auto b_copy_ld   = b_copy->getView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -568,9 +568,9 @@ TEST_CASE("Vector<3> scaleThenAddScaled", "[Vector]")
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
 		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getLocalData(c, i);
-			auto b_ld        = b->getLocalData(c, i);
-			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			auto expected_ld = expected->getView(c, i);
+			auto b_ld        = b->getView(c, i);
+			auto b_copy_ld   = b_copy->getView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -635,9 +635,9 @@ TEST_CASE("Vector<3> scaleThenAddScaled two vectors", "[Vector]")
 
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
 		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getLocalData(c, i);
-			auto b_ld        = b->getLocalData(c, i);
-			auto b_copy_ld   = b_copy->getLocalData(c, i);
+			auto expected_ld = expected->getView(c, i);
+			auto b_ld        = b->getView(c, i);
+			auto b_copy_ld   = b_copy->getView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -678,7 +678,7 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 	double expected_norm = 0;
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getLocalData(c, i);
+			auto ld = vec.getView(c, i);
 			nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
 				expected_norm += ld[coord] * ld[coord];
 			});
@@ -717,7 +717,7 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
 	double expected_norm = 0;
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getLocalData(c, i);
+			auto ld = vec.getView(c, i);
 			nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
 				expected_norm = max(abs(ld[coord]), expected_norm);
 			});
@@ -761,8 +761,8 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	double expected_value = 0;
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
 		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto a_ld = a->getLocalData(c, i);
-			auto b_ld = b->getLocalData(c, i);
+			auto a_ld = a->getView(c, i);
+			auto b_ld = b->getView(c, i);
 			nested_loop<3>(b_ld.getStart(), b_ld.getEnd(), [&](std::array<int, 3> &coord) {
 				expected_value += b_ld[coord] * a_ld[coord];
 			});

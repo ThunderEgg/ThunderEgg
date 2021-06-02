@@ -67,8 +67,8 @@ class MockPatchOperator : public PatchOperator<D>
 			patches_to_be_called.insert(&pinfo);
 		}
 	}
-	void applySinglePatch(const PatchInfo<D> &             pinfo,
-	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
+	void applySinglePatch(const PatchInfo<D> &        pinfo,
+	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs,
 	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
 		CHECK_FALSE(treat_interior_boundary_as_dirichlet);
@@ -77,16 +77,16 @@ class MockPatchOperator : public PatchOperator<D>
 		INFO("LOCAL_INDEX: " << pinfo.local_index);
 		for (int c = 0; c < u_vec->getNumComponents(); c++) {
 			INFO("c: " << c);
-			CHECK(u_vec->getLocalData(c, pinfo.local_index).getPtr() == us[c].getPtr());
+			CHECK(u_vec->getView(c, pinfo.local_index).getPtr() == us[c].getPtr());
 		}
 		for (int c = 0; c < f_vec->getNumComponents(); c++) {
 			INFO("c: " << c);
-			CHECK(f_vec->getLocalData(c, pinfo.local_index).getPtr() == fs[c].getPtr());
+			CHECK(f_vec->getView(c, pinfo.local_index).getPtr() == fs[c].getPtr());
 		}
 	}
-	void addGhostToRHS(const PatchInfo<D> &             pinfo,
-	                   const std::vector<LocalData<D>> &us,
-	                   std::vector<LocalData<D>> &      fs) const override
+	void addGhostToRHS(const PatchInfo<D> &        pinfo,
+	                   const std::vector<View<D>> &us,
+	                   std::vector<View<D>> &      fs) const override
 	{
 	}
 	bool allPatchesCalled()

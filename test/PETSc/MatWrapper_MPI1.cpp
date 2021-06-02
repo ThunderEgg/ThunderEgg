@@ -77,8 +77,8 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(0, pinfo.local_index);
-		LocalData<2> b_ld = b->getLocalData(0, pinfo.local_index);
+		View<2> x_ld = x->getView(0, pinfo.local_index);
+		View<2> b_ld = b->getView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -127,8 +127,8 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper with ghost and 0.5I",
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(0, pinfo.local_index);
-		LocalData<2> b_ld = b->getLocalData(0, pinfo.local_index);
+		View<2> x_ld = x->getView(0, pinfo.local_index);
+		View<2> b_ld = b->getView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -177,8 +177,8 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper without ghost and 0.5I
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(0, pinfo.local_index);
-		LocalData<2> b_ld = b->getLocalData(0, pinfo.local_index);
+		View<2> x_ld = x->getView(0, pinfo.local_index);
+		View<2> b_ld = b->getView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -231,15 +231,15 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(0, pinfo.local_index);
-		LocalData<2> b_ld = b->getLocalData(0, pinfo.local_index);
+		View<2> x_ld = x->getView(0, pinfo.local_index);
+		View<2> b_ld = b->getView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
 		});
-		LocalData<2> x_ld2 = x->getLocalData(1, pinfo.local_index);
-		LocalData<2> b_ld2 = b->getLocalData(1, pinfo.local_index);
+		View<2> x_ld2 = x->getView(1, pinfo.local_index);
+		View<2> b_ld2 = b->getView(1, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -293,15 +293,15 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper with ghost and 0.5I tw
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(0, pinfo.local_index);
-		LocalData<2> b_ld = b->getLocalData(0, pinfo.local_index);
+		View<2> x_ld = x->getView(0, pinfo.local_index);
+		View<2> b_ld = b->getView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
 		});
-		LocalData<2> x_ld2 = x->getLocalData(1, pinfo.local_index);
-		LocalData<2> b_ld2 = b->getLocalData(1, pinfo.local_index);
+		View<2> x_ld2 = x->getView(1, pinfo.local_index);
+		View<2> b_ld2 = b->getView(1, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -355,15 +355,15 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper without ghost and 0.5I
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(0, pinfo.local_index);
-		LocalData<2> b_ld = b->getLocalData(0, pinfo.local_index);
+		View<2> x_ld = x->getView(0, pinfo.local_index);
+		View<2> b_ld = b->getView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
 		});
-		LocalData<2> x_ld2 = x->getLocalData(1, pinfo.local_index);
-		LocalData<2> b_ld2 = b->getLocalData(1, pinfo.local_index);
+		View<2> x_ld2 = x->getView(1, pinfo.local_index);
+		View<2> b_ld2 = b->getView(1, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

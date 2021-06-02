@@ -27,7 +27,7 @@
 
 using namespace std;
 using namespace ThunderEgg;
-#define MESHES                                                                                     \
+#define MESHES \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 TEST_CASE("ValVectorGenerator getNewVector", "[ValVectorGenerator]")
 {
@@ -49,6 +49,6 @@ TEST_CASE("ValVectorGenerator getNewVector", "[ValVectorGenerator]")
 	CHECK(val_vector->getNumComponents() == num_components);
 	CHECK(val_vector->getNumLocalPatches() == d_fine->getNumLocalPatches());
 	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
-	CHECK(val_vector->getLocalData(0, 0).getLengths()[0] == nx);
-	CHECK(val_vector->getLocalData(0, 0).getLengths()[1] == ny);
+	CHECK(val_vector->getView(0, 0).getLengths()[0] == nx);
+	CHECK(val_vector->getView(0, 0).getLengths()[1] == ny);
 }

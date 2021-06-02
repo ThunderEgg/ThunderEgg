@@ -22,9 +22,9 @@
 #include "Vector.h"
 namespace ThunderEgg
 {
-template class LocalData<1>;
-template class LocalData<2>;
-template class LocalData<3>;
+template class View<1>;
+template class View<2>;
+template class View<3>;
 template class Vector<1>;
 template class Vector<2>;
 template class Vector<3>;

@@ -49,14 +49,12 @@ template <int D> class MatWrapper : public Operator<D>
 	Vec getPetscVecWithoutGhost(std::shared_ptr<const Vector<D>> vec) const
 	{
 		Vec                                         petsc_vec;
-		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
+		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr = std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
 		if (petsc_vec_ptr != nullptr && petsc_vec_ptr->getNumGhostCells() == 0) {
 			petsc_vec = petsc_vec_ptr->getVec();
 		} else {
 			// have to create a new petsc vector without ghostcells for petsc call
-			VecCreateMPI(vec->getMPIComm(), vec->getNumLocalCells() * vec->getNumComponents(),
-			             PETSC_DETERMINE, &petsc_vec);
+			VecCreateMPI(vec->getMPIComm(), vec->getNumLocalCells() * vec->getNumComponents(), PETSC_DETERMINE, &petsc_vec);
 		}
 		return petsc_vec;
 	}
@@ -68,20 +66,18 @@ template <int D> class MatWrapper : public Operator<D>
 	 */
 	void copyToPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
 	{
-		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
+		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr = std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
 		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
 			double *petsc_vec_view;
 			size_t  curr_index = 0;
 			VecGetArray(petsc_vec, &petsc_vec_view);
 			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
 				for (int c = 0; c < vec->getNumComponents(); c++) {
-					const LocalData<D> ld = vec->getLocalData(c, i);
-					nested_loop<D>(ld.getStart(), ld.getEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               petsc_vec_view[curr_index] = ld[coord];
-						               curr_index++;
-					               });
+					const View<D> ld = vec->getView(c, i);
+					nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+						petsc_vec_view[curr_index] = ld[coord];
+						curr_index++;
+					});
 				}
 			}
 			VecRestoreArray(petsc_vec, &petsc_vec_view);
@@ -95,20 +91,18 @@ template <int D> class MatWrapper : public Operator<D>
 	 */
 	void copyToVec(Vec petsc_vec, std::shared_ptr<Vector<D>> vec) const
 	{
-		std::shared_ptr<PETSc::VecWrapper<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<PETSc::VecWrapper<D>>(vec);
+		std::shared_ptr<PETSc::VecWrapper<D>> petsc_vec_ptr = std::dynamic_pointer_cast<PETSc::VecWrapper<D>>(vec);
 		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
 			const double *petsc_vec_view;
 			size_t        curr_index = 0;
 			VecGetArrayRead(petsc_vec, &petsc_vec_view);
 			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
 				for (int c = 0; c < vec->getNumComponents(); c++) {
-					LocalData<D> ld = vec->getLocalData(c, i);
-					nested_loop<D>(ld.getStart(), ld.getEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               ld[coord] = petsc_vec_view[curr_index];
-						               curr_index++;
-					               });
+					View<D> ld = vec->getView(c, i);
+					nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+						ld[coord] = petsc_vec_view[curr_index];
+						curr_index++;
+					});
 				}
 			}
 			VecRestoreArrayRead(petsc_vec, &petsc_vec_view);
@@ -122,8 +116,7 @@ template <int D> class MatWrapper : public Operator<D>
 	 */
 	void destroyPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
 	{
-		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
+		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr = std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
 		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
 			VecDestroy(&petsc_vec);
 		}

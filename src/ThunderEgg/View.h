@@ -19,11 +19,11 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_LOCALDATA_H
-#define THUNDEREGG_LOCALDATA_H
+#ifndef THUNDEREGG_VIEW_H
+#define THUNDEREGG_VIEW_H
 #include <ThunderEgg/Face.h>
-#include <ThunderEgg/LocalDataManager.h>
 #include <ThunderEgg/Loops.h>
+#include <ThunderEgg/ViewManager.h>
 #include <memory>
 namespace ThunderEgg
 {
@@ -32,7 +32,7 @@ namespace ThunderEgg
  *
  * @tparam D number of cartesian dimensions
  */
-template <int D> class LocalData
+template <int D> class View
 {
 	private:
 	/**
@@ -64,9 +64,9 @@ template <int D> class LocalData
 	 */
 	std::array<int, D> ghost_end;
 	/**
-	 * @brief The LocalDataManager that does any necessary cleanup
+	 * @brief The ViewManager that does any necessary cleanup
 	 */
-	std::shared_ptr<LocalDataManager> ldm;
+	std::shared_ptr<ViewManager> ldm;
 	/**
 	 * @brief The number of ghost cells on each side of the patch
 	 */
@@ -78,9 +78,9 @@ template <int D> class LocalData
 	 * @param s the side of patch for the slice
 	 * @param offset the offset, with {0, 0} being the first slice of non-ghost cell values, and {-1, -1} being
 	 * the first slice of ghost cell values
-	 * @return LocalData<1> the resulting slice
+	 * @return View<1> the resulting slice
 	 */
-	template <int M> LocalData<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
+	template <int M> View<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
 		std::array<int, M>         new_strides;
 		std::array<int, M>         new_lengths;
@@ -102,7 +102,7 @@ template <int D> class LocalData
 				lengths_index++;
 			}
 		}
-		return LocalData<M>(new_data, new_strides, new_lengths, 0, ldm);
+		return View<M>(new_data, new_strides, new_lengths, 0, ldm);
 	}
 
 	template <int idx, class Type, class... Types> int getIndex(Type t, Types... args) const
@@ -115,9 +115,9 @@ template <int D> class LocalData
 	}
 
 	public:
-	LocalData() {}
+	View() {}
 	/**
-	 * @brief Construct a new LocalData object
+	 * @brief Construct a new View object
 	 *
 	 * @param data_in pointer to the first element in the patch (non-ghost cell element)
 	 * @param strides_in the strides in each direction
@@ -125,11 +125,11 @@ template <int D> class LocalData
 	 * @param num_ghost_cells_in the number of ghost cells on each side of the patch
 	 * @param ldm_in the local data manager for the data
 	 */
-	LocalData(double *                          data_in,
-	          const std::array<int, D> &        strides_in,
-	          const std::array<int, D> &        lengths_in,
-	          int                               num_ghost_cells_in,
-	          std::shared_ptr<LocalDataManager> ldm_in = nullptr)
+	View(double *                     data_in,
+	     const std::array<int, D> &   strides_in,
+	     const std::array<int, D> &   lengths_in,
+	     int                          num_ghost_cells_in,
+	     std::shared_ptr<ViewManager> ldm_in = nullptr)
 	: data(data_in),
 	  strides(strides_in),
 	  lengths(lengths_in),
@@ -219,7 +219,7 @@ template <int D> class LocalData
 	 * face
 	 * @return double& the value
 	 */
-	template <int M> LocalData<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
+	template <int M> View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
 	{
 		return getSliceOnPriv(f, offset);
 	}
@@ -231,11 +231,11 @@ template <int D> class LocalData
 	 * face
 	 * @return double& the value
 	 */
-	template <int M> const LocalData<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
+	template <int M> const View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
 		return getSliceOnPriv(f, offset);
 	}
-	template <int M> LocalData<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
+	template <int M> View<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
 	{
 		std::array<int, M>         new_strides;
 		std::array<int, M>         new_lengths;
@@ -257,7 +257,7 @@ template <int D> class LocalData
 				lengths_index++;
 			}
 		}
-		return LocalData<M>(new_data, new_strides, new_lengths, 0, ldm);
+		return View<M>(new_data, new_strides, new_lengths, 0, ldm);
 	}
 	/**
 	 * @brief Get the Lengths of the patch in each direction
@@ -316,15 +316,15 @@ template <int D> class LocalData
 		return data;
 	}
 };
-extern template class LocalData<1>;
-extern template class LocalData<2>;
-extern template class LocalData<3>;
+extern template class View<1>;
+extern template class View<2>;
+extern template class View<3>;
 /*
-template <> inline const double &LocalData<2>::operator[](const std::array<int, 2> &coord) const
+template <> inline const double &View<2>::operator[](const std::array<int, 2> &coord) const
 {
     return data[strides[0] * coord[0] + strides[1] * coord[1]];
 }
-template <> inline double &LocalData<2>::operator[](const std::array<int, 2> &coord)
+template <> inline double &View<2>::operator[](const std::array<int, 2> &coord)
 {
     return data[strides[0] * coord[0] + strides[1] * coord[1]];
 }

@@ -228,13 +228,13 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 			addPatch(pinfo);
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &fs, std::vector<LocalData<D>> &us) const override
+	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<View<D>> &fs, std::vector<View<D>> &us) const override
 	{
-		LocalData<D> f_copy_ld = f_copy->getLocalData(0, 0);
+		View<D> f_copy_ld = f_copy->getView(0, 0);
 
 		nested_loop<D>(f_copy_ld.getStart(), f_copy_ld.getEnd(), [&](std::array<int, D> coord) { f_copy_ld[coord] = fs[0][coord]; });
 
-		std::vector<LocalData<D>> f_copy_lds = {f_copy_ld};
+		std::vector<View<D>> f_copy_lds = {f_copy_ld};
 		op->addGhostToRHS(pinfo, us, f_copy_lds);
 
 		fftw_execute(plan1.at(pinfo));
@@ -247,7 +247,7 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 
 		fftw_execute(plan2.at(pinfo));
 
-		LocalData<D> sol_ld = sol->getLocalData(0, 0);
+		View<D> sol_ld = sol->getView(0, 0);
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {

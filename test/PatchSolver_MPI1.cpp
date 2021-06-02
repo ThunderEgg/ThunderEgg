@@ -16,7 +16,6 @@ constexpr auto single_mesh_file  = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
 constexpr auto cross_mesh_file   = "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json";
 
-
 TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
 {
 	auto mesh_file
@@ -41,7 +40,7 @@ TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
 		for (int c = 0; c < u->getNumComponents(); c++) {
-			auto ld = u->getLocalData(c, i);
+			auto ld = u->getView(c, i);
 			nested_loop<2>(ld.getStart(), ld.getEnd(),
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 		}
@@ -74,7 +73,7 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
 		for (int c = 0; c < u->getNumComponents(); c++) {
-			auto ld = u->getLocalData(c, i);
+			auto ld = u->getView(c, i);
 			nested_loop<2>(ld.getStart(), ld.getEnd(),
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 		}
@@ -111,7 +110,7 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
 		for (int c = 0; c < u->getNumComponents(); c++) {
-			auto ld = u->getLocalData(c, i);
+			auto ld = u->getView(c, i);
 			nested_loop<2>(ld.getStart(), ld.getEnd(),
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 		}
@@ -147,7 +146,7 @@ TEST_CASE("PatchSolver smooth for various domains with timer", "[PatchSolver]")
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
 		for (int c = 0; c < u->getNumComponents(); c++) {
-			auto ld = u->getLocalData(c, i);
+			auto ld = u->getView(c, i);
 			nested_loop<2>(ld.getStart(), ld.getEnd(),
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 		}

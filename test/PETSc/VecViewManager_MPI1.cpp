@@ -20,22 +20,22 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include <ThunderEgg/PETSc/VecLocalDataManager.h>
+#include <ThunderEgg/PETSc/VecViewManager.h>
 
 #include <catch2/catch_test_macros.hpp>
 
 using namespace std;
 using namespace ThunderEgg;
 
-#define MESHES                                                                                     \
+#define MESHES \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
-TEST_CASE("PETSc::VecLocalDataManager getVecView", "[PETSc::VecLocalDataManager]")
+TEST_CASE("PETSc::VecViewManager getVecView", "[PETSc::VecViewManager]")
 {
 	Vec vec;
 	VecCreateMPI(MPI_COMM_WORLD, 100, PETSC_DETERMINE, &vec);
-	PETSc::VecLocalDataManager *vldm = new PETSc::VecLocalDataManager(vec, false);
+	PETSc::VecViewManager *vldm = new PETSc::VecViewManager(vec, false);
 
 	double *view;
 	VecGetArray(vec, &view);
@@ -46,11 +46,11 @@ TEST_CASE("PETSc::VecLocalDataManager getVecView", "[PETSc::VecLocalDataManager]
 	delete vldm;
 	VecDestroy(&vec);
 }
-TEST_CASE("PETSc::VecLocalDataManager getVecView read only", "[PETSc::VecLocalDataManager]")
+TEST_CASE("PETSc::VecViewManager getVecView read only", "[PETSc::VecViewManager]")
 {
 	Vec vec;
 	VecCreateMPI(MPI_COMM_WORLD, 100, PETSC_DETERMINE, &vec);
-	PETSc::VecLocalDataManager *vldm = new PETSc::VecLocalDataManager(vec, true);
+	PETSc::VecViewManager *vldm = new PETSc::VecViewManager(vec, true);
 
 	double *view;
 	VecGetArray(vec, &view);
@@ -61,8 +61,8 @@ TEST_CASE("PETSc::VecLocalDataManager getVecView read only", "[PETSc::VecLocalDa
 	delete vldm;
 	VecDestroy(&vec);
 }
-TEST_CASE("PETSc::VecLocalDataManager throws exception when Vec is read only",
-          "[PETSc::VecLocalDataManager]")
+TEST_CASE("PETSc::VecViewManager throws exception when Vec is read only",
+          "[PETSc::VecViewManager]")
 {
 	Vec vec;
 	VecCreateMPI(MPI_COMM_WORLD, 100, PETSC_DETERMINE, &vec);
@@ -73,7 +73,7 @@ TEST_CASE("PETSc::VecLocalDataManager throws exception when Vec is read only",
 #endif
 
 #if PETSC_USE_DEBUG
-	CHECK_THROWS_AS(PETSc::VecLocalDataManager(vec, false), RuntimeError);
+	CHECK_THROWS_AS(PETSc::VecViewManager(vec, false), RuntimeError);
 #endif
 
 	VecDestroy(&vec);

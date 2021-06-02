@@ -50,16 +50,16 @@ class MockPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
-	void applySinglePatch(const PatchInfo<D> &             pinfo,
-	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
+	void applySinglePatch(const PatchInfo<D> &        pinfo,
+	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs,
 	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
 		interior_dirichlet |= true;
 		num_apply_calls++;
 	}
-	void addGhostToRHS(const PatchInfo<D> &             pinfo,
-	                   const std::vector<LocalData<D>> &us,
-	                   std::vector<LocalData<D>> &      fs) const override
+	void addGhostToRHS(const PatchInfo<D> &        pinfo,
+	                   const std::vector<View<D>> &us,
+	                   std::vector<View<D>> &      fs) const override
 	{
 		rhs_was_modified = true;
 	}
@@ -89,8 +89,8 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
-	void applySinglePatch(const PatchInfo<D> &             pinfo,
-	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
+	void applySinglePatch(const PatchInfo<D> &        pinfo,
+	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs,
 	                      bool treat_interior_boundary_as_dirichlet) const override
 	{
 		interior_dirichlet |= treat_interior_boundary_as_dirichlet;
@@ -99,9 +99,9 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 			               [&](const std::array<int, D> &coord) { fs[c][coord] += 1; });
 		}
 	}
-	void addGhostToRHS(const PatchInfo<D> &             pinfo,
-	                   const std::vector<LocalData<D>> &us,
-	                   std::vector<LocalData<D>> &      fs) const override
+	void addGhostToRHS(const PatchInfo<D> &        pinfo,
+	                   const std::vector<View<D>> &us,
+	                   std::vector<View<D>> &      fs) const override
 	{
 		rhs_was_modified = true;
 	}

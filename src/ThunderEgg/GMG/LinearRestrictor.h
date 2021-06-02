@@ -45,7 +45,7 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	 * @param fine_data the finer patch
 	 * @param coarse_data the coarser patch
 	 */
-	void extrapolateBoundaries(const PatchInfo<D> &pinfo, const LocalData<D> &fine_data, LocalData<D> &coarse_data) const
+	void extrapolateBoundaries(const PatchInfo<D> &pinfo, const View<D> &fine_data, View<D> &coarse_data) const
 	{
 		Orthant<D>         orth = pinfo.orth_on_parent;
 		std::array<int, D> starts;
@@ -84,8 +84,8 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	                             std::shared_ptr<const Vector<D>> finer_vector,
 	                             std::shared_ptr<Vector<D>>       coarser_vector) const
 	{
-		auto coarse_local_datas = coarser_vector->getLocalDatas(parent_index);
-		auto fine_datas         = finer_vector->getLocalDatas(pinfo.local_index);
+		auto coarse_local_datas = coarser_vector->getViews(parent_index);
+		auto fine_datas         = finer_vector->getViews(pinfo.local_index);
 		// get starting index in coarser patch
 		Orthant<D>         orth = pinfo.orth_on_parent;
 		std::array<int, D> starts;
@@ -122,8 +122,8 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	                  std::shared_ptr<const Vector<D>> finer_vector,
 	                  std::shared_ptr<Vector<D>>       coarser_vector) const
 	{
-		auto coarse_local_datas = coarser_vector->getLocalDatas(parent_index);
-		auto fine_datas         = finer_vector->getLocalDatas(pinfo.local_index);
+		auto coarse_local_datas = coarser_vector->getViews(parent_index);
+		auto fine_datas         = finer_vector->getViews(pinfo.local_index);
 		for (size_t c = 0; c < fine_datas.size(); c++) {
 			// just copy the values
 			nested_loop<D>(fine_datas[c].getStart(), fine_datas[c].getEnd(), [&](const std::array<int, D> &coord) {

@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_PETSC_VECLOCALDATAMANAGER_H
-#define THUNDEREGG_PETSC_VECLOCALDATAMANAGER_H
+#ifndef THUNDEREGG_PETSC_VECVIEWMANAGER_H
+#define THUNDEREGG_PETSC_VECVIEWMANAGER_H
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
 #include <petscvec.h>
@@ -34,7 +34,7 @@ namespace PETSc
  *
  * This calls VecGetArray() and VecRestoreArray() for PETSc vectors
  */
-class VecLocalDataManager : public LocalDataManager
+class VecViewManager : public ViewManager
 {
 	private:
 	/**
@@ -52,13 +52,12 @@ class VecLocalDataManager : public LocalDataManager
 
 	public:
 	/**
-	 * @brief Construct a new VecLocalDataManager object
+	 * @brief Construct a new VecViewManager object
 	 *
 	 * @param vec_in the PETSc Vec to manage
 	 * @param is_read_only_in whether or not to treat this vector as read only
 	 */
-	VecLocalDataManager(Vec vec_in, bool is_read_only_in)
-	: vec(vec_in), is_read_only(is_read_only_in)
+	VecViewManager(Vec vec_in, bool is_read_only_in) : vec(vec_in), is_read_only(is_read_only_in)
 	{
 		if (is_read_only) {
 			VecGetArrayRead(vec, const_cast<const double **>(&vec_view));
@@ -71,14 +70,14 @@ class VecLocalDataManager : public LocalDataManager
 			VecGetArray(vec, &vec_view);
 		}
 	}
-	VecLocalDataManager(const VecLocalDataManager &) = delete;
-	VecLocalDataManager &operator=(const VecLocalDataManager &) = delete;
-	VecLocalDataManager(VecLocalDataManager &&) noexcept        = delete;
-	VecLocalDataManager &operator=(VecLocalDataManager &&) noexcept = delete;
+	VecViewManager(const VecViewManager &) = delete;
+	VecViewManager &operator=(const VecViewManager &) = delete;
+	VecViewManager(VecViewManager &&) noexcept        = delete;
+	VecViewManager &operator=(VecViewManager &&) noexcept = delete;
 	/**
-	 * @brief Destroy the VecLocalDataManager object
+	 * @brief Destroy the VecViewManager object
 	 */
-	~VecLocalDataManager()
+	~VecViewManager()
 	{
 		if (is_read_only) {
 			VecRestoreArrayRead(vec, const_cast<const double **>(&vec_view));
