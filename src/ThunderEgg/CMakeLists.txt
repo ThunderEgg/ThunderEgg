@@ -65,6 +65,9 @@ if(TARGET P4EST::P4EST)
 
 endif(TARGET P4EST::P4EST)
 
+list(APPEND ThunderEgg_HDRS PatchArray.h)
+target_sources(ThunderEgg PRIVATE PatchArray.cpp)
+
 list(APPEND ThunderEgg_HDRS PatchInfo.h)
 target_sources(ThunderEgg PRIVATE PatchInfo.cpp)
 
