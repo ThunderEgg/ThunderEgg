@@ -1,10 +1,32 @@
-list(APPEND ThunderEgg_HDRS ThunderEgg/Iterative/BiCGStab.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Iterative/BiCGStab.cpp)
+# -- clear header list form parent scope
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Iterative/CG.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Iterative/CG.cpp)
+unset(ThunderEgg_HDRS)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Iterative/PatchSolver.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Iterative/PatchSolver.cpp)
+# -- add sources
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Iterative/Solver.h)
+list(APPEND ThunderEgg_HDRS BiCGStab.h)
+target_sources(ThunderEgg PRIVATE BiCGStab.cpp)
+
+list(APPEND ThunderEgg_HDRS CG.h)
+target_sources(ThunderEgg PRIVATE CG.cpp)
+
+list(APPEND ThunderEgg_HDRS PatchSolver.h)
+target_sources(ThunderEgg PRIVATE PatchSolver.cpp)
+
+list(APPEND ThunderEgg_HDRS Solver.h)
+
+# -- install public headers
+
+install(
+  FILES ${ThunderEgg_HDRS}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg/Iterative
+)
+
+# -- add list of headers to all
+
+list(TRANSFORM ThunderEgg_HDRS PREPEND "ThunderEgg/Iterative/")
+list(APPEND ALL_ThunderEgg_HDRS ${ThunderEgg_HDRS})
+
+# -- propogate to parent scope
+
+set(ALL_ThunderEgg_HDRS ${ALL_ThunderEgg_HDRS} PARENT_SCOPE)

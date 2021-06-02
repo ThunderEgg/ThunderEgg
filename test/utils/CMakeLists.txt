@@ -1,0 +1,1 @@
+target_sources(test_shared PRIVATE DomainReader.cpp)

@@ -1,36 +1,58 @@
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Cycle.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/Cycle.cpp)
+# -- clear header list form parent scope
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleBuilder.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/CycleBuilder.cpp)
+unset(ThunderEgg_HDRS)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/CycleOpts.h)
+# -- add sources
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/DirectInterpolator.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/DirectInterpolator.cpp)
+list(APPEND ThunderEgg_HDRS Cycle.h)
+target_sources(ThunderEgg PRIVATE Cycle.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/InterLevelComm.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/InterLevelComm.cpp)
+list(APPEND ThunderEgg_HDRS CycleBuilder.h)
+target_sources(ThunderEgg PRIVATE CycleBuilder.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Interpolator.h)
+list(APPEND ThunderEgg_HDRS CycleOpts.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Level.h)
+list(APPEND ThunderEgg_HDRS DirectInterpolator.h)
+target_sources(ThunderEgg PRIVATE DirectInterpolator.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/LinearRestrictor.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/LinearRestrictor.cpp)
+list(APPEND ThunderEgg_HDRS InterLevelComm.h)
+target_sources(ThunderEgg PRIVATE InterLevelComm.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/MPIInterpolator.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/MPIInterpolator.cpp)
+list(APPEND ThunderEgg_HDRS Interpolator.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/MPIRestrictor.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/MPIRestrictor.cpp)
+list(APPEND ThunderEgg_HDRS Level.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Restrictor.h)
+list(APPEND ThunderEgg_HDRS LinearRestrictor.h)
+target_sources(ThunderEgg PRIVATE LinearRestrictor.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/Smoother.h)
+list(APPEND ThunderEgg_HDRS MPIInterpolator.h)
+target_sources(ThunderEgg PRIVATE MPIInterpolator.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/VCycle.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/VCycle.cpp)
+list(APPEND ThunderEgg_HDRS MPIRestrictor.h)
+target_sources(ThunderEgg PRIVATE MPIRestrictor.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/GMG/WCycle.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/GMG/WCycle.cpp)
+list(APPEND ThunderEgg_HDRS Restrictor.h)
+
+list(APPEND ThunderEgg_HDRS Smoother.h)
+
+list(APPEND ThunderEgg_HDRS VCycle.h)
+target_sources(ThunderEgg PRIVATE VCycle.cpp)
+
+list(APPEND ThunderEgg_HDRS WCycle.h)
+target_sources(ThunderEgg PRIVATE WCycle.cpp)
+
+# -- install public headers
+
+install(
+  FILES ${ThunderEgg_HDRS}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg/GMG
+)
+
+# -- add list of headers to all
+
+list(TRANSFORM ThunderEgg_HDRS PREPEND "ThunderEgg/GMG/")
+list(APPEND ALL_ThunderEgg_HDRS ${ThunderEgg_HDRS})
+
+# -- propogate to parent scope
+
+set(ALL_ThunderEgg_HDRS ${ALL_ThunderEgg_HDRS} PARENT_SCOPE)

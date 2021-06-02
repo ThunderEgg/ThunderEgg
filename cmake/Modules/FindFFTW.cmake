@@ -1,97 +1,63 @@
-# - Find the FFTW library
+# FindFFTW.cmake
+# ---------------
 #
-# Usage:
-#   find_package(FFTW [REQUIRED] [QUIET] )
+# Find fftw library
 #
-# It sets the following variables:
-#   FFTW_FOUND               ... true if fftw is found on the system
-#   FFTW_LIBRARIES           ... full path to fftw library
-#   FFTW_INCLUDES            ... fftw include directory
+# Result Variables
+# ----------------
 #
-# The following variables will be checked by the function
-#   FFTW_USE_STATIC_LIBS    ... if true, only static libraries are found
-#   FFTW_DIR               ... if set, the libraries are exclusively searched
-#                               under this path
-#   FFTW_LIBRARY            ... fftw library to use
-#   FFTW_INCLUDE_DIR        ... fftw include directory
+# This module defines the following variables::
 #
-
-#If environment variable FFTWDIR is specified, it has same effect as FFTW_DIR
-
+#   FFTW_FOUND
+#   FFTW_INCLUDE_DIRS   - include directories for p4est
+#   FFTW_LIBRARIES      - link against this library to use p4est
+#
+# Imported Targets
+# ^^^^^^^^^^^^^^^^
+#   FFTW::FFTW
 
 # Check if we can use PkgConfig
 find_package(PkgConfig)
 
 #Determine from PKG
-if( PKG_CONFIG_FOUND AND NOT FFTW_DIR )
+if(PKG_CONFIG_FOUND)
   pkg_check_modules( PKG_FFTW QUIET "fftw3" )
-endif()
+endif(PKG_CONFIG_FOUND)
 
-if( FFTW_DIR )
+if(NOT FFTW_FOUND)
 
-  #find libs
-  find_library(
-    FFTW_LIB
-    NAMES "fftw3"
-    NO_DEFAULT_PATH
-    PATHS ${FFTW_DIR}
-    PATH_SUFFIXES "lib" "lib64"
-  )
-
-  #find includes
-  find_path(
-    FFTW_INCLUDES
-    NAMES "fftw3.h"
-    NO_DEFAULT_PATH
-    PATHS ${FFTW_DIR}
-    PATH_SUFFIXES "include"
-  )
-
-else()
-  find_path (FFTW_DIR NAMES include/fftw3.h HINTS ENV FFTW_DIR)
-  if( FFTW_DIR )
-    #find libs
-    find_library(
-      FFTW_LIB
-      NAMES "fftw3"
-      PATHS ${FFTW_DIR}
-      PATH_SUFFIXES "lib" "lib64"
-    )
-
-    #find includes
-    find_path(
-      FFTW_INCLUDES
-      NAMES "fftw3.h"
-      PATHS ${FFTW_DIR}
-      PATH_SUFFIXES "include"
-    )
-
-  else()
-
-
-    find_library(
-      FFTW_LIB
-      NAMES "fftw3"
-      PATHS ${PKG_FFTW_LIBRARY_DIRS} ${LIB_INSTALL_DIR}
-    )
-
-    find_path(
-      FFTW_INCLUDES
-      NAMES "fftw3.h"
-      PATHS ${PKG_FFTW_INCLUDE_DIRS} ${INCLUDE_INSTALL_DIR}
-    )
+  find_path (FFTW_INCLUDE_DIR
+    NAMES fftw3.h
+    DOC "fftw3 header")
+  
+  find_library (FFTW_LIBRARY
+    NAMES fftw3
+    DOC "fftw3 library")
+  
+  if(FFTW_LIBRARY AND FFTW_INCLUDE_DIR)
+    set(FFTW_FFTW_FOUND true)
   endif()
+  
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args (FFTW
+    REQUIRED_VARS FFTW_LIBRARY FFTW_INCLUDE_DIR
+    HANDLE_COMPONENTS)
+  
+endif(NOT FFTW_FOUND)
 
-endif( FFTW_DIR )
+if(FFTW_FOUND)
 
-set(FFTW_LIBRARIES ${FFTW_LIB} ${FFTWF_LIB})
+  set(FFTW_INCLUDE_DIRS ${FFTW_INCLUDE_DIR})
+  set(FFTW_LIBRARIES ${FFTW_LIBRARY})
+  
+  if(NOT TARGET FFTW::FFTW)
+      add_library(FFTW::FFTW INTERFACE IMPORTED)
+      set_target_properties(FFTW::FFTW PROPERTIES
+          INTERFACE_INCLUDE_DIRECTORIES "${FFTW_INCLUDE_DIR}"
+          INTERFACE_LINK_LIBRARIES "${FFTW_LIBRARY}"
+      )
+  endif(NOT TARGET FFTW::FFTW)
 
-if(FFTWL_LIB)
-  set(FFTW_LIBRARIES ${FFTW_LIBRARIES} ${FFTWL_LIB})
-endif()
+endif(FFTW_FOUND)
 
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(FFTW
-                                 REQUIRED_VARS FFTW_INCLUDES FFTW_LIBRARIES)
-
-mark_as_advanced(FFTW_INCLUDES FFTW_LIBRARIES FFTW_LIB )
+mark_as_advanced(FFTW_INCLUDE_DIR FFTW_LIBRARY)

@@ -1,28 +1,52 @@
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/CoarseIfaceInfo.h)
+# -- clear header list form parent scope
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceInfo.h)
+unset(ThunderEgg_HDRS)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/IfaceType.h)
+# -- add sources
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/Interface.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/Interface.cpp)
+list(APPEND ThunderEgg_HDRS CoarseIfaceInfo.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/NormalIfaceInfo.h)
+list(APPEND ThunderEgg_HDRS FineIfaceInfo.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/InterfaceDomain.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/InterfaceDomain.cpp)
+list(APPEND ThunderEgg_HDRS IfaceInfo.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PatchIfaceInfo.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchIfaceInfo.cpp)
+list(APPEND ThunderEgg_HDRS IfaceType.h)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PatchIfaceScatter.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchIfaceScatter.cpp)
+list(APPEND ThunderEgg_HDRS Interface.h)
+target_sources(ThunderEgg PRIVATE Interface.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/PatchSolverWrapper.h)
-list(APPEND ThunderEgg_SRCS ThunderEgg/Schur/PatchSolverWrapper.cpp)
+list(APPEND ThunderEgg_HDRS InterfaceDomain.h)
+target_sources(ThunderEgg PRIVATE InterfaceDomain.cpp)
 
-list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/ValVectorGenerator.h)
+list(APPEND ThunderEgg_HDRS NormalIfaceInfo.h)
 
-if(PETSC_FOUND)
-  list(APPEND ThunderEgg_HDRS ThunderEgg/Schur/VecWrapperGenerator.h)
-endif(PETSC_FOUND)
+list(APPEND ThunderEgg_HDRS PatchIfaceInfo.h)
+target_sources(ThunderEgg PRIVATE PatchIfaceInfo.cpp)
+
+list(APPEND ThunderEgg_HDRS PatchIfaceScatter.h)
+target_sources(ThunderEgg PRIVATE PatchIfaceScatter.cpp)
+
+list(APPEND ThunderEgg_HDRS PatchSolverWrapper.h)
+target_sources(ThunderEgg PRIVATE PatchSolverWrapper.cpp)
+
+list(APPEND ThunderEgg_HDRS ValVectorGenerator.h)
+
+if(TARGET PETSC::PETSC)
+  list(APPEND ThunderEgg_HDRS VecWrapperGenerator.h)
+endif(TARGET PETSC::PETSC)
+
+# -- install public headers
+
+install(
+  FILES ${ThunderEgg_HDRS}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg/Schur
+)
+
+# -- add list of headers to all
+
+list(TRANSFORM ThunderEgg_HDRS PREPEND "ThunderEgg/Schur/")
+list(APPEND ALL_ThunderEgg_HDRS ${ThunderEgg_HDRS})
+
+# -- propogate to parent scope
+
+set(ALL_ThunderEgg_HDRS ${ALL_ThunderEgg_HDRS} PARENT_SCOPE)

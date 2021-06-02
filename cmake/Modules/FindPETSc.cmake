@@ -18,6 +18,10 @@
 #  PETSC_DIR - directory in which PETSc resides
 #  PETSC_ARCH - build architecture
 #
+# Imported Targets
+# ^^^^^^^^^^^^^^^^
+#   PETSC::PETSC
+#
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 #
@@ -344,3 +348,15 @@ find_package_handle_standard_args (PETSc
   REQUIRED_VARS PETSC_INCLUDES PETSC_LIBRARIES PETSC_EXECUTABLE_RUNS
   VERSION_VAR PETSC_VERSION
   FAIL_MESSAGE "PETSc could not be found.  Be sure to set PETSC_DIR and PETSC_ARCH.")
+
+if(PETSC_FOUND)
+
+  if(NOT TARGET PETSC::PETSC)
+      add_library(PETSC::PETSC INTERFACE IMPORTED)
+      set_target_properties(PETSC::PETSC PROPERTIES
+          INTERFACE_INCLUDE_DIRECTORIES "${PETSC_INCLUDES}"
+          INTERFACE_LINK_LIBRARIES "${PETSC_LIBRARIES}"
+      )
+  endif(NOT TARGET PETSC::PETSC)
+
+endif(PETSC_FOUND)

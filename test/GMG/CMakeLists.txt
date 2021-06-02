@@ -1,0 +1,11 @@
+target_sources(unit_tests_mpi1 PRIVATE CycleBuilder_MPI1.cpp)
+
+target_sources(unit_tests_mpi1 PRIVATE DirectInterpolator_MPI1.cpp)
+target_sources(unit_tests_mpi2 PRIVATE DirectInterpolator_MPI2.cpp)
+
+target_sources(unit_tests_mpi1 PRIVATE InterLevelComm_MPI1.cpp)
+target_sources(unit_tests_mpi2 PRIVATE InterLevelComm_MPI2.cpp)
+target_sources(unit_tests_mpi3 PRIVATE InterLevelComm_MPI3.cpp)
+
+target_sources(unit_tests_mpi1 PRIVATE LinearRestrictor_MPI1.cpp)
+target_sources(unit_tests_mpi2 PRIVATE LinearRestrictor_MPI2.cpp)
