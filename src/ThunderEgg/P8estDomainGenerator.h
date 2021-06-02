@@ -119,10 +119,10 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	 * @param bmf the function used to map the blocks to the domain
 	 */
 	P8estDomainGenerator(p8est_t *p8est, const std::array<int, 3> &ns, int num_ghost_cells, const BlockMapFunc &bmf);
-	P8estDomainGenerator(P8estDomainGenerator &)  = delete;
-	P8estDomainGenerator(P8estDomainGenerator &&) = delete;
-	P8estDomainGenerator &operator=(const P8estDomainGenerator &) = delete;
-	P8estDomainGenerator &operator=(P8estDomainGenerator &&) = delete;
+	P8estDomainGenerator(P8estDomainGenerator &);
+	P8estDomainGenerator(P8estDomainGenerator &&) = default;
+	P8estDomainGenerator &operator                =(const P8estDomainGenerator &);
+	P8estDomainGenerator &operator=(P8estDomainGenerator &&) = default;
 	~P8estDomainGenerator();
 	std::shared_ptr<Domain<3>> getFinestDomain();
 	bool                       hasCoarserDomain();

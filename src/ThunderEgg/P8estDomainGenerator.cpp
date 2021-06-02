@@ -218,6 +218,27 @@ P8estDomainGenerator::~P8estDomainGenerator()
 	p8est_destroy(my_p8est);
 }
 
+P8estDomainGenerator::P8estDomainGenerator(P8estDomainGenerator &other)
+: domain_patches(other.domain_patches),
+  ns(other.ns),
+  num_ghost_cells(other.num_ghost_cells),
+  curr_level(other.curr_level),
+  bmf(other.bmf)
+{
+	my_p8est = p8est_copy(other.my_p8est, true);
+}
+
+P8estDomainGenerator &P8estDomainGenerator::operator=(const P8estDomainGenerator &other)
+{
+	domain_patches  = other.domain_patches;
+	ns              = other.ns;
+	num_ghost_cells = other.num_ghost_cells;
+	curr_level      = other.curr_level;
+	bmf             = other.bmf;
+	p8est_destroy(my_p8est);
+	my_p8est = p8est_copy(other.my_p8est, true);
+	return *this;
+}
 void P8estDomainGenerator::extractLevel()
 {
 	if (domain_patches.size() > 0) {
