@@ -119,3 +119,5 @@ export(EXPORT ${PROJECT_NAME}Targets
   FILE ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Targets.cmake
   NAMESPACE ${PROJECT_NAME}::)
 
+# -- generate a pkgconfig file
+include(cmake/pkgconfig.cmake)

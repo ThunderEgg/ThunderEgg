@@ -56,12 +56,6 @@ install(
 
 install(EXPORT ThunderEggConfig DESTINATION share/ThunderEgg/cmake)
 
-# -- generate a pkgconfig file
-
-include(PkgConfigHandler)
-configure_pc_file("ThunderEgg" "ThunderEgg.pc.in" "ThunderEgg.pc")
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.pc"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 # -- imported target, for use from FetchContent
 
