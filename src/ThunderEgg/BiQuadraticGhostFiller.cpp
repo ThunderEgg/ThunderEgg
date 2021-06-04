@@ -45,7 +45,7 @@ void FillGhostForLocalWithCoarseNbr(const ComponentView<2> &local_data, Side<2> 
 	auto inner_slice = local_data.getSliceOn(side, {1});
 	auto slice       = local_data.getSliceOn(side, {0});
 	auto ghost       = local_data.getSliceOn(side, {-1});
-	int  n           = ghost.getLengths()[0];
+	int  n           = ghost.getEnd()[0] + 1;
 	for (int idx = 0; idx < n; idx++) {
 		ghost[{idx}] += 2 * slice[{idx}] / 3 - inner_slice[{idx}] / 5;
 	}
@@ -64,7 +64,7 @@ void FillGhostForLocalWithFineNbr(const ComponentView<2> &local_data, Side<2> si
 {
 	auto slice = local_data.getSliceOn(side, {0});
 	auto ghost = local_data.getSliceOn(side, {-1});
-	int  n     = ghost.getLengths()[0];
+	int  n     = ghost.getEnd()[0] + 1;
 	ghost[{0}] += -slice[{0}] / 10 + slice[{1}] / 15 - slice[{2}] / 30;
 	for (int idx = 1; idx < n - 1; idx++) {
 		ghost[{idx}] += -slice[{idx - 1}] / 30 - slice[{idx + 1}] / 30;
@@ -104,7 +104,7 @@ void FillGhostForCoarseNbrLower(const std::vector<ComponentView<2>> &local_datas
 		auto slice       = local_datas[c].getSliceOn(side, {0});
 		auto inner_slice = local_datas[c].getSliceOn(side, {1});
 		auto ghost       = nbr_datas[c].getSliceOn(side.opposite(), {-1});
-		int  n           = ghost.getLengths()[0];
+		int  n           = ghost.getEnd()[0] + 1;
 		for (int idx = 0; idx < n; idx++) {
 			ghost[{idx / 2}] += slice[{idx}] / 3 + inner_slice[{idx}] / 5;
 		}
@@ -128,7 +128,7 @@ void FillGhostForCoarseNbrUpper(const std::vector<ComponentView<2>> &local_datas
 		auto slice       = local_datas[c].getSliceOn(side, {0});
 		auto inner_slice = local_datas[c].getSliceOn(side, {1});
 		auto ghost       = nbr_datas[c].getSliceOn(side.opposite(), {-1});
-		int  n           = ghost.getLengths()[0];
+		int  n           = ghost.getEnd()[0] + 1;
 		for (int idx = 0; idx < n; idx++) {
 			ghost[{(idx + n) / 2}] += slice[{idx}] / 3 + inner_slice[{idx}] / 5;
 		}
@@ -151,7 +151,7 @@ void FillGhostForFineNbrLower(const std::vector<ComponentView<2>> &local_datas, 
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		auto slice = local_datas[c].getSliceOn(side, {0});
 		auto ghost = nbr_datas[c].getSliceOn(side.opposite(), {-1});
-		int  n     = ghost.getLengths()[0];
+		int  n     = ghost.getEnd()[0] + 1;
 		ghost[{0}] += 3 * slice[{0}] / 4 - 3 * slice[{1}] / 10 + slice[{2}] / 12;
 		ghost[{1}] += 7 * slice[{0}] / 20 + 7 * slice[{1}] / 30 - slice[{2}] / 20;
 		for (int idx = 2; idx < n; idx++) {
@@ -178,9 +178,9 @@ void FillGhostForFineNbrLower(const std::vector<ComponentView<2>> &local_datas, 
 void FillGhostForFineNbrUpper(const std::vector<ComponentView<2>> &local_datas, std::vector<ComponentView<2>> &nbr_datas, Side<2> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		auto slice = local_datas[c].getSliceOn(side, {0});
-		auto ghost = nbr_datas[c].getSliceOn(side.opposite(), {-1});
-		int  n     = ghost.getLengths()[0];
+		View<1> slice = local_datas[c].getSliceOn(side, {0});
+		View<1> ghost = nbr_datas[c].getSliceOn(side.opposite(), {-1});
+		int     n     = ghost.getEnd()[0] + 1;
 		for (int idx = 0; idx < n - 2; idx++) {
 			if ((idx + n) % 2 == 0) {
 				ghost[{idx}] += slice[{(idx + n) / 2 - 1}] / 12 + slice[{(idx + n) / 2}] / 2 - slice[{(idx + n) / 2 + 1}] / 20;
@@ -203,9 +203,9 @@ void FillGhostForFineNbrUpper(const std::vector<ComponentView<2>> &local_datas, 
 void FillGhostForNormalCornerNbr(const std::vector<ComponentView<2>> &local_datas, std::vector<ComponentView<2>> &nbr_datas, Corner<2> corner)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		ComponentView<0> local_slice = local_datas[c].getSliceOn(corner, {0, 0});
-		ComponentView<0> nbr_ghosts  = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
-		nbr_ghosts[{}]               = local_slice[{}];
+		View<0> local_slice = local_datas[c].getSliceOn(corner, {0, 0});
+		View<0> nbr_ghosts  = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		nbr_ghosts[{}]      = local_slice[{}];
 	}
 }
 /**
@@ -222,9 +222,9 @@ void FillGhostForNormalCornerNbr(const std::vector<ComponentView<2>> &local_data
 void FillGhostForCoarseCornerNbr(const std::vector<ComponentView<2>> &local_datas, std::vector<ComponentView<2>> &nbr_datas, Corner<2> corner)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		ComponentView<0> slice       = local_datas[c].getSliceOn(corner, {0, 0});
-		ComponentView<0> inner_slice = local_datas[c].getSliceOn(corner, {1, 1});
-		ComponentView<0> ghost       = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		View<0> slice       = local_datas[c].getSliceOn(corner, {0, 0});
+		View<0> inner_slice = local_datas[c].getSliceOn(corner, {1, 1});
+		View<0> ghost       = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
 		ghost[{}] += 2 * slice[{}] / 3 + 2 * inner_slice[{}] / 5;
 	}
 }
@@ -240,8 +240,8 @@ void FillGhostForCoarseCornerNbr(const std::vector<ComponentView<2>> &local_data
  */
 void FillGhostForLocalWithFineCornerNbr(const ComponentView<2> &local_data, Corner<2> corner)
 {
-	ComponentView<0> slice = local_data.getSliceOn(corner, {0, 0});
-	ComponentView<0> ghost = local_data.getSliceOn(corner, {-1, -1});
+	View<0> slice = local_data.getSliceOn(corner, {0, 0});
+	View<0> ghost = local_data.getSliceOn(corner, {-1, -1});
 	ghost[{}] += -slice[{}] / 15;
 }
 
@@ -259,8 +259,8 @@ void FillGhostForLocalWithFineCornerNbr(const ComponentView<2> &local_data, Corn
 void FillGhostForFineCornerNbr(const std::vector<ComponentView<2>> &local_datas, std::vector<ComponentView<2>> &nbr_datas, Corner<2> corner)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		ComponentView<0> slice = local_datas[c].getSliceOn(corner, {0, 0});
-		ComponentView<0> ghost = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
+		View<0> slice = local_datas[c].getSliceOn(corner, {0, 0});
+		View<0> ghost = nbr_datas[c].getSliceOn(corner.opposite(), {-1, -1});
 		ghost[{}] += 8 * slice[{}] / 15;
 	}
 }
@@ -276,9 +276,9 @@ void FillGhostForFineCornerNbr(const std::vector<ComponentView<2>> &local_datas,
  */
 void FillGhostForLocalWithCoarseCornerNbr(const ComponentView<2> &local_data, Corner<2> corner)
 {
-	ComponentView<0> inner_slice = local_data.getSliceOn(corner, {1, 1});
-	ComponentView<0> slice       = local_data.getSliceOn(corner, {0, 0});
-	ComponentView<0> ghost       = local_data.getSliceOn(corner, {-1, -1});
+	View<0> inner_slice = local_data.getSliceOn(corner, {1, 1});
+	View<0> slice       = local_data.getSliceOn(corner, {0, 0});
+	View<0> ghost       = local_data.getSliceOn(corner, {-1, -1});
 	ghost[{}] += 2 * slice[{}] / 3 - inner_slice[{}] / 5;
 }
 /**

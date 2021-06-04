@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_VIEW_H
-#define THUNDEREGG_VIEW_H
+#ifndef THUNDEREGG_COMPONENTVIEW_H
+#define THUNDEREGG_COMPONENTVIEW_H
 #include <ThunderEgg/Config.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
@@ -48,6 +48,46 @@ template <int D> class ComponentView : public View<D>
 	int num_ghost_cells = 0;
 
 	/**
+	 * @brief Return array filled with -num_ghost_cells
+	 */
+	template <int M> static std::array<int, M> DetermineGhostStart(int num_ghost_cells)
+	{
+		std::array<int, M> start;
+		start.fill(-num_ghost_cells);
+		return start;
+	}
+
+	/**
+	 * @brief Return array filled with 0
+	 */
+	template <int M> static std::array<int, M> DetermineStart()
+	{
+		std::array<int, M> start;
+		start.fill(0);
+		return start;
+	}
+
+	/**
+	 * @brief Return array filled with lengths-1
+	 */
+	template <int M> static std::array<int, M> DetermineEnd(const std::array<int, M> &lengths)
+	{
+		std::array<int, M> end = lengths;
+		loop<0, M - 1>([&](int i) { end[i]--; });
+		return end;
+	}
+
+	/**
+	 * @brief Return array filled with lengths-1+num_ghost_cells
+	 */
+	template <int M> static std::array<int, M> DetermineGhostEnd(const std::array<int, M> &lengths, int num_ghost_cells)
+	{
+		std::array<int, M> end = lengths;
+		loop<0, M - 1>([&](int i) { end[i] += num_ghost_cells - 1; });
+		return end;
+	}
+
+	/**
 	 * @brief Get a slice for a slide
 	 *
 	 * @param s the side of patch for the slice
@@ -55,7 +95,7 @@ template <int D> class ComponentView : public View<D>
 	 * the first slice of ghost cell values
 	 * @return View<1> the resulting slice
 	 */
-	template <int M> ComponentView<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
+	template <int M> View<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
 		const std::array<int, D> &strides = this->getStrides();
 
@@ -83,37 +123,19 @@ template <int D> class ComponentView : public View<D>
 			}
 		}
 		double *new_data = const_cast<double *>(&(*this)[first_non_ghost_value]);
-		return ComponentView<M>(new_data, new_strides, new_lengths, num_ghost_cells, this->getComponentViewDataManager());
-	}
-
-	static std::array<int, D> DetermineGhostStart(int num_ghost_cells)
-	{
-		std::array<int, D> start;
-		start.fill(-num_ghost_cells);
-		return start;
-	}
-
-	static std::array<int, D> DetermineStart()
-	{
-		std::array<int, D> start;
-		start.fill(0);
-		return start;
-	}
-	static std::array<int, D> DetermineEnd(const std::array<int, D> &lengths)
-	{
-		std::array<int, D> end = lengths;
-		loop<0, D - 1>([&](int i) { end[i]--; });
-		return end;
-	}
-
-	static std::array<int, D> DetermineGhostEnd(const std::array<int, D> &lengths, int num_ghost_cells)
-	{
-		std::array<int, D> end = lengths;
-		loop<0, D - 1>([&](int i) { end[i] += num_ghost_cells - 1; });
-		return end;
+		return View<M>(new_data,
+		               new_strides,
+		               DetermineGhostStart<M>(num_ghost_cells),
+		               DetermineStart<M>(),
+		               DetermineEnd<M>(new_lengths),
+		               DetermineGhostEnd<M>(new_lengths, num_ghost_cells),
+		               this->getComponentViewDataManager());
 	}
 
 	public:
+	/**
+	 * @brief Construct a new ComponentView with size 0
+	 */
 	ComponentView() : View<D>()
 	{
 		lengths.fill(0);
@@ -134,10 +156,10 @@ template <int D> class ComponentView : public View<D>
 	              std::shared_ptr<const ViewManager> ldm = nullptr)
 	: View<D>(data,
 	          strides,
-	          DetermineGhostStart(num_ghost_cells),
-	          DetermineStart(),
-	          DetermineEnd(lengths),
-	          DetermineGhostEnd(lengths, num_ghost_cells),
+	          DetermineGhostStart<D>(num_ghost_cells),
+	          DetermineStart<D>(),
+	          DetermineEnd<D>(lengths),
+	          DetermineGhostEnd<D>(lengths, num_ghost_cells),
 	          ldm),
 	  lengths(lengths),
 	  num_ghost_cells(num_ghost_cells)
@@ -151,7 +173,7 @@ template <int D> class ComponentView : public View<D>
 	 * face
 	 * @return double& the value
 	 */
-	template <int M> ComponentView<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
+	template <int M> View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
 	{
 		return getSliceOnPriv(f, offset);
 	}
@@ -163,11 +185,11 @@ template <int D> class ComponentView : public View<D>
 	 * face
 	 * @return double& the value
 	 */
-	template <int M> const ComponentView<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
+	template <int M> const View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
 		return getSliceOnPriv(f, offset);
 	}
-	template <int M> ComponentView<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
+	template <int M> View<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
 	{
 		const std::array<int, D> &strides = this->getStrides();
 
@@ -195,7 +217,13 @@ template <int D> class ComponentView : public View<D>
 			}
 		}
 		double *new_data = const_cast<double *>(&(*this)[first_non_ghost_value]);
-		return ComponentView<M>(new_data, new_strides, new_lengths, num_ghost_cells, this->getComponentViewDataManager());
+		return View<M>(new_data,
+		               new_strides,
+		               DetermineGhostStart<M>(num_ghost_cells),
+		               DetermineStart<M>(),
+		               DetermineEnd<M>(new_lengths),
+		               DetermineGhostEnd<M>(new_lengths, num_ghost_cells),
+		               this->getComponentViewDataManager());
 	}
 	/**
 	 * @brief Get the Lengths of the patch in each direction

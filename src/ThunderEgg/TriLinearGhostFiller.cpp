@@ -62,8 +62,8 @@ std::array<int, 2> getOffset(const std::array<int, 3> ns, Side<3> s, Orthant<2> 
 void FillGhostCellsForNormalNbr(const std::vector<ComponentView<3>> &local_datas, std::vector<ComponentView<3>> &nbr_datas, Side<3> side)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		ComponentView<2> local_slice = local_datas[c].getSliceOn(side, {0});
-		ComponentView<2> nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
+		View<2> local_slice = local_datas[c].getSliceOn(side, {0});
+		View<2> nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
 		nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 	}
 }
@@ -85,8 +85,8 @@ void FillGhostCellsForCoarseNbr(const std::vector<ComponentView<3>> &local_datas
 {
 	std::array<int, 2> offset = getOffset(local_datas[0].getLengths(), side, orthant);
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		ComponentView<2> local_slice = local_datas[c].getSliceOn(side, {0});
-		ComponentView<2> nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
+		View<2> local_slice = local_datas[c].getSliceOn(side, {0});
+		View<2> nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
 		nested_loop<2>(local_slice.getStart(), local_slice.getEnd(), [&](const std::array<int, 2> &coord) {
 			std::array<int, 2> coarse_coord;
 			for (int i = 0; i < 2; i++) {
@@ -131,8 +131,8 @@ void FillGhostCellsForFineNbr(const PatchInfo<3> &                 pinfo,
 	auto               nbr_info = pinfo.getFineNbrInfo(side);
 	std::array<int, 2> offset   = getOffset(pinfo.ns, side, orthant);
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		ComponentView<2> local_slice = local_datas[c].getSliceOn(side, {0});
-		ComponentView<2> nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
+		View<2> local_slice = local_datas[c].getSliceOn(side, {0});
+		View<2> nbr_ghosts  = nbr_datas[c].getSliceOn(side.opposite(), {-1});
 		nested_loop<2>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 2> &coord) {
 			std::array<int, 2> coarse_coord;
 			for (int i = 0; i < 2; i++) {
@@ -153,8 +153,8 @@ void FillGhostCellsForFineNbr(const PatchInfo<3> &                 pinfo,
  */
 void FillGhostCellsForLocalWithCoarseNbr(const PatchInfo<3> &pinfo, ComponentView<3> local_data, Side<3> side)
 {
-	ComponentView<2>   local_slice  = local_data.getSliceOn(side, {0});
-	ComponentView<2>   local_ghosts = local_data.getSliceOn(side, {-1});
+	View<2>            local_slice  = local_data.getSliceOn(side, {0});
+	View<2>            local_ghosts = local_data.getSliceOn(side, {-1});
 	auto               nbr_info     = pinfo.getCoarseNbrInfo(side);
 	std::array<int, 2> offset       = getOffset(pinfo.ns, side, nbr_info.orth_on_coarse);
 	nested_loop<2>(local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 2> &coord) {
@@ -187,8 +187,8 @@ void FillGhostCellsForLocalWithCoarseNbr(const PatchInfo<3> &pinfo, ComponentVie
 void FillGhostCellsForNormalEdgeNbr(const std::vector<ComponentView<3>> &local_datas, const std::vector<ComponentView<3>> &nbr_datas, Edge edge)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		ComponentView<1> local_slice = local_datas[c].getSliceOn(edge, {0, 0});
-		ComponentView<1> nbr_ghosts  = nbr_datas[c].getSliceOn(edge.opposite(), {-1, -1});
+		View<1> local_slice = local_datas[c].getSliceOn(edge, {0, 0});
+		View<1> nbr_ghosts  = nbr_datas[c].getSliceOn(edge.opposite(), {-1, -1});
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 	}
 }
@@ -209,11 +209,11 @@ void FillGhostCellsForCoarseEdgeNbr(const std::vector<ComponentView<3>> &local_d
                                     Orthant<1>                           orthant)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		ComponentView<1> local_slice = local_datas[c].getSliceOn(edge, {0, 0});
-		ComponentView<1> nbr_ghosts  = nbr_datas[c].getSliceOn(edge.opposite(), {-1, -1});
-		int              offset      = 0;
+		View<1> local_slice = local_datas[c].getSliceOn(edge, {0, 0});
+		View<1> nbr_ghosts  = nbr_datas[c].getSliceOn(edge.opposite(), {-1, -1});
+		int     offset      = 0;
 		if (orthant == Orthant<1>::upper()) {
-			offset = local_slice.getLengths()[0];
+			offset = local_slice.getEnd()[0] + 1;
 		}
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
 			nbr_ghosts[{(coord[0] + offset) / 2}] += 2.0 / 3.0 * local_slice[coord];
@@ -237,11 +237,11 @@ void FillGhostCellsForFineEdgeNbr(const std::vector<ComponentView<3>> &local_dat
                                   Orthant<1>                           orthant)
 {
 	for (size_t c = 0; c < local_datas.size(); c++) {
-		ComponentView<1> local_slice = local_datas[c].getSliceOn(edge, {0, 0});
-		ComponentView<1> nbr_ghosts  = nbr_datas[c].getSliceOn(edge.opposite(), {-1, -1});
-		int              offset      = 0;
+		View<1> local_slice = local_datas[c].getSliceOn(edge, {0, 0});
+		View<1> nbr_ghosts  = nbr_datas[c].getSliceOn(edge.opposite(), {-1, -1});
+		int     offset      = 0;
 		if (orthant == Orthant<1>::upper()) {
-			offset = local_slice.getLengths()[0];
+			offset = local_slice.getEnd()[0] + 1;
 		}
 		nested_loop<1>(nbr_ghosts.getStart(), nbr_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
 			nbr_ghosts[coord] += 2.0 / 3.0 * local_slice[{(coord[0] + offset) / 2}];
@@ -259,14 +259,14 @@ void FillGhostCellsForFineEdgeNbr(const std::vector<ComponentView<3>> &local_dat
  */
 void FillGhostCellsForLocalWithCoarseEdgeNbr(const PatchInfo<3> &pinfo, const ComponentView<3> &local_data, Edge side)
 {
-	ComponentView<1> local_slice  = local_data.getSliceOn(side, {0, 0});
-	ComponentView<1> local_ghosts = local_data.getSliceOn(side, {-1, -1});
+	View<1> local_slice  = local_data.getSliceOn(side, {0, 0});
+	View<1> local_ghosts = local_data.getSliceOn(side, {-1, -1});
 	nested_loop<1>(local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
 		local_ghosts[coord] += 2.0 / 3.0 * local_slice[coord];
 
 		int offset = 0;
 		if (pinfo.getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper()) {
-			offset = local_slice.getLengths()[0];
+			offset = local_slice.getEnd()[0] + 1;
 		}
 
 		if ((coord[0] + offset) % 2 == 0) {
@@ -286,8 +286,8 @@ void FillGhostCellsForLocalWithCoarseEdgeNbr(const PatchInfo<3> &pinfo, const Co
  */
 void FillGhostCellsForLocalWithFineEdgeNbr(const ComponentView<3> &local_data, Edge side)
 {
-	ComponentView<1> local_slice  = local_data.getSliceOn(side, {0, 0});
-	ComponentView<1> local_ghosts = local_data.getSliceOn(side, {-1, -1});
+	View<1> local_slice  = local_data.getSliceOn(side, {0, 0});
+	View<1> local_ghosts = local_data.getSliceOn(side, {-1, -1});
 	nested_loop<1>(
 	local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 1> &coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
 }

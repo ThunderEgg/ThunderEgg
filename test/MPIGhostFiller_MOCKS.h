@@ -419,7 +419,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 		for (size_t c = 0; c < nbr_datas.size(); c++) {
 			int index = 0;
 			for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-				ComponentView<D - 1> slice = nbr_datas[c].getSliceOn(side.opposite(), {-i - 1});
+				View<D - 1> slice = nbr_datas[c].getSliceOn(side.opposite(), {-i - 1});
 				nested_loop<D - 1>(slice.getStart(), slice.getEnd(),
 				                   [&](const std::array<int, D - 1> &coord) {
 					                   slice[coord] += pinfo.id + index + c;
@@ -439,7 +439,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 				int index = 0;
 				for (int j = 0; j < pinfo.num_ghost_cells; j++) {
 					for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-						ComponentView<1> slice = nbr_datas[c].getSliceOn(edge.opposite(), {-1 - i, -1 - j});
+						View<1> slice = nbr_datas[c].getSliceOn(edge.opposite(), {-1 - i, -1 - j});
 						nested_loop<1>(slice.getStart(), slice.getEnd(),
 						               [&](const std::array<int, 1> &coord) {
 							               slice[coord] += pinfo.id + index + c;

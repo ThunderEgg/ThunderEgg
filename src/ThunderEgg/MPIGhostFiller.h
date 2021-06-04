@@ -477,8 +477,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				std::array<size_t, D - M> end;
 				end.fill(domain->getNumGhostCells() - 1);
 				nested_loop<D - M>(start, end, [&](const std::array<size_t, D - M> &offset) {
-					ComponentView<M> local_slice  = local_data.getGhostSliceOn(face, offset);
-					ComponentView<M> buffer_slice = buffer_data.getGhostSliceOn(face, offset);
+					View<M> local_slice  = local_data.getGhostSliceOn(face, offset);
+					View<M> buffer_slice = buffer_data.getGhostSliceOn(face, offset);
 					nested_loop<M>(local_slice.getStart(), local_slice.getEnd(), [&](const std::array<int, M> &coord) {
 						local_slice[coord] += buffer_slice[coord];
 					});
@@ -796,7 +796,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				std::array<size_t, D - M> end;
 				end.fill(domain->getNumGhostCells() - 1);
 				nested_loop<D - M>(start, end, [&](const std::array<size_t, D - M> &offset) {
-					ComponentView<M> this_ghost = data.getGhostSliceOn(f, offset);
+					View<M> this_ghost = data.getGhostSliceOn(f, offset);
 					nested_loop<M>(this_ghost.getStart(), this_ghost.getEnd(), [&](const std::array<int, M> &coord) { this_ghost[coord] = 0; });
 				});
 			}

@@ -288,8 +288,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -344,8 +344,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -406,8 +406,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components", "[BiL
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -423,8 +423,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components", "[BiL
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -484,8 +484,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -500,8 +500,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -554,8 +554,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners", "[BiLinearGh
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -568,8 +568,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners", "[BiLinearGh
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			ComponentView<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
-			ComponentView<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			View<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			View<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("corner:    " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -619,8 +619,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -633,8 +633,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			ComponentView<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
-			ComponentView<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			View<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			View<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("corner:    " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -690,8 +690,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -704,8 +704,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			ComponentView<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
-			ComponentView<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			View<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			View<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("corner:    " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -716,8 +716,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -729,8 +729,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			ComponentView<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
-			ComponentView<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
+			View<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
+			View<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("corner:    " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -786,8 +786,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -799,8 +799,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			ComponentView<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
-			ComponentView<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			View<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			View<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("corner:    " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -811,8 +811,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			ComponentView<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			ComponentView<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			View<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			View<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -824,8 +824,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			ComponentView<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
-			ComponentView<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
+			View<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
+			View<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("corner:    " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
