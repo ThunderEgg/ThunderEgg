@@ -83,9 +83,9 @@ class MockPatchSolver : public PatchSolver<D>
 			}
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &fs,
-	                      std::vector<View<D>> &      us) const override
+	void solveSinglePatch(const PatchInfo<D> &                 pinfo,
+	                      const std::vector<ComponentView<D>> &fs,
+	                      std::vector<ComponentView<D>> &      us) const override
 	{
 		CHECK(patch_ids_to_be_called.count(pinfo.id) == 1);
 		patch_ids_to_be_called.erase(pinfo.id);
@@ -109,9 +109,9 @@ class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 	: PatchSolver<D>(domain_in, ghost_filler_in), schur_fill_value(schur_fill_value)
 	{
 	}
-	void solveSinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &fs,
-	                      std::vector<View<D>> &      us) const override
+	void solveSinglePatch(const PatchInfo<D> &                 pinfo,
+	                      const std::vector<ComponentView<D>> &fs,
+	                      std::vector<ComponentView<D>> &      us) const override
 	{
 		was_called = true;
 		for (Side<D> s : Side<D>::getValues()) {

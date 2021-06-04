@@ -315,7 +315,7 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				auto local_datas = ghost_vector->getViews(local_index);
+				auto local_datas = ghost_vector->getComponentViews(local_index);
 				for (const auto &local_data : local_datas) {
 					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(), [&](const std::array<int, D> &coord) {
 						send_buffers.back()[buffer_idx] = local_data[coord];
@@ -374,7 +374,7 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				auto local_datas = vector->getViews(local_index);
+				auto local_datas = vector->getComponentViews(local_index);
 				for (auto &local_data : local_datas) {
 					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(), [&](const std::array<int, D> &coord) {
 						local_data[coord] += buffer[buffer_idx];
@@ -446,7 +446,7 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				auto local_datas = vector->getViews(local_index);
+				auto local_datas = vector->getComponentViews(local_index);
 				for (const auto &local_data : local_datas) {
 					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(), [&](const std::array<int, D> &coord) {
 						send_buffers.back()[buffer_idx] = local_data[coord];
@@ -505,7 +505,7 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				auto local_datas = ghost_vector->getViews(local_index);
+				auto local_datas = ghost_vector->getComponentViews(local_index);
 				for (auto &local_data : local_datas) {
 					nested_loop<D>(local_data.getGhostStart(), local_data.getGhostEnd(), [&](const std::array<int, D> &coord) {
 						local_data[coord] = buffer[buffer_idx];

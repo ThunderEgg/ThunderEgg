@@ -50,7 +50,7 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		auto lds = coarse_vec->getViews(pinfo.local_index);
+		auto lds = coarse_vec->getComponentViews(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
 				lds[c][coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + c;
@@ -60,7 +60,7 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto lds = fine_expected->getViews(pinfo.local_index);
+		auto lds = fine_expected->getComponentViews(pinfo.local_index);
 
 		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
@@ -87,8 +87,8 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		auto vec_lds      = fine_vec->getViews(pinfo.local_index);
-		auto expected_lds = fine_expected->getViews(pinfo.local_index);
+		auto vec_lds      = fine_vec->getComponentViews(pinfo.local_index);
+		auto expected_lds = fine_expected->getComponentViews(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {
@@ -113,7 +113,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		auto lds = coarse_vec->getViews(pinfo.local_index);
+		auto lds = coarse_vec->getComponentViews(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
 				lds[c][coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + c;
@@ -123,7 +123,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto lds = fine_expected->getViews(pinfo.local_index);
+		auto lds = fine_expected->getComponentViews(pinfo.local_index);
 
 		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
@@ -152,8 +152,8 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		auto vec_lds      = fine_vec->getViews(pinfo.local_index);
-		auto expected_lds = fine_expected->getViews(pinfo.local_index);
+		auto vec_lds      = fine_vec->getComponentViews(pinfo.local_index);
+		auto expected_lds = fine_expected->getComponentViews(pinfo.local_index);
 		for (int c = 0; c < num_components; c++) {
 			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
 			               [&](const array<int, 2> &coord) {

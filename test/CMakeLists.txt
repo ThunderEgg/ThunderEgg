@@ -36,6 +36,8 @@ target_sources(unit_tests_mpi1 PRIVATE BiQuadraticGhostFiller_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE CoarseNbrInfo_MPI1.cpp)
 
+target_sources(unit_tests_mpi1 PRIVATE ComponentView_MPI1.cpp)
+
 target_sources(unit_tests_mpi1 PRIVATE Corner_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE Domain_MPI1.cpp)
@@ -49,13 +51,10 @@ target_sources(unit_tests_mpi1 PRIVATE Face_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE FineNbrInfo_MPI1.cpp)
 
-target_sources(unit_tests_mpi1 PRIVATE View_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE MPIGhostFiller_MPI1.cpp)
 target_sources(unit_tests_mpi2 PRIVATE MPIGhostFiller_MPI2.cpp)
 target_sources(unit_tests_mpi3 PRIVATE MPIGhostFiller_MPI3.cpp)
-
-target_sources(unit_tests_mpi1 PRIVATE MultiDimensionalView_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE NbrType_MPI1.cpp)
 
@@ -123,6 +122,8 @@ target_sources(unit_tests_mpi1 PRIVATE ValVectorGenerator_MPI1.cpp)
 target_sources(unit_tests_mpi1 PRIVATE Vector_MPI1.cpp)
 target_sources(unit_tests_mpi2 PRIVATE Vector_MPI2.cpp)
 target_sources(unit_tests_mpi3 PRIVATE Vector_MPI3.cpp)
+
+target_sources(unit_tests_mpi1 PRIVATE View_MPI1.cpp)
 
 
 # -- determine compile flags

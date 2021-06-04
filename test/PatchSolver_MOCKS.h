@@ -64,19 +64,19 @@ class MockPatchSolver : public PatchSolver<D>
 			patches_to_be_called.insert(&pinfo);
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &fs,
-	                      std::vector<View<D>> &      us) const override
+	void solveSinglePatch(const PatchInfo<D> &                 pinfo,
+	                      const std::vector<ComponentView<D>> &fs,
+	                      std::vector<ComponentView<D>> &      us) const override
 	{
 		CHECK(patches_to_be_called.count(&pinfo) == 1);
 		patches_to_be_called.erase(&pinfo);
 		std::array<int, D> zero;
 		zero.fill(0);
 		for (int c = 0; c < u_vec->getNumComponents(); c++) {
-			CHECK(&u_vec->getView(c, pinfo.local_index)[zero] == &us[c][zero]);
+			CHECK(&u_vec->getComponentView(c, pinfo.local_index)[zero] == &us[c][zero]);
 		}
 		for (int c = 0; c < f_vec->getNumComponents(); c++) {
-			CHECK(&f_vec->getView(c, pinfo.local_index)[zero] == &fs[c][zero]);
+			CHECK(&f_vec->getComponentView(c, pinfo.local_index)[zero] == &fs[c][zero]);
 		}
 	}
 	bool allPatchesCalled()

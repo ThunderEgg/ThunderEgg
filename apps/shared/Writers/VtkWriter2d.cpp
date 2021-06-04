@@ -55,10 +55,10 @@ void VtkWriter2d::add(std::shared_ptr<const Vector<2>> u, string name)
 {
 	// create MultiPieceDataSet and fill with patch information
 	for (auto &d_ptr : dc->getPatchInfoVector()) {
-		PatchInfo<2> &d   = *d_ptr;
-		double        h_x = d.spacings[0];
-		double        h_y = d.spacings[1];
-		const View<2> ld  = u->getView(0, d.local_index);
+		PatchInfo<2> &         d   = *d_ptr;
+		double                 h_x = d.spacings[0];
+		double                 h_y = d.spacings[1];
+		const ComponentView<2> ld  = u->getComponentView(0, d.local_index);
 
 		// create image object
 		vtkSmartPointer<vtkImageData> image = images[d.id];

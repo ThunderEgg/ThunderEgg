@@ -66,14 +66,14 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		View<2> vec_ld      = coarse_vec->getView(0, pinfo.local_index);
-		View<2> expected_ld = coarse_expected->getView(0, pinfo.local_index);
+		ComponentView<2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (!pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
@@ -119,14 +119,14 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		View<2> vec_ld      = coarse_vec->getView(0, pinfo.local_index);
-		View<2> expected_ld = coarse_expected->getView(0, pinfo.local_index);
+		ComponentView<2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (!pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),

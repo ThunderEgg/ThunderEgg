@@ -12,6 +12,9 @@ list(APPEND ThunderEgg_HDRS BufferWriter.h)
 
 list(APPEND ThunderEgg_HDRS CoarseNbrInfo.h)
 
+list(APPEND ThunderEgg_HDRS ComponentView.h)
+target_sources(ThunderEgg PRIVATE ComponentView.cpp)
+
 list(APPEND ThunderEgg_HDRS DivergenceError.h)
 
 list(APPEND ThunderEgg_HDRS DimensionalArray.h)
@@ -34,16 +37,10 @@ list(APPEND ThunderEgg_HDRS GhostFillingType.h)
 
 list(APPEND ThunderEgg_HDRS Loops.h)
 
-list(APPEND ThunderEgg_HDRS View.h)
-target_sources(ThunderEgg PRIVATE View.cpp)
-
 list(APPEND ThunderEgg_HDRS ViewManager.h)
 
 list(APPEND ThunderEgg_HDRS MPIGhostFiller.h)
 target_sources(ThunderEgg PRIVATE MPIGhostFiller.cpp)
-
-list(APPEND ThunderEgg_HDRS MultiDimensionalView.h)
-target_sources(ThunderEgg PRIVATE MultiDimensionalView.cpp)
 
 list(APPEND ThunderEgg_HDRS NbrInfo.h)
 
@@ -101,6 +98,9 @@ list(APPEND ThunderEgg_HDRS Vector.h)
 target_sources(ThunderEgg PRIVATE Vector.cpp)
 
 list(APPEND ThunderEgg_HDRS VectorGenerator.h)
+
+list(APPEND ThunderEgg_HDRS View.h)
+target_sources(ThunderEgg PRIVATE View.cpp)
 
 # -- install public headers
 

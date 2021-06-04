@@ -51,22 +51,22 @@ class MockPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
-	void applySinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
+	void applySinglePatch(const PatchInfo<D> &                 pinfo,
+	                      const std::vector<ComponentView<D>> &us, std::vector<ComponentView<D>> &fs) const override
 	{
 		num_apply_calls++;
 	}
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const override
 	{
 		bc_enforced = true;
 	}
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const override
 	{
 		interior_dirichlet = true;
 	}
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &        pinfo,
-	                                                   const std::vector<View<D>> &us,
-	                                                   std::vector<View<D>> &      fs) const override
+	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                 pinfo,
+	                                                   const std::vector<ComponentView<D>> &us,
+	                                                   std::vector<ComponentView<D>> &      fs) const override
 	{
 		rhs_was_modified = true;
 	}
@@ -101,25 +101,25 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
-	void applySinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
+	void applySinglePatch(const PatchInfo<D> &                 pinfo,
+	                      const std::vector<ComponentView<D>> &us, std::vector<ComponentView<D>> &fs) const override
 	{
 		for (size_t c = 0; c < fs.size(); c++) {
 			nested_loop<D>(fs[c].getStart(), fs[c].getEnd(),
 			               [&](const std::array<int, D> &coord) { fs[c][coord] += 1; });
 		}
 	}
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const override
 	{
 		bc_enforced = true;
 	}
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const override
 	{
 		interior_dirichlet = true;
 	}
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &        pinfo,
-	                                                   const std::vector<View<D>> &us,
-	                                                   std::vector<View<D>> &      fs) const override
+	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                 pinfo,
+	                                                   const std::vector<ComponentView<D>> &us,
+	                                                   std::vector<ComponentView<D>> &      fs) const override
 	{
 		rhs_was_modified = true;
 	}

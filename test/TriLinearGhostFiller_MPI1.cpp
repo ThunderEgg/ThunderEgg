@@ -50,14 +50,14 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld      = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld = expected->getView(0, pinfo.local_index);
+		ComponentView<3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld = expected->getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -113,16 +113,16 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld       = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld  = expected->getView(0, pinfo.local_index);
-		View<3> vec_ld2      = vec->getView(1, pinfo.local_index);
-		View<3> expected_ld2 = expected->getView(1, pinfo.local_index);
+		ComponentView<3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
+		ComponentView<3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -137,8 +137,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -194,16 +194,16 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld       = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld  = expected->getView(0, pinfo.local_index);
-		View<3> vec_ld2      = vec->getView(1, pinfo.local_index);
-		View<3> expected_ld2 = expected->getView(1, pinfo.local_index);
+		ComponentView<3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
+		ComponentView<3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -218,8 +218,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -269,14 +269,14 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld      = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld = expected->getView(0, pinfo.local_index);
+		ComponentView<3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld = expected->getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -345,14 +345,14 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGh
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld      = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld = expected->getView(0, pinfo.local_index);
+		ComponentView<3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld = expected->getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -364,8 +364,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGh
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -421,16 +421,16 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld       = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld  = expected->getView(0, pinfo.local_index);
-		View<3> vec_ld2      = vec->getView(1, pinfo.local_index);
-		View<3> expected_ld2 = expected->getView(1, pinfo.local_index);
+		ComponentView<3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
+		ComponentView<3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -442,8 +442,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -458,8 +458,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -471,8 +471,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld2.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld2.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld2.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld2.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -528,16 +528,16 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld       = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld  = expected->getView(0, pinfo.local_index);
-		View<3> vec_ld2      = vec->getView(1, pinfo.local_index);
-		View<3> expected_ld2 = expected->getView(1, pinfo.local_index);
+		ComponentView<3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
+		ComponentView<3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -549,8 +549,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -565,8 +565,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -578,8 +578,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld2.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld2.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld2.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld2.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -629,14 +629,14 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld      = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld = expected->getView(0, pinfo.local_index);
+		ComponentView<3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld = expected->getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -648,8 +648,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -698,14 +698,14 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld      = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld = expected->getView(0, pinfo.local_index);
+		ComponentView<3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld = expected->getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -717,8 +717,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -730,8 +730,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			View<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1, -1});
-			View<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -783,16 +783,16 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld       = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld  = expected->getView(0, pinfo.local_index);
-		View<3> vec_ld2      = vec->getView(1, pinfo.local_index);
-		View<3> expected_ld2 = expected->getView(1, pinfo.local_index);
+		ComponentView<3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
+		ComponentView<3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -804,8 +804,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -817,8 +817,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			View<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1, -1});
-			View<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -829,8 +829,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -842,8 +842,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld2.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld2.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld2.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld2.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -855,8 +855,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			View<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1, -1});
-			View<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -908,16 +908,16 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld       = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld  = expected->getView(0, pinfo.local_index);
-		View<3> vec_ld2      = vec->getView(1, pinfo.local_index);
-		View<3> expected_ld2 = expected->getView(1, pinfo.local_index);
+		ComponentView<3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
+		ComponentView<3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -929,8 +929,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -942,8 +942,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			View<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1, -1});
-			View<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -954,8 +954,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -967,8 +967,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld2.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld2.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld2.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld2.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -980,8 +980,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			View<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1, -1});
-			View<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -1027,14 +1027,14 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		View<3> vec_ld      = vec->getView(0, pinfo.local_index);
-		View<3> expected_ld = expected->getView(0, pinfo.local_index);
+		ComponentView<3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> expected_ld = expected->getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<3> s : Side<3>::getValues()) {
-			View<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			ComponentView<2> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			ComponentView<2> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -1046,8 +1046,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
 			}
 		}
 		for (Edge e : Edge::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
-			View<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> vec_ghost      = vec_ld.getSliceOn(e, {-1, -1});
+			ComponentView<1> expected_ghost = expected_ld.getSliceOn(e, {-1, -1});
 			if (pinfo.hasNbr(e)) {
 				INFO("side:      " << e);
 				INFO("nbr-type:  " << pinfo.getNbrType(e));
@@ -1059,8 +1059,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
 			}
 		}
 		for (Corner<3> c : Corner<3>::getValues()) {
-			View<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1, -1});
-			View<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1, -1});
+			ComponentView<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));

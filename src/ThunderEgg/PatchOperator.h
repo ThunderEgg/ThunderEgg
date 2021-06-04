@@ -76,7 +76,7 @@ template <int D> class PatchOperator : public Operator<D>
 	 * modified so that the interior boundaries are assumed to be zero, and the ghost values should
 	 * not be used
 	 */
-	virtual void applySinglePatch(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us, std::vector<View<D>> &fs) const = 0;
+	virtual void applySinglePatch(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us, std::vector<ComponentView<D>> &fs) const = 0;
 
 	/**
 	 * @brief modify values in ghost cells in order to enforce boundary conditions
@@ -84,7 +84,7 @@ template <int D> class PatchOperator : public Operator<D>
 	 * @param pinfo the patch info
 	 * @param us the left hand side
 	 */
-	virtual void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const = 0;
+	virtual void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const = 0;
 
 	/**
 	 * @brief modify values in ghost cells order to enforce zero dirichlet boundary conditions at the internal patch boundary
@@ -92,7 +92,7 @@ template <int D> class PatchOperator : public Operator<D>
 	 * @param pinfo the patch info
 	 * @param us the left hand side
 	 */
-	virtual void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const = 0;
+	virtual void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const = 0;
 
 	/**
 	 * @brief Treat the internal patch boundaries as an dirichlet boundary condition, and modify the
@@ -104,8 +104,9 @@ template <int D> class PatchOperator : public Operator<D>
 	 * @param us the left hand side
 	 * @param fs the right hand side
 	 */
-	virtual void
-	modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us, std::vector<View<D>> &fs) const = 0;
+	virtual void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                 pinfo,
+	                                                           const std::vector<ComponentView<D>> &us,
+	                                                           std::vector<ComponentView<D>> &      fs) const = 0;
 
 	/**
 	 * @brief Apply the operator
@@ -119,9 +120,9 @@ template <int D> class PatchOperator : public Operator<D>
 	{
 		ghost_filler->fillGhost(u);
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			auto us = u->getViews(pinfo.local_index);
+			auto us = u->getComponentViews(pinfo.local_index);
 			enforceBoundaryConditions(pinfo, us);
-			auto fs = f->getViews(pinfo.local_index);
+			auto fs = f->getComponentViews(pinfo.local_index);
 			applySinglePatch(pinfo, us, fs);
 		}
 	}

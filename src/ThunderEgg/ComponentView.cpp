@@ -19,11 +19,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "MultiDimensionalView.h"
+#include "ComponentView.h"
 namespace ThunderEgg
 {
-template class MultiDimensionalView<1>;
-template class MultiDimensionalView<2>;
-template class MultiDimensionalView<3>;
-template class MultiDimensionalView<4>;
+template class ComponentView<1>;
+template class ComponentView<2>;
+template class ComponentView<3>;
 } // namespace ThunderEgg

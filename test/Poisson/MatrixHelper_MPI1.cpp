@@ -88,8 +88,8 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
 		INFO("dz:    " << pinfo.spacings[1]);
-		View<3> f_vec_ld          = f_vec->getView(0, pinfo.local_index);
-		View<3> f_vec_expected_ld = f_vec_expected->getView(0, pinfo.local_index);
+		ComponentView<3> f_vec_ld          = f_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> f_vec_expected_ld = f_vec_expected->getComponentView(0, pinfo.local_index);
 		nested_loop<3>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -149,8 +149,8 @@ TEST_CASE(
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
 		INFO("dz:    " << pinfo.spacings[2]);
-		View<3> f_vec_ld          = f_vec->getView(0, pinfo.local_index);
-		View<3> f_vec_expected_ld = f_vec_expected->getView(0, pinfo.local_index);
+		ComponentView<3> f_vec_ld          = f_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<3> f_vec_expected_ld = f_vec_expected->getComponentView(0, pinfo.local_index);
 		nested_loop<3>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

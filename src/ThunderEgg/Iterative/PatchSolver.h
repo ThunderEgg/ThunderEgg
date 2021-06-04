@@ -87,23 +87,23 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		}
 	};
 	/**
-	 * @brief Wrapper that provides a vector interface for the View of a patch
+	 * @brief Wrapper that provides a vector interface for the ComponentView of a patch
 	 */
 	class SinglePatchVec : public Vector<D>
 	{
 		private:
 		/**
-		 * @brief The View for the patch
+		 * @brief The ComponentView for the patch
 		 */
-		std::vector<View<D>> lds;
+		std::vector<ComponentView<D>> lds;
 
 		/**
-		 * @brief Get the number of local cells in the View object
+		 * @brief Get the number of local cells in the ComponentView object
 		 *
-		 * @param ld the View object
+		 * @param ld the ComponentView object
 		 * @return int the number of local cells
 		 */
-		static int GetNumLocalCells(const View<D> &ld)
+		static int GetNumLocalCells(const ComponentView<D> &ld)
 		{
 			int patch_stride = 1;
 			for (size_t i = 0; i < D; i++) {
@@ -116,14 +116,14 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		/**
 		 * @brief Construct a new SinglePatchVec object
 		 *
-		 * @param ld_in the View for the patch
+		 * @param ld_in the ComponentView for the patch
 		 */
-		SinglePatchVec(const std::vector<View<D>> &lds) : Vector<D>(MPI_COMM_SELF, lds.size(), 1, GetNumLocalCells(lds[0])), lds(lds) {}
-		View<D> getView(int component_index, int local_patch_id) override
+		SinglePatchVec(const std::vector<ComponentView<D>> &lds) : Vector<D>(MPI_COMM_SELF, lds.size(), 1, GetNumLocalCells(lds[0])), lds(lds) {}
+		ComponentView<D> getComponentView(int component_index, int local_patch_id) override
 		{
 			return lds[component_index];
 		}
-		const View<D> getView(int component_index, int local_patch_id) const override
+		const ComponentView<D> getComponentView(int component_index, int local_patch_id) const override
 		{
 			return lds[component_index];
 		}
@@ -154,8 +154,8 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		SinglePatchOp(const PatchInfo<D> &pinfo, std::shared_ptr<const PatchOperator<D>> op) : op(op), pinfo(pinfo) {}
 		void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
 		{
-			auto xs = x->getViews(0);
-			auto bs = b->getViews(0);
+			auto xs = x->getComponentViews(0);
+			auto bs = b->getComponentViews(0);
 			op->enforceBoundaryConditions(pinfo, xs);
 			op->enforceZeroDirichletAtInternalBoundaries(pinfo, xs);
 			op->applySinglePatch(pinfo, xs, bs);
@@ -193,7 +193,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 	  continue_on_breakdown(continue_on_breakdown)
 	{
 	}
-	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<View<D>> &fs, std::vector<View<D>> &us) const override
+	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &fs, std::vector<ComponentView<D>> &us) const override
 	{
 		std::shared_ptr<SinglePatchOp>      single_op(new SinglePatchOp(pinfo, op));
 		std::shared_ptr<VectorGenerator<D>> vg(new SingleVG(pinfo, fs.size()));
@@ -203,7 +203,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 
 		auto f_copy = vg->getNewVector();
 		f_copy->copy(f_single);
-		auto f_copy_lds = f_copy->getViews(0);
+		auto f_copy_lds = f_copy->getComponentViews(0);
 		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, us, f_copy_lds);
 
 		int iterations = 0;

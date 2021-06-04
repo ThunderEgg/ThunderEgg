@@ -58,7 +58,7 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
 	double expected_norm = 0;
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getView(c, i);
+			auto ld = vec.getComponentView(c, i);
 			nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
 				expected_norm += ld[coord] * ld[coord];
 			});
@@ -99,7 +99,7 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
 	double expected_norm = 0;
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 		for (int c = 0; c < vec.getNumComponents(); c++) {
-			auto ld = vec.getView(c, i);
+			auto ld = vec.getComponentView(c, i);
 			nested_loop<3>(ld.getStart(), ld.getEnd(), [&](std::array<int, 3> &coord) {
 				expected_norm = max(abs(ld[coord]), expected_norm);
 			});
@@ -145,8 +145,8 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	double expected_value = 0;
 	for (int i = 0; i < a->getNumLocalPatches(); i++) {
 		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto a_ld = a->getView(c, i);
-			auto b_ld = b->getView(c, i);
+			auto a_ld = a->getComponentView(c, i);
+			auto b_ld = b->getComponentView(c, i);
 			nested_loop<3>(b_ld.getStart(), b_ld.getEnd(), [&](std::array<int, 3> &coord) {
 				expected_value += b_ld[coord] * a_ld[coord];
 			});

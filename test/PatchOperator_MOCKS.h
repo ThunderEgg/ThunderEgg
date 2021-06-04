@@ -67,8 +67,8 @@ class MockPatchOperator : public PatchOperator<D>
 			patches_to_be_called.insert(&pinfo);
 		}
 	}
-	void applySinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
+	void applySinglePatch(const PatchInfo<D> &                 pinfo,
+	                      const std::vector<ComponentView<D>> &us, std::vector<ComponentView<D>> &fs) const override
 	{
 		CHECK(patches_to_be_called.count(&pinfo) == 1);
 		patches_to_be_called.erase(&pinfo);
@@ -77,22 +77,22 @@ class MockPatchOperator : public PatchOperator<D>
 		zero.fill(0);
 		for (int c = 0; c < u_vec->getNumComponents(); c++) {
 			INFO("c: " << c);
-			CHECK(&u_vec->getView(c, pinfo.local_index)[zero] == &us[c][zero]);
+			CHECK(&u_vec->getComponentView(c, pinfo.local_index)[zero] == &us[c][zero]);
 		}
 		for (int c = 0; c < f_vec->getNumComponents(); c++) {
 			INFO("c: " << c);
-			CHECK(&f_vec->getView(c, pinfo.local_index)[zero] == &fs[c][zero]);
+			CHECK(&f_vec->getComponentView(c, pinfo.local_index)[zero] == &fs[c][zero]);
 		}
 	}
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const override
 	{
 	}
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const override
 	{
 	}
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &        pinfo,
-	                                                   const std::vector<View<D>> &us,
-	                                                   std::vector<View<D>> &      fs) const override
+	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                 pinfo,
+	                                                   const std::vector<ComponentView<D>> &us,
+	                                                   std::vector<ComponentView<D>> &      fs) const override
 	{
 	}
 	bool allPatchesCalled()

@@ -199,9 +199,9 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @param out the resulting values after the transform
 	 * @param inverse weather we a re calculate
 	 */
-	void executePlan(const std::array<std::shared_ptr<std::valarray<double>>, D> &plan, View<D> in, View<D> out) const
+	void executePlan(const std::array<std::shared_ptr<std::valarray<double>>, D> &plan, ComponentView<D> in, ComponentView<D> out) const
 	{
-		View<D> prev_result = in;
+		ComponentView<D> prev_result = in;
 
 		for (size_t axis = 0; axis < D; axis++) {
 			int                n     = this->domain->getNs()[axis];
@@ -211,7 +211,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 
 			std::valarray<double> &matrix = *plan[axis];
 
-			View<D> new_result;
+			ComponentView<D> new_result;
 			if (D % 2) {
 				if (axis % 2) {
 					new_result = in;
@@ -222,7 +222,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 				if (axis == D - 1) {
 					new_result = out;
 				} else if (axis == D - 2) {
-					new_result = local_tmp->getView(0, 0);
+					new_result = local_tmp->getComponentView(0, 0);
 				} else if (axis % 2) {
 					new_result = in;
 				} else {
@@ -396,14 +396,14 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 			addPatch(pinfo);
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<View<D>> &fs, std::vector<View<D>> &us) const override
+	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &fs, std::vector<ComponentView<D>> &us) const override
 	{
-		View<D> f_copy_ld = f_copy->getView(0, 0);
-		View<D> tmp_ld    = tmp->getView(0, 0);
+		ComponentView<D> f_copy_ld = f_copy->getComponentView(0, 0);
+		ComponentView<D> tmp_ld    = tmp->getComponentView(0, 0);
 
 		nested_loop<D>(f_copy_ld.getStart(), f_copy_ld.getEnd(), [&](std::array<int, D> coord) { f_copy_ld[coord] = fs[0][coord]; });
 
-		std::vector<View<D>> f_copy_lds = {f_copy_ld};
+		std::vector<ComponentView<D>> f_copy_lds = {f_copy_ld};
 		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, us, f_copy_lds);
 
 		executePlan(plan1.at(pinfo), f_copy_ld, tmp_ld);

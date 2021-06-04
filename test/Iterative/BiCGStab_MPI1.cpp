@@ -234,13 +234,13 @@ class MockVector : public Vector<2>
 	double      dot_value;
 	MockVector(double dot_value)
 	: Vector<2>(MPI_COMM_WORLD, 1, 0, 10), dot_value(dot_value) {}
-	View<2> getView(int, int) override
+	ComponentView<2> getComponentView(int, int) override
 	{
-		return View<2>();
+		return ComponentView<2>();
 	}
-	const View<2> getView(int, int) const override
+	const ComponentView<2> getComponentView(int, int) const override
 	{
-		return View<2>();
+		return ComponentView<2>();
 	}
 	double dot(std::shared_ptr<const Vector<2>>) const override
 	{

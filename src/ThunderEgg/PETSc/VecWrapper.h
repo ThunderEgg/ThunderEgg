@@ -180,18 +180,18 @@ template <int D> class VecWrapper : public Vector<D>
 			VecDestroy(&vec);
 		}
 	}
-	View<D> getView(int component_index, int patch_local_index) override
+	ComponentView<D> getComponentView(int component_index, int patch_local_index) override
 	{
 		std::shared_ptr<VecViewManager> ldm(new VecViewManager(vec, false));
 		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset + component_index * component_stride;
-		return View<D>(data, strides, lengths, num_ghost_cells, ldm);
+		return ComponentView<D>(data, strides, lengths, num_ghost_cells, ldm);
 	}
 
-	const View<D> getView(int component_index, int patch_local_index) const override
+	const ComponentView<D> getComponentView(int component_index, int patch_local_index) const override
 	{
 		std::shared_ptr<VecViewManager> ldm(new VecViewManager(vec, true));
 		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset + component_index * component_stride;
-		return View<D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
+		return ComponentView<D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
 	}
 	int getNumGhostCells() const
 	{

@@ -279,8 +279,8 @@ template <int D> class PatchIfaceScatter
 		}
 
 		for (int i = 0; i < global_vector->getNumLocalPatches(); i++) {
-			auto global_data = global_vector->getView(0, i);
-			auto local_data  = local_patch_iface_vector->getView(0, i);
+			auto global_data = global_vector->getComponentView(0, i);
+			auto local_data  = local_patch_iface_vector->getComponentView(0, i);
 			nested_loop<D - 1>(
 			local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1> &coord) { local_data[coord] = global_data[coord]; });
 		}
@@ -302,7 +302,7 @@ template <int D> class PatchIfaceScatter
 
 			int buffer_index = 0;
 			for (int local_index : send_local_indexes[send_index]) {
-				auto local_data = global_vector->getView(0, local_index);
+				auto local_data = global_vector->getComponentView(0, local_index);
 				nested_loop<D - 1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					buffer[buffer_index] = local_data[coord];
 					buffer_index++;
@@ -313,8 +313,8 @@ template <int D> class PatchIfaceScatter
 		}
 
 		for (int local_iface = 0; local_iface < global_vector->getNumLocalPatches(); local_iface++) {
-			auto global_data = global_vector->getView(0, local_iface);
-			auto local_data  = local_patch_iface_vector->getView(0, local_iface);
+			auto global_data = global_vector->getComponentView(0, local_iface);
+			auto local_data  = local_patch_iface_vector->getComponentView(0, local_iface);
 			nested_loop<D - 1>(
 			local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1> &coord) { local_data[coord] = global_data[coord]; });
 		}
@@ -348,7 +348,7 @@ template <int D> class PatchIfaceScatter
 
 			int buffer_index = 0;
 			for (int local_index : recv_local_indexes[recv_index]) {
-				auto local_data = local_patch_iface_vector->getView(0, local_index);
+				auto local_data = local_patch_iface_vector->getComponentView(0, local_index);
 				nested_loop<D - 1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					local_data[coord] = buffer[buffer_index];
 					buffer_index++;

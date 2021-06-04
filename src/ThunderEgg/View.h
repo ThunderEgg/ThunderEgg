@@ -19,14 +19,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_VIEW_H
-#define THUNDEREGG_VIEW_H
+#ifndef THUNDEREGG_MULTIDIMENSIONALVIEW_H
+#define THUNDEREGG_MULTIDIMENSIONALVIEW_H
 #include <ThunderEgg/Config.h>
-#include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
-#include <ThunderEgg/MultiDimensionalView.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/ViewManager.h>
+#include <array>
 #include <memory>
 namespace ThunderEgg
 {
@@ -35,88 +34,76 @@ namespace ThunderEgg
  *
  * @tparam D number of cartesian dimensions
  */
-template <int D> class View : public MultiDimensionalView<D>
+template <int D> class View
 {
 	private:
 	/**
-	 * @brief The number of cells in each direction
+	 * @brief Pointer to the first non-ghost cell value
 	 */
-	std::array<int, D> lengths;
+	double *data = nullptr;
 	/**
-	 * @brief The number of ghost cells on each side of the patch
+	 * @brief the strides between each element, in each direction
 	 */
-	int num_ghost_cells = 0;
+	std::array<int, D> strides;
+	/**
+	 * @brief the coordianate of the first ghost element
+	 */
+	std::array<int, D> ghost_start;
+	/**
+	 * @brief the coordinate of the first non-ghost element
+	 */
+	std::array<int, D> start;
+	/**
+	 * @brief the coordinate of the last non-ghost
+	 */
+	std::array<int, D> end;
+	/**
+	 * @brief the corrdinate of the last ghost element
+	 */
+	std::array<int, D> ghost_end;
+	/**
+	 * @brief The ViewManager that does any necessary cleanup
+	 */
+	std::shared_ptr<const ViewManager> ldm;
+
+	template <int idx, class Type, class... Types> int getIndex(Type t, Types... args) const
+	{
+		return strides[idx] * t + getIndex<idx + 1>(args...);
+	}
+	template <int idx, class Type> int getIndex(Type t) const
+	{
+		return strides[idx] * t;
+	}
 
 	/**
-	 * @brief Get a slice for a slide
+	 * @brief check that a coordinate is in bounds
+	 * will throw an exception if it isn't
 	 *
-	 * @param s the side of patch for the slice
-	 * @param offset the offset, with {0, 0} being the first slice of non-ghost cell values, and {-1, -1} being
-	 * the first slice of ghost cell values
-	 * @return View<1> the resulting slice
+	 * @param coord the coordinate
 	 */
-	template <int M> View<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
+	void checkCoordIsInBounds(const std::array<int, D> &coord) const
 	{
-		const std::array<int, D> &strides = this->getStrides();
-
-		std::array<int, M> new_strides;
-		std::array<int, M> new_lengths;
-
-		std::array<int, D> first_non_ghost_value;
-		first_non_ghost_value.fill(0);
-
-		std::array<Side<D>, D - M> sides         = f.getSides();
-		size_t                     lengths_index = 0;
-		size_t                     sides_index   = 0;
-		for (size_t axis = 0; axis < (size_t) D; axis++) {
-			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
-				if (sides[sides_index].isLowerOnAxis()) {
-					first_non_ghost_value[axis] = offset[sides_index];
-				} else {
-					first_non_ghost_value[axis] = lengths[axis] - 1 - offset[sides_index];
-				}
-				sides_index++;
-			} else {
-				new_lengths[lengths_index] = lengths[axis];
-				new_strides[lengths_index] = strides[axis];
-				lengths_index++;
-			}
+		bool is_valid_coord = true;
+		for (int i = 0; i < D; i++) {
+			is_valid_coord = is_valid_coord && (coord[i] >= ghost_start[i] && coord[i] <= ghost_end[i]);
 		}
-		double *new_data = const_cast<double *>(&(*this)[first_non_ghost_value]);
-		return View<M>(new_data, new_strides, new_lengths, num_ghost_cells, this->getViewDataManager());
-	}
-
-	static std::array<int, D> DetermineGhostStart(int num_ghost_cells)
-	{
-		std::array<int, D> start;
-		start.fill(-num_ghost_cells);
-		return start;
-	}
-
-	static std::array<int, D> DetermineStart()
-	{
-		std::array<int, D> start;
-		start.fill(0);
-		return start;
-	}
-	static std::array<int, D> DetermineEnd(const std::array<int, D> &lengths)
-	{
-		std::array<int, D> end = lengths;
-		loop<0, D - 1>([&](int i) { end[i]--; });
-		return end;
-	}
-
-	static std::array<int, D> DetermineGhostEnd(const std::array<int, D> &lengths, int num_ghost_cells)
-	{
-		std::array<int, D> end = lengths;
-		loop<0, D - 1>([&](int i) { end[i] += num_ghost_cells - 1; });
-		return end;
+		if (!is_valid_coord) {
+			// oob coord
+			throw RuntimeError("index for view is out of bounds");
+		}
 	}
 
 	public:
-	View() : MultiDimensionalView<D>()
+	/**
+	 * @brief Constructs a view of size 0
+	 */
+	View()
 	{
-		lengths.fill(0);
+		strides.fill(0);
+		ghost_start.fill(0);
+		start.fill(0);
+		end.fill(-1);
+		ghost_end.fill(-1);
 	}
 	/**
 	 * @brief Construct a new View object
@@ -129,101 +116,139 @@ template <int D> class View : public MultiDimensionalView<D>
 	 */
 	View(double *                           data,
 	     const std::array<int, D> &         strides,
-	     const std::array<int, D> &         lengths,
-	     int                                num_ghost_cells,
+	     const std::array<int, D> &         ghost_start,
+	     const std::array<int, D> &         start,
+	     const std::array<int, D> &         end,
+	     const std::array<int, D> &         ghost_end,
 	     std::shared_ptr<const ViewManager> ldm = nullptr)
-	: MultiDimensionalView<D>(data,
-	                          strides,
-	                          DetermineGhostStart(num_ghost_cells),
-	                          DetermineStart(),
-	                          DetermineEnd(lengths),
-	                          DetermineGhostEnd(lengths, num_ghost_cells),
-	                          ldm),
-	  lengths(lengths),
-	  num_ghost_cells(num_ghost_cells)
+	: data(data),
+	  strides(strides),
+	  ghost_start(ghost_start),
+	  start(start),
+	  end(end),
+	  ghost_end(ghost_end),
+	  ldm(ldm)
 	{
 	}
+
 	/**
-	 * @brief Get a slice in a given face
+	 * @brief Get a reference to the element at the specified coordinate
 	 *
-	 * @param f the face
-	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
-	 * face
-	 * @return double& the value
+	 * @param coord the coordinate
+	 * @return double& the element
 	 */
-	template <int M> View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
+	inline double &operator[](const std::array<int, D> &coord)
 	{
-		return getSliceOnPriv(f, offset);
-	}
-	/**
-	 * @brief Get a slice in a given face
-	 *
-	 * @param f the face
-	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
-	 * face
-	 * @return double& the value
-	 */
-	template <int M> const View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
-	{
-		return getSliceOnPriv(f, offset);
-	}
-	template <int M> View<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
-	{
-		const std::array<int, D> &strides = this->getStrides();
-
-		std::array<int, M> new_strides;
-		std::array<int, M> new_lengths;
-
-		std::array<int, D> first_non_ghost_value;
-		first_non_ghost_value.fill(0);
-
-		std::array<Side<D>, D - M> sides         = f.getSides();
-		size_t                     lengths_index = 0;
-		size_t                     sides_index   = 0;
-		for (size_t axis = 0; axis < (size_t) D; axis++) {
-			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
-				if (sides[sides_index].isLowerOnAxis()) {
-					first_non_ghost_value[axis] = -1 - offset[sides_index];
-				} else {
-					first_non_ghost_value[axis] = lengths[axis] + offset[sides_index];
-				}
-				sides_index++;
-			} else {
-				new_lengths[lengths_index] = lengths[axis];
-				new_strides[lengths_index] = strides[axis];
-				lengths_index++;
-			}
+		if constexpr (ENABLE_DEBUG) {
+			checkCoordIsInBounds(coord);
 		}
-		double *new_data = const_cast<double *>(&(*this)[first_non_ghost_value]);
-		return View<M>(new_data, new_strides, new_lengths, num_ghost_cells, this->getViewDataManager());
+		int idx = 0;
+		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
+		return data[idx];
+	}
+
+	/**
+	 * @brief Get a reference to the element at the specified coordinate
+	 *
+	 * @param coord the coordinate
+	 * @return double& the element
+	 */
+	inline const double &operator[](const std::array<int, D> &coord) const
+	{
+		if constexpr (ENABLE_DEBUG) {
+			checkCoordIsInBounds(coord);
+		}
+		int idx = 0;
+		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
+		return data[idx];
+	}
+	template <class... Types> inline double &operator()(Types... args)
+	{
+		static_assert(sizeof...(args) == D, "incorrect number of arguments");
+		if constexpr (ENABLE_DEBUG) {
+			checkCoordIsInBounds({args...});
+		}
+		return data[getIndex<0>(args...)];
+	}
+	template <class... Types> inline const double &operator()(Types... args) const
+	{
+		static_assert(sizeof...(args) == D, "incorrect number of arguments");
+		if constexpr (ENABLE_DEBUG) {
+			checkCoordIsInBounds({args...});
+		}
+		return data[getIndex<0>(args...)];
+	}
+	inline void set(const std::array<int, D> &coord, double value)
+	{
+		if constexpr (ENABLE_DEBUG) {
+			checkCoordIsInBounds(coord);
+		}
+		int idx = 0;
+		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
+		data[idx] = value;
+	}
+	inline void set(const std::array<int, D> &coord, double value) const
+	{
+		if constexpr (ENABLE_DEBUG) {
+			// check that only ghost cells are being modified
+			bool is_interior_coord = true;
+			for (int i = 0; i < D; i++) {
+				is_interior_coord = is_interior_coord && (coord[i] >= start[i] && coord[i] <= end[i]);
+			}
+			if (is_interior_coord) {
+				// intertior coord
+				throw RuntimeError("interior value of const view is being modified");
+			}
+			checkCoordIsInBounds(coord);
+		}
+		int idx = 0;
+		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
+		data[idx] = value;
+	}
+
+	/**
+	 * @brief Get the strides of the patch in each direction
+	 */
+	const std::array<int, D> &getStrides() const
+	{
+		return strides;
 	}
 	/**
-	 * @brief Get the Lengths of the patch in each direction
+	 * @brief Get the coordinate of the first element
 	 */
-	const std::array<int, D> &getLengths() const
+	const std::array<int, D> &getStart() const
 	{
-		return lengths;
+		return start;
 	}
 	/**
-	 * @brief Get the number of ghost cells on each side of the patch
+	 * @brief Get the coordinate of the last element
 	 */
-	int getNumGhostCells() const
+	const std::array<int, D> &getEnd() const
 	{
-		return num_ghost_cells;
+		return end;
+	}
+	/**
+	 * @brief Get the coordinate of the first ghost cell element
+	 */
+	const std::array<int, D> &getGhostStart() const
+	{
+		return ghost_start;
+	}
+	/**
+	 * @brief Get the coordinate of the last ghost cell element
+	 */
+	const std::array<int, D> &getGhostEnd() const
+	{
+		return ghost_end;
+	}
+	const std::shared_ptr<const ViewManager> getComponentViewDataManager() const
+	{
+		return ldm;
 	}
 };
 extern template class View<1>;
 extern template class View<2>;
 extern template class View<3>;
-/*
-template <> inline const double &View<2>::operator[](const std::array<int, 2> &coord) const
-{
-    return data[strides[0] * coord[0] + strides[1] * coord[1]];
-}
-template <> inline double &View<2>::operator[](const std::array<int, 2> &coord)
-{
-    return data[strides[0] * coord[0] + strides[1] * coord[1]];
-}
-*/
+extern template class View<4>;
 } // namespace ThunderEgg
 #endif

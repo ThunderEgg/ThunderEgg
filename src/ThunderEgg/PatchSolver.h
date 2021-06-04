@@ -90,7 +90,7 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @param us the left hand side
 	 * @param fs the right hand side
 	 */
-	virtual void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<View<D>> &fs, std::vector<View<D>> &us) const = 0;
+	virtual void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &fs, std::vector<ComponentView<D>> &us) const = 0;
 	/**
 	 * @brief Solve all the patches in the domain, assuming zero boundary conditions for the patches
 	 *
@@ -107,8 +107,8 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			if (domain->hasTimer()) {
 				domain->getTimer()->start("Single Patch Solve");
 			}
-			auto fs = f->getViews(pinfo.local_index);
-			auto us = u->getViews(pinfo.local_index);
+			auto fs = f->getComponentViews(pinfo.local_index);
+			auto us = u->getComponentViews(pinfo.local_index);
 			solveSinglePatch(pinfo, fs, us);
 			if (domain->hasTimer()) {
 				domain->getTimer()->stop("Single Patch Solve");
@@ -134,8 +134,8 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			if (domain->hasTimer()) {
 				domain->getTimer()->startPatchTiming(pinfo.id, domain->getId(), "Single Patch Solve");
 			}
-			auto fs = f->getViews(pinfo.local_index);
-			auto us = u->getViews(pinfo.local_index);
+			auto fs = f->getComponentViews(pinfo.local_index);
+			auto us = u->getComponentViews(pinfo.local_index);
 			solveSinglePatch(pinfo, fs, us);
 			if (domain->hasTimer()) {
 				domain->getTimer()->stopPatchTiming(pinfo.id, domain->getId(), "Single Patch Solve");
