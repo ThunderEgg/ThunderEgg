@@ -126,3 +126,14 @@ list(APPEND ALL_ThunderEgg_HDRS ${ThunderEgg_HDRS})
 set(ALL_ThunderEgg_HDRS ${ALL_ThunderEgg_HDRS} PARENT_SCOPE)
 
 
+# -- config header
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(TE_ENABLE_DEBUG "true")
+else()
+  set(TE_ENABLE_DEBUG "false")
+endif()
+configure_file(Config.h.in Config.h)
+target_include_directories(
+  ThunderEgg
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)

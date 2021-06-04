@@ -1,0 +1,4 @@
+namespace ThunderEgg
+{
+constexpr bool ENABLE_DEBUG = @TE_ENABLE_DEBUG@;
+} // namespace ThunderEgg

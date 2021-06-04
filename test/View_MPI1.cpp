@@ -992,3 +992,133 @@ TEST_CASE("View<2> getGhostSliceOn<0>", "[View]")
 		}
 	}
 }
+TEST_CASE("View squarebracket operator", "[View]")
+{
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
+
+	array<int, 2> lengths = {nx, ny};
+	array<int, 2> strides = {1, nx + 2 * num_ghost};
+	int           size    = 1;
+	for (size_t i = 0; i < 2; i++) {
+		size *= (lengths[i] + 2 * num_ghost);
+	}
+	double data[size];
+
+	View<2> v(data + num_ghost * strides[0] + num_ghost * strides[1], strides, lengths, num_ghost);
+
+	double *start = &v[{0, 0}];
+
+	for (int yi = -num_ghost - 1; yi < ny + num_ghost + 1; yi++) {
+		for (int xi = -num_ghost - 1; xi < nx + num_ghost + 1; xi++) {
+			if (xi < -num_ghost || xi >= nx + num_ghost || yi < -num_ghost || yi >= ny + num_ghost) {
+				//oob coord
+				if constexpr (ENABLE_DEBUG) {
+					CHECK_THROWS_AS((v[{xi, yi}]), RuntimeError);
+				}
+			} else {
+				CHECK(&v[{xi, yi}] == start + xi + yi * (nx + 2 * num_ghost));
+			}
+		}
+	}
+}
+TEST_CASE("View squarebracket operator const", "[View]")
+{
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
+
+	array<int, 2> lengths = {nx, ny};
+	array<int, 2> strides = {1, nx + 2 * num_ghost};
+	int           size    = 1;
+	for (size_t i = 0; i < 2; i++) {
+		size *= (lengths[i] + 2 * num_ghost);
+	}
+	double data[size];
+
+	const View<2> v(data + num_ghost * strides[0] + num_ghost * strides[1], strides, lengths, num_ghost);
+
+	const double *start = &v[{0, 0}];
+	for (int yi = -num_ghost - 1; yi < ny + num_ghost + 1; yi++) {
+		for (int xi = -num_ghost - 1; xi < nx + num_ghost + 1; xi++) {
+			if (xi < -num_ghost || xi >= nx + num_ghost || yi < -num_ghost || yi >= ny + num_ghost) {
+				//oob coord
+				if constexpr (ENABLE_DEBUG) {
+					CHECK_THROWS_AS((v[{xi, yi}]), RuntimeError);
+				}
+			} else {
+				CHECK(&v[{xi, yi}] == start + xi + yi * (nx + 2 * num_ghost));
+			}
+		}
+	}
+}
+TEST_CASE("View set", "[View]")
+{
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
+
+	array<int, 2> lengths = {nx, ny};
+	array<int, 2> strides = {1, nx + 2 * num_ghost};
+	int           size    = 1;
+	for (size_t i = 0; i < 2; i++) {
+		size *= (lengths[i] + 2 * num_ghost);
+	}
+	double data[size];
+
+	View<2> v(data + num_ghost * strides[0] + num_ghost * strides[1], strides, lengths, num_ghost);
+
+	double value = 0;
+	for (int yi = -num_ghost - 1; yi < ny + num_ghost + 1; yi++) {
+		for (int xi = -num_ghost - 1; xi < nx + num_ghost + 1; xi++) {
+			if ((xi < -num_ghost) || (xi >= nx + num_ghost) || (yi < -num_ghost) || (yi >= ny + num_ghost)) {
+				//oob coord
+				if constexpr (ENABLE_DEBUG) {
+					CHECK_THROWS_AS(v.set({xi, yi}, value), RuntimeError);
+				}
+			} else {
+				v.set({xi, yi}, value);
+				CHECK(v[{xi, yi}] == value);
+			}
+			value++;
+		}
+	}
+}
+TEST_CASE("View set const", "[View]")
+{
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
+
+	array<int, 2> lengths = {nx, ny};
+	array<int, 2> strides = {1, nx + 2 * num_ghost};
+	int           size    = 1;
+	for (size_t i = 0; i < 2; i++) {
+		size *= (lengths[i] + 2 * num_ghost);
+	}
+	double data[size];
+
+	const View<2> v(data + num_ghost * strides[0] + num_ghost * strides[1], strides, lengths, num_ghost);
+
+	double value = 0;
+	for (int yi = -num_ghost - 1; yi < ny + num_ghost + 1; yi++) {
+		for (int xi = -num_ghost - 1; xi < nx + num_ghost + 1; xi++) {
+			if (xi >= 0 && xi < nx && yi >= 0 && yi < ny) {
+				//intertior coord
+				if constexpr (ENABLE_DEBUG) {
+					CHECK_THROWS_AS(v.set({xi, yi}, value), RuntimeError);
+				}
+			} else if (xi < -num_ghost || xi >= nx + num_ghost || yi < -num_ghost || yi >= ny + num_ghost) {
+				//oob coord
+				if constexpr (ENABLE_DEBUG) {
+					CHECK_THROWS_AS(v.set({xi, yi}, value), RuntimeError);
+				}
+			} else {
+				v.set({xi, yi}, value);
+				CHECK(v[{xi, yi}] == value);
+			}
+			value++;
+		}
+	}
+}

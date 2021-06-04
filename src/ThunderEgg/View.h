@@ -21,8 +21,10 @@
 
 #ifndef THUNDEREGG_VIEW_H
 #define THUNDEREGG_VIEW_H
+#include <ThunderEgg/Config.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/ViewManager.h>
 #include <memory>
 namespace ThunderEgg
@@ -102,7 +104,7 @@ template <int D> class View
 				lengths_index++;
 			}
 		}
-		return View<M>(new_data, new_strides, new_lengths, 0, ldm);
+		return View<M>(new_data, new_strides, new_lengths, num_ghost_cells, ldm);
 	}
 
 	template <int idx, class Type, class... Types> int getIndex(Type t, Types... args) const
@@ -112,6 +114,24 @@ template <int D> class View
 	template <int idx, class Type> int getIndex(Type t) const
 	{
 		return strides[idx] * t;
+	}
+
+	/**
+	 * @brief check that a coordinate is in bounds
+	 * will throw an exception if it isn't
+	 *
+	 * @param coord the coordinate
+	 */
+	void checkCoordIsInBounds(const std::array<int, D> &coord) const
+	{
+		bool is_valid_coord = true;
+		for (int i = 0; i < D; i++) {
+			is_valid_coord = is_valid_coord && (coord[i] >= ghost_start[i] && coord[i] <= ghost_end[i]);
+		}
+		if (!is_valid_coord) {
+			// oob coord
+			throw RuntimeError("index for view is out of bounds");
+		}
 	}
 
 	public:
@@ -185,9 +205,39 @@ template <int D> class View
 	 */
 	inline double &operator[](const std::array<int, D> &coord)
 	{
+		if constexpr (ENABLE_DEBUG) {
+			checkCoordIsInBounds(coord);
+		}
 		int idx = 0;
 		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
 		return data[idx];
+	}
+	inline void set(const std::array<int, D> &coord, double value)
+	{
+		if constexpr (ENABLE_DEBUG) {
+			checkCoordIsInBounds(coord);
+		}
+		int idx = 0;
+		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
+		data[idx] = value;
+	}
+	inline void set(const std::array<int, D> &coord, double value) const
+	{
+		if constexpr (ENABLE_DEBUG) {
+			// check that only ghost cells are being modified
+			bool is_interior_coord = true;
+			for (int i = 0; i < D; i++) {
+				is_interior_coord = is_interior_coord && (coord[i] >= start[i] && coord[i] <= end[i]);
+			}
+			if (is_interior_coord) {
+				// intertior coord
+				throw RuntimeError("interior value of const view is being modified");
+			}
+			checkCoordIsInBounds(coord);
+		}
+		int idx = 0;
+		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
+		data[idx] = value;
 	}
 	/**
 	 * @brief Get a reference to the element at the specified coordinate
@@ -197,6 +247,9 @@ template <int D> class View
 	 */
 	inline const double &operator[](const std::array<int, D> &coord) const
 	{
+		if constexpr (ENABLE_DEBUG) {
+			checkCoordIsInBounds(coord);
+		}
 		int idx = 0;
 		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
 		return data[idx];
@@ -257,7 +310,7 @@ template <int D> class View
 				lengths_index++;
 			}
 		}
-		return View<M>(new_data, new_strides, new_lengths, 0, ldm);
+		return View<M>(new_data, new_strides, new_lengths, num_ghost_cells, ldm);
 	}
 	/**
 	 * @brief Get the Lengths of the patch in each direction

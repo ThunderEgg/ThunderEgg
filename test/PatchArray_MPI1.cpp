@@ -96,6 +96,23 @@ TEST_CASE("PatchArray squarebracket operator", "[PatchArray]")
 	CHECK(pa.getStrides()[0] == 1);
 	CHECK(pa.getStrides()[1] == nx + 2 * num_ghost);
 }
+TEST_CASE("PatchArray squarebracket operator const", "[PatchArray]")
+{
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	auto num_ghost = GENERATE(0, 1, 2);
+
+	const PatchArray<2> pa({nx, ny}, num_ghost);
+
+	const double *start = &pa[{0, 0}];
+	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
+		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
+			CHECK(&pa[{xi, yi}] == start + xi + yi * (nx + 2 * num_ghost));
+		}
+	}
+	CHECK(pa.getStrides()[0] == 1);
+	CHECK(pa.getStrides()[1] == nx + 2 * num_ghost);
+}
 TEST_CASE("PatchArray default is zero", "[PatchArray]")
 {
 	auto nx        = GENERATE(2, 3);

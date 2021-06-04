@@ -103,7 +103,7 @@ template <int D> class PatchArray
 				lengths_index++;
 			}
 		}
-		return View<M>(new_data, new_strides, new_lengths, 0, ldm);
+		return View<M>(new_data, new_strides, new_lengths, num_ghost_cells, ldm);
 	}
 
 	public:
@@ -205,7 +205,7 @@ template <int D> class PatchArray
 				lengths_index++;
 			}
 		}
-		return View<M>(new_data, new_strides, new_lengths, 0, ldm);
+		return View<M>(new_data, new_strides, new_lengths, num_ghost_cells, ldm);
 	}
 	/**
 	 * @brief Get the Lengths of the patch in each direction
