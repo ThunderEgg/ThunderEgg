@@ -156,7 +156,9 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		{
 			auto xs = x->getViews(0);
 			auto bs = b->getViews(0);
-			op->applySinglePatch(pinfo, xs, bs, true);
+			op->enforceBoundaryConditions(pinfo, xs);
+			op->enforceZeroDirichletAtInternalBoundaries(pinfo, xs);
+			op->applySinglePatch(pinfo, xs, bs);
 		}
 	};
 
@@ -202,7 +204,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		auto f_copy = vg->getNewVector();
 		f_copy->copy(f_single);
 		auto f_copy_lds = f_copy->getViews(0);
-		op->addGhostToRHS(pinfo, us, f_copy_lds);
+		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, us, f_copy_lds);
 
 		int iterations = 0;
 		try {

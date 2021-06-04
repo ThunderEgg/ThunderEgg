@@ -69,10 +69,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 		this->ghost_filler->fillGhost(this->coeffs);
 	}
-	void applySinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &us,
-	                      std::vector<View<D>> &      fs,
-	                      bool                        treat_interior_boundary_as_dirichlet) const override
+	void applySinglePatch(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
 	{
 		const View<D>         c  = coeffs->getView(0, pinfo.local_index);
 		std::array<double, D> h2 = pinfo.spacings;
@@ -80,18 +77,6 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			h2[i] *= h2[i];
 		}
 		loop<0, D - 1>([&](int axis) {
-			Side<D> lower_side(axis * 2);
-			Side<D> upper_side(axis * 2 + 1);
-			if (!pinfo.hasNbr(lower_side) || treat_interior_boundary_as_dirichlet) {
-				View<D - 1>       lower = us[0].getSliceOn(lower_side, {-1});
-				const View<D - 1> mid   = us[0].getSliceOn(lower_side, {0});
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -mid[coord]; });
-			}
-			if (!pinfo.hasNbr(upper_side) || treat_interior_boundary_as_dirichlet) {
-				View<D - 1>       upper = us[0].getSliceOn(upper_side, {-1});
-				const View<D - 1> mid   = us[0].getSliceOn(upper_side, {0});
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -mid[coord]; });
-			}
 			int stride   = us[0].getStrides()[axis];
 			int c_stride = c.getStrides()[axis];
 			nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) {
@@ -108,7 +93,45 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			});
 		});
 	}
-	void addGhostToRHS(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
+
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	{
+		for (int axis = 0; axis < D; axis++) {
+			Side<D> lower_side(axis * 2);
+			Side<D> upper_side(axis * 2 + 1);
+			if (!pinfo.hasNbr(lower_side)) {
+				View<D - 1>       lower = us[0].getSliceOn(lower_side, {-1});
+				const View<D - 1> mid   = us[0].getSliceOn(lower_side, {0});
+				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -mid[coord]; });
+			}
+			if (!pinfo.hasNbr(upper_side)) {
+				View<D - 1>       upper = us[0].getSliceOn(upper_side, {-1});
+				const View<D - 1> mid   = us[0].getSliceOn(upper_side, {0});
+				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -mid[coord]; });
+			}
+		}
+	}
+
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	{
+		for (int axis = 0; axis < D; axis++) {
+			Side<D> lower_side(axis * 2);
+			Side<D> upper_side(axis * 2 + 1);
+			if (pinfo.hasNbr(lower_side)) {
+				View<D - 1>       lower = us[0].getSliceOn(lower_side, {-1});
+				const View<D - 1> mid   = us[0].getSliceOn(lower_side, {0});
+				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -mid[coord]; });
+			}
+			if (pinfo.hasNbr(upper_side)) {
+				View<D - 1>       upper = us[0].getSliceOn(upper_side, {-1});
+				const View<D - 1> mid   = us[0].getSliceOn(upper_side, {0});
+				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -mid[coord]; });
+			}
+		}
+	}
+
+	void
+	modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
 	{
 		const View<D> c = coeffs->getView(0, pinfo.local_index);
 		for (Side<D> s : Side<D>::getValues()) {

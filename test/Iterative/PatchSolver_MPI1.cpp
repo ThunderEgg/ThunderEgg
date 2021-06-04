@@ -85,6 +85,8 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 	bcgs_solver.smooth(f, u);
 	CHECK(mpo->getNumApplyCalls() == 1);
 	CHECK(mpo->rhsWasModified());
+	CHECK(mpo->boundaryConditionsEnforced());
+	CHECK(mpo->internalBoundaryConditionsEnforced());
 }
 TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::PatchSolver]")
 {

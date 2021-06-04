@@ -65,10 +65,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
 	}
-	void applySinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &us,
-	                      std::vector<View<D>> &      fs,
-	                      bool                        treat_interior_boundary_as_dirichlet) const override
+	void applySinglePatch(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
 	{
 		std::array<double, D> h2 = pinfo.spacings;
 		for (size_t i = 0; i < D; i++) {
@@ -76,22 +73,6 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 
 		loop<0, D - 1>([&](int axis) {
-			Side<D>           lower_side = LowerSideOnAxis<D>(axis);
-			Side<D>           upper_side = HigherSideOnAxis<D>(axis);
-			View<D - 1>       lower      = us[0].getSliceOn(lower_side, {-1});
-			const View<D - 1> lower_mid  = us[0].getSliceOn(lower_side, {0});
-			if (!pinfo.hasNbr(lower_side) && neumann) {
-				nested_loop<D - 1>(lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = lower_mid[coord]; });
-			} else if (!pinfo.hasNbr(lower_side) || treat_interior_boundary_as_dirichlet) {
-				nested_loop<D - 1>(lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -lower_mid[coord]; });
-			}
-			View<D - 1>       upper     = us[0].getSliceOn(upper_side, {-1});
-			const View<D - 1> upper_mid = us[0].getSliceOn(upper_side, {0});
-			if (!pinfo.hasNbr(upper_side) && neumann) {
-				nested_loop<D - 1>(upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = upper_mid[coord]; });
-			} else if (!pinfo.hasNbr(upper_side) || treat_interior_boundary_as_dirichlet) {
-				nested_loop<D - 1>(upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -upper_mid[coord]; });
-			}
 			int stride = us[0].getStrides()[axis];
 			nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) {
 				const double *ptr   = us[0].getPtr(coord);
@@ -102,7 +83,54 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			});
 		});
 	}
-	void addGhostToRHS(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	{
+		for (int axis = 0; axis < D; axis++) {
+			Side<D> lower_side = LowerSideOnAxis<D>(axis);
+			Side<D> upper_side = HigherSideOnAxis<D>(axis);
+			if (!pinfo.hasNbr(lower_side)) {
+				View<D - 1>       lower     = us[0].getSliceOn(lower_side, {-1});
+				const View<D - 1> lower_mid = us[0].getSliceOn(lower_side, {0});
+				if (neumann) {
+					nested_loop<D - 1>(
+					lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = lower_mid[coord]; });
+				} else {
+					nested_loop<D - 1>(
+					lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -lower_mid[coord]; });
+				}
+			}
+			if (!pinfo.hasNbr(upper_side)) {
+				View<D - 1>       upper     = us[0].getSliceOn(upper_side, {-1});
+				const View<D - 1> upper_mid = us[0].getSliceOn(upper_side, {0});
+				if (neumann) {
+					nested_loop<D - 1>(
+					upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = upper_mid[coord]; });
+				} else {
+					nested_loop<D - 1>(
+					upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -upper_mid[coord]; });
+				}
+			}
+		}
+	}
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	{
+		for (int axis = 0; axis < D; axis++) {
+			Side<D> lower_side = LowerSideOnAxis<D>(axis);
+			Side<D> upper_side = HigherSideOnAxis<D>(axis);
+			if (pinfo.hasNbr(lower_side)) {
+				View<D - 1>       lower     = us[0].getSliceOn(lower_side, {-1});
+				const View<D - 1> lower_mid = us[0].getSliceOn(lower_side, {0});
+				nested_loop<D - 1>(lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -lower_mid[coord]; });
+			}
+			if (pinfo.hasNbr(upper_side)) {
+				View<D - 1>       upper     = us[0].getSliceOn(upper_side, {-1});
+				const View<D - 1> upper_mid = us[0].getSliceOn(upper_side, {0});
+				nested_loop<D - 1>(upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -upper_mid[coord]; });
+			}
+		}
+	}
+	void
+	modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
 	{
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo.hasNbr(s)) {

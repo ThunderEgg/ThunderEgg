@@ -41,6 +41,7 @@ class MockPatchOperator : public PatchOperator<D>
 {
 	private:
 	mutable bool rhs_was_modified   = false;
+	mutable bool bc_enforced        = false;
 	mutable bool interior_dirichlet = false;
 	mutable int  num_apply_calls    = 0;
 
@@ -51,15 +52,21 @@ class MockPatchOperator : public PatchOperator<D>
 	{
 	}
 	void applySinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs,
-	                      bool treat_interior_boundary_as_dirichlet) const override
+	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
 	{
-		interior_dirichlet |= true;
 		num_apply_calls++;
 	}
-	void addGhostToRHS(const PatchInfo<D> &        pinfo,
-	                   const std::vector<View<D>> &us,
-	                   std::vector<View<D>> &      fs) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	{
+		bc_enforced = true;
+	}
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	{
+		interior_dirichlet = true;
+	}
+	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &        pinfo,
+	                                                   const std::vector<View<D>> &us,
+	                                                   std::vector<View<D>> &      fs) const override
 	{
 		rhs_was_modified = true;
 	}
@@ -67,7 +74,11 @@ class MockPatchOperator : public PatchOperator<D>
 	{
 		return rhs_was_modified;
 	}
-	bool interiorDirichlet()
+	bool boundaryConditionsEnforced()
+	{
+		return bc_enforced;
+	}
+	bool internalBoundaryConditionsEnforced()
 	{
 		return interior_dirichlet;
 	}
@@ -81,6 +92,7 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 {
 	private:
 	mutable bool rhs_was_modified   = false;
+	mutable bool bc_enforced        = false;
 	mutable bool interior_dirichlet = false;
 
 	public:
@@ -90,18 +102,24 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	{
 	}
 	void applySinglePatch(const PatchInfo<D> &        pinfo,
-	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs,
-	                      bool treat_interior_boundary_as_dirichlet) const override
+	                      const std::vector<View<D>> &us, std::vector<View<D>> &fs) const override
 	{
-		interior_dirichlet |= treat_interior_boundary_as_dirichlet;
 		for (size_t c = 0; c < fs.size(); c++) {
 			nested_loop<D>(fs[c].getStart(), fs[c].getEnd(),
 			               [&](const std::array<int, D> &coord) { fs[c][coord] += 1; });
 		}
 	}
-	void addGhostToRHS(const PatchInfo<D> &        pinfo,
-	                   const std::vector<View<D>> &us,
-	                   std::vector<View<D>> &      fs) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	{
+		bc_enforced = true;
+	}
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<View<D>> &us) const override
+	{
+		interior_dirichlet = true;
+	}
+	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &        pinfo,
+	                                                   const std::vector<View<D>> &us,
+	                                                   std::vector<View<D>> &      fs) const override
 	{
 		rhs_was_modified = true;
 	}
@@ -109,7 +127,11 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	{
 		return rhs_was_modified;
 	}
-	bool interiorDirichlet()
+	bool boundaryConditionsEnforced()
+	{
+		return bc_enforced;
+	}
+	bool internalBoundaryConditionsEnforced()
 	{
 		return interior_dirichlet;
 	}
