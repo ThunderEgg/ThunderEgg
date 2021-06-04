@@ -138,7 +138,7 @@ TEST_CASE("Vector<3> getViews", "[Vector]")
 		auto lds = vec.getViews(i);
 		for (int c = 0; c < vec.getNumComponents(); c++) {
 			auto ld = vec.getView(c, i);
-			CHECK(ld.getPtr() == lds[c].getPtr());
+			CHECK(&ld[{0, 0, 0}] == &lds[c][{0, 0, 0}]);
 		}
 	}
 }
@@ -165,7 +165,7 @@ TEST_CASE("Vector<3> getViews const", "[Vector]")
 		auto lds = vec.getViews(i);
 		for (int c = 0; c < vec.getNumComponents(); c++) {
 			auto ld = vec.getView(c, i);
-			CHECK(ld.getPtr() == lds[c].getPtr());
+			CHECK(&ld[{0, 0, 0}] == &lds[c][{0, 0, 0}]);
 		}
 	}
 }

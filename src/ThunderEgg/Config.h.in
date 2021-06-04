@@ -1,4 +1,7 @@
+#ifndef THUNDEREGG_CONFIG_H
+#define THUNDEREGG_CONFIG_H
 namespace ThunderEgg
 {
 constexpr bool ENABLE_DEBUG = @TE_ENABLE_DEBUG@;
 } // namespace ThunderEgg
+#endif

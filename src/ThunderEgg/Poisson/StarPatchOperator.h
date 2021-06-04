@@ -75,7 +75,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		loop<0, D - 1>([&](int axis) {
 			int stride = us[0].getStrides()[axis];
 			nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) {
-				const double *ptr   = us[0].getPtr(coord);
+				const double *ptr   = &us[0][coord];
 				double        lower = *(ptr - stride);
 				double        mid   = *ptr;
 				double        upper = *(ptr + stride);

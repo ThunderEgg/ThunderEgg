@@ -22,7 +22,6 @@ TEST_CASE("View constructor", "[View]")
 	           num_ghost);
 
 	CHECK(ld.getNumGhostCells() == num_ghost);
-	CHECK(ld.getPtr() == vec.data() + num_ghost * strides[0] + num_ghost * strides[1]);
 	for (int i = 0; i < 2; i++) {
 		CHECK(ld.getLengths()[i] == lengths[i]);
 		CHECK(ld.getStrides()[i] == strides[i]);
@@ -31,7 +30,6 @@ TEST_CASE("View constructor", "[View]")
 		CHECK(ld.getGhostStart()[i] == -num_ghost);
 		CHECK(ld.getGhostEnd()[i] == lengths[i] - 1 + num_ghost);
 	}
-	CHECK(ld.getPtr(ld.getGhostStart()) == vec.data());
 }
 TEST_CASE("View<2> getSliceOn<1>", "[View]")
 {

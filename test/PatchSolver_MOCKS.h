@@ -70,11 +70,13 @@ class MockPatchSolver : public PatchSolver<D>
 	{
 		CHECK(patches_to_be_called.count(&pinfo) == 1);
 		patches_to_be_called.erase(&pinfo);
+		std::array<int, D> zero;
+		zero.fill(0);
 		for (int c = 0; c < u_vec->getNumComponents(); c++) {
-			CHECK(u_vec->getView(c, pinfo.local_index).getPtr() == us[c].getPtr());
+			CHECK(&u_vec->getView(c, pinfo.local_index)[zero] == &us[c][zero]);
 		}
 		for (int c = 0; c < f_vec->getNumComponents(); c++) {
-			CHECK(f_vec->getView(c, pinfo.local_index).getPtr() == fs[c].getPtr());
+			CHECK(&f_vec->getView(c, pinfo.local_index)[zero] == &fs[c][zero]);
 		}
 	}
 	bool allPatchesCalled()

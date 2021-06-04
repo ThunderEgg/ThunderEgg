@@ -80,8 +80,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			int stride   = us[0].getStrides()[axis];
 			int c_stride = c.getStrides()[axis];
 			nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) {
-				const double *ptr     = us[0].getPtr(coord);
-				const double *c_ptr   = c.getPtr(coord);
+				const double *ptr     = &us[0][coord];
+				const double *c_ptr   = &c[coord];
 				double        lower   = *(ptr - stride);
 				double        mid     = *ptr;
 				double        upper   = *(ptr + stride);

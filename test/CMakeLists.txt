@@ -55,6 +55,8 @@ target_sources(unit_tests_mpi1 PRIVATE MPIGhostFiller_MPI1.cpp)
 target_sources(unit_tests_mpi2 PRIVATE MPIGhostFiller_MPI2.cpp)
 target_sources(unit_tests_mpi3 PRIVATE MPIGhostFiller_MPI3.cpp)
 
+target_sources(unit_tests_mpi1 PRIVATE MultiDimensionalView_MPI1.cpp)
+
 target_sources(unit_tests_mpi1 PRIVATE NbrType_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE NormalNbrInfo_MPI1.cpp)

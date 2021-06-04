@@ -42,6 +42,9 @@ list(APPEND ThunderEgg_HDRS ViewManager.h)
 list(APPEND ThunderEgg_HDRS MPIGhostFiller.h)
 target_sources(ThunderEgg PRIVATE MPIGhostFiller.cpp)
 
+list(APPEND ThunderEgg_HDRS MultiDimensionalView.h)
+target_sources(ThunderEgg PRIVATE MultiDimensionalView.cpp)
+
 list(APPEND ThunderEgg_HDRS NbrInfo.h)
 
 list(APPEND ThunderEgg_HDRS NbrInfoBase.h)
