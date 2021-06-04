@@ -132,7 +132,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 else()
   set(TE_ENABLE_DEBUG "false")
 endif()
+
 configure_file(Config.h.in Config.h)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg)
+
 target_include_directories(
   ThunderEgg
   PUBLIC
