@@ -95,14 +95,15 @@ template <int D> class ComponentView : public View<D>
 	 * the first slice of ghost cell values
 	 * @return View<1> the resulting slice
 	 */
-	template <int M> View<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
+	template <int M>
+	void getSliceOnPriv(Face<D, M>                    f,
+	                    const std::array<int, D - M> &offset,
+	                    std::array<int, M> &          new_strides,
+	                    std::array<int, M> &          new_lengths,
+	                    std::array<int, D> &          first_non_ghost_value) const
 	{
 		const std::array<int, D> &strides = this->getStrides();
 
-		std::array<int, M> new_strides;
-		std::array<int, M> new_lengths;
-
-		std::array<int, D> first_non_ghost_value;
 		first_non_ghost_value.fill(0);
 
 		std::array<Side<D>, D - M> sides         = f.getSides();
@@ -122,14 +123,6 @@ template <int D> class ComponentView : public View<D>
 				lengths_index++;
 			}
 		}
-		double *new_data = const_cast<double *>(&(*this)[first_non_ghost_value]);
-		return View<M>(new_data,
-		               new_strides,
-		               DetermineGhostStart<M>(num_ghost_cells),
-		               DetermineStart<M>(),
-		               DetermineEnd<M>(new_lengths),
-		               DetermineGhostEnd<M>(new_lengths, num_ghost_cells),
-		               this->getComponentViewDataManager());
 	}
 
 	public:
@@ -175,7 +168,20 @@ template <int D> class ComponentView : public View<D>
 	 */
 	template <int M> View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
 	{
-		return getSliceOnPriv(f, offset);
+		std::array<int, M> new_strides;
+		std::array<int, M> new_lengths;
+		std::array<int, D> first_non_ghost_value;
+
+		getSliceOnPriv<M>(f, offset, new_strides, new_lengths, first_non_ghost_value);
+
+		double *new_data = (&(*this)[first_non_ghost_value]);
+		return View<M>(new_data,
+		               new_strides,
+		               DetermineGhostStart<M>(num_ghost_cells),
+		               DetermineStart<M>(),
+		               DetermineEnd<M>(new_lengths),
+		               DetermineGhostEnd<M>(new_lengths, num_ghost_cells),
+		               this->getComponentViewDataManager());
 	}
 	/**
 	 * @brief Get a slice in a given face
@@ -185,10 +191,24 @@ template <int D> class ComponentView : public View<D>
 	 * face
 	 * @return double& the value
 	 */
-	template <int M> const View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
+	template <int M> ConstView<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
-		return getSliceOnPriv(f, offset);
+		std::array<int, M> new_strides;
+		std::array<int, M> new_lengths;
+		std::array<int, D> first_non_ghost_value;
+
+		getSliceOnPriv<M>(f, offset, new_strides, new_lengths, first_non_ghost_value);
+
+		const double *new_data = (&(*this)[first_non_ghost_value]);
+		return ConstView<M>(new_data,
+		                    new_strides,
+		                    DetermineGhostStart<M>(num_ghost_cells),
+		                    DetermineStart<M>(),
+		                    DetermineEnd<M>(new_lengths),
+		                    DetermineGhostEnd<M>(new_lengths, num_ghost_cells),
+		                    this->getComponentViewDataManager());
 	}
+
 	template <int M> View<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
 	{
 		const std::array<int, D> &strides = this->getStrides();

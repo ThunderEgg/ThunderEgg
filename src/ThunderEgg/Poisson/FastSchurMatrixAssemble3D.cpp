@@ -231,8 +231,8 @@ void FillBlockColumnForCoarseToCoarseInterface(int                              
 	new_pinfo.setNbrInfo(s, new FineNbrInfo<2>());
 	std::vector<ComponentView<3>> us = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
-	auto slice       = u.getSliceOn(s, {0});
-	auto ghost_slice = u.getSliceOn(s, {-1});
+	ConstView<2> slice       = u.getSliceOn(s, {0});
+	View<2>      ghost_slice = u.getGhostSliceOn(s, {0});
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			block[(xi + yi * n) * n * n + j] = -(slice[{xi, yi}] + ghost_slice[{xi, yi}]) / 2;
@@ -265,8 +265,8 @@ void FillBlockColumnForFineToFineInterface(int                                  
 	new_pinfo.setNbrInfo(s, new CoarseNbrInfo<2>(100, type.getOrthant()));
 	std::vector<ComponentView<3>> us = {u};
 	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
-	auto slice       = u.getSliceOn(s, {0});
-	auto ghost_slice = u.getSliceOn(s, {-1});
+	ConstView<2> slice       = u.getSliceOn(s, {0});
+	View<2>      ghost_slice = u.getGhostSliceOn(s, {0});
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			block[(xi + yi * n) * n * n + j] = -(slice[{xi, yi}] + ghost_slice[{xi, yi}]) / 2;

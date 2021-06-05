@@ -89,8 +89,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			Side<D> lower_side = LowerSideOnAxis<D>(axis);
 			Side<D> upper_side = HigherSideOnAxis<D>(axis);
 			if (!pinfo.hasNbr(lower_side)) {
-				View<D - 1>       lower     = us[0].getSliceOn(lower_side, {-1});
-				const View<D - 1> lower_mid = us[0].getSliceOn(lower_side, {0});
+				View<D - 1>      lower     = us[0].getGhostSliceOn(lower_side, {0});
+				ConstView<D - 1> lower_mid = us[0].getSliceOn(lower_side, {0});
 				if (neumann) {
 					nested_loop<D - 1>(
 					lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = lower_mid[coord]; });
@@ -100,8 +100,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 				}
 			}
 			if (!pinfo.hasNbr(upper_side)) {
-				View<D - 1>       upper     = us[0].getSliceOn(upper_side, {-1});
-				const View<D - 1> upper_mid = us[0].getSliceOn(upper_side, {0});
+				View<D - 1>      upper     = us[0].getGhostSliceOn(upper_side, {0});
+				ConstView<D - 1> upper_mid = us[0].getSliceOn(upper_side, {0});
 				if (neumann) {
 					nested_loop<D - 1>(
 					upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = upper_mid[coord]; });
@@ -118,13 +118,13 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			Side<D> lower_side = LowerSideOnAxis<D>(axis);
 			Side<D> upper_side = HigherSideOnAxis<D>(axis);
 			if (pinfo.hasNbr(lower_side)) {
-				View<D - 1>       lower     = us[0].getSliceOn(lower_side, {-1});
-				const View<D - 1> lower_mid = us[0].getSliceOn(lower_side, {0});
+				View<D - 1>      lower     = us[0].getGhostSliceOn(lower_side, {0});
+				ConstView<D - 1> lower_mid = us[0].getSliceOn(lower_side, {0});
 				nested_loop<D - 1>(lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -lower_mid[coord]; });
 			}
 			if (pinfo.hasNbr(upper_side)) {
-				View<D - 1>       upper     = us[0].getSliceOn(upper_side, {-1});
-				const View<D - 1> upper_mid = us[0].getSliceOn(upper_side, {0});
+				View<D - 1>      upper     = us[0].getGhostSliceOn(upper_side, {0});
+				ConstView<D - 1> upper_mid = us[0].getSliceOn(upper_side, {0});
 				nested_loop<D - 1>(upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -upper_mid[coord]; });
 			}
 		}
@@ -135,10 +135,10 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	{
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo.hasNbr(s)) {
-				double            h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
-				View<D - 1>       f_inner = fs[0].getSliceOn(s, {0});
-				View<D - 1>       u_ghost = us[0].getSliceOn(s, {-1});
-				const View<D - 1> u_inner = us[0].getSliceOn(s, {0});
+				double           h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
+				View<D - 1>      f_inner = fs[0].getSliceOn(s, {0});
+				View<D - 1>      u_ghost = us[0].getGhostSliceOn(s, {0});
+				ConstView<D - 1> u_inner = us[0].getSliceOn(s, {0});
 				nested_loop<D - 1>(f_inner.getStart(), f_inner.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2;
 					u_ghost[coord] = 0;

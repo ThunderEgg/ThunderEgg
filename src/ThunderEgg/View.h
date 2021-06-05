@@ -19,14 +19,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_MULTIDIMENSIONALVIEW_H
-#define THUNDEREGG_MULTIDIMENSIONALVIEW_H
-#include <ThunderEgg/Config.h>
-#include <ThunderEgg/Loops.h>
-#include <ThunderEgg/RuntimeError.h>
-#include <ThunderEgg/ViewManager.h>
-#include <array>
-#include <memory>
+#ifndef THUNDEREGG_VIEW_H
+#define THUNDEREGG_VIEW_H
+#include <ThunderEgg/ConstView.h>
 namespace ThunderEgg
 {
 /**
@@ -34,77 +29,19 @@ namespace ThunderEgg
  *
  * @tparam D number of cartesian dimensions
  */
-template <int D> class View
+template <int D> class View : public ConstView<D>
 {
 	private:
 	/**
 	 * @brief Pointer to the first non-ghost cell value
 	 */
 	double *data = nullptr;
-	/**
-	 * @brief the strides between each element, in each direction
-	 */
-	std::array<int, D> strides;
-	/**
-	 * @brief the coordianate of the first ghost element
-	 */
-	std::array<int, D> ghost_start;
-	/**
-	 * @brief the coordinate of the first non-ghost element
-	 */
-	std::array<int, D> start;
-	/**
-	 * @brief the coordinate of the last non-ghost
-	 */
-	std::array<int, D> end;
-	/**
-	 * @brief the corrdinate of the last ghost element
-	 */
-	std::array<int, D> ghost_end;
-	/**
-	 * @brief The ViewManager that does any necessary cleanup
-	 */
-	std::shared_ptr<const ViewManager> ldm;
-
-	template <int idx, class Type, class... Types> int getIndex(Type t, Types... args) const
-	{
-		return strides[idx] * t + getIndex<idx + 1>(args...);
-	}
-	template <int idx, class Type> int getIndex(Type t) const
-	{
-		return strides[idx] * t;
-	}
-
-	/**
-	 * @brief check that a coordinate is in bounds
-	 * will throw an exception if it isn't
-	 *
-	 * @param coord the coordinate
-	 */
-	void checkCoordIsInBounds(const std::array<int, D> &coord) const
-	{
-		bool is_valid_coord = true;
-		for (int i = 0; i < D; i++) {
-			is_valid_coord = is_valid_coord && (coord[i] >= ghost_start[i] && coord[i] <= ghost_end[i]);
-		}
-		if (!is_valid_coord) {
-			// oob coord
-			throw RuntimeError("index for view is out of bounds");
-		}
-	}
 
 	public:
 	/**
 	 * @brief Constructs a view of size 0
 	 */
-	View()
-	{
-		strides.fill(0);
-		ghost_start.fill(0);
-		start.fill(0);
-		end.fill(-1);
-		ghost_end.fill(-1);
-	}
+	View() : ConstView<D>() {}
 	/**
 	 * @brief Construct a new View object
 	 *
@@ -121,13 +58,8 @@ template <int D> class View
 	     const std::array<int, D> &         end,
 	     const std::array<int, D> &         ghost_end,
 	     std::shared_ptr<const ViewManager> ldm = nullptr)
-	: data(data),
-	  strides(strides),
-	  ghost_start(ghost_start),
-	  start(start),
-	  end(end),
-	  ghost_end(ghost_end),
-	  ldm(ldm)
+	: ConstView<D>(data, strides, ghost_start, start, end, ghost_end, ldm),
+	  data(data)
 	{
 	}
 
@@ -140,111 +72,30 @@ template <int D> class View
 	inline double &operator[](const std::array<int, D> &coord)
 	{
 		if constexpr (ENABLE_DEBUG) {
-			checkCoordIsInBounds(coord);
+			this->checkCoordIsInBounds(coord);
 		}
-		int idx = 0;
-		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
-		return data[idx];
+		return data[this->getIndex(coord)];
 	}
 
-	/**
-	 * @brief Get a reference to the element at the specified coordinate
-	 *
-	 * @param coord the coordinate
-	 * @return double& the element
-	 */
-	inline const double &operator[](const std::array<int, D> &coord) const
-	{
-		if constexpr (ENABLE_DEBUG) {
-			checkCoordIsInBounds(coord);
-		}
-		int idx = 0;
-		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
-		return data[idx];
-	}
 	template <class... Types> inline double &operator()(Types... args)
 	{
 		static_assert(sizeof...(args) == D, "incorrect number of arguments");
 		if constexpr (ENABLE_DEBUG) {
-			checkCoordIsInBounds({args...});
+			this->checkCoordIsInBounds({args...});
 		}
-		return data[getIndex<0>(args...)];
-	}
-	template <class... Types> inline const double &operator()(Types... args) const
-	{
-		static_assert(sizeof...(args) == D, "incorrect number of arguments");
-		if constexpr (ENABLE_DEBUG) {
-			checkCoordIsInBounds({args...});
-		}
-		return data[getIndex<0>(args...)];
+		return data[this->getIndex({args...})];
 	}
 	inline void set(const std::array<int, D> &coord, double value)
 	{
 		if constexpr (ENABLE_DEBUG) {
-			checkCoordIsInBounds(coord);
+			this->checkCoordIsInBounds(coord);
 		}
-		int idx = 0;
-		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
-		data[idx] = value;
-	}
-	inline void set(const std::array<int, D> &coord, double value) const
-	{
-		if constexpr (ENABLE_DEBUG) {
-			// check that only ghost cells are being modified
-			bool is_interior_coord = true;
-			for (int i = 0; i < D; i++) {
-				is_interior_coord = is_interior_coord && (coord[i] >= start[i] && coord[i] <= end[i]);
-			}
-			if (is_interior_coord) {
-				// intertior coord
-				throw RuntimeError("interior value of const view is being modified");
-			}
-			checkCoordIsInBounds(coord);
-		}
-		int idx = 0;
-		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
-		data[idx] = value;
+		data[this->getIndex(coord)] = value;
 	}
 
-	/**
-	 * @brief Get the strides of the patch in each direction
-	 */
-	const std::array<int, D> &getStrides() const
-	{
-		return strides;
-	}
-	/**
-	 * @brief Get the coordinate of the first element
-	 */
-	const std::array<int, D> &getStart() const
-	{
-		return start;
-	}
-	/**
-	 * @brief Get the coordinate of the last element
-	 */
-	const std::array<int, D> &getEnd() const
-	{
-		return end;
-	}
-	/**
-	 * @brief Get the coordinate of the first ghost cell element
-	 */
-	const std::array<int, D> &getGhostStart() const
-	{
-		return ghost_start;
-	}
-	/**
-	 * @brief Get the coordinate of the last ghost cell element
-	 */
-	const std::array<int, D> &getGhostEnd() const
-	{
-		return ghost_end;
-	}
-	const std::shared_ptr<const ViewManager> getComponentViewDataManager() const
-	{
-		return ldm;
-	}
+	using ConstView<D>::operator[];
+	using ConstView<D>::operator();
+	using ConstView<D>::set;
 };
 extern template class View<1>;
 extern template class View<2>;

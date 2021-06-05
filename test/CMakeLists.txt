@@ -38,6 +38,8 @@ target_sources(unit_tests_mpi1 PRIVATE CoarseNbrInfo_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE ComponentView_MPI1.cpp)
 
+target_sources(unit_tests_mpi1 PRIVATE ConstView_MPI1.cpp)
+
 target_sources(unit_tests_mpi1 PRIVATE Corner_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE Domain_MPI1.cpp)

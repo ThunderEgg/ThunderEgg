@@ -55,9 +55,9 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 		// extrapolate ghost values
 		for (Side<D> s : pinfo.orth_on_parent.getExteriorSides()) {
 			if (!pinfo.hasNbr(s)) {
-				View<D - 1> fine_ghost    = fine_data.getSliceOn(s, {-1});
-				View<D - 1> fine_interior = fine_data.getSliceOn(s, {0});
-				View<D - 1> coarse_ghost  = coarse_data.getSliceOn(s, {-1});
+				ConstView<D - 1> fine_ghost    = fine_data.getSliceOn(s, {-1});
+				ConstView<D - 1> fine_interior = fine_data.getSliceOn(s, {0});
+				View<D - 1>      coarse_ghost  = coarse_data.getSliceOn(s, {-1});
 				nested_loop<D - 1>(fine_ghost.getStart(), fine_ghost.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					std::array<int, D - 1> coarse_coord;
 					for (size_t x = 0; x < s.getAxisIndex(); x++) {
