@@ -77,11 +77,9 @@ class MockVector : public Vector<D>
 	{
 		std::array<int, 3> strides;
 		int                patch_stride = num_components;
-		int                first_offset = 0;
 		for (size_t i = 0; i < 3; i++) {
 			strides[i] = patch_stride;
 			patch_stride *= (ns[i] + 2 * num_ghost_cells);
-			first_offset += strides[i] * num_ghost_cells;
 		}
 		int size = patch_stride * num_local_patches;
 
@@ -91,7 +89,7 @@ class MockVector : public Vector<D>
 
 		for (int i = 0; i < num_local_patches; i++) {
 			for (int c = 0; c < num_components; c++) {
-				double *data_ptr = data.data() + i * patch_stride + first_offset + c;
+				double *data_ptr = data.data() + i * patch_stride + c;
 				local_data.emplace_back(data_ptr, strides, ns, num_ghost_cells);
 			}
 		}

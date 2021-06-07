@@ -3,89 +3,89 @@
 #include <catch2/generators/catch_generators.hpp>
 using namespace std;
 using namespace ThunderEgg;
-TEST_CASE("PatchArray getLengths", "[PatchArray]")
+TEST_CASE("ComponentArray getLengths", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	CHECK(pa.getLengths()[0] == nx);
 	CHECK(pa.getLengths()[1] == ny);
 }
-TEST_CASE("PatchArray getStart", "[PatchArray]")
+TEST_CASE("ComponentArray getStart", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	CHECK(pa.getStart()[0] == 0);
 	CHECK(pa.getStart()[1] == 0);
 }
-TEST_CASE("PatchArray getEnd", "[PatchArray]")
+TEST_CASE("ComponentArray getEnd", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	CHECK(pa.getEnd()[0] == nx - 1);
 	CHECK(pa.getEnd()[1] == ny - 1);
 }
-TEST_CASE("PatchArray getGhostStart", "[PatchArray]")
+TEST_CASE("ComponentArray getGhostStart", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	CHECK(pa.getGhostStart()[0] == -num_ghost);
 	CHECK(pa.getGhostStart()[1] == -num_ghost);
 }
-TEST_CASE("PatchArray getGhostEnd", "[PatchArray]")
+TEST_CASE("ComponentArray getGhostEnd", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	CHECK(pa.getGhostEnd()[0] == nx - 1 + num_ghost);
 	CHECK(pa.getGhostEnd()[1] == ny - 1 + num_ghost);
 }
-TEST_CASE("PatchArray getNumGhostCells", "[PatchArray]")
+TEST_CASE("ComponentArray getNumGhostCells", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	CHECK(pa.getNumGhostCells() == num_ghost);
 }
-TEST_CASE("PatchArray getStrides", "[PatchArray]")
+TEST_CASE("ComponentArray getStrides", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	CHECK(pa.getStrides()[0] == 1);
 	CHECK(pa.getStrides()[1] == nx + 2 * num_ghost);
 }
-TEST_CASE("PatchArray squarebracket operator", "[PatchArray]")
+TEST_CASE("ComponentArray squarebracket operator", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	double *start = &pa[{0, 0}];
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -96,13 +96,13 @@ TEST_CASE("PatchArray squarebracket operator", "[PatchArray]")
 	CHECK(pa.getStrides()[0] == 1);
 	CHECK(pa.getStrides()[1] == nx + 2 * num_ghost);
 }
-TEST_CASE("PatchArray squarebracket operator const", "[PatchArray]")
+TEST_CASE("ComponentArray squarebracket operator const", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	const PatchArray<2> pa({nx, ny}, num_ghost);
+	const ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	const double *start = &pa[{0, 0}];
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -113,13 +113,13 @@ TEST_CASE("PatchArray squarebracket operator const", "[PatchArray]")
 	CHECK(pa.getStrides()[0] == 1);
 	CHECK(pa.getStrides()[1] == nx + 2 * num_ghost);
 }
-TEST_CASE("PatchArray default is zero", "[PatchArray]")
+TEST_CASE("ComponentArray default is zero", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -129,17 +129,17 @@ TEST_CASE("PatchArray default is zero", "[PatchArray]")
 	CHECK(pa.getStrides()[0] == 1);
 	CHECK(pa.getStrides()[1] == nx + 2 * num_ghost);
 }
-TEST_CASE("PatchArray<2> getSliceOn<1>", "[PatchArray]")
+TEST_CASE("ComponentArray<2> getSliceOn<1>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ComponentView<1> slice = pa.getSliceOn(Side<2>::west(), {xi});
+		View<1> slice = pa.getSliceOn(Side<2>::west(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{xi, yi}] == &slice[{yi}]);
@@ -148,7 +148,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1>", "[PatchArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ComponentView<1> slice = pa.getSliceOn(Side<2>::east(), {xi});
+		View<1> slice = pa.getSliceOn(Side<2>::east(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{nx - 1 - xi, yi}] == &slice[{yi}]);
@@ -157,7 +157,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1>", "[PatchArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ComponentView<1> slice = pa.getSliceOn(Side<2>::south(), {yi});
+		View<1> slice = pa.getSliceOn(Side<2>::south(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, yi}] == &slice[{xi}]);
@@ -166,24 +166,24 @@ TEST_CASE("PatchArray<2> getSliceOn<1>", "[PatchArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ComponentView<1> slice = pa.getSliceOn(Side<2>::north(), {yi});
+		View<1> slice = pa.getSliceOn(Side<2>::north(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, ny - 1 - yi}] == &slice[{xi}]);
 		}
 	}
 }
-TEST_CASE("PatchArray<2> getSliceOn<1> const", "[PatchArray]")
+TEST_CASE("ComponentArray<2> getSliceOn<1> const", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	const PatchArray<2> pa({nx, ny}, num_ghost);
+	const ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		const ComponentView<1> slice = pa.getSliceOn(Side<2>::west(), {xi});
+		ConstView<1> slice = pa.getSliceOn(Side<2>::west(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{xi, yi}] == &slice[{yi}]);
@@ -192,7 +192,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1> const", "[PatchArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		const ComponentView<1> slice = pa.getSliceOn(Side<2>::east(), {xi});
+		ConstView<1> slice = pa.getSliceOn(Side<2>::east(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{nx - 1 - xi, yi}] == &slice[{yi}]);
@@ -201,7 +201,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1> const", "[PatchArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		const ComponentView<1> slice = pa.getSliceOn(Side<2>::south(), {yi});
+		ConstView<1> slice = pa.getSliceOn(Side<2>::south(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, yi}] == &slice[{xi}]);
@@ -210,25 +210,25 @@ TEST_CASE("PatchArray<2> getSliceOn<1> const", "[PatchArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		const ComponentView<1> slice = pa.getSliceOn(Side<2>::north(), {yi});
+		ConstView<1> slice = pa.getSliceOn(Side<2>::north(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, ny - 1 - yi}] == &slice[{xi}]);
 		}
 	}
 }
-TEST_CASE("PatchArray<3> getSliceOn<2>", "[PatchArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<2>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto nz        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<3> pa({nx, ny, nz}, num_ghost);
+	ComponentArray<3> pa({nx, ny, nz}, num_ghost);
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ComponentView<2> slice = pa.getSliceOn(Side<3>::west(), {xi});
+		View<2> slice = pa.getSliceOn(Side<3>::west(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -240,7 +240,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>", "[PatchArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ComponentView<2> slice = pa.getSliceOn(Side<3>::east(), {xi});
+		View<2> slice = pa.getSliceOn(Side<3>::east(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -252,7 +252,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>", "[PatchArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ComponentView<2> slice = pa.getSliceOn(Side<3>::south(), {yi});
+		View<2> slice = pa.getSliceOn(Side<3>::south(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -264,7 +264,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>", "[PatchArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ComponentView<2> slice = pa.getSliceOn(Side<3>::north(), {yi});
+		View<2> slice = pa.getSliceOn(Side<3>::north(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -276,7 +276,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>", "[PatchArray]")
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
-		ComponentView<2> slice = pa.getSliceOn(Side<3>::bottom(), {zi});
+		View<2> slice = pa.getSliceOn(Side<3>::bottom(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -288,7 +288,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>", "[PatchArray]")
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
-		ComponentView<2> slice = pa.getSliceOn(Side<3>::top(), {zi});
+		View<2> slice = pa.getSliceOn(Side<3>::top(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -298,18 +298,18 @@ TEST_CASE("PatchArray<3> getSliceOn<2>", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<3> getSliceOn<2> const", "[PatchArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<2> const", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto nz        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	const PatchArray<3> pa({nx, ny, nz}, num_ghost);
+	const ComponentArray<3> pa({nx, ny, nz}, num_ghost);
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		const ComponentView<2> slice = pa.getSliceOn(Side<3>::west(), {xi});
+		ConstView<2> slice = pa.getSliceOn(Side<3>::west(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -321,7 +321,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const", "[PatchArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		const ComponentView<2> slice = pa.getSliceOn(Side<3>::east(), {xi});
+		ConstView<2> slice = pa.getSliceOn(Side<3>::east(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -333,7 +333,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const", "[PatchArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		const ComponentView<2> slice = pa.getSliceOn(Side<3>::south(), {yi});
+		ConstView<2> slice = pa.getSliceOn(Side<3>::south(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -345,7 +345,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const", "[PatchArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		const ComponentView<2> slice = pa.getSliceOn(Side<3>::north(), {yi});
+		ConstView<2> slice = pa.getSliceOn(Side<3>::north(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -357,7 +357,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const", "[PatchArray]")
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
-		const ComponentView<2> slice = pa.getSliceOn(Side<3>::bottom(), {zi});
+		ConstView<2> slice = pa.getSliceOn(Side<3>::bottom(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -369,7 +369,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const", "[PatchArray]")
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
-		const ComponentView<2> slice = pa.getSliceOn(Side<3>::top(), {zi});
+		ConstView<2> slice = pa.getSliceOn(Side<3>::top(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -379,20 +379,20 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto nz        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<3> pa({nx, ny, nz}, num_ghost);
+	ComponentArray<3> pa({nx, ny, nz}, num_ghost);
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::bs(), {yi, zi});
+			View<1> slice = pa.getSliceOn(Edge::bs(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{xi}]);
@@ -404,7 +404,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::tn(), {yi, zi});
+			View<1> slice = pa.getSliceOn(Edge::tn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, ny - 1 - yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -416,7 +416,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::bn(), {yi, zi});
+			View<1> slice = pa.getSliceOn(Edge::bn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, ny - 1 - yi, zi}] == &slice[{xi}]);
@@ -428,7 +428,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::ts(), {yi, zi});
+			View<1> slice = pa.getSliceOn(Edge::ts(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -440,7 +440,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::bw(), {xi, zi});
+			View<1> slice = pa.getSliceOn(Edge::bw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{yi}]);
@@ -452,7 +452,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::te(), {xi, zi});
+			View<1> slice = pa.getSliceOn(Edge::te(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{nx - 1 - xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -464,7 +464,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::be(), {xi, zi});
+			View<1> slice = pa.getSliceOn(Edge::be(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{nx - 1 - xi, yi, zi}] == &slice[{yi}]);
@@ -476,7 +476,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::tw(), {xi, zi});
+			View<1> slice = pa.getSliceOn(Edge::tw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -488,7 +488,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::sw(), {xi, yi});
+			View<1> slice = pa.getSliceOn(Edge::sw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{zi}]);
@@ -500,7 +500,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::ne(), {xi, yi});
+			View<1> slice = pa.getSliceOn(Edge::ne(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{nx - 1 - xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -512,7 +512,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::se(), {xi, yi});
+			View<1> slice = pa.getSliceOn(Edge::se(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{nx - 1 - xi, yi, zi}] == &slice[{zi}]);
@@ -524,7 +524,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice = pa.getSliceOn(Edge::nw(), {xi, yi});
+			View<1> slice = pa.getSliceOn(Edge::nw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -532,20 +532,20 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto nz        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	const PatchArray<3> pa({nx, ny, nz}, num_ghost);
+	const ComponentArray<3> pa({nx, ny, nz}, num_ghost);
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::bs(), {yi, zi});
+			ConstView<1> slice = pa.getSliceOn(Edge::bs(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{xi}]);
@@ -557,7 +557,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::tn(), {yi, zi});
+			ConstView<1> slice = pa.getSliceOn(Edge::tn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, ny - 1 - yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -569,7 +569,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::bn(), {yi, zi});
+			ConstView<1> slice = pa.getSliceOn(Edge::bn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, ny - 1 - yi, zi}] == &slice[{xi}]);
@@ -581,7 +581,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::ts(), {yi, zi});
+			ConstView<1> slice = pa.getSliceOn(Edge::ts(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -593,7 +593,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::bw(), {xi, zi});
+			ConstView<1> slice = pa.getSliceOn(Edge::bw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{yi}]);
@@ -605,7 +605,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::te(), {xi, zi});
+			ConstView<1> slice = pa.getSliceOn(Edge::te(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{nx - 1 - xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -617,7 +617,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::be(), {xi, zi});
+			ConstView<1> slice = pa.getSliceOn(Edge::be(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{nx - 1 - xi, yi, zi}] == &slice[{yi}]);
@@ -629,7 +629,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::tw(), {xi, zi});
+			ConstView<1> slice = pa.getSliceOn(Edge::tw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -641,7 +641,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::sw(), {xi, yi});
+			ConstView<1> slice = pa.getSliceOn(Edge::sw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{zi}]);
@@ -653,7 +653,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::ne(), {xi, yi});
+			ConstView<1> slice = pa.getSliceOn(Edge::ne(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{nx - 1 - xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -665,7 +665,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::se(), {xi, yi});
+			ConstView<1> slice = pa.getSliceOn(Edge::se(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{nx - 1 - xi, yi, zi}] == &slice[{zi}]);
@@ -677,7 +677,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			const ComponentView<1> slice = pa.getSliceOn(Edge::nw(), {xi, yi});
+			ConstView<1> slice = pa.getSliceOn(Edge::nw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -685,14 +685,14 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<3> getSliceOn<0>", "[PatchArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<0>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto nz        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<3> pa({nx, ny, nz}, num_ghost);
+	ComponentArray<3> pa({nx, ny, nz}, num_ghost);
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
@@ -712,14 +712,14 @@ TEST_CASE("PatchArray<3> getSliceOn<0>", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<3> getSliceOn<0> const", "[PatchArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<0> const", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto nz        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	const PatchArray<3> pa({nx, ny, nz}, num_ghost);
+	const ComponentArray<3> pa({nx, ny, nz}, num_ghost);
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
@@ -739,13 +739,13 @@ TEST_CASE("PatchArray<3> getSliceOn<0> const", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<2> getSliceOn<0>", "[PatchArray]")
+TEST_CASE("ComponentArray<2> getSliceOn<0>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
@@ -758,13 +758,13 @@ TEST_CASE("PatchArray<2> getSliceOn<0>", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<2> getSliceOn<0> const", "[PatchArray]")
+TEST_CASE("ComponentArray<2> getSliceOn<0> const", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	const PatchArray<2> pa({nx, ny}, num_ghost);
+	const ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
@@ -778,18 +778,18 @@ TEST_CASE("PatchArray<2> getSliceOn<0> const", "[PatchArray]")
 	}
 }
 
-TEST_CASE("PatchArray<2> getGhostSliceOn<1>", "[PatchArray]")
+TEST_CASE("ComponentArray<2> getGhostSliceOn<1>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	for (unsigned char xi = 0; xi < num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ComponentView<1> slice_w = pa.getGhostSliceOn(Side<2>::west(), {xi});
-		ComponentView<1> slice_e = pa.getGhostSliceOn(Side<2>::east(), {xi});
+		View<1> slice_w = pa.getGhostSliceOn(Side<2>::west(), {xi});
+		View<1> slice_e = pa.getGhostSliceOn(Side<2>::east(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{-1 - xi, yi}] == &slice_w[{yi}]);
@@ -799,8 +799,8 @@ TEST_CASE("PatchArray<2> getGhostSliceOn<1>", "[PatchArray]")
 
 	for (unsigned char yi = 0; yi < num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ComponentView<1> slice_s = pa.getGhostSliceOn(Side<2>::south(), {yi});
-		ComponentView<1> slice_n = pa.getGhostSliceOn(Side<2>::north(), {yi});
+		View<1> slice_s = pa.getGhostSliceOn(Side<2>::south(), {yi});
+		View<1> slice_n = pa.getGhostSliceOn(Side<2>::north(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, -1 - yi}] == &slice_s[{xi}]);
@@ -808,19 +808,19 @@ TEST_CASE("PatchArray<2> getGhostSliceOn<1>", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<3> getGhostSliceOn<2>", "[PatchArray]")
+TEST_CASE("ComponentArray<3> getGhostSliceOn<2>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto nz        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	const PatchArray<3> pa({nx, ny, nz}, num_ghost);
+	const ComponentArray<3> pa({nx, ny, nz}, num_ghost);
 
 	for (unsigned char xi = 0; xi < num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ComponentView<2> slice_w = pa.getGhostSliceOn(Side<3>::west(), {xi});
-		ComponentView<2> slice_e = pa.getGhostSliceOn(Side<3>::east(), {xi});
+		View<2> slice_w = pa.getGhostSliceOn(Side<3>::west(), {xi});
+		View<2> slice_e = pa.getGhostSliceOn(Side<3>::east(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -833,8 +833,8 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<2>", "[PatchArray]")
 
 	for (unsigned char yi = 0; yi < num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ComponentView<2> slice_s = pa.getGhostSliceOn(Side<3>::south(), {yi});
-		ComponentView<2> slice_n = pa.getGhostSliceOn(Side<3>::north(), {yi});
+		View<2> slice_s = pa.getGhostSliceOn(Side<3>::south(), {yi});
+		View<2> slice_n = pa.getGhostSliceOn(Side<3>::north(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -847,8 +847,8 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<2>", "[PatchArray]")
 
 	for (unsigned char zi = 0; zi < num_ghost; zi++) {
 		INFO("zi: " << zi);
-		ComponentView<2> slice_b = pa.getGhostSliceOn(Side<3>::bottom(), {zi});
-		ComponentView<2> slice_t = pa.getGhostSliceOn(Side<3>::top(), {zi});
+		View<2> slice_b = pa.getGhostSliceOn(Side<3>::bottom(), {zi});
+		View<2> slice_t = pa.getGhostSliceOn(Side<3>::top(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -859,23 +859,23 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<2>", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<3> getGhostSliceOn<1>", "[PatchArray]")
+TEST_CASE("ComponentArray<3> getGhostSliceOn<1>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto nz        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<3> pa({nx, ny, nz}, num_ghost);
+	ComponentArray<3> pa({nx, ny, nz}, num_ghost);
 
 	for (unsigned char zi = 0; zi < num_ghost; zi++) {
 		INFO("zi: " << zi);
 		for (unsigned char yi = 0; yi < num_ghost; yi++) {
 			INFO("yi: " << yi);
-			ComponentView<1> slice_bs = pa.getGhostSliceOn(Edge::bs(), {yi, zi});
-			ComponentView<1> slice_tn = pa.getGhostSliceOn(Edge::tn(), {yi, zi});
-			ComponentView<1> slice_bn = pa.getGhostSliceOn(Edge::bn(), {yi, zi});
-			ComponentView<1> slice_ts = pa.getGhostSliceOn(Edge::ts(), {yi, zi});
+			View<1> slice_bs = pa.getGhostSliceOn(Edge::bs(), {yi, zi});
+			View<1> slice_tn = pa.getGhostSliceOn(Edge::tn(), {yi, zi});
+			View<1> slice_bn = pa.getGhostSliceOn(Edge::bn(), {yi, zi});
+			View<1> slice_ts = pa.getGhostSliceOn(Edge::ts(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, -1 - yi, -1 - zi}] == &slice_bs[{xi}]);
@@ -890,10 +890,10 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<1>", "[PatchArray]")
 		INFO("zi: " << zi);
 		for (unsigned char xi = 0; xi < num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice_bw = pa.getGhostSliceOn(Edge::bw(), {xi, zi});
-			ComponentView<1> slice_te = pa.getGhostSliceOn(Edge::te(), {xi, zi});
-			ComponentView<1> slice_be = pa.getGhostSliceOn(Edge::be(), {xi, zi});
-			ComponentView<1> slice_tw = pa.getGhostSliceOn(Edge::tw(), {xi, zi});
+			View<1> slice_bw = pa.getGhostSliceOn(Edge::bw(), {xi, zi});
+			View<1> slice_te = pa.getGhostSliceOn(Edge::te(), {xi, zi});
+			View<1> slice_be = pa.getGhostSliceOn(Edge::be(), {xi, zi});
+			View<1> slice_tw = pa.getGhostSliceOn(Edge::tw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{-1 - xi, yi, -1 - zi}] == &slice_bw[{yi}]);
@@ -908,10 +908,10 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<1>", "[PatchArray]")
 		INFO("yi: " << yi);
 		for (unsigned char xi = 0; xi < num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ComponentView<1> slice_sw = pa.getGhostSliceOn(Edge::sw(), {xi, yi});
-			ComponentView<1> slice_ne = pa.getGhostSliceOn(Edge::ne(), {xi, yi});
-			ComponentView<1> slice_se = pa.getGhostSliceOn(Edge::se(), {xi, yi});
-			ComponentView<1> slice_nw = pa.getGhostSliceOn(Edge::nw(), {xi, yi});
+			View<1> slice_sw = pa.getGhostSliceOn(Edge::sw(), {xi, yi});
+			View<1> slice_ne = pa.getGhostSliceOn(Edge::ne(), {xi, yi});
+			View<1> slice_se = pa.getGhostSliceOn(Edge::se(), {xi, yi});
+			View<1> slice_nw = pa.getGhostSliceOn(Edge::nw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{-1 - xi, -1 - yi, zi}] == &slice_sw[{zi}]);
@@ -922,14 +922,14 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<1>", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<3> getGhostSliceOn<0>", "[PatchArray]")
+TEST_CASE("ComponentArray<3> getGhostSliceOn<0>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto nz        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<3> pa({nx, ny, nz}, num_ghost);
+	ComponentArray<3> pa({nx, ny, nz}, num_ghost);
 
 	for (unsigned char zi = 0; zi < num_ghost; zi++) {
 		INFO("zi: " << zi);
@@ -949,13 +949,13 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<0>", "[PatchArray]")
 		}
 	}
 }
-TEST_CASE("PatchArray<2> getGhostSliceOn<0>", "[PatchArray]")
+TEST_CASE("ComponentArray<2> getGhostSliceOn<0>", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
 	auto ny        = GENERATE(2, 3);
 	auto num_ghost = GENERATE(0, 1, 2);
 
-	PatchArray<2> pa({nx, ny}, num_ghost);
+	ComponentArray<2> pa({nx, ny}, num_ghost);
 
 	for (unsigned char yi = 0; yi < num_ghost; yi++) {
 		INFO("yi: " << yi);

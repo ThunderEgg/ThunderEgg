@@ -22,7 +22,7 @@
 #include "PatchArray.h"
 namespace ThunderEgg
 {
-template class PatchArray<1>;
-template class PatchArray<2>;
-template class PatchArray<3>;
+template class ComponentArray<1>;
+template class ComponentArray<2>;
+template class ComponentArray<3>;
 } // namespace ThunderEgg

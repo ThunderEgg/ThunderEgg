@@ -29,82 +29,11 @@ namespace ThunderEgg
  *
  * @tparam D number of cartesian dimensions
  */
-template <int D> class PatchArray
+template <int D> class ComponentArray
 {
 	private:
-	/**
-	 * @brief data
-	 */
-	std::vector<double> data;
-	/**
-	 * @brief the strides between each element, in each direction
-	 */
-	std::array<int, D> strides;
-	/**
-	 * @brief The number of cells in each direction
-	 */
-	std::array<int, D> lengths;
-	/**
-	 * @brief the coordinate of the first non-ghost element
-	 */
-	std::array<int, D> start;
-	/**
-	 * @brief the coordinate of the last non-ghost
-	 */
-	std::array<int, D> end;
-	/**
-	 * @brief the coordianate of the first ghost element
-	 */
-	std::array<int, D> ghost_start;
-	/**
-	 * @brief the corrdinate of the last ghost element
-	 */
-	std::array<int, D> ghost_end;
-	/**
-	 * @brief The ViewManager that does any necessary cleanup
-	 */
-	std::shared_ptr<ViewManager> ldm;
-	/**
-	 * @brief The number of ghost cells on each side of the patch
-	 */
-	int num_ghost_cells;
-	/**
-	 * @brief Starting index of first non-ghost cell
-	 */
-	int start_idx;
-
-	/**
-	 * @brief Get a slice for a slide
-	 *
-	 * @param s the side of patch for the slice
-	 * @param offset the offset, with {0, 0} being the first slice of non-ghost cell values, and {-1, -1} being
-	 * the first slice of ghost cell values
-	 * @return View<1> the resulting slice
-	 */
-	template <int M> ComponentView<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
-	{
-		std::array<int, M>         new_strides;
-		std::array<int, M>         new_lengths;
-		double *                   new_data      = const_cast<double *>(data.data()) + start_idx;
-		std::array<Side<D>, D - M> sides         = f.getSides();
-		size_t                     lengths_index = 0;
-		size_t                     sides_index   = 0;
-		for (size_t axis = 0; axis < (size_t) D; axis++) {
-			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
-				if (sides[sides_index].isLowerOnAxis()) {
-					new_data += offset[sides_index] * strides[axis];
-				} else {
-					new_data += (lengths[axis] - 1 - offset[sides_index]) * strides[axis];
-				}
-				sides_index++;
-			} else {
-				new_lengths[lengths_index] = lengths[axis];
-				new_strides[lengths_index] = strides[axis];
-				lengths_index++;
-			}
-		}
-		return ComponentView<M>(new_data, new_strides, new_lengths, num_ghost_cells, ldm);
-	}
+	std::vector<double> vector;
+	ComponentView<D>    view;
 
 	public:
 	/**
@@ -113,152 +42,137 @@ template <int D> class PatchArray
 	 * @param lengths the lengths in each direction
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
 	 */
-	PatchArray(const std::array<int, D> &lengths, int num_ghost_cells) : lengths(lengths), num_ghost_cells(num_ghost_cells)
+	ComponentArray(const std::array<int, D> &lengths, int num_ghost_cells)
 	{
-		start.fill(0);
-		end = lengths;
-		for (int i = 0; i < D; i++) {
-			end[i]--;
+		std::array<int, D> strides;
+		strides[0] = 1;
+		for (int i = 1; i < D; i++) {
+			strides[i] = strides[i - 1] * (lengths[i - 1] + 2 * num_ghost_cells);
 		}
-		ghost_start = start;
-		ghost_end   = end;
-		for (size_t i = 0; i < D; i++) {
-			ghost_start[i] -= num_ghost_cells;
-			ghost_end[i] += num_ghost_cells;
-		}
-		int size  = 1;
-		start_idx = 0;
-		for (int i = 0; i < D; i++) {
-			strides[i] = size;
-			start_idx += num_ghost_cells * strides[i];
-			size *= lengths[i] + 2 * num_ghost_cells;
-		}
-		data.resize(size);
+		int size = strides[D - 1] * (lengths[D - 1] + 2 * num_ghost_cells);
+		vector.resize(size);
+		view = ComponentView<D>(vector.data(), strides, lengths, num_ghost_cells);
 	}
+
 	/**
-	 * @brief Get a reference to the element at the specified coordinate
+	 * @brief Get the slice on a given face
 	 *
-	 * @param coord the coordinate
-	 * @return double& the element
+	 * @tparam M the dimension of the face
+	 * @param f the face
+	 * @param offset offset the offset of the value {0,..,0} is the non ghost cell touching the face. {-1,..,-1} is the first ghost cell touching that
+	 * face
+	 * @return View<M> a view to the slice on the face
 	 */
-	inline double &operator[](const std::array<int, D> &coord)
+	template <int M> inline View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
 	{
-		int idx = start_idx;
-		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
-		return data[idx];
+		return view.template getSliceOn<M>(f, offset);
 	}
+
 	/**
-	 * @brief Get a reference to the element at the specified coordinate
+	 * @brief Get the slice on a given face
 	 *
-	 * @param coord the coordinate
-	 * @return double& the element
+	 * @tparam M the dimension of the face
+	 * @param f the face
+	 * @param offset offset the offset of the value {0,..,0} is the non ghost cell touching the face. {-1,..,-1} is the first ghost cell touching that
+	 * face
+	 * @return ConstView<M> a view to the slice on the face
 	 */
+	template <int M> inline ConstView<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
+	{
+		return view.template getSliceOn<M>(f, offset);
+	}
+
+	/**
+	 * @brief Get the gosts slice on a given face
+	 *
+	 * @tparam M the dimension of the face
+	 * @param f the face
+	 * @param offset offset the offset of the value {0,..,0} first ghost cell slice touching that face
+	 * face
+	 * @return View<M> a view to the slice on the face
+	 */
+	template <int M> inline View<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
+	{
+		return view.template getGhostSliceOn<M>(f, offset);
+	}
+
 	inline const double &operator[](const std::array<int, D> &coord) const
 	{
-		int idx = start_idx;
-		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
-		return data[idx];
+		return view[coord];
 	}
-	/**
-	 * @brief Get a slice in a given face
-	 *
-	 * @param f the face
-	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
-	 * face
-	 * @return double& the value
-	 */
-	template <int M> ComponentView<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
+	template <class... Types> inline const double &operator()(Types... args) const
 	{
-		return getSliceOnPriv(f, offset);
+		return view(args...);
 	}
-	/**
-	 * @brief Get a slice in a given face
-	 *
-	 * @param f the face
-	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
-	 * face
-	 * @return double& the value
-	 */
-	template <int M> const ComponentView<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
+	inline void set(const std::array<int, D> &coord, double value) const
 	{
-		return getSliceOnPriv(f, offset);
+		view.set(coord, value);
 	}
-	template <int M> ComponentView<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
+	inline double &operator[](const std::array<int, D> &coord)
 	{
-		std::array<int, M>         new_strides;
-		std::array<int, M>         new_lengths;
-		double *                   new_data      = const_cast<double *>(data.data()) + start_idx;
-		std::array<Side<D>, D - M> sides         = f.getSides();
-		size_t                     lengths_index = 0;
-		size_t                     sides_index   = 0;
-		for (size_t axis = 0; axis < (size_t) D; axis++) {
-			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
-				if (sides[sides_index].isLowerOnAxis()) {
-					new_data += (-1 - offset[sides_index]) * strides[axis];
-				} else {
-					new_data += (lengths[axis] + offset[sides_index]) * strides[axis];
-				}
-				sides_index++;
-			} else {
-				new_lengths[lengths_index] = lengths[axis];
-				new_strides[lengths_index] = strides[axis];
-				lengths_index++;
-			}
-		}
-		return ComponentView<M>(new_data, new_strides, new_lengths, num_ghost_cells, ldm);
+		return view[coord];
 	}
-	/**
-	 * @brief Get the Lengths of the patch in each direction
-	 */
-	const std::array<int, D> &getLengths() const
+	template <class... Types> inline double &operator()(Types... args)
 	{
-		return lengths;
+		return view(args...);
 	}
+	inline void set(const std::array<int, D> &coord, double value)
+	{
+		view.set(coord, value);
+	}
+
 	/**
 	 * @brief Get the strides of the patch in each direction
 	 */
-	const std::array<int, D> &getStrides() const
+	inline const std::array<int, D> &getStrides() const
 	{
-		return strides;
+		return view.getStrides();
 	}
 	/**
 	 * @brief Get the coordinate of the first element
 	 */
-	const std::array<int, D> &getStart() const
+	inline const std::array<int, D> &getStart() const
 	{
-		return start;
+		return view.getStart();
 	}
 	/**
 	 * @brief Get the coordinate of the last element
 	 */
-	const std::array<int, D> &getEnd() const
+	inline const std::array<int, D> &getEnd() const
 	{
-		return end;
+		return view.getEnd();
 	}
 	/**
 	 * @brief Get the coordinate of the first ghost cell element
 	 */
-	const std::array<int, D> &getGhostStart() const
+	inline const std::array<int, D> &getGhostStart() const
 	{
-		return ghost_start;
+		return view.getGhostStart();
 	}
 	/**
 	 * @brief Get the coordinate of the last ghost cell element
 	 */
-	const std::array<int, D> &getGhostEnd() const
+	inline const std::array<int, D> &getGhostEnd() const
 	{
-		return ghost_end;
+		return view.getGhostEnd();
+	}
+	/**
+	 * @brief Get the Lengths of the patch in each direction
+	 */
+	inline const std::array<int, D> &getLengths() const
+	{
+		return view.getLengths();
 	}
 	/**
 	 * @brief Get the number of ghost cells on each side of the patch
 	 */
-	int getNumGhostCells() const
+	inline int getNumGhostCells() const
 	{
-		return num_ghost_cells;
+		return view.getNumGhostCells();
 	}
 };
-extern template class PatchArray<1>;
-extern template class PatchArray<2>;
-extern template class PatchArray<3>;
+extern template class ComponentArray<1>;
+extern template class ComponentArray<2>;
+extern template class ComponentArray<3>;
 } // namespace ThunderEgg
 #endif

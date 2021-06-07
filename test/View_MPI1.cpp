@@ -46,6 +46,7 @@ TEST_CASE("View constructor", "[View]")
 	CHECK(v.getEnd()[1] == y_end);
 	CHECK(v.getGhostEnd()[0] == x_ghost_end);
 	CHECK(v.getGhostEnd()[1] == y_ghost_end);
+	CHECK(&v[v.getGhostStart()] == &data);
 }
 TEST_CASE("View squarebracket operator", "[View]")
 {
@@ -67,6 +68,7 @@ TEST_CASE("View squarebracket operator", "[View]")
 
 	View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
 
+	double *origin = data - (x_ghost_start * x_stride + y_ghost_start * y_stride);
 	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
 		for (int xi = x_ghost_start - 1; xi <= x_ghost_end + 1; xi++) {
 			if (xi < x_ghost_start || xi > x_ghost_end || yi < y_ghost_start || yi > y_ghost_end) {
@@ -75,7 +77,7 @@ TEST_CASE("View squarebracket operator", "[View]")
 					CHECK_THROWS_AS((v[{xi, yi}]), RuntimeError);
 				}
 			} else {
-				CHECK(&v[{xi, yi}] == data + xi * x_stride + yi * y_stride);
+				CHECK(&v[{xi, yi}] == origin + xi * x_stride + yi * y_stride);
 			}
 		}
 	}
@@ -100,6 +102,7 @@ TEST_CASE("View squarebracket operator const", "[View]")
 
 	const View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
 
+	double *origin = data - (x_ghost_start * x_stride + y_ghost_start * y_stride);
 	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
 		for (int xi = x_ghost_start - 1; xi <= x_ghost_end + 1; xi++) {
 			if (xi < x_ghost_start || xi > x_ghost_end || yi < y_ghost_start || yi > y_ghost_end) {
@@ -108,7 +111,7 @@ TEST_CASE("View squarebracket operator const", "[View]")
 					CHECK_THROWS_AS((v[{xi, yi}]), RuntimeError);
 				}
 			} else {
-				CHECK(&v[{xi, yi}] == data + xi * x_stride + yi * y_stride);
+				CHECK(&v[{xi, yi}] == origin + xi * x_stride + yi * y_stride);
 			}
 		}
 	}
@@ -133,6 +136,7 @@ TEST_CASE("View parens operator", "[View]")
 
 	View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
 
+	double *origin = data - (x_ghost_start * x_stride + y_ghost_start * y_stride);
 	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
 		for (int xi = x_ghost_start - 1; xi <= x_ghost_end + 1; xi++) {
 			if (xi < x_ghost_start || xi > x_ghost_end || yi < y_ghost_start || yi > y_ghost_end) {
@@ -141,7 +145,7 @@ TEST_CASE("View parens operator", "[View]")
 					CHECK_THROWS_AS((v(xi, yi)), RuntimeError);
 				}
 			} else {
-				CHECK(&v(xi, yi) == data + xi * x_stride + yi * y_stride);
+				CHECK(&v(xi, yi) == origin + xi * x_stride + yi * y_stride);
 			}
 		}
 	}
@@ -166,6 +170,7 @@ TEST_CASE("View parens operator const", "[View]")
 
 	const View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
 
+	double *origin = data - (x_ghost_start * x_stride + y_ghost_start * y_stride);
 	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
 		for (int xi = x_ghost_start - 1; xi <= x_ghost_end + 1; xi++) {
 			if (xi < x_ghost_start || xi > x_ghost_end || yi < y_ghost_start || yi > y_ghost_end) {
@@ -174,7 +179,7 @@ TEST_CASE("View parens operator const", "[View]")
 					CHECK_THROWS_AS((v(xi, yi)), RuntimeError);
 				}
 			} else {
-				CHECK(&v(xi, yi) == data + xi * x_stride + yi * y_stride);
+				CHECK(&v(xi, yi) == origin + xi * x_stride + yi * y_stride);
 			}
 		}
 	}

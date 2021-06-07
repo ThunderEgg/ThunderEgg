@@ -58,9 +58,9 @@ template <int D> class View : public ConstView<D>
 	     const std::array<int, D> &         end,
 	     const std::array<int, D> &         ghost_end,
 	     std::shared_ptr<const ViewManager> ldm = nullptr)
-	: ConstView<D>(data, strides, ghost_start, start, end, ghost_end, ldm),
-	  data(data)
+	: ConstView<D>(data, strides, ghost_start, start, end, ghost_end, ldm)
 	{
+		this->data = data - this->getIndex(ghost_start);
 	}
 
 	/**
@@ -77,6 +77,15 @@ template <int D> class View : public ConstView<D>
 		return data[this->getIndex(coord)];
 	}
 
+	/**
+	 * @brief Get a reference to the element at the specified coordinate
+	 *
+	 * for example uasage in 3d is view(ix,iy,iz)
+	 *
+	 * @tparam Types the types
+	 * @param args the coordnate in x,y,z form
+	 * @return const double&  the value
+	 */
 	template <class... Types> inline double &operator()(Types... args)
 	{
 		static_assert(sizeof...(args) == D, "incorrect number of arguments");
@@ -85,6 +94,13 @@ template <int D> class View : public ConstView<D>
 		}
 		return data[this->getIndex({args...})];
 	}
+
+	/**
+	 * @brief Set the value at a coordinate to the specified value
+	 *
+	 * @param coord the coordinate
+	 * @param value the value
+	 */
 	inline void set(const std::array<int, D> &coord, double value)
 	{
 		if constexpr (ENABLE_DEBUG) {

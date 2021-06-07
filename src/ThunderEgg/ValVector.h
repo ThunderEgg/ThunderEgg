@@ -56,10 +56,6 @@ template <int D> class ValVector : public Vector<D>
 	 */
 	int num_ghost_cells;
 	/**
-	 * @brief the offset of the first element in each patch
-	 */
-	int first_offset;
-	/**
 	 * @brief the underlying vector
 	 */
 	std::valarray<double> vec;
@@ -95,14 +91,11 @@ template <int D> class ValVector : public Vector<D>
 	  lengths(lengths),
 	  num_ghost_cells(num_ghost_cells)
 	{
-		int size            = 1;
-		int my_first_offset = 0;
+		int size = 1;
 		for (size_t i = 0; i < D; i++) {
 			strides[i] = size;
 			size *= (this->lengths[i] + 2 * num_ghost_cells);
-			my_first_offset += strides[i] * num_ghost_cells;
 		}
-		first_offset     = my_first_offset;
 		component_stride = size;
 		size *= num_components;
 		patch_stride = size;
@@ -123,12 +116,12 @@ template <int D> class ValVector : public Vector<D>
 	}
 	ComponentView<D> getComponentView(int component_index, int local_patch_index) override
 	{
-		double *data = &vec[patch_stride * local_patch_index + first_offset + component_stride * component_index];
+		double *data = &vec[patch_stride * local_patch_index + component_stride * component_index];
 		return ComponentView<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 	const ComponentView<D> getComponentView(int component_index, int local_patch_index) const override
 	{
-		double *data = const_cast<double *>(&vec[patch_stride * local_patch_index + first_offset + component_stride * component_index]);
+		double *data = const_cast<double *>(&vec[patch_stride * local_patch_index + component_stride * component_index]);
 		return ComponentView<D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 

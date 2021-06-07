@@ -65,10 +65,6 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @brief The number of (non-ghost) cells in each direction of the patch
 	 */
 	std::array<int, D> lengths;
-	/**
-	 * @brief The offset to the first non-ghost cell value
-	 */
-	int first_offset;
 
 	/**
 	 * @brief Get the Num Local Patches in this vector
@@ -128,13 +124,10 @@ template <int D> class VecWrapper : public Vector<D>
 	  own(own),
 	  lengths(lengths)
 	{
-		strides[0]          = 1;
-		int my_first_offset = num_ghost_cells;
+		strides[0] = 1;
 		for (size_t i = 1; i < D; i++) {
 			strides[i] = (this->lengths[i - 1] + 2 * num_ghost_cells) * strides[i - 1];
-			my_first_offset += strides[i] * num_ghost_cells;
 		}
-		first_offset     = my_first_offset;
 		component_stride = strides[D - 1] * (lengths[D - 1] + 2 * num_ghost_cells);
 		patch_stride     = component_stride * num_components;
 	}
@@ -183,14 +176,14 @@ template <int D> class VecWrapper : public Vector<D>
 	ComponentView<D> getComponentView(int component_index, int patch_local_index) override
 	{
 		std::shared_ptr<VecViewManager> ldm(new VecViewManager(vec, false));
-		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset + component_index * component_stride;
+		double *                        data = ldm->getVecView() + patch_stride * patch_local_index + component_index * component_stride;
 		return ComponentView<D>(data, strides, lengths, num_ghost_cells, ldm);
 	}
 
 	const ComponentView<D> getComponentView(int component_index, int patch_local_index) const override
 	{
 		std::shared_ptr<VecViewManager> ldm(new VecViewManager(vec, true));
-		double *data = ldm->getVecView() + patch_stride * patch_local_index + first_offset + component_index * component_stride;
+		double *                        data = ldm->getVecView() + patch_stride * patch_local_index + component_index * component_stride;
 		return ComponentView<D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
 	}
 	int getNumGhostCells() const

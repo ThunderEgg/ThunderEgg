@@ -38,9 +38,19 @@ namespace ThunderEgg
 template <int D> class ComponentView : public View<D>
 {
 	private:
+	template <int M> struct SliceInfo {
+		std::array<int, M> strides;
+		std::array<int, M> ghost_start;
+		std::array<int, M> start;
+		std::array<int, M> end;
+		std::array<int, M> ghost_end;
+		std::array<int, D> first_value;
+	};
+
 	/**
 	 * @brief The number of cells in each direction
 	 */
+
 	std::array<int, D> lengths;
 	/**
 	 * @brief The number of ghost cells on each side of the patch
@@ -95,34 +105,34 @@ template <int D> class ComponentView : public View<D>
 	 * the first slice of ghost cell values
 	 * @return View<1> the resulting slice
 	 */
-	template <int M>
-	void getSliceOnPriv(Face<D, M>                    f,
-	                    const std::array<int, D - M> &offset,
-	                    std::array<int, M> &          new_strides,
-	                    std::array<int, M> &          new_lengths,
-	                    std::array<int, D> &          first_non_ghost_value) const
+	template <int M> SliceInfo<M> getSliceOnPriv(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
-		const std::array<int, D> &strides = this->getStrides();
+		SliceInfo<M> info;
 
-		first_non_ghost_value.fill(0);
+		info.first_value = this->getGhostStart();
 
 		std::array<Side<D>, D - M> sides         = f.getSides();
 		size_t                     lengths_index = 0;
 		size_t                     sides_index   = 0;
+
 		for (size_t axis = 0; axis < (size_t) D; axis++) {
 			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
 				if (sides[sides_index].isLowerOnAxis()) {
-					first_non_ghost_value[axis] = offset[sides_index];
+					info.first_value[axis] = offset[sides_index];
 				} else {
-					first_non_ghost_value[axis] = lengths[axis] - 1 - offset[sides_index];
+					info.first_value[axis] = this->getEnd()[axis] - offset[sides_index];
 				}
 				sides_index++;
 			} else {
-				new_lengths[lengths_index] = lengths[axis];
-				new_strides[lengths_index] = strides[axis];
+				info.strides[lengths_index]     = this->getStrides()[axis];
+				info.ghost_start[lengths_index] = this->getGhostStart()[axis];
+				info.start[lengths_index]       = this->getStart()[axis];
+				info.end[lengths_index]         = this->getEnd()[axis];
+				info.ghost_end[lengths_index]   = this->getGhostEnd()[axis];
 				lengths_index++;
 			}
 		}
+		return info;
 	}
 
 	public:
@@ -133,6 +143,7 @@ template <int D> class ComponentView : public View<D>
 	{
 		lengths.fill(0);
 	}
+
 	/**
 	 * @brief Construct a new View object
 	 *
@@ -158,93 +169,87 @@ template <int D> class ComponentView : public View<D>
 	  num_ghost_cells(num_ghost_cells)
 	{
 	}
+
 	/**
-	 * @brief Get a slice in a given face
+	 * @brief Get the slice on a given face
 	 *
+	 * @tparam M the dimension of the face
 	 * @param f the face
-	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
+	 * @param offset offset the offset of the value {0,..,0} is the non ghost cell touching the face. {-1,..,-1} is the first ghost cell touching that
 	 * face
-	 * @return double& the value
+	 * @return View<M> a view to the slice on the face
 	 */
 	template <int M> View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
 	{
-		std::array<int, M> new_strides;
-		std::array<int, M> new_lengths;
-		std::array<int, D> first_non_ghost_value;
+		SliceInfo<M> info = getSliceOnPriv<M>(f, offset);
 
-		getSliceOnPriv<M>(f, offset, new_strides, new_lengths, first_non_ghost_value);
-
-		double *new_data = (&(*this)[first_non_ghost_value]);
-		return View<M>(new_data,
-		               new_strides,
-		               DetermineGhostStart<M>(num_ghost_cells),
-		               DetermineStart<M>(),
-		               DetermineEnd<M>(new_lengths),
-		               DetermineGhostEnd<M>(new_lengths, num_ghost_cells),
-		               this->getComponentViewDataManager());
+		double *new_data = (&(*this)[info.first_value]);
+		return View<M>(new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end, this->getComponentViewDataManager());
 	}
+
 	/**
-	 * @brief Get a slice in a given face
+	 * @brief Get the slice on a given face
 	 *
+	 * @tparam M the dimension of the face
 	 * @param f the face
-	 * @param offset the offset of the value {0,..,0} is the non ghost cell touching the corner. {-1,..,-1} is the first ghost cell touching that
+	 * @param offset offset the offset of the value {0,..,0} is the non ghost cell touching the face. {-1,..,-1} is the first ghost cell touching that
 	 * face
-	 * @return double& the value
+	 * @return ConstView<M> a view to the slice on the face
 	 */
 	template <int M> ConstView<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
-		std::array<int, M> new_strides;
-		std::array<int, M> new_lengths;
-		std::array<int, D> first_non_ghost_value;
+		SliceInfo<M> info = getSliceOnPriv<M>(f, offset);
 
-		getSliceOnPriv<M>(f, offset, new_strides, new_lengths, first_non_ghost_value);
-
-		const double *new_data = (&(*this)[first_non_ghost_value]);
-		return ConstView<M>(new_data,
-		                    new_strides,
-		                    DetermineGhostStart<M>(num_ghost_cells),
-		                    DetermineStart<M>(),
-		                    DetermineEnd<M>(new_lengths),
-		                    DetermineGhostEnd<M>(new_lengths, num_ghost_cells),
-		                    this->getComponentViewDataManager());
+		const double *new_data = (&(*this)[info.first_value]);
+		return ConstView<M>(new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end, this->getComponentViewDataManager());
 	}
 
+	/**
+	 * @brief Get the gosts slice on a given face
+	 *
+	 * @tparam M the dimension of the face
+	 * @param f the face
+	 * @param offset offset the offset of the value {0,..,0} first ghost cell slice touching that face
+	 * face
+	 * @return View<M> a view to the slice on the face
+	 */
 	template <int M> View<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
 	{
-		const std::array<int, D> &strides = this->getStrides();
-
 		std::array<int, M> new_strides;
-		std::array<int, M> new_lengths;
+		std::array<int, M> new_ghost_start;
+		std::array<int, M> new_start;
+		std::array<int, M> new_end;
+		std::array<int, M> new_ghost_end;
+		std::array<int, D> first_value;
 
-		std::array<int, D> first_non_ghost_value;
-		first_non_ghost_value.fill(0);
+		first_value = this->getGhostStart();
 
 		std::array<Side<D>, D - M> sides         = f.getSides();
 		size_t                     lengths_index = 0;
 		size_t                     sides_index   = 0;
+
 		for (size_t axis = 0; axis < (size_t) D; axis++) {
 			if (sides_index < sides.size() && sides[sides_index].getAxisIndex() == axis) {
 				if (sides[sides_index].isLowerOnAxis()) {
-					first_non_ghost_value[axis] = -1 - offset[sides_index];
+					first_value[axis] = -1 - offset[sides_index];
 				} else {
-					first_non_ghost_value[axis] = lengths[axis] + offset[sides_index];
+					first_value[axis] = this->getEnd()[axis] + 1 + offset[sides_index];
 				}
 				sides_index++;
 			} else {
-				new_lengths[lengths_index] = lengths[axis];
-				new_strides[lengths_index] = strides[axis];
+				new_strides[lengths_index]     = this->getStrides()[axis];
+				new_ghost_start[lengths_index] = this->getGhostStart()[axis];
+				new_start[lengths_index]       = this->getStart()[axis];
+				new_end[lengths_index]         = this->getEnd()[axis];
+				new_ghost_end[lengths_index]   = this->getGhostEnd()[axis];
 				lengths_index++;
 			}
 		}
-		double *new_data = const_cast<double *>(&(*this)[first_non_ghost_value]);
-		return View<M>(new_data,
-		               new_strides,
-		               DetermineGhostStart<M>(num_ghost_cells),
-		               DetermineStart<M>(),
-		               DetermineEnd<M>(new_lengths),
-		               DetermineGhostEnd<M>(new_lengths, num_ghost_cells),
-		               this->getComponentViewDataManager());
+
+		double *new_data = const_cast<double *>(&(*this)[first_value]); // Thunderegg doesn't care if values in ghosts are modified
+		return View<M>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getComponentViewDataManager());
 	}
+
 	/**
 	 * @brief Get the Lengths of the patch in each direction
 	 */
@@ -252,6 +257,7 @@ template <int D> class ComponentView : public View<D>
 	{
 		return lengths;
 	}
+
 	/**
 	 * @brief Get the number of ghost cells on each side of the patch
 	 */
