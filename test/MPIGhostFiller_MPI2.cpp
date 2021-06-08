@@ -128,9 +128,12 @@ TEST_CASE("Exchange for various domains 2d face cases MPI2", "[MPIGhostFiller]")
 	auto num_components = GENERATE(1, 2);
 	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 3);
-	auto                  ny        = GENERATE(2, 3);
-	int                   num_ghost = GENERATE(1, 2);
+	auto nx        = GENERATE(2, 3);
+	auto ny        = GENERATE(2, 3);
+	int  num_ghost = GENERATE(1, 2);
+	INFO("nx: " << nx);
+	INFO("ny: " << ny);
+	INFO("num_ghost: " << ny);
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 

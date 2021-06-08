@@ -80,8 +80,8 @@ TEST_CASE("PETSc::MatShellCreator works with 0.5I", "[PETSc::MatShellCreator]")
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		ComponentView<2> x_ld = x->getComponentView(0, pinfo.local_index);
-		ComponentView<2> b_ld = b->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> x_ld = x->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> b_ld = b->getComponentView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -129,15 +129,15 @@ TEST_CASE("PETSc::MatShellCreator works with 0.5I two components", "[PETSc::MatS
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		ComponentView<2> x_ld = x->getComponentView(0, pinfo.local_index);
-		ComponentView<2> b_ld = b->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> x_ld = x->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> b_ld = b->getComponentView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
 		});
-		ComponentView<2> x_ld2 = x->getComponentView(1, pinfo.local_index);
-		ComponentView<2> b_ld2 = b->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> x_ld2 = x->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> b_ld2 = b->getComponentView(1, pinfo.local_index);
 		nested_loop<2>(x_ld2.getStart(), x_ld2.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

@@ -12,11 +12,15 @@ FetchContent_MakeAvailable(catch2)
 include(CTest)
 include(ParseAndAddCatchTests)
 
+set(TE_TEST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+configure_file(TestConfig.h.in TestConfig.h)
+
 add_executable(unit_tests_mpi1)
 add_executable(unit_tests_mpi2)
 add_executable(unit_tests_mpi3)
 
 add_library(test_shared test.cpp)
+target_include_directories(test_shared PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 # -- add subdirectories
 
@@ -37,8 +41,6 @@ target_sources(unit_tests_mpi1 PRIVATE BiQuadraticGhostFiller_MPI1.cpp)
 target_sources(unit_tests_mpi1 PRIVATE CoarseNbrInfo_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE ComponentView_MPI1.cpp)
-
-target_sources(unit_tests_mpi1 PRIVATE ConstView_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE Corner_MPI1.cpp)
 

@@ -525,7 +525,7 @@ TEST_CASE("PETSc::VecWrapper<1> getComponentView.h", "[PETSc::VecWrapper]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			ComponentView<1> ld = vec_wrapper->getComponentView(c, i);
+			ComponentView<double, 1> ld = vec_wrapper->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -563,7 +563,7 @@ TEST_CASE("PETSc::VecWrapper<1> getComponentView const", "[PETSc::VecWrapper]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const ComponentView<1> ld = const_vec_wrapper->getComponentView(c, i);
+			ComponentView<const double, 1> ld = const_vec_wrapper->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -603,7 +603,7 @@ TEST_CASE("PETSc::VecWrapper<2> getComponentView.h", "[PETSc::VecWrapper]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			ComponentView<2> ld = vec_wrapper->getComponentView(c, i);
+			ComponentView<double, 2> ld = vec_wrapper->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -644,7 +644,7 @@ TEST_CASE("PETSc::VecWrapper<2> getComponentView const", "[PETSc::VecWrapper]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const ComponentView<2> ld = const_vec_wrapper->getComponentView(c, i);
+			ComponentView<const double, 2> ld = const_vec_wrapper->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -687,7 +687,7 @@ TEST_CASE("PETSc::VecWrapper<3> getComponentView.h", "[PETSc::VecWrapper]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			ComponentView<3> ld = vec_wrapper->getComponentView(c, i);
+			ComponentView<double, 3> ld = vec_wrapper->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -731,7 +731,7 @@ TEST_CASE("PETSc::VecWrapper<3> getComponentView const", "[PETSc::VecWrapper]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const ComponentView<3> ld = const_vec_wrapper->getComponentView(c, i);
+			ComponentView<const double, 3> ld = const_vec_wrapper->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);

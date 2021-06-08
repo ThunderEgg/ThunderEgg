@@ -199,9 +199,10 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @param out the resulting values after the transform
 	 * @param inverse weather we a re calculate
 	 */
-	void executePlan(const std::array<std::shared_ptr<std::valarray<double>>, D> &plan, ComponentView<D> in, ComponentView<D> out) const
+	void
+	executePlan(const std::array<std::shared_ptr<std::valarray<double>>, D> &plan, ComponentView<double, D> in, ComponentView<double, D> out) const
 	{
-		ComponentView<D> prev_result = in;
+		ComponentView<double, D> prev_result = in;
 
 		for (size_t axis = 0; axis < D; axis++) {
 			int                n     = this->domain->getNs()[axis];
@@ -211,7 +212,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 
 			std::valarray<double> &matrix = *plan[axis];
 
-			ComponentView<D> new_result;
+			ComponentView<double, D> new_result;
 			if (D % 2) {
 				if (axis % 2) {
 					new_result = in;
@@ -396,15 +397,19 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 			addPatch(pinfo);
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &fs, std::vector<ComponentView<D>> &us) const override
+	void solveSinglePatch(const PatchInfo<D> &                               pinfo,
+	                      const std::vector<ComponentView<const double, D>> &fs,
+	                      const std::vector<ComponentView<double, D>> &      us) const override
 	{
-		ComponentView<D> f_copy_ld = f_copy->getComponentView(0, 0);
-		ComponentView<D> tmp_ld    = tmp->getComponentView(0, 0);
+		ComponentView<double, D> f_copy_ld = f_copy->getComponentView(0, 0);
+		ComponentView<double, D> tmp_ld    = tmp->getComponentView(0, 0);
 
 		nested_loop<D>(f_copy_ld.getStart(), f_copy_ld.getEnd(), [&](std::array<int, D> coord) { f_copy_ld[coord] = fs[0][coord]; });
 
-		std::vector<ComponentView<D>> f_copy_lds = {f_copy_ld};
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, us, f_copy_lds);
+		std::vector<ComponentView<double, D>> f_copy_lds = {f_copy_ld};
+
+		std::vector<ComponentView<const double, D>> us_const(us.begin(), us.end());
+		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, us_const, f_copy_lds);
 
 		executePlan(plan1.at(pinfo), f_copy_ld, tmp_ld);
 

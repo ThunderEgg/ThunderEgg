@@ -95,7 +95,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		/**
 		 * @brief The ComponentView for the patch
 		 */
-		std::vector<ComponentView<D>> lds;
+		std::vector<ComponentView<double, D>> lds;
 
 		/**
 		 * @brief Get the number of local cells in the ComponentView object
@@ -103,7 +103,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		 * @param ld the ComponentView object
 		 * @return int the number of local cells
 		 */
-		static int GetNumLocalCells(const ComponentView<D> &ld)
+		static int GetNumLocalCells(const ComponentView<double, D> &ld)
 		{
 			int patch_stride = 1;
 			for (size_t i = 0; i < D; i++) {
@@ -118,12 +118,60 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		 *
 		 * @param ld_in the ComponentView for the patch
 		 */
-		SinglePatchVec(const std::vector<ComponentView<D>> &lds) : Vector<D>(MPI_COMM_SELF, lds.size(), 1, GetNumLocalCells(lds[0])), lds(lds) {}
-		ComponentView<D> getComponentView(int component_index, int local_patch_id) override
+		SinglePatchVec(const std::vector<ComponentView<double, D>> &lds) : Vector<D>(MPI_COMM_SELF, lds.size(), 1, GetNumLocalCells(lds[0])), lds(lds)
+		{
+		}
+		ComponentView<double, D> getComponentView(int component_index, int local_patch_id) override
 		{
 			return lds[component_index];
 		}
-		const ComponentView<D> getComponentView(int component_index, int local_patch_id) const override
+		ComponentView<const double, D> getComponentView(int component_index, int local_patch_id) const override
+		{
+			return lds[component_index];
+		}
+	};
+	/**
+	 * @brief Wrapper that provides a vector interface for the ComponentView of a patch
+	 */
+	class SinglePatchConstVec : public Vector<D>
+	{
+		private:
+		/**
+		 * @brief The ComponentView for the patch
+		 */
+		std::vector<ComponentView<const double, D>> lds;
+
+		/**
+		 * @brief Get the number of local cells in the ComponentView object
+		 *
+		 * @param ld the ComponentView object
+		 * @return int the number of local cells
+		 */
+		static int GetNumLocalCells(const ComponentView<const double, D> &ld)
+		{
+			int patch_stride = 1;
+			for (size_t i = 0; i < D; i++) {
+				patch_stride *= ld.getLengths()[i];
+			}
+			return patch_stride;
+		}
+
+		public:
+		/**
+		 * @brief Construct a new SinglePatchConstVec object
+		 *
+		 * @param ld_in the ComponentView for the patch
+		 */
+		SinglePatchConstVec(const std::vector<ComponentView<const double, D>> &lds)
+		: Vector<D>(MPI_COMM_SELF, lds.size(), 1, GetNumLocalCells(lds[0])),
+		  lds(lds)
+		{
+		}
+		ComponentView<double, D> getComponentView(int component_index, int local_patch_id) override
+		{
+			throw RuntimeError("This is a read only vector");
+		}
+		ComponentView<const double, D> getComponentView(int component_index, int local_patch_id) const override
 		{
 			return lds[component_index];
 		}
@@ -193,18 +241,21 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 	  continue_on_breakdown(continue_on_breakdown)
 	{
 	}
-	void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &fs, std::vector<ComponentView<D>> &us) const override
+	void solveSinglePatch(const PatchInfo<D> &                               pinfo,
+	                      const std::vector<ComponentView<const double, D>> &fs,
+	                      const std::vector<ComponentView<double, D>> &      us) const override
 	{
 		std::shared_ptr<SinglePatchOp>      single_op(new SinglePatchOp(pinfo, op));
 		std::shared_ptr<VectorGenerator<D>> vg(new SingleVG(pinfo, fs.size()));
 
-		std::shared_ptr<Vector<D>> f_single(new SinglePatchVec(fs));
+		std::shared_ptr<Vector<D>> f_single(new SinglePatchConstVec(fs));
 		std::shared_ptr<Vector<D>> u_single(new SinglePatchVec(us));
 
 		auto f_copy = vg->getNewVector();
 		f_copy->copy(f_single);
-		auto f_copy_lds = f_copy->getComponentViews(0);
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, us, f_copy_lds);
+		auto                                        f_copy_lds = f_copy->getComponentViews(0);
+		std::vector<ComponentView<const double, D>> us_const(us.begin(), us.end());
+		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, us_const, f_copy_lds);
 
 		int iterations = 0;
 		try {

@@ -22,8 +22,12 @@
 #include "View.h"
 namespace ThunderEgg
 {
-template class View<1>;
-template class View<2>;
-template class View<3>;
-template class View<4>;
+template class View<double, 1>;
+template class View<double, 2>;
+template class View<double, 3>;
+template class View<double, 4>;
+template class View<const double, 1>;
+template class View<const double, 2>;
+template class View<const double, 3>;
+template class View<const double, 4>;
 } // namespace ThunderEgg

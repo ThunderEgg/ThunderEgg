@@ -5,7 +5,7 @@ using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("View default constructor", "[View]")
 {
-	View<2> v;
+	View<double, 2> v;
 
 	for (int i = 0; i < 2; i++) {
 		CHECK(v.getStrides()[i] == 0);
@@ -34,7 +34,7 @@ TEST_CASE("View constructor", "[View]")
 
 	double data;
 
-	View<2> v(&data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
+	View<double, 2> v(&data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
 
 	CHECK(v.getStrides()[0] == x_stride);
 	CHECK(v.getStrides()[1] == y_stride);
@@ -66,41 +66,7 @@ TEST_CASE("View squarebracket operator", "[View]")
 		data[i] = 0;
 	}
 
-	View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
-
-	double *origin = data - (x_ghost_start * x_stride + y_ghost_start * y_stride);
-	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
-		for (int xi = x_ghost_start - 1; xi <= x_ghost_end + 1; xi++) {
-			if (xi < x_ghost_start || xi > x_ghost_end || yi < y_ghost_start || yi > y_ghost_end) {
-				//oob coord
-				if constexpr (ENABLE_DEBUG) {
-					CHECK_THROWS_AS((v[{xi, yi}]), RuntimeError);
-				}
-			} else {
-				CHECK(&v[{xi, yi}] == origin + xi * x_stride + yi * y_stride);
-			}
-		}
-	}
-}
-TEST_CASE("View squarebracket operator const", "[View]")
-{
-	auto x_stride      = GENERATE(1, 2);
-	auto y_stride      = GENERATE(4, 5);
-	auto x_ghost_start = GENERATE(-1, 1);
-	auto x_start       = GENERATE(2, 3);
-	auto x_end         = GENERATE(3, 4);
-	auto x_ghost_end   = GENERATE(5, 6);
-	auto y_ghost_start = GENERATE(-1, 1);
-	auto y_start       = GENERATE(2, 3);
-	auto y_end         = GENERATE(3, 4);
-	auto y_ghost_end   = GENERATE(5, 6);
-
-	double data[100];
-	for (int i = 0; i < 100; i++) {
-		data[i] = 0;
-	}
-
-	const View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
+	View<double, 2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
 
 	double *origin = data - (x_ghost_start * x_stride + y_ghost_start * y_stride);
 	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
@@ -134,41 +100,7 @@ TEST_CASE("View parens operator", "[View]")
 		data[i] = 0;
 	}
 
-	View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
-
-	double *origin = data - (x_ghost_start * x_stride + y_ghost_start * y_stride);
-	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
-		for (int xi = x_ghost_start - 1; xi <= x_ghost_end + 1; xi++) {
-			if (xi < x_ghost_start || xi > x_ghost_end || yi < y_ghost_start || yi > y_ghost_end) {
-				//oob coord
-				if constexpr (ENABLE_DEBUG) {
-					CHECK_THROWS_AS((v(xi, yi)), RuntimeError);
-				}
-			} else {
-				CHECK(&v(xi, yi) == origin + xi * x_stride + yi * y_stride);
-			}
-		}
-	}
-}
-TEST_CASE("View parens operator const", "[View]")
-{
-	auto x_stride      = GENERATE(1, 2);
-	auto y_stride      = GENERATE(4, 5);
-	auto x_ghost_start = GENERATE(-1, 1);
-	auto x_start       = GENERATE(2, 3);
-	auto x_end         = GENERATE(3, 4);
-	auto x_ghost_end   = GENERATE(5, 6);
-	auto y_ghost_start = GENERATE(-1, 1);
-	auto y_start       = GENERATE(2, 3);
-	auto y_end         = GENERATE(3, 4);
-	auto y_ghost_end   = GENERATE(5, 6);
-
-	double data[1000];
-	for (int i = 0; i < 1000; i++) {
-		data[i] = 0;
-	}
-
-	const View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
+	View<double, 2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
 
 	double *origin = data - (x_ghost_start * x_stride + y_ghost_start * y_stride);
 	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
@@ -202,7 +134,7 @@ TEST_CASE("View set", "[View]")
 		data[i] = 0;
 	}
 
-	View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
+	View<double, 2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
 
 	double value = 0;
 	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
@@ -238,7 +170,7 @@ TEST_CASE("View set const", "[View]")
 		data[i] = 0;
 	}
 
-	const View<2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
+	View<const double, 2> v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
 
 	double value = 0;
 	for (int yi = y_ghost_start - 1; yi <= y_ghost_end + 1; yi++) {
@@ -260,4 +192,33 @@ TEST_CASE("View set const", "[View]")
 			value++;
 		}
 	}
+}
+TEST_CASE("View implicit conversion to const type", "[View]")
+{
+	auto x_stride      = GENERATE(1, 2);
+	auto y_stride      = GENERATE(4, 5);
+	auto x_ghost_start = GENERATE(-1, 1);
+	auto x_start       = GENERATE(2, 3);
+	auto x_end         = GENERATE(3, 4);
+	auto x_ghost_end   = GENERATE(5, 6);
+	auto y_ghost_start = GENERATE(-1, 1);
+	auto y_start       = GENERATE(2, 3);
+	auto y_end         = GENERATE(3, 4);
+	auto y_ghost_end   = GENERATE(5, 6);
+
+	double data[1000];
+	for (int i = 0; i < 1000; i++) {
+		data[i] = 0;
+	}
+
+	View<double, 2>       v(data, {x_stride, y_stride}, {x_ghost_start, y_ghost_start}, {x_start, y_start}, {x_end, y_end}, {x_ghost_end, y_ghost_end});
+	View<const double, 2> vc = v;
+
+	CHECK(vc.getGhostStart() == v.getGhostStart());
+	CHECK(vc.getStart() == v.getStart());
+	CHECK(vc.getEnd() == v.getEnd());
+	CHECK(vc.getGhostEnd() == v.getGhostEnd());
+	CHECK(vc.getStrides() == v.getStrides());
+	CHECK(vc.getComponentViewDataManager() == v.getComponentViewDataManager());
+	CHECK(&vc[vc.getGhostStart()] == &v[v.getGhostStart()]);
 }

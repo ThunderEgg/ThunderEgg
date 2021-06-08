@@ -64,9 +64,9 @@ class MockPatchSolver : public PatchSolver<D>
 			patches_to_be_called.insert(&pinfo);
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &                 pinfo,
-	                      const std::vector<ComponentView<D>> &fs,
-	                      std::vector<ComponentView<D>> &      us) const override
+	void solveSinglePatch(const PatchInfo<D> &                               pinfo,
+	                      const std::vector<ComponentView<const double, D>> &fs,
+	                      const std::vector<ComponentView<double, D>> &      us) const override
 	{
 		CHECK(patches_to_be_called.count(&pinfo) == 1);
 		patches_to_be_called.erase(&pinfo);

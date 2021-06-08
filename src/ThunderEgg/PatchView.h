@@ -35,7 +35,7 @@ namespace ThunderEgg
  *
  * @tparam D number of cartesian dimensions
  */
-template <typename T, int D> class ComponentView : public View<T, D>
+template <typename T, int D> class PatchView : public View<T, D + 1>
 {
 	private:
 	template <int M> struct SliceInfo {
@@ -136,11 +136,11 @@ template <typename T, int D> class ComponentView : public View<T, D>
 	}
 
 	public:
-	using T_ptr = typename View<T, D>::T_ptr;
+	using T_ptr = typename View<T, D + 1>::T_ptr;
 	/**
-	 * @brief Construct a new ComponentView with size 0
+	 * @brief Construct a new PatchView with size 0
 	 */
-	ComponentView() : View<T, D>()
+	PatchView() : View<T, D + 1>()
 	{
 		lengths.fill(0);
 	}
@@ -154,42 +154,18 @@ template <typename T, int D> class ComponentView : public View<T, D>
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
 	 * @param ldm the local data manager for the data
 	 */
-	ComponentView(T_ptr                              data,
-	              const std::array<int, D> &         strides,
-	              const std::array<int, D> &         ghost_start,
-	              const std::array<int, D> &         start,
-	              const std::array<int, D> &         end,
-	              const std::array<int, D> &         ghost_end,
-	              const std::array<int, D> &         lengths,
-	              int                                num_ghost_cells,
-	              std::shared_ptr<const ViewManager> ldm = nullptr)
-	: View<T, D>(data, strides, ghost_start, start, end, ghost_end, ldm),
-	  lengths(lengths),
-	  num_ghost_cells(num_ghost_cells)
-	{
-	}
-
-	/**
-	 * @brief Construct a new View object
-	 *
-	 * @param data pointer to the first element in the patch (non-ghost cell element)
-	 * @param strides the strides in each direction
-	 * @param lengths the lengths in each direction
-	 * @param num_ghost_cells the number of ghost cells on each side of the patch
-	 * @param ldm the local data manager for the data
-	 */
-	ComponentView(T_ptr                              data,
-	              const std::array<int, D> &         strides,
-	              const std::array<int, D> &         lengths,
-	              int                                num_ghost_cells,
-	              std::shared_ptr<const ViewManager> ldm = nullptr)
-	: View<T, D>(data,
-	             strides,
-	             DetermineGhostStart<D>(num_ghost_cells),
-	             DetermineStart<D>(),
-	             DetermineEnd<D>(lengths),
-	             DetermineGhostEnd<D>(lengths, num_ghost_cells),
-	             ldm),
+	PatchView(T_ptr                              data,
+	          const std::array<int, D + 1> &     strides,
+	          const std::array<int, D + 1> &     lengths,
+	          int                                num_ghost_cells,
+	          std::shared_ptr<const ViewManager> ldm = nullptr)
+	: View<T, D + 1>(data,
+	                 strides,
+	                 DetermineGhostStart<D>(num_ghost_cells),
+	                 DetermineStart<D>(),
+	                 DetermineEnd<D>(lengths),
+	                 DetermineGhostEnd<D>(lengths, num_ghost_cells),
+	                 ldm),
 	  lengths(lengths),
 	  num_ghost_cells(num_ghost_cells)
 	{
@@ -209,7 +185,7 @@ template <typename T, int D> class ComponentView : public View<T, D>
 		SliceInfo<M> info = getSliceOnPriv<M>(f, offset);
 
 		T_ptr new_data = (&(*this)[info.first_value]);
-		return View<T, M>(new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end, this->getComponentViewDataManager());
+		return View<T, M>(new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end, this->getPatchViewDataManager());
 	}
 
 	/**
@@ -257,7 +233,7 @@ template <typename T, int D> class ComponentView : public View<T, D>
 		}
 
 		noconst_T_ptr new_data = const_cast<noconst_T_ptr>(&(*this)[first_value]); // Thunderegg doesn't care if values in ghosts are modified
-		return View<noconst_T, M>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getComponentViewDataManager());
+		return View<noconst_T, M>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getPatchViewDataManager());
 	}
 
 	/**
@@ -275,25 +251,6 @@ template <typename T, int D> class ComponentView : public View<T, D>
 	{
 		return num_ghost_cells;
 	}
-
-	operator ComponentView<std::add_const_t<T>, D>() const
-	{
-		return ComponentView<std::add_const_t<T>, D>(this->getData() + this->getIndex(this->getGhostStart()),
-		                                             this->getStrides(),
-		                                             this->getGhostStart(),
-		                                             this->getStart(),
-		                                             this->getEnd(),
-		                                             this->getGhostEnd(),
-		                                             lengths,
-		                                             num_ghost_cells,
-		                                             this->getComponentViewDataManager());
-	}
 };
-extern template class ComponentView<double, 1>;
-extern template class ComponentView<double, 2>;
-extern template class ComponentView<double, 3>;
-extern template class ComponentView<const double, 1>;
-extern template class ComponentView<const double, 2>;
-extern template class ComponentView<const double, 3>;
 } // namespace ThunderEgg
 #endif

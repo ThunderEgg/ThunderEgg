@@ -114,15 +114,15 @@ template <int D> class ValVector : public Vector<D>
 		return std::shared_ptr<ValVector<D>>(
 		new ValVector<D>(MPI_COMM_WORLD, domain->getNs(), domain->getNumGhostCells(), num_components, domain->getNumLocalPatches()));
 	}
-	ComponentView<D> getComponentView(int component_index, int local_patch_index) override
+	ComponentView<double, D> getComponentView(int component_index, int local_patch_index) override
 	{
 		double *data = &vec[patch_stride * local_patch_index + component_stride * component_index];
-		return ComponentView<D>(data, strides, lengths, num_ghost_cells, nullptr);
+		return ComponentView<double, D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
-	const ComponentView<D> getComponentView(int component_index, int local_patch_index) const override
+	ComponentView<const double, D> getComponentView(int component_index, int local_patch_index) const override
 	{
-		double *data = const_cast<double *>(&vec[patch_stride * local_patch_index + component_stride * component_index]);
-		return ComponentView<D>(data, strides, lengths, num_ghost_cells, nullptr);
+		const double *data = &vec[patch_stride * local_patch_index + component_stride * component_index];
+		return ComponentView<const double, D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 
 	/**

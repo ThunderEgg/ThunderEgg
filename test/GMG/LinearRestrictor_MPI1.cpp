@@ -70,14 +70,14 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		INFO("nx:             " << pinfo.ns[0]);
 		INFO("ny:             " << pinfo.ns[1]);
 		INFO("parent_orth:    " << pinfo.orth_on_parent);
-		ComponentView<2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			if (!pinfo.hasNbr(s)) {
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
@@ -135,19 +135,19 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 		INFO("nx:             " << pinfo.ns[0]);
 		INFO("ny:             " << pinfo.ns[1]);
 		INFO("parent_orth:    " << pinfo.orth_on_parent);
-		ComponentView<2> vec_ld       = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<2> expected_ld  = coarse_expected->getComponentView(0, pinfo.local_index);
-		ComponentView<2> vec_ld2      = coarse_vec->getComponentView(1, pinfo.local_index);
-		ComponentView<2> expected_ld2 = coarse_expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = coarse_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = coarse_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = coarse_vec->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = coarse_expected->getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			View<1> vec_ghost       = vec_ld.getSliceOn(s, {-1});
-			View<1> expected_ghost  = expected_ld.getSliceOn(s, {-1});
-			View<1> vec_ghost2      = vec_ld2.getSliceOn(s, {-1});
-			View<1> expected_ghost2 = expected_ld2.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost       = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost  = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost2      = vec_ld2.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost2 = expected_ld2.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			if (!pinfo.hasNbr(s)) {
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
@@ -202,14 +202,14 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 		INFO("nx:             " << pinfo.ns[0]);
 		INFO("ny:             " << pinfo.ns[1]);
 		INFO("parent_orth:    " << pinfo.orth_on_parent);
-		ComponentView<2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			View<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 			               [&](const array<int, 1> &coord) {
@@ -260,19 +260,19 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 		INFO("nx:             " << pinfo.ns[0]);
 		INFO("ny:             " << pinfo.ns[1]);
 		INFO("parent_orth:    " << pinfo.orth_on_parent);
-		ComponentView<2> vec_ld       = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<2> expected_ld  = coarse_expected->getComponentView(0, pinfo.local_index);
-		ComponentView<2> vec_ld2      = coarse_vec->getComponentView(1, pinfo.local_index);
-		ComponentView<2> expected_ld2 = coarse_expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = coarse_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = coarse_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = coarse_vec->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = coarse_expected->getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			View<1> vec_ghost       = vec_ld.getSliceOn(s, {-1});
-			View<1> expected_ghost  = expected_ld.getSliceOn(s, {-1});
-			View<1> vec_ghost2      = vec_ld2.getSliceOn(s, {-1});
-			View<1> expected_ghost2 = expected_ld2.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost       = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost  = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost2      = vec_ld2.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost2 = expected_ld2.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 			               [&](const array<int, 1> &coord) {

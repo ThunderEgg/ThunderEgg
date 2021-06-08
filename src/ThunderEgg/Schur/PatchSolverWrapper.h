@@ -123,9 +123,10 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		}
 		// go ahead and solve for patches with only local interfaces
 		for (auto piinfo : patches_with_only_local_ifaces) {
-			auto us = u->getComponentViews(piinfo->pinfo.local_index);
-			auto fs = f->getComponentViews(piinfo->pinfo.local_index);
-			solver->solveSinglePatch(piinfo->pinfo, fs, us);
+			auto                                        us = u->getComponentViews(piinfo->pinfo.local_index);
+			auto                                        fs = f->getComponentViews(piinfo->pinfo.local_index);
+			std::vector<ComponentView<const double, D>> fs_const(fs.begin(), fs.end());
+			solver->solveSinglePatch(piinfo->pinfo, fs_const, us);
 		}
 
 		scatter.scatterFinish(x, local_x);
@@ -144,9 +145,10 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		}
 		// solve the remaining patches
 		for (auto piinfo : patches_with_ifaces_on_neighbor_rank) {
-			auto us = u->getComponentViews(piinfo->pinfo.local_index);
-			auto fs = f->getComponentViews(piinfo->pinfo.local_index);
-			solver->solveSinglePatch(piinfo->pinfo, fs, us);
+			auto                                        us = u->getComponentViews(piinfo->pinfo.local_index);
+			auto                                        fs = f->getComponentViews(piinfo->pinfo.local_index);
+			std::vector<ComponentView<const double, D>> fs_const(fs.begin(), fs.end());
+			solver->solveSinglePatch(piinfo->pinfo, fs_const, us);
 		}
 
 		solver->getGhostFiller()->fillGhost(u);

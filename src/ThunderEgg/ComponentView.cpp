@@ -22,7 +22,10 @@
 #include "ComponentView.h"
 namespace ThunderEgg
 {
-template class ComponentView<1>;
-template class ComponentView<2>;
-template class ComponentView<3>;
+template class ComponentView<double, 1>;
+template class ComponentView<double, 2>;
+template class ComponentView<double, 3>;
+template class ComponentView<const double, 1>;
+template class ComponentView<const double, 2>;
+template class ComponentView<const double, 3>;
 } // namespace ThunderEgg

@@ -120,8 +120,8 @@ template <int D, typename T> void SetValues(std::shared_ptr<Domain<D>> domain, s
 	}
 	std::array<double, D> real_coord;
 	for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-		ComponentView<D> ld    = vec->getComponentView(component_index, i);
-		auto             pinfo = domain->getPatchInfoVector()[i];
+		ComponentView<double, D> ld    = vec->getComponentView(component_index, i);
+		auto                     pinfo = domain->getPatchInfoVector()[i];
 		nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 			GetRealCoord<D>(pinfo, coord, real_coord);
 			ld[coord] = func(real_coord);
@@ -195,8 +195,8 @@ template <int D, typename T> void SetValuesWithGhost(std::shared_ptr<Domain<D>> 
 	}
 	std::array<double, D> real_coord;
 	for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-		ComponentView<D> ld    = vec->getComponentView(component_index, i);
-		auto             pinfo = domain->getPatchInfoVector()[i];
+		ComponentView<double, D> ld    = vec->getComponentView(component_index, i);
+		auto                     pinfo = domain->getPatchInfoVector()[i];
 		nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, D> &coord) {
 			GetRealCoordGhost<D>(pinfo, coord, real_coord);
 			ld[coord] = func(real_coord);
@@ -253,30 +253,6 @@ template <int D, typename T, typename... Args>
 void SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, T func, Args... args)
 {
 	_SetValuesWithGhost(domain, vec, 0, func, args...);
-}
-/**
- * @brief Set the value of a boundary vector using a given function.
- *
- * @tparam D the number of cartesian dimensions
- */
-template <int D, typename T> void SetBCValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D - 1>> vec, T func, int component_index = 0)
-{
-	if (component_index >= vec->getNumComponents()) {
-		throw RuntimeError("More functions given than available components");
-	}
-	std::array<double, D> real_coord;
-	for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-		auto pinfo = domain->getPatchInfoMap()[domain->patch_id_bc_map_vec[i]];
-		for (Side<D> s : Side<D>::getValues()) {
-			if (!pinfo.hasNbr(s)) {
-				ComponentView<D - 1> ld = vec->getComponentView(component_index, pinfo.getBCLocalIndex(s));
-				nested_loop<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
-					GetRealCoordBound<D>(pinfo, coord, s, real_coord);
-					ld[coord] = func(real_coord);
-				});
-			}
-		}
-	}
 }
 }; // namespace DomainTools
 } // namespace ThunderEgg

@@ -139,7 +139,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1>", "[ComponentArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		View<1> slice = pa.getSliceOn(Side<2>::west(), {xi});
+		View<double, 1> slice = pa.getSliceOn(Side<2>::west(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{xi, yi}] == &slice[{yi}]);
@@ -148,7 +148,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1>", "[ComponentArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		View<1> slice = pa.getSliceOn(Side<2>::east(), {xi});
+		View<double, 1> slice = pa.getSliceOn(Side<2>::east(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{nx - 1 - xi, yi}] == &slice[{yi}]);
@@ -157,7 +157,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1>", "[ComponentArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		View<1> slice = pa.getSliceOn(Side<2>::south(), {yi});
+		View<double, 1> slice = pa.getSliceOn(Side<2>::south(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, yi}] == &slice[{xi}]);
@@ -166,7 +166,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1>", "[ComponentArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		View<1> slice = pa.getSliceOn(Side<2>::north(), {yi});
+		View<double, 1> slice = pa.getSliceOn(Side<2>::north(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, ny - 1 - yi}] == &slice[{xi}]);
@@ -183,7 +183,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1> const", "[ComponentArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ConstView<1> slice = pa.getSliceOn(Side<2>::west(), {xi});
+		View<const double, 1> slice = pa.getSliceOn(Side<2>::west(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{xi, yi}] == &slice[{yi}]);
@@ -192,7 +192,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1> const", "[ComponentArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ConstView<1> slice = pa.getSliceOn(Side<2>::east(), {xi});
+		View<const double, 1> slice = pa.getSliceOn(Side<2>::east(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{nx - 1 - xi, yi}] == &slice[{yi}]);
@@ -201,7 +201,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1> const", "[ComponentArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ConstView<1> slice = pa.getSliceOn(Side<2>::south(), {yi});
+		View<const double, 1> slice = pa.getSliceOn(Side<2>::south(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, yi}] == &slice[{xi}]);
@@ -210,7 +210,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1> const", "[ComponentArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ConstView<1> slice = pa.getSliceOn(Side<2>::north(), {yi});
+		View<const double, 1> slice = pa.getSliceOn(Side<2>::north(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, ny - 1 - yi}] == &slice[{xi}]);
@@ -228,7 +228,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2>", "[ComponentArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		View<2> slice = pa.getSliceOn(Side<3>::west(), {xi});
+		View<double, 2> slice = pa.getSliceOn(Side<3>::west(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -240,7 +240,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2>", "[ComponentArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		View<2> slice = pa.getSliceOn(Side<3>::east(), {xi});
+		View<double, 2> slice = pa.getSliceOn(Side<3>::east(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -252,7 +252,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2>", "[ComponentArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		View<2> slice = pa.getSliceOn(Side<3>::south(), {yi});
+		View<double, 2> slice = pa.getSliceOn(Side<3>::south(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -264,7 +264,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2>", "[ComponentArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		View<2> slice = pa.getSliceOn(Side<3>::north(), {yi});
+		View<double, 2> slice = pa.getSliceOn(Side<3>::north(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -276,7 +276,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2>", "[ComponentArray]")
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
-		View<2> slice = pa.getSliceOn(Side<3>::bottom(), {zi});
+		View<double, 2> slice = pa.getSliceOn(Side<3>::bottom(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -288,7 +288,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2>", "[ComponentArray]")
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
-		View<2> slice = pa.getSliceOn(Side<3>::top(), {zi});
+		View<double, 2> slice = pa.getSliceOn(Side<3>::top(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -309,7 +309,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2> const", "[ComponentArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ConstView<2> slice = pa.getSliceOn(Side<3>::west(), {xi});
+		View<const double, 2> slice = pa.getSliceOn(Side<3>::west(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -321,7 +321,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2> const", "[ComponentArray]")
 
 	for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 		INFO("xi: " << xi);
-		ConstView<2> slice = pa.getSliceOn(Side<3>::east(), {xi});
+		View<const double, 2> slice = pa.getSliceOn(Side<3>::east(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -333,7 +333,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2> const", "[ComponentArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ConstView<2> slice = pa.getSliceOn(Side<3>::south(), {yi});
+		View<const double, 2> slice = pa.getSliceOn(Side<3>::south(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -345,7 +345,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2> const", "[ComponentArray]")
 
 	for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 		INFO("yi: " << yi);
-		ConstView<2> slice = pa.getSliceOn(Side<3>::north(), {yi});
+		View<const double, 2> slice = pa.getSliceOn(Side<3>::north(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -357,7 +357,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2> const", "[ComponentArray]")
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
-		ConstView<2> slice = pa.getSliceOn(Side<3>::bottom(), {zi});
+		View<const double, 2> slice = pa.getSliceOn(Side<3>::bottom(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -369,7 +369,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2> const", "[ComponentArray]")
 
 	for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 		INFO("zi: " << zi);
-		ConstView<2> slice = pa.getSliceOn(Side<3>::top(), {zi});
+		View<const double, 2> slice = pa.getSliceOn(Side<3>::top(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -392,7 +392,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			View<1> slice = pa.getSliceOn(Edge::bs(), {yi, zi});
+			View<double, 1> slice = pa.getSliceOn(Edge::bs(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{xi}]);
@@ -404,7 +404,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			View<1> slice = pa.getSliceOn(Edge::tn(), {yi, zi});
+			View<double, 1> slice = pa.getSliceOn(Edge::tn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, ny - 1 - yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -416,7 +416,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			View<1> slice = pa.getSliceOn(Edge::bn(), {yi, zi});
+			View<double, 1> slice = pa.getSliceOn(Edge::bn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, ny - 1 - yi, zi}] == &slice[{xi}]);
@@ -428,7 +428,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			View<1> slice = pa.getSliceOn(Edge::ts(), {yi, zi});
+			View<double, 1> slice = pa.getSliceOn(Edge::ts(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -440,7 +440,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice = pa.getSliceOn(Edge::bw(), {xi, zi});
+			View<double, 1> slice = pa.getSliceOn(Edge::bw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{yi}]);
@@ -452,7 +452,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice = pa.getSliceOn(Edge::te(), {xi, zi});
+			View<double, 1> slice = pa.getSliceOn(Edge::te(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{nx - 1 - xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -464,7 +464,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice = pa.getSliceOn(Edge::be(), {xi, zi});
+			View<double, 1> slice = pa.getSliceOn(Edge::be(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{nx - 1 - xi, yi, zi}] == &slice[{yi}]);
@@ -476,7 +476,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice = pa.getSliceOn(Edge::tw(), {xi, zi});
+			View<double, 1> slice = pa.getSliceOn(Edge::tw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -488,7 +488,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice = pa.getSliceOn(Edge::sw(), {xi, yi});
+			View<double, 1> slice = pa.getSliceOn(Edge::sw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{zi}]);
@@ -500,7 +500,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice = pa.getSliceOn(Edge::ne(), {xi, yi});
+			View<double, 1> slice = pa.getSliceOn(Edge::ne(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{nx - 1 - xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -512,7 +512,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice = pa.getSliceOn(Edge::se(), {xi, yi});
+			View<double, 1> slice = pa.getSliceOn(Edge::se(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{nx - 1 - xi, yi, zi}] == &slice[{zi}]);
@@ -524,7 +524,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice = pa.getSliceOn(Edge::nw(), {xi, yi});
+			View<double, 1> slice = pa.getSliceOn(Edge::nw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -545,7 +545,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			ConstView<1> slice = pa.getSliceOn(Edge::bs(), {yi, zi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::bs(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{xi}]);
@@ -557,7 +557,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			ConstView<1> slice = pa.getSliceOn(Edge::tn(), {yi, zi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::tn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, ny - 1 - yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -569,7 +569,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			ConstView<1> slice = pa.getSliceOn(Edge::bn(), {yi, zi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::bn(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, ny - 1 - yi, zi}] == &slice[{xi}]);
@@ -581,7 +581,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
-			ConstView<1> slice = pa.getSliceOn(Edge::ts(), {yi, zi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::ts(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, yi, nz - 1 - zi}] == &slice[{xi}]);
@@ -593,7 +593,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ConstView<1> slice = pa.getSliceOn(Edge::bw(), {xi, zi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::bw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{yi}]);
@@ -605,7 +605,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ConstView<1> slice = pa.getSliceOn(Edge::te(), {xi, zi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::te(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{nx - 1 - xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -617,7 +617,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ConstView<1> slice = pa.getSliceOn(Edge::be(), {xi, zi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::be(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{nx - 1 - xi, yi, zi}] == &slice[{yi}]);
@@ -629,7 +629,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ConstView<1> slice = pa.getSliceOn(Edge::tw(), {xi, zi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::tw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{xi, yi, nz - 1 - zi}] == &slice[{yi}]);
@@ -641,7 +641,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ConstView<1> slice = pa.getSliceOn(Edge::sw(), {xi, yi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::sw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{xi, yi, zi}] == &slice[{zi}]);
@@ -653,7 +653,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ConstView<1> slice = pa.getSliceOn(Edge::ne(), {xi, yi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::ne(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{nx - 1 - xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -665,7 +665,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ConstView<1> slice = pa.getSliceOn(Edge::se(), {xi, yi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::se(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{nx - 1 - xi, yi, zi}] == &slice[{zi}]);
@@ -677,7 +677,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
 		INFO("yi: " << yi);
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
-			ConstView<1> slice = pa.getSliceOn(Edge::nw(), {xi, yi});
+			View<const double, 1> slice = pa.getSliceOn(Edge::nw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{xi, ny - 1 - yi, zi}] == &slice[{zi}]);
@@ -788,8 +788,8 @@ TEST_CASE("ComponentArray<2> getGhostSliceOn<1>", "[ComponentArray]")
 
 	for (unsigned char xi = 0; xi < num_ghost; xi++) {
 		INFO("xi: " << xi);
-		View<1> slice_w = pa.getGhostSliceOn(Side<2>::west(), {xi});
-		View<1> slice_e = pa.getGhostSliceOn(Side<2>::east(), {xi});
+		View<double, 1> slice_w = pa.getGhostSliceOn(Side<2>::west(), {xi});
+		View<double, 1> slice_e = pa.getGhostSliceOn(Side<2>::east(), {xi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			CHECK(&pa[{-1 - xi, yi}] == &slice_w[{yi}]);
@@ -799,8 +799,8 @@ TEST_CASE("ComponentArray<2> getGhostSliceOn<1>", "[ComponentArray]")
 
 	for (unsigned char yi = 0; yi < num_ghost; yi++) {
 		INFO("yi: " << yi);
-		View<1> slice_s = pa.getGhostSliceOn(Side<2>::south(), {yi});
-		View<1> slice_n = pa.getGhostSliceOn(Side<2>::north(), {yi});
+		View<double, 1> slice_s = pa.getGhostSliceOn(Side<2>::south(), {yi});
+		View<double, 1> slice_n = pa.getGhostSliceOn(Side<2>::north(), {yi});
 		for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 			INFO("xi: " << xi);
 			CHECK(&pa[{xi, -1 - yi}] == &slice_s[{xi}]);
@@ -819,8 +819,8 @@ TEST_CASE("ComponentArray<3> getGhostSliceOn<2>", "[ComponentArray]")
 
 	for (unsigned char xi = 0; xi < num_ghost; xi++) {
 		INFO("xi: " << xi);
-		View<2> slice_w = pa.getGhostSliceOn(Side<3>::west(), {xi});
-		View<2> slice_e = pa.getGhostSliceOn(Side<3>::east(), {xi});
+		View<double, 2> slice_w = pa.getGhostSliceOn(Side<3>::west(), {xi});
+		View<double, 2> slice_e = pa.getGhostSliceOn(Side<3>::east(), {xi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
@@ -833,8 +833,8 @@ TEST_CASE("ComponentArray<3> getGhostSliceOn<2>", "[ComponentArray]")
 
 	for (unsigned char yi = 0; yi < num_ghost; yi++) {
 		INFO("yi: " << yi);
-		View<2> slice_s = pa.getGhostSliceOn(Side<3>::south(), {yi});
-		View<2> slice_n = pa.getGhostSliceOn(Side<3>::north(), {yi});
+		View<double, 2> slice_s = pa.getGhostSliceOn(Side<3>::south(), {yi});
+		View<double, 2> slice_n = pa.getGhostSliceOn(Side<3>::north(), {yi});
 		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 			INFO("zi: " << zi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -847,8 +847,8 @@ TEST_CASE("ComponentArray<3> getGhostSliceOn<2>", "[ComponentArray]")
 
 	for (unsigned char zi = 0; zi < num_ghost; zi++) {
 		INFO("zi: " << zi);
-		View<2> slice_b = pa.getGhostSliceOn(Side<3>::bottom(), {zi});
-		View<2> slice_t = pa.getGhostSliceOn(Side<3>::top(), {zi});
+		View<double, 2> slice_b = pa.getGhostSliceOn(Side<3>::bottom(), {zi});
+		View<double, 2> slice_t = pa.getGhostSliceOn(Side<3>::top(), {zi});
 		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 			INFO("yi: " << yi);
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
@@ -872,10 +872,10 @@ TEST_CASE("ComponentArray<3> getGhostSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (unsigned char yi = 0; yi < num_ghost; yi++) {
 			INFO("yi: " << yi);
-			View<1> slice_bs = pa.getGhostSliceOn(Edge::bs(), {yi, zi});
-			View<1> slice_tn = pa.getGhostSliceOn(Edge::tn(), {yi, zi});
-			View<1> slice_bn = pa.getGhostSliceOn(Edge::bn(), {yi, zi});
-			View<1> slice_ts = pa.getGhostSliceOn(Edge::ts(), {yi, zi});
+			View<double, 1> slice_bs = pa.getGhostSliceOn(Edge::bs(), {yi, zi});
+			View<double, 1> slice_tn = pa.getGhostSliceOn(Edge::tn(), {yi, zi});
+			View<double, 1> slice_bn = pa.getGhostSliceOn(Edge::bn(), {yi, zi});
+			View<double, 1> slice_ts = pa.getGhostSliceOn(Edge::ts(), {yi, zi});
 			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
 				INFO("xi: " << xi);
 				CHECK(&pa[{xi, -1 - yi, -1 - zi}] == &slice_bs[{xi}]);
@@ -890,10 +890,10 @@ TEST_CASE("ComponentArray<3> getGhostSliceOn<1>", "[ComponentArray]")
 		INFO("zi: " << zi);
 		for (unsigned char xi = 0; xi < num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice_bw = pa.getGhostSliceOn(Edge::bw(), {xi, zi});
-			View<1> slice_te = pa.getGhostSliceOn(Edge::te(), {xi, zi});
-			View<1> slice_be = pa.getGhostSliceOn(Edge::be(), {xi, zi});
-			View<1> slice_tw = pa.getGhostSliceOn(Edge::tw(), {xi, zi});
+			View<double, 1> slice_bw = pa.getGhostSliceOn(Edge::bw(), {xi, zi});
+			View<double, 1> slice_te = pa.getGhostSliceOn(Edge::te(), {xi, zi});
+			View<double, 1> slice_be = pa.getGhostSliceOn(Edge::be(), {xi, zi});
+			View<double, 1> slice_tw = pa.getGhostSliceOn(Edge::tw(), {xi, zi});
 			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
 				INFO("yi: " << yi);
 				CHECK(&pa[{-1 - xi, yi, -1 - zi}] == &slice_bw[{yi}]);
@@ -908,10 +908,10 @@ TEST_CASE("ComponentArray<3> getGhostSliceOn<1>", "[ComponentArray]")
 		INFO("yi: " << yi);
 		for (unsigned char xi = 0; xi < num_ghost; xi++) {
 			INFO("xi: " << xi);
-			View<1> slice_sw = pa.getGhostSliceOn(Edge::sw(), {xi, yi});
-			View<1> slice_ne = pa.getGhostSliceOn(Edge::ne(), {xi, yi});
-			View<1> slice_se = pa.getGhostSliceOn(Edge::se(), {xi, yi});
-			View<1> slice_nw = pa.getGhostSliceOn(Edge::nw(), {xi, yi});
+			View<double, 1> slice_sw = pa.getGhostSliceOn(Edge::sw(), {xi, yi});
+			View<double, 1> slice_ne = pa.getGhostSliceOn(Edge::ne(), {xi, yi});
+			View<double, 1> slice_se = pa.getGhostSliceOn(Edge::se(), {xi, yi});
+			View<double, 1> slice_nw = pa.getGhostSliceOn(Edge::nw(), {xi, yi});
 			for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
 				INFO("zi: " << zi);
 				CHECK(&pa[{-1 - xi, -1 - yi, zi}] == &slice_sw[{zi}]);

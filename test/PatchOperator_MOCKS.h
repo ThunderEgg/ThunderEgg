@@ -67,8 +67,8 @@ class MockPatchOperator : public PatchOperator<D>
 			patches_to_be_called.insert(&pinfo);
 		}
 	}
-	void applySinglePatch(const PatchInfo<D> &                 pinfo,
-	                      const std::vector<ComponentView<D>> &us, std::vector<ComponentView<D>> &fs) const override
+	void applySinglePatch(const PatchInfo<D> &                               pinfo,
+	                      const std::vector<ComponentView<const double, D>> &us, const std::vector<ComponentView<double, D>> &fs) const override
 	{
 		CHECK(patches_to_be_called.count(&pinfo) == 1);
 		patches_to_be_called.erase(&pinfo);
@@ -84,15 +84,15 @@ class MockPatchOperator : public PatchOperator<D>
 			CHECK(&f_vec->getComponentView(c, pinfo.local_index)[zero] == &fs[c][zero]);
 		}
 	}
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const override
 	{
 	}
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &us) const override
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const override
 	{
 	}
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                 pinfo,
-	                                                   const std::vector<ComponentView<D>> &us,
-	                                                   std::vector<ComponentView<D>> &      fs) const override
+	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                               pinfo,
+	                                                   const std::vector<ComponentView<const double, D>> &us,
+	                                                   const std::vector<ComponentView<double, D>> &      fs) const override
 	{
 	}
 	bool allPatchesCalled()

@@ -32,8 +32,8 @@ namespace ThunderEgg
 template <int D> class ComponentArray
 {
 	private:
-	std::vector<double> vector;
-	ComponentView<D>    view;
+	std::vector<double>      vector;
+	ComponentView<double, D> view;
 
 	public:
 	/**
@@ -51,7 +51,7 @@ template <int D> class ComponentArray
 		}
 		int size = strides[D - 1] * (lengths[D - 1] + 2 * num_ghost_cells);
 		vector.resize(size);
-		view = ComponentView<D>(vector.data(), strides, lengths, num_ghost_cells);
+		view = ComponentView<double, D>(vector.data(), strides, lengths, num_ghost_cells);
 	}
 
 	/**
@@ -63,7 +63,7 @@ template <int D> class ComponentArray
 	 * face
 	 * @return View<M> a view to the slice on the face
 	 */
-	template <int M> inline View<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
+	template <int M> inline View<double, M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset)
 	{
 		return view.template getSliceOn<M>(f, offset);
 	}
@@ -77,9 +77,9 @@ template <int D> class ComponentArray
 	 * face
 	 * @return ConstView<M> a view to the slice on the face
 	 */
-	template <int M> inline ConstView<M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
+	template <int M> inline View<const double, M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
-		return view.template getSliceOn<M>(f, offset);
+		return View<const double, M>(view.template getSliceOn<M>(f, offset));
 	}
 
 	/**
@@ -91,7 +91,7 @@ template <int D> class ComponentArray
 	 * face
 	 * @return View<M> a view to the slice on the face
 	 */
-	template <int M> inline View<M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
+	template <int M> inline View<double, M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
 	{
 		return view.template getGhostSliceOn<M>(f, offset);
 	}

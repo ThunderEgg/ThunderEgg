@@ -95,9 +95,10 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto gs = g_vec->getComponentViews(pinfo.local_index);
-		auto fs = f_vec->getComponentViews(pinfo.local_index);
-		p_operator->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, gs, fs);
+		auto                                        gs = g_vec->getComponentViews(pinfo.local_index);
+		auto                                        fs = f_vec->getComponentViews(pinfo.local_index);
+		std::vector<ComponentView<const double, 2>> gs_const(gs.begin(), gs.end());
+		p_operator->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, gs_const, fs);
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
@@ -106,8 +107,8 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<2> vec_ld      = f_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<2> expected_ld = f_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = f_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = f_expected->getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -148,7 +149,7 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff",
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<2> vec_ld = g_vec->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld = g_vec->getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

@@ -45,7 +45,7 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	 * @param fine_data the finer patch
 	 * @param coarse_data the coarser patch
 	 */
-	void extrapolateBoundaries(const PatchInfo<D> &pinfo, const ComponentView<D> &fine_data, ComponentView<D> &coarse_data) const
+	void extrapolateBoundaries(const PatchInfo<D> &pinfo, ComponentView<const double, D> &fine_data, ComponentView<double, D> &coarse_data) const
 	{
 		Orthant<D>         orth = pinfo.orth_on_parent;
 		std::array<int, D> starts;
@@ -55,9 +55,9 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 		// extrapolate ghost values
 		for (Side<D> s : pinfo.orth_on_parent.getExteriorSides()) {
 			if (!pinfo.hasNbr(s)) {
-				ConstView<D - 1> fine_ghost    = fine_data.getSliceOn(s, {-1});
-				ConstView<D - 1> fine_interior = fine_data.getSliceOn(s, {0});
-				View<D - 1>      coarse_ghost  = coarse_data.getSliceOn(s, {-1});
+				View<const double, D - 1> fine_ghost    = fine_data.getSliceOn(s, {-1});
+				View<const double, D - 1> fine_interior = fine_data.getSliceOn(s, {0});
+				View<double, D - 1>       coarse_ghost  = coarse_data.getSliceOn(s, {-1});
 				nested_loop<D - 1>(fine_ghost.getStart(), fine_ghost.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					std::array<int, D - 1> coarse_coord;
 					for (size_t x = 0; x < s.getAxisIndex(); x++) {
@@ -133,8 +133,8 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 				// copy boundary ghost values
 				for (Side<D> s : Side<D>::getValues()) {
 					if (!pinfo.hasNbr(s)) {
-						View<D - 1> fine_ghost   = fine_datas[c].getSliceOn(s, {-1});
-						View<D - 1> coarse_ghost = coarse_local_datas[c].getSliceOn(s, {-1});
+						View<const double, D - 1> fine_ghost   = fine_datas[c].getSliceOn(s, {-1});
+						View<double, D - 1>       coarse_ghost = coarse_local_datas[c].getGhostSliceOn(s, {0});
 						nested_loop<D - 1>(fine_ghost.getStart(), fine_ghost.getEnd(), [&](const std::array<int, D - 1> &coord) {
 							coarse_ghost[coord] += fine_ghost[coord];
 						});

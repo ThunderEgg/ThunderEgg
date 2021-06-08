@@ -61,7 +61,7 @@ class MockVector : public Vector<D>
 	/**
 	 * @brief vector of View objects
 	 */
-	std::vector<ComponentView<D>> local_data;
+	std::vector<ComponentView<double, D>> local_data;
 	/**
 	 * @brief Construct a new MockVector object
 	 *
@@ -94,11 +94,11 @@ class MockVector : public Vector<D>
 			}
 		}
 	}
-	ComponentView<D> getComponentView(int component_index, int patch_local_index) override
+	ComponentView<double, D> getComponentView(int component_index, int patch_local_index) override
 	{
 		return local_data[patch_local_index * this->getNumComponents() + component_index];
 	}
-	const ComponentView<D> getComponentView(int component_index, int patch_local_index) const override
+	ComponentView<const double, D> getComponentView(int component_index, int patch_local_index) const override
 	{
 		return local_data[patch_local_index * this->getNumComponents() + component_index];
 	}

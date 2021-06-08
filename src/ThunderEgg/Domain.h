@@ -329,7 +329,7 @@ template <int D> class Domain
 
 		for (const auto &pinfo : pinfos) {
 			for (int c = 0; c < u->getNumComponents(); c++) {
-				const ComponentView<D> u_data = u->getComponentView(c, pinfo.local_index);
+				ComponentView<const double, D> u_data = u->getComponentView(c, pinfo.local_index);
 
 				double patch_sum = 0;
 				nested_loop<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });

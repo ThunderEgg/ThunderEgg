@@ -113,7 +113,7 @@ template <int D> class Vector
 	 * @param patch_local_index the local index of the patch
 	 * @return View<D> the View object
 	 */
-	virtual ComponentView<D> getComponentView(int component_index, int patch_local_index) = 0;
+	virtual ComponentView<double, D> getComponentView(int component_index, int patch_local_index) = 0;
 	/**
 	 * @brief Get the ComponentView for the specified patch and component
 	 *
@@ -121,7 +121,7 @@ template <int D> class Vector
 	 * @param patch_local_index the local index of the patch
 	 * @return View<D> the View object
 	 */
-	virtual const ComponentView<D> getComponentView(int component_index, int patch_local_index) const = 0;
+	virtual ComponentView<const double, D> getComponentView(int component_index, int patch_local_index) const = 0;
 	/**
 	 * @brief Get the View objects for the specified patch
 	 * index of View object will correspond to component index
@@ -129,9 +129,9 @@ template <int D> class Vector
 	 * @param patch_local_index the local index of the patch
 	 * @return View<D> the View object
 	 */
-	std::vector<ComponentView<D>> getComponentViews(int patch_local_index)
+	std::vector<ComponentView<double, D>> getComponentViews(int patch_local_index)
 	{
-		std::vector<ComponentView<D>> local_datas;
+		std::vector<ComponentView<double, D>> local_datas;
 		local_datas.reserve(num_components);
 		for (int c = 0; c < num_components; c++) {
 			local_datas.emplace_back(std::move(getComponentView(c, patch_local_index)));
@@ -145,9 +145,9 @@ template <int D> class Vector
 	 * @param patch_local_index the local index of the patch
 	 * @return View<D> the View object
 	 */
-	const std::vector<ComponentView<D>> getComponentViews(int patch_local_index) const
+	std::vector<ComponentView<const double, D>> getComponentViews(int patch_local_index) const
 	{
-		std::vector<ComponentView<D>> local_datas;
+		std::vector<ComponentView<const double, D>> local_datas;
 		local_datas.reserve(num_components);
 		for (int c = 0; c < num_components; c++) {
 			local_datas.emplace_back(std::move(getComponentView(c, patch_local_index)));
@@ -163,7 +163,7 @@ template <int D> class Vector
 	virtual void set(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>> lds = getComponentViews(i);
+			std::vector<ComponentView<double, D>> lds = getComponentViews(i);
 			for (auto &ld : lds) {
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] = alpha; });
 			}
@@ -177,7 +177,7 @@ template <int D> class Vector
 	virtual void setWithGhost(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>> lds = getComponentViews(i);
+			std::vector<ComponentView<double, D>> lds = getComponentViews(i);
 			for (auto &ld : lds) {
 				nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, D> coord) { ld[coord] = alpha; });
 			}
@@ -191,7 +191,7 @@ template <int D> class Vector
 	virtual void scale(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>> lds = getComponentViews(i);
+			std::vector<ComponentView<double, D>> lds = getComponentViews(i);
 			for (auto &ld : lds) {
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] *= alpha; });
 			}
@@ -205,7 +205,7 @@ template <int D> class Vector
 	virtual void shift(double delta)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>> lds = getComponentViews(i);
+			std::vector<ComponentView<double, D>> lds = getComponentViews(i);
 			for (auto &ld : lds) {
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] += delta; });
 			}
@@ -219,8 +219,8 @@ template <int D> class Vector
 	virtual void copy(std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>>       lds   = getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_b = b->getComponentViews(i);
+			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] = lds_b[c][coord]; });
 			}
@@ -234,8 +234,8 @@ template <int D> class Vector
 	virtual void add(std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>>       lds   = getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_b = b->getComponentViews(i);
+			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord]; });
 			}
@@ -247,8 +247,8 @@ template <int D> class Vector
 	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>>       lds   = getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_b = b->getComponentViews(i);
+			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord] * alpha; });
 			}
@@ -260,9 +260,9 @@ template <int D> class Vector
 	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> a, double beta, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>>       lds   = getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_a = a->getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_b = b->getComponentViews(i);
+			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds_a = a->getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
 					lds[c][coord] += lds_a[c][coord] * alpha + lds_b[c][coord] * beta;
@@ -276,8 +276,8 @@ template <int D> class Vector
 	virtual void scaleThenAdd(double alpha, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>>       lds   = getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_b = b->getComponentViews(i);
+			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<D>(
 				lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] = alpha * lds[c][coord] + lds_b[c][coord]; });
@@ -290,8 +290,8 @@ template <int D> class Vector
 	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>>       lds   = getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_b = b->getComponentViews(i);
+			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
 					lds[c][coord] = alpha * lds[c][coord] + beta * lds_b[c][coord];
@@ -305,9 +305,9 @@ template <int D> class Vector
 	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b, double gamma, std::shared_ptr<const Vector<D>> c)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>>       lds   = getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_b = b->getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_c = c->getComponentViews(i);
+			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds_c = c->getComponentViews(i);
 			for (int comp = 0; comp < num_components; comp++) {
 				nested_loop<D>(lds[comp].getStart(), lds[comp].getEnd(), [&](std::array<int, D> coord) {
 					lds[comp][coord] = alpha * lds[comp][coord] + beta * lds_b[comp][coord] + gamma * lds_c[comp][coord];
@@ -322,7 +322,7 @@ template <int D> class Vector
 	{
 		double sum = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			const std::vector<ComponentView<D>> lds = getComponentViews(i);
+			const std::vector<ComponentView<const double, D>> lds = getComponentViews(i);
 			for (const auto &ld : lds) {
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { sum += ld[coord] * ld[coord]; });
 			}
@@ -338,7 +338,7 @@ template <int D> class Vector
 	{
 		double max = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>> lds = getComponentViews(i);
+			std::vector<ComponentView<const double, D>> lds = getComponentViews(i);
 			for (const auto &ld : lds) {
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { max = fmax(fabs(ld[coord]), max); });
 			}
@@ -354,8 +354,8 @@ template <int D> class Vector
 	{
 		double retval = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<D>>       lds   = getComponentViews(i);
-			const std::vector<ComponentView<D>> lds_b = b->getComponentViews(i);
+			std::vector<ComponentView<const double, D>>       lds   = getComponentViews(i);
+			const std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
 			for (int c = 0; c < num_components; c++) {
 				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { retval += lds[c][coord] * lds_b[c][coord]; });
 			}

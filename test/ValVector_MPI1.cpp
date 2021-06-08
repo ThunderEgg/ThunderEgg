@@ -401,7 +401,7 @@ TEST_CASE("ValVector<1> getComponentView.h", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			ComponentView<1> ld = val_vector->getComponentView(c, i);
+			ComponentView<double, 1> ld = val_vector->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + (patch_stride * i + c * component_stride));
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + (patch_stride * i + (c + 1) * component_stride) - 1);
@@ -431,7 +431,7 @@ TEST_CASE("ValVector<1> getComponentView const", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const ComponentView<1> ld = const_val_vector->getComponentView(c, i);
+			ComponentView<const double, 1> ld = const_val_vector->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -462,7 +462,7 @@ TEST_CASE("ValVector<2> getComponentView.h", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			ComponentView<2> ld = val_vector->getComponentView(c, i);
+			ComponentView<double, 2> ld = val_vector->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -494,7 +494,7 @@ TEST_CASE("ValVector<2> getComponentView const", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const ComponentView<2> ld = const_val_vector->getComponentView(c, i);
+			ComponentView<const double, 2> ld = const_val_vector->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -527,7 +527,7 @@ TEST_CASE("ValVector<3> getComponentView.h", "[ValVector]")
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
-			ComponentView<3> ld = val_vector->getComponentView(c, i);
+			ComponentView<double, 3> ld = val_vector->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -562,7 +562,7 @@ TEST_CASE("ValVector<3> getComponentView const", "[ValVector]")
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
-			const ComponentView<3> ld = const_val_vector->getComponentView(c, i);
+			ComponentView<const double, 3> ld = const_val_vector->getComponentView(c, i);
 			CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);

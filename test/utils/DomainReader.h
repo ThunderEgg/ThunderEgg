@@ -18,6 +18,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
+#include <TestConfig.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/tpl/json.hpp>
 #include <fstream>
@@ -49,7 +50,7 @@ class DomainReader
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 		nlohmann::json j;
-		std::ifstream  input_stream(TEST_DIRECTORY "/" + file_name);
+		std::ifstream  input_stream(ThunderEgg::TEST_SRC_DIR + file_name);
 		if (!input_stream.good()) {
 			throw "could not open file";
 		}

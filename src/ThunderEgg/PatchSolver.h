@@ -90,7 +90,9 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @param us the left hand side
 	 * @param fs the right hand side
 	 */
-	virtual void solveSinglePatch(const PatchInfo<D> &pinfo, const std::vector<ComponentView<D>> &fs, std::vector<ComponentView<D>> &us) const = 0;
+	virtual void solveSinglePatch(const PatchInfo<D> &                               pinfo,
+	                              const std::vector<ComponentView<const double, D>> &fs,
+	                              const std::vector<ComponentView<double, D>> &      us) const = 0;
 	/**
 	 * @brief Solve all the patches in the domain, assuming zero boundary conditions for the patches
 	 *
