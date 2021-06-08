@@ -40,6 +40,8 @@ target_sources(unit_tests_mpi1 PRIVATE BiQuadraticGhostFiller_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE CoarseNbrInfo_MPI1.cpp)
 
+target_sources(unit_tests_mpi1 PRIVATE ComponentArray_MPI1.cpp)
+
 target_sources(unit_tests_mpi1 PRIVATE ComponentView_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE Corner_MPI1.cpp)
@@ -105,8 +107,6 @@ if(TARGET P4EST::P4EST)
 endif(TARGET P4EST::P4EST)
 
 target_sources(unit_tests_mpi1 PRIVATE PatchInfo_MPI1.cpp)
-
-target_sources(unit_tests_mpi1 PRIVATE PatchArray_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE PatchOperator_MPI1.cpp)
 

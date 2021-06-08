@@ -12,6 +12,9 @@ list(APPEND ThunderEgg_HDRS BufferWriter.h)
 
 list(APPEND ThunderEgg_HDRS CoarseNbrInfo.h)
 
+list(APPEND ThunderEgg_HDRS ComponentArray.h)
+target_sources(ThunderEgg PRIVATE ComponentArray.cpp)
+
 list(APPEND ThunderEgg_HDRS ComponentView.h)
 target_sources(ThunderEgg PRIVATE ComponentView.cpp)
 
@@ -67,9 +70,6 @@ if(TARGET P4EST::P4EST)
   target_sources(ThunderEgg PRIVATE P8estDomainGenerator.cpp)
 
 endif(TARGET P4EST::P4EST)
-
-list(APPEND ThunderEgg_HDRS PatchArray.h)
-target_sources(ThunderEgg PRIVATE PatchArray.cpp)
 
 list(APPEND ThunderEgg_HDRS PatchInfo.h)
 target_sources(ThunderEgg PRIVATE PatchInfo.cpp)

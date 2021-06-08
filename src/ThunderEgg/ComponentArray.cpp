@@ -19,7 +19,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "PatchArray.h"
+#include "ComponentArray.h"
 namespace ThunderEgg
 {
 template class ComponentArray<1>;

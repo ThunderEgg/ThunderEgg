@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_PATCHARRAY_H
-#define THUNDEREGG_PATCHARRAY_H
+#ifndef THUNDEREGG_COMPONENTARRAY_H
+#define THUNDEREGG_COMPONENTARRAY_H
 #include <ThunderEgg/ComponentView.h>
 namespace ThunderEgg
 {
