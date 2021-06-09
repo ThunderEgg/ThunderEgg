@@ -156,20 +156,6 @@ template <int D> class ComponentArray
 	{
 		return view.getGhostEnd();
 	}
-	/**
-	 * @brief Get the Lengths of the patch in each direction
-	 */
-	inline const std::array<int, D> &getLengths() const
-	{
-		return view.getLengths();
-	}
-	/**
-	 * @brief Get the number of ghost cells on each side of the patch
-	 */
-	inline int getNumGhostCells() const
-	{
-		return view.getNumGhostCells();
-	}
 };
 extern template class ComponentArray<1>;
 extern template class ComponentArray<2>;

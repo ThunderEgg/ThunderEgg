@@ -509,9 +509,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		                                      gld_info.getGhostStart(face),
 		                                      gld_info.getStart(face),
 		                                      gld_info.getEnd(face),
-		                                      gld_info.getGhostEnd(face),
-		                                      domain->getNs(),
-		                                      domain->getNumGhostCells());
+		                                      gld_info.getGhostEnd(face));
 	}
 	/**
 	 * @brief Post send requests

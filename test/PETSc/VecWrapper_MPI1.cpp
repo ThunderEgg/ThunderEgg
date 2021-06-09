@@ -761,8 +761,8 @@ TEST_CASE("PETSc::VecWrapper getNewVector works", "[PETSc::VecWrapper]")
 	CHECK(vec_wrapper->getNumLocalCells() == d_fine->getNumLocalCells());
 	CHECK(vec_wrapper->getNumLocalPatches() == d_fine->getNumLocalPatches());
 	CHECK(vec_wrapper->getMPIComm() == MPI_COMM_WORLD);
-	CHECK(vec_wrapper->getComponentView(0, 0).getLengths()[0] == nx);
-	CHECK(vec_wrapper->getComponentView(0, 0).getLengths()[1] == ny);
+	CHECK(vec_wrapper->getComponentView(0, 0).getEnd()[0] + 1 == nx);
+	CHECK(vec_wrapper->getComponentView(0, 0).getEnd()[1] + 1 == ny);
 	int size
 	= (nx + 2 * num_ghost) * (ny + 2 * num_ghost) * d_fine->getNumLocalPatches() * num_components;
 	int vec_size;

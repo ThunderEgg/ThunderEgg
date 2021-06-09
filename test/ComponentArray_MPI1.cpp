@@ -3,17 +3,6 @@
 #include <catch2/generators/catch_generators.hpp>
 using namespace std;
 using namespace ThunderEgg;
-TEST_CASE("ComponentArray getLengths", "[ComponentArray]")
-{
-	auto nx        = GENERATE(2, 3);
-	auto ny        = GENERATE(2, 3);
-	auto num_ghost = GENERATE(0, 1, 2);
-
-	ComponentArray<2> pa({nx, ny}, num_ghost);
-
-	CHECK(pa.getLengths()[0] == nx);
-	CHECK(pa.getLengths()[1] == ny);
-}
 TEST_CASE("ComponentArray getStart", "[ComponentArray]")
 {
 	auto nx        = GENERATE(2, 3);
@@ -57,16 +46,6 @@ TEST_CASE("ComponentArray getGhostEnd", "[ComponentArray]")
 
 	CHECK(pa.getGhostEnd()[0] == nx - 1 + num_ghost);
 	CHECK(pa.getGhostEnd()[1] == ny - 1 + num_ghost);
-}
-TEST_CASE("ComponentArray getNumGhostCells", "[ComponentArray]")
-{
-	auto nx        = GENERATE(2, 3);
-	auto ny        = GENERATE(2, 3);
-	auto num_ghost = GENERATE(0, 1, 2);
-
-	ComponentArray<2> pa({nx, ny}, num_ghost);
-
-	CHECK(pa.getNumGhostCells() == num_ghost);
 }
 TEST_CASE("ComponentArray getStrides", "[ComponentArray]")
 {

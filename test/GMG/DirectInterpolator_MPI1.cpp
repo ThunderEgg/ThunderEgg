@@ -65,7 +65,7 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
 		for (size_t i = 0; i < 2; i++) {
-			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : lds[0].getLengths()[i];
+			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : (lds[0].getEnd()[i] + 1);
 		}
 
 		for (int c = 0; c < num_components; c++) {
@@ -130,7 +130,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
 		for (size_t i = 0; i < 2; i++) {
-			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : lds[0].getLengths()[i];
+			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : (lds[0].getEnd()[i] + 1);
 		}
 
 		for (int c = 0; c < num_components; c++) {
@@ -197,7 +197,7 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 			Orthant<2>         orth = pinfo.orth_on_parent;
 			std::array<int, 2> starts;
 			for (size_t i = 0; i < 2; i++) {
-				starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : lds[0].getLengths()[i];
+				starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : (lds[0].getEnd()[i] + 1);
 			}
 
 			for (int c = 0; c < num_components; c++) {

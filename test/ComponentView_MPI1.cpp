@@ -20,9 +20,7 @@ TEST_CASE("ComponentView constructor", "[ComponentView]")
 
 	ComponentView<double, 2> ld(vec.data(), strides, lengths, num_ghost);
 
-	CHECK(ld.getNumGhostCells() == num_ghost);
 	for (int i = 0; i < 2; i++) {
-		CHECK(ld.getLengths()[i] == lengths[i]);
 		CHECK(ld.getStrides()[i] == strides[i]);
 		CHECK(ld.getStart()[i] == 0);
 		CHECK(ld.getEnd()[i] == lengths[i] - 1);
@@ -950,7 +948,5 @@ TEST_CASE("ComponentView implicit conversion to const type", "[View]")
 	CHECK(vc.getGhostEnd() == v.getGhostEnd());
 	CHECK(vc.getStrides() == v.getStrides());
 	CHECK(vc.getComponentViewDataManager() == v.getComponentViewDataManager());
-	CHECK(vc.getLengths() == v.getLengths());
-	CHECK(vc.getNumGhostCells() == v.getNumGhostCells());
 	CHECK(&vc[vc.getGhostStart()] == &v[v.getGhostStart()]);
 }

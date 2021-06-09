@@ -62,7 +62,7 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 				Orthant<D>         orth = pinfo.orth_on_parent;
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
-					starts[i] = orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_datas[0].getLengths()[i];
+					starts[i] = orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_local_datas[0].getEnd()[i] + 1;
 				}
 
 				for (size_t c = 0; c < fine_datas.size(); c++) {

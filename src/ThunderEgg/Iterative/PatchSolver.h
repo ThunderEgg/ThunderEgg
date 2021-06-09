@@ -107,7 +107,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		{
 			int patch_stride = 1;
 			for (size_t i = 0; i < D; i++) {
-				patch_stride *= ld.getLengths()[i];
+				patch_stride *= ld.getEnd()[i] + 1;
 			}
 			return patch_stride;
 		}
@@ -151,7 +151,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		{
 			int patch_stride = 1;
 			for (size_t i = 0; i < D; i++) {
-				patch_stride *= ld.getLengths()[i];
+				patch_stride *= ld.getEnd()[i] + 1;
 			}
 			return patch_stride;
 		}

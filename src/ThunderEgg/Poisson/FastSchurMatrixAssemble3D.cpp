@@ -206,7 +206,7 @@ ComponentView<const double, 3> getComponentViewForBuffer(double *buffer_ptr, con
 		start[side.getAxisIndex()]       = ns[side.getAxisIndex()] - 2;
 	}
 
-	return ComponentView<double, 3>(buffer_ptr, strides, ghost_start, start, end, ghost_end, ns, num_ghost_cells);
+	return ComponentView<double, 3>(buffer_ptr, strides, ghost_start, start, end, ghost_end);
 }
 
 /**
@@ -219,7 +219,7 @@ ComponentView<const double, 3> getComponentViewForBuffer(double *buffer_ptr, con
  */
 void FillBlockColumnForNormalInterface(int j, const ComponentView<const double, 3> &u, Side<3> s, std::vector<double> &block)
 {
-	int  n     = u.getLengths()[0];
+	int  n     = u.getEnd()[0] + 1;
 	auto slice = u.getSliceOn(s, {0});
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {

@@ -64,7 +64,7 @@ void FillGhostForCoarseNbr(const std::vector<ComponentView<const double, 2>> &lo
 {
 	int offset = 0;
 	if (orthant == Orthant<1>::upper()) {
-		offset = local_datas[0].getLengths()[!side.getAxisIndex()];
+		offset = local_datas[0].getEnd()[!side.getAxisIndex()] + 1;
 	}
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		View<const double, 1> local_slice = local_datas[c].getSliceOn(side, {0});
@@ -93,7 +93,7 @@ void FillGhostForFineNbr(const std::vector<ComponentView<const double, 2>> &loca
 {
 	int offset = 0;
 	if (orthant == Orthant<1>::upper()) {
-		offset = local_datas[0].getLengths()[!side.getAxisIndex()];
+		offset = local_datas[0].getEnd()[!side.getAxisIndex()] + 1;
 	}
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		View<const double, 1> local_slice = local_datas[c].getSliceOn(side, {0});
@@ -120,7 +120,7 @@ void FillLocalGhostsForCoarseNbr(const PatchInfo<2> &pinfo, const ComponentView<
 	View<double, 1>       local_ghosts = local_data.getGhostSliceOn(side, {0});
 	int                   offset       = 0;
 	if (pinfo.getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper()) {
-		offset = local_data.getLengths()[!side.getAxisIndex()];
+		offset = local_data.getEnd()[!side.getAxisIndex()] + 1;
 	}
 	nested_loop<1>(local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 1> &coord) {
 		local_ghosts[coord] += 2.0 / 3.0 * local_slice[coord];

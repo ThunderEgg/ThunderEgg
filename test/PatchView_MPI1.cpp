@@ -1276,3 +1276,76 @@ TEST_CASE("PatchView implicit conversion to const type", "[View]")
 	CHECK(vc.getComponentViewDataManager() == v.getComponentViewDataManager());
 	CHECK(&vc[vc.getGhostStart()] == &v[v.getGhostStart()]);
 }
+TEST_CASE("PatchView<double,2> getComponentView", "[PatchView]")
+{
+	auto nx             = GENERATE(2, 3);
+	auto ny             = GENERATE(2, 3);
+	auto num_components = GENERATE(1, 2);
+	auto num_ghost      = GENERATE(0, 1, 2);
+
+	array<int, 3> lengths = {nx, ny, num_components};
+	array<int, 3> strides = {1, nx + 2 * num_ghost, (ny + 2 * num_ghost) * (nx + 2 * num_ghost)};
+	int           size    = 1;
+	for (size_t i = 0; i < 2; i++) {
+		size *= (lengths[i] + 2 * num_ghost);
+	}
+	size *= num_components;
+	double data[size];
+
+	PatchView<double, 2> pview(data, strides, lengths, num_ghost);
+
+	for (int c = 0; c < num_components; c++) {
+		INFO("c: " << c);
+		ComponentView<double, 2> slice = pview.getComponentView(c);
+		CHECK(slice.getGhostStart() == array<int, 2>({-num_ghost, -num_ghost}));
+		CHECK(slice.getStart() == array<int, 2>({0, 0}));
+		CHECK(slice.getEnd() == array<int, 2>({nx - 1, ny - 1}));
+		CHECK(slice.getGhostEnd() == array<int, 2>({nx - 1 + num_ghost, ny - 1 + num_ghost}));
+		for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
+			INFO("yi: " << yi);
+			for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
+				INFO("xi: " << xi);
+				CHECK(&pview[{xi, yi, c}] == &slice[{xi, yi}]);
+			}
+		}
+	}
+}
+TEST_CASE("PatchView<double,3> getComponentView", "[PatchView]")
+{
+	auto nx             = GENERATE(2, 3);
+	auto ny             = GENERATE(2, 3);
+	auto nz             = GENERATE(2, 3);
+	auto num_components = GENERATE(1, 2);
+	auto num_ghost      = GENERATE(0, 1, 2);
+
+	array<int, 4> lengths = {nx, ny, nz, num_components};
+	array<int, 4> strides = {1, nx + 2 * num_ghost, (nx + 2 * num_ghost) * (ny + 2 * num_ghost), (nx + 2 * num_ghost) * (ny + 2 * num_ghost) * (nz + 2 * num_ghost)};
+	int           size    = 1;
+	for (size_t i = 0; i < 3; i++) {
+		size *= (lengths[i] + 2 * num_ghost);
+	}
+	size *= num_components;
+	double data[size];
+
+	PatchView<double, 3> pview(data, strides, lengths, num_ghost);
+
+	for (int c = 0; c < num_components; c++) {
+		INFO("c: " << c);
+		ComponentView<double, 3> slice = pview.getComponentView(c);
+		CHECK(slice.getGhostStart() == array<int, 3>({-num_ghost, -num_ghost, -num_ghost}));
+		CHECK(slice.getStart() == array<int, 3>({0, 0, 0}));
+		CHECK(slice.getEnd() == array<int, 3>({nx - 1, ny - 1, nz - 1}));
+		CHECK(slice.getGhostEnd() == array<int, 3>({nx - 1 + num_ghost, ny - 1 + num_ghost, nz - 1 + num_ghost}));
+
+		for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
+			INFO("zi: " << zi);
+			for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
+				INFO("yi: " << yi);
+				for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
+					INFO("xi: " << xi);
+					CHECK(&pview[{xi, yi, zi, c}] == &slice[{xi, yi, zi}]);
+				}
+			}
+		}
+	}
+}

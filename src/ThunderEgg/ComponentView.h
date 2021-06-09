@@ -48,16 +48,6 @@ template <typename T, int D> class ComponentView : public View<T, D>
 	};
 
 	/**
-	 * @brief The number of cells in each direction
-	 */
-
-	std::array<int, D> lengths;
-	/**
-	 * @brief The number of ghost cells on each side of the patch
-	 */
-	int num_ghost_cells = 0;
-
-	/**
 	 * @brief Return array filled with -num_ghost_cells
 	 */
 	template <int M> static std::array<int, M> DetermineGhostStart(int num_ghost_cells)
@@ -140,10 +130,7 @@ template <typename T, int D> class ComponentView : public View<T, D>
 	/**
 	 * @brief Construct a new ComponentView with size 0
 	 */
-	ComponentView() : View<T, D>()
-	{
-		lengths.fill(0);
-	}
+	ComponentView() : View<T, D>() {}
 
 	/**
 	 * @brief Construct a new View object
@@ -160,12 +147,8 @@ template <typename T, int D> class ComponentView : public View<T, D>
 	              const std::array<int, D> &         start,
 	              const std::array<int, D> &         end,
 	              const std::array<int, D> &         ghost_end,
-	              const std::array<int, D> &         lengths,
-	              int                                num_ghost_cells,
 	              std::shared_ptr<const ViewManager> ldm = nullptr)
-	: View<T, D>(data, strides, ghost_start, start, end, ghost_end, ldm),
-	  lengths(lengths),
-	  num_ghost_cells(num_ghost_cells)
+	: View<T, D>(data, strides, ghost_start, start, end, ghost_end, ldm)
 	{
 	}
 
@@ -189,9 +172,7 @@ template <typename T, int D> class ComponentView : public View<T, D>
 	             DetermineStart<D>(),
 	             DetermineEnd<D>(lengths),
 	             DetermineGhostEnd<D>(lengths, num_ghost_cells),
-	             ldm),
-	  lengths(lengths),
-	  num_ghost_cells(num_ghost_cells)
+	             ldm)
 	{
 	}
 
@@ -260,22 +241,6 @@ template <typename T, int D> class ComponentView : public View<T, D>
 		return View<noconst_T, M>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getComponentViewDataManager());
 	}
 
-	/**
-	 * @brief Get the Lengths of the patch in each direction
-	 */
-	const std::array<int, D> &getLengths() const
-	{
-		return lengths;
-	}
-
-	/**
-	 * @brief Get the number of ghost cells on each side of the patch
-	 */
-	int getNumGhostCells() const
-	{
-		return num_ghost_cells;
-	}
-
 	operator ComponentView<std::add_const_t<T>, D>() const
 	{
 		return ComponentView<std::add_const_t<T>, D>(this->getData() + this->getIndex(this->getGhostStart()),
@@ -284,8 +249,6 @@ template <typename T, int D> class ComponentView : public View<T, D>
 		                                             this->getStart(),
 		                                             this->getEnd(),
 		                                             this->getGhostEnd(),
-		                                             lengths,
-		                                             num_ghost_cells,
 		                                             this->getComponentViewDataManager());
 	}
 };

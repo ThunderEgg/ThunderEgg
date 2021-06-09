@@ -28,21 +28,21 @@ namespace
 /**
  * @brief Get the Offset on a given orthant
  *
- * @param ns the dimensions of the patch
+ * @param end coordnate of non-ghost celsl
  * @param orth the orthant
  * @return std::array<int,2> the offsets
  */
-std::array<int, 2> getOffset(const std::array<int, 3> ns, Side<3> s, Orthant<2> orth)
+std::array<int, 2> getOffset(const std::array<int, 3> end, Side<3> s, Orthant<2> orth)
 {
 	std::array<int, 2> offset = {0, 0};
 	for (size_t i = 0; i < s.getAxisIndex(); i++) {
 		if (orth.isHigherOnAxis(i)) {
-			offset[i] = ns[i];
+			offset[i] = end[i] + 1;
 		}
 	}
 	for (size_t i = s.getAxisIndex() + 1; i < 3; i++) {
 		if (orth.isHigherOnAxis(i - 1)) {
-			offset[i - 1] = ns[i];
+			offset[i - 1] = end[i] + 1;
 		}
 	}
 	return offset;
@@ -85,7 +85,7 @@ void FillGhostCellsForCoarseNbr(const std::vector<ComponentView<const double, 3>
                                 Side<3>                                            side,
                                 Orthant<2>                                         orthant)
 {
-	std::array<int, 2> offset = getOffset(local_datas[0].getLengths(), side, orthant);
+	std::array<int, 2> offset = getOffset(local_datas[0].getEnd(), side, orthant);
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		View<const double, 2> local_slice = local_datas[c].getSliceOn(side, {0});
 		View<double, 2>       nbr_ghosts  = nbr_datas[c].getGhostSliceOn(side.opposite(), {0});
@@ -131,7 +131,7 @@ void FillGhostCellsForFineNbr(const PatchInfo<3> &                              
                               Orthant<2>                                         orthant)
 {
 	auto               nbr_info = pinfo.getFineNbrInfo(side);
-	std::array<int, 2> offset   = getOffset(pinfo.ns, side, orthant);
+	std::array<int, 2> offset   = getOffset(local_datas[0].getEnd(), side, orthant);
 	for (size_t c = 0; c < local_datas.size(); c++) {
 		View<const double, 2> local_slice = local_datas[c].getSliceOn(side, {0});
 		View<double, 2>       nbr_ghosts  = nbr_datas[c].getGhostSliceOn(side.opposite(), {0});
@@ -158,7 +158,7 @@ void FillGhostCellsForLocalWithCoarseNbr(const PatchInfo<3> &pinfo, ComponentVie
 	View<const double, 2> local_slice  = local_data.getSliceOn(side, {0});
 	View<double, 2>       local_ghosts = local_data.getGhostSliceOn(side, {0});
 	auto                  nbr_info     = pinfo.getCoarseNbrInfo(side);
-	std::array<int, 2>    offset       = getOffset(pinfo.ns, side, nbr_info.orth_on_coarse);
+	std::array<int, 2>    offset       = getOffset(local_data.getEnd(), side, nbr_info.orth_on_coarse);
 	nested_loop<2>(local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 2> &coord) {
 		std::array<int, 2> offset_coord;
 		for (int i = 0; i < 2; i++) {

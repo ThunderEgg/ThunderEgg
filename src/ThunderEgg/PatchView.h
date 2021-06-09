@@ -21,17 +21,11 @@
 
 #ifndef THUNDEREGG_PATCHVIEW_H
 #define THUNDEREGG_PATCHVIEW_H
-#include <ThunderEgg/Config.h>
-#include <ThunderEgg/Face.h>
-#include <ThunderEgg/Loops.h>
-#include <ThunderEgg/RuntimeError.h>
-#include <ThunderEgg/View.h>
-#include <ThunderEgg/ViewManager.h>
-#include <memory>
+#include <ThunderEgg/ComponentView.h>
 namespace ThunderEgg
 {
 /**
- * @brief Array for acessing data of a patch. It supports variable striding
+ * @brief View for accessing data of a patch. It supports variable striding
  *
  * @tparam D number of cartesian dimensions
  */
@@ -253,6 +247,29 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 		return View<noconst_T, M + 1>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getComponentViewDataManager());
 	}
 
+	ComponentView<T, D> getComponentView(int component_index) const
+	{
+		std::array<int, D>     new_strides;
+		std::array<int, D>     new_ghost_start;
+		std::array<int, D>     new_start;
+		std::array<int, D>     new_end;
+		std::array<int, D>     new_ghost_end;
+		std::array<int, D + 1> first_value;
+
+		first_value    = this->getGhostStart();
+		first_value[D] = component_index;
+
+		for (size_t axis = 0; axis < (size_t) D; axis++) {
+			new_strides[axis]     = this->getStrides()[axis];
+			new_ghost_start[axis] = this->getGhostStart()[axis];
+			new_start[axis]       = this->getStart()[axis];
+			new_end[axis]         = this->getEnd()[axis];
+			new_ghost_end[axis]   = this->getGhostEnd()[axis];
+		}
+
+		T_ptr new_data = (&(*this)[first_value]);
+		return ComponentView<T, D>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getComponentViewDataManager());
+	}
 	operator PatchView<std::add_const_t<T>, D>() const
 	{
 		return PatchView<std::add_const_t<T>, D>(this->getData() + this->getIndex(this->getGhostStart()),

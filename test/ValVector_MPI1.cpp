@@ -589,6 +589,6 @@ TEST_CASE("ValVector getNewVector works", "[ValVector]")
 	CHECK(val_vector->getNumComponents() == num_components);
 	CHECK(val_vector->getNumLocalPatches() == d_fine->getNumLocalPatches());
 	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
-	CHECK(val_vector->getComponentView(0, 0).getLengths()[0] == nx);
-	CHECK(val_vector->getComponentView(0, 0).getLengths()[1] == ny);
+	CHECK(val_vector->getComponentView(0, 0).getEnd()[0] + 1 == nx);
+	CHECK(val_vector->getComponentView(0, 0).getEnd()[1] + 1 == ny);
 }
