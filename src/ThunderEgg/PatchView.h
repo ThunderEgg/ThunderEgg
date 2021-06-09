@@ -19,8 +19,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_COMPONENTVIEW_H
-#define THUNDEREGG_COMPONENTVIEW_H
+#ifndef THUNDEREGG_PATCHVIEW_H
+#define THUNDEREGG_PATCHVIEW_H
 #include <ThunderEgg/Config.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
@@ -39,40 +39,31 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 {
 	private:
 	template <int M> struct SliceInfo {
-		std::array<int, M> strides;
-		std::array<int, M> ghost_start;
-		std::array<int, M> start;
-		std::array<int, M> end;
-		std::array<int, M> ghost_end;
-		std::array<int, D> first_value;
+		std::array<int, M + 1> strides;
+		std::array<int, M + 1> ghost_start;
+		std::array<int, M + 1> start;
+		std::array<int, M + 1> end;
+		std::array<int, M + 1> ghost_end;
+		std::array<int, D + 1> first_value;
 	};
-
-	/**
-	 * @brief The number of cells in each direction
-	 */
-
-	std::array<int, D> lengths;
-	/**
-	 * @brief The number of ghost cells on each side of the patch
-	 */
-	int num_ghost_cells = 0;
 
 	/**
 	 * @brief Return array filled with -num_ghost_cells
 	 */
-	template <int M> static std::array<int, M> DetermineGhostStart(int num_ghost_cells)
+	template <int M> static std::array<int, M + 1> DetermineGhostStart(int num_ghost_cells)
 	{
-		std::array<int, M> start;
+		std::array<int, M + 1> start;
 		start.fill(-num_ghost_cells);
+		start[M] = 0;
 		return start;
 	}
 
 	/**
 	 * @brief Return array filled with 0
 	 */
-	template <int M> static std::array<int, M> DetermineStart()
+	template <int M> static std::array<int, M + 1> DetermineStart()
 	{
-		std::array<int, M> start;
+		std::array<int, M + 1> start;
 		start.fill(0);
 		return start;
 	}
@@ -80,20 +71,21 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 	/**
 	 * @brief Return array filled with lengths-1
 	 */
-	template <int M> static std::array<int, M> DetermineEnd(const std::array<int, M> &lengths)
+	template <int M> static std::array<int, M + 1> DetermineEnd(const std::array<int, M + 1> &lengths)
 	{
-		std::array<int, M> end = lengths;
-		loop<0, M - 1>([&](int i) { end[i]--; });
+		std::array<int, M + 1> end = lengths;
+		loop<0, M>([&](int i) { end[i]--; });
 		return end;
 	}
 
 	/**
 	 * @brief Return array filled with lengths-1+num_ghost_cells
 	 */
-	template <int M> static std::array<int, M> DetermineGhostEnd(const std::array<int, M> &lengths, int num_ghost_cells)
+	template <int M> static std::array<int, M + 1> DetermineGhostEnd(const std::array<int, M + 1> &lengths, int num_ghost_cells)
 	{
-		std::array<int, M> end = lengths;
+		std::array<int, M + 1> end = lengths;
 		loop<0, M - 1>([&](int i) { end[i] += num_ghost_cells - 1; });
+		end[M] = lengths[M] - 1;
 		return end;
 	}
 
@@ -132,17 +124,39 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 				lengths_index++;
 			}
 		}
+		info.strides[M]     = this->getStrides()[D];
+		info.ghost_start[M] = this->getGhostStart()[D];
+		info.start[M]       = this->getStart()[D];
+		info.end[M]         = this->getEnd()[D];
+		info.ghost_end[M]   = this->getGhostEnd()[D];
 		return info;
 	}
 
 	public:
-	using T_ptr = typename View<T, D + 1>::T_ptr;
+	using T_ptr = typename View<T, D>::T_ptr;
 	/**
 	 * @brief Construct a new PatchView with size 0
 	 */
-	PatchView() : View<T, D + 1>()
+	PatchView() : View<T, D + 1>() {}
+
+	/**
+	 * @brief Construct a new View object
+	 *
+	 * @param data pointer to the first element in the patch (non-ghost cell element)
+	 * @param strides the strides in each direction
+	 * @param lengths the lengths in each direction
+	 * @param num_ghost_cells the number of ghost cells on each side of the patch
+	 * @param ldm the local data manager for the data
+	 */
+	PatchView(T_ptr                              data,
+	          const std::array<int, D + 1> &     strides,
+	          const std::array<int, D + 1> &     ghost_start,
+	          const std::array<int, D + 1> &     start,
+	          const std::array<int, D + 1> &     end,
+	          const std::array<int, D + 1> &     ghost_end,
+	          std::shared_ptr<const ViewManager> ldm = nullptr)
+	: View<T, D + 1>(data, strides, ghost_start, start, end, ghost_end, ldm)
 	{
-		lengths.fill(0);
 	}
 
 	/**
@@ -165,9 +179,7 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 	                 DetermineStart<D>(),
 	                 DetermineEnd<D>(lengths),
 	                 DetermineGhostEnd<D>(lengths, num_ghost_cells),
-	                 ldm),
-	  lengths(lengths),
-	  num_ghost_cells(num_ghost_cells)
+	                 ldm)
 	{
 	}
 
@@ -178,14 +190,14 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 	 * @param f the face
 	 * @param offset offset the offset of the value {0,..,0} is the non ghost cell touching the face. {-1,..,-1} is the first ghost cell touching that
 	 * face
-	 * @return View<M> a view to the slice on the face
+	 * @return View<T,M+1> a view to the slice on the face
 	 */
-	template <int M> View<T, M> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
+	template <int M> View<T, M + 1> getSliceOn(Face<D, M> f, const std::array<int, D - M> &offset) const
 	{
 		SliceInfo<M> info = getSliceOnPriv<M>(f, offset);
 
 		T_ptr new_data = (&(*this)[info.first_value]);
-		return View<T, M>(new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end, this->getPatchViewDataManager());
+		return View<T, M + 1>(new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end, this->getComponentViewDataManager());
 	}
 
 	/**
@@ -195,18 +207,18 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 	 * @param f the face
 	 * @param offset offset the offset of the value {0,..,0} first ghost cell slice touching that face
 	 * face
-	 * @return View<M> a view to the slice on the face
+	 * @return View<typename std::remove_const<T>::type, M + 1>
 	 */
-	template <int M> View<typename std::remove_const<T>::type, M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
+	template <int M> View<typename std::remove_const<T>::type, M + 1> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M> &offset) const
 	{
 		using noconst_T     = typename std::remove_const<T>::type;
 		using noconst_T_ptr = typename std::add_pointer<noconst_T>::type;
-		std::array<int, M> new_strides;
-		std::array<int, M> new_ghost_start;
-		std::array<int, M> new_start;
-		std::array<int, M> new_end;
-		std::array<int, M> new_ghost_end;
-		std::array<int, D> first_value;
+		std::array<int, M + 1> new_strides;
+		std::array<int, M + 1> new_ghost_start;
+		std::array<int, M + 1> new_start;
+		std::array<int, M + 1> new_end;
+		std::array<int, M + 1> new_ghost_end;
+		std::array<int, D + 1> first_value;
 
 		first_value = this->getGhostStart();
 
@@ -231,26 +243,32 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 				lengths_index++;
 			}
 		}
+		new_strides[M]     = this->getStrides()[D];
+		new_ghost_start[M] = this->getGhostStart()[D];
+		new_start[M]       = this->getStart()[D];
+		new_end[M]         = this->getEnd()[D];
+		new_ghost_end[M]   = this->getGhostEnd()[D];
 
 		noconst_T_ptr new_data = const_cast<noconst_T_ptr>(&(*this)[first_value]); // Thunderegg doesn't care if values in ghosts are modified
-		return View<noconst_T, M>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getPatchViewDataManager());
+		return View<noconst_T, M + 1>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getComponentViewDataManager());
 	}
 
-	/**
-	 * @brief Get the Lengths of the patch in each direction
-	 */
-	const std::array<int, D> &getLengths() const
+	operator PatchView<std::add_const_t<T>, D>() const
 	{
-		return lengths;
-	}
-
-	/**
-	 * @brief Get the number of ghost cells on each side of the patch
-	 */
-	int getNumGhostCells() const
-	{
-		return num_ghost_cells;
+		return PatchView<std::add_const_t<T>, D>(this->getData() + this->getIndex(this->getGhostStart()),
+		                                         this->getStrides(),
+		                                         this->getGhostStart(),
+		                                         this->getStart(),
+		                                         this->getEnd(),
+		                                         this->getGhostEnd(),
+		                                         this->getComponentViewDataManager());
 	}
 };
+extern template class PatchView<double, 1>;
+extern template class PatchView<double, 2>;
+extern template class PatchView<double, 3>;
+extern template class PatchView<const double, 1>;
+extern template class PatchView<const double, 2>;
+extern template class PatchView<const double, 3>;
 } // namespace ThunderEgg
 #endif
