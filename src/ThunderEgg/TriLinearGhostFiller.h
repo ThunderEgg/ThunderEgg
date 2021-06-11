@@ -34,27 +34,27 @@ namespace ThunderEgg
 class TriLinearGhostFiller : public MPIGhostFiller<3>
 {
 	public:
-	void fillGhostCellsForNbrPatch(const PatchInfo<3> &                               pinfo,
-	                               const std::vector<ComponentView<const double, 3>> &local_datas,
-	                               const std::vector<ComponentView<const double, 3>> &nbr_datas,
-	                               Side<3>                                            side,
-	                               NbrType                                            nbr_type,
-	                               Orthant<2>                                         orthant_on_coarse) const override;
+	void fillGhostCellsForNbrPatch(const PatchInfo<3> &              pinfo,
+	                               const PatchView<const double, 3> &local_view,
+	                               const PatchView<const double, 3> &nbr_view,
+	                               Side<3>                           side,
+	                               NbrType                           nbr_type,
+	                               Orthant<2>                        orthant_on_coarse) const override;
 
-	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<3> &                               pinfo,
-	                                   const std::vector<ComponentView<const double, 3>> &local_datas,
-	                                   const std::vector<ComponentView<const double, 3>> &nbr_datas,
-	                                   Edge                                               edge,
-	                                   NbrType                                            nbr_type,
-	                                   Orthant<1>                                         orthant_on_coarse) const override;
+	void fillGhostCellsForEdgeNbrPatch(const PatchInfo<3> &              pinfo,
+	                                   const PatchView<const double, 3> &local_view,
+	                                   const PatchView<const double, 3> &nbr_view,
+	                                   Edge                              edge,
+	                                   NbrType                           nbr_type,
+	                                   Orthant<1>                        orthant_on_coarse) const override;
 
-	void fillGhostCellsForCornerNbrPatch(const PatchInfo<3> &                               pinfo,
-	                                     const std::vector<ComponentView<const double, 3>> &local_datas,
-	                                     const std::vector<ComponentView<const double, 3>> &nbr_datas,
-	                                     Corner<3>                                          corner,
-	                                     NbrType                                            nbr_type) const override;
+	void fillGhostCellsForCornerNbrPatch(const PatchInfo<3> &              pinfo,
+	                                     const PatchView<const double, 3> &local_view,
+	                                     const PatchView<const double, 3> &nbr_view,
+	                                     Corner<3>                         corner,
+	                                     NbrType                           nbr_type) const override;
 
-	void fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo, const std::vector<ComponentView<const double, 3>> &local_datas) const override;
+	void fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo, const PatchView<const double, 3> &view) const override;
 	/**
 	 * @brief Construct a new TriLinearGhostFiller object
 	 *

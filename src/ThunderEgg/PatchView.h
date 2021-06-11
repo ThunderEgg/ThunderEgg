@@ -282,10 +282,39 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 	}
 };
 extern template class PatchView<double, 1>;
+extern template View<double, 1> PatchView<double, 1>::getSliceOn(Face<1, 0>, const std::array<int, 1> &) const;
+extern template View<double, 1> PatchView<double, 1>::getGhostSliceOn(Face<1, 0>, const std::array<size_t, 1> &) const;
+
 extern template class PatchView<double, 2>;
+extern template View<double, 1> PatchView<double, 2>::getSliceOn(Face<2, 0>, const std::array<int, 2> &) const;
+extern template View<double, 2> PatchView<double, 2>::getSliceOn(Face<2, 1>, const std::array<int, 1> &) const;
+extern template View<double, 1> PatchView<double, 2>::getGhostSliceOn(Face<2, 0>, const std::array<size_t, 2> &) const;
+extern template View<double, 2> PatchView<double, 2>::getGhostSliceOn(Face<2, 1>, const std::array<size_t, 1> &) const;
+
 extern template class PatchView<double, 3>;
+extern template View<double, 1> PatchView<double, 3>::getSliceOn(Face<3, 0>, const std::array<int, 3> &) const;
+extern template View<double, 2> PatchView<double, 3>::getSliceOn(Face<3, 1>, const std::array<int, 2> &) const;
+extern template View<double, 3> PatchView<double, 3>::getSliceOn(Face<3, 2>, const std::array<int, 1> &) const;
+extern template View<double, 1> PatchView<double, 3>::getGhostSliceOn(Face<3, 0>, const std::array<size_t, 3> &) const;
+extern template View<double, 2> PatchView<double, 3>::getGhostSliceOn(Face<3, 1>, const std::array<size_t, 2> &) const;
+extern template View<double, 3> PatchView<double, 3>::getGhostSliceOn(Face<3, 2>, const std::array<size_t, 1> &) const;
+
 extern template class PatchView<const double, 1>;
+extern template View<const double, 1> PatchView<const double, 1>::getSliceOn(Face<1, 0>, const std::array<int, 1> &) const;
+extern template View<double, 1>       PatchView<const double, 1>::getGhostSliceOn(Face<1, 0>, const std::array<size_t, 1> &) const;
+
 extern template class PatchView<const double, 2>;
+extern template View<const double, 1> PatchView<const double, 2>::getSliceOn(Face<2, 0>, const std::array<int, 2> &) const;
+extern template View<const double, 2> PatchView<const double, 2>::getSliceOn(Face<2, 1>, const std::array<int, 1> &) const;
+extern template View<double, 1>       PatchView<const double, 2>::getGhostSliceOn(Face<2, 0>, const std::array<size_t, 2> &) const;
+extern template View<double, 2>       PatchView<const double, 2>::getGhostSliceOn(Face<2, 1>, const std::array<size_t, 1> &) const;
+
 extern template class PatchView<const double, 3>;
+extern template View<const double, 1> PatchView<const double, 3>::getSliceOn(Face<3, 0>, const std::array<int, 3> &) const;
+extern template View<const double, 2> PatchView<const double, 3>::getSliceOn(Face<3, 1>, const std::array<int, 2> &) const;
+extern template View<const double, 3> PatchView<const double, 3>::getSliceOn(Face<3, 2>, const std::array<int, 1> &) const;
+extern template View<double, 1>       PatchView<const double, 3>::getGhostSliceOn(Face<3, 0>, const std::array<size_t, 3> &) const;
+extern template View<double, 2>       PatchView<const double, 3>::getGhostSliceOn(Face<3, 1>, const std::array<size_t, 2> &) const;
+extern template View<double, 3>       PatchView<const double, 3>::getGhostSliceOn(Face<3, 2>, const std::array<size_t, 1> &) const;
 } // namespace ThunderEgg
 #endif

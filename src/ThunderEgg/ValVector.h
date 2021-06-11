@@ -40,25 +40,21 @@ template <int D> class ValVector : public Vector<D>
 	 */
 	int patch_stride;
 	/**
-	 * @brief striding to next component
-	 */
-	int component_stride;
-	/**
 	 * @brief the number of non-ghost cells in each direction of the patch
 	 */
-	std::array<int, D> lengths;
+	std::array<int, D + 1> lengths;
 	/**
 	 * @brief the strides for each axis of the patch
 	 */
-	std::array<int, D> strides;
-	/**
-	 * @brief the number of ghost cells on each side of the patch
-	 */
-	int num_ghost_cells;
+	std::array<int, D + 1> strides;
 	/**
 	 * @brief the underlying vector
 	 */
 	std::valarray<double> vec;
+	/**
+	 * @brief The number of ghost cells
+	 */
+	int num_ghost_cells;
 
 	/**
 	 * @brief Calculate the number of local (non-ghost) cells
@@ -88,15 +84,16 @@ template <int D> class ValVector : public Vector<D>
 	 */
 	ValVector(MPI_Comm comm, const std::array<int, D> &lengths, int num_ghost_cells, int num_components, int num_patches)
 	: Vector<D>(comm, num_components, num_patches, GetNumLocalCells(lengths, num_patches)),
-	  lengths(lengths),
 	  num_ghost_cells(num_ghost_cells)
 	{
 		int size = 1;
 		for (size_t i = 0; i < D; i++) {
-			strides[i] = size;
+			this->lengths[i] = lengths[i];
+			strides[i]       = size;
 			size *= (this->lengths[i] + 2 * num_ghost_cells);
 		}
-		component_stride = size;
+		this->lengths[D] = num_components;
+		this->strides[D] = size;
 		size *= num_components;
 		patch_stride = size;
 		size *= num_patches;
@@ -114,15 +111,15 @@ template <int D> class ValVector : public Vector<D>
 		return std::shared_ptr<ValVector<D>>(
 		new ValVector<D>(MPI_COMM_WORLD, domain->getNs(), domain->getNumGhostCells(), num_components, domain->getNumLocalPatches()));
 	}
-	ComponentView<double, D> getComponentView(int component_index, int local_patch_index) override
+	PatchView<double, D> getPatchView(int local_patch_index) override
 	{
-		double *data = &vec[patch_stride * local_patch_index + component_stride * component_index];
-		return ComponentView<double, D>(data, strides, lengths, num_ghost_cells, nullptr);
+		double *data = &vec[patch_stride * local_patch_index];
+		return PatchView<double, D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
-	ComponentView<const double, D> getComponentView(int component_index, int local_patch_index) const override
+	PatchView<const double, D> getPatchView(int local_patch_index) const override
 	{
-		const double *data = &vec[patch_stride * local_patch_index + component_stride * component_index];
-		return ComponentView<const double, D>(data, strides, lengths, num_ghost_cells, nullptr);
+		const double *data = &vec[patch_stride * local_patch_index];
+		return PatchView<const double, D>(data, strides, lengths, num_ghost_cells, nullptr);
 	}
 
 	/**

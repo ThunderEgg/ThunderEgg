@@ -60,11 +60,11 @@ template <int D> class VecWrapper : public Vector<D>
 	/**
 	 * @brief The striding for each patch
 	 */
-	std::array<int, D> strides;
+	std::array<int, D + 1> strides;
 	/**
 	 * @brief The number of (non-ghost) cells in each direction of the patch
 	 */
-	std::array<int, D> lengths;
+	std::array<int, D + 1> lengths;
 
 	/**
 	 * @brief Get the Num Local Patches in this vector
@@ -72,12 +72,11 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param vec the Petsc vector
 	 * @param lengths the number of cells in each direction
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
-	 * @param num_components the number of components for each cell
 	 * @return int the number of local patches
 	 */
-	static int GetNumLocalPatches(Vec vec, const std::array<int, D> &lengths, int num_ghost_cells, int num_components)
+	static int GetNumLocalPatches(Vec vec, const std::array<int, D + 1> &lengths, int num_ghost_cells)
 	{
-		int patch_stride = num_components;
+		int patch_stride = lengths[D];
 		for (size_t i = 0; i < D; i++) {
 			patch_stride *= (lengths[i] + 2 * num_ghost_cells);
 		}
@@ -92,16 +91,15 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param vec the vector
 	 * @param lengths the number of cells in each direction
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
-	 * @param num_components the number of components for each cell
 	 * @return int the number of local cells
 	 */
-	static int GetNumLocalCells(Vec vec, const std::array<int, D> &lengths, int num_ghost_cells, int num_components)
+	static int GetNumLocalCells(Vec vec, const std::array<int, D + 1> &lengths, int num_ghost_cells)
 	{
 		int num_cells_in_patch = 1;
 		for (size_t i = 0; i < D; i++) {
 			num_cells_in_patch *= lengths[i];
 		}
-		return num_cells_in_patch * GetNumLocalPatches(vec, lengths, num_ghost_cells, num_components);
+		return num_cells_in_patch * GetNumLocalPatches(vec, lengths, num_ghost_cells);
 	}
 
 	public:
@@ -114,11 +112,8 @@ template <int D> class VecWrapper : public Vector<D>
 	 * @param num_components the number of components for each cell
 	 * @param own whether or not to deallocate the PETSc vector when this object is destroyed.
 	 */
-	VecWrapper(Vec vec, const std::array<int, D> &lengths, int num_components, int num_ghost_cells, bool own)
-	: Vector<D>(MPI_COMM_WORLD,
-	            num_components,
-	            GetNumLocalPatches(vec, lengths, num_ghost_cells, num_components),
-	            GetNumLocalCells(vec, lengths, num_ghost_cells, num_components)),
+	VecWrapper(Vec vec, const std::array<int, D + 1> &lengths, int num_ghost_cells, bool own)
+	: Vector<D>(MPI_COMM_WORLD, lengths[D], GetNumLocalPatches(vec, lengths, num_ghost_cells), GetNumLocalCells(vec, lengths, num_ghost_cells)),
 	  vec(vec),
 	  num_ghost_cells(num_ghost_cells),
 	  own(own),
@@ -128,8 +123,8 @@ template <int D> class VecWrapper : public Vector<D>
 		for (size_t i = 1; i < D; i++) {
 			strides[i] = (this->lengths[i - 1] + 2 * num_ghost_cells) * strides[i - 1];
 		}
-		component_stride = strides[D - 1] * (lengths[D - 1] + 2 * num_ghost_cells);
-		patch_stride     = component_stride * num_components;
+		strides[D]   = strides[D - 1] * (lengths[D - 1] + 2 * num_ghost_cells);
+		patch_stride = strides[D] * lengths[D];
 	}
 	VecWrapper(const VecWrapper &) = delete;
 	VecWrapper &operator=(const VecWrapper &) = delete;
@@ -144,25 +139,14 @@ template <int D> class VecWrapper : public Vector<D>
 	 */
 	static std::shared_ptr<VecWrapper<D>> GetNewVector(std::shared_ptr<const Domain<D>> domain, int num_components)
 	{
-		Vec u;
-		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCellsWithGhost() * num_components, PETSC_DETERMINE, &u);
-		return std::make_shared<VecWrapper<D>>(u, domain->getNs(), num_components, domain->getNumGhostCells(), true);
-	}
-	/**
-	 * @brief Get a new boundary condition vector for a given Domain
-	 *
-	 * @param domain the Domain
-	 * @return std::shared_ptr<VecWrapper<D - 1>> the resulting vector
-	 */
-	static std::shared_ptr<VecWrapper<D - 1>> GetNewBCVector(std::shared_ptr<Domain<D>> domain)
-	{
-		Vec u;
-		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalBCCells(), PETSC_DETERMINE, &u);
-		std::array<int, D - 1> ns;
-		for (size_t i = 0; i < ns.size(); i++) {
-			ns[i] = domain->getNs()[i];
+		Vec                    u;
+		std::array<int, D + 1> lengths;
+		for (int i = 0; i < D; i++) {
+			lengths[i] = domain->getNs()[i];
 		}
-		return std::make_shared<VecWrapper<D - 1>>(u, ns, 1, 0, true);
+		lengths[D] = num_components;
+		VecCreateMPI(MPI_COMM_WORLD, domain->getNumLocalCellsWithGhost() * num_components, PETSC_DETERMINE, &u);
+		return std::make_shared<VecWrapper<D>>(u, lengths, domain->getNumGhostCells(), true);
 	}
 	/**
 	 * @brief Destroy the VecWrapper object
@@ -173,18 +157,18 @@ template <int D> class VecWrapper : public Vector<D>
 			VecDestroy(&vec);
 		}
 	}
-	ComponentView<double, D> getComponentView(int component_index, int patch_local_index) override
+	PatchView<double, D> getPatchView(int patch_local_index) override
 	{
 		std::shared_ptr<VecViewManager> ldm(new VecViewManager(vec, false));
-		double *                        data = ldm->getVecView() + patch_stride * patch_local_index + component_index * component_stride;
-		return ComponentView<double, D>(data, strides, lengths, num_ghost_cells, ldm);
+		double *                        data = ldm->getVecView() + patch_stride * patch_local_index;
+		return PatchView<double, D>(data, strides, lengths, num_ghost_cells, ldm);
 	}
 
-	ComponentView<const double, D> getComponentView(int component_index, int patch_local_index) const override
+	PatchView<const double, D> getPatchView(int patch_local_index) const override
 	{
 		std::shared_ptr<VecViewManager> ldm(new VecViewManager(vec, true));
-		double *                        data = ldm->getVecView() + patch_stride * patch_local_index + component_index * component_stride;
-		return ComponentView<const double, D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
+		double *                        data = ldm->getVecView() + patch_stride * patch_local_index;
+		return PatchView<const double, D>(data, strides, lengths, num_ghost_cells, std::move(ldm));
 	}
 	int getNumGhostCells() const
 	{

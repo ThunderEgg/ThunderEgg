@@ -199,20 +199,21 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @param out the resulting values after the transform
 	 * @param inverse weather we a re calculate
 	 */
-	void
-	executePlan(const std::array<std::shared_ptr<std::valarray<double>>, D> &plan, ComponentView<double, D> in, ComponentView<double, D> out) const
+	void executePlan(const std::array<std::shared_ptr<std::valarray<double>>, D> &plan,
+	                 const PatchView<double, D> &                                 in,
+	                 const PatchView<double, D> &                                 out) const
 	{
-		ComponentView<double, D> prev_result = in;
+		PatchView<double, D> prev_result = in;
 
 		for (size_t axis = 0; axis < D; axis++) {
-			int                n     = this->domain->getNs()[axis];
-			std::array<int, D> start = in.getStart();
-			std::array<int, D> end   = in.getEnd();
-			end[axis]                = 0;
+			int                    n     = this->domain->getNs()[axis];
+			std::array<int, D + 1> start = in.getStart();
+			std::array<int, D + 1> end   = in.getEnd();
+			end[axis]                    = 0;
 
 			std::valarray<double> &matrix = *plan[axis];
 
-			ComponentView<double, D> new_result;
+			PatchView<double, D> new_result;
 			if (D % 2) {
 				if (axis % 2) {
 					new_result = in;
@@ -223,7 +224,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 				if (axis == D - 1) {
 					new_result = out;
 				} else if (axis == D - 2) {
-					new_result = local_tmp->getComponentView(0, 0);
+					new_result = local_tmp->getPatchView(0);
 				} else if (axis % 2) {
 					new_result = in;
 				} else {
@@ -237,7 +238,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 			char   T    = 'T';
 			double one  = 1;
 			double zero = 0;
-			nested_loop<D>(start, end, [&](std::array<int, D> coord) {
+			nested_loop<D + 1>(start, end, [&](std::array<int, D + 1> coord) {
 				dgemv_(T, n, n, one, &matrix[0], n, &prev_result[coord], pstride, zero, &new_result[coord], nstride);
 			});
 
@@ -397,21 +398,16 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 			addPatch(pinfo);
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &                               pinfo,
-	                      const std::vector<ComponentView<const double, D>> &fs,
-	                      const std::vector<ComponentView<double, D>> &      us) const override
+	void solveSinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &f_view, const PatchView<double, D> &u_view) const override
 	{
-		ComponentView<double, D> f_copy_ld = f_copy->getComponentView(0, 0);
-		ComponentView<double, D> tmp_ld    = tmp->getComponentView(0, 0);
+		PatchView<double, D> f_copy_view = f_copy->getPatchView(0);
+		PatchView<double, D> tmp_view    = tmp->getPatchView(0);
 
-		nested_loop<D>(f_copy_ld.getStart(), f_copy_ld.getEnd(), [&](std::array<int, D> coord) { f_copy_ld[coord] = fs[0][coord]; });
+		loop_over_interior_indexes<D + 1>(f_view, [&](std::array<int, D + 1> coord) { f_copy_view[coord] = f_view[coord]; });
 
-		std::vector<ComponentView<double, D>> f_copy_lds = {f_copy_ld};
+		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy_view);
 
-		std::vector<ComponentView<const double, D>> us_const(us.begin(), us.end());
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, us_const, f_copy_lds);
-
-		executePlan(plan1.at(pinfo), f_copy_ld, tmp_ld);
+		executePlan(plan1.at(pinfo), f_copy_view, tmp_view);
 
 		tmp->getValArray() /= eigen_vals.at(pinfo);
 
@@ -419,13 +415,13 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 			tmp->getValArray()[0] = 0;
 		}
 
-		executePlan(plan2.at(pinfo), tmp_ld, us[0]);
+		executePlan(plan2.at(pinfo), tmp_view, u_view);
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {
 			scale *= 2.0 / this->domain->getNs()[axis];
 		}
-		nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) { us[0][coord] *= scale; });
+		loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] *= scale; });
 	}
 };
 

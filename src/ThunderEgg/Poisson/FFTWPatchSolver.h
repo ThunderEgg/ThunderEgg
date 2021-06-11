@@ -228,17 +228,13 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 			addPatch(pinfo);
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &                               pinfo,
-	                      const std::vector<ComponentView<const double, D>> &fs,
-	                      const std::vector<ComponentView<double, D>> &      us) const override
+	void solveSinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &f_view, const PatchView<double, D> &u_view) const override
 	{
-		ComponentView<double, D> f_copy_ld = f_copy->getComponentView(0, 0);
+		PatchView<double, D> f_copy_view = f_copy->getPatchView(0);
 
-		nested_loop<D>(f_copy_ld.getStart(), f_copy_ld.getEnd(), [&](std::array<int, D> coord) { f_copy_ld[coord] = fs[0][coord]; });
+		loop_over_interior_indexes<D + 1>(f_copy_view, [&](std::array<int, D + 1> coord) { f_copy_view[coord] = f_view[coord]; });
 
-		std::vector<ComponentView<double, D>>       f_copy_lds = {f_copy_ld};
-		std::vector<ComponentView<const double, D>> us_const(us.begin(), us.end());
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, us_const, f_copy_lds);
+		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy_view);
 
 		fftw_execute(plan1.at(pinfo));
 
@@ -250,13 +246,13 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 
 		fftw_execute(plan2.at(pinfo));
 
-		ComponentView<double, D> sol_ld = sol->getComponentView(0, 0);
+		PatchView<double, D> sol_view = sol->getPatchView(0);
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {
 			scale *= 2.0 * this->domain->getNs()[axis];
 		}
-		nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) { us[0][coord] = sol_ld[coord] / scale; });
+		loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] = sol_view[coord] / scale; });
 	}
 	/**
 	 * @brief add a patch to the solver

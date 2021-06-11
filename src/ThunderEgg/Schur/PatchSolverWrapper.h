@@ -123,10 +123,9 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		}
 		// go ahead and solve for patches with only local interfaces
 		for (auto piinfo : patches_with_only_local_ifaces) {
-			auto                                        us = u->getComponentViews(piinfo->pinfo.local_index);
-			auto                                        fs = f->getComponentViews(piinfo->pinfo.local_index);
-			std::vector<ComponentView<const double, D>> fs_const(fs.begin(), fs.end());
-			solver->solveSinglePatch(piinfo->pinfo, fs_const, us);
+			PatchView<double, D> u_view = u->getPatchView(piinfo->pinfo.local_index);
+			PatchView<double, D> f_view = f->getPatchView(piinfo->pinfo.local_index);
+			solver->solveSinglePatch(piinfo->pinfo, f_view, u_view);
 		}
 
 		scatter.scatterFinish(x, local_x);
@@ -145,10 +144,9 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		}
 		// solve the remaining patches
 		for (auto piinfo : patches_with_ifaces_on_neighbor_rank) {
-			auto                                        us = u->getComponentViews(piinfo->pinfo.local_index);
-			auto                                        fs = f->getComponentViews(piinfo->pinfo.local_index);
-			std::vector<ComponentView<const double, D>> fs_const(fs.begin(), fs.end());
-			solver->solveSinglePatch(piinfo->pinfo, fs_const, us);
+			PatchView<double, D> u_view = u->getPatchView(piinfo->pinfo.local_index);
+			PatchView<double, D> f_view = f->getPatchView(piinfo->pinfo.local_index);
+			solver->solveSinglePatch(piinfo->pinfo, f_view, u_view);
 		}
 
 		solver->getGhostFiller()->fillGhost(u);
@@ -194,9 +192,9 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 			}
 		}
 		for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
-			auto us = u->getComponentViews(piinfo->pinfo.local_index);
-			auto fs = domain_b->getComponentViews(piinfo->pinfo.local_index);
-			solver->solveSinglePatch(piinfo->pinfo, fs, us);
+			PatchView<double, D>       u_view = u->getPatchView(piinfo->pinfo.local_index);
+			PatchView<const double, D> f_view = domain_b->getPatchView(piinfo->pinfo.local_index);
+			solver->solveSinglePatch(piinfo->pinfo, f_view, u_view);
 		}
 
 		solver->getGhostFiller()->fillGhost(u);

@@ -61,7 +61,7 @@ class MockVector : public Vector<D>
 	/**
 	 * @brief vector of View objects
 	 */
-	std::vector<ComponentView<double, D>> local_data;
+	std::vector<PatchView<double, D>> views;
 	/**
 	 * @brief Construct a new MockVector object
 	 *
@@ -75,32 +75,35 @@ class MockVector : public Vector<D>
 	           std::array<int, D> ns)
 	: Vector<D>(comm, num_components, num_local_patches, GetNumLocalCells(num_local_patches, ns))
 	{
-		std::array<int, 3> strides;
-		int                patch_stride = num_components;
+		std::array<int, 4> strides;
+		std::array<int, 4> lengths;
+		int                patch_stride = 1;
 		for (size_t i = 0; i < 3; i++) {
+			lengths[i] = ns[i];
 			strides[i] = patch_stride;
 			patch_stride *= (ns[i] + 2 * num_ghost_cells);
 		}
+		lengths[D] = num_components;
+		strides[D] = patch_stride;
+		patch_stride *= num_components;
 		int size = patch_stride * num_local_patches;
 
 		data.resize(size);
 
-		local_data.reserve(num_local_patches);
+		views.reserve(num_local_patches);
 
 		for (int i = 0; i < num_local_patches; i++) {
-			for (int c = 0; c < num_components; c++) {
-				double *data_ptr = data.data() + i * patch_stride + c;
-				local_data.emplace_back(data_ptr, strides, ns, num_ghost_cells);
-			}
+			double *data_ptr = data.data() + i * patch_stride;
+			views.emplace_back(data_ptr, strides, lengths, num_ghost_cells);
 		}
 	}
-	ComponentView<double, D> getComponentView(int component_index, int patch_local_index) override
+	PatchView<double, D> getPatchView(int patch_local_index) override
 	{
-		return local_data[patch_local_index * this->getNumComponents() + component_index];
+		return views[patch_local_index];
 	}
-	ComponentView<const double, D> getComponentView(int component_index, int patch_local_index) const override
+	PatchView<const double, D> getPatchView(int patch_local_index) const override
 	{
-		return local_data[patch_local_index * this->getNumComponents() + component_index];
+		return views[patch_local_index];
 	}
 };
 } // namespace ThunderEgg

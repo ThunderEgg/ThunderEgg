@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  This program is distributed in the hope that it will be u_vieweful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -83,9 +83,9 @@ class MockPatchSolver : public PatchSolver<D>
 			}
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &                               pinfo,
-	                      const std::vector<ComponentView<const double, D>> &fs,
-	                      const std::vector<ComponentView<double, D>> &      us) const override
+	void solveSinglePatch(const PatchInfo<D> &              pinfo,
+	                      const PatchView<const double, D> &f_view,
+	                      const PatchView<double, D> &      u_view) const override
 	{
 		CHECK(patch_ids_to_be_called.count(pinfo.id) == 1);
 		patch_ids_to_be_called.erase(pinfo.id);
@@ -109,17 +109,16 @@ class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 	: PatchSolver<D>(domain_in, ghost_filler_in), schur_fill_value(schur_fill_value)
 	{
 	}
-	void solveSinglePatch(const PatchInfo<D> &                               pinfo,
-	                      const std::vector<ComponentView<const double, D>> &fs,
-	                      const std::vector<ComponentView<double, D>> &      us) const override
+	void solveSinglePatch(const PatchInfo<D> &              pinfo,
+	                      const PatchView<const double, D> &f_view,
+	                      const PatchView<double, D> &      u_view) const override
 	{
 		was_called = true;
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo.hasNbr(s)) {
-				auto ghosts = us[0].getSliceOn(s, {-1});
-				auto inner  = us[0].getSliceOn(s, {0});
-				nested_loop<D - 1>(
-				ghosts.getStart(), ghosts.getEnd(), [&](const std::array<int, D - 1> &coord) {
+				auto ghosts = u_view.getSliceOn(s, {-1});
+				auto inner  = u_view.getSliceOn(s, {0});
+				loop_over_interior_indexes<D>(ghosts, [&](const std::array<int, D> &coord) {
 					CHECK((ghosts[coord] + inner[coord]) / 2 == Catch::Approx(schur_fill_value));
 				});
 			}

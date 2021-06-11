@@ -21,9 +21,9 @@
 
 #ifndef THUNDEREGG_VECTOR_H
 #define THUNDEREGG_VECTOR_H
-#include <ThunderEgg/ComponentView.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
+#include <ThunderEgg/PatchView.h>
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -111,32 +111,22 @@ template <int D> class Vector
 	 *
 	 * @param component_index the index of the component access
 	 * @param patch_local_index the local index of the patch
-	 * @return View<D> the View object
+	 * @return ComponentView<D> the View object
 	 */
-	virtual ComponentView<double, D> getComponentView(int component_index, int patch_local_index) = 0;
+	ComponentView<double, D> getComponentView(int component_index, int patch_local_index)
+	{
+		return getPatchView(patch_local_index).getComponentView(component_index);
+	}
 	/**
 	 * @brief Get the ComponentView for the specified patch and component
 	 *
 	 * @param component_index the index of the component access
 	 * @param patch_local_index the local index of the patch
-	 * @return View<D> the View object
+	 * @return ComponentView<D> the View object
 	 */
-	virtual ComponentView<const double, D> getComponentView(int component_index, int patch_local_index) const = 0;
-	/**
-	 * @brief Get the View objects for the specified patch
-	 * index of View object will correspond to component index
-	 *
-	 * @param patch_local_index the local index of the patch
-	 * @return View<D> the View object
-	 */
-	std::vector<ComponentView<double, D>> getComponentViews(int patch_local_index)
+	ComponentView<const double, D> getComponentView(int component_index, int patch_local_index) const
 	{
-		std::vector<ComponentView<double, D>> local_datas;
-		local_datas.reserve(num_components);
-		for (int c = 0; c < num_components; c++) {
-			local_datas.emplace_back(std::move(getComponentView(c, patch_local_index)));
-		}
-		return local_datas;
+		return getPatchView(patch_local_index).getComponentView(component_index);
 	}
 	/**
 	 * @brief Get the View objects for the specified patch
@@ -145,28 +135,27 @@ template <int D> class Vector
 	 * @param patch_local_index the local index of the patch
 	 * @return View<D> the View object
 	 */
-	std::vector<ComponentView<const double, D>> getComponentViews(int patch_local_index) const
-	{
-		std::vector<ComponentView<const double, D>> local_datas;
-		local_datas.reserve(num_components);
-		for (int c = 0; c < num_components; c++) {
-			local_datas.emplace_back(std::move(getComponentView(c, patch_local_index)));
-		}
-		return local_datas;
-	}
+	virtual PatchView<double, D> getPatchView(int patch_local_index) = 0;
+
+	/**
+	 * @brief Get the View objects for the specified patch
+	 * index of View object will correspond to component index
+	 *
+	 * @param patch_local_index the local index of the patch
+	 * @return View<D> the View object
+	 */
+	virtual PatchView<const double, D> getPatchView(int patch_local_index) const = 0;
 
 	/**
 	 * @brief set all value in the vector
 	 *
 	 * @param alpha the value ot be set
 	 */
-	virtual void set(double alpha)
+	void set(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>> lds = getComponentViews(i);
-			for (auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] = alpha; });
-			}
+			PatchView<double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = alpha; });
 		}
 	}
 	/**
@@ -174,13 +163,11 @@ template <int D> class Vector
 	 *
 	 * @param alpha the value ot be set
 	 */
-	virtual void setWithGhost(double alpha)
+	void setWithGhost(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>> lds = getComponentViews(i);
-			for (auto &ld : lds) {
-				nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, D> coord) { ld[coord] = alpha; });
-			}
+			PatchView<double, D> view = getPatchView(i);
+			loop_over_all_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = alpha; });
 		}
 	}
 	/**
@@ -188,13 +175,11 @@ template <int D> class Vector
 	 *
 	 * @param alpha the value to scale by
 	 */
-	virtual void scale(double alpha)
+	void scale(double alpha)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>> lds = getComponentViews(i);
-			for (auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] *= alpha; });
-			}
+			PatchView<double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] *= alpha; });
 		}
 	}
 	/**
@@ -202,13 +187,11 @@ template <int D> class Vector
 	 *
 	 * @param delta the value to shift by
 	 */
-	virtual void shift(double delta)
+	void shift(double delta)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>> lds = getComponentViews(i);
-			for (auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] += delta; });
-			}
+			PatchView<double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += delta; });
 		}
 	}
 	/**
@@ -216,14 +199,12 @@ template <int D> class Vector
 	 *
 	 * @param b the other vector
 	 */
-	virtual void copy(std::shared_ptr<const Vector<D>> b)
+	void copy(std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
-			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] = lds_b[c][coord]; });
-			}
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b->getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = b_view[coord]; });
 		}
 	}
 	/**
@@ -231,14 +212,12 @@ template <int D> class Vector
 	 *
 	 * @param b the other vector
 	 */
-	virtual void add(std::shared_ptr<const Vector<D>> b)
+	void add(std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
-			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord]; });
-			}
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b->getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord]; });
 		}
 	}
 	/**
@@ -247,11 +226,9 @@ template <int D> class Vector
 	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
-			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord] * alpha; });
-			}
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b->getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord] * alpha; });
 		}
 	}
 	/**
@@ -260,72 +237,58 @@ template <int D> class Vector
 	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> a, double beta, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
-			std::vector<ComponentView<const double, D>> lds_a = a->getComponentViews(i);
-			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
-					lds[c][coord] += lds_a[c][coord] * alpha + lds_b[c][coord] * beta;
-				});
-			}
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> a_view = a->getPatchView(i);
+			PatchView<const double, D> b_view = b->getPatchView(i);
+			loop_over_interior_indexes<D + 1>(
+			view, [&](const std::array<int, D + 1> &coord) { view[coord] += a_view[coord] * alpha + b_view[coord] * beta; });
 		}
 	}
 	/**
 	 * @brief `this = alpha * this + b`
 	 */
-	virtual void scaleThenAdd(double alpha, std::shared_ptr<const Vector<D>> b)
+	void scaleThenAdd(double alpha, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
-			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(
-				lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] = alpha * lds[c][coord] + lds_b[c][coord]; });
-			}
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b->getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord]; });
 		}
 	}
 	/**
 	 * @brief `this = alpha * this + beta * b`
 	 */
-	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b)
+	void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
-			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
-					lds[c][coord] = alpha * lds[c][coord] + beta * lds_b[c][coord];
-				});
-			}
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b->getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view,
+			                                  [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord] * beta; });
 		}
 	}
 	/**
 	 * @brief `this = alpha * this + beta * b + gamma * c`
 	 */
-	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b, double gamma, std::shared_ptr<const Vector<D>> c)
+	void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b, double gamma, std::shared_ptr<const Vector<D>> c)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<double, D>>       lds   = getComponentViews(i);
-			std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
-			std::vector<ComponentView<const double, D>> lds_c = c->getComponentViews(i);
-			for (int comp = 0; comp < num_components; comp++) {
-				nested_loop<D>(lds[comp].getStart(), lds[comp].getEnd(), [&](std::array<int, D> coord) {
-					lds[comp][coord] = alpha * lds[comp][coord] + beta * lds_b[comp][coord] + gamma * lds_c[comp][coord];
-				});
-			}
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b->getPatchView(i);
+			PatchView<const double, D> c_view = c->getPatchView(i);
+			loop_over_interior_indexes<D + 1>(
+			view, [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord] * beta + c_view[coord] * gamma; });
 		}
 	}
 	/**
 	 * @brief get the l2norm
 	 */
-	virtual double twoNorm() const
+	double twoNorm() const
 	{
 		double sum = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			const std::vector<ComponentView<const double, D>> lds = getComponentViews(i);
-			for (const auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { sum += ld[coord] * ld[coord]; });
-			}
+			PatchView<const double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { sum += view[coord] * view[coord]; });
 		}
 		double global_sum;
 		MPI_Allreduce(&sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, comm);
@@ -334,14 +297,12 @@ template <int D> class Vector
 	/**
 	 * @brief get the infnorm
 	 */
-	virtual double infNorm() const
+	double infNorm() const
 	{
 		double max = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<const double, D>> lds = getComponentViews(i);
-			for (const auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { max = fmax(fabs(ld[coord]), max); });
-			}
+			PatchView<const double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { max = fmax(view[coord], max); });
 		}
 		double global_max;
 		MPI_Allreduce(&max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm);
@@ -350,15 +311,13 @@ template <int D> class Vector
 	/**
 	 * @brief get the dot product
 	 */
-	virtual double dot(std::shared_ptr<const Vector<D>> b) const
+	double dot(std::shared_ptr<const Vector<D>> b) const
 	{
 		double retval = 0;
 		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<ComponentView<const double, D>>       lds   = getComponentViews(i);
-			const std::vector<ComponentView<const double, D>> lds_b = b->getComponentViews(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { retval += lds[c][coord] * lds_b[c][coord]; });
-			}
+			PatchView<const double, D> view   = getPatchView(i);
+			PatchView<const double, D> b_view = b->getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { retval += view[coord] * b_view[coord]; });
 		}
 		double global_retval;
 		MPI_Allreduce(&retval, &global_retval, 1, MPI_DOUBLE, MPI_SUM, comm);

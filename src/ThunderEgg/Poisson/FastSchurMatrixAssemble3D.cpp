@@ -158,19 +158,19 @@ const char             Block::rot_quad_lookup_right[4][4] = {{0, 1, 2, 3}, {2, 0
 const char             Block::quad_flip_lookup[4]         = {1, 0, 3, 2};
 
 /**
- * @brief Get the View object for the buffer
+ * @brief Get the view for the buffer
  *
  * @param buffer_ptr pointer to the ghost cells position in the buffer
  * @param pinfo  the PatchInfo object
  * @param side  the side that the ghost cells are on
- * @return View<D> the View object
+ * @return PatchView<D> the view
  */
-ComponentView<const double, 3> getComponentViewForBuffer(double *buffer_ptr, const PatchInfo<3> &pinfo, const Side<3> side)
+PatchView<const double, 3> getPatchViewForBuffer(double *buffer_ptr, const PatchInfo<3> &pinfo, const Side<3> side)
 {
 	auto ns              = pinfo.ns;
 	int  num_ghost_cells = pinfo.num_ghost_cells;
 	// determine striding
-	std::array<int, 3> strides;
+	std::array<int, 4> strides;
 	strides[0] = 1;
 	for (size_t i = 1; i < 3; i++) {
 		if (i == side.getAxisIndex() + 1) {
@@ -179,22 +179,21 @@ ComponentView<const double, 3> getComponentViewForBuffer(double *buffer_ptr, con
 			strides[i] = ns[i - 1] * strides[i - 1];
 		}
 	}
+	strides[3] = ns[2] * strides[2];
 	// determine bounds of buffer
-	std::array<int, 3> ghost_start;
+	std::array<int, 4> ghost_start;
 	ghost_start.fill(0);
 
-	std::array<int, 3> start;
+	std::array<int, 4> start;
 	start.fill(0);
 
-	std::array<int, 3> end = ns;
-	for (int &val : end) {
-		val--;
+	std::array<int, 4> end;
+	for (int i = 0; i < 3; i++) {
+		end[i] = ns[i] - 1;
 	}
+	end[3] = 0;
 
-	std::array<int, 3> ghost_end = ns;
-	for (int &val : ghost_end) {
-		val--;
-	}
+	std::array<int, 4> ghost_end = end;
 
 	if (side.isLowerOnAxis()) {
 		ghost_start[side.getAxisIndex()] = -1;
@@ -203,10 +202,10 @@ ComponentView<const double, 3> getComponentViewForBuffer(double *buffer_ptr, con
 	} else {
 		ghost_start[side.getAxisIndex()] = ns[side.getAxisIndex()];
 		ghost_end[side.getAxisIndex()]   = ns[side.getAxisIndex()];
-		start[side.getAxisIndex()]       = ns[side.getAxisIndex()] - 2;
+		start[side.getAxisIndex()]       = ns[side.getAxisIndex()];
 	}
 
-	return ComponentView<double, 3>(buffer_ptr, strides, ghost_start, start, end, ghost_end);
+	return PatchView<double, 3>(buffer_ptr, strides, ghost_start, start, end, ghost_end);
 }
 
 /**
@@ -217,13 +216,13 @@ ComponentView<const double, 3> getComponentViewForBuffer(double *buffer_ptr, con
  * @param s the side of the patch that the block is on
  * @param block
  */
-void FillBlockColumnForNormalInterface(int j, const ComponentView<const double, 3> &u, Side<3> s, std::vector<double> &block)
+void FillBlockColumnForNormalInterface(int j, const PatchView<const double, 3> &u, Side<3> s, std::vector<double> &block)
 {
-	int  n     = u.getEnd()[0] + 1;
-	auto slice = u.getSliceOn(s, {0});
+	int                   n     = u.getEnd()[0] + 1;
+	View<const double, 3> slice = u.getSliceOn(s, {0});
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
-			block[(xi + n * yi) * n * n + j] = -slice[{xi, yi}] / 2;
+			block[(xi + n * yi) * n * n + j] = -slice(xi, yi, 0) / 2;
 		}
 	}
 }
@@ -238,7 +237,7 @@ void FillBlockColumnForNormalInterface(int j, const ComponentView<const double, 
  * @param block
  */
 void FillBlockColumnForCoarseToCoarseInterface(int                                      j,
-                                               const ComponentView<const double, 3> &   u,
+                                               const PatchView<const double, 3> &       u,
                                                Side<3>                                  s,
                                                std::shared_ptr<const MPIGhostFiller<3>> ghost_filler,
                                                const PatchInfo<3> &                     pinfo,
@@ -248,14 +247,13 @@ void FillBlockColumnForCoarseToCoarseInterface(int                              
 	PatchInfo<3> new_pinfo = pinfo;
 	new_pinfo.setNbrInfo(Side<3>::west(), nullptr);
 	new_pinfo.setNbrInfo(s, new FineNbrInfo<2>());
-	std::vector<ComponentView<const double, 3>> us = {u};
-	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
-	View<const double, 2> slice       = u.getSliceOn(s, {0});
-	View<double, 2>       ghost_slice = u.getGhostSliceOn(s, {0});
+	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u);
+	View<const double, 3> slice       = u.getSliceOn(s, {0});
+	View<double, 3>       ghost_slice = u.getGhostSliceOn(s, {0});
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
-			block[(xi + yi * n) * n * n + j] = -(slice[{xi, yi}] + ghost_slice[{xi, yi}]) / 2;
-			ghost_slice[{xi, yi}]            = 0;
+			block[(xi + yi * n) * n * n + j] = -(slice(xi, yi, 0) + ghost_slice(xi, yi, 0)) / 2;
+			ghost_slice(xi, yi, 0)           = 0;
 		}
 	}
 }
@@ -271,7 +269,7 @@ void FillBlockColumnForCoarseToCoarseInterface(int                              
  * @param block
  */
 void FillBlockColumnForFineToFineInterface(int                                      j,
-                                           const ComponentView<const double, 3> &   u,
+                                           const PatchView<const double, 3> &       u,
                                            Side<3>                                  s,
                                            std::shared_ptr<const MPIGhostFiller<3>> ghost_filler,
                                            const PatchInfo<3> &                     pinfo,
@@ -282,14 +280,13 @@ void FillBlockColumnForFineToFineInterface(int                                  
 	PatchInfo<3> new_pinfo = pinfo;
 	new_pinfo.setNbrInfo(Side<3>::west(), nullptr);
 	new_pinfo.setNbrInfo(s, new CoarseNbrInfo<2>(100, type.getOrthant()));
-	std::vector<ComponentView<const double, 3>> us = {u};
-	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, us);
-	View<const double, 2> slice       = u.getSliceOn(s, {0});
-	View<double, 2>       ghost_slice = u.getGhostSliceOn(s, {0});
+	ghost_filler->fillGhostCellsForLocalPatch(new_pinfo, u);
+	View<const double, 3> slice       = u.getSliceOn(s, {0});
+	View<double, 3>       ghost_slice = u.getGhostSliceOn(s, {0});
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
-			block[(xi + yi * n) * n * n + j] = -(slice[{xi, yi}] + ghost_slice[{xi, yi}]) / 2;
-			ghost_slice[{xi, yi}]            = 0;
+			block[(xi + yi * n) * n * n + j] = -(slice(xi, yi, 0) + ghost_slice(xi, yi, 0)) / 2;
+			ghost_slice(xi, yi, 0)           = 0;
 		}
 	}
 }
@@ -305,7 +302,7 @@ void FillBlockColumnForFineToFineInterface(int                                  
  * @param block
  */
 void FillBlockColumnForCoarseToFineInterface(int                                      j,
-                                             const ComponentView<const double, 3> &   u,
+                                             const PatchView<const double, 3> &       u,
                                              Side<3>                                  s,
                                              std::shared_ptr<const MPIGhostFiller<3>> ghost_filler,
                                              const PatchInfo<3> &                     pinfo,
@@ -316,10 +313,9 @@ void FillBlockColumnForCoarseToFineInterface(int                                
 	PatchInfo<3> new_pinfo = pinfo;
 	new_pinfo.setNbrInfo(Side<3>::west(), nullptr);
 	new_pinfo.setNbrInfo(s, new FineNbrInfo<2>());
-	vector<double>                              ghosts(n * n);
-	std::vector<ComponentView<const double, 3>> us        = {u};
-	std::vector<ComponentView<const double, 3>> nbr_datas = {getComponentViewForBuffer(ghosts.data(), pinfo, s.opposite())};
-	ghost_filler->fillGhostCellsForNbrPatch(new_pinfo, us, nbr_datas, s, NbrType::Fine, type.getOrthant());
+	vector<double>             ghosts(n * n);
+	PatchView<const double, 3> nbr_view = getPatchViewForBuffer(ghosts.data(), pinfo, s.opposite());
+	ghost_filler->fillGhostCellsForNbrPatch(new_pinfo, u, nbr_view, s, NbrType::Fine, type.getOrthant());
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			block[(xi + yi * n) * n * n + j] = -ghosts[xi + yi * n] / 2;
@@ -338,7 +334,7 @@ void FillBlockColumnForCoarseToFineInterface(int                                
  * @param block
  */
 void FillBlockColumnForFineToCoarseInterface(int                                      j,
-                                             const ComponentView<const double, 3> &   u,
+                                             const PatchView<const double, 3> &       u,
                                              Side<3>                                  s,
                                              std::shared_ptr<const MPIGhostFiller<3>> ghost_filler,
                                              const PatchInfo<3> &                     pinfo,
@@ -349,10 +345,9 @@ void FillBlockColumnForFineToCoarseInterface(int                                
 	PatchInfo<3> new_pinfo = pinfo;
 	new_pinfo.setNbrInfo(Side<3>::west(), nullptr);
 	new_pinfo.setNbrInfo(s, new CoarseNbrInfo<2>(100, type.getOrthant()));
-	vector<double>                              ghosts(n * n);
-	std::vector<ComponentView<const double, 3>> us        = {u};
-	std::vector<ComponentView<const double, 3>> nbr_datas = {getComponentViewForBuffer(ghosts.data(), pinfo, s.opposite())};
-	ghost_filler->fillGhostCellsForNbrPatch(new_pinfo, us, nbr_datas, s, NbrType::Coarse, type.getOrthant());
+	vector<double>             ghosts(n * n);
+	PatchView<const double, 3> nbr_view = getPatchViewForBuffer(ghosts.data(), pinfo, s.opposite());
+	ghost_filler->fillGhostCellsForNbrPatch(new_pinfo, u, nbr_view, s, NbrType::Coarse, type.getOrthant());
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			block[(xi + yi * n) * n * n + j] = -ghosts[xi + yi * n] / 2;
@@ -411,35 +406,33 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 		for (int xi = 0; xi < n; xi++) {
 			int j = xi + yi * n;
 			// create some work vectors
-			auto                           u_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1, 1);
-			auto                           f_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1, 1);
-			ComponentView<const double, 3> u_local_data  = u_vec->getComponentView(0, 0);
-			auto                           u_local_datas = u_vec->getComponentViews(0);
-			View<double, 2>                u_west_ghosts = u_local_data.getGhostSliceOn(Side<3>::west(), {0});
-			ComponentView<const double, 3> f_local_data  = f_vec->getComponentView(0, 0);
-			auto                           f_local_datas = {f_local_data};
+			auto                 u_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1, 1);
+			auto                 f_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1, 1);
+			PatchView<double, 3> u_view        = u_vec->getPatchView(0);
+			View<double, 3>      u_west_ghosts = u_view.getGhostSliceOn(Side<3>::west(), {0});
+			PatchView<double, 3> f_view        = f_vec->getPatchView(0);
 
-			u_west_ghosts[{xi, yi}] = 2;
+			u_west_ghosts(xi, yi, 0) = 2;
 
-			solver->solveSinglePatch(pinfo, f_local_datas, u_local_datas);
+			solver->solveSinglePatch(pinfo, f_view, u_view);
 
 			for (const auto &pair : coeffs) {
 				Side<3>         s     = pair.first.aux;
 				IfaceType<3>    type  = pair.first.type;
 				vector<double> &block = *pair.second;
 				if (type.isNormal()) {
-					FillBlockColumnForNormalInterface(j, u_local_data, s, block);
+					FillBlockColumnForNormalInterface(j, u_view, s, block);
 				} else if (type.isCoarseToCoarse()) {
-					FillBlockColumnForCoarseToCoarseInterface(j, u_local_data, s, ghost_filler, pinfo, block);
+					FillBlockColumnForCoarseToCoarseInterface(j, u_view, s, ghost_filler, pinfo, block);
 
 				} else if (type.isFineToFine()) {
-					FillBlockColumnForFineToFineInterface(j, u_local_data, s, ghost_filler, pinfo, type, block);
+					FillBlockColumnForFineToFineInterface(j, u_view, s, ghost_filler, pinfo, type, block);
 
 				} else if (type.isCoarseToFine()) {
-					FillBlockColumnForCoarseToFineInterface(j, u_local_data, s, ghost_filler, pinfo, type, block);
+					FillBlockColumnForCoarseToFineInterface(j, u_view, s, ghost_filler, pinfo, type, block);
 
 				} else if (type.isFineToCoarse()) {
-					FillBlockColumnForFineToCoarseInterface(j, u_local_data, s, ghost_filler, pinfo, type, block);
+					FillBlockColumnForFineToCoarseInterface(j, u_view, s, ghost_filler, pinfo, type, block);
 				}
 
 				if (s == Side<3>::west()) {

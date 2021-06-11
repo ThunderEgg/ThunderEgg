@@ -67,32 +67,26 @@ class MockPatchOperator : public PatchOperator<D>
 			patches_to_be_called.insert(&pinfo);
 		}
 	}
-	void applySinglePatch(const PatchInfo<D> &                               pinfo,
-	                      const std::vector<ComponentView<const double, D>> &us, const std::vector<ComponentView<double, D>> &fs) const override
+	void applySinglePatch(const PatchInfo<D> &              pinfo,
+	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
 		CHECK(patches_to_be_called.count(&pinfo) == 1);
 		patches_to_be_called.erase(&pinfo);
 		INFO("LOCAL_INDEX: " << pinfo.local_index);
-		std::array<int, D> zero;
+		std::array<int, D + 1> zero;
 		zero.fill(0);
-		for (int c = 0; c < u_vec->getNumComponents(); c++) {
-			INFO("c: " << c);
-			CHECK(&u_vec->getComponentView(c, pinfo.local_index)[zero] == &us[c][zero]);
-		}
-		for (int c = 0; c < f_vec->getNumComponents(); c++) {
-			INFO("c: " << c);
-			CHECK(&f_vec->getComponentView(c, pinfo.local_index)[zero] == &fs[c][zero]);
-		}
+		CHECK(&u_vec->getPatchView(pinfo.local_index)[zero] == &us[zero]);
+		CHECK(&f_vec->getPatchView(pinfo.local_index)[zero] == &fs[zero]);
 	}
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
 	}
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const override
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
 	}
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                               pinfo,
-	                                                   const std::vector<ComponentView<const double, D>> &us,
-	                                                   const std::vector<ComponentView<double, D>> &      fs) const override
+	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
+	                                                   const PatchView<const double, D> &us,
+	                                                   const PatchView<double, D> &      fs) const override
 	{
 	}
 	bool allPatchesCalled()

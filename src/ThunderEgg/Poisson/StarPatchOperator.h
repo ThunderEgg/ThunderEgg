@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  This program is distributed in the hope that it will be u_vieweful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -54,8 +54,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 * @brief Construct a new StarPatchOperator object
 	 *
 	 * @param domain_in the Domain that the operator is associated with
-	 * @param ghost_filler_in the GhostFiller to use before calling applySinglePatch
-	 * @param neumann_in whether or not to use Neumann boundary conditions
+	 * @param ghost_filler_in the GhostFiller to u_viewe before calling applySinglePatch
+	 * @param neumann_in whether or not to u_viewe Neumann boundary conditions
 	 */
 	StarPatchOperator(std::shared_ptr<const Domain<D>> domain_in, std::shared_ptr<const GhostFiller<D>> ghost_filler_in, bool neumann_in = false)
 	: PatchOperator<D>(domain_in, ghost_filler_in),
@@ -65,9 +65,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
 	}
-	void applySinglePatch(const PatchInfo<D> &                               pinfo,
-	                      const std::vector<ComponentView<const double, D>> &us,
-	                      const std::vector<ComponentView<double, D>> &      fs) const override
+	void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const override
 	{
 		std::array<double, D> h2 = pinfo.spacings;
 		for (size_t i = 0; i < D; i++) {
@@ -75,73 +73,69 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 
 		loop<0, D - 1>([&](int axis) {
-			int stride = us[0].getStrides()[axis];
-			nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) {
-				const double *ptr   = &us[0][coord];
+			int stride = u_view.getStrides()[axis];
+			loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) {
+				const double *ptr   = &u_view[coord];
 				double        lower = *(ptr - stride);
 				double        mid   = *ptr;
 				double        upper = *(ptr + stride);
-				fs[0][coord]        = addValue(axis) * fs[0][coord] + (upper - 2 * mid + lower) / h2[axis];
+				f_view[coord]       = addValue(axis) * f_view[coord] + (upper - 2 * mid + lower) / h2[axis];
 			});
 		});
 	}
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const override
 	{
 		for (int axis = 0; axis < D; axis++) {
 			Side<D> lower_side = LowerSideOnAxis<D>(axis);
 			Side<D> upper_side = HigherSideOnAxis<D>(axis);
 			if (!pinfo.hasNbr(lower_side)) {
-				View<double, D - 1>       lower     = us[0].getGhostSliceOn(lower_side, {0});
-				View<const double, D - 1> lower_mid = us[0].getSliceOn(lower_side, {0});
+				View<double, D>       lower     = u_view.getGhostSliceOn(lower_side, {0});
+				View<const double, D> lower_mid = u_view.getSliceOn(lower_side, {0});
 				if (neumann) {
-					nested_loop<D - 1>(
-					lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = lower_mid[coord]; });
+					loop_over_interior_indexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = lower_mid[coord]; });
 				} else {
-					nested_loop<D - 1>(
-					lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -lower_mid[coord]; });
+					loop_over_interior_indexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
 				}
 			}
 			if (!pinfo.hasNbr(upper_side)) {
-				View<double, D - 1>       upper     = us[0].getGhostSliceOn(upper_side, {0});
-				View<const double, D - 1> upper_mid = us[0].getSliceOn(upper_side, {0});
+				View<double, D>       upper     = u_view.getGhostSliceOn(upper_side, {0});
+				View<const double, D> upper_mid = u_view.getSliceOn(upper_side, {0});
 				if (neumann) {
-					nested_loop<D - 1>(
-					upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = upper_mid[coord]; });
+					loop_over_interior_indexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = upper_mid[coord]; });
 				} else {
-					nested_loop<D - 1>(
-					upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -upper_mid[coord]; });
+					loop_over_interior_indexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
 				}
 			}
 		}
 	}
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const override
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const override
 	{
 		for (int axis = 0; axis < D; axis++) {
 			Side<D> lower_side = LowerSideOnAxis<D>(axis);
 			Side<D> upper_side = HigherSideOnAxis<D>(axis);
 			if (pinfo.hasNbr(lower_side)) {
-				View<double, D - 1>       lower     = us[0].getGhostSliceOn(lower_side, {0});
-				View<const double, D - 1> lower_mid = us[0].getSliceOn(lower_side, {0});
-				nested_loop<D - 1>(lower_mid.getStart(), lower_mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -lower_mid[coord]; });
+				View<double, D>       lower     = u_view.getGhostSliceOn(lower_side, {0});
+				View<const double, D> lower_mid = u_view.getSliceOn(lower_side, {0});
+				loop_over_interior_indexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
 			}
 			if (pinfo.hasNbr(upper_side)) {
-				View<double, D - 1>       upper     = us[0].getGhostSliceOn(upper_side, {0});
-				View<const double, D - 1> upper_mid = us[0].getSliceOn(upper_side, {0});
-				nested_loop<D - 1>(upper_mid.getStart(), upper_mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -upper_mid[coord]; });
+				View<double, D>       upper     = u_view.getGhostSliceOn(upper_side, {0});
+				View<const double, D> upper_mid = u_view.getSliceOn(upper_side, {0});
+				loop_over_interior_indexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
 			}
 		}
 	}
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                               pinfo,
-	                                                   const std::vector<ComponentView<const double, D>> &us,
-	                                                   const std::vector<ComponentView<double, D>> &      fs) const override
+	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
+	                                                   const PatchView<const double, D> &u_view,
+	                                                   const PatchView<double, D> &      f_view) const override
 	{
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo.hasNbr(s)) {
-				double                    h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
-				View<double, D - 1>       f_inner = fs[0].getSliceOn(s, {0});
-				View<double, D - 1>       u_ghost = us[0].getGhostSliceOn(s, {0});
-				View<const double, D - 1> u_inner = us[0].getSliceOn(s, {0});
-				nested_loop<D - 1>(f_inner.getStart(), f_inner.getEnd(), [&](const std::array<int, D - 1> &coord) {
+				double                h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
+				View<double, D>       f_inner = f_view.getSliceOn(s, {0});
+				View<double, D>       u_ghost = u_view.getGhostSliceOn(s, {0});
+				View<const double, D> u_inner = u_view.getSliceOn(s, {0});
+				loop_over_interior_indexes<D>(f_inner, [&](const std::array<int, D> &coord) {
 					f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2;
 					u_ghost[coord] = 0;
 				});

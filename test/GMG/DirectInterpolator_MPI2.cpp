@@ -50,30 +50,26 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		auto lds = coarse_vec->getComponentViews(pinfo.local_index);
-		for (int c = 0; c < num_components; c++) {
-			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + c;
-			});
-		}
+		PatchView<double, 2> view = coarse_vec->getPatchView(pinfo.local_index);
+		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
+			view[coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + coord[2];
+		});
 	}
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto lds = fine_expected->getComponentViews(pinfo.local_index);
+		PatchView<double, 2> view = fine_expected->getPatchView(pinfo.local_index);
 
 		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
 		for (size_t i = 0; i < 2; i++) {
-			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : (lds[0].getEnd()[i] + 1);
+			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : (view.getEnd()[i] + 1);
 		}
 
-		for (int c = 0; c < num_components; c++) {
-			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 1 + pinfo.parent_id * nx * ny + (coord[0] + starts[0]) / 2
-				                + (coord[1] + starts[1]) / 2 * nx + c;
-			});
-		}
+		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
+			view[coord] = 1 + pinfo.parent_id * nx * ny + (coord[0] + starts[0]) / 2
+			              + (coord[1] + starts[1]) / 2 * nx + coord[2];
+		});
 	}
 
 	auto interpolator
@@ -87,14 +83,12 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		auto vec_lds      = fine_vec->getComponentViews(pinfo.local_index);
-		auto expected_lds = fine_expected->getComponentViews(pinfo.local_index);
-		for (int c = 0; c < num_components; c++) {
-			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
-			               [&](const array<int, 2> &coord) {
-				               REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
-			               });
-		}
+		PatchView<double, 2> vec_view      = fine_vec->getPatchView(pinfo.local_index);
+		PatchView<double, 2> expected_view = fine_expected->getPatchView(pinfo.local_index);
+		loop_over_interior_indexes<3>(vec_view,
+		                              [&](const array<int, 3> &coord) {
+			                              REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
+		                              });
 	}
 }
 TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::DirectInterpolator]")
@@ -113,30 +107,26 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		auto lds = coarse_vec->getComponentViews(pinfo.local_index);
-		for (int c = 0; c < num_components; c++) {
-			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + c;
-			});
-		}
+		PatchView<double, 2> view = coarse_vec->getPatchView(pinfo.local_index);
+		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
+			view[coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + coord[2];
+		});
 	}
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto lds = fine_expected->getComponentViews(pinfo.local_index);
+		PatchView<double, 2> view = fine_expected->getPatchView(pinfo.local_index);
 
 		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
 		for (size_t i = 0; i < 2; i++) {
-			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : (lds[0].getEnd()[i] + 1);
+			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : (view.getEnd()[i] + 1);
 		}
 
-		for (int c = 0; c < num_components; c++) {
-			nested_loop<2>(lds[c].getStart(), lds[c].getEnd(), [&](const array<int, 2> &coord) {
-				lds[c][coord] = 2 + pinfo.parent_id * nx * ny + (coord[0] + starts[0]) / 2
-				                + (coord[1] + starts[1]) / 2 * nx + c;
-			});
-		}
+		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
+			view[coord] = 2 + pinfo.parent_id * nx * ny + (coord[0] + starts[0]) / 2
+			              + (coord[1] + starts[1]) / 2 * nx + coord[2];
+		});
 	}
 
 	fine_vec->set(1.0);
@@ -152,13 +142,11 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		auto vec_lds      = fine_vec->getComponentViews(pinfo.local_index);
-		auto expected_lds = fine_expected->getComponentViews(pinfo.local_index);
-		for (int c = 0; c < num_components; c++) {
-			nested_loop<2>(vec_lds[c].getStart(), vec_lds[c].getEnd(),
-			               [&](const array<int, 2> &coord) {
-				               REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
-			               });
-		}
+		PatchView<double, 2> vec_view      = fine_vec->getPatchView(pinfo.local_index);
+		PatchView<double, 2> expected_view = fine_expected->getPatchView(pinfo.local_index);
+		loop_over_interior_indexes<3>(vec_view,
+		                              [&](const array<int, 3> &coord) {
+			                              REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
+		                              });
 	}
 }

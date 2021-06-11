@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  This program is distributed in the hope that it will be u_vieweful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -43,7 +43,7 @@ namespace VarPoisson
 template <int D> class StarPatchOperator : public PatchOperator<D>
 {
 	protected:
-	std::shared_ptr<const Vector<D>> coeffs;
+	std::shared_ptr<const Vector<D>> coeff_view;
 
 	constexpr int addValue(int axis) const
 	{
@@ -54,35 +54,33 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	/**
 	 * @brief Construct a new StarPatchOperator object
 	 *
-	 * @param coeffs_in the cell centered coefficients
+	 * @param coeff_view_in the cell centered coefficients
 	 * @param domain_in the Domain associated with the operator
-	 * @param ghost_filler_in the GhostFiller to use before calling applySinglePatch
+	 * @param ghost_filler_in the GhostFiller to u_viewe before calling applySinglePatch
 	 */
-	StarPatchOperator(std::shared_ptr<const Vector<D>>      coeffs_in,
+	StarPatchOperator(std::shared_ptr<const Vector<D>>      coeff_view_in,
 	                  std::shared_ptr<const Domain<D>>      domain_in,
 	                  std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
 	: PatchOperator<D>(domain_in, ghost_filler_in),
-	  coeffs(coeffs_in)
+	  coeff_view(coeff_view_in)
 	{
 		if (this->domain->getNumGhostCells() < 1) {
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
-		this->ghost_filler->fillGhost(this->coeffs);
+		this->ghost_filler->fillGhost(this->coeff_view);
 	}
-	void applySinglePatch(const PatchInfo<D> &                               pinfo,
-	                      const std::vector<ComponentView<const double, D>> &us,
-	                      const std::vector<ComponentView<double, D>> &      fs) const override
+	void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const override
 	{
-		const ComponentView<const double, D> c  = coeffs->getComponentView(0, pinfo.local_index);
-		std::array<double, D>                h2 = pinfo.spacings;
+		PatchView<const double, D> c  = coeff_view->getPatchView(pinfo.local_index);
+		std::array<double, D>      h2 = pinfo.spacings;
 		for (size_t i = 0; i < D; i++) {
 			h2[i] *= h2[i];
 		}
 		loop<0, D - 1>([&](int axis) {
-			int stride   = us[0].getStrides()[axis];
+			int stride   = u_view.getStrides()[axis];
 			int c_stride = c.getStrides()[axis];
-			nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) {
-				const double *ptr     = &us[0][coord];
+			loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) {
+				const double *ptr     = &u_view[coord];
 				const double *c_ptr   = &c[coord];
 				double        lower   = *(ptr - stride);
 				double        mid     = *ptr;
@@ -90,62 +88,62 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 				double        c_lower = *(c_ptr - c_stride);
 				double        c_mid   = *c_ptr;
 				double        c_upper = *(c_ptr + c_stride);
-				fs[0][coord]
-				= addValue(axis) * fs[0][coord] + ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower)) / (2 * h2[axis]);
+				f_view[coord]
+				= addValue(axis) * f_view[coord] + ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower)) / (2 * h2[axis]);
 			});
 		});
 	}
 
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const override
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const override
 	{
 		for (int axis = 0; axis < D; axis++) {
 			Side<D> lower_side(axis * 2);
 			Side<D> upper_side(axis * 2 + 1);
 			if (!pinfo.hasNbr(lower_side)) {
-				View<double, D - 1>       lower = us[0].getGhostSliceOn(lower_side, {0});
-				View<const double, D - 1> mid   = us[0].getSliceOn(lower_side, {0});
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -mid[coord]; });
+				View<double, D>       lower = u_view.getGhostSliceOn(lower_side, {0});
+				View<const double, D> mid   = u_view.getSliceOn(lower_side, {0});
+				loop_over_interior_indexes<D>(mid, [&](std::array<int, D> coord) { lower[coord] = -mid[coord]; });
 			}
 			if (!pinfo.hasNbr(upper_side)) {
-				View<double, D - 1>       upper = us[0].getGhostSliceOn(upper_side, {0});
-				View<const double, D - 1> mid   = us[0].getSliceOn(upper_side, {0});
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -mid[coord]; });
+				View<double, D>       upper = u_view.getGhostSliceOn(upper_side, {0});
+				View<const double, D> mid   = u_view.getSliceOn(upper_side, {0});
+				loop_over_interior_indexes<D>(mid, [&](std::array<int, D> coord) { upper[coord] = -mid[coord]; });
 			}
 		}
 	}
 
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const override
+	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const override
 	{
 		for (int axis = 0; axis < D; axis++) {
 			Side<D> lower_side(axis * 2);
 			Side<D> upper_side(axis * 2 + 1);
 			if (pinfo.hasNbr(lower_side)) {
-				View<double, D - 1>       lower = us[0].getGhostSliceOn(lower_side, {0});
-				View<const double, D - 1> mid   = us[0].getSliceOn(lower_side, {0});
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -mid[coord]; });
+				View<double, D>       lower = u_view.getGhostSliceOn(lower_side, {0});
+				View<const double, D> mid   = u_view.getSliceOn(lower_side, {0});
+				loop_over_interior_indexes<D>(mid, [&](std::array<int, D> coord) { lower[coord] = -mid[coord]; });
 			}
 			if (pinfo.hasNbr(upper_side)) {
-				View<double, D - 1>       upper = us[0].getGhostSliceOn(upper_side, {0});
-				View<const double, D - 1> mid   = us[0].getSliceOn(upper_side, {0});
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -mid[coord]; });
+				View<double, D>       upper = u_view.getGhostSliceOn(upper_side, {0});
+				View<const double, D> mid   = u_view.getSliceOn(upper_side, {0});
+				loop_over_interior_indexes<D>(mid, [&](std::array<int, D> coord) { upper[coord] = -mid[coord]; });
 			}
 		}
 	}
 
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                               pinfo,
-	                                                   const std::vector<ComponentView<const double, D>> &us,
-	                                                   const std::vector<ComponentView<double, D>> &      fs) const override
+	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
+	                                                   const PatchView<const double, D> &u_view,
+	                                                   const PatchView<double, D> &      f_view) const override
 	{
-		const ComponentView<const double, D> c = coeffs->getComponentView(0, pinfo.local_index);
+		PatchView<const double, D> c = coeff_view->getPatchView(pinfo.local_index);
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo.hasNbr(s)) {
-				double                    h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
-				View<double, D - 1>       f_inner = fs[0].getSliceOn(s, {0});
-				View<double, D - 1>       u_ghost = us[0].getGhostSliceOn(s, {0});
-				View<const double, D - 1> u_inner = us[0].getSliceOn(s, {0});
-				View<const double, D - 1> c_ghost = c.getSliceOn(s, {-1});
-				View<const double, D - 1> c_inner = c.getSliceOn(s, {0});
-				nested_loop<D - 1>(f_inner.getStart(), f_inner.getEnd(), [&](const std::array<int, D - 1> &coord) {
+				double                h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
+				View<double, D>       f_inner = f_view.getSliceOn(s, {0});
+				View<double, D>       u_ghost = u_view.getGhostSliceOn(s, {0});
+				View<const double, D> u_inner = u_view.getSliceOn(s, {0});
+				View<const double, D> c_ghost = c.getSliceOn(s, {-1});
+				View<const double, D> c_inner = c.getSliceOn(s, {0});
+				loop_over_interior_indexes<D>(f_inner, [&](const std::array<int, D> &coord) {
 					f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) * (c_inner[coord] + c_ghost[coord]) / (2 * h2);
 					u_ghost[coord] = 0;
 				});

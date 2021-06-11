@@ -135,10 +135,10 @@ TEST_CASE("Vector<3> getComponentViews", "[Vector]")
 	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto lds = vec.getComponentViews(i);
+		auto lds = vec.getPatchView(i);
 		for (int c = 0; c < vec.getNumComponents(); c++) {
 			auto ld = vec.getComponentView(c, i);
-			CHECK(&ld[{0, 0, 0}] == &lds[c][{0, 0, 0}]);
+			CHECK(&ld[{0, 0, 0}] == &lds[{0, 0, 0, c}]);
 		}
 	}
 }
@@ -162,10 +162,10 @@ TEST_CASE("Vector<3> getComponentViews const", "[Vector]")
 	INFO("num_components:    " << num_components);
 
 	for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-		auto lds = vec.getComponentViews(i);
+		auto lds = vec.getPatchView(i);
 		for (int c = 0; c < vec.getNumComponents(); c++) {
 			auto ld = vec.getComponentView(c, i);
-			CHECK(&ld[{0, 0, 0}] == &lds[c][{0, 0, 0}]);
+			CHECK(&ld[{0, 0, 0}] == &lds[{0, 0, 0, c}]);
 		}
 	}
 }

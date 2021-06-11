@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  This program is distributed in the hope that it will be u_vieweful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -70,45 +70,43 @@ template <int D> class PatchOperator : public Operator<D>
 	 * The ghost values in u will be updated to the latest values, and should not need to be modified
 	 *
 	 * @param pinfo  the patch
-	 * @param us the right hand side
-	 * @param fs the left hand side
+	 * @param u_view the right hand side
+	 * @param f_view the left hand side
 	 * @param treat_interior_boundary_as_dirichlet if true, the stencil of the patch should be
 	 * modified so that the interior boundaries are assumed to be zero, and the ghost values should
-	 * not be used
+	 * not be u_viewed
 	 */
-	virtual void applySinglePatch(const PatchInfo<D> &                               pinfo,
-	                              const std::vector<ComponentView<const double, D>> &us,
-	                              const std::vector<ComponentView<double, D>> &      fs) const = 0;
+	virtual void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const = 0;
 
 	/**
 	 * @brief modify values in ghost cells in order to enforce boundary conditions
 	 *
 	 * @param pinfo the patch info
-	 * @param us the left hand side
+	 * @param u_view the left hand side
 	 */
-	virtual void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const = 0;
+	virtual void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const = 0;
 
 	/**
 	 * @brief modify values in ghost cells order to enforce zero dirichlet boundary conditions at the internal patch boundary
 	 *
 	 * @param pinfo the patch info
-	 * @param us the left hand side
+	 * @param u_view the left hand side
 	 */
-	virtual void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const std::vector<ComponentView<const double, D>> &us) const = 0;
+	virtual void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const = 0;
 
 	/**
 	 * @brief Treat the internal patch boundaries as an dirichlet boundary condition, and modify the
 	 * RHS accordingly.
 	 *
-	 * This will be used in patch solvers to formulate a RHS for the individual patch to solve for.
+	 * This will be u_viewed in patch solvers to formulate a RHS for the individual patch to solve for.
 	 *
 	 * @param pinfo the patch
-	 * @param us the left hand side
-	 * @param fs the right hand side
+	 * @param u_view the left hand side
+	 * @param f_view the right hand side
 	 */
-	virtual void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &                               pinfo,
-	                                                           const std::vector<ComponentView<const double, D>> &us,
-	                                                           const std::vector<ComponentView<double, D>> &      fs) const = 0;
+	virtual void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
+	                                                           const PatchView<const double, D> &u_view,
+	                                                           const PatchView<double, D> &      f_view) const = 0;
 
 	/**
 	 * @brief Apply the operator
@@ -122,10 +120,10 @@ template <int D> class PatchOperator : public Operator<D>
 	{
 		ghost_filler->fillGhost(u);
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			auto us = u->getComponentViews(pinfo.local_index);
-			enforceBoundaryConditions(pinfo, us);
-			auto fs = f->getComponentViews(pinfo.local_index);
-			applySinglePatch(pinfo, us, fs);
+			PatchView<const double, D> u_view = u->getPatchView(pinfo.local_index);
+			enforceBoundaryConditions(pinfo, u_view);
+			PatchView<double, D> f_view = f->getPatchView(pinfo.local_index);
+			applySinglePatch(pinfo, u_view, f_view);
 		}
 	}
 	/**

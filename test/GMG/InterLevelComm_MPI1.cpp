@@ -119,12 +119,10 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_vec, f);
 	int idx = 0;
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto vec_lds = coarse_vec->getComponentViews(i);
-		nested_loop<2>(vec_lds[0].getStart(), vec_lds[0].getEnd(), [&](const array<int, 2> &coord) {
-			for (size_t c = 0; c < vec_lds.size(); c++) {
-				vec_lds[c][coord] = idx;
-				idx++;
-			}
+		PatchView<double, 2> vec_view = coarse_vec->getPatchView(i);
+		loop_over_interior_indexes<3>(vec_view, [&](const array<int, 3> &coord) {
+			vec_view[coord] = idx;
+			idx++;
 		});
 	}
 	// since there are not ghost patches, the coarse vec should not be modified
@@ -133,12 +131,10 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto vec_lds      = coarse_vec->getComponentViews(i);
-		auto expected_lds = coarse_expected->getComponentViews(i);
-		nested_loop<2>(vec_lds[0].getStart(), vec_lds[0].getEnd(), [&](const array<int, 2> &coord) {
-			for (size_t c = 0; c < vec_lds.size(); c++) {
-				REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
-			}
+		PatchView<double, 2> vec_view      = coarse_vec->getPatchView(i);
+		PatchView<double, 2> expected_view = coarse_expected->getPatchView(i);
+		loop_over_interior_indexes<3>(vec_view, [&](const array<int, 3> &coord) {
+			REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
 		});
 	}
 }

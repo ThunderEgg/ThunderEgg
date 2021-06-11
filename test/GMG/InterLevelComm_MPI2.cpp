@@ -146,38 +146,29 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 
 	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
-		auto local_datas = coarse_vec->getComponentViews(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               INFO("c " << c);
-				               INFO("xi: " << coord[0]);
-				               INFO("yi: " << coord[1]);
-				               CHECK(local_datas[c][coord] == 3 + 2 * c);
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec->getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 3 + 2 * coord[2]);
+		                         });
 	} else {
 	}
 }
@@ -345,22 +336,18 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 
 	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
 	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
@@ -368,13 +355,11 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
-		auto local_datas = ghost_vec->getComponentViews(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               CHECK(local_datas[c][coord] == 1 + c);
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec->getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 1 + coord[2]);
+		                         });
 	}
 }
 TEST_CASE(
@@ -620,22 +605,18 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 
 		// fill vectors with rank+c+1
 		for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-			auto local_datas = coarse_vec->getComponentViews(i);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               local_datas[c][coord] = rank + c + 1;
-				               }
-			               });
+			PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         local_view[coord] = rank + coord[2] + 1;
+			                         });
 		}
 		for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-			auto local_datas = ghost_vec->getComponentViews(i);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               local_datas[c][coord] = rank + c + 1;
-				               }
-			               });
+			PatchView<double, 2> local_view = ghost_vec->getPatchView(i);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         local_view[coord] = rank + coord[2] + 1;
+			                         });
 		}
 
 		ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
@@ -643,13 +624,11 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 		if (rank == 0) {
 		} else {
 			// the coarse vec should be filled with 1+c
-			auto local_datas = ghost_vec->getComponentViews(0);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               CHECK(local_datas[c][coord] == 1 + c);
-				               }
-			               });
+			PatchView<double, 2> local_view = ghost_vec->getPatchView(0);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         CHECK(local_view[coord] == 1 + coord[2]);
+			                         });
 		}
 	}
 }
@@ -673,40 +652,31 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 
 		auto ghost_vec = ilc->getNewGhostVector();
 
-		// fill vectors with rank+1
+		// fill vectors with rank+c+1
 		for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-			auto local_datas = coarse_vec->getComponentViews(i);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               local_datas[c][coord] = rank + c + 1;
-				               }
-			               });
+			PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         local_view[coord] = rank + coord[2] + 1;
+			                         });
 		}
 		for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-			auto local_datas = ghost_vec->getComponentViews(i);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               local_datas[c][coord] = rank + c + 1;
-				               }
-			               });
+			PatchView<double, 2> local_view = ghost_vec->getPatchView(i);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         local_view[coord] = rank + coord[2] + 1;
+			                         });
 		}
 
 		ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
 		ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 		if (rank == 0) {
 			// the coarse vec should be filled with 3+2*c
-			auto local_datas = coarse_vec->getComponentViews(0);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               INFO("c " << c);
-					               INFO("xi: " << coord[0]);
-					               INFO("yi: " << coord[1]);
-					               CHECK(local_datas[c][coord] == 3 + 2 * c);
-				               }
-			               });
+			PatchView<double, 2> local_view = coarse_vec->getPatchView(0);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         CHECK(local_view[coord] == 3 + 2 * coord[2]);
+			                         });
 		} else {
 		}
 	}
@@ -730,61 +700,48 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
 	auto ghost_vec  = ilc->getNewGhostVector();
 
-	// fill vectors with rank+1
+	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
-		auto local_datas = coarse_vec->getComponentViews(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               INFO("c " << c);
-				               INFO("xi: " << coord[0]);
-				               INFO("yi: " << coord[1]);
-				               CHECK(local_datas[c][coord] == 3 + 2 * c);
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec->getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 3 + 2 * coord[2]);
+		                         });
 	} else {
 	}
 
-	// fill vectors with rank+1
+	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
 	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
@@ -792,13 +749,11 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
-		auto local_datas = ghost_vec->getComponentViews(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               CHECK(local_datas[c][coord] == 1 + c);
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec->getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 1 + coord[2]);
+		                         });
 	}
 }
 TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform quad",
@@ -820,24 +775,20 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
 	auto ghost_vec  = ilc->getNewGhostVector();
 
-	// fill vectors with rank+1
+	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
 	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
@@ -845,49 +796,38 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
-		auto local_datas = ghost_vec->getComponentViews(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               CHECK(local_datas[c][coord] == 1 + c);
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec->getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 1 + coord[2]);
+		                         });
 	}
 
-	// fill vectors with rank+1
+	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getComponentViews(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec->getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
 	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
 	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
-		auto local_datas = coarse_vec->getComponentViews(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               INFO("c " << c);
-				               INFO("xi: " << coord[0]);
-				               INFO("yi: " << coord[1]);
-				               CHECK(local_datas[c][coord] == 3 + 2 * c);
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec->getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 3 + 2 * coord[2]);
+		                         });
 	} else {
 	}
 }

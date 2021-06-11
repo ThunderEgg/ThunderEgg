@@ -37,22 +37,20 @@ TEST_CASE("PETSc::VecWrapper<1> getNumGhostCells", "[PETSc::VecWrapper]")
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
-	int           ny                = GENERATE(1, 4, 5);
-	array<int, 2> ns                = {nx, ny};
+	array<int, 2> lengths           = {nx, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size
-	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches * num_components;
+	= (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
-	INFO("ny:                " << ny);
 	INFO("num_local_patches: " << num_local_patches);
 
 	Vec vec;
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<1>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumGhostCells() == num_ghost_cells);
 
@@ -63,7 +61,7 @@ TEST_CASE("PETSc::VecWrapper<1> getMPIComm", "[PETSc::VecWrapper]")
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
-	array<int, 1> ns                = {nx};
+	array<int, 2> lengths           = {nx, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
 
@@ -75,7 +73,7 @@ TEST_CASE("PETSc::VecWrapper<1> getMPIComm", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<1>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<1>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getMPIComm() == MPI_COMM_WORLD);
 
@@ -86,7 +84,7 @@ TEST_CASE("PETSc::VecWrapper<1> getNumLocalPatches", "[PETSc::VecWrapper]")
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
-	array<int, 1> ns                = {nx};
+	array<int, 2> lengths           = {nx, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
 
@@ -98,7 +96,7 @@ TEST_CASE("PETSc::VecWrapper<1> getNumLocalPatches", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<1>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<1>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumLocalPatches() == num_local_patches);
 
@@ -109,7 +107,7 @@ TEST_CASE("PETSc::VecWrapper<1> getNumComponents", "[PETSc::VecWrapper]")
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
-	array<int, 1> ns                = {nx};
+	array<int, 2> lengths           = {nx, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
 
@@ -121,7 +119,7 @@ TEST_CASE("PETSc::VecWrapper<1> getNumComponents", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<1>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<1>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumComponents() == num_components);
 
@@ -132,7 +130,7 @@ TEST_CASE("PETSc::VecWrapper<1> getVec", "[PETSc::VecWrapper]")
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
-	array<int, 1> ns                = {nx};
+	array<int, 2> lengths           = {nx, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
 
@@ -144,7 +142,7 @@ TEST_CASE("PETSc::VecWrapper<1> getVec", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<1>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<1>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getVec() == vec);
 
@@ -155,7 +153,7 @@ TEST_CASE("PETSc::VecWrapper<1> getNumLocalCells", "[PETSc::VecWrapper]")
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
-	array<int, 1> ns                = {nx};
+	array<int, 2> lengths           = {nx, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * num_local_patches * num_components;
 
@@ -167,7 +165,7 @@ TEST_CASE("PETSc::VecWrapper<1> getNumLocalCells", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<1>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<1>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumLocalCells() == nx * num_local_patches);
 
@@ -179,7 +177,7 @@ TEST_CASE("PETSc::VecWrapper<2> getNumGhostCells", "[PETSc::VecWrapper]")
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
-	array<int, 2> ns                = {nx, ny};
+	array<int, 3> lengths           = {nx, ny, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches * num_components;
@@ -193,7 +191,7 @@ TEST_CASE("PETSc::VecWrapper<2> getNumGhostCells", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<2>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumGhostCells() == num_ghost_cells);
 
@@ -205,7 +203,7 @@ TEST_CASE("PETSc::VecWrapper<2> getMPIComm", "[PETSc::VecWrapper]")
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
-	array<int, 2> ns                = {nx, ny};
+	array<int, 3> lengths           = {nx, ny, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches * num_components;
@@ -219,7 +217,7 @@ TEST_CASE("PETSc::VecWrapper<2> getMPIComm", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<2>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getMPIComm() == MPI_COMM_WORLD);
 
@@ -231,7 +229,7 @@ TEST_CASE("PETSc::VecWrapper<2> getNumLocalPatches", "[PETSc::VecWrapper]")
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
-	array<int, 2> ns                = {nx, ny};
+	array<int, 3> lengths           = {nx, ny, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches * num_components;
@@ -245,7 +243,7 @@ TEST_CASE("PETSc::VecWrapper<2> getNumLocalPatches", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<2>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumLocalPatches() == num_local_patches);
 
@@ -257,7 +255,7 @@ TEST_CASE("PETSc::VecWrapper<2> getNumComponents", "[PETSc::VecWrapper]")
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
-	array<int, 2> ns                = {nx, ny};
+	array<int, 3> lengths           = {nx, ny, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches * num_components;
@@ -271,7 +269,7 @@ TEST_CASE("PETSc::VecWrapper<2> getNumComponents", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<2>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumComponents() == num_components);
 
@@ -283,7 +281,7 @@ TEST_CASE("PETSc::VecWrapper<2> getVec", "[PETSc::VecWrapper]")
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
-	array<int, 2> ns                = {nx, ny};
+	array<int, 3> lengths           = {nx, ny, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches * num_components;
@@ -297,7 +295,7 @@ TEST_CASE("PETSc::VecWrapper<2> getVec", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<2>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getVec() == vec);
 
@@ -309,7 +307,7 @@ TEST_CASE("PETSc::VecWrapper<2> getNumLocalCells", "[PETSc::VecWrapper]")
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
-	array<int, 2> ns                = {nx, ny};
+	array<int, 3> lengths           = {nx, ny, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_local_patches * num_components;
@@ -323,7 +321,7 @@ TEST_CASE("PETSc::VecWrapper<2> getNumLocalCells", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<2>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumLocalCells() == nx * ny * num_local_patches);
 
@@ -336,7 +334,7 @@ TEST_CASE("PETSc::VecWrapper<3> getNumGhostCells", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
 	int           nz                = GENERATE(1, 4, 5);
-	array<int, 3> ns                = {nx, ny, nz};
+	array<int, 4> lengths           = {nx, ny, nz, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
@@ -351,7 +349,7 @@ TEST_CASE("PETSc::VecWrapper<3> getNumGhostCells", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<3>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<3>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumGhostCells() == num_ghost_cells);
 
@@ -364,7 +362,7 @@ TEST_CASE("PETSc::VecWrapper<3> getMPIComm", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
 	int           nz                = GENERATE(1, 4, 5);
-	array<int, 3> ns                = {nx, ny, nz};
+	array<int, 4> lengths           = {nx, ny, nz, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
@@ -379,7 +377,7 @@ TEST_CASE("PETSc::VecWrapper<3> getMPIComm", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<3>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<3>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getMPIComm() == MPI_COMM_WORLD);
 
@@ -392,7 +390,7 @@ TEST_CASE("PETSc::VecWrapper<3> getNumLocalPatches", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
 	int           nz                = GENERATE(1, 4, 5);
-	array<int, 3> ns                = {nx, ny, nz};
+	array<int, 4> lengths           = {nx, ny, nz, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
@@ -407,7 +405,7 @@ TEST_CASE("PETSc::VecWrapper<3> getNumLocalPatches", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<3>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<3>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumLocalPatches() == num_local_patches);
 
@@ -420,7 +418,7 @@ TEST_CASE("PETSc::VecWrapper<3> getNumComponents", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
 	int           nz                = GENERATE(1, 4, 5);
-	array<int, 3> ns                = {nx, ny, nz};
+	array<int, 4> lengths           = {nx, ny, nz, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
@@ -435,7 +433,7 @@ TEST_CASE("PETSc::VecWrapper<3> getNumComponents", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<3>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<3>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumComponents() == num_components);
 
@@ -448,7 +446,7 @@ TEST_CASE("PETSc::VecWrapper<3> getVec", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
 	int           nz                = GENERATE(1, 4, 5);
-	array<int, 3> ns                = {nx, ny, nz};
+	array<int, 4> lengths           = {nx, ny, nz, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
@@ -463,7 +461,7 @@ TEST_CASE("PETSc::VecWrapper<3> getVec", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<3>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<3>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getVec() == vec);
 
@@ -476,7 +474,7 @@ TEST_CASE("PETSc::VecWrapper<3> getNumLocalCells", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
 	int           nz                = GENERATE(1, 4, 5);
-	array<int, 3> ns                = {nx, ny, nz};
+	array<int, 4> lengths           = {nx, ny, nz, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           size              = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells)
 	           * num_local_patches * num_components;
@@ -491,7 +489,7 @@ TEST_CASE("PETSc::VecWrapper<3> getNumLocalCells", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<3>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<3>>(vec, lengths, num_ghost_cells, false);
 
 	CHECK(vec_wrapper->getNumLocalCells() == nx * ny * nz * num_local_patches);
 
@@ -503,7 +501,7 @@ TEST_CASE("PETSc::VecWrapper<1> getComponentView.h", "[PETSc::VecWrapper]")
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
-	array<int, 1> ns                = {nx};
+	array<int, 2> lengths           = {nx, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           component_stride  = (nx + 2 * num_ghost_cells);
 	int           patch_stride      = component_stride * num_components;
@@ -517,7 +515,7 @@ TEST_CASE("PETSc::VecWrapper<1> getComponentView.h", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<1>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<1>>(vec, lengths, num_ghost_cells, false);
 
 	double *view;
 	VecGetArray(vec, &view);
@@ -540,7 +538,7 @@ TEST_CASE("PETSc::VecWrapper<1> getComponentView const", "[PETSc::VecWrapper]")
 	int           num_components    = GENERATE(1, 2, 3);
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
-	array<int, 1> ns                = {nx};
+	array<int, 2> lengths           = {nx, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           component_stride  = (nx + 2 * num_ghost_cells);
 	int           patch_stride      = component_stride * num_components;
@@ -554,7 +552,7 @@ TEST_CASE("PETSc::VecWrapper<1> getComponentView const", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<1>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<1>>(vec, lengths, num_ghost_cells, false);
 	auto const_vec_wrapper = std::const_pointer_cast<const PETSc::VecWrapper<1>>(vec_wrapper);
 
 	double *view;
@@ -579,7 +577,7 @@ TEST_CASE("PETSc::VecWrapper<2> getComponentView.h", "[PETSc::VecWrapper]")
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
-	array<int, 2> ns                = {nx, ny};
+	array<int, 3> lengths           = {nx, ny, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           component_stride  = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
 	int           patch_stride      = component_stride * num_components;
@@ -595,7 +593,7 @@ TEST_CASE("PETSc::VecWrapper<2> getComponentView.h", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<2>>(vec, lengths, num_ghost_cells, false);
 
 	double *view;
 	VecGetArray(vec, &view);
@@ -619,7 +617,7 @@ TEST_CASE("PETSc::VecWrapper<2> getComponentView const", "[PETSc::VecWrapper]")
 	auto          num_ghost_cells   = GENERATE(0, 1, 5);
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
-	array<int, 2> ns                = {nx, ny};
+	array<int, 3> lengths           = {nx, ny, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           component_stride  = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
 	int           patch_stride      = component_stride * num_components;
@@ -635,7 +633,7 @@ TEST_CASE("PETSc::VecWrapper<2> getComponentView const", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<2>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<2>>(vec, lengths, num_ghost_cells, false);
 	auto const_vec_wrapper = std::const_pointer_cast<const PETSc::VecWrapper<2>>(vec_wrapper);
 
 	double *view;
@@ -661,7 +659,7 @@ TEST_CASE("PETSc::VecWrapper<3> getComponentView.h", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
 	int           nz                = GENERATE(1, 4, 5);
-	array<int, 3> ns                = {nx, ny, nz};
+	array<int, 4> lengths           = {nx, ny, nz, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           component_stride
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
@@ -679,7 +677,7 @@ TEST_CASE("PETSc::VecWrapper<3> getComponentView.h", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<3>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<3>>(vec, lengths, num_ghost_cells, false);
 
 	double *view;
 	VecGetArray(vec, &view);
@@ -704,7 +702,7 @@ TEST_CASE("PETSc::VecWrapper<3> getComponentView const", "[PETSc::VecWrapper]")
 	int           nx                = GENERATE(1, 4, 5);
 	int           ny                = GENERATE(1, 4, 5);
 	int           nz                = GENERATE(1, 4, 5);
-	array<int, 3> ns                = {nx, ny, nz};
+	array<int, 4> lengths           = {nx, ny, nz, num_components};
 	int           num_local_patches = GENERATE(1, 13);
 	int           component_stride
 	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
@@ -722,7 +720,7 @@ TEST_CASE("PETSc::VecWrapper<3> getComponentView const", "[PETSc::VecWrapper]")
 	VecCreateMPI(MPI_COMM_WORLD, size, PETSC_DETERMINE, &vec);
 
 	auto vec_wrapper
-	= make_shared<PETSc::VecWrapper<3>>(vec, ns, num_components, num_ghost_cells, false);
+	= make_shared<PETSc::VecWrapper<3>>(vec, lengths, num_ghost_cells, false);
 	auto const_vec_wrapper = std::const_pointer_cast<const PETSc::VecWrapper<3>>(vec_wrapper);
 
 	double *view;

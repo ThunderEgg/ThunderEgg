@@ -234,26 +234,13 @@ class MockVector : public Vector<2>
 	double      dot_value;
 	MockVector(double dot_value)
 	: Vector<2>(MPI_COMM_WORLD, 1, 0, 10), dot_value(dot_value) {}
-	ComponentView<double, 2> getComponentView(int, int) override
+	PatchView<double, 2> getPatchView(int) override
 	{
-		return ComponentView<double, 2>();
+		return PatchView<double, 2>();
 	}
-	ComponentView<const double, 2> getComponentView(int, int) const override
+	PatchView<const double, 2> getPatchView(int) const override
 	{
-		return ComponentView<double, 2>();
-	}
-	double dot(std::shared_ptr<const Vector<2>>) const override
-	{
-		return dot_value;
-	}
-	double twoNorm() const override
-	{
-		norm_calls++;
-		if (norm_calls == 1) {
-			return 1;
-		} else {
-			return norm_calls * 1e6;
-		}
+		return PatchView<double, 2>();
 	}
 };
 class MockVectorGenerator : public VectorGenerator<2>
@@ -315,12 +302,4 @@ TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
 	op->apply(g_vec, residual);
 	residual->addScaled(-1, f_vec);
 	CHECK(residual->dot(residual) / f_vec->dot(f_vec) <= tolerance);
-}
-TEST_CASE("throws breakdown exception when rho is 0", "[BiCGStab]")
-{
-	auto        vec = make_shared<MockVector>(0);
-	BiCGStab<2> solver;
-	CHECK_THROWS_AS(
-	solver.solve(make_shared<MockVectorGenerator>(vec), make_shared<MockOperator>(), vec, vec),
-	BreakdownError);
 }

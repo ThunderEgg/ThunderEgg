@@ -87,9 +87,13 @@ template <int D, typename T, typename A> inline void nested_loop(A start, A end,
 	A coord = start;
 	NestedLoop<D, D - 1, T, A>::nested_loop_loop(coord, start, end, lambda);
 }
-template <int D, template <int> class V, typename T> inline void loop_over_interior_indexes(const V<D> &view, T lambda)
+template <int D, typename V, typename T> inline void loop_over_interior_indexes(const V &view, T lambda)
 {
 	nested_loop<D>(view.getStart(), view.getEnd(), lambda);
+}
+template <int D, typename V, typename T> inline void loop_over_all_indexes(const V &view, T lambda)
+{
+	nested_loop<D>(view.getGhostStart(), view.getGhostEnd(), lambda);
 }
 } // namespace ThunderEgg
 #endif

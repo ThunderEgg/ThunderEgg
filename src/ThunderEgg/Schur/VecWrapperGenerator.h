@@ -40,7 +40,7 @@ template <int D> class VecWrapperGenerator : public VectorGenerator<D>
 	/**
 	 * @brief The dimensions of an interface
 	 */
-	std::array<int, D> iface_ns;
+	std::array<int, D + 1> iface_ns;
 	/**
 	 * @brief The InterfaceDomain
 	 */
@@ -52,18 +52,17 @@ template <int D> class VecWrapperGenerator : public VectorGenerator<D>
 	 *
 	 * @param iface_domain the InterfaceDomain to generate ValVector objects for
 	 */
-	explicit VecWrapperGenerator(std::shared_ptr<InterfaceDomain<D + 1>> iface_domain)
-	: iface_domain(iface_domain)
+	explicit VecWrapperGenerator(std::shared_ptr<InterfaceDomain<D + 1>> iface_domain) : iface_domain(iface_domain)
 	{
 		std::array<int, D + 1> ns = iface_domain->getDomain()->getNs();
 		for (int i = 1; i < D + 1; i++) {
 			if (ns[0] != ns[i]) {
-				throw RuntimeError(
-				"Cannot form Schur compliment vector for Domain with non-square patches");
+				throw RuntimeError("Cannot form Schur compliment vector for Domain with non-square patches");
 			}
 		}
 
 		iface_ns.fill(ns[0]);
+		iface_ns[D] = 1;
 	}
 	std::shared_ptr<Vector<D>> getNewVector() const override
 	{
@@ -78,9 +77,8 @@ template <int D> class VecWrapperGenerator : public VectorGenerator<D>
 	{
 		int size = std::pow(iface_ns[0], D);
 		Vec u;
-		VecCreateMPI(MPI_COMM_WORLD, iface_domain->getNumLocalInterfaces() * size, PETSC_DETERMINE,
-		             &u);
-		return std::make_shared<PETSc::VecWrapper<D>>(u, iface_ns, 1, 0, true);
+		VecCreateMPI(MPI_COMM_WORLD, iface_domain->getNumLocalInterfaces() * size, PETSC_DETERMINE, &u);
+		return std::make_shared<PETSc::VecWrapper<D>>(u, iface_ns, 0, true);
 	}
 };
 } // namespace Schur

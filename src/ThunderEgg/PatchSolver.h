@@ -87,12 +87,10 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @brief Perform a single solve over a patch
 	 *
 	 * @param pinfo the PatchInfo for the patch
-	 * @param us the left hand side
-	 * @param fs the right hand side
+	 * @param f_view the left hand side
+	 * @param u_view the right hand side
 	 */
-	virtual void solveSinglePatch(const PatchInfo<D> &                               pinfo,
-	                              const std::vector<ComponentView<const double, D>> &fs,
-	                              const std::vector<ComponentView<double, D>> &      us) const = 0;
+	virtual void solveSinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &f_view, const PatchView<double, D> &u_view) const = 0;
 	/**
 	 * @brief Solve all the patches in the domain, assuming zero boundary conditions for the patches
 	 *
@@ -109,9 +107,9 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			if (domain->hasTimer()) {
 				domain->getTimer()->start("Single Patch Solve");
 			}
-			auto fs = f->getComponentViews(pinfo.local_index);
-			auto us = u->getComponentViews(pinfo.local_index);
-			solveSinglePatch(pinfo, fs, us);
+			PatchView<const double, D> f_view = f->getPatchView(pinfo.local_index);
+			PatchView<double, D>       u_view = u->getPatchView(pinfo.local_index);
+			solveSinglePatch(pinfo, f_view, u_view);
 			if (domain->hasTimer()) {
 				domain->getTimer()->stop("Single Patch Solve");
 			}
@@ -136,9 +134,9 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			if (domain->hasTimer()) {
 				domain->getTimer()->startPatchTiming(pinfo.id, domain->getId(), "Single Patch Solve");
 			}
-			auto fs = f->getComponentViews(pinfo.local_index);
-			auto us = u->getComponentViews(pinfo.local_index);
-			solveSinglePatch(pinfo, fs, us);
+			PatchView<const double, D> f_view = f->getPatchView(pinfo.local_index);
+			PatchView<double, D>       u_view = u->getPatchView(pinfo.local_index);
+			solveSinglePatch(pinfo, f_view, u_view);
 			if (domain->hasTimer()) {
 				domain->getTimer()->stopPatchTiming(pinfo.id, domain->getId(), "Single Patch Solve");
 			}
