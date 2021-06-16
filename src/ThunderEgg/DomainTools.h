@@ -187,10 +187,10 @@ class DomainTools
 	 * @param func the function
 	 */
 	template <int D>
-	static void SetValues(std::shared_ptr<Domain<D>>                           domain,
-	                      std::shared_ptr<Vector<D>>                           vec,
-	                      int                                                  component_index,
-	                      std::function<double(const std::array<double, D> &)> func)
+	static void SetValues(std::shared_ptr<Domain<D>>                                 domain,
+	                      std::shared_ptr<Vector<D>>                                 vec,
+	                      int                                                        component_index,
+	                      std::function<double(const std::array<double, (int) D> &)> func)
 	{
 		if (component_index >= vec->getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
@@ -294,7 +294,6 @@ class DomainTools
 	 * @brief Set the values for a vector with the given functions
 	 *
 	 * @tparam D the number of cartesian dimensions
-	 * @tparam T function type
 	 * @tparam Args additional functions
 	 * @param domain the domain that we are setting values for
 	 * @param vec the vector to set values in
@@ -302,8 +301,11 @@ class DomainTools
 	 * @param func the function
 	 * @param args additional functions for additional components
 	 */
-	template <int D, typename T, typename... Args>
-	static void SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, T func, Args... args)
+	template <int D, typename... Args>
+	static void SetValues(std::shared_ptr<Domain<D>>                           domain,
+	                      std::shared_ptr<Vector<D>>                           vec,
+	                      std::function<double(const std::array<double, D> &)> func,
+	                      Args... args)
 	{
 		_SetValues(domain, vec, 0, func, args...);
 	}
