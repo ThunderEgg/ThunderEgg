@@ -241,10 +241,10 @@ int main(int argc, char *argv[])
 	// read in a tree from file
 	Tree<2> t;
 	t = Tree<2>(mesh_filename);
-	for (int i = 0; i < div; i++) {
-		t.refineLeaves();
-	}
 	TreeToP4est ttp(t);
+	for (int i = 0; i < div; i++) {
+		ttp.divide();
+	}
 
 	auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
 		x = unit_x;
@@ -326,8 +326,8 @@ int main(int argc, char *argv[])
 	std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain, num_components));
 
 	// Create a smoother for the finest level
-	shared_ptr<GMG::Smoother<2>> finest_smoother;
-	bitset<4>                    neumann_bitset = neumann ? 0xF : 0x0;
+	shared_ptr<PatchSolver<2>> finest_smoother;
+	bitset<4>                  neumann_bitset = neumann ? 0xF : 0x0;
 	if (patch_solver == "dft") {
 		finest_smoother = make_shared<DFTPatchSolver<2>>(patch_operator, neumann_bitset);
 	} else if (patch_solver == "fftw") {
@@ -336,81 +336,86 @@ int main(int argc, char *argv[])
 		finest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, patch_operator);
 	}
 
-	// the next coarser domain is needed for the restrictor
-	shared_ptr<Domain<2>> coarser_domain = domain_generator->getCoarserDomain();
+	std::shared_ptr<Operator<2>> M;
+	if (true) {
+		// the next coarser domain is needed for the restrictor
+		shared_ptr<Domain<2>> coarser_domain = domain_generator->getCoarserDomain();
 
-	shared_ptr<GMG::Restrictor<2>> finest_restrictor = make_shared<GMG::LinearRestrictor<2>>(domain, coarser_domain, num_components);
+		shared_ptr<GMG::Restrictor<2>> finest_restrictor = make_shared<GMG::LinearRestrictor<2>>(domain, coarser_domain, num_components);
 
-	//add the finest level
-	builder.addFinestLevel(patch_operator, finest_smoother, finest_restrictor, vg);
+		//add the finest level
+		builder.addFinestLevel(patch_operator, finest_smoother, finest_restrictor, vg);
 
-	shared_ptr<Domain<2>> finer_domain   = domain;
-	shared_ptr<Domain<2>> current_domain = coarser_domain;
+		shared_ptr<Domain<2>> finer_domain   = domain;
+		shared_ptr<Domain<2>> current_domain = coarser_domain;
 
-	//generate each of the middle levels
-	while (domain_generator->hasCoarserDomain()) {
+		//generate each of the middle levels
+		while (domain_generator->hasCoarserDomain()) {
+			current_domain->setTimer(timer);
+			domain_level++;
+
+			// get the coarser domain
+			coarser_domain = domain_generator->getCoarserDomain();
+
+			// vector generator
+			auto middle_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, num_components);
+
+			// create operator for middle domain
+			auto middle_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
+			auto middle_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, middle_ghost_filler);
+
+			// smoother
+			shared_ptr<GMG::Smoother<2>> middle_smoother;
+			if (patch_solver == "dft") {
+				middle_smoother = make_shared<DFTPatchSolver<2>>(middle_patch_operator, neumann_bitset);
+			} else if (patch_solver == "fftw") {
+				middle_smoother = make_shared<FFTWPatchSolver<2>>(middle_patch_operator, neumann_bitset);
+			} else {
+				middle_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, middle_patch_operator);
+			}
+
+			// restrictor and interpolator
+			shared_ptr<GMG::Interpolator<2>> interpolator = make_shared<GMG::DirectInterpolator<2>>(current_domain, finer_domain, num_components);
+			shared_ptr<GMG::Restrictor<2>>   restrictor   = make_shared<GMG::LinearRestrictor<2>>(current_domain, coarser_domain, num_components);
+
+			// add the middle level
+			builder.addIntermediateLevel(middle_patch_operator, middle_smoother, restrictor, interpolator, middle_vector_generator);
+
+			finer_domain   = current_domain;
+			current_domain = coarser_domain;
+		}
 		current_domain->setTimer(timer);
-		domain_level++;
 
-		// get the coarser domain
-		coarser_domain = domain_generator->getCoarserDomain();
+		//add the coarsest level to the builder
 
 		// vector generator
-		auto middle_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, num_components);
+		shared_ptr<VectorGenerator<2>> coarsest_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, 1);
 
-		// create operator for middle domain
-		auto middle_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
-		auto middle_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, middle_ghost_filler);
+		// patch operator
+		shared_ptr<GhostFiller<2>>   coarsest_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
+		shared_ptr<PatchOperator<2>> coarsest_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, coarsest_ghost_filler);
 
 		// smoother
-		shared_ptr<GMG::Smoother<2>> middle_smoother;
+		shared_ptr<GMG::Smoother<2>> coarsest_smoother;
 		if (patch_solver == "dft") {
-			middle_smoother = make_shared<DFTPatchSolver<2>>(middle_patch_operator, neumann_bitset);
+			coarsest_smoother = make_shared<DFTPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
 		} else if (patch_solver == "fftw") {
-			middle_smoother = make_shared<FFTWPatchSolver<2>>(middle_patch_operator, neumann_bitset);
+			coarsest_smoother = make_shared<FFTWPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
 		} else {
-			middle_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, middle_patch_operator);
+			coarsest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, coarsest_patch_operator);
 		}
 
-		// restrictor and interpolator
-		shared_ptr<GMG::Interpolator<2>> interpolator = make_shared<GMG::DirectInterpolator<2>>(current_domain, finer_domain, num_components);
-		shared_ptr<GMG::Restrictor<2>>   restrictor   = make_shared<GMG::LinearRestrictor<2>>(current_domain, coarser_domain, num_components);
+		// coarsets level only needs an interpolator
+		shared_ptr<GMG::Interpolator<2>> interpolator = make_shared<GMG::DirectInterpolator<2>>(current_domain, finer_domain, 1);
 
-		// add the middle level
-		builder.addIntermediateLevel(middle_patch_operator, middle_smoother, restrictor, interpolator, middle_vector_generator);
+		// add the coarsest level
+		builder.addCoarsestLevel(coarsest_patch_operator, coarsest_smoother, interpolator, coarsest_vector_generator);
 
-		finer_domain   = current_domain;
-		current_domain = coarser_domain;
-	}
-	current_domain->setTimer(timer);
-
-	//add the coarsest level to the builder
-
-	// vector generator
-	shared_ptr<VectorGenerator<2>> coarsest_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, 1);
-
-	// patch operator
-	shared_ptr<GhostFiller<2>>   coarsest_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
-	shared_ptr<PatchOperator<2>> coarsest_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, coarsest_ghost_filler);
-
-	// smoother
-	shared_ptr<GMG::Smoother<2>> coarsest_smoother;
-	if (patch_solver == "dft") {
-		coarsest_smoother = make_shared<DFTPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
-	} else if (patch_solver == "fftw") {
-		coarsest_smoother = make_shared<FFTWPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
+		// get the preconditioner operator
+		M = builder.getCycle();
 	} else {
-		coarsest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, coarsest_patch_operator);
+		M = finest_smoother;
 	}
-
-	// coarsets level only needs an interpolator
-	shared_ptr<GMG::Interpolator<2>> interpolator = make_shared<GMG::DirectInterpolator<2>>(current_domain, finer_domain, 1);
-
-	// add the coarsest level
-	builder.addCoarsestLevel(coarsest_patch_operator, coarsest_smoother, interpolator, coarsest_vector_generator);
-
-	// get the preconditioner operator
-	std::shared_ptr<Operator<2>> M = builder.getCycle();
 
 	timer->stop("Preconditioner Setup");
 
