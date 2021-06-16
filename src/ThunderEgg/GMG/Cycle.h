@@ -92,8 +92,7 @@ template <int D> class Cycle : public Operator<D>
 	 *
 	 * @param level the level currently begin visited.
 	 */
-	virtual void visit(const Level<D> &level, VecList &u_vectors,
-	                   ConstVecList &f_vectors) const = 0;
+	virtual void visit(const Level<D> &level, VecList &u_vectors, ConstVecList &f_vectors) const = 0;
 
 	public:
 	/**
@@ -113,7 +112,7 @@ template <int D> class Cycle : public Operator<D>
 	 */
 	void apply(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const
 	{
-		u->set(0);
+		u->setWithGhost(0);
 		VecList      u_vectors;
 		ConstVecList f_vectors;
 		f_vectors.push_back(f); /* Appends */

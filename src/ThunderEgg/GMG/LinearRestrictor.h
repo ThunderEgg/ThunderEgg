@@ -91,7 +91,7 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 		Orthant<D>         orth = pinfo.orth_on_parent;
 		std::array<int, D> starts;
 		for (size_t i = 0; i < D; i++) {
-			starts[i] = orth.isLowerOnAxis(i) ? 0 : coarse_view.getEnd()[i] + 1;
+			starts[i] = orth.isLowerOnAxis(i) ? 0 : (coarse_view.getEnd()[i] + 1);
 		}
 
 		// interpolate interior values

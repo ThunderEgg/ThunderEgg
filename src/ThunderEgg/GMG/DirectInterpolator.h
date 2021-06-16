@@ -62,7 +62,7 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 				Orthant<D>         orth = pinfo.orth_on_parent;
 				std::array<int, D> starts;
 				for (size_t i = 0; i < D; i++) {
-					starts[i] = orth.isOnSide(Side<D>(2 * i)) ? 0 : coarse_view.getEnd()[i] + 1;
+					starts[i] = orth.isLowerOnAxis(i) ? 0 : (coarse_view.getEnd()[i] + 1);
 				}
 
 				loop_over_interior_indexes<D + 1>(fine_view, [&](const std::array<int, D + 1> &coord) {

@@ -521,6 +521,14 @@ template <int D> class InterLevelComm
 		current_ghost_vector = nullptr;
 		current_vector       = nullptr;
 	}
+	std::shared_ptr<const Domain<D>> getCoarserDomain() const
+	{
+		return coarser_domain;
+	}
+	std::shared_ptr<const Domain<D>> getFinerDomain() const
+	{
+		return finer_domain;
+	}
 };
 extern template class InterLevelComm<2>;
 extern template class InterLevelComm<3>;
