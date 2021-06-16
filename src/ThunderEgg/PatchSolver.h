@@ -99,6 +99,14 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 */
 	virtual void apply(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const override
 	{
+		if constexpr (ENABLE_DEBUG) {
+			if (u->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+				throw RuntimeError("u vector is incorrect length");
+			}
+			if (f->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+				throw RuntimeError("f vector is incorrect length");
+			}
+		}
 		u->setWithGhost(0);
 		if (domain->hasTimer()) {
 			domain->getTimer()->startDomainTiming(domain->getId(), "Total Patch Solve");
@@ -126,6 +134,14 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 */
 	virtual void smooth(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const override
 	{
+		if constexpr (ENABLE_DEBUG) {
+			if (u->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+				throw RuntimeError("u vector is incorrect length");
+			}
+			if (f->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+				throw RuntimeError("f vector is incorrect length");
+			}
+		}
 		if (domain->hasTimer()) {
 			domain->getTimer()->startDomainTiming(domain->getId(), "Total Patch Smooth");
 		}

@@ -118,6 +118,15 @@ template <int D> class PatchOperator : public Operator<D>
 	 */
 	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f) const override
 	{
+		if constexpr (ENABLE_DEBUG) {
+			if (u->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+				throw RuntimeError("u vector is incorrect length");
+			}
+			if (f->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+				throw RuntimeError("f vector is incorrect length");
+			}
+		}
+		f->setWithGhost(0);
 		ghost_filler->fillGhost(u);
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
 			PatchView<const double, D> u_view = u->getPatchView(pinfo.local_index);

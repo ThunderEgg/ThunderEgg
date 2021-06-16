@@ -958,6 +958,12 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	void fillGhost(std::shared_ptr<const Vector<D>> u) const
 	{
+		if constexpr (ENABLE_DEBUG) {
+			if (u->getNumLocalPatches() != domain->getNumLocalPatches()) {
+				throw RuntimeError("u vector is incorrect length. Expected Lenght of " + std::to_string(domain->getNumLocalPatches())
+				                   + " but vector was length " + std::to_string(u->getNumLocalPatches()));
+			}
+		}
 		// zero out ghost cells
 		zeroGhostCells(u);
 
