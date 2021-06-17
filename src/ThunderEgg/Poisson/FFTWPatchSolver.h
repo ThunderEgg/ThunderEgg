@@ -252,7 +252,8 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 		for (size_t axis = 0; axis < D; axis++) {
 			scale *= 2.0 * this->domain->getNs()[axis];
 		}
-		loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] = sol_view[coord] / scale; });
+		sol->getValArray() /= scale;
+		loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] = sol_view[coord]; });
 	}
 	/**
 	 * @brief add a patch to the solver

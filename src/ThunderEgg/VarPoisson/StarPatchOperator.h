@@ -145,7 +145,6 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 				View<const double, D> c_inner = c.getSliceOn(s, {0});
 				loop_over_interior_indexes<D>(f_inner, [&](const std::array<int, D> &coord) {
 					f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) * (c_inner[coord] + c_ghost[coord]) / (2 * h2);
-					u_ghost[coord] = 0;
 				});
 			}
 		}

@@ -133,12 +133,10 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			if (pinfo.hasNbr(s)) {
 				double                h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
 				View<double, D>       f_inner = f_view.getSliceOn(s, {0});
-				View<double, D>       u_ghost = u_view.getGhostSliceOn(s, {0});
+				View<const double, D> u_ghost = u_view.getSliceOn(s, {-1});
 				View<const double, D> u_inner = u_view.getSliceOn(s, {0});
-				loop_over_interior_indexes<D>(f_inner, [&](const std::array<int, D> &coord) {
-					f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2;
-					u_ghost[coord] = 0;
-				});
+				loop_over_interior_indexes<D>(f_inner,
+				                              [&](const std::array<int, D> &coord) { f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2; });
 			}
 		}
 	}
