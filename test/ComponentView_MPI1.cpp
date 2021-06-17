@@ -947,6 +947,5 @@ TEST_CASE("ComponentView implicit conversion to const type", "[View]")
 	CHECK(vc.getEnd() == v.getEnd());
 	CHECK(vc.getGhostEnd() == v.getGhostEnd());
 	CHECK(vc.getStrides() == v.getStrides());
-	CHECK(vc.getComponentViewDataManager() == v.getComponentViewDataManager());
 	CHECK(&vc[vc.getGhostStart()] == &v[v.getGhostStart()]);
 }

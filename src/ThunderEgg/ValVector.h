@@ -114,12 +114,12 @@ template <int D> class ValVector : public Vector<D>
 	PatchView<double, D> getPatchView(int local_patch_index) override
 	{
 		double *data = &vec[patch_stride * local_patch_index];
-		return PatchView<double, D>(data, strides, lengths, num_ghost_cells, nullptr);
+		return PatchView<double, D>(data, strides, lengths, num_ghost_cells);
 	}
 	PatchView<const double, D> getPatchView(int local_patch_index) const override
 	{
 		const double *data = &vec[patch_stride * local_patch_index];
-		return PatchView<const double, D>(data, strides, lengths, num_ghost_cells, nullptr);
+		return PatchView<const double, D>(data, strides, lengths, num_ghost_cells);
 	}
 
 	/**

@@ -142,14 +142,13 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
 	 * @param ldm the local data manager for the data
 	 */
-	PatchView(T_ptr                              data,
-	          const std::array<int, D + 1> &     strides,
-	          const std::array<int, D + 1> &     ghost_start,
-	          const std::array<int, D + 1> &     start,
-	          const std::array<int, D + 1> &     end,
-	          const std::array<int, D + 1> &     ghost_end,
-	          std::shared_ptr<const ViewManager> ldm = nullptr)
-	: View<T, D + 1>(data, strides, ghost_start, start, end, ghost_end, ldm)
+	PatchView(T_ptr                         data,
+	          const std::array<int, D + 1> &strides,
+	          const std::array<int, D + 1> &ghost_start,
+	          const std::array<int, D + 1> &start,
+	          const std::array<int, D + 1> &end,
+	          const std::array<int, D + 1> &ghost_end)
+	: View<T, D + 1>(data, strides, ghost_start, start, end, ghost_end)
 	{
 	}
 
@@ -162,18 +161,13 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
 	 * @param ldm the local data manager for the data
 	 */
-	PatchView(T_ptr                              data,
-	          const std::array<int, D + 1> &     strides,
-	          const std::array<int, D + 1> &     lengths,
-	          int                                num_ghost_cells,
-	          std::shared_ptr<const ViewManager> ldm = nullptr)
+	PatchView(T_ptr data, const std::array<int, D + 1> &strides, const std::array<int, D + 1> &lengths, int num_ghost_cells)
 	: View<T, D + 1>(data,
 	                 strides,
 	                 DetermineGhostStart<D>(num_ghost_cells),
 	                 DetermineStart<D>(),
 	                 DetermineEnd<D>(lengths),
-	                 DetermineGhostEnd<D>(lengths, num_ghost_cells),
-	                 ldm)
+	                 DetermineGhostEnd<D>(lengths, num_ghost_cells))
 	{
 	}
 
@@ -191,7 +185,7 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 		SliceInfo<M> info = getSliceOnPriv<M>(f, offset);
 
 		T_ptr new_data = (&(*this)[info.first_value]);
-		return View<T, M + 1>(new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end, this->getComponentViewDataManager());
+		return View<T, M + 1>(new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end);
 	}
 
 	/**
@@ -244,7 +238,7 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 		new_ghost_end[M]   = this->getGhostEnd()[D];
 
 		noconst_T_ptr new_data = const_cast<noconst_T_ptr>(&(*this)[first_value]); // Thunderegg doesn't care if values in ghosts are modified
-		return View<noconst_T, M + 1>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getComponentViewDataManager());
+		return View<noconst_T, M + 1>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end);
 	}
 
 	ComponentView<T, D> getComponentView(int component_index) const
@@ -268,7 +262,7 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 		}
 
 		T_ptr new_data = (&(*this)[first_value]);
-		return ComponentView<T, D>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end, this->getComponentViewDataManager());
+		return ComponentView<T, D>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end);
 	}
 	operator PatchView<std::add_const_t<T>, D>() const
 	{
@@ -277,8 +271,7 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 		                                         this->getGhostStart(),
 		                                         this->getStart(),
 		                                         this->getEnd(),
-		                                         this->getGhostEnd(),
-		                                         this->getComponentViewDataManager());
+		                                         this->getGhostEnd());
 	}
 };
 extern template class PatchView<double, 1>;

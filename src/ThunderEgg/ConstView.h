@@ -24,7 +24,6 @@
 #include <ThunderEgg/Config.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/RuntimeError.h>
-#include <ThunderEgg/ViewManager.h>
 #include <array>
 #include <memory>
 #endif

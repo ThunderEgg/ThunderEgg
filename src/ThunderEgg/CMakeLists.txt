@@ -43,8 +43,6 @@ list(APPEND ThunderEgg_HDRS GhostFillingType.h)
 
 list(APPEND ThunderEgg_HDRS Loops.h)
 
-list(APPEND ThunderEgg_HDRS ViewManager.h)
-
 list(APPEND ThunderEgg_HDRS MPIGhostFiller.h)
 target_sources(ThunderEgg PRIVATE MPIGhostFiller.cpp)
 

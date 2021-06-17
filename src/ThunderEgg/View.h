@@ -59,10 +59,6 @@ template <typename T, int D> class View
 	 * @brief the corrdinate of the last ghost element
 	 */
 	std::array<int, D> ghost_end;
-	/**
-	 * @brief The ViewManager that does any necessary cleanup
-	 */
-	std::shared_ptr<const ViewManager> ldm;
 
 	/**
 	 * @brief check that a coordinate is in bounds
@@ -94,10 +90,6 @@ template <typename T, int D> class View
 	{
 		return data;
 	}
-	std::shared_ptr<const ViewManager> getLDM() const
-	{
-		return ldm;
-	}
 
 	public:
 	/**
@@ -120,19 +112,17 @@ template <typename T, int D> class View
 	 * @param num_ghost_cells the number of ghost cells on each side of the patch
 	 * @param ldm the local data manager for the data
 	 */
-	View(T_ptr                              data,
-	     const std::array<int, D> &         strides,
-	     const std::array<int, D> &         ghost_start,
-	     const std::array<int, D> &         start,
-	     const std::array<int, D> &         end,
-	     const std::array<int, D> &         ghost_end,
-	     std::shared_ptr<const ViewManager> ldm = nullptr)
+	View(T_ptr                     data,
+	     const std::array<int, D> &strides,
+	     const std::array<int, D> &ghost_start,
+	     const std::array<int, D> &start,
+	     const std::array<int, D> &end,
+	     const std::array<int, D> &ghost_end)
 	: strides(strides),
 	  ghost_start(ghost_start),
 	  start(start),
 	  end(end),
-	  ghost_end(ghost_end),
-	  ldm(ldm)
+	  ghost_end(ghost_end)
 	{
 		this->data = data - this->getIndex(ghost_start);
 	}
@@ -236,14 +226,10 @@ template <typename T, int D> class View
 	{
 		return ghost_end;
 	}
-	const std::shared_ptr<const ViewManager> getComponentViewDataManager() const
-	{
-		return ldm;
-	}
 
 	operator View<std::add_const_t<T>, D>() const
 	{
-		return View<std::add_const_t<T>, D>(data + getIndex(getGhostStart()), strides, ghost_start, start, end, ghost_end, ldm);
+		return View<std::add_const_t<T>, D>(data + getIndex(getGhostStart()), strides, ghost_start, start, end, ghost_end);
 	}
 };
 extern template class View<double, 1>;
