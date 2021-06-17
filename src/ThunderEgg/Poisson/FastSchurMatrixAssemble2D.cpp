@@ -22,7 +22,6 @@
 #include "FastSchurMatrixAssemble2D.h"
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/BiQuadraticGhostFiller.h>
-#include <ThunderEgg/PETSc/VecWrapper.h>
 #include <numeric>
 #include <typeinfo>
 using namespace std;

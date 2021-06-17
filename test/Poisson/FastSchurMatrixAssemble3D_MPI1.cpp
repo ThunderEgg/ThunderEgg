@@ -23,12 +23,11 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
-#include <ThunderEgg/PETSc/VecWrapper.h>
 #include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/Poisson/FastSchurMatrixAssemble3D.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/Schur/PatchSolverWrapper.h>
-#include <ThunderEgg/Schur/VecWrapperGenerator.h>
+#include <ThunderEgg/Schur/ValVectorGenerator.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
 
 #include <catch2/catch_approx.hpp>
@@ -105,18 +104,22 @@ TEST_CASE(
 	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
 
-	Schur::VecWrapperGenerator<2> vg(iface_domain);
-	auto                          f_vec          = vg.getNewVecWrapper();
-	auto                          f_vec_expected = vg.getNewVecWrapper();
+	Schur::ValVectorGenerator<2> vg(iface_domain);
+	auto                         f_vec          = vg.getNewVector();
+	auto                         g_vec          = vg.getNewVector();
+	auto                         f_vec_expected = vg.getNewVector();
 
-	auto    g_vec = vg.getNewVecWrapper();
-	double *g_view;
-	VecGetArray(g_vec->getVec(), &g_view);
-	for (int i = 0; i < g_vec->getNumLocalCells(); i++) {
-		double x  = (i + 0.5) / g_vec->getNumLocalCells();
-		g_view[i] = sin(M_PI * x);
+	int index = 0;
+	for (auto iface_info : iface_domain->getInterfaces()) {
+		View<double, 2> view = g_vec->getComponentView(0, iface_info->local_index);
+		for (int j = 0; j < n; j++) {
+			for (int i = 0; i < n; i++) {
+				double x   = (index + 0.5) / g_vec->getNumLocalCells();
+				view(i, j) = sin(M_PI * x);
+				index++;
+			}
+		}
 	}
-	VecRestoreArray(g_vec->getVec(), &g_view);
 
 	auto gf               = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
@@ -168,19 +171,23 @@ TEST_CASE(
 	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
 	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
 
-	Schur::VecWrapperGenerator<2> vg(iface_domain);
-	auto                          f_vec          = vg.getNewVecWrapper();
-	auto                          f_vec_expected = vg.getNewVecWrapper();
+	Schur::ValVectorGenerator<2> vg(iface_domain);
+	auto                         f_vec          = vg.getNewVector();
+	auto                         f_vec_expected = vg.getNewVector();
 
-	auto    g_vec = vg.getNewVecWrapper();
-	double *g_view;
-	Vec     g = g_vec->getVec();
-	VecGetArray(g, &g_view);
-	for (int i = 0; i < g_vec->getNumLocalCells(); i++) {
-		double x  = (i + 0.5) / g_vec->getNumLocalCells();
-		g_view[i] = sin(M_PI * x);
+	auto g_vec = vg.getNewVector();
+
+	int index = 0;
+	for (auto iface_info : iface_domain->getInterfaces()) {
+		View<double, 2> view = g_vec->getComponentView(0, iface_info->local_index);
+		for (int j = 0; j < n; j++) {
+			for (int i = 0; i < n; i++) {
+				double x   = (index + 0.5) / g_vec->getNumLocalCells();
+				view(i, j) = sin(M_PI * x);
+				index++;
+			}
+		}
 	}
-	VecRestoreArray(g, &g_view);
 
 	auto gf               = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf, true);

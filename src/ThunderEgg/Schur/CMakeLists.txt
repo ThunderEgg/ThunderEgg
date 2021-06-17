@@ -31,10 +31,6 @@ target_sources(ThunderEgg PRIVATE PatchSolverWrapper.cpp)
 
 list(APPEND ThunderEgg_HDRS ValVectorGenerator.h)
 
-if(TARGET PETSC::PETSC)
-  list(APPEND ThunderEgg_HDRS VecWrapperGenerator.h)
-endif(TARGET PETSC::PETSC)
-
 # -- install public headers
 
 install(

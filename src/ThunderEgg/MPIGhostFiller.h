@@ -961,7 +961,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		if constexpr (ENABLE_DEBUG) {
 			if (u.getNumLocalPatches() != domain->getNumLocalPatches()) {
 				throw RuntimeError("u vector is incorrect length. Expected Lenght of " + std::to_string(domain->getNumLocalPatches())
-				                   + " but vector was length " + std::to_string(u->getNumLocalPatches()));
+				                   + " but vector was length " + std::to_string(u.getNumLocalPatches()));
 			}
 		}
 		// zero out ghost cells

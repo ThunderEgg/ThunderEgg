@@ -61,15 +61,15 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	void restrict(const Vector<D> &fine, Vector<D> &coarse) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (fine->getNumLocalPatches() != ilc->getFinerDomain()->getNumLocalPatches()) {
+			if (fine.getNumLocalPatches() != ilc->getFinerDomain()->getNumLocalPatches()) {
 				throw RuntimeError("fine vector is incorrect length. Expected Lenght of "
 				                   + std::to_string(ilc->getFinerDomain()->getNumLocalPatches()) + " but vector was length "
-				                   + std::to_string(fine->getNumLocalPatches()));
+				                   + std::to_string(fine.getNumLocalPatches()));
 			}
-			if (coarse->getNumLocalPatches() != ilc->getCoarserDomain()->getNumLocalPatches()) {
+			if (coarse.getNumLocalPatches() != ilc->getCoarserDomain()->getNumLocalPatches()) {
 				throw RuntimeError("coarse vector is incorrect length. Expected Lenght of "
 				                   + std::to_string(ilc->getCoarserDomain()->getNumLocalPatches()) + " but vector was length "
-				                   + std::to_string(coarse->getNumLocalPatches()));
+				                   + std::to_string(coarse.getNumLocalPatches()));
 			}
 		}
 		std::shared_ptr<Vector<D>> coarse_ghost = ilc->getNewGhostVector();

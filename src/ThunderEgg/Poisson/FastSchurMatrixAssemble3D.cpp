@@ -21,7 +21,6 @@
 
 #include "FastSchurMatrixAssemble3D.h"
 #include <ThunderEgg/MPIGhostFiller.h>
-#include <ThunderEgg/PETSc/VecWrapper.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
 using namespace std;
 using namespace ThunderEgg;

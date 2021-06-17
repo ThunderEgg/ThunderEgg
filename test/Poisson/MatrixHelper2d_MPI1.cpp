@@ -24,7 +24,6 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
-#include <ThunderEgg/PETSc/VecWrapper.h>
 #include <ThunderEgg/Poisson/MatrixHelper2d.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 
@@ -56,10 +55,10 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto f_vec          = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
-	auto f_vec_expected = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
+	auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
 
-	auto g_vec = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
+	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
 	DomainTools::SetValues<2>(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
@@ -110,10 +109,10 @@ TEST_CASE(
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto f_vec          = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
-	auto f_vec_expected = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
+	auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
+	auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
 
-	auto g_vec = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
+	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
 	DomainTools::SetValues<2>(d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);

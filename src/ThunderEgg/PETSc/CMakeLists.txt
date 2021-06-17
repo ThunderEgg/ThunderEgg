@@ -9,8 +9,6 @@ if(TARGET PETSC::PETSC)
   list(APPEND ThunderEgg_HDRS MatWrapper.h)
   list(APPEND ThunderEgg_HDRS MatShellCreator.h)
   list(APPEND ThunderEgg_HDRS PCShellCreator.h)
-  list(APPEND ThunderEgg_HDRS VecWrapper.h)
-  list(APPEND ThunderEgg_HDRS VecViewManager.h)
 
 endif(TARGET PETSC::PETSC)
 

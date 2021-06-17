@@ -23,9 +23,3 @@ target_sources(unit_tests_mpi1 PRIVATE PatchSolverWrapper_MPI1.cpp)
 target_sources(unit_tests_mpi2 PRIVATE PatchSolverWrapper_MPI2.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE ValVectorGenerator_MPI1.cpp)
-
-if(TARGET PETSC::PETSC)
-
-    target_sources(unit_tests_mpi1 PRIVATE VecWrapperGenerator_MPI1.cpp)
-
-endif(TARGET PETSC::PETSC)
