@@ -319,10 +319,10 @@ class DomainTools
 	 * @param func the function
 	 */
 	template <int D>
-	static void SetValuesWithGhost(std::shared_ptr<Domain<D>>                           domain,
-	                               std::shared_ptr<Vector<D>>                           vec,
-	                               int                                                  component_index,
-	                               std::function<double(const std::array<double, D> &)> func)
+	static void SetValuesWithGhost(std::shared_ptr<Domain<D>>                                 domain,
+	                               std::shared_ptr<Vector<D>>                                 vec,
+	                               int                                                        component_index,
+	                               std::function<double(const std::array<double, (int) D> &)> func)
 	{
 		if (component_index >= vec->getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
@@ -440,8 +440,11 @@ class DomainTools
 	 * @param func the function
 	 * @param args additional functions for additional components
 	 */
-	template <int D, typename T, typename... Args>
-	static void SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, T func, Args... args)
+	template <int D, typename... Args>
+	static void SetValuesWithGhost(std::shared_ptr<Domain<D>>                           domain,
+	                               std::shared_ptr<Vector<D>>                           vec,
+	                               std::function<double(const std::array<double, D> &)> func,
+	                               Args... args)
 	{
 		_SetValuesWithGhost(domain, vec, 0, func, args...);
 	}

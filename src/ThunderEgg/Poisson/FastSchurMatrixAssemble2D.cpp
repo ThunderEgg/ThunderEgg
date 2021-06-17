@@ -357,6 +357,8 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 
 		solver->solveSinglePatch(pinfo, f_view, u_view);
 
+		u_west_ghosts(j, 0) = 0;
+
 		for (const auto &pair : coeffs) {
 			Side<2>         s    = pair.first.s;
 			IfaceType<2>    type = pair.first.type;
