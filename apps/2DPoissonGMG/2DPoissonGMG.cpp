@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	app.add_flag("--nozerof", no_zero_rhs_avg,
 	             "Make the average of the rhs on neumann problems zero");
 
-	double tolerance = 1e-12;
+	double tolerance = 1e-8;
 	app.add_option("-t,--tolerance", tolerance, "Tolerance of Krylov solver");
 
 	bool neumann;
@@ -216,22 +216,22 @@ int main(int argc, char *argv[])
 		ffun = [](const array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[2];
-			return -5 * M_PI * M_PI * sinl(M_PI * y) * cosl(2 * M_PI * x);
+			return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
 		};
 		gfun = [](const array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[2];
-			return sinl(M_PI * y) * cosl(2 * M_PI * x);
+			return sin(M_PI * y) * cos(2 * M_PI * x);
 		};
 		nfunx = [](const array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[2];
-			return -2 * M_PI * sinl(M_PI * y) * sinl(2 * M_PI * x);
+			return -2 * M_PI * sin(M_PI * y) * sin(2 * M_PI * x);
 		};
 		nfuny = [](const array<double, 2> &coord) {
 			double x = coord[0];
 			double y = coord[2];
-			return M_PI * cosl(M_PI * y) * cosl(2 * M_PI * x);
+			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 	}
 
@@ -275,7 +275,6 @@ int main(int argc, char *argv[])
 	// Create some new vectors for the domain
 	int num_components = 1; //the poisson operator just has one value in each cell
 
-	shared_ptr<ValVector<2>> u     = ValVector<2>::GetNewVector(domain, num_components);
 	shared_ptr<ValVector<2>> exact = ValVector<2>::GetNewVector(domain, num_components);
 	shared_ptr<ValVector<2>> f     = ValVector<2>::GetNewVector(domain, num_components);
 
@@ -286,9 +285,9 @@ int main(int argc, char *argv[])
 	// modify the rhs to set the boundary conditions
 	// the patch operator contains some helper functions for this
 	if (neumann) {
-		patch_operator->addDrichletBCToRHS(f, gfun);
-	} else {
 		patch_operator->addNeumannBCToRHS(f, gfun, {nfunx, nfuny});
+	} else {
+		patch_operator->addDrichletBCToRHS(f, gfun);
 	}
 
 	timer->stop("Domain Initialization");
@@ -316,7 +315,7 @@ int main(int argc, char *argv[])
 
 	// set the patch solver
 	auto patch_bcgs = make_shared<Iterative::BiCGStab<2>>();
-	// p_bcgs->setTolerance(ps_tol);
+	//p_bcgs->setTolerance(ps_tol);
 	// p_bcgs->setMaxIterations(ps_max_it);
 
 	// create a CycleBuilder and set the options
@@ -428,6 +427,8 @@ int main(int argc, char *argv[])
 	Iterative::BiCGStab<2> solver;
 	solver.setTimer(timer);
 	solver.setTolerance(tolerance);
+
+	shared_ptr<ValVector<2>> u = ValVector<2>::GetNewVector(domain, num_components);
 
 	int num_iterations = solver.solve(vg, A, u, f, M, true);
 
