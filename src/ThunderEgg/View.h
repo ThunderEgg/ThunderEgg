@@ -21,7 +21,11 @@
 
 #ifndef THUNDEREGG_VIEW_H
 #define THUNDEREGG_VIEW_H
-#include <ThunderEgg/ConstView.h>
+#include <ThunderEgg/Config.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <array>
+#include <memory>
 namespace ThunderEgg
 {
 /**

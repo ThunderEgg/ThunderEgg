@@ -18,9 +18,6 @@ target_sources(ThunderEgg PRIVATE ComponentArray.cpp)
 list(APPEND ThunderEgg_HDRS ComponentView.h)
 target_sources(ThunderEgg PRIVATE ComponentView.cpp)
 
-list(APPEND ThunderEgg_HDRS ConstView.h)
-target_sources(ThunderEgg PRIVATE ConstView.cpp)
-
 list(APPEND ThunderEgg_HDRS DivergenceError.h)
 
 list(APPEND ThunderEgg_HDRS DimensionalArray.h)
