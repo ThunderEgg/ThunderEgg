@@ -77,7 +77,7 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 	p_operator->addDrichletBCToRHS(f_vec, gfun, hfun);
 
 	auto f_expected = ValVector<2>::GetNewVector(d_fine, 1);
-	f_expected->copy(f_vec);
+	f_expected->copy(*f_vec);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		auto u = g_vec->getComponentView(0, pinfo.local_index);
 		auto f = f_expected->getComponentView(0, pinfo.local_index);
@@ -140,7 +140,7 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff",
 	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine, GhostFillingType::Faces));
 	shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
 	new VarPoisson::StarPatchOperator<2>(h_vec, d_fine, gf));
-	p_operator->apply(f_vec, g_vec);
+	p_operator->apply(*f_vec, *g_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -195,10 +195,10 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff",
 		auto p_operator = make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf);
 		p_operator->addDrichletBCToRHS(f_vec_expected, gfun, hfun);
 
-		p_operator->apply(g_vec, f_vec);
+		p_operator->apply(*g_vec, *f_vec);
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		error_vec->addScaled(1.0, f_vec, -1.0, f_vec_expected);
+		error_vec->addScaled(1.0, *f_vec, -1.0, *f_vec_expected);
 		errors[i] = error_vec->twoNorm() / f_vec_expected->twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
@@ -250,10 +250,10 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff",
 		auto p_operator = make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf);
 		p_operator->addDrichletBCToRHS(f_vec_expected, gfun, hfun);
 
-		p_operator->apply(g_vec, f_vec);
+		p_operator->apply(*g_vec, *f_vec);
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		error_vec->addScaled(1.0, f_vec, -1.0, f_vec_expected);
+		error_vec->addScaled(1.0, *f_vec, -1.0, *f_vec_expected);
 		errors[i] = error_vec->twoNorm() / f_vec_expected->twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);

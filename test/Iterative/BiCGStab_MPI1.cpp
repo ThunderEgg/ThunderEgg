@@ -106,9 +106,9 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]
 	solver.setTolerance(tolerance);
 	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
 
-	p_operator->apply(g_vec, residual);
-	residual->addScaled(-1, f_vec);
-	CHECK(residual->dot(residual) / f_vec->dot(f_vec) <= tolerance);
+	p_operator->apply(*g_vec, *residual);
+	residual->addScaled(-1, *f_vec);
+	CHECK(residual->dot(*residual) / f_vec->dot(*f_vec) <= tolerance);
 }
 TEST_CASE("BiCGStab handles zero rhs vector", "[BiCGStab]")
 {
@@ -257,15 +257,15 @@ class MockVectorGenerator : public VectorGenerator<2>
 class MockOperator : public Operator<2>
 {
 	public:
-	void apply(std::shared_ptr<const Vector<2>>, std::shared_ptr<Vector<2>>) const override {}
+	void apply(const Vector<2> &, Vector<2> &) const override {}
 };
 class I2Operator : public Operator<2>
 {
 	public:
-	void apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> y) const override
+	void apply(const Vector<2> &x, Vector<2> &y) const override
 	{
-		y->copy(x);
-		y->scale(2);
+		y.copy(x);
+		y.scale(2);
 	}
 };
 } // namespace
@@ -299,7 +299,7 @@ TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
 	solver.setTolerance(tolerance);
 	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), op, g_vec, f_vec);
 
-	op->apply(g_vec, residual);
-	residual->addScaled(-1, f_vec);
-	CHECK(residual->dot(residual) / f_vec->dot(f_vec) <= tolerance);
+	op->apply(*g_vec, *residual);
+	residual->addScaled(-1, *f_vec);
+	CHECK(residual->dot(*residual) / f_vec->dot(*f_vec) <= tolerance);
 }

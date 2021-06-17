@@ -75,7 +75,7 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
         if (!called) {
             called = true;
             CHECK(A != mpo);
-            A->apply(b, x);
+            A->apply(*b, *x);
         }
         return 1;
     });

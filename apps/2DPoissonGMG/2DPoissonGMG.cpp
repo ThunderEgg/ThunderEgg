@@ -441,16 +441,16 @@ int main(int argc, char *argv[])
 	shared_ptr<ValVector<2>> au              = ValVector<2>::GetNewVector(domain, num_components);
 	shared_ptr<ValVector<2>> residual_vector = ValVector<2>::GetNewVector(domain, num_components);
 
-	A->apply(u, au);
+	A->apply(*u, *au);
 
-	residual_vector->addScaled(-1, au, 1, f);
+	residual_vector->addScaled(-1, *au, 1, *f);
 
 	double residual = residual_vector->twoNorm();
 	double fnorm    = f->twoNorm();
 
 	// calculate error
 	shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain, 1);
-	error->addScaled(-1, exact, 1, u);
+	error->addScaled(-1, *exact, 1, *u);
 	if (neumann) {
 		double u_average     = domain->integrate(u) / domain->volume();
 		double exact_average = domain->integrate(exact) / domain->volume();

@@ -61,11 +61,11 @@ template <int D> class BiCGStab : public Solver<D>
 	                             std::shared_ptr<Vector<D>>          b) const
 	{
 		if (M_l == nullptr && M_r == nullptr) {
-			A->apply(x, b);
+			A->apply(*x, *b);
 		} else if (M_l == nullptr && M_r != nullptr) {
 			std::shared_ptr<Vector<D>> tmp = vg->getNewVector();
-			M_r->apply(x, tmp);
-			A->apply(tmp, b);
+			M_r->apply(*x, *tmp);
+			A->apply(*tmp, *b);
 		}
 	}
 
@@ -145,23 +145,23 @@ template <int D> class BiCGStab : public Solver<D>
 	{
 		std::shared_ptr<Vector<D>> resid = vg->getNewVector();
 
-		A->apply(x, resid);
-		resid->scaleThenAdd(-1, b);
+		A->apply(*x, *resid);
+		resid->scaleThenAdd(-1, *b);
 
 		std::shared_ptr<Vector<D>> initial_guess = vg->getNewVector();
-		initial_guess->copy(x);
+		initial_guess->copy(*x);
 		x->set(0);
 
 		double                     r0_norm = b->twoNorm();
 		std::shared_ptr<Vector<D>> rhat    = vg->getNewVector();
-		rhat->copy(resid);
+		rhat->copy(*resid);
 		std::shared_ptr<Vector<D>> p = vg->getNewVector();
-		p->copy(resid);
+		p->copy(*resid);
 		std::shared_ptr<Vector<D>> ap = vg->getNewVector();
 		std::shared_ptr<Vector<D>> as = vg->getNewVector();
 
 		std::shared_ptr<Vector<D>> s   = vg->getNewVector();
-		double                     rho = rhat->dot(resid);
+		double                     rho = rhat->dot(*resid);
 
 		int    num_its  = 0;
 		double residual = resid->twoNorm() / r0_norm;
@@ -183,26 +183,26 @@ template <int D> class BiCGStab : public Solver<D>
 			}
 
 			applyWithPreconditioner(vg, nullptr, A, Mr, p, ap);
-			double alpha = rho / rhat->dot(ap);
-			s->copy(resid);
-			s->addScaled(-alpha, ap);
+			double alpha = rho / rhat->dot(*ap);
+			s->copy(*resid);
+			s->addScaled(-alpha, *ap);
 			if (s->twoNorm() / r0_norm <= tolerance) {
-				x->addScaled(alpha, p);
+				x->addScaled(alpha, *p);
 				if (timer) {
 					timer->stop("Iteration");
 				}
 				break;
 			}
 			applyWithPreconditioner(vg, nullptr, A, Mr, s, as);
-			double omega = as->dot(s) / as->dot(as);
-			x->addScaled(alpha, p, omega, s);
-			resid->addScaled(-alpha, ap);
-			resid->addScaled(-omega, as);
+			double omega = as->dot(*s) / as->dot(*as);
+			x->addScaled(alpha, *p, omega, *s);
+			resid->addScaled(-alpha, *ap);
+			resid->addScaled(-omega, *as);
 
-			double rho_new = resid->dot(rhat);
+			double rho_new = resid->dot(*rhat);
 			double beta    = rho_new * alpha / (rho * omega);
-			p->addScaled(-omega, ap);
-			p->scaleThenAdd(beta, resid);
+			p->addScaled(-omega, *ap);
+			p->scaleThenAdd(beta, *resid);
 
 			num_its++;
 			rho      = rho_new;
@@ -218,10 +218,10 @@ template <int D> class BiCGStab : public Solver<D>
 			}
 		}
 		if (Mr != nullptr) {
-			Mr->apply(x, resid);
-			x->copy(resid);
+			Mr->apply(*x, *resid);
+			x->copy(*resid);
 		}
-		x->add(initial_guess);
+		x->add(*initial_guess);
 		return num_its;
 	}
 };

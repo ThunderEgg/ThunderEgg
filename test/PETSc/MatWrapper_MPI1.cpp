@@ -67,7 +67,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 
 	// create MatWrapper
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(x, b);
+	m_operator->apply(*x, *b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -117,7 +117,7 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper with ghost and 0.5I",
 
 	// create MatWrapper
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(x, b);
+	m_operator->apply(*x, *b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -167,7 +167,7 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper without ghost and 0.5I
 
 	// create MatWrapper
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(x, b);
+	m_operator->apply(*x, *b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -221,7 +221,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 
 	// create MatWrapper
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(x, b);
+	m_operator->apply(*x, *b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -283,7 +283,7 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper with ghost and 0.5I tw
 
 	// create MatWrapper
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(x, b);
+	m_operator->apply(*x, *b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -345,7 +345,7 @@ TEST_CASE("PETSc::MatWrapper works with PETSc::VecWrapper without ghost and 0.5I
 
 	// create MatWrapper
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(x, b);
+	m_operator->apply(*x, *b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);

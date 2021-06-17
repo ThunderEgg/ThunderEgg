@@ -73,7 +73,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply fills ghost in rhs as expected",
 
 	// checking will be done in the solver
 	Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
-	psw.apply(x, b);
+	psw.apply(*x, *b);
 	CHECK(solver->wasCalled());
 }
 TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur matrix",
@@ -99,7 +99,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 	x->set(schur_fill_value);
 
 	Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
-	psw.apply(x, b);
+	psw.apply(*x, *b);
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < b->getNumLocalPatches(); i++) {
@@ -135,7 +135,7 @@ TEST_CASE(
 	b->set(99);
 
 	Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
-	psw.apply(x, b);
+	psw.apply(*x, *b);
 	CHECK(solver->allPatchesCalled());
 	CHECK(ghost_filler->wasCalled());
 	for (int i = 0; i < b->getNumLocalPatches(); i++) {

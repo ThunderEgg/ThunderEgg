@@ -199,11 +199,11 @@ template <int D> class Vector
 	 *
 	 * @param b the other vector
 	 */
-	void copy(std::shared_ptr<const Vector<D>> b)
+	void copy(const Vector<D> &b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			PatchView<double, D>       view   = getPatchView(i);
-			PatchView<const double, D> b_view = b->getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
 			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = b_view[coord]; });
 		}
 	}
@@ -212,34 +212,34 @@ template <int D> class Vector
 	 *
 	 * @param b the other vector
 	 */
-	void add(std::shared_ptr<const Vector<D>> b)
+	void add(const Vector<D> &b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			PatchView<double, D>       view   = getPatchView(i);
-			PatchView<const double, D> b_view = b->getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
 			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord]; });
 		}
 	}
 	/**
 	 * @brief `this = this + alpha * b`
 	 */
-	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> b)
+	virtual void addScaled(double alpha, const Vector<D> &b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			PatchView<double, D>       view   = getPatchView(i);
-			PatchView<const double, D> b_view = b->getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
 			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord] * alpha; });
 		}
 	}
 	/**
 	 * @brief `this = this + alpha * a + beta * b`
 	 */
-	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> a, double beta, std::shared_ptr<const Vector<D>> b)
+	virtual void addScaled(double alpha, const Vector<D> &a, double beta, const Vector<D> &b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			PatchView<double, D>       view   = getPatchView(i);
-			PatchView<const double, D> a_view = a->getPatchView(i);
-			PatchView<const double, D> b_view = b->getPatchView(i);
+			PatchView<const double, D> a_view = a.getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
 			loop_over_interior_indexes<D + 1>(
 			view, [&](const std::array<int, D + 1> &coord) { view[coord] += a_view[coord] * alpha + b_view[coord] * beta; });
 		}
@@ -247,22 +247,22 @@ template <int D> class Vector
 	/**
 	 * @brief `this = alpha * this + b`
 	 */
-	void scaleThenAdd(double alpha, std::shared_ptr<const Vector<D>> b)
+	void scaleThenAdd(double alpha, const Vector<D> &b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			PatchView<double, D>       view   = getPatchView(i);
-			PatchView<const double, D> b_view = b->getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
 			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord]; });
 		}
 	}
 	/**
 	 * @brief `this = alpha * this + beta * b`
 	 */
-	void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b)
+	void scaleThenAddScaled(double alpha, double beta, const Vector<D> &b)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			PatchView<double, D>       view   = getPatchView(i);
-			PatchView<const double, D> b_view = b->getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
 			loop_over_interior_indexes<D + 1>(view,
 			                                  [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord] * beta; });
 		}
@@ -270,12 +270,12 @@ template <int D> class Vector
 	/**
 	 * @brief `this = alpha * this + beta * b + gamma * c`
 	 */
-	void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b, double gamma, std::shared_ptr<const Vector<D>> c)
+	void scaleThenAddScaled(double alpha, double beta, const Vector<D> &b, double gamma, const Vector<D> &c)
 	{
 		for (int i = 0; i < num_local_patches; i++) {
 			PatchView<double, D>       view   = getPatchView(i);
-			PatchView<const double, D> b_view = b->getPatchView(i);
-			PatchView<const double, D> c_view = c->getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			PatchView<const double, D> c_view = c.getPatchView(i);
 			loop_over_interior_indexes<D + 1>(
 			view, [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord] * beta + c_view[coord] * gamma; });
 		}
@@ -311,12 +311,12 @@ template <int D> class Vector
 	/**
 	 * @brief get the dot product
 	 */
-	double dot(std::shared_ptr<const Vector<D>> b) const
+	double dot(const Vector<D> &b) const
 	{
 		double retval = 0;
 		for (int i = 0; i < num_local_patches; i++) {
 			PatchView<const double, D> view   = getPatchView(i);
-			PatchView<const double, D> b_view = b->getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
 			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { retval += view[coord] * b_view[coord]; });
 		}
 		double global_retval;

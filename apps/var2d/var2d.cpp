@@ -370,17 +370,17 @@ int main(int argc, char *argv[])
 		}
 		timer->stop("Linear Solve");
 
-		A->apply(u, au);
+		A->apply(*u, *au);
 
 		// residual
 		shared_ptr<ValVector<2>> resid = ValVector<2>::GetNewVector(domain, 1);
-		resid->scaleThenAddScaled(0, -1, au, 1, f);
+		resid->scaleThenAddScaled(0, -1, *au, 1, *f);
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
 		shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain, 1);
-		error->scaleThenAddScaled(0, -1, exact, 1, u);
+		error->scaleThenAddScaled(0, -1, *exact, 1, *u);
 		if (neumann) {
 			double uavg = domain->integrate(u) / domain->volume();
 			double eavg = domain->integrate(exact) / domain->volume();

@@ -106,9 +106,9 @@ TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
 	solver.setTolerance(tolerance);
 	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
 
-	p_operator->apply(g_vec, residual);
-	residual->addScaled(-1, f_vec);
-	CHECK(residual->dot(residual) / f_vec->dot(f_vec) <= tolerance);
+	p_operator->apply(*g_vec, *residual);
+	residual->addScaled(-1, *f_vec);
+	CHECK(residual->dot(*residual) / f_vec->dot(*f_vec) <= tolerance);
 }
 TEST_CASE("CG handles zero rhs vector", "[CG]")
 {

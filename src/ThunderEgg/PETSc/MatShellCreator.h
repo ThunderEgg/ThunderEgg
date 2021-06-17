@@ -84,7 +84,7 @@ template <int D> class MatShellCreator
 
 		VecRestoreArrayRead(x, &x_view);
 
-		msc->op->apply(te_x, te_b);
+		msc->op->apply(*te_x, *te_b);
 
 		double *b_view;
 		VecGetArray(b, &b_view);

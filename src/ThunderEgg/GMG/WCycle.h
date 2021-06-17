@@ -45,30 +45,40 @@ template <int D> class WCycle : public Cycle<D>
 	 *
 	 * @param level the current level that is being visited.
 	 */
-	void visit(const Level<D> &level, std::list<std::shared_ptr<Vector<D>>> &u_vectors,
-	           std::list<std::shared_ptr<const Vector<D>>> &f_vectors) const
+	void visit(const Level<D> &level, const Vector<D> &f, Vector<D> &u) const override
 	{
 		if (level.coarsest()) {
 			for (int i = 0; i < num_coarse_sweeps; i++) {
-				this->smooth(level, u_vectors, f_vectors);
+				level.getSmoother()->smooth(f, u);
 			}
 		} else {
 			for (int i = 0; i < num_pre_sweeps; i++) {
-				this->smooth(level, u_vectors, f_vectors);
+				level.getSmoother()->smooth(f, u);
 			}
-			this->prepCoarser(level, u_vectors, f_vectors);
-			this->visit(*level.getCoarser(), u_vectors, f_vectors);
+
+			const Level<D> &           coarser_level = *level.getCoarser();
+			std::shared_ptr<Vector<D>> coarser_f     = coarser_level.getVectorGenerator()->getNewVector();
+			std::shared_ptr<Vector<D>> coarser_u     = coarser_level.getVectorGenerator()->getNewVector();
+
+			this->restrict(level, f, u, *coarser_f);
+
+			this->visit(*level.getCoarser(), *coarser_f, *coarser_u);
+
+			coarser_level.getInterpolator()->interpolate(*coarser_u, u);
+
 			for (int i = 0; i < num_mid_sweeps; i++) {
-				this->smooth(level, u_vectors, f_vectors);
+				level.getSmoother()->smooth(f, u);
 			}
-			this->prepCoarser(level, u_vectors, f_vectors);
-			this->visit(*level.getCoarser(), u_vectors, f_vectors);
+
+			this->restrict(level, f, u, *coarser_f);
+
+			this->visit(*level.getCoarser(), *coarser_f, *coarser_u);
+
+			coarser_level.getInterpolator()->interpolate(*coarser_u, u);
+
 			for (int i = 0; i < num_post_sweeps; i++) {
-				this->smooth(level, u_vectors, f_vectors);
+				level.getSmoother()->smooth(f, u);
 			}
-		}
-		if (!level.finest()) {
-			this->prepFiner(level, u_vectors, f_vectors);
 		}
 	}
 

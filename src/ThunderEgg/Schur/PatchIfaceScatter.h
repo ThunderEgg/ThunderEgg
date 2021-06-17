@@ -46,11 +46,11 @@ template <int D> class PatchIfaceScatter
 	/**
 	 * @brief The global vector passed to scatterStart
 	 */
-	std::shared_ptr<const Vector<D - 1>> curr_global_vector;
+	const Vector<D - 1> *curr_global_vector = nullptr;
 	/**
 	 * @brief The local vector passed to scatterStart
 	 */
-	std::shared_ptr<const Vector<D - 1>> curr_local_vector;
+	const Vector<D - 1> *curr_local_vector = nullptr;
 	/**
 	 * @brief the number of cells in each direction of the interface
 	 */
@@ -272,15 +272,15 @@ template <int D> class PatchIfaceScatter
 	 * @param global_vector the global Schur compliment vector
 	 * @param local_patch_iface_vector the the local patch iface vector
 	 */
-	void scatterStart(std::shared_ptr<const Vector<D - 1>> global_vector, std::shared_ptr<Vector<D - 1>> local_patch_iface_vector)
+	void scatterStart(const Vector<D - 1> &global_vector, Vector<D - 1> &local_patch_iface_vector)
 	{
 		if (communicating) {
 			throw RuntimeError("This PatchIfaceScatter is in the middle of communicating");
 		}
 
-		for (int i = 0; i < global_vector->getNumLocalPatches(); i++) {
-			auto global_data = global_vector->getComponentView(0, i);
-			auto local_data  = local_patch_iface_vector->getComponentView(0, i);
+		for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
+			auto global_data = global_vector.getComponentView(0, i);
+			auto local_data  = local_patch_iface_vector.getComponentView(0, i);
 			nested_loop<D - 1>(
 			local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1> &coord) { local_data[coord] = global_data[coord]; });
 		}
@@ -302,7 +302,7 @@ template <int D> class PatchIfaceScatter
 
 			int buffer_index = 0;
 			for (int local_index : send_local_indexes[send_index]) {
-				auto local_data = global_vector->getComponentView(0, local_index);
+				auto local_data = global_vector.getComponentView(0, local_index);
 				nested_loop<D - 1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					buffer[buffer_index] = local_data[coord];
 					buffer_index++;
@@ -312,15 +312,15 @@ template <int D> class PatchIfaceScatter
 			MPI_Isend(buffer.data(), buffer.size(), MPI_DOUBLE, send_ranks[send_index], 0, MPI_COMM_WORLD, &send_requests[send_index]);
 		}
 
-		for (int local_iface = 0; local_iface < global_vector->getNumLocalPatches(); local_iface++) {
-			auto global_data = global_vector->getComponentView(0, local_iface);
-			auto local_data  = local_patch_iface_vector->getComponentView(0, local_iface);
+		for (int local_iface = 0; local_iface < global_vector.getNumLocalPatches(); local_iface++) {
+			auto global_data = global_vector.getComponentView(0, local_iface);
+			auto local_data  = local_patch_iface_vector.getComponentView(0, local_iface);
 			nested_loop<D - 1>(
 			local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1> &coord) { local_data[coord] = global_data[coord]; });
 		}
 
-		curr_global_vector = global_vector;
-		curr_local_vector  = local_patch_iface_vector;
+		curr_global_vector = &global_vector;
+		curr_local_vector  = &local_patch_iface_vector;
 		communicating      = true;
 	}
 	/**
@@ -333,9 +333,9 @@ template <int D> class PatchIfaceScatter
 	 * @param global_vector the global Schur compliment vector
 	 * @param local_patch_iface_vector the the local patch iface vector
 	 */
-	void scatterFinish(std::shared_ptr<const Vector<D - 1>> global_vector, std::shared_ptr<Vector<D - 1>> local_patch_iface_vector)
+	void scatterFinish(const Vector<D - 1> &global_vector, Vector<D - 1> &local_patch_iface_vector)
 	{
-		if (global_vector != curr_global_vector || local_patch_iface_vector != curr_local_vector) {
+		if (&global_vector != curr_global_vector || &local_patch_iface_vector != curr_local_vector) {
 			throw RuntimeError("Different vectors were passed ot scatterFinish than were passed to scatterStart");
 		}
 
@@ -348,7 +348,7 @@ template <int D> class PatchIfaceScatter
 
 			int buffer_index = 0;
 			for (int local_index : recv_local_indexes[recv_index]) {
-				auto local_data = local_patch_iface_vector->getComponentView(0, local_index);
+				auto local_data = local_patch_iface_vector.getComponentView(0, local_index);
 				nested_loop<D - 1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1> &coord) {
 					local_data[coord] = buffer[buffer_index];
 					buffer_index++;

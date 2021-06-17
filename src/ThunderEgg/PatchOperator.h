@@ -116,22 +116,22 @@ template <int D> class PatchOperator : public Operator<D>
 	 * @param u the left hand side
 	 * @param f the right hand side
 	 */
-	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f) const override
+	void apply(const Vector<D> &u, Vector<D> &f) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (u->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (u.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
 				throw RuntimeError("u vector is incorrect length");
 			}
-			if (f->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (f.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
 				throw RuntimeError("f vector is incorrect length");
 			}
 		}
-		f->setWithGhost(0);
-		ghost_filler->fillGhost(*u);
+		f.setWithGhost(0);
+		ghost_filler->fillGhost(u);
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			PatchView<const double, D> u_view = u->getPatchView(pinfo.local_index);
+			PatchView<const double, D> u_view = u.getPatchView(pinfo.local_index);
 			enforceBoundaryConditions(pinfo, u_view);
-			PatchView<double, D> f_view = f->getPatchView(pinfo.local_index);
+			PatchView<double, D> f_view = f.getPatchView(pinfo.local_index);
 			applySinglePatch(pinfo, u_view, f_view);
 		}
 	}

@@ -120,10 +120,10 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                    num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                    num_ghost_cells, ns);
+	MockVector<3> a(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -132,21 +132,21 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (size_t i = 0; i < a->data.size(); i++) {
-		double x   = (i + 0.5) / a->data.size();
-		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
+	for (size_t i = 0; i < a.data.size(); i++) {
+		double x  = (i + 0.5) / a.data.size();
+		a.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (size_t i = 0; i < b->data.size(); i++) {
-		double x   = (i + 0.5) / b->data.size();
-		b->data[i] = (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < b.data.size(); i++) {
+		double x  = (i + 0.5) / b.data.size();
+		b.data[i] = (x - 0.5) * (x - 0.5);
 	}
 
 	double expected_value = 0;
-	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto a_ld = a->getComponentView(c, i);
-			auto b_ld = b->getComponentView(c, i);
+	for (int i = 0; i < a.getNumLocalPatches(); i++) {
+		for (int c = 0; c < a.getNumComponents(); c++) {
+			auto a_ld = a.getComponentView(c, i);
+			auto b_ld = b.getComponentView(c, i);
 			nested_loop<3>(b_ld.getStart(), b_ld.getEnd(), [&](std::array<int, 3> &coord) {
 				expected_value += b_ld[coord] * a_ld[coord];
 			});
@@ -155,5 +155,5 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	double global_expected_value;
 	MPI_Allreduce(&expected_value, &global_expected_value, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
-	CHECK(a->dot(b) == Catch::Approx(global_expected_value));
+	CHECK(a.dot(b) == Catch::Approx(global_expected_value));
 }

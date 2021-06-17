@@ -34,7 +34,7 @@ TEST_CASE("Check PatchOperator calls for various domains", "[PatchOperator]")
 	auto                 mgf = make_shared<MockGhostFiller<2>>();
 	MockPatchOperator<2> mpo(d_fine, mgf, u, f);
 
-	mpo.apply(u, f);
+	mpo.apply(*u, *f);
 
 	CHECK(mgf->wasCalled());
 	CHECK(mpo.allPatchesCalled());

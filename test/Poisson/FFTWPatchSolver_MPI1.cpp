@@ -81,7 +81,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence",
 		p_solver->smooth(*f_vec, *g_vec);
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		error_vec->addScaled(1.0, g_vec, -1.0, g_vec_expected);
+		error_vec->addScaled(1.0, *g_vec, -1.0, *g_vec_expected);
 		errors[i - 1] = error_vec->twoNorm() / g_vec_expected->twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
@@ -143,7 +143,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		g_vec->shift(-d_fine->integrate(g_vec) / d_fine->volume());
 		g_vec_expected->shift(-d_fine->integrate(g_vec_expected) / d_fine->volume());
-		error_vec->addScaled(1.0, g_vec, -1.0, g_vec_expected);
+		error_vec->addScaled(1.0, *g_vec, -1.0, *g_vec_expected);
 		errors[i - 1] = error_vec->twoNorm() / g_vec_expected->twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
@@ -206,7 +206,7 @@ TEST_CASE(
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		g_vec->shift(-d_fine->integrate(g_vec) / d_fine->volume());
 		g_vec_expected->shift(-d_fine->integrate(g_vec_expected) / d_fine->volume());
-		error_vec->addScaled(1.0, g_vec, -1.0, g_vec_expected);
+		error_vec->addScaled(1.0, *g_vec, -1.0, *g_vec_expected);
 		errors[i - 1] = error_vec->twoNorm() / g_vec_expected->twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);

@@ -312,10 +312,10 @@ TEST_CASE("Vector<3> copy", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                    num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                    num_ghost_cells, ns);
+	MockVector<3> a(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -324,17 +324,17 @@ TEST_CASE("Vector<3> copy", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (size_t i = 0; i < a->data.size(); i++) {
-		double x   = (i + 0.5) / a->data.size();
-		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
+	for (size_t i = 0; i < a.data.size(); i++) {
+		double x  = (i + 0.5) / a.data.size();
+		a.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	b->copy(a);
+	b.copy(a);
 
-	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto a_ld = a->getComponentView(c, i);
-			auto b_ld = b->getComponentView(c, i);
+	for (int i = 0; i < a.getNumLocalPatches(); i++) {
+		for (int c = 0; c < a.getNumComponents(); c++) {
+			auto a_ld = a.getComponentView(c, i);
+			auto b_ld = b.getComponentView(c, i);
 			nested_loop<3>(a_ld.getGhostStart(), a_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -356,14 +356,14 @@ TEST_CASE("Vector<3> add", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                             num_ghost_cells, ns);
-	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                           num_ghost_cells, ns);
+	MockVector<3> a(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b_copy(MPI_COMM_WORLD, num_components, num_local_patches,
+	                     num_ghost_cells, ns);
+	MockVector<3> expected(MPI_COMM_WORLD, num_components, num_local_patches,
+	                       num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -372,28 +372,28 @@ TEST_CASE("Vector<3> add", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (size_t i = 0; i < a->data.size(); i++) {
-		double x   = (i + 0.5) / a->data.size();
-		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
+	for (size_t i = 0; i < a.data.size(); i++) {
+		double x  = (i + 0.5) / a.data.size();
+		a.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (size_t i = 0; i < b->data.size(); i++) {
-		double x        = (i + 0.5) / b->data.size();
-		b->data[i]      = (x - 0.5) * (x - 0.5);
-		b_copy->data[i] = (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < b.data.size(); i++) {
+		double x       = (i + 0.5) / b.data.size();
+		b.data[i]      = (x - 0.5) * (x - 0.5);
+		b_copy.data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (size_t i = 0; i < expected->data.size(); i++) {
-		double x          = (i + 0.5) / expected->data.size();
-		expected->data[i] = 10 - (x - 0.75) * (x - 0.75) + (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < expected.data.size(); i++) {
+		double x         = (i + 0.5) / expected.data.size();
+		expected.data[i] = 10 - (x - 0.75) * (x - 0.75) + (x - 0.5) * (x - 0.5);
 	}
-	b->add(a);
+	b.add(a);
 
-	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getComponentView(c, i);
-			auto b_ld        = b->getComponentView(c, i);
-			auto b_copy_ld   = b_copy->getComponentView(c, i);
+	for (int i = 0; i < a.getNumLocalPatches(); i++) {
+		for (int c = 0; c < a.getNumComponents(); c++) {
+			auto expected_ld = expected.getComponentView(c, i);
+			auto b_ld        = b.getComponentView(c, i);
+			auto b_copy_ld   = b_copy.getComponentView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -415,14 +415,14 @@ TEST_CASE("Vector<3> addScaled", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                             num_ghost_cells, ns);
-	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                           num_ghost_cells, ns);
+	MockVector<3> a(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b_copy(MPI_COMM_WORLD, num_components, num_local_patches,
+	                     num_ghost_cells, ns);
+	MockVector<3> expected(MPI_COMM_WORLD, num_components, num_local_patches,
+	                       num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -431,28 +431,28 @@ TEST_CASE("Vector<3> addScaled", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (size_t i = 0; i < a->data.size(); i++) {
-		double x   = (i + 0.5) / a->data.size();
-		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
+	for (size_t i = 0; i < a.data.size(); i++) {
+		double x  = (i + 0.5) / a.data.size();
+		a.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (size_t i = 0; i < b->data.size(); i++) {
-		double x        = (i + 0.5) / b->data.size();
-		b->data[i]      = (x - 0.5) * (x - 0.5);
-		b_copy->data[i] = (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < b.data.size(); i++) {
+		double x       = (i + 0.5) / b.data.size();
+		b.data[i]      = (x - 0.5) * (x - 0.5);
+		b_copy.data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (size_t i = 0; i < expected->data.size(); i++) {
-		double x          = (i + 0.5) / expected->data.size();
-		expected->data[i] = 0.7 * (10 - (x - 0.75) * (x - 0.75)) + (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < expected.data.size(); i++) {
+		double x         = (i + 0.5) / expected.data.size();
+		expected.data[i] = 0.7 * (10 - (x - 0.75) * (x - 0.75)) + (x - 0.5) * (x - 0.5);
 	}
-	b->addScaled(0.7, a);
+	b.addScaled(0.7, a);
 
-	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getComponentView(c, i);
-			auto b_ld        = b->getComponentView(c, i);
-			auto b_copy_ld   = b_copy->getComponentView(c, i);
+	for (int i = 0; i < a.getNumLocalPatches(); i++) {
+		for (int c = 0; c < a.getNumComponents(); c++) {
+			auto expected_ld = expected.getComponentView(c, i);
+			auto b_ld        = b.getComponentView(c, i);
+			auto b_copy_ld   = b_copy.getComponentView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -474,14 +474,14 @@ TEST_CASE("Vector<3> scaleThenAdd", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                             num_ghost_cells, ns);
-	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                           num_ghost_cells, ns);
+	MockVector<3> a(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b_copy(MPI_COMM_WORLD, num_components, num_local_patches,
+	                     num_ghost_cells, ns);
+	MockVector<3> expected(MPI_COMM_WORLD, num_components, num_local_patches,
+	                       num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -490,28 +490,28 @@ TEST_CASE("Vector<3> scaleThenAdd", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (size_t i = 0; i < a->data.size(); i++) {
-		double x   = (i + 0.5) / a->data.size();
-		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
+	for (size_t i = 0; i < a.data.size(); i++) {
+		double x  = (i + 0.5) / a.data.size();
+		a.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (size_t i = 0; i < b->data.size(); i++) {
-		double x        = (i + 0.5) / b->data.size();
-		b->data[i]      = (x - 0.5) * (x - 0.5);
-		b_copy->data[i] = (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < b.data.size(); i++) {
+		double x       = (i + 0.5) / b.data.size();
+		b.data[i]      = (x - 0.5) * (x - 0.5);
+		b_copy.data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (size_t i = 0; i < expected->data.size(); i++) {
-		double x          = (i + 0.5) / expected->data.size();
-		expected->data[i] = (10 - (x - 0.75) * (x - 0.75)) + 0.7 * (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < expected.data.size(); i++) {
+		double x         = (i + 0.5) / expected.data.size();
+		expected.data[i] = (10 - (x - 0.75) * (x - 0.75)) + 0.7 * (x - 0.5) * (x - 0.5);
 	}
-	b->scaleThenAdd(0.7, a);
+	b.scaleThenAdd(0.7, a);
 
-	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getComponentView(c, i);
-			auto b_ld        = b->getComponentView(c, i);
-			auto b_copy_ld   = b_copy->getComponentView(c, i);
+	for (int i = 0; i < a.getNumLocalPatches(); i++) {
+		for (int c = 0; c < a.getNumComponents(); c++) {
+			auto expected_ld = expected.getComponentView(c, i);
+			auto b_ld        = b.getComponentView(c, i);
+			auto b_copy_ld   = b_copy.getComponentView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -533,14 +533,14 @@ TEST_CASE("Vector<3> scaleThenAddScaled", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                             num_ghost_cells, ns);
-	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                           num_ghost_cells, ns);
+	MockVector<3> a(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b_copy(MPI_COMM_WORLD, num_components, num_local_patches,
+	                     num_ghost_cells, ns);
+	MockVector<3> expected(MPI_COMM_WORLD, num_components, num_local_patches,
+	                       num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -549,28 +549,28 @@ TEST_CASE("Vector<3> scaleThenAddScaled", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (size_t i = 0; i < a->data.size(); i++) {
-		double x   = (i + 0.5) / a->data.size();
-		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
+	for (size_t i = 0; i < a.data.size(); i++) {
+		double x  = (i + 0.5) / a.data.size();
+		a.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (size_t i = 0; i < b->data.size(); i++) {
-		double x        = (i + 0.5) / b->data.size();
-		b->data[i]      = (x - 0.5) * (x - 0.5);
-		b_copy->data[i] = (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < b.data.size(); i++) {
+		double x       = (i + 0.5) / b.data.size();
+		b.data[i]      = (x - 0.5) * (x - 0.5);
+		b_copy.data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (size_t i = 0; i < expected->data.size(); i++) {
-		double x          = (i + 0.5) / expected->data.size();
-		expected->data[i] = -2 * (10 - (x - 0.75) * (x - 0.75)) + 0.7 * (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < expected.data.size(); i++) {
+		double x         = (i + 0.5) / expected.data.size();
+		expected.data[i] = -2 * (10 - (x - 0.75) * (x - 0.75)) + 0.7 * (x - 0.5) * (x - 0.5);
 	}
-	b->scaleThenAddScaled(0.7, -2, a);
+	b.scaleThenAddScaled(0.7, -2, a);
 
-	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getComponentView(c, i);
-			auto b_ld        = b->getComponentView(c, i);
-			auto b_copy_ld   = b_copy->getComponentView(c, i);
+	for (int i = 0; i < a.getNumLocalPatches(); i++) {
+		for (int c = 0; c < a.getNumComponents(); c++) {
+			auto expected_ld = expected.getComponentView(c, i);
+			auto b_ld        = b.getComponentView(c, i);
+			auto b_copy_ld   = b_copy.getComponentView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -592,16 +592,16 @@ TEST_CASE("Vector<3> scaleThenAddScaled two vectors", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto c        = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                        num_ghost_cells, ns);
-	auto b_copy   = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-                                             num_ghost_cells, ns);
-	auto expected = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                           num_ghost_cells, ns);
+	MockVector<3> a(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> c(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b_copy(MPI_COMM_WORLD, num_components, num_local_patches,
+	                     num_ghost_cells, ns);
+	MockVector<3> expected(MPI_COMM_WORLD, num_components, num_local_patches,
+	                       num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -610,34 +610,34 @@ TEST_CASE("Vector<3> scaleThenAddScaled two vectors", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (size_t i = 0; i < a->data.size(); i++) {
-		double x   = (i + 0.5) / a->data.size();
-		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
+	for (size_t i = 0; i < a.data.size(); i++) {
+		double x  = (i + 0.5) / a.data.size();
+		a.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (size_t i = 0; i < b->data.size(); i++) {
-		double x        = (i + 0.5) / b->data.size();
-		b->data[i]      = (x - 0.5) * (x - 0.5);
-		b_copy->data[i] = (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < b.data.size(); i++) {
+		double x       = (i + 0.5) / b.data.size();
+		b.data[i]      = (x - 0.5) * (x - 0.5);
+		b_copy.data[i] = (x - 0.5) * (x - 0.5);
 	}
 
-	for (size_t i = 0; i < c->data.size(); i++) {
-		double x   = (i + 0.5) / c->data.size();
-		c->data[i] = 1 + (x - 0.25) * (x - 0.25);
+	for (size_t i = 0; i < c.data.size(); i++) {
+		double x  = (i + 0.5) / c.data.size();
+		c.data[i] = 1 + (x - 0.25) * (x - 0.25);
 	}
 
-	for (size_t i = 0; i < expected->data.size(); i++) {
-		double x          = (i + 0.5) / expected->data.size();
-		expected->data[i] = -2 * (10 - (x - 0.75) * (x - 0.75)) + 0.7 * (x - 0.5) * (x - 0.5)
-		                    + 9 * (1 + (x - 0.25) * (x - 0.25));
+	for (size_t i = 0; i < expected.data.size(); i++) {
+		double x         = (i + 0.5) / expected.data.size();
+		expected.data[i] = -2 * (10 - (x - 0.75) * (x - 0.75)) + 0.7 * (x - 0.5) * (x - 0.5)
+		                   + 9 * (1 + (x - 0.25) * (x - 0.25));
 	}
-	b->scaleThenAddScaled(0.7, -2, a, 9, c);
+	b.scaleThenAddScaled(0.7, -2, a, 9, c);
 
-	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto expected_ld = expected->getComponentView(c, i);
-			auto b_ld        = b->getComponentView(c, i);
-			auto b_copy_ld   = b_copy->getComponentView(c, i);
+	for (int i = 0; i < a.getNumLocalPatches(); i++) {
+		for (int c = 0; c < a.getNumComponents(); c++) {
+			auto expected_ld = expected.getComponentView(c, i);
+			auto b_ld        = b.getComponentView(c, i);
+			auto b_copy_ld   = b_copy.getComponentView(c, i);
 			nested_loop<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(),
 			               [&](std::array<int, 3> &coord) {
 				               if (isGhost(coord, ns, num_ghost_cells)) {
@@ -736,10 +736,10 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	array<int, 3> ns                = {nx, ny, nz};
 	int           num_local_patches = GENERATE(1, 13);
 
-	auto a = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                    num_ghost_cells, ns);
-	auto b = make_shared<MockVector<3>>(MPI_COMM_WORLD, num_components, num_local_patches,
-	                                    num_ghost_cells, ns);
+	MockVector<3> a(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
+	MockVector<3> b(MPI_COMM_WORLD, num_components, num_local_patches,
+	                num_ghost_cells, ns);
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
@@ -748,26 +748,26 @@ TEST_CASE("Vector<3> dot", "[Vector]")
 	INFO("num_local_patches: " << num_local_patches);
 	INFO("num_components:    " << num_components);
 
-	for (size_t i = 0; i < a->data.size(); i++) {
-		double x   = (i + 0.5) / a->data.size();
-		a->data[i] = 10 - (x - 0.75) * (x - 0.75);
+	for (size_t i = 0; i < a.data.size(); i++) {
+		double x  = (i + 0.5) / a.data.size();
+		a.data[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	for (size_t i = 0; i < b->data.size(); i++) {
-		double x   = (i + 0.5) / b->data.size();
-		b->data[i] = (x - 0.5) * (x - 0.5);
+	for (size_t i = 0; i < b.data.size(); i++) {
+		double x  = (i + 0.5) / b.data.size();
+		b.data[i] = (x - 0.5) * (x - 0.5);
 	}
 
 	double expected_value = 0;
-	for (int i = 0; i < a->getNumLocalPatches(); i++) {
-		for (int c = 0; c < a->getNumComponents(); c++) {
-			auto a_ld = a->getComponentView(c, i);
-			auto b_ld = b->getComponentView(c, i);
+	for (int i = 0; i < a.getNumLocalPatches(); i++) {
+		for (int c = 0; c < a.getNumComponents(); c++) {
+			auto a_ld = a.getComponentView(c, i);
+			auto b_ld = b.getComponentView(c, i);
 			nested_loop<3>(b_ld.getStart(), b_ld.getEnd(), [&](std::array<int, 3> &coord) {
 				expected_value += b_ld[coord] * a_ld[coord];
 			});
 		}
 	}
 
-	CHECK(a->dot(b) == Catch::Approx(expected_value));
+	CHECK(a.dot(b) == Catch::Approx(expected_value));
 }

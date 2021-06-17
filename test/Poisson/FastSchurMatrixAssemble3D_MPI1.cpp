@@ -122,7 +122,7 @@ TEST_CASE(
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
 	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<3>>(iface_domain, p_solver);
-	p_solver_wrapper->apply(g_vec, f_vec_expected);
+	p_solver_wrapper->apply(*g_vec, *f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Mat A = Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver);
@@ -136,7 +136,7 @@ TEST_CASE(
 	*/
 
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(g_vec, f_vec);
+	m_operator->apply(*g_vec, *f_vec);
 
 	CHECK(f_vec->infNorm() == Catch::Approx(f_vec_expected->infNorm()));
 	CHECK(f_vec->twoNorm() == Catch::Approx(f_vec_expected->twoNorm()));
@@ -186,12 +186,12 @@ TEST_CASE(
 	auto p_operator       = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf, true);
 	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
 	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<3>>(iface_domain, p_solver);
-	p_solver_wrapper->apply(g_vec, f_vec_expected);
+	p_solver_wrapper->apply(*g_vec, *f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Mat  A          = Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver);
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(g_vec, f_vec);
+	m_operator->apply(*g_vec, *f_vec);
 
 	CHECK(f_vec->infNorm() == Catch::Approx(f_vec_expected->infNorm()));
 	CHECK(f_vec->twoNorm() == Catch::Approx(f_vec_expected->twoNorm()));

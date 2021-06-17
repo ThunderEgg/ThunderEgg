@@ -99,7 +99,7 @@ template <int D> class PCShellCreator
 
 		VecRestoreArrayRead(x, &x_view);
 
-		psc->op->apply(te_x, te_b);
+		psc->op->apply(*te_x, *te_b);
 
 		double *b_view;
 		VecGetArray(b, &b_view);

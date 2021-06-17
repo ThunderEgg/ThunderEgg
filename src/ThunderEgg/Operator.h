@@ -43,7 +43,7 @@ template <int D> class Operator
 	 * @param x the input vector.
 	 * @param b the output vector.
 	 */
-	virtual void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const = 0;
+	virtual void apply(const Vector<D> &x, Vector<D> &b) const = 0;
 };
 } // namespace ThunderEgg
 #endif

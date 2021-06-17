@@ -79,7 +79,7 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 	p_operator->addDrichletBCToRHS(f_vec, gfun);
 
 	auto f_expected = ValVector<2>::GetNewVector(d_fine, 1);
-	f_expected->copy(f_vec);
+	f_expected->copy(*f_vec);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		auto u = g_vec->getComponentView(0, pinfo.local_index);
 		auto f = f_expected->getComponentView(0, pinfo.local_index);
@@ -146,7 +146,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 	p_operator->addDrichletBCToRHS(f_vec_expected, gfun);
 
-	p_operator->apply(g_vec, f_vec);
+	p_operator->apply(*g_vec, *f_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -194,7 +194,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 	p_operator->addNeumannBCToRHS(f_vec_expected, gfun, {gfun_x, gfun_y});
 
-	p_operator->apply(g_vec, f_vec);
+	p_operator->apply(*g_vec, *f_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -249,10 +249,10 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence",
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 		p_operator->addDrichletBCToRHS(f_vec_expected, gfun);
 
-		p_operator->apply(g_vec, f_vec);
+		p_operator->apply(*g_vec, *f_vec);
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		error_vec->addScaled(1.0, f_vec, -1.0, f_vec_expected);
+		error_vec->addScaled(1.0, *f_vec, -1.0, *f_vec_expected);
 		errors[i] = error_vec->twoNorm() / f_vec_expected->twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
@@ -302,10 +302,10 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence with neuma
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 		p_operator->addNeumannBCToRHS(f_vec_expected, gfun, {gfun_x, gfun_y});
 
-		p_operator->apply(g_vec, f_vec);
+		p_operator->apply(*g_vec, *f_vec);
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		error_vec->addScaled(1.0, f_vec, -1.0, f_vec_expected);
+		error_vec->addScaled(1.0, *f_vec, -1.0, *f_vec_expected);
 		errors[i] = error_vec->twoNorm() / f_vec_expected->twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);

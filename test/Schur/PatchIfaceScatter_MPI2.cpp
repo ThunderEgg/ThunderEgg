@@ -77,8 +77,8 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatterStart throws exception when called
 	auto global_vector = vg.getNewVector();
 	auto local_vector  = scatter.getNewLocalPatchIfaceVector();
 
-	scatter.scatterStart(global_vector, local_vector);
-	CHECK_THROWS_AS(scatter.scatterStart(global_vector, local_vector), RuntimeError);
+	scatter.scatterStart(*global_vector, *local_vector);
+	CHECK_THROWS_AS(scatter.scatterStart(*global_vector, *local_vector), RuntimeError);
 }
 TEST_CASE(
 "Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different global vectors",
@@ -100,8 +100,8 @@ TEST_CASE(
 	auto global_vector_2 = vg.getNewVector();
 	auto local_vector    = scatter.getNewLocalPatchIfaceVector();
 
-	scatter.scatterStart(global_vector, local_vector);
-	CHECK_THROWS_AS(scatter.scatterFinish(global_vector_2, local_vector), RuntimeError);
+	scatter.scatterStart(*global_vector, *local_vector);
+	CHECK_THROWS_AS(scatter.scatterFinish(*global_vector_2, *local_vector), RuntimeError);
 }
 TEST_CASE(
 "Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different local vectors",
@@ -123,8 +123,8 @@ TEST_CASE(
 	auto local_vector   = scatter.getNewLocalPatchIfaceVector();
 	auto local_vector_2 = scatter.getNewLocalPatchIfaceVector();
 
-	scatter.scatterStart(global_vector, local_vector);
-	CHECK_THROWS_AS(scatter.scatterFinish(global_vector, local_vector_2), RuntimeError);
+	scatter.scatterStart(*global_vector, *local_vector);
+	CHECK_THROWS_AS(scatter.scatterFinish(*global_vector, *local_vector_2), RuntimeError);
 }
 TEST_CASE(
 "Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different local and global vectors",
@@ -147,8 +147,8 @@ TEST_CASE(
 	auto local_vector    = scatter.getNewLocalPatchIfaceVector();
 	auto local_vector_2  = scatter.getNewLocalPatchIfaceVector();
 
-	scatter.scatterStart(global_vector, local_vector);
-	CHECK_THROWS_AS(scatter.scatterFinish(global_vector_2, local_vector_2), RuntimeError);
+	scatter.scatterStart(*global_vector, *local_vector);
+	CHECK_THROWS_AS(scatter.scatterFinish(*global_vector_2, *local_vector_2), RuntimeError);
 }
 /******
  *
@@ -237,7 +237,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied",
 			               local_data[coord] = iface->global_index + 1 + coord[0];
 		               });
 	}
-	scatter.scatterStart(global_vector, local_vector);
+	scatter.scatterStart(*global_vector, *local_vector);
 	for (auto iface : iface_domain->getInterfaces()) {
 		INFO("IFACE_ID: " << iface->id);
 		auto local_data = local_vector->getComponentView(0, iface->local_index);
@@ -272,8 +272,8 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
 			               local_data[coord] = iface->global_index + 1 + coord[0];
 		               });
 	}
-	scatter.scatterStart(global_vector, local_vector);
-	scatter.scatterFinish(global_vector, local_vector);
+	scatter.scatterStart(*global_vector, *local_vector);
+	scatter.scatterFinish(*global_vector, *local_vector);
 	for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
 		INFO("PATCH_ID: " << piinfo->pinfo.id);
 		for (Side<2> s : Side<2>::getValues()) {
@@ -314,10 +314,10 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice", "[Schur::PatchIfaceScatte
 			               local_data[coord] = iface->global_index + 1 + coord[0];
 		               });
 	}
-	scatter.scatterStart(global_vector, local_vector);
-	scatter.scatterFinish(global_vector, local_vector);
-	scatter.scatterStart(global_vector, local_vector);
-	scatter.scatterFinish(global_vector, local_vector);
+	scatter.scatterStart(*global_vector, *local_vector);
+	scatter.scatterFinish(*global_vector, *local_vector);
+	scatter.scatterStart(*global_vector, *local_vector);
+	scatter.scatterFinish(*global_vector, *local_vector);
 	for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
 		INFO("PATCH_ID: " << piinfo->pinfo.id);
 		for (Side<2> s : Side<2>::getValues()) {
@@ -360,8 +360,8 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled"
 			               local_data[coord] = iface->global_index + 1 + coord[0];
 		               });
 	}
-	scatter.scatterStart(global_vector, local_vector);
-	scatter.scatterFinish(global_vector, local_vector);
+	scatter.scatterStart(*global_vector, *local_vector);
+	scatter.scatterFinish(*global_vector, *local_vector);
 	for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
 		INFO("PATCH_ID: " << piinfo->pinfo.id);
 		for (Side<2> s : Side<2>::getValues()) {

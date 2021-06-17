@@ -97,17 +97,17 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @param f the rhs vector
 	 * @param u the lhs vector
 	 */
-	virtual void apply(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const override
+	virtual void apply(const Vector<D> &f, Vector<D> &u) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (u->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (u.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
 				throw RuntimeError("u vector is incorrect length");
 			}
-			if (f->getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (f.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
 				throw RuntimeError("f vector is incorrect length");
 			}
 		}
-		u->setWithGhost(0);
+		u.setWithGhost(0);
 		if (domain->hasTimer()) {
 			domain->getTimer()->startDomainTiming(domain->getId(), "Total Patch Solve");
 		}
@@ -115,8 +115,8 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 			if (domain->hasTimer()) {
 				domain->getTimer()->start("Single Patch Solve");
 			}
-			PatchView<const double, D> f_view = f->getPatchView(pinfo.local_index);
-			PatchView<double, D>       u_view = u->getPatchView(pinfo.local_index);
+			PatchView<const double, D> f_view = f.getPatchView(pinfo.local_index);
+			PatchView<double, D>       u_view = u.getPatchView(pinfo.local_index);
 			solveSinglePatch(pinfo, f_view, u_view);
 			if (domain->hasTimer()) {
 				domain->getTimer()->stop("Single Patch Solve");

@@ -97,7 +97,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 	 * @param x the input vector.
 	 * @param b the output vector.
 	 */
-	void apply(std::shared_ptr<const Vector<D - 1>> x, std::shared_ptr<Vector<D - 1>> b) const override
+	void apply(const Vector<D - 1> &x, Vector<D - 1> &b) const override
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -106,7 +106,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		auto f = vg.getNewVector();
 		// scatter local iface vector
 		auto local_x = scatter.getNewLocalPatchIfaceVector();
-		scatter.scatterStart(x, local_x);
+		scatter.scatterStart(x, *local_x);
 
 		// each patch has a local interface, go ahead and set the ghost values using those
 		// interfaces
@@ -128,7 +128,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 			solver->solveSinglePatch(piinfo->pinfo, f_view, u_view);
 		}
 
-		scatter.scatterFinish(x, local_x);
+		scatter.scatterFinish(x, *local_x);
 
 		// set ghosts using interfaces that were on a neighboring rank
 		for (auto piinfo : patches_with_ifaces_on_neighbor_rank) {
@@ -157,7 +157,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 					auto local_data = u->getComponentView(0, patch.piinfo->pinfo.local_index);
 					auto ghosts     = local_data.getSliceOn(patch.side, {-1});
 					auto inner      = local_data.getSliceOn(patch.side, {0});
-					auto interface  = b->getComponentView(0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
+					auto interface  = b.getComponentView(0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
 					nested_loop<D - 1>(interface.getStart(), interface.getEnd(), [&](const std::array<int, D - 1> &coord) {
 						interface[coord] = (ghosts[coord] + inner[coord]) / 2;
 					});
@@ -165,7 +165,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 				}
 			}
 		}
-		b->scaleThenAdd(-1, x);
+		b.scaleThenAdd(-1, x);
 	}
 	/**
 	 * @brief Get the RHS for the Schur system from a given RHS for the domain system

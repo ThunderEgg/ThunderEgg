@@ -68,13 +68,13 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 
 	auto gf         = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	p_operator->apply(g_vec, f_vec_expected);
+	p_operator->apply(*g_vec, *f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper mh(d_fine, neumann);
 	Mat                   A          = mh.formCRSMatrix();
 	auto                  m_operator = make_shared<PETSc::MatWrapper<3>>(A);
-	m_operator->apply(g_vec, f_vec);
+	m_operator->apply(*g_vec, *f_vec);
 
 	REQUIRE(f_vec->infNorm() > 0);
 
@@ -128,13 +128,13 @@ TEST_CASE(
 
 	auto gf         = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf, true);
-	p_operator->apply(g_vec, f_vec_expected);
+	p_operator->apply(*g_vec, *f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper mh(d_fine, neumann);
 	Mat                   A          = mh.formCRSMatrix();
 	auto                  m_operator = make_shared<PETSc::MatWrapper<3>>(A);
-	m_operator->apply(g_vec, f_vec);
+	m_operator->apply(*g_vec, *f_vec);
 
 	REQUIRE(f_vec->infNorm() > 0);
 

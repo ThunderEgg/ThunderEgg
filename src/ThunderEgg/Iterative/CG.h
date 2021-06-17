@@ -61,11 +61,11 @@ template <int D> class CG : public Solver<D>
 	                             std::shared_ptr<Vector<D>>          b) const
 	{
 		if (M_l == nullptr && M_r == nullptr) {
-			A->apply(x, b);
+			A->apply(*x, *b);
 		} else if (M_l == nullptr && M_r != nullptr) {
 			std::shared_ptr<Vector<D>> tmp = vg->getNewVector();
-			M_r->apply(x, tmp);
-			A->apply(tmp, b);
+			M_r->apply(*x, *tmp);
+			A->apply(*tmp, *b);
 		}
 	}
 
@@ -135,26 +135,29 @@ template <int D> class CG : public Solver<D>
 	}
 
 	public:
-	int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
-	          std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
-	          std::shared_ptr<const Operator<D>> Mr = nullptr, bool output = false,
-	          std::ostream &os = std::cout) const override
+	int solve(std::shared_ptr<VectorGenerator<D>> vg,
+	          std::shared_ptr<const Operator<D>>  A,
+	          std::shared_ptr<Vector<D>>          x,
+	          std::shared_ptr<const Vector<D>>    b,
+	          std::shared_ptr<const Operator<D>>  Mr     = nullptr,
+	          bool                                output = false,
+	          std::ostream &                      os     = std::cout) const override
 	{
 		std::shared_ptr<Vector<D>> resid = vg->getNewVector();
 
-		A->apply(x, resid);
-		resid->scaleThenAdd(-1, b);
+		A->apply(*x, *resid);
+		resid->scaleThenAdd(-1, *b);
 
 		std::shared_ptr<Vector<D>> initial_guess = vg->getNewVector();
-		initial_guess->copy(x);
+		initial_guess->copy(*x);
 		x->set(0);
 
 		double                     r0_norm = b->twoNorm();
 		std::shared_ptr<Vector<D>> p       = vg->getNewVector();
-		p->copy(resid);
+		p->copy(*resid);
 		std::shared_ptr<Vector<D>> ap = vg->getNewVector();
 
-		double rho = resid->dot(resid);
+		double rho = resid->dot(*resid);
 
 		int num_its = 0;
 		if (r0_norm == 0) {
@@ -172,18 +175,17 @@ template <int D> class CG : public Solver<D>
 			}
 
 			if (rho == 0) {
-				throw BreakdownError("CG broke down, rho was 0 on iteration "
-				                     + std::to_string(num_its));
+				throw BreakdownError("CG broke down, rho was 0 on iteration " + std::to_string(num_its));
 			}
 
 			applyWithPreconditioner(vg, nullptr, A, Mr, p, ap);
-			double alpha = rho / p->dot(ap);
-			x->addScaled(alpha, p);
-			resid->addScaled(-alpha, ap);
+			double alpha = rho / p->dot(*ap);
+			x->addScaled(alpha, *p);
+			resid->addScaled(-alpha, *ap);
 
-			double rho_new = resid->dot(resid);
+			double rho_new = resid->dot(*resid);
 			double beta    = rho_new / rho;
-			p->scaleThenAdd(beta, resid);
+			p->scaleThenAdd(beta, *resid);
 
 			num_its++;
 			rho      = rho_new;
@@ -199,10 +201,10 @@ template <int D> class CG : public Solver<D>
 			}
 		}
 		if (Mr != nullptr) {
-			Mr->apply(x, resid);
-			x->copy(resid);
+			Mr->apply(*x, *resid);
+			x->copy(*resid);
 		}
-		x->add(initial_guess);
+		x->add(*initial_guess);
 		return num_its;
 	}
 };

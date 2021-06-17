@@ -40,10 +40,10 @@ const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 class HalfIdentity : public Operator<2>
 {
 	public:
-	void apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const override
+	void apply(const Vector<2> &x, Vector<2> &b) const override
 	{
-		b->copy(x);
-		b->scale(0.5);
+		b.copy(x);
+		b.scale(0.5);
 	}
 };
 TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")

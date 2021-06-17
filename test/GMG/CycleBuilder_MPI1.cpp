@@ -30,7 +30,7 @@ using namespace ThunderEgg;
 class MockOperator : public Operator<2>
 {
 	public:
-	void apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const override {}
+	void apply(const Vector<2> &x, Vector<2> &b) const override {}
 };
 class MockSmoother : public GMG::Smoother<2>
 {
