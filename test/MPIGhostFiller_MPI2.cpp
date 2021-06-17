@@ -30,7 +30,7 @@ TEST_CASE("Calls for various domains 2d face cases MPI2", "[MPIGhostFiller]")
 
 	CallMockMPIGhostFiller<2> mgf(d_fine, num_components, GhostFillingType::Faces);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	CHECK(mgf.called == true);
 
@@ -51,7 +51,7 @@ TEST_CASE("Calls for various domains 2d corner cases MPI2", "[MPIGhostFiller]")
 
 	CallMockMPIGhostFiller<2> mgf(d_fine, num_components, GhostFillingType::Corners);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	CHECK(mgf.called == true);
 
@@ -73,7 +73,7 @@ TEST_CASE("Calls for various domains 3d face cases MPI2", "[MPIGhostFiller]")
 
 	CallMockMPIGhostFiller<3> mgf(d_fine, num_components, GhostFillingType::Faces);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	CHECK(mgf.called == true);
 
@@ -95,7 +95,7 @@ TEST_CASE("Calls for various domains 3d edge cases MPI2", "[MPIGhostFiller]")
 
 	CallMockMPIGhostFiller<3> mgf(d_fine, num_components, GhostFillingType::Edges);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	CHECK(mgf.called == true);
 
@@ -117,7 +117,7 @@ TEST_CASE("Calls for various domains 3d corners cases MPI2", "[MPIGhostFiller]")
 
 	CallMockMPIGhostFiller<3> mgf(d_fine, num_components, GhostFillingType::Corners);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	CHECK(mgf.called == true);
 
@@ -148,7 +148,7 @@ TEST_CASE("Exchange for various domains 2d face cases MPI2", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, GhostFillingType::Faces);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }
@@ -174,7 +174,7 @@ TEST_CASE("Exchange for various domains 2d corner cases MPI2", "[MPIGhostFiller]
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, GhostFillingType::Corners);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }
@@ -201,7 +201,7 @@ TEST_CASE("Exchange for various domains 3d face cases MPI2", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Faces);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }
@@ -228,7 +228,7 @@ TEST_CASE("Exchange for various domains 3d edge cases MPI2", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Edges);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }
@@ -255,7 +255,7 @@ TEST_CASE("Exchange for various domains 3d corner cases MPI2", "[MPIGhostFiller]
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Corners);
 
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }
@@ -281,8 +281,8 @@ TEST_CASE("Two Exchanges for various domains 2d face cases MPI2", "[MPIGhostFill
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, GhostFillingType::Faces);
 
-	mgf.fillGhost(vec);
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }
@@ -308,8 +308,8 @@ TEST_CASE("Two Exchanges for various domains 2d corner cases MPI2", "[MPIGhostFi
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, GhostFillingType::Corners);
 
-	mgf.fillGhost(vec);
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }
@@ -336,8 +336,8 @@ TEST_CASE("Two Exchange for various domains 3d face cases MPI2", "[MPIGhostFille
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Faces);
 
-	mgf.fillGhost(vec);
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }
@@ -364,8 +364,8 @@ TEST_CASE("Two Exchange for various domains 3d edge cases MPI2", "[MPIGhostFille
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Edges);
 
-	mgf.fillGhost(vec);
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }
@@ -392,8 +392,8 @@ TEST_CASE("Two Exchange for various domains 3d corner cases MPI2", "[MPIGhostFil
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Corners);
 
-	mgf.fillGhost(vec);
-	mgf.fillGhost(vec);
+	mgf.fillGhost(*vec);
+	mgf.fillGhost(*vec);
 
 	mgf.checkVector(vec);
 }

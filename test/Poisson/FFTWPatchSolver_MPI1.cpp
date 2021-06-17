@@ -78,7 +78,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence",
 		auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 		p_operator->addDrichletBCToRHS(f_vec, gfun);
 
-		p_solver->smooth(f_vec, g_vec);
+		p_solver->smooth(*f_vec, *g_vec);
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		error_vec->addScaled(1.0, g_vec, -1.0, g_vec_expected);
@@ -138,7 +138,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
 		auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
-		p_solver->smooth(f_vec, g_vec);
+		p_solver->smooth(*f_vec, *g_vec);
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		g_vec->shift(-d_fine->integrate(g_vec) / d_fine->volume());
@@ -201,7 +201,7 @@ TEST_CASE(
 		auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
-		p_solver->smooth(f_vec, g_vec);
+		p_solver->smooth(*f_vec, *g_vec);
 
 		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
 		g_vec->shift(-d_fine->integrate(g_vec) / d_fine->volume());

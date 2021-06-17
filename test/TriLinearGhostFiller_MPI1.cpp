@@ -40,7 +40,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -103,7 +103,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -184,7 +184,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -259,7 +259,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -335,7 +335,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGh
 	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -411,7 +411,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -518,7 +518,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -619,7 +619,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
 	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -688,7 +688,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
 	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -773,7 +773,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -898,7 +898,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -1017,7 +1017,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
 	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
-	tlgf.fillGhost(vec);
+	tlgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);

@@ -37,7 +37,7 @@ class MockGhostFiller : public GhostFiller<D>
 	mutable bool called = false;
 
 	public:
-	void fillGhost(std::shared_ptr<const Vector<D>> u) const override
+	void fillGhost(const Vector<D> &u) const override
 	{
 		called = true;
 	}
@@ -56,9 +56,9 @@ class PatchFillingGhostFiller : public GhostFiller<D>
 	public:
 	PatchFillingGhostFiller(double fill_value)
 	: fill_value(fill_value) {}
-	void fillGhost(std::shared_ptr<const Vector<D>> u) const override
+	void fillGhost(const Vector<D> &u) const override
 	{
-		std::const_pointer_cast<Vector<D>>(u)->setWithGhost(fill_value);
+		const_cast<Vector<D> &>(u).setWithGhost(fill_value);
 		called = true;
 	}
 	bool wasCalled()

@@ -70,7 +70,7 @@ template <int D>
 class MockGhostFiller : public GhostFiller<D>
 {
 	public:
-	void fillGhost(std::shared_ptr<const Vector<D>> u) const override {}
+	void fillGhost(const Vector<D> &u) const override {}
 };
 } // namespace
 } // namespace ThunderEgg

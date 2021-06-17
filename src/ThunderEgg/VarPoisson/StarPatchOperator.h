@@ -67,7 +67,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		if (this->domain->getNumGhostCells() < 1) {
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
-		this->ghost_filler->fillGhost(this->coeff_view);
+		this->ghost_filler->fillGhost(*this->coeff_view);
 	}
 	void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const override
 	{

@@ -35,7 +35,7 @@ class MockOperator : public Operator<2>
 class MockSmoother : public GMG::Smoother<2>
 {
 	public:
-	void smooth(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const override {}
+	void smooth(const Vector<2> &x, Vector<2> &b) const override {}
 };
 class MockInterpolator : public GMG::Interpolator<2>
 {

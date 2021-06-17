@@ -84,7 +84,7 @@ template <int D> class Cycle : public Operator<D>
 	 */
 	void smooth(const Level<D> &level, VecList &u_vectors, ConstVecList &f_vectors) const
 	{
-		level.getSmoother()->smooth(f_vectors.front(), u_vectors.front());
+		level.getSmoother()->smooth(*f_vectors.front(), *u_vectors.front());
 	}
 
 	/**

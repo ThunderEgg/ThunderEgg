@@ -77,7 +77,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	DomainTools::SetValues<2>(d, vec, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(vec);
+	blgf.fillGhost(*vec);
 
 	// patch 1
 	{
@@ -273,7 +273,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(vec);
+	blgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -329,7 +329,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(vec);
+	blgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -389,7 +389,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components", "[BiL
 	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(vec);
+	blgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -468,7 +468,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(vec);
+	blgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -539,7 +539,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners", "[BiLinearGh
 	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
-	blgf.fillGhost(vec);
+	blgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -604,7 +604,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
 	DomainTools::SetValuesWithGhost<2>(d, expected, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
-	blgf.fillGhost(vec);
+	blgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -673,7 +673,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
 	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
-	blgf.fillGhost(vec);
+	blgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -770,7 +770,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
-	blgf.fillGhost(vec);
+	blgf.fillGhost(*vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);

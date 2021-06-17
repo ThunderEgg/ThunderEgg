@@ -42,7 +42,7 @@ template <int D> class Smoother
 	 * @param f the RHS vector
 	 * @param u the solution vector, updated upon return.
 	 */
-	virtual void smooth(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const = 0;
+	virtual void smooth(const Vector<D> &f, Vector<D> &u) const = 0;
 };
 } // namespace GMG
 } // namespace ThunderEgg

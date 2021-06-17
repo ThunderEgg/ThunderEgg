@@ -522,7 +522,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param buffers the recv buffers
 	 * @param u the vector to fill ghost values in
 	 */
-	void processRecvs(std::vector<MPI_Request> &requests, std::vector<std::vector<double>> &buffers, std::shared_ptr<const Vector<D>> u) const
+	void processRecvs(std::vector<MPI_Request> &requests, std::vector<std::vector<double>> &buffers, const Vector<D> &u) const
 	{
 		size_t num_requests = requests.size();
 		for (size_t i = 0; i < num_requests; i++) {
@@ -531,14 +531,14 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			switch (fill_type) {
 				case GhostFillingType::Corners:
 					if constexpr (D >= 2) {
-						addRecvBufferToGhost<0>(remote_call_sets[finished_index], buffers[finished_index], *u);
+						addRecvBufferToGhost<0>(remote_call_sets[finished_index], buffers[finished_index], u);
 					}
 				case GhostFillingType::Edges:
 					if constexpr (D == 3) {
-						addRecvBufferToGhost<1>(remote_call_sets[finished_index], buffers[finished_index], *u);
+						addRecvBufferToGhost<1>(remote_call_sets[finished_index], buffers[finished_index], u);
 					}
 				case GhostFillingType::Faces:
-					addRecvBufferToGhost<D - 1>(remote_call_sets[finished_index], buffers[finished_index], *u);
+					addRecvBufferToGhost<D - 1>(remote_call_sets[finished_index], buffers[finished_index], u);
 					break;
 				default:
 					throw RuntimeError("Unsupported GhostFilling Type");
@@ -577,21 +577,21 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param u the vector to fill buffers from
 	 * @return std::vector<MPI_Request> the requests
 	 */
-	std::vector<MPI_Request> postSends(std::vector<std::vector<double>> &buffers, std::shared_ptr<const Vector<D>> u) const
+	std::vector<MPI_Request> postSends(std::vector<std::vector<double>> &buffers, const Vector<D> &u) const
 	{
 		std::vector<MPI_Request> send_requests(remote_call_sets.size());
 		for (size_t i = 0; i < remote_call_sets.size(); i++) {
 			switch (fill_type) {
 				case GhostFillingType::Corners:
 					if constexpr (D >= 2) {
-						fillSendBuffer<0>(remote_call_sets[i], buffers[i], *u);
+						fillSendBuffer<0>(remote_call_sets[i], buffers[i], u);
 					}
 				case GhostFillingType::Edges:
 					if constexpr (D == 3) {
-						fillSendBuffer<1>(remote_call_sets[i], buffers[i], *u);
+						fillSendBuffer<1>(remote_call_sets[i], buffers[i], u);
 					}
 				case GhostFillingType::Faces:
-					fillSendBuffer<D - 1>(remote_call_sets[i], buffers[i], *u);
+					fillSendBuffer<D - 1>(remote_call_sets[i], buffers[i], u);
 					break;
 				default:
 					throw RuntimeError("Unsupported GhostFilling Type");
@@ -637,12 +637,12 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @tparam M the dimension
 	 * @param u the vector that the ghost are being filled for
 	 */
-	template <int M> void processLocalFills(std::shared_ptr<const Vector<D>> u) const
+	template <int M> void processLocalFills(const Vector<D> &u) const
 	{
 		for (const LocalCall<M> &call : local_calls.template get<M>()) {
 			const PatchInfo<D> &       pinfo      = domain->getPatchInfoVector()[call.local_index];
-			PatchView<const double, D> local_view = u->getPatchView(call.local_index);
-			PatchView<const double, D> nbr_view   = u->getPatchView(call.nbr_local_index);
+			PatchView<const double, D> local_view = u.getPatchView(call.local_index);
+			PatchView<const double, D> nbr_view   = u.getPatchView(call.nbr_local_index);
 			fillGhostCellsForNbrPatchPriv(pinfo, local_view, nbr_view, call.face, call.nbr_type, call.orthant);
 		}
 		if constexpr (M > 0) {
@@ -833,10 +833,10 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 *
 	 * @param u the vector to zero out the ghost cells on
 	 */
-	void zeroGhostCells(std::shared_ptr<const Vector<D>> u) const
+	void zeroGhostCells(const Vector<D> &u) const
 	{
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			PatchView<const double, D> this_patch = u->getPatchView(pinfo.local_index);
+			PatchView<const double, D> this_patch = u.getPatchView(pinfo.local_index);
 			switch (fill_type) {
 				case GhostFillingType::Corners:
 					if constexpr (D >= 2) {
@@ -956,10 +956,10 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 *
 	 * @param u  the vector
 	 */
-	void fillGhost(std::shared_ptr<const Vector<D>> u) const
+	void fillGhost(const Vector<D> &u) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (u->getNumLocalPatches() != domain->getNumLocalPatches()) {
+			if (u.getNumLocalPatches() != domain->getNumLocalPatches()) {
 				throw RuntimeError("u vector is incorrect length. Expected Lenght of " + std::to_string(domain->getNumLocalPatches())
 				                   + " but vector was length " + std::to_string(u->getNumLocalPatches()));
 			}
@@ -970,20 +970,20 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		// allocate recv buffers and post recvs
 		std::vector<std::vector<double>> recv_buffers(remote_call_sets.size());
 		for (size_t i = 0; i < remote_call_sets.size(); i++) {
-			recv_buffers[i].resize(remote_call_sets[i].recv_buffer_length * u->getNumComponents());
+			recv_buffers[i].resize(remote_call_sets[i].recv_buffer_length * u.getNumComponents());
 		}
 		std::vector<MPI_Request> recv_requests = postRecvs(recv_buffers);
 
 		// allocate send buffers
 		std::vector<std::vector<double>> out_buffers(remote_call_sets.size());
 		for (size_t i = 0; i < remote_call_sets.size(); i++) {
-			out_buffers[i].resize(remote_call_sets[i].send_buffer_length * u->getNumComponents());
+			out_buffers[i].resize(remote_call_sets[i].send_buffer_length * u.getNumComponents());
 		}
 		std::vector<MPI_Request> send_requests = postSends(out_buffers, u);
 
 		// perform local operations
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			PatchView<const double, D> view = u->getPatchView(pinfo.local_index);
+			PatchView<const double, D> view = u.getPatchView(pinfo.local_index);
 			fillGhostCellsForLocalPatch(pinfo, view);
 		}
 		processLocalFills<D - 1>(u);

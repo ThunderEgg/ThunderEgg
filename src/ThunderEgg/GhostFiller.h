@@ -39,7 +39,7 @@ template <int D> class GhostFiller
 	 *
 	 * @param u  the vector
 	 */
-	virtual void fillGhost(std::shared_ptr<const Vector<D>> u) const = 0;
+	virtual void fillGhost(const Vector<D> &u) const = 0;
 };
 } // namespace ThunderEgg
 #endif

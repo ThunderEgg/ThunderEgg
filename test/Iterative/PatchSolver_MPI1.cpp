@@ -46,7 +46,7 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length",
 
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
-	bcgs_solver.smooth(f, u);
+	bcgs_solver.smooth(*f, *u);
 }
 TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchSolver]")
 {
@@ -82,7 +82,7 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
-	bcgs_solver.smooth(f, u);
+	bcgs_solver.smooth(*f, *u);
 	CHECK(mpo->getNumApplyCalls() == 1);
 	CHECK(mpo->rhsWasModified());
 	CHECK(mpo->boundaryConditionsEnforced());
@@ -118,7 +118,7 @@ TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::Patch
 
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
-	CHECK_THROWS_AS(bcgs_solver.smooth(f, u), BreakdownError);
+	CHECK_THROWS_AS(bcgs_solver.smooth(*f, *u), BreakdownError);
 }
 TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterative::PatchSolver]")
 {
@@ -150,5 +150,5 @@ TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterativ
 
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo, true);
 
-	CHECK_NOTHROW(bcgs_solver.smooth(f, u));
+	CHECK_NOTHROW(bcgs_solver.smooth(*f, *u));
 }

@@ -127,7 +127,7 @@ template <int D> class PatchOperator : public Operator<D>
 			}
 		}
 		f->setWithGhost(0);
-		ghost_filler->fillGhost(u);
+		ghost_filler->fillGhost(*u);
 		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
 			PatchView<const double, D> u_view = u->getPatchView(pinfo.local_index);
 			enforceBoundaryConditions(pinfo, u_view);
