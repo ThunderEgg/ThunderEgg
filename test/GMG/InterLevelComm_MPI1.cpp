@@ -128,8 +128,8 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	// since there are not ghost patches, the coarse vec should not be modified
 	coarse_expected->copy(coarse_vec);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec);
 	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
 		PatchView<double, 2> vec_view      = coarse_vec->getPatchView(i);
 		PatchView<double, 2> expected_view = coarse_expected->getPatchView(i);

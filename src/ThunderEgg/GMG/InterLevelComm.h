@@ -103,8 +103,8 @@ template <int D> class InterLevelComm
 	bool                                          communicating = false;
 	bool                                          sending       = false;
 
-	std::shared_ptr<const Vector<D>> current_vector;
-	std::shared_ptr<const Vector<D>> current_ghost_vector;
+	const Vector<D> *current_vector       = nullptr;
+	const Vector<D> *current_ghost_vector = nullptr;
 
 	std::vector<std::vector<double>> recv_buffers;
 	std::vector<MPI_Request>         recv_requests;
@@ -279,7 +279,7 @@ template <int D> class InterLevelComm
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
 	 */
-	void sendGhostPatchesStart(std::shared_ptr<Vector<D>> vector, std::shared_ptr<const Vector<D>> ghost_vector)
+	void sendGhostPatchesStart(Vector<D> &vector, const Vector<D> &ghost_vector)
 	{
 		if (communicating) {
 			if (sending) {
@@ -290,8 +290,8 @@ template <int D> class InterLevelComm
 		}
 
 		// keep track of what vectors we are using
-		current_ghost_vector = ghost_vector;
-		current_vector       = vector;
+		current_ghost_vector = &ghost_vector;
+		current_vector       = &vector;
 
 		// post receives
 		recv_buffers.reserve(rank_and_local_indexes_for_vector.size());
@@ -315,7 +315,7 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				PatchView<const double, D> view = ghost_vector->getPatchView(local_index);
+				PatchView<const double, D> view = ghost_vector.getPatchView(local_index);
 				loop_over_all_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) {
 					send_buffers.back()[buffer_idx] = view[coord];
 					buffer_idx++;
@@ -344,18 +344,18 @@ template <int D> class InterLevelComm
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
 	 */
-	void sendGhostPatchesFinish(std::shared_ptr<Vector<D>> vector, std::shared_ptr<const Vector<D>> ghost_vector)
+	void sendGhostPatchesFinish(Vector<D> &vector, const Vector<D> &ghost_vector)
 	{
 		if (!communicating) {
 			throw RuntimeError("InterLevelComm cannot finish sendGhostPatches since communication was not started");
 		} else if (!sending) {
 			throw RuntimeError("InterLevelComm sendGhostPatchesFinish is being called after getGhostPatchesStart was called");
 		}
-		if (vector != current_vector) {
+		if (&vector != current_vector) {
 			throw RuntimeError(
 			"InterLevelComm sendGhostPatchesFinish is being called with a different vector than when sendGhostPatchesStart was called");
 		}
-		if (ghost_vector != current_ghost_vector) {
+		if (&ghost_vector != current_ghost_vector) {
 			throw RuntimeError(
 			"InterLevelComm senGhostPatchesFinish is being called with a different ghost vector than when sendGhostPatchesStart was called");
 		}
@@ -372,7 +372,7 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				PatchView<double, D> view = vector->getPatchView(local_index);
+				PatchView<double, D> view = vector.getPatchView(local_index);
 				loop_over_all_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) {
 					view[coord] += buffer[buffer_idx];
 					buffer_idx++;
@@ -406,7 +406,7 @@ template <int D> class InterLevelComm
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
 	 */
-	void getGhostPatchesStart(std::shared_ptr<const Vector<D>> vector, std::shared_ptr<Vector<D>> ghost_vector)
+	void getGhostPatchesStart(const Vector<D> &vector, Vector<D> &ghost_vector)
 	{
 		if (communicating) {
 			if (sending) {
@@ -417,8 +417,8 @@ template <int D> class InterLevelComm
 		}
 
 		// keep track of what vectors we are using
-		current_ghost_vector = ghost_vector;
-		current_vector       = vector;
+		current_ghost_vector = &ghost_vector;
+		current_vector       = &vector;
 
 		// post receives
 		recv_buffers.reserve(rank_and_local_indexes_for_ghost_vector.size());
@@ -442,7 +442,7 @@ template <int D> class InterLevelComm
 			// fill buffer with values
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
-				PatchView<const double, D> local_view = vector->getPatchView(local_index);
+				PatchView<const double, D> local_view = vector.getPatchView(local_index);
 				loop_over_all_indexes<D + 1>(local_view, [&](const std::array<int, D + 1> &coord) {
 					send_buffers.back()[buffer_idx] = local_view[coord];
 					buffer_idx++;
@@ -471,18 +471,18 @@ template <int D> class InterLevelComm
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
 	 */
-	void getGhostPatchesFinish(std::shared_ptr<const Vector<D>> vector, std::shared_ptr<Vector<D>> ghost_vector)
+	void getGhostPatchesFinish(const Vector<D> &vector, Vector<D> &ghost_vector)
 	{
 		if (!communicating) {
 			throw RuntimeError("InterLevelComm cannot finish sendGhostPatches since communication was not started");
 		} else if (sending) {
 			throw RuntimeError("InterLevelComm getGhostPatchesFinish is being called after sendGhostPatchesStart was called");
 		}
-		if (vector != current_vector) {
+		if (&vector != current_vector) {
 			throw RuntimeError(
 			"InterLevelComm getGhostPatchesFinish is being called with a different vector than when getGhostPatchesStart was called");
 		}
-		if (ghost_vector != current_ghost_vector) {
+		if (&ghost_vector != current_ghost_vector) {
 			throw RuntimeError(
 			"InterLevelComm getGhostPatchesFinish is being called with a different ghost vector than when getGhostPatchesStart was called");
 		}
@@ -499,7 +499,7 @@ template <int D> class InterLevelComm
 			std::vector<double> &buffer     = recv_buffers.at(finished_idx);
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
-				PatchView<double, D> local_view = ghost_vector->getPatchView(local_index);
+				PatchView<double, D> local_view = ghost_vector.getPatchView(local_index);
 				loop_over_all_indexes<D + 1>(local_view, [&](const std::array<int, D + 1> &coord) {
 					local_view[coord] = buffer[buffer_idx];
 					buffer_idx++;

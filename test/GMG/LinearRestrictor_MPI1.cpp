@@ -61,7 +61,7 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	restrictor->restrict(*fine_vec, *coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -126,7 +126,7 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 2, true);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	restrictor->restrict(*fine_vec, *coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -193,7 +193,7 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, false);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	restrictor->restrict(*fine_vec, *coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -251,7 +251,7 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 2, false);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	restrictor->restrict(*fine_vec, *coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);

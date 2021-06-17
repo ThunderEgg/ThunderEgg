@@ -63,8 +63,8 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	 * @param coarser_vector the coaser vector
 	 */
 	virtual void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
-	                                std::shared_ptr<const Vector<D>>                                               coarser_vector,
-	                                std::shared_ptr<Vector<D>>                                                     finer_vector) const = 0;
+	                                const Vector<D> &                                                              coarser_vector,
+	                                Vector<D> &                                                                    finer_vector) const = 0;
 
 	/**
 	 * @brief interpolation function
@@ -72,7 +72,7 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	 * @param coarse the input vector that is interpolated from
 	 * @param fine the output vector that is interpolated to.
 	 */
-	void interpolate(std::shared_ptr<const Vector<D>> coarse, std::shared_ptr<Vector<D>> fine) const
+	void interpolate(const Vector<D> &coarse, Vector<D> &fine) const
 	{
 		if constexpr (ENABLE_DEBUG) {
 			if (coarse->getNumLocalPatches() != ilc->getCoarserDomain()->getNumLocalPatches()) {
@@ -89,16 +89,16 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 		std::shared_ptr<Vector<D>> coarse_ghost = ilc->getNewGhostVector();
 
 		// start scatter for ghost values
-		ilc->getGhostPatchesStart(coarse, coarse_ghost);
+		ilc->getGhostPatchesStart(coarse, *coarse_ghost);
 
 		// interpolate form local values
 		interpolatePatches(ilc->getPatchesWithLocalParent(), coarse, fine);
 
 		// finish scatter for ghost values
-		ilc->getGhostPatchesFinish(coarse, coarse_ghost);
+		ilc->getGhostPatchesFinish(coarse, *coarse_ghost);
 
 		// interpolator from ghost values
-		interpolatePatches(ilc->getPatchesWithGhostParent(), coarse_ghost, fine);
+		interpolatePatches(ilc->getPatchesWithGhostParent(), *coarse_ghost, fine);
 	}
 };
 } // namespace GMG

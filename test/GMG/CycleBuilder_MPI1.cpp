@@ -40,8 +40,7 @@ class MockSmoother : public GMG::Smoother<2>
 class MockInterpolator : public GMG::Interpolator<2>
 {
 	public:
-	void interpolate(std::shared_ptr<const Vector<2>> x,
-	                 std::shared_ptr<Vector<2>>       b) const override
+	void interpolate(const Vector<2> &x, Vector<2> &b) const override
 	{
 	}
 };
@@ -49,7 +48,7 @@ class MockRestrictor : public GMG::Restrictor<2>
 {
 	public:
 	mutable int num_calls = 0;
-	void restrict(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const override
+	void restrict(const Vector<2> &x, Vector<2> &b) const override
 	{
 	}
 };

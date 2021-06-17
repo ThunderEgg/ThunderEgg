@@ -75,7 +75,7 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 	auto interpolator
 	= std::make_shared<GMG::DirectInterpolator<2>>(d_coarse, d_fine, num_components);
 
-	interpolator->interpolate(coarse_vec, fine_vec);
+	interpolator->interpolate(*coarse_vec, *fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -135,7 +135,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 	auto interpolator
 	= std::make_shared<GMG::DirectInterpolator<2>>(d_coarse, d_fine, num_components);
 
-	interpolator->interpolate(coarse_vec, fine_vec);
+	interpolator->interpolate(*coarse_vec, *fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -198,7 +198,7 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 	auto interpolator
 	= std::make_shared<GMG::DirectInterpolator<2>>(d_coarse, d_fine, num_components);
 
-	interpolator->interpolate(coarse_vec, fine_vec);
+	interpolator->interpolate(*coarse_vec, *fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);

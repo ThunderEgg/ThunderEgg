@@ -50,13 +50,13 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 	{
 	}
 	void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
-	                        std::shared_ptr<const Vector<D>>                                               coarser_vector,
-	                        std::shared_ptr<Vector<D>>                                                     finer_vector) const override
+	                        const Vector<D> &                                                              coarser_vector,
+	                        Vector<D> &                                                                    finer_vector) const override
 	{
 		for (auto pair : patches) {
 			const PatchInfo<D> &       pinfo       = pair.second.get();
-			PatchView<const double, D> coarse_view = coarser_vector->getPatchView(pair.first);
-			PatchView<double, D>       fine_view   = finer_vector->getPatchView(pinfo.local_index);
+			PatchView<const double, D> coarse_view = coarser_vector.getPatchView(pair.first);
+			PatchView<double, D>       fine_view   = finer_vector.getPatchView(pinfo.local_index);
 
 			if (pinfo.hasCoarseParent()) {
 				Orthant<D>         orth = pinfo.orth_on_parent;

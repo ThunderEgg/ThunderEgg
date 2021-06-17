@@ -80,13 +80,10 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	 * @param finer_vector the finer vector
 	 * @param coarser_vector the coarser vector
 	 */
-	void restrictToCoarserParent(const PatchInfo<D> &             pinfo,
-	                             int                              parent_index,
-	                             std::shared_ptr<const Vector<D>> finer_vector,
-	                             std::shared_ptr<Vector<D>>       coarser_vector) const
+	void restrictToCoarserParent(const PatchInfo<D> &pinfo, int parent_index, const Vector<D> &finer_vector, Vector<D> &coarser_vector) const
 	{
-		PatchView<double, D>       coarse_view = coarser_vector->getPatchView(parent_index);
-		PatchView<const double, D> fine_view   = finer_vector->getPatchView(pinfo.local_index);
+		PatchView<double, D>       coarse_view = coarser_vector.getPatchView(parent_index);
+		PatchView<const double, D> fine_view   = finer_vector.getPatchView(pinfo.local_index);
 		// get starting index in coarser patch
 		Orthant<D>         orth = pinfo.orth_on_parent;
 		std::array<int, D> starts;
@@ -117,13 +114,10 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	 * @param coarser_vector the coarser vector
 	 */
 
-	void copyToParent(const PatchInfo<D> &             pinfo,
-	                  int                              parent_index,
-	                  std::shared_ptr<const Vector<D>> finer_vector,
-	                  std::shared_ptr<Vector<D>>       coarser_vector) const
+	void copyToParent(const PatchInfo<D> &pinfo, int parent_index, const Vector<D> &finer_vector, Vector<D> &coarser_vector) const
 	{
-		PatchView<double, D>       coarse_view = coarser_vector->getPatchView(parent_index);
-		PatchView<const double, D> fine_view   = finer_vector->getPatchView(pinfo.local_index);
+		PatchView<double, D>       coarse_view = coarser_vector.getPatchView(parent_index);
+		PatchView<const double, D> fine_view   = finer_vector.getPatchView(pinfo.local_index);
 		// just copy the values
 		loop_over_interior_indexes<D + 1>(fine_view, [&](const std::array<int, D + 1> &coord) { coarse_view[coord] += fine_view[coord]; });
 		if (extrapolate_boundary_ghosts) {
@@ -157,8 +151,8 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	{
 	}
 	void restrictPatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
-	                     std::shared_ptr<const Vector<D>>                                               finer_vector,
-	                     std::shared_ptr<Vector<D>>                                                     coarser_vector) const override
+	                     const Vector<D> &                                                              finer_vector,
+	                     Vector<D> &                                                                    coarser_vector) const override
 	{
 		for (const auto &pair : patches) {
 			if (pair.second.get().hasCoarseParent()) {

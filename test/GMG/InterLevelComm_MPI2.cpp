@@ -160,8 +160,8 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 		                         });
 	}
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
 		PatchView<double, 2> local_view = coarse_vec->getPatchView(0);
@@ -189,7 +189,7 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
@@ -209,8 +209,8 @@ TEST_CASE(
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec_2), RuntimeError);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
@@ -230,8 +230,8 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec), RuntimeError);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec_2, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
@@ -252,8 +252,8 @@ TEST_CASE(
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec_2), RuntimeError);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec_2, *ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when start is called twice on uniform quad",
@@ -272,8 +272,8 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when get start is called after send start on uniform quad",
@@ -292,8 +292,8 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when sned start is called after get start on uniform quad",
@@ -312,8 +312,8 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
@@ -350,8 +350,8 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 		                         });
 	}
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec);
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
@@ -379,7 +379,7 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
@@ -399,8 +399,8 @@ TEST_CASE(
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec_2), RuntimeError);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
@@ -420,8 +420,8 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec), RuntimeError);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec_2, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
@@ -442,8 +442,8 @@ TEST_CASE(
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec_2, ghost_vec_2), RuntimeError);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(*coarse_vec_2, *ghost_vec_2), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when start is called twice on uniform quad",
           "[GMG::InterLevelComm]")
@@ -461,8 +461,8 @@ TEST_CASE("2-processor getGhostPatches throws exception when start is called twi
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when send finish is called on get start",
           "[GMG::InterLevelComm]")
@@ -480,8 +480,8 @@ TEST_CASE("2-processor getGhostPatches throws exception when send finish is call
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when get finish is called on send start",
           "[GMG::InterLevelComm]")
@@ -499,8 +499,8 @@ TEST_CASE("2-processor getGhostPatches throws exception when get finish is calle
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when send start is called after get start",
           "[GMG::InterLevelComm]")
@@ -518,8 +518,8 @@ TEST_CASE("2-processor getGhostPatches throws exception when send start is calle
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when get start is called after send start",
           "[GMG::InterLevelComm]")
@@ -537,8 +537,8 @@ TEST_CASE("2-processor getGhostPatches throws exception when get start is called
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when send finish is called after get start and finish",
@@ -557,9 +557,9 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when get finish is called after send start and finish",
@@ -578,9 +578,9 @@ TEST_CASE(
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::InterLevelComm]")
 {
@@ -619,8 +619,8 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 			                         });
 		}
 
-		ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-		ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
+		ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+		ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec);
 		if (rank == 0) {
 		} else {
 			// the coarse vec should be filled with 1+c
@@ -668,8 +668,8 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 			                         });
 		}
 
-		ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-		ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
+		ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+		ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec);
 		if (rank == 0) {
 			// the coarse vec should be filled with 3+2*c
 			PatchView<double, 2> local_view = coarse_vec->getPatchView(0);
@@ -716,8 +716,8 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 		                         });
 	}
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
 		PatchView<double, 2> local_view = coarse_vec->getPatchView(0);
@@ -744,8 +744,8 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 		                         });
 	}
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec);
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
@@ -791,8 +791,8 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 		                         });
 	}
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
+	ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec);
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
@@ -819,8 +819,8 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 		                         });
 	}
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
+	ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
 		PatchView<double, 2> local_view = coarse_vec->getPatchView(0);

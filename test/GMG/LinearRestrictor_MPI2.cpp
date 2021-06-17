@@ -58,7 +58,7 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	restrictor->restrict(*fine_vec, *coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -111,7 +111,7 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	restrictor->restrict(*fine_vec, *coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);

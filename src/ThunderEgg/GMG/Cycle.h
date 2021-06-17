@@ -60,7 +60,7 @@ template <int D> class Cycle : public Operator<D>
 		// create vectors for coarser levels
 		std::shared_ptr<Vector<D>> new_u = level.getCoarser()->getVectorGenerator()->getNewVector();
 		std::shared_ptr<Vector<D>> new_f = level.getCoarser()->getVectorGenerator()->getNewVector();
-		level.getRestrictor()->restrict(r, new_f);
+		level.getRestrictor()->restrict(*r, *new_f);
 		u_vectors.push_front(new_u);
 		f_vectors.push_front(new_f);
 	}
@@ -74,7 +74,7 @@ template <int D> class Cycle : public Operator<D>
 		std::shared_ptr<Vector<D>> old_u = u_vectors.front();
 		u_vectors.pop_front();
 		f_vectors.pop_front();
-		level.getInterpolator()->interpolate(old_u, u_vectors.front());
+		level.getInterpolator()->interpolate(*old_u, *u_vectors.front());
 	}
 
 	/**
