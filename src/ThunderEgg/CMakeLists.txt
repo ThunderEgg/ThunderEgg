@@ -77,6 +77,9 @@ target_sources(ThunderEgg PRIVATE PatchOperator.cpp)
 
 list(APPEND ThunderEgg_HDRS PatchSolver.h)
 
+list(APPEND ThunderEgg_HDRS PatchArray.h)
+target_sources(ThunderEgg PRIVATE PatchArray.cpp)
+
 list(APPEND ThunderEgg_HDRS PatchView.h)
 target_sources(ThunderEgg PRIVATE PatchView.cpp)
 

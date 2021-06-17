@@ -112,6 +112,8 @@ target_sources(unit_tests_mpi1 PRIVATE PatchOperator_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE PatchSolver_MPI1.cpp)
 
+target_sources(unit_tests_mpi1 PRIVATE PatchArray_MPI1.cpp)
+
 target_sources(unit_tests_mpi1 PRIVATE PatchView_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE Side_MPI1.cpp)
