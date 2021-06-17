@@ -318,33 +318,6 @@ template <int D> class Domain
 		return retval;
 	}
 	/**
-	 * @brief Integrate a vector over the domain.
-	 *
-	 * @param u the vector
-	 * @return double the result of the integral
-	 */
-	double integrate(std::shared_ptr<const Vector<D>> u) const
-	{
-		double sum = 0;
-
-		for (const auto &pinfo : pinfos) {
-			for (int c = 0; c < u->getNumComponents(); c++) {
-				ComponentView<const double, D> u_data = u->getComponentView(c, pinfo.local_index);
-
-				double patch_sum = 0;
-				nested_loop<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
-
-				for (size_t i = 0; i < D; i++) {
-					patch_sum *= pinfo.spacings[i];
-				}
-				sum += patch_sum;
-			}
-		}
-		double retval;
-		MPI_Allreduce(&sum, &retval, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-		return retval;
-	}
-	/**
 	 * @brief Set the Timer object
 	 *
 	 * @param timer the timer

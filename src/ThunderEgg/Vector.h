@@ -40,6 +40,27 @@ template <int D> class Vector
 {
 	private:
 	/**
+	 * @brief the pointers to patch starts
+	 */
+	std::vector<double *> patch_starts;
+
+	/**
+	 * @brief the number of non-ghost cells in each direction of the patch
+	 */
+	std::array<int, D + 1> lengths;
+	/**
+	 * @brief the strides for each axis of the patch
+	 */
+	std::array<int, D + 1> strides;
+
+	double *data = nullptr;
+
+	/**
+	 * @brief The number of ghost cells
+	 */
+	int num_ghost_cells;
+
+	/**
 	 * @brief The number of components for a patch
 	 */
 	int num_components;
@@ -73,6 +94,16 @@ template <int D> class Vector
 	  comm(comm)
 	{
 	}
+	/*
+	Vector(MPI_Comm comm, const Domain<D> &domain, int num_components)
+	{
+	    //
+	}
+	Vector(MPI_Comm comm, const Domain<D> &domain, int num_components)
+	{
+	    //
+	}
+	*/
 	/**
 	 * @brief Destroy the Vector object
 	 */

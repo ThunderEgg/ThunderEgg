@@ -466,6 +466,33 @@ class DomainTools
 	{
 		_SetValuesWithGhost(domain, vec, 0, func, args...);
 	}
+	/**
+	 * @brief Integrate a vector over the domain.
+	 *
+	 * @param u the vector
+	 * @return double the result of the integral
+	 */
+	template <int D> static double Integrate(std::shared_ptr<Domain<D>> domain, std::shared_ptr<const Vector<D>> u)
+	{
+		double sum = 0;
+
+		for (const auto &pinfo : domain->getPatchInfoVector()) {
+			for (int c = 0; c < u->getNumComponents(); c++) {
+				ComponentView<const double, D> u_data = u->getComponentView(c, pinfo.local_index);
+
+				double patch_sum = 0;
+				nested_loop<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
+
+				for (size_t i = 0; i < D; i++) {
+					patch_sum *= pinfo.spacings[i];
+				}
+				sum += patch_sum;
+			}
+		}
+		double retval;
+		MPI_Allreduce(&sum, &retval, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		return retval;
+	}
 };
 } // namespace ThunderEgg
 #endif

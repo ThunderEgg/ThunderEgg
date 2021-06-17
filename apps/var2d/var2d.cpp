@@ -382,8 +382,8 @@ int main(int argc, char *argv[])
 		shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain, 1);
 		error->scaleThenAddScaled(0, -1, *exact, 1, *u);
 		if (neumann) {
-			double uavg = domain->integrate(u) / domain->volume();
-			double eavg = domain->integrate(exact) / domain->volume();
+			double uavg = DomainTools::Integrate<2>(domain, u) / domain->volume();
+			double eavg = DomainTools::Integrate<2>(domain, exact) / domain->volume();
 
 			if (my_global_rank == 0) {
 				cout << "Average of computed solution: " << uavg << endl;
@@ -395,8 +395,8 @@ int main(int argc, char *argv[])
 		double error_norm = error->twoNorm();
 		double exact_norm = exact->twoNorm();
 
-		double ausum = domain->integrate(au);
-		double fsum  = domain->integrate(f);
+		double ausum = DomainTools::Integrate<2>(domain, au);
+		double fsum  = DomainTools::Integrate<2>(domain, f);
 		if (my_global_rank == 0) {
 			std::cout << std::scientific;
 			std::cout.precision(13);

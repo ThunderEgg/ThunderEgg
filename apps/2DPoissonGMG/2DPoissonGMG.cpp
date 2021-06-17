@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 	timer->stop("Domain Initialization");
 
 	if (neumann && !no_zero_rhs_avg) {
-		double fdiff = domain->integrate(f) / domain->volume();
+		double fdiff = DomainTools::Integrate<2>(domain, f) / domain->volume();
 		if (my_global_rank == 0)
 			cout << "Fdiff: " << fdiff << endl;
 		f->shift(-fdiff);
@@ -452,8 +452,8 @@ int main(int argc, char *argv[])
 	shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain, 1);
 	error->addScaled(-1, *exact, 1, *u);
 	if (neumann) {
-		double u_average     = domain->integrate(u) / domain->volume();
-		double exact_average = domain->integrate(exact) / domain->volume();
+		double u_average     = DomainTools::Integrate<2>(domain, u) / domain->volume();
+		double exact_average = DomainTools::Integrate<2>(domain, exact) / domain->volume();
 
 		if (my_global_rank == 0) {
 			cout << "Average of computed solution: " << u_average << endl;
@@ -466,8 +466,8 @@ int main(int argc, char *argv[])
 	double error_norm_inf = error->infNorm();
 	double exact_norm     = exact->twoNorm();
 
-	double au_sum = domain->integrate(au);
-	double f_sum  = domain->integrate(f);
+	double au_sum = DomainTools::Integrate<2>(domain, au);
+	double f_sum  = DomainTools::Integrate<2>(domain, f);
 	if (my_global_rank == 0) {
 		std::cout << std::scientific;
 		std::cout.precision(13);
