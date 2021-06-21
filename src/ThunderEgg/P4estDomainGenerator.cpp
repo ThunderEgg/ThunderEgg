@@ -619,7 +619,9 @@ std::shared_ptr<Domain<2>> P4estDomainGenerator::getCoarserDomain()
 	if (curr_level >= 0) {
 		extractLevel();
 	}
-	std::shared_ptr<Domain<2>> domain = make_shared<Domain<2>>(id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
+	Communicator               comm(my_p4est->mpicomm);
+	std::shared_ptr<Domain<2>> domain
+	= make_shared<Domain<2>>(comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
 	domain_patches.pop_back();
 	id++;
 	return domain;
@@ -630,7 +632,9 @@ std::shared_ptr<Domain<2>> P4estDomainGenerator::getFinestDomain()
 	if (curr_level >= 0) {
 		extractLevel();
 	}
-	std::shared_ptr<Domain<2>> domain = make_shared<Domain<2>>(id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
+	Communicator               comm(my_p4est->mpicomm);
+	std::shared_ptr<Domain<2>> domain
+	= make_shared<Domain<2>>(comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
 	domain_patches.pop_back();
 	id++;
 	return domain;

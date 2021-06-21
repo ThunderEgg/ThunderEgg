@@ -49,7 +49,7 @@ template <int D> class Domain
 	/**
 	 * @brief The communicator associated with the domain
 	 */
-	MPI_Comm comm;
+	Communicator comm;
 	/**
 	 * @brief The id of the domain
 	 */
@@ -108,13 +108,10 @@ template <int D> class Domain
 	 */
 	void indexPatchesGlobal()
 	{
-		int rank;
-		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
 		// get starting global index
 		int num_local_patches = (int) pinfos.size();
 		int curr_global_index;
-		MPI_Scan(&num_local_patches, &curr_global_index, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+		MPI_Scan(&num_local_patches, &curr_global_index, 1, MPI_INT, MPI_SUM, comm.getMPIComm());
 		curr_global_index -= num_local_patches;
 
 		// index the patches
@@ -133,7 +130,7 @@ template <int D> class Domain
 			for (size_t idx = 0; idx < ranks.size(); idx++) {
 				int nbr_id   = ids[idx];
 				int nbr_rank = ranks[idx];
-				if (nbr_rank != rank) {
+				if (nbr_rank != comm.getRank()) {
 					ranks_to_ids_and_global_indexes_outgoing[nbr_rank].insert(std::make_pair(pinfo.id, pinfo.global_index));
 					ranks_to_ids_incoming[nbr_rank].insert(nbr_id);
 				}
@@ -151,7 +148,7 @@ template <int D> class Domain
 			incoming_data.resize(pair.second.size());
 
 			MPI_Request request;
-			MPI_Irecv(incoming_data.data(), (int) incoming_data.size(), MPI_INT, source_rank, 0, MPI_COMM_WORLD, &request);
+			MPI_Irecv(incoming_data.data(), (int) incoming_data.size(), MPI_INT, source_rank, 0, comm.getMPIComm(), &request);
 			recv_requests.push_back(request);
 		}
 
@@ -169,7 +166,7 @@ template <int D> class Domain
 				data.push_back(id_and_global_index.second);
 			}
 			MPI_Request request;
-			MPI_Isend(data.data(), (int) data.size(), MPI_INT, dest_rank, 0, MPI_COMM_WORLD, &request);
+			MPI_Isend(data.data(), (int) data.size(), MPI_INT, dest_rank, 0, comm.getMPIComm(), &request);
 			send_requests.push_back(request);
 		}
 
@@ -213,8 +210,9 @@ template <int D> class Domain
 	 * @param last_pinfo end iterator for PatchInfo objects
 	 */
 	template <class InputIterator>
-	Domain(int id, std::array<int, D> ns, int num_ghost_cells, InputIterator first_pinfo, InputIterator last_pinfo)
-	: id(id),
+	Domain(Communicator comm, int id, std::array<int, D> ns, int num_ghost_cells, InputIterator first_pinfo, InputIterator last_pinfo)
+	: comm(comm),
+	  id(id),
 	  ns(ns),
 	  num_ghost_cells(num_ghost_cells),
 	  pinfos(first_pinfo, last_pinfo)
@@ -227,10 +225,19 @@ template <int D> class Domain
 		}
 
 		int num_local_domains = pinfos.size();
-		MPI_Allreduce(&num_local_domains, &global_num_patches, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(&num_local_domains, &global_num_patches, 1, MPI_INT, MPI_SUM, comm.getMPIComm());
 
 		indexPatchesLocal();
 		indexPatchesGlobal();
+	}
+	/**
+	 * @brief Get the Communicator object associated with this domain
+	 *
+	 * @return const Communicator& the Communicator
+	 */
+	const Communicator &getCommunicator() const
+	{
+		return comm;
 	}
 	/**
 	 * @brief Get a vector of PatchInfo pointers where index in the vector corresponds to the
@@ -313,7 +320,7 @@ template <int D> class Domain
 			sum += patch_vol;
 		}
 		double retval;
-		MPI_Allreduce(&sum, &retval, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		MPI_Allreduce(&sum, &retval, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
 		return retval;
 	}
 	/**

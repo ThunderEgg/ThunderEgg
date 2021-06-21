@@ -11,6 +11,8 @@ using namespace ThunderEgg;
 
 TEST_CASE("Domain constructors work", "[Domain]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	vector<PatchInfo<2>> pinfos(1);
 
 	auto n         = GENERATE(1, 2, 10, 13);
@@ -21,7 +23,7 @@ TEST_CASE("Domain constructors work", "[Domain]")
 	pinfos[0].ns.fill(n);
 	pinfos[0].spacings.fill(spacing);
 	pinfos[0].num_ghost_cells = num_ghost;
-	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
+	Domain<2> d(comm, 0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	// check getters
 	for (int ni : d.getNs()) {
@@ -35,7 +37,11 @@ TEST_CASE("Domain constructors work", "[Domain]")
 	CHECK(d.getNumCellsInPatch() == n * n);
 	CHECK(d.getNumGhostCells() == num_ghost);
 	CHECK(d.volume() == Catch::Approx(spacing * spacing * n * n));
-	// TODO Check intigrate
+
+	int result;
+	int err = MPI_Comm_compare(comm.getMPIComm(), d.getCommunicator().getMPIComm(), &result);
+	REQUIRE(err == MPI_SUCCESS);
+	CHECK(result == MPI_CONGRUENT);
 }
 TEST_CASE("Domain setTimer", "[Domain]")
 {
@@ -51,7 +57,7 @@ TEST_CASE("Domain setTimer", "[Domain]")
 	pinfos[0].ns.fill(n);
 	pinfos[0].spacings.fill(spacing);
 	pinfos[0].num_ghost_cells = num_ghost;
-	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
+	Domain<2> d(comm, 0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	auto timer = make_shared<Timer>(comm);
 	d.setTimer(timer);
@@ -72,7 +78,7 @@ TEST_CASE("Domain setTimer adds domain to timer", "[Domain]")
 	pinfos[0].ns.fill(n);
 	pinfos[0].spacings.fill(spacing);
 	pinfos[0].num_ghost_cells = num_ghost;
-	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
+	Domain<2> d(comm, 0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	auto timer = make_shared<Timer>(comm);
 	d.setTimer(timer);
@@ -82,6 +88,8 @@ TEST_CASE("Domain setTimer adds domain to timer", "[Domain]")
 }
 TEST_CASE("Domain getTimer default is no timer", "[Domain]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
@@ -92,13 +100,15 @@ TEST_CASE("Domain getTimer default is no timer", "[Domain]")
 	pinfos[0].ns.fill(n);
 	pinfos[0].spacings.fill(spacing);
 	pinfos[0].num_ghost_cells = num_ghost;
-	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
+	Domain<2> d(comm, 0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	CHECK(d.getTimer() == nullptr);
 	CHECK_FALSE(d.hasTimer());
 }
 TEST_CASE("Domain id in constructor", "[Domain]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
@@ -110,12 +120,14 @@ TEST_CASE("Domain id in constructor", "[Domain]")
 	pinfos[0].spacings.fill(spacing);
 	pinfos[0].num_ghost_cells = num_ghost;
 	auto      id              = GENERATE(1, 2, 9);
-	Domain<2> d(id, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
+	Domain<2> d(comm, id, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	CHECK(d.getId() == id);
 }
 TEST_CASE("Domain to_json", "[Domain]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
@@ -126,7 +138,7 @@ TEST_CASE("Domain to_json", "[Domain]")
 	pinfos[0].ns.fill(n);
 	pinfos[0].spacings.fill(spacing);
 	pinfos[0].num_ghost_cells = num_ghost;
-	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
+	Domain<2> d(comm, 0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
 	nlohmann::json j = d;
 	REQUIRE(j.is_array());

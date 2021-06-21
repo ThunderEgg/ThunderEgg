@@ -10,7 +10,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-static Domain<2> GetDomain()
+static Domain<2> GetDomain(const Communicator &comm)
 {
 	vector<PatchInfo<2>> pinfos(1);
 
@@ -22,7 +22,7 @@ static Domain<2> GetDomain()
 	pinfos[0].ns.fill(n);
 	pinfos[0].spacings.fill(spacing);
 	pinfos[0].num_ghost_cells = num_ghost;
-	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
+	Domain<2> d(comm, 0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 	return d;
 }
 static int occurrences(const std::string &s, const std::string &target)
@@ -72,7 +72,7 @@ TEST_CASE("Timer Two DomainTimings Sequential Stop second before started", "[Tim
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	int          id   = GENERATE(0, 1);
@@ -83,7 +83,7 @@ TEST_CASE("Timer DomainTimings Nested Wrong id on stop", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(1, "A"), RuntimeError);
 }
@@ -91,7 +91,7 @@ TEST_CASE("Timer DomainTimings Nested Wrong name on stop", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(0, "blah"), RuntimeError);
 }
@@ -99,7 +99,7 @@ TEST_CASE("Timer DomainTimings Nested Wrong name and id on stop", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(1, "blah"), RuntimeError);
 }
@@ -107,8 +107,8 @@ TEST_CASE("Timer Two DomainTimings Nested Wrong Order", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(1, "B");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(0, "A"), RuntimeError);
@@ -117,8 +117,8 @@ TEST_CASE("Timer addDomain twice fails", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	REQUIRE_THROWS_AS(timer.addDomain(0, GetDomain()), RuntimeError);
+	timer.addDomain(0, GetDomain(comm));
+	REQUIRE_THROWS_AS(timer.addDomain(0, GetDomain(comm)), RuntimeError);
 }
 TEST_CASE("Timer startDomainTiming fails without added domain", "[Timer]")
 {
@@ -455,7 +455,7 @@ TEST_CASE("Timer to_json domain timing", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	const nlohmann::json j = timer;
@@ -480,7 +480,7 @@ TEST_CASE("Timer to_json patch timing", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
 	timer.startPatchTiming(0, 0, "A");
 	timer.stopPatchTiming(0, 0, "A");
 	const nlohmann::json j = timer;
@@ -617,7 +617,7 @@ TEST_CASE("Timer ostream sequential patch timing", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
 	timer.startPatchTiming(0, 0, "A");
 	timer.stopPatchTiming(0, 0, "A");
 	timer.startPatchTiming(0, 0, "A");
@@ -637,7 +637,7 @@ TEST_CASE("Timer ostream domain timing", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	stringstream ss;
@@ -655,8 +655,8 @@ TEST_CASE("Timer ostream domain timing two different domains sequential", "[Time
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	timer.startDomainTiming(1, "A");
@@ -677,8 +677,8 @@ TEST_CASE("Timer ostream domain timing two different domains with information se
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.addIntInfo("Example", 0);
 	timer.stopDomainTiming(0, "A");
@@ -704,8 +704,8 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested",
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -732,8 +732,8 @@ TEST_CASE(
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "C");
 	timer.stopDomainTiming(0, "C");
@@ -763,8 +763,8 @@ TEST_CASE(
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -792,8 +792,8 @@ TEST_CASE("Timer saveToFile new empty file", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -822,8 +822,8 @@ TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -853,8 +853,8 @@ TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 	Timer        timer(comm);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");

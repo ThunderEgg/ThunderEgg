@@ -16,6 +16,8 @@ constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.j
 constexpr auto cross_mesh_file   = "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json";
 TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto   nx        = GENERATE(1, 2, 10, 13);
 	auto   ny        = GENERATE(1, 2, 10, 13);
 	double startx    = 0;
@@ -69,7 +71,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	pinfos[3].setNbrInfo(Side<2>::west(), new NormalNbrInfo<1>(2));
 	pinfos[3].setNbrInfo(Side<2>::south(), new NormalNbrInfo<1>(1));
 
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 4));

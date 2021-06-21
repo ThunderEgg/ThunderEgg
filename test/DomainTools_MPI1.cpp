@@ -305,6 +305,8 @@ TEST_CASE("DomainTools::GetRealCoordBound 2D", "[getRealCoord][DomainTools]")
 }
 TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 1> coord) { return coord[0]; };
 
 	vector<PatchInfo<1>> pinfos(1);
@@ -319,7 +321,7 @@ TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx};
 	pinfos[0].starts          = {startx};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<1>> d(new Domain<1>(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<1>> vec(
 	new ValVector<1>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
@@ -338,6 +340,8 @@ TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
 }
 TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 1> coord) { return coord[0] * coord[0]; };
 
 	vector<PatchInfo<1>> pinfos(1);
@@ -352,7 +356,7 @@ TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx};
 	pinfos[0].starts          = {startx};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<1>> d(new Domain<1>(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<1>> vec(
 	new ValVector<1>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
@@ -371,6 +375,8 @@ TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
 }
 TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 
 	vector<PatchInfo<2>> pinfos(1);
@@ -388,7 +394,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
@@ -407,6 +413,8 @@ TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 }
 TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 	auto g = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
@@ -425,7 +433,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 2, 1));
@@ -454,6 +462,8 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
 }
 TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
 	vector<PatchInfo<2>> pinfos(1);
@@ -471,7 +481,7 @@ TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
@@ -490,6 +500,8 @@ TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 }
 TEST_CASE("DomainTools::setValuesWithGhost 1D f=x", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 1> coord) { return coord[0]; };
 
 	vector<PatchInfo<1>> pinfos(1);
@@ -504,7 +516,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx};
 	pinfos[0].starts          = {startx};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<1>> d(new Domain<1>(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<1>> vec(
 	new ValVector<1>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
@@ -519,6 +531,8 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x", "[DomainTools]")
 }
 TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 1> coord) { return coord[0] * coord[0]; };
 
 	vector<PatchInfo<1>> pinfos(1);
@@ -533,7 +547,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx};
 	pinfos[0].starts          = {startx};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<1>> d(new Domain<1>(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<1>> vec(
 	new ValVector<1>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
@@ -548,6 +562,8 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2", "[DomainTools]")
 }
 TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 
 	vector<PatchInfo<2>> pinfos(1);
@@ -565,7 +581,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
@@ -580,6 +596,8 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
 }
 TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 	auto g = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
@@ -598,7 +616,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 2, 1));
@@ -620,6 +638,8 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y", "[DomainTools]")
 TEST_CASE("DomainTools::setValuesWithGhost 2D throws when too many functions are given",
           "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 	auto g = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
@@ -638,7 +658,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D throws when too many functions are
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
@@ -647,6 +667,8 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D throws when too many functions are
 }
 TEST_CASE("DomainTools::setValues 2D throws when too many functions are given", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 2> coord) { return coord[0] + coord[1]; };
 	auto g = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
@@ -665,7 +687,7 @@ TEST_CASE("DomainTools::setValues 2D throws when too many functions are given", 
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));
@@ -674,6 +696,8 @@ TEST_CASE("DomainTools::setValues 2D throws when too many functions are given", 
 }
 TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto f = [](const std::array<double, 2> coord) { return coord[0] * coord[1]; };
 
 	vector<PatchInfo<2>> pinfos(1);
@@ -691,7 +715,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
 	shared_ptr<ValVector<2>> vec(
 	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 1));

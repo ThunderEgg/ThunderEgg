@@ -25,7 +25,7 @@ static Domain<2> GetDomain(const Communicator &comm)
 
 	pinfos[0].rank = comm.getRank();
 
-	Domain<2> d(1, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
+	Domain<2> d(comm, 1, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 	return d;
 }
 static int occurrences(const std::string &s, const std::string &target)
