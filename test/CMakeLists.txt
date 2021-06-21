@@ -40,6 +40,8 @@ target_sources(unit_tests_mpi1 PRIVATE BiQuadraticGhostFiller_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE CoarseNbrInfo_MPI1.cpp)
 
+target_sources(unit_tests_mpi1 PRIVATE Communicator_MPI1.cpp)
+
 target_sources(unit_tests_mpi1 PRIVATE ComponentArray_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE ComponentView_MPI1.cpp)

@@ -21,14 +21,12 @@
 
 #ifndef THUNDEREGG_VECTOR_H
 #define THUNDEREGG_VECTOR_H
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PatchView.h>
-#include <algorithm>
 #include <cmath>
-#include <memory>
 #include <mpi.h>
-#include <numeric>
 namespace ThunderEgg
 {
 /**
@@ -45,14 +43,17 @@ template <int D> class Vector
 	std::vector<double *> patch_starts;
 
 	/**
-	 * @brief the number of non-ghost cells in each direction of the patch
-	 */
-	std::array<int, D + 1> lengths;
-	/**
 	 * @brief the strides for each axis of the patch
 	 */
 	std::array<int, D + 1> strides;
+	/**
+	 * @brief the number of non-ghost cells in each direction of the patch
+	 */
+	std::array<int, D + 1> lengths;
 
+	/**
+	 * @brief allocated data, nullptr if not allocated
+	 */
 	double *data = nullptr;
 
 	/**
@@ -94,16 +95,18 @@ template <int D> class Vector
 	  comm(comm)
 	{
 	}
-	/*
 	Vector(MPI_Comm comm, const Domain<D> &domain, int num_components)
 	{
-	    //
+		//
 	}
-	Vector(MPI_Comm comm, const Domain<D> &domain, int num_components)
+	Vector(MPI_Comm                      comm,
+	       const std::vector<double *> & patch_starts,
+	       const std::array<int, D + 1> &strides,
+	       const std::array<int, D + 1> &lengths,
+	       int                           num_ghost_cells)
 	{
-	    //
+		//
 	}
-	*/
 	/**
 	 * @brief Destroy the Vector object
 	 */

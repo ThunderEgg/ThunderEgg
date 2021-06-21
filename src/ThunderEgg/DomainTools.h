@@ -22,8 +22,8 @@
 #ifndef THUNDEREGG_DOMAIN_TOOLS_H
 #define THUNDEREGG_DOMAIN_TOOLS_H
 
-#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Vector.h>
 
 namespace ThunderEgg
 {

@@ -23,13 +23,8 @@
 #define THUNDEREGG_DOMAIN_H
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/Timer.h>
-#include <ThunderEgg/Vector.h>
-#include <cmath>
-#include <deque>
 #include <map>
-#include <memory>
 #include <set>
-#include <string>
 #include <vector>
 
 namespace ThunderEgg
@@ -51,6 +46,10 @@ namespace ThunderEgg
 template <int D> class Domain
 {
 	private:
+	/**
+	 * @brief The communicator associated with the domain
+	 */
+	MPI_Comm comm;
 	/**
 	 * @brief The id of the domain
 	 */
