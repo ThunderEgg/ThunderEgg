@@ -37,28 +37,32 @@ static int occurrences(const std::string &s, const std::string &target)
 }
 TEST_CASE("Two Timings Sequential Stop second before started", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.stop("A");
 	REQUIRE_THROWS_AS(timer.stop("B"), RuntimeError);
 }
 TEST_CASE("Two Timings Sequential Stop with empty string second before started", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.stop("A");
 	REQUIRE_THROWS_AS(timer.stop(""), RuntimeError);
 }
 TEST_CASE("Two Timings Nested Wrong Order", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.start("B");
 	REQUIRE_THROWS_AS(timer.stop("A"), RuntimeError);
 }
 TEST_CASE("Timer ostream operator throws with unfinished timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.start("B");
 	stringstream writer;
@@ -66,7 +70,8 @@ TEST_CASE("Timer ostream operator throws with unfinished timing", "[Timer]")
 }
 TEST_CASE("Timer Two DomainTimings Sequential Stop second before started", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
@@ -76,28 +81,32 @@ TEST_CASE("Timer Two DomainTimings Sequential Stop second before started", "[Tim
 }
 TEST_CASE("Timer DomainTimings Nested Wrong id on stop", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(1, "A"), RuntimeError);
 }
 TEST_CASE("Timer DomainTimings Nested Wrong name on stop", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(0, "blah"), RuntimeError);
 }
 TEST_CASE("Timer DomainTimings Nested Wrong name and id on stop", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	REQUIRE_THROWS_AS(timer.stopDomainTiming(1, "blah"), RuntimeError);
 }
 TEST_CASE("Timer Two DomainTimings Nested Wrong Order", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
@@ -106,49 +115,57 @@ TEST_CASE("Timer Two DomainTimings Nested Wrong Order", "[Timer]")
 }
 TEST_CASE("Timer addDomain twice fails", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	REQUIRE_THROWS_AS(timer.addDomain(0, GetDomain()), RuntimeError);
 }
 TEST_CASE("Timer startDomainTiming fails without added domain", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	REQUIRE_THROWS_AS(timer.startDomainTiming(0, "A"), RuntimeError);
 }
 TEST_CASE("Timer addDoubleInfo fails for existing int information", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addIntInfo("Example", 0);
 	REQUIRE_THROWS_AS(timer.addDoubleInfo("Example", 0), RuntimeError);
 }
 TEST_CASE("Timer addDoubleInfo fails without timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	REQUIRE_THROWS_AS(timer.addDoubleInfo("Example", 0), RuntimeError);
 }
 TEST_CASE("Timer addIntInfo fails for existing double information", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addDoubleInfo("Example", 0);
 	REQUIRE_THROWS_AS(timer.addIntInfo("Example", 0), RuntimeError);
 }
 TEST_CASE("Timer addIntInfo fails without timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	REQUIRE_THROWS_AS(timer.addIntInfo("Example", 0), RuntimeError);
 }
 TEST_CASE("Timer to_json empty timer", "[Timer]")
 {
-	Timer          timer(MPI_COMM_WORLD);
+	Communicator   comm(MPI_COMM_WORLD);
+	Timer          timer(comm);
 	nlohmann::json j = timer;
 	INFO(j.dump(4));
 	REQUIRE(j == nullptr);
 }
 TEST_CASE("Timer to_json unassociated timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.stop("A");
 	const nlohmann::json j = timer;
@@ -167,7 +184,8 @@ TEST_CASE("Timer to_json unassociated timing", "[Timer]")
 }
 TEST_CASE("Timer to_json unassociated timing with single int info", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addIntInfo("Example", 10);
 	timer.stop("A");
@@ -194,7 +212,8 @@ TEST_CASE("Timer to_json unassociated timing with single int info", "[Timer]")
 }
 TEST_CASE("Timer to_json unassociated timing with two int info calls", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addIntInfo("Example", 10);
 	timer.addIntInfo("Example", 1);
@@ -222,7 +241,8 @@ TEST_CASE("Timer to_json unassociated timing with two int info calls", "[Timer]"
 }
 TEST_CASE("Timer to_json unassociated timing with single double info", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addDoubleInfo("Example", 10.0);
 	timer.stop("A");
@@ -249,7 +269,8 @@ TEST_CASE("Timer to_json unassociated timing with single double info", "[Timer]"
 }
 TEST_CASE("Timer to_json unassociated timing with two double info calls", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addDoubleInfo("Example", 10.0);
 	timer.addDoubleInfo("Example", 1.0);
@@ -277,7 +298,8 @@ TEST_CASE("Timer to_json unassociated timing with two double info calls", "[Time
 }
 TEST_CASE("Timer to_json unassociated timing with two different double info calls", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addDoubleInfo("Example1", 10.0);
 	timer.addDoubleInfo("Example2", 1.0);
@@ -310,7 +332,8 @@ TEST_CASE("Timer to_json unassociated timing with two different double info call
 }
 TEST_CASE("Timer to_json unassociated timing with two different int info calls", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addIntInfo("Example1", 10);
 	timer.addIntInfo("Example2", 1);
@@ -344,7 +367,8 @@ TEST_CASE("Timer to_json unassociated timing with two different int info calls",
 TEST_CASE("Timer to_json unassociated timing with two different int and double info calls",
           "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addIntInfo("Example1", 10);
 	timer.addDoubleInfo("Example2", 1.0);
@@ -377,7 +401,8 @@ TEST_CASE("Timer to_json unassociated timing with two different int and double i
 }
 TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.stop("A");
 	timer.start("B");
@@ -404,7 +429,8 @@ TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
 }
 TEST_CASE("Timer to_json nested timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.start("B");
 	timer.stop("B");
@@ -427,7 +453,8 @@ TEST_CASE("Timer to_json nested timing", "[Timer]")
 }
 TEST_CASE("Timer to_json domain timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
@@ -451,7 +478,8 @@ TEST_CASE("Timer to_json domain timing", "[Timer]")
 }
 TEST_CASE("Timer to_json patch timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.startPatchTiming(0, 0, "A");
 	timer.stopPatchTiming(0, 0, "A");
@@ -476,7 +504,8 @@ TEST_CASE("Timer to_json patch timing", "[Timer]")
 }
 TEST_CASE("Timer ostream empty timing", "[Timer]")
 {
-	Timer        timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	stringstream ss;
 	ss << timer;
 	std::string s = ss.str();
@@ -485,7 +514,8 @@ TEST_CASE("Timer ostream empty timing", "[Timer]")
 }
 TEST_CASE("Timer ostream unassociated timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.stop("A");
 	stringstream ss;
@@ -501,7 +531,8 @@ TEST_CASE("Timer ostream unassociated timing", "[Timer]")
 }
 TEST_CASE("Timer ostream unassociated timing with single int info", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addIntInfo("Example", 10);
 	timer.stop("A");
@@ -522,7 +553,8 @@ TEST_CASE("Timer ostream unassociated timing with single int info", "[Timer]")
 }
 TEST_CASE("Timer ostream unassociated timing with two int info", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.addIntInfo("Example", 10);
 	timer.addIntInfo("Example", 11);
@@ -544,7 +576,8 @@ TEST_CASE("Timer ostream unassociated timing with two int info", "[Timer]")
 }
 TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.start("B");
 	timer.stop("B");
@@ -563,7 +596,8 @@ TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
 }
 TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.stop("A");
 	timer.start("A");
@@ -581,7 +615,8 @@ TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
 }
 TEST_CASE("Timer ostream sequential patch timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.startPatchTiming(0, 0, "A");
 	timer.stopPatchTiming(0, 0, "A");
@@ -600,7 +635,8 @@ TEST_CASE("Timer ostream sequential patch timing", "[Timer]")
 }
 TEST_CASE("Timer ostream domain timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
@@ -617,7 +653,8 @@ TEST_CASE("Timer ostream domain timing", "[Timer]")
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
@@ -638,7 +675,8 @@ TEST_CASE("Timer ostream domain timing two different domains sequential", "[Time
 TEST_CASE("Timer ostream domain timing two different domains with information sequential",
           "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
@@ -664,7 +702,8 @@ TEST_CASE("Timer ostream domain timing two different domains with information se
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential nested", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
@@ -691,7 +730,8 @@ TEST_CASE(
 "Timer ostream domain timing two different domains sequential nested first domain has extra timing",
 "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
@@ -721,7 +761,8 @@ TEST_CASE(
 "Timer ostream domain timing two different domains sequential nested second domain has extra timing",
 "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
@@ -749,7 +790,8 @@ TEST_CASE(
 }
 TEST_CASE("Timer saveToFile new empty file", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
@@ -778,7 +820,8 @@ TEST_CASE("Timer saveToFile new empty file", "[Timer]")
 }
 TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");
@@ -808,7 +851,8 @@ TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
 }
 TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.addDomain(0, GetDomain());
 	timer.addDomain(1, GetDomain());
 	timer.startDomainTiming(0, "A");

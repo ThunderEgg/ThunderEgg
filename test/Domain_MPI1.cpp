@@ -39,6 +39,8 @@ TEST_CASE("Domain constructors work", "[Domain]")
 }
 TEST_CASE("Domain setTimer", "[Domain]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
@@ -51,13 +53,15 @@ TEST_CASE("Domain setTimer", "[Domain]")
 	pinfos[0].num_ghost_cells = num_ghost;
 	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
-	auto timer = make_shared<Timer>(MPI_COMM_WORLD);
+	auto timer = make_shared<Timer>(comm);
 	d.setTimer(timer);
 	CHECK(d.getTimer() == timer);
 	CHECK(d.hasTimer());
 }
 TEST_CASE("Domain setTimer adds domain to timer", "[Domain]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	vector<PatchInfo<2>> pinfos(1);
 
 	int    n         = 10;
@@ -70,7 +74,7 @@ TEST_CASE("Domain setTimer adds domain to timer", "[Domain]")
 	pinfos[0].num_ghost_cells = num_ghost;
 	Domain<2> d(0, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 
-	auto timer = make_shared<Timer>(MPI_COMM_WORLD);
+	auto timer = make_shared<Timer>(comm);
 	d.setTimer(timer);
 	// will throw exception if domain not added to timer
 	timer->startDomainTiming(0, "A");

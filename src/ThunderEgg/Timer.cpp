@@ -232,7 +232,10 @@ class Timer::Timing
 	 * @param name the name of the timing
 	 */
 	Timing(const Timing *parent, int patch_id, int domain_id, const std::string &name)
-	: parent(parent), name(name), domain_id(domain_id), patch_id(patch_id)
+	: parent(parent),
+	  name(name),
+	  domain_id(domain_id),
+	  patch_id(patch_id)
 	{
 	}
 	/**
@@ -295,8 +298,7 @@ class Timer::Timing
 			infos.emplace_back(info_ptr);
 			pair.first->second = info_ptr;
 		} else if (info_ptr == nullptr) {
-			throw RuntimeError("Adding int info to existing double info timing" + name
-			                   + " for info " + info_name);
+			throw RuntimeError("Adding int info to existing double info timing" + name + " for info " + info_name);
 		}
 		info_ptr->addInfo(info);
 	}
@@ -321,8 +323,7 @@ class Timer::Timing
 			infos.emplace_back(info_ptr);
 			pair.first->second = info_ptr;
 		} else if (info_ptr == nullptr) {
-			throw RuntimeError("Adding int info to existing int info timing" + name + " for info "
-			                   + info_name);
+			throw RuntimeError("Adding int info to existing int info timing" + name + " for info " + info_name);
 		}
 		info_ptr->addInfo(info);
 	}
@@ -339,9 +340,9 @@ class Timer::Timing
 		}
 		if (timing.num_calls != 0) {
 			j["num_calls"] = timing.num_calls;
-			j["sum"] = timing.sum;
-			j["max"] = timing.max;
-			j["min"] = timing.min;
+			j["sum"]       = timing.sum;
+			j["max"]       = timing.max;
+			j["min"]       = timing.min;
 		}
 		if (timing.timings.size() > 0) {
 			j["timings"] = timing.timings;
@@ -351,7 +352,7 @@ class Timer::Timing
 		}
 	}
 };
-Timer::Timer(MPI_Comm comm) : comm(comm), root(new Timing())
+Timer::Timer(const Communicator &comm) : comm(comm), root(new Timing())
 {
 	stack.push_back(*root);
 }
@@ -368,8 +369,7 @@ void Timer::addDomain(int domain_id, nlohmann::json domain)
 {
 	auto pair = domains.emplace(domain_id, domain);
 	if (!pair.second) {
-		throw RuntimeError("Domain with id " + std::to_string(domain_id)
-		                   + " was already added to timer");
+		throw RuntimeError("Domain with id " + std::to_string(domain_id) + " was already added to timer");
 	}
 }
 void Timer::startDomainTiming(int domain_id, const std::string &name)
@@ -383,8 +383,7 @@ void Timer::stopDomainTiming(int domain_id, const std::string &name)
 void Timer::startPatchTiming(int patch_id, int domain_id, const std::string &name)
 {
 	if (domain_id != std::numeric_limits<int>::max() && domains.find(domain_id) == domains.end()) {
-		throw RuntimeError("Domain with id " + std::to_string(domain_id)
-		                   + " was not added to timer");
+		throw RuntimeError("Domain with id " + std::to_string(domain_id) + " was not added to timer");
 	}
 	Timing &curr_timing = stack.back();
 	Timing &next_timing = curr_timing.getTiming(patch_id, domain_id, name);
@@ -394,13 +393,11 @@ void Timer::startPatchTiming(int patch_id, int domain_id, const std::string &nam
 void Timer::stopPatchTiming(int patch_id, int domain_id, const std::string &name)
 {
 	Timing &curr_timing = stack.back();
-	if (curr_timing.patch_id == patch_id && curr_timing.domain_id == domain_id
-	    && curr_timing.name == name && stack.size() > 1) {
+	if (curr_timing.patch_id == patch_id && curr_timing.domain_id == domain_id && curr_timing.name == name && stack.size() > 1) {
 		curr_timing.stop();
 		stack.pop_back();
 	} else {
-		throw RuntimeError("Timer was expecting to end \"" + curr_timing.name + "\", instead got \""
-		                   + name + "\"");
+		throw RuntimeError("Timer was expecting to end \"" + curr_timing.name + "\", instead got \"" + name + "\"");
 	}
 }
 
@@ -421,9 +418,8 @@ void Timer::addDoubleInfo(const std::string &name, double info)
 	Timing &curr_timing = stack.back();
 	curr_timing.addDoubleInfo(name, info);
 }
-static void PrintMergedTimings(MPI_Comm comm, size_t max_name_size,
-                               const std::string &parent_string, std::ostream &os,
-                               nlohmann::json &timings);
+static void
+PrintMergedTimings(const Communicator &comm, size_t max_name_size, const std::string &parent_string, std::ostream &os, nlohmann::json &timings);
 /**
  * @brief Output an information line
  *
@@ -432,8 +428,7 @@ static void PrintMergedTimings(MPI_Comm comm, size_t max_name_size,
  * @param name the name
  * @param value the value
  */
-static void OutputLine(std::ostream &os, size_t max_name_size, const std::string &name,
-                       double value)
+static void OutputLine(std::ostream &os, size_t max_name_size, const std::string &name, double value)
 {
 	os.width(max_name_size + 1);
 	os << std::right << name << std::left;
@@ -450,37 +445,29 @@ static void OutputLine(std::ostream &os, size_t max_name_size, const std::string
  * @param os the output stream
  * @param timing the timing to print
  */
-static void PrintTiming(MPI_Comm comm, size_t max_name_size, const std::string &parent_string,
-                        std::ostream &os, nlohmann::json &timing)
+static void PrintTiming(const Communicator &comm, size_t max_name_size, const std::string &parent_string, std::ostream &os, nlohmann::json &timing)
 {
 	std::string my_string = parent_string + timing["name"].get<std::string>();
 	os << my_string << std::endl;
 	os << std::string(my_string.size(), '-') << std::endl;
 
-	int size;
-	MPI_Comm_size(comm, &size);
+	int size = comm.getSize();
 
 	if (timing["num_calls"].get<size_t>() == 1) {
 		OutputLine(os, max_name_size, "time (sec)", timing["sum"].get<double>());
 	} else {
-		OutputLine(os, max_name_size, "average calls per rank",
-		           timing["num_calls"].get<double>() / size);
-		OutputLine(os, max_name_size, "average (sec)",
-		           timing["sum"].get<double>() / timing["num_calls"].get<double>());
+		OutputLine(os, max_name_size, "average calls per rank", timing["num_calls"].get<double>() / size);
+		OutputLine(os, max_name_size, "average (sec)", timing["sum"].get<double>() / timing["num_calls"].get<double>());
 		OutputLine(os, max_name_size, "min (sec)", timing["min"].get<double>());
 		OutputLine(os, max_name_size, "max (sec)", timing["max"].get<double>());
 	}
 	for (const auto &info : timing["infos"]) {
 		if (info["num_calls"] == 1) {
-			OutputLine(os, max_name_size, info["name"].get<std::string>(),
-			           info["sum"].get<double>());
+			OutputLine(os, max_name_size, info["name"].get<std::string>(), info["sum"].get<double>());
 		} else {
-			OutputLine(os, max_name_size, info["name"].get<std::string>() + " avg",
-			           info["sum"].get<double>() / info["num_calls"].get<double>());
-			OutputLine(os, max_name_size, info["name"].get<std::string>() + " min",
-			           info["min"].get<double>());
-			OutputLine(os, max_name_size, info["name"].get<std::string>() + " max",
-			           info["max"].get<double>());
+			OutputLine(os, max_name_size, info["name"].get<std::string>() + " avg", info["sum"].get<double>() / info["num_calls"].get<double>());
+			OutputLine(os, max_name_size, info["name"].get<std::string>() + " min", info["min"].get<double>());
+			OutputLine(os, max_name_size, info["name"].get<std::string>() + " max", info["max"].get<double>());
 		}
 	}
 	os << std::endl;
@@ -567,9 +554,8 @@ static nlohmann::json MergeTimings(nlohmann::json &timings)
  * @param os the output stream
  * @param timings the timings to print
  */
-static void PrintMergedTimings(MPI_Comm comm, size_t max_name_size,
-                               const std::string &parent_string, std::ostream &os,
-                               nlohmann::json &timings)
+static void
+PrintMergedTimings(const Communicator &comm, size_t max_name_size, const std::string &parent_string, std::ostream &os, nlohmann::json &timings)
 {
 	nlohmann::json merged_timings = MergeTimings(timings);
 	for (nlohmann::json &timing : merged_timings) {
@@ -599,9 +585,7 @@ std::ostream &operator<<(std::ostream &os, const Timer &timer)
 	}
 	nlohmann::json timer_j = timer;
 
-	int rank;
-	MPI_Comm_rank(timer.comm, &rank);
-	if (rank == 0) {
+	if (timer.comm.getRank() == 0) {
 		os << std::endl;
 		os << "TIMING RESULTS" << std::endl;
 		os << "==============" << std::endl << std::endl;
@@ -689,11 +673,9 @@ static void MergeIncomingJson(nlohmann::json &j, nlohmann::json &incoming_j)
 }
 void to_json(nlohmann::json &output_j, const Timer &timer)
 {
-	int rank;
-	int size;
-	MPI_Comm_rank(timer.comm, &rank);
-	MPI_Comm_size(timer.comm, &size);
-	nlohmann::json j = *timer.root;
+	int            rank = timer.comm.getRank();
+	int            size = timer.comm.getSize();
+	nlohmann::json j    = *timer.root;
 
 	if (timer.domains.size() > 0) {
 		j["domains"] = timer.domains;
@@ -702,14 +684,13 @@ void to_json(nlohmann::json &output_j, const Timer &timer)
 	if (rank == 0) {
 		for (int incoming_rank = 1; incoming_rank < size; incoming_rank++) {
 			MPI_Status status;
-			MPI_Probe(incoming_rank, 0, timer.comm, &status);
+			MPI_Probe(incoming_rank, 0, timer.comm.getMPIComm(), &status);
 
 			int buffer_size;
 			MPI_Get_count(&status, MPI_CHAR, &buffer_size);
 
 			char incoming_j_string[buffer_size];
-			MPI_Recv(incoming_j_string, buffer_size, MPI_CHAR, incoming_rank, 0, timer.comm,
-			         &status);
+			MPI_Recv(incoming_j_string, buffer_size, MPI_CHAR, incoming_rank, 0, timer.comm.getMPIComm(), &status);
 
 			nlohmann::json incoming_j = nlohmann::json::parse(incoming_j_string);
 			MergeIncomingJson(j, incoming_j);
@@ -722,15 +703,13 @@ void to_json(nlohmann::json &output_j, const Timer &timer)
 		}
 	} else {
 		std::string j_string = j.dump();
-		MPI_Send(j_string.data(), (int) j_string.size() + 1, MPI_CHAR, 0, 0, timer.comm);
+		MPI_Send(j_string.data(), (int) j_string.size() + 1, MPI_CHAR, 0, 0, timer.comm.getMPIComm());
 	}
 }
 void Timer::saveToFile(const std::string &filename) const
 {
 	nlohmann::json j = *this;
-	int            rank;
-	MPI_Comm_rank(comm, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		std::ofstream out(filename, std::ofstream::out | std::ofstream::trunc);
 		if (out.fail()) {
 			throw RuntimeError("Failed to open file " + filename);

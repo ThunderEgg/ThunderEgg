@@ -65,8 +65,9 @@ TEST_CASE("CG default timer", "[CG]")
 }
 TEST_CASE("CG set timer", "[CG]")
 {
-	CG<2> bcgs;
-	auto  timer = make_shared<Timer>(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	CG<2>        bcgs;
+	auto         timer = make_shared<Timer>(comm);
 	bcgs.setTimer(timer);
 	CHECK(bcgs.getTimer() == timer);
 }

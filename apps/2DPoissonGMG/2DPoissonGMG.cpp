@@ -40,6 +40,8 @@ int main(int argc, char *argv[])
 {
 	MPI_Init(&argc, &argv);
 
+	Communicator comm(MPI_COMM_WORLD);
+
 	// command line options
 	CLI::App app{"ThunderEgg 2d poisson solver example"};
 
@@ -117,12 +119,6 @@ int main(int argc, char *argv[])
 		file_out << app.config_to_str(true, true);
 		file_out.close();
 	}
-
-	int num_procs;
-	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
-
-	int my_global_rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &my_global_rank);
 
 	// the functions that we are using
 	function<double(const std::array<double, 2> &)> ffun; // rhs
@@ -236,7 +232,7 @@ int main(int argc, char *argv[])
 	}
 
 	// create a Timer object to keep track of timings
-	std::shared_ptr<Timer> timer = make_shared<Timer>(MPI_COMM_WORLD);
+	std::shared_ptr<Timer> timer = make_shared<Timer>(comm);
 
 	// read in a tree from file
 	Tree<2> t;
@@ -294,7 +290,7 @@ int main(int argc, char *argv[])
 
 	if (neumann && !no_zero_rhs_avg) {
 		double fdiff = DomainTools::Integrate<2>(domain, f) / domain->volume();
-		if (my_global_rank == 0)
+		if (comm.getRank() == 0)
 			cout << "Fdiff: " << fdiff << endl;
 		f->shift(-fdiff);
 	}
@@ -432,7 +428,7 @@ int main(int argc, char *argv[])
 
 	int num_iterations = solver.solve(vg, A, u, f, M, true);
 
-	if (my_global_rank == 0) {
+	if (comm.getRank() == 0) {
 		cout << "Iterations: " << num_iterations << endl;
 	}
 	timer->stop("Linear Solve");
@@ -455,7 +451,7 @@ int main(int argc, char *argv[])
 		double u_average     = DomainTools::Integrate<2>(domain, u) / domain->volume();
 		double exact_average = DomainTools::Integrate<2>(domain, exact) / domain->volume();
 
-		if (my_global_rank == 0) {
+		if (comm.getRank() == 0) {
 			cout << "Average of computed solution: " << u_average << endl;
 			cout << "Average of exact solution: " << exact_average << endl;
 		}
@@ -468,7 +464,7 @@ int main(int argc, char *argv[])
 
 	double au_sum = DomainTools::Integrate<2>(domain, au);
 	double f_sum  = DomainTools::Integrate<2>(domain, f);
-	if (my_global_rank == 0) {
+	if (comm.getRank() == 0) {
 		std::cout << std::scientific;
 		std::cout.precision(13);
 		std::cout << "Error (2-norm):   " << error_norm / exact_norm << endl;
@@ -478,7 +474,7 @@ int main(int argc, char *argv[])
 		cout.unsetf(std::ios_base::floatfield);
 		int total_cells = domain->getNumGlobalCells();
 		cout << "Total cells: " << total_cells << endl;
-		cout << "Number of Processors: " << num_procs << endl;
+		cout << "Number of Processors: " << comm.getSize() << endl;
 	}
 
 #ifdef HAVE_VTK

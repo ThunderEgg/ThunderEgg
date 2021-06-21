@@ -65,8 +65,9 @@ TEST_CASE("BiCGStab default timer", "[BiCGStab]")
 }
 TEST_CASE("BiCGStab set timer", "[BiCGStab]")
 {
-	BiCGStab<2> bcgs;
-	auto        timer = make_shared<Timer>(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	BiCGStab<2>  bcgs;
+	auto         timer = make_shared<Timer>(comm);
 	bcgs.setTimer(timer);
 	CHECK(bcgs.getTimer() == timer);
 }

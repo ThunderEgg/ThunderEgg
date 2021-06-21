@@ -50,7 +50,8 @@ TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
 }
 TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 {
-	auto mesh_file
+	Communicator comm(MPI_COMM_WORLD);
+	auto         mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
 	auto                  nx        = GENERATE(2, 5);
@@ -68,7 +69,7 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
 
 	u->setWithGhost(1);
-	d_fine->setTimer(make_shared<Timer>(MPI_COMM_WORLD));
+	d_fine->setTimer(make_shared<Timer>(comm));
 	mps.apply(*f, *u);
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {
@@ -87,7 +88,8 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 }
 TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 {
-	auto mesh_file
+	Communicator comm(MPI_COMM_WORLD);
+	auto         mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
 	auto                  nx        = GENERATE(2, 5);
@@ -105,7 +107,7 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 	MockPatchSolver<2> mps(d_fine, mgf, u, f);
 
 	u->setWithGhost(1);
-	d_fine->setTimer(make_shared<Timer>(MPI_COMM_WORLD));
+	d_fine->setTimer(make_shared<Timer>(comm));
 	mps.smooth(*f, *u);
 
 	for (int i = 0; i < u->getNumLocalPatches(); i++) {

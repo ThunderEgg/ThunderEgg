@@ -45,6 +45,7 @@ using namespace ThunderEgg::VarPoisson;
 int main(int argc, char *argv[])
 {
 	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
+	Communicator comm(MPI_COMM_WORLD);
 
 	// parse input
 	CLI::App app{"ThunderEgg 3d poisson solver example"};
@@ -177,12 +178,6 @@ int main(int argc, char *argv[])
 
 	PetscOptionsInsertString(nullptr, petsc_opts.c_str());
 
-	int num_procs;
-	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
-
-	int my_global_rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &my_global_rank);
-
 	// Set the number of discretization points in the x and y direction.
 	std::array<int, 2> ns;
 	ns.fill(n);
@@ -251,7 +246,7 @@ int main(int argc, char *argv[])
 		hfun = [](const std::array<double, 2> &coord) { return 1; };
 	}
 
-	std::shared_ptr<Timer> timer = make_shared<Timer>(MPI_COMM_WORLD);
+	std::shared_ptr<Timer> timer = make_shared<Timer>(comm);
 	for (int loop = 0; loop < loop_count; loop++) {
 		timer->start("Domain Initialization");
 
@@ -365,7 +360,7 @@ int main(int argc, char *argv[])
 		solver.setTolerance(1e-12);
 		solver.setTimer(timer);
 		int its = solver.solve(vg, A, u, f, M);
-		if (my_global_rank == 0) {
+		if (comm.getRank() == 0) {
 			cout << "Iterations: " << its << endl;
 		}
 		timer->stop("Linear Solve");
@@ -385,7 +380,7 @@ int main(int argc, char *argv[])
 			double uavg = DomainTools::Integrate<2>(domain, u) / domain->volume();
 			double eavg = DomainTools::Integrate<2>(domain, exact) / domain->volume();
 
-			if (my_global_rank == 0) {
+			if (comm.getRank() == 0) {
 				cout << "Average of computed solution: " << uavg << endl;
 				cout << "Average of exact solution: " << eavg << endl;
 			}
@@ -397,7 +392,7 @@ int main(int argc, char *argv[])
 
 		double ausum = DomainTools::Integrate<2>(domain, au);
 		double fsum  = DomainTools::Integrate<2>(domain, f);
-		if (my_global_rank == 0) {
+		if (comm.getRank() == 0) {
 			std::cout << std::scientific;
 			std::cout.precision(13);
 			std::cout << "Error: " << error_norm / exact_norm << endl;
