@@ -86,6 +86,7 @@ TEST_CASE("PatchArray squarebracket operator", "[PatchArray]")
 		}
 	}
 }
+
 TEST_CASE("PatchArray squarebracket operator const", "[PatchArray]")
 {
 	auto nx             = GENERATE(2, 3);
@@ -1186,4 +1187,73 @@ TEST_CASE("PatchArray<2> getGhostSliceOn<0>", "[PatchArray]")
 			}
 		}
 	}
+}
+TEST_CASE("PatchArray copy constructor", "[PatchArray]")
+{
+	auto nx             = GENERATE(2, 3);
+	auto ny             = GENERATE(2, 3);
+	auto num_components = GENERATE(1, 2);
+	auto num_ghost      = GENERATE(0, 1, 2);
+
+	PatchArray<2> pa({nx, ny}, num_components, num_ghost);
+
+	for (int c = 0; c < num_components; c++) {
+		for (int iy = -num_ghost; iy < ny + num_ghost; iy++) {
+			for (int ix = -num_ghost; ix < nx + num_ghost; ix++) {
+				pa(ix, iy, c) = ix + iy + c;
+			}
+		}
+	}
+
+	PatchArray<2> pa_copy(pa);
+
+	for (int c = 0; c < num_components; c++) {
+		for (int iy = -num_ghost; iy < ny + num_ghost; iy++) {
+			for (int ix = -num_ghost; ix < nx + num_ghost; ix++) {
+				CHECK(pa(ix, iy, c) == pa_copy(ix, iy, c));
+			}
+		}
+	}
+
+	CHECK(pa.getStrides() == pa_copy.getStrides());
+	CHECK(pa.getGhostStart() == pa_copy.getGhostStart());
+	CHECK(pa.getStart() == pa_copy.getStart());
+	CHECK(pa.getEnd() == pa_copy.getEnd());
+	CHECK(pa.getGhostEnd() == pa_copy.getGhostEnd());
+	CHECK(&pa(0, 0, 0) != &pa_copy(0, 0, 0));
+}
+TEST_CASE("PatchArray copy assignment", "[PatchArray]")
+{
+	auto nx             = GENERATE(2, 3);
+	auto ny             = GENERATE(2, 3);
+	auto num_components = GENERATE(1, 2);
+	auto num_ghost      = GENERATE(0, 1, 2);
+
+	PatchArray<2> pa({nx, ny}, num_components, num_ghost);
+
+	for (int c = 0; c < num_components; c++) {
+		for (int iy = -num_ghost; iy < ny + num_ghost; iy++) {
+			for (int ix = -num_ghost; ix < nx + num_ghost; ix++) {
+				pa(ix, iy, c) = ix + iy + c;
+			}
+		}
+	}
+
+	PatchArray<2> pa_copy({nx, ny}, num_components, num_ghost);
+	pa_copy = pa;
+
+	for (int c = 0; c < num_components; c++) {
+		for (int iy = -num_ghost; iy < ny + num_ghost; iy++) {
+			for (int ix = -num_ghost; ix < nx + num_ghost; ix++) {
+				CHECK(pa(ix, iy, c) == pa_copy(ix, iy, c));
+			}
+		}
+	}
+
+	CHECK(pa.getStrides() == pa_copy.getStrides());
+	CHECK(pa.getGhostStart() == pa_copy.getGhostStart());
+	CHECK(pa.getStart() == pa_copy.getStart());
+	CHECK(pa.getEnd() == pa_copy.getEnd());
+	CHECK(pa.getGhostEnd() == pa_copy.getGhostEnd());
+	CHECK(&pa(0, 0, 0) != &pa_copy(0, 0, 0));
 }

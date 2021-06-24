@@ -27,7 +27,7 @@
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/RuntimeError.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/Vector.h>
 
 namespace ThunderEgg
 {
@@ -43,7 +43,7 @@ namespace VarPoisson
 template <int D> class StarPatchOperator : public PatchOperator<D>
 {
 	protected:
-	std::shared_ptr<const Vector<D>> coeff_view;
+	Vector<D> coeffs;
 
 	constexpr int addValue(int axis) const
 	{
@@ -54,24 +54,22 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	/**
 	 * @brief Construct a new StarPatchOperator object
 	 *
-	 * @param coeff_view_in the cell centered coefficients
-	 * @param domain_in the Domain associated with the operator
-	 * @param ghost_filler_in the GhostFiller to u_viewe before calling applySinglePatch
+	 * @param coeffs the cell centered coefficients
+	 * @param domain the Domain associated with the operator
+	 * @param ghost_filler the GhostFiller to u_viewe before calling applySinglePatch
 	 */
-	StarPatchOperator(std::shared_ptr<const Vector<D>>      coeff_view_in,
-	                  std::shared_ptr<const Domain<D>>      domain_in,
-	                  std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
-	: PatchOperator<D>(domain_in, ghost_filler_in),
-	  coeff_view(coeff_view_in)
+	StarPatchOperator(const Vector<D> &coeffs, std::shared_ptr<const Domain<D>> domain, std::shared_ptr<const GhostFiller<D>> ghost_filler)
+	: PatchOperator<D>(domain, ghost_filler),
+	  coeffs(coeffs)
 	{
 		if (this->domain->getNumGhostCells() < 1) {
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
-		this->ghost_filler->fillGhost(*this->coeff_view);
+		this->ghost_filler->fillGhost(this->coeffs);
 	}
 	void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const override
 	{
-		PatchView<const double, D> c  = coeff_view->getPatchView(pinfo.local_index);
+		PatchView<const double, D> c  = coeffs.getPatchView(pinfo.local_index);
 		std::array<double, D>      h2 = pinfo.spacings;
 		for (size_t i = 0; i < D; i++) {
 			h2[i] *= h2[i];
@@ -134,17 +132,17 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	                                                   const PatchView<const double, D> &u_view,
 	                                                   const PatchView<double, D> &      f_view) const override
 	{
-		PatchView<const double, D> c = coeff_view->getPatchView(pinfo.local_index);
+		PatchView<const double, D> c = coeffs.getPatchView(pinfo.local_index);
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo.hasNbr(s)) {
 				double                h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
-				View<double, D>       f_inner = f_view.getSliceOn(s, {0});
+				View<double, D>       fner    = f_view.getSliceOn(s, {0});
 				View<double, D>       u_ghost = u_view.getGhostSliceOn(s, {0});
-				View<const double, D> u_inner = u_view.getSliceOn(s, {0});
+				View<const double, D> uner    = u_view.getSliceOn(s, {0});
 				View<const double, D> c_ghost = c.getSliceOn(s, {-1});
-				View<const double, D> c_inner = c.getSliceOn(s, {0});
-				loop_over_interior_indexes<D>(f_inner, [&](const std::array<int, D> &coord) {
-					f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) * (c_inner[coord] + c_ghost[coord]) / (2 * h2);
+				View<const double, D> cner    = c.getSliceOn(s, {0});
+				loop_over_interior_indexes<D>(fner, [&](const std::array<int, D> &coord) {
+					fner[coord] -= (u_ghost[coord] + uner[coord]) * (cner[coord] + c_ghost[coord]) / (2 * h2);
 				});
 			}
 		}
@@ -156,12 +154,12 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 * @param gfunc the exact solution
 	 * @param hfunc the coefficients
 	 */
-	void addDrichletBCToRHS(std::shared_ptr<Vector<D>>                           f,
+	void addDrichletBCToRHS(Vector<D> &                                          f,
 	                        std::function<double(const std::array<double, D> &)> gfunc,
 	                        std::function<double(const std::array<double, D> &)> hfunc)
 	{
-		for (int i = 0; i < f->getNumLocalPatches(); i++) {
-			ComponentView<double, D> f_ld  = f->getComponentView(0, i);
+		for (int i = 0; i < f.getNumLocalPatches(); i++) {
+			ComponentView<double, D> f_ld  = f.getComponentView(0, i);
 			auto                     pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo.hasNbr(s)) {

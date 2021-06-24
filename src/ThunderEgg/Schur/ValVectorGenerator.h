@@ -23,7 +23,6 @@
 #define THUNDEREGG_SCHUR_VALVECTORGENERATOR_H
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Schur/InterfaceDomain.h>
-#include <ThunderEgg/ValVector.h>
 #include <ThunderEgg/VectorGenerator.h>
 namespace ThunderEgg
 {
@@ -52,14 +51,12 @@ template <int D> class ValVectorGenerator : public VectorGenerator<D>
 	 *
 	 * @param iface_domain the InterfaceDomain to generate ValVector objects for
 	 */
-	explicit ValVectorGenerator(std::shared_ptr<InterfaceDomain<D + 1>> iface_domain)
-	: iface_domain(iface_domain)
+	explicit ValVectorGenerator(std::shared_ptr<InterfaceDomain<D + 1>> iface_domain) : iface_domain(iface_domain)
 	{
 		std::array<int, D + 1> ns = iface_domain->getDomain()->getNs();
 		for (int i = 1; i < D + 1; i++) {
 			if (ns[0] != ns[i]) {
-				throw RuntimeError(
-				"Cannot form Schur compliment vector for Domain with non-square patches");
+				throw RuntimeError("Cannot form Schur compliment vector for Domain with non-square patches");
 			}
 		}
 
@@ -67,8 +64,7 @@ template <int D> class ValVectorGenerator : public VectorGenerator<D>
 	}
 	std::shared_ptr<Vector<D>> getNewVector() const override
 	{
-		return std::make_shared<ValVector<D>>(MPI_COMM_WORLD, iface_ns, 0, 1,
-		                                      iface_domain->getNumLocalInterfaces());
+		return std::make_shared<Vector<D>>(Communicator(MPI_COMM_WORLD), iface_ns, 1, iface_domain->getNumLocalInterfaces(), 0);
 	}
 };
 } // namespace Schur

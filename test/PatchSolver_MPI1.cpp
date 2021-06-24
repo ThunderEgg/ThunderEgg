@@ -2,7 +2,6 @@
 #include "utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/MPIGhostFiller.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <list>
 #include <sstream>
@@ -27,20 +26,20 @@ TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u_num_components = GENERATE(1, 2, 3);
-	auto u                = ValVector<2>::GetNewVector(d_fine, u_num_components);
-	auto f_num_components = GENERATE(1, 2, 3);
-	auto f                = ValVector<2>::GetNewVector(d_fine, f_num_components);
+	auto      u_num_components = GENERATE(1, 2, 3);
+	Vector<2> u(*d_fine, u_num_components);
+	auto      f_num_components = GENERATE(1, 2, 3);
+	Vector<2> f(*d_fine, f_num_components);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
-	MockPatchSolver<2> mps(d_fine, mgf, u, f);
+	MockPatchSolver<2> mps(d_fine, mgf);
 
-	u->setWithGhost(1);
-	mps.apply(*f, *u);
+	u.setWithGhost(1);
+	mps.apply(f, u);
 
-	for (int i = 0; i < u->getNumLocalPatches(); i++) {
-		for (int c = 0; c < u->getNumComponents(); c++) {
-			auto ld = u->getComponentView(c, i);
+	for (int i = 0; i < u.getNumLocalPatches(); i++) {
+		for (int c = 0; c < u.getNumComponents(); c++) {
+			auto ld = u.getComponentView(c, i);
 			nested_loop<2>(ld.getStart(), ld.getEnd(),
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 		}
@@ -60,21 +59,21 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u_num_components = GENERATE(1, 2, 3);
-	auto u                = ValVector<2>::GetNewVector(d_fine, u_num_components);
-	auto f_num_components = GENERATE(1, 2, 3);
-	auto f                = ValVector<2>::GetNewVector(d_fine, f_num_components);
+	auto      u_num_components = GENERATE(1, 2, 3);
+	Vector<2> u(*d_fine, u_num_components);
+	auto      f_num_components = GENERATE(1, 2, 3);
+	Vector<2> f(*d_fine, f_num_components);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
-	MockPatchSolver<2> mps(d_fine, mgf, u, f);
+	MockPatchSolver<2> mps(d_fine, mgf);
 
-	u->setWithGhost(1);
+	u.setWithGhost(1);
 	d_fine->setTimer(make_shared<Timer>(comm));
-	mps.apply(*f, *u);
+	mps.apply(f, u);
 
-	for (int i = 0; i < u->getNumLocalPatches(); i++) {
-		for (int c = 0; c < u->getNumComponents(); c++) {
-			auto ld = u->getComponentView(c, i);
+	for (int i = 0; i < u.getNumLocalPatches(); i++) {
+		for (int c = 0; c < u.getNumComponents(); c++) {
+			auto ld = u.getComponentView(c, i);
 			nested_loop<2>(ld.getStart(), ld.getEnd(),
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 		}
@@ -98,21 +97,21 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u_num_components = GENERATE(1, 2, 3);
-	auto u                = ValVector<2>::GetNewVector(d_fine, u_num_components);
-	auto f_num_components = GENERATE(1, 2, 3);
-	auto f                = ValVector<2>::GetNewVector(d_fine, f_num_components);
+	auto      u_num_components = GENERATE(1, 2, 3);
+	Vector<2> u(*d_fine, u_num_components);
+	auto      f_num_components = GENERATE(1, 2, 3);
+	Vector<2> f(*d_fine, f_num_components);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
-	MockPatchSolver<2> mps(d_fine, mgf, u, f);
+	MockPatchSolver<2> mps(d_fine, mgf);
 
-	u->setWithGhost(1);
+	u.setWithGhost(1);
 	d_fine->setTimer(make_shared<Timer>(comm));
-	mps.smooth(*f, *u);
+	mps.smooth(f, u);
 
-	for (int i = 0; i < u->getNumLocalPatches(); i++) {
-		for (int c = 0; c < u->getNumComponents(); c++) {
-			auto ld = u->getComponentView(c, i);
+	for (int i = 0; i < u.getNumLocalPatches(); i++) {
+		for (int c = 0; c < u.getNumComponents(); c++) {
+			auto ld = u.getComponentView(c, i);
 			nested_loop<2>(ld.getStart(), ld.getEnd(),
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 		}
@@ -135,20 +134,20 @@ TEST_CASE("PatchSolver smooth for various domains with timer", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u_num_components = GENERATE(1, 2, 3);
-	auto u                = ValVector<2>::GetNewVector(d_fine, u_num_components);
-	auto f_num_components = GENERATE(1, 2, 3);
-	auto f                = ValVector<2>::GetNewVector(d_fine, f_num_components);
+	auto      u_num_components = GENERATE(1, 2, 3);
+	Vector<2> u(*d_fine, u_num_components);
+	auto      f_num_components = GENERATE(1, 2, 3);
+	Vector<2> f(*d_fine, f_num_components);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
-	MockPatchSolver<2> mps(d_fine, mgf, u, f);
+	MockPatchSolver<2> mps(d_fine, mgf);
 
-	u->setWithGhost(1);
-	mps.smooth(*f, *u);
+	u.setWithGhost(1);
+	mps.smooth(f, u);
 
-	for (int i = 0; i < u->getNumLocalPatches(); i++) {
-		for (int c = 0; c < u->getNumComponents(); c++) {
-			auto ld = u->getComponentView(c, i);
+	for (int i = 0; i < u.getNumLocalPatches(); i++) {
+		for (int c = 0; c < u.getNumComponents(); c++) {
+			auto ld = u.getComponentView(c, i);
 			nested_loop<2>(ld.getStart(), ld.getEnd(),
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 		}
@@ -167,11 +166,11 @@ TEST_CASE("PatchSolver getDomain", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine, 1);
-	auto f = ValVector<2>::GetNewVector(d_fine, 1);
+	Vector<2> u(*d_fine, 1);
+	Vector<2> f(*d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
-	MockPatchSolver<2> mps(d_fine, mgf, u, f);
+	MockPatchSolver<2> mps(d_fine, mgf);
 
 	CHECK(mps.getDomain() == d_fine);
 }
@@ -186,11 +185,11 @@ TEST_CASE("PatchSolver getGhostFiller", "[PatchSolver]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto u = ValVector<2>::GetNewVector(d_fine, 1);
-	auto f = ValVector<2>::GetNewVector(d_fine, 1);
+	Vector<2> u(*d_fine, 1);
+	Vector<2> f(*d_fine, 1);
 
 	auto               mgf = make_shared<MockGhostFiller<2>>();
-	MockPatchSolver<2> mps(d_fine, mgf, u, f);
+	MockPatchSolver<2> mps(d_fine, mgf);
 
 	CHECK(mps.getGhostFiller() == mgf);
 }

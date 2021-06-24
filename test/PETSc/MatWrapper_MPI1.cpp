@@ -22,7 +22,6 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <petscmat.h>
 
@@ -52,9 +51,9 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto x = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValues<2>(d_fine, x, gfun);
-	auto b = ValVector<2>::GetNewVector(d_fine, 1);
+	Vector<2> x(*d_fine, 1);
+	DomainTools::SetValues<2>(*d_fine, x, gfun);
+	Vector<2> b(*d_fine, 1);
 
 	// create an Identity matrix
 	Mat A;
@@ -66,7 +65,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 
 	// create MatWrapper
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(*x, *b);
+	m_operator->apply(x, b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -76,8 +75,8 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		ComponentView<double, 2> x_ld = x->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> b_ld = b->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> x_ld = x.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> b_ld = b.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -106,9 +105,9 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 		return x + y;
 	};
 
-	auto x = ValVector<2>::GetNewVector(d_fine, 2);
-	DomainTools::SetValues<2>(d_fine, x, gfun, ffun);
-	auto b = ValVector<2>::GetNewVector(d_fine, 2);
+	Vector<2> x(*d_fine, 2);
+	DomainTools::SetValues<2>(*d_fine, x, gfun, ffun);
+	Vector<2> b(*d_fine, 2);
 
 	// create an Identity matrix
 	Mat A;
@@ -120,7 +119,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 
 	// create MatWrapper
 	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(*x, *b);
+	m_operator->apply(x, b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -130,15 +129,15 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		ComponentView<double, 2> x_ld = x->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> b_ld = b->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> x_ld = x.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> b_ld = b.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
 		});
-		ComponentView<double, 2> x_ld2 = x->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 2> b_ld2 = b->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> x_ld2 = x.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> b_ld2 = b.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

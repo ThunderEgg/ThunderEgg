@@ -23,7 +23,7 @@
 #define THUNDEREGG_SCHUR_PATCHIFACESCATTER_H
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Schur/InterfaceDomain.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/Vector.h>
 namespace ThunderEgg
 {
 namespace Schur
@@ -258,7 +258,7 @@ template <int D> class PatchIfaceScatter
 	 */
 	std::shared_ptr<Vector<D - 1>> getNewLocalPatchIfaceVector() const
 	{
-		return std::make_shared<ValVector<D - 1>>(MPI_COMM_SELF, lengths, 0, 1, num_local_patch_ifaces);
+		return std::make_shared<Vector<D - 1>>(Communicator(MPI_COMM_SELF), lengths, 1, num_local_patch_ifaces, 0);
 	}
 	/**
 	 * @brief Start the scatter from the global Schur compliment vector to the local patch iface

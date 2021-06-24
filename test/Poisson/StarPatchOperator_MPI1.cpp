@@ -25,7 +25,6 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -58,31 +57,26 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 		double y = coord[1];
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
-	auto hfun = [](const std::array<double, 2> &coord) { return 1; };
 
-	auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValuesWithGhost<2>(d_fine, f_vec, ffun);
+	Vector<2> f_vec(*d_fine, 1);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, f_vec, ffun);
 
-	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
+	Vector<2> g_vec(*d_fine, 1);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, g_vec, gfun);
 
-	auto g_zero = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValuesWithGhost<2>(d_fine, g_zero, gfun);
-	g_zero->set(0);
-
-	auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
+	Vector<2> g_zero(*d_fine, 1);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, g_zero, gfun);
+	g_zero.set(0);
 
 	shared_ptr<BiLinearGhostFiller>           gf(new BiLinearGhostFiller(d_fine, GhostFillingType::Faces));
 	shared_ptr<Poisson::StarPatchOperator<2>> p_operator(
 	new Poisson::StarPatchOperator<2>(d_fine, gf));
 	p_operator->addDrichletBCToRHS(f_vec, gfun);
 
-	auto f_expected = ValVector<2>::GetNewVector(d_fine, 1);
-	f_expected->copy(*f_vec);
+	Vector<2> f_expected = f_vec;
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto u = g_vec->getComponentView(0, pinfo.local_index);
-		auto f = f_expected->getComponentView(0, pinfo.local_index);
+		auto u = g_vec.getComponentView(0, pinfo.local_index);
+		auto f = f_expected.getComponentView(0, pinfo.local_index);
 		for (Side<2> s : Side<2>::getValues()) {
 			if (pinfo.hasNbr(s)) {
 				double h2      = std::pow(pinfo.spacings[s.getAxisIndex()], 2);
@@ -97,8 +91,8 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		auto gs = g_vec->getPatchView(pinfo.local_index);
-		auto fs = f_vec->getPatchView(pinfo.local_index);
+		auto gs = g_vec.getPatchView(pinfo.local_index);
+		auto fs = f_vec.getPatchView(pinfo.local_index);
 		p_operator->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, gs, fs);
 	}
 
@@ -108,8 +102,8 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld      = f_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld = f_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = f_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = f_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -135,18 +129,18 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
 	};
 	auto ffun = [](const std::array<double, 2> &coord) { return 0; };
 
-	auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
-	auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValuesWithGhost<2>(d_fine, f_vec_expected, ffun);
+	Vector<2> f_vec(*d_fine, 1);
+	Vector<2> f_vec_expected(*d_fine, 1);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, f_vec_expected, ffun);
 
-	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
+	Vector<2> g_vec(*d_fine, 1);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 	p_operator->addDrichletBCToRHS(f_vec_expected, gfun);
 
-	p_operator->apply(*g_vec, *f_vec);
+	p_operator->apply(g_vec, f_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -154,8 +148,8 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld          = f_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_vec_ld = f_vec_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld          = f_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_vec_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -183,18 +177,18 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 	auto gfun_x = [](const std::array<double, 2> &coord) { return 5; };
 	auto gfun_y = [](const std::array<double, 2> &coord) { return 13; };
 
-	auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
-	auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValuesWithGhost<2>(d_fine, f_vec_expected, ffun);
+	Vector<2> f_vec(*d_fine, 1);
+	Vector<2> f_vec_expected(*d_fine, 1);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, f_vec_expected, ffun);
 
-	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
+	Vector<2> g_vec(*d_fine, 1);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 	p_operator->addNeumannBCToRHS(f_vec_expected, gfun, {gfun_x, gfun_y});
 
-	p_operator->apply(*g_vec, *f_vec);
+	p_operator->apply(g_vec, f_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -202,8 +196,8 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld           = f_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> exptected_vec_ld = f_vec_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld           = f_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> exptected_vec_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -235,25 +229,25 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence",
 		};
 		auto hfun = [](const std::array<double, 2> &coord) { return 1; };
 
-		auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
-		auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, f_vec_expected, ffun);
+		Vector<2> f_vec(*d_fine, 1);
+		Vector<2> f_vec_expected(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, f_vec_expected, ffun);
 
-		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, g_vec, gfun);
+		Vector<2> g_vec(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, g_vec, gfun);
 
-		auto h_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValuesWithGhost<2>(d_fine, h_vec, hfun);
+		Vector<2> h_vec(*d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(*d_fine, h_vec, hfun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 		p_operator->addDrichletBCToRHS(f_vec_expected, gfun);
 
-		p_operator->apply(*g_vec, *f_vec);
+		p_operator->apply(g_vec, f_vec);
 
-		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		error_vec->addScaled(1.0, *f_vec, -1.0, *f_vec_expected);
-		errors[i] = error_vec->twoNorm() / f_vec_expected->twoNorm();
+		Vector<2> error_vec(*d_fine, 1);
+		error_vec.addScaled(1.0, f_vec, -1.0, f_vec_expected);
+		errors[i] = error_vec.twoNorm() / f_vec_expected.twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
@@ -291,22 +285,22 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence with neuma
 			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 
-		auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
-		auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, f_vec_expected, ffun);
+		Vector<2> f_vec(*d_fine, 1);
+		Vector<2> f_vec_expected(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, f_vec_expected, ffun);
 
-		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, g_vec, gfun);
+		Vector<2> g_vec(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, g_vec, gfun);
 
 		auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 		p_operator->addNeumannBCToRHS(f_vec_expected, gfun, {gfun_x, gfun_y});
 
-		p_operator->apply(*g_vec, *f_vec);
+		p_operator->apply(g_vec, f_vec);
 
-		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		error_vec->addScaled(1.0, *f_vec, -1.0, *f_vec_expected);
-		errors[i] = error_vec->twoNorm() / f_vec_expected->twoNorm();
+		Vector<2> error_vec(*d_fine, 1);
+		error_vec.addScaled(1.0, f_vec, -1.0, f_vec_expected);
+		errors[i] = error_vec.twoNorm() / f_vec_expected.twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);

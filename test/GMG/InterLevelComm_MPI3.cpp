@@ -21,7 +21,6 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -110,7 +109,7 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
+	Vector<2> coarse_vec(*d_coarse, num_components);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -118,8 +117,8 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	// fill vectors with rank+c+1
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
 		loop_over_all_indexes<3>(local_view,
 		                         [&](const std::array<int, 3> &coord) {
 			                         for (int c = 0; c < num_components; c++) {
@@ -137,11 +136,11 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 		                         });
 	}
 
-	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
-	ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec);
+	ilc->sendGhostPatchesStart(coarse_vec, *ghost_vec);
+	ilc->sendGhostPatchesFinish(coarse_vec, *ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 6+2*c
-		PatchView<double, 2> local_view = coarse_vec->getPatchView(0);
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
 		loop_over_all_indexes<3>(local_view,
 		                         [&](const std::array<int, 3> &coord) {
 			                         for (int c = 0; c < num_components; c++) {
@@ -166,11 +165,11 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec), RuntimeError);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "3-processor sendGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
@@ -184,13 +183,13 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
 
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec_2), RuntimeError);
+	ilc->sendGhostPatchesStart(coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, *ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "3-processor sendGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
@@ -204,13 +203,13 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec_2(*d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec_2, *ghost_vec), RuntimeError);
+	ilc->sendGhostPatchesStart(coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "3-processor sendGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
@@ -224,14 +223,14 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec_2(*d_coarse, 1);
 
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec_2, *ghost_vec_2), RuntimeError);
+	ilc->sendGhostPatchesStart(coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, *ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "3-processor sendGhostPatches throws exception when start is called twice on uniform quad",
@@ -245,12 +244,12 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec), RuntimeError);
+	ilc->sendGhostPatchesStart(coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
@@ -263,7 +262,7 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
+	Vector<2> coarse_vec(*d_coarse, num_components);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -271,8 +270,8 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	// fill vectors with rank+c+1
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		PatchView<double, 2> local_view = coarse_vec->getPatchView(i);
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
 		loop_over_all_indexes<3>(local_view,
 		                         [&](const std::array<int, 3> &coord) {
 			                         local_view[coord] = rank + coord[2] + 1;
@@ -286,8 +285,8 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 		                         });
 	}
 
-	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
-	ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec);
+	ilc->getGhostPatchesStart(coarse_vec, *ghost_vec);
+	ilc->getGhostPatchesFinish(coarse_vec, *ghost_vec);
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
@@ -310,11 +309,11 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec), RuntimeError);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "3-processor getGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
@@ -328,13 +327,13 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
 
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(*coarse_vec, *ghost_vec_2), RuntimeError);
+	ilc->getGhostPatchesStart(coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, *ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "3-processor getGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
@@ -348,13 +347,13 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec_2(*d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(*coarse_vec_2, *ghost_vec), RuntimeError);
+	ilc->getGhostPatchesStart(coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, *ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "3-processor getGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
@@ -368,14 +367,14 @@ TEST_CASE(
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec_2(*d_coarse, 1);
 
 	auto ghost_vec   = ilc->getNewGhostVector();
 	auto ghost_vec_2 = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(*coarse_vec_2, *ghost_vec_2), RuntimeError);
+	ilc->getGhostPatchesStart(coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec_2, *ghost_vec_2), RuntimeError);
 }
 TEST_CASE("3-processor getGhostPatches throws exception when start is called twice on uniform quad",
           "[GMG::InterLevelComm]")
@@ -388,10 +387,10 @@ TEST_CASE("3-processor getGhostPatches throws exception when start is called twi
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
-	ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesStart(*coarse_vec, *ghost_vec), RuntimeError);
+	ilc->getGhostPatchesStart(coarse_vec, *ghost_vec);
+	CHECK_THROWS_AS(ilc->getGhostPatchesStart(coarse_vec, *ghost_vec), RuntimeError);
 }

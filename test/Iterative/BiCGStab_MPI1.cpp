@@ -89,16 +89,16 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
-	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	auto f_vec = make_shared<Vector<2>>(*domain, 1);
+	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
+	auto residual = make_shared<Vector<2>>(*domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto g_vec = make_shared<Vector<2>>(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(f_vec, gfun);
+	p_operator->addDrichletBCToRHS(*f_vec, *gfun);
 
 	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
 
@@ -118,9 +118,9 @@ TEST_CASE("BiCGStab handles zero rhs vector", "[BiCGStab]")
 	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
 	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto f_vec = make_shared<Vector<2>>(*domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto g_vec = make_shared<Vector<2>>(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
@@ -153,16 +153,16 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
-	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	auto f_vec = make_shared<Vector<2>>(*domain, 1);
+	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
+	auto residual = make_shared<Vector<2>>(*domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto g_vec = make_shared<Vector<2>>(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(f_vec, gfun);
+	p_operator->addDrichletBCToRHS(*f_vec, *gfun);
 
 	double tolerance = 1e-7;
 
@@ -203,16 +203,16 @@ TEST_CASE("giving a good initial guess reduces the iterations", "[BiCGStab]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
-	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	auto f_vec = make_shared<Vector<2>>(*domain, 1);
+	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
+	auto residual = make_shared<Vector<2>>(*domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto g_vec = make_shared<Vector<2>>(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(f_vec, gfun);
+	p_operator->addDrichletBCToRHS(*f_vec, *gfun);
 
 	double tolerance = 1e-5;
 
@@ -228,33 +228,6 @@ TEST_CASE("giving a good initial guess reduces the iterations", "[BiCGStab]")
 }
 namespace
 {
-class MockVector : public Vector<2>
-{
-	public:
-	mutable int norm_calls = 0;
-	double      dot_value;
-	MockVector(double dot_value)
-	: Vector<2>(MPI_COMM_WORLD, 1, 0, 10), dot_value(dot_value) {}
-	PatchView<double, 2> getPatchView(int) override
-	{
-		return PatchView<double, 2>();
-	}
-	PatchView<const double, 2> getPatchView(int) const override
-	{
-		return PatchView<double, 2>();
-	}
-};
-class MockVectorGenerator : public VectorGenerator<2>
-{
-	public:
-	std::shared_ptr<MockVector> vec;
-	MockVectorGenerator(std::shared_ptr<MockVector> vec)
-	: vec(vec) {}
-	std::shared_ptr<Vector<2>> getNewVector() const override
-	{
-		return vec;
-	}
-};
 class MockOperator : public Operator<2>
 {
 	public:
@@ -283,11 +256,11 @@ TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
 		return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
-	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	auto f_vec = make_shared<Vector<2>>(*domain, 1);
+	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
+	auto residual = make_shared<Vector<2>>(*domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto g_vec = make_shared<Vector<2>>(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 

@@ -61,6 +61,31 @@ template <int D> class PatchArray
 	}
 
 	/**
+	 * @brief Copy constructor
+	 *
+	 * @param other the array to copy
+	 */
+	PatchArray(const PatchArray<D> &other)
+	: vector(other.vector),
+	  view(vector.data(), other.getStrides(), other.getGhostStart(), other.getStart(), other.getEnd(), other.getGhostEnd())
+
+	{
+	}
+
+	/**
+	 * @brief Copy assignment
+	 *
+	 * @param other the array to copy
+	 * @return PatchArray<D>&  this
+	 */
+	PatchArray<D> &operator=(const PatchArray<D> &other)
+	{
+		vector = other.vector;
+		view = PatchView<double, D>(vector.data(), other.getStrides(), other.getGhostStart(), other.getStart(), other.getEnd(), other.getGhostEnd());
+		return *this;
+	}
+
+	/**
 	 * @brief Get the slice on a given face
 	 *
 	 * @tparam M the dimension of the face
@@ -161,6 +186,15 @@ template <int D> class PatchArray
 	inline const std::array<int, D + 1> &getGhostEnd() const
 	{
 		return view.getGhostEnd();
+	}
+	/**
+	 * @brief Get the View for the array
+	 *
+	 * @return const PatchView<double, D>& the View
+	 */
+	const PatchView<double, D> &getView()
+	{
+		return view;
 	}
 };
 extern template class PatchArray<1>;

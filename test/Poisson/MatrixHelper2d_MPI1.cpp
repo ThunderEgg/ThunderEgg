@@ -55,23 +55,23 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
-	auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
+	Vector<2> f_vec(*d_fine, 1);
+	Vector<2> f_vec_expected(*d_fine, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValues<2>(d_fine, g_vec, gfun);
+	Vector<2> g_vec(*d_fine, 1);
+	DomainTools::SetValues<2>(*d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	p_operator->apply(*g_vec, *f_vec_expected);
+	p_operator->apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper2d mh(d_fine, neumann);
 	Mat                     A          = mh.formCRSMatrix();
 	auto                    m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(*g_vec, *f_vec);
+	m_operator->apply(g_vec, f_vec);
 
-	REQUIRE(f_vec->infNorm() > 0);
+	REQUIRE(f_vec.infNorm() > 0);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -81,8 +81,8 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		ComponentView<double, 2> f_vec_ld          = f_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> f_vec_expected_ld = f_vec_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> f_vec_ld          = f_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> f_vec_expected_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
@@ -109,23 +109,23 @@ TEST_CASE(
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	auto f_vec          = ValVector<2>::GetNewVector(d_fine, 1);
-	auto f_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
+	Vector<2> f_vec(*d_fine, 1);
+	Vector<2> f_vec_expected(*d_fine, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValues<2>(d_fine, g_vec, gfun);
+	Vector<2> g_vec(*d_fine, 1);
+	DomainTools::SetValues<2>(*d_fine, g_vec, gfun);
 
 	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-	p_operator->apply(*g_vec, *f_vec_expected);
+	p_operator->apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper2d mh(d_fine, neumann);
 	Mat                     A          = mh.formCRSMatrix();
 	auto                    m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(*g_vec, *f_vec);
+	m_operator->apply(g_vec, f_vec);
 
-	REQUIRE(f_vec->infNorm() > 0);
+	REQUIRE(f_vec.infNorm() > 0);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -135,8 +135,8 @@ TEST_CASE(
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("dx:    " << pinfo.spacings[0]);
 		INFO("dy:    " << pinfo.spacings[1]);
-		ComponentView<double, 2> f_vec_ld          = f_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> f_vec_expected_ld = f_vec_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> f_vec_ld          = f_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> f_vec_expected_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);

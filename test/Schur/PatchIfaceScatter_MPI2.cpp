@@ -203,7 +203,7 @@ TEST_CASE(
 
 	auto local_vector = scatter.getNewLocalPatchIfaceVector();
 
-	CHECK(local_vector->getMPIComm() == MPI_COMM_SELF);
+	CHECK(local_vector->getCommunicator().getMPIComm() == MPI_COMM_SELF);
 }
 /******
  *

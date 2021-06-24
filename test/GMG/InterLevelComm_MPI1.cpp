@@ -21,7 +21,6 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -104,8 +103,8 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
 
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, num_components);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, num_components);
+	Vector<2> coarse_vec(*d_coarse, num_components);
+	Vector<2> coarse_expected(*d_coarse, num_components);
 
 	auto ghost_vec = ilc->getNewGhostVector();
 
@@ -116,23 +115,23 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	auto f
 	= [&](const std::array<double, 2> coord) -> double { return 1 + coord[0] + 2 * coord[1]; };
 
-	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_vec, f);
+	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_vec, f);
 	int idx = 0;
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		PatchView<double, 2> vec_view = coarse_vec->getPatchView(i);
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> vec_view = coarse_vec.getPatchView(i);
 		loop_over_interior_indexes<3>(vec_view, [&](const array<int, 3> &coord) {
 			vec_view[coord] = idx;
 			idx++;
 		});
 	}
 	// since there are not ghost patches, the coarse vec should not be modified
-	coarse_expected->copy(*coarse_vec);
+	coarse_expected.copy(coarse_vec);
 
-	ilc->sendGhostPatchesStart(*coarse_vec, *ghost_vec);
-	ilc->sendGhostPatchesFinish(*coarse_vec, *ghost_vec);
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		PatchView<double, 2> vec_view      = coarse_vec->getPatchView(i);
-		PatchView<double, 2> expected_view = coarse_expected->getPatchView(i);
+	ilc->sendGhostPatchesStart(coarse_vec, *ghost_vec);
+	ilc->sendGhostPatchesFinish(coarse_vec, *ghost_vec);
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> vec_view      = coarse_vec.getPatchView(i);
+		PatchView<double, 2> expected_view = coarse_expected.getPatchView(i);
 		loop_over_interior_indexes<3>(vec_view, [&](const array<int, 3> &coord) {
 			REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
 		});

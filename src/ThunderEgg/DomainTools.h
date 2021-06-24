@@ -44,8 +44,7 @@ class DomainTools
 	 * @param component_index the component to set
 	 * @param func the function
 	 */
-	template <int D, typename T>
-	static void _SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, int component_index, T func)
+	template <int D, typename T> static void _SetValues(const Domain<D> &domain, Vector<D> &vec, int component_index, T func)
 	{
 		SetValues(domain, vec, component_index, func);
 	}
@@ -63,7 +62,7 @@ class DomainTools
 	 * @param args additional functions for additional components
 	 */
 	template <int D, typename T, typename... Args>
-	static void _SetValues(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, int component_index, T func, Args... args)
+	static void _SetValues(const Domain<D> &domain, Vector<D> &vec, int component_index, T func, Args... args)
 	{
 		SetValues(domain, vec, component_index, func);
 		_SetValues(domain, vec, component_index + 1, args...);
@@ -79,8 +78,7 @@ class DomainTools
 	 * @param component_index the component to set
 	 * @param func the function
 	 */
-	template <int D, typename T>
-	static void _SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, int component_index, T func)
+	template <int D, typename T> static void _SetValuesWithGhost(const Domain<D> &domain, Vector<D> &vec, int component_index, T func)
 	{
 		SetValuesWithGhost(domain, vec, component_index, func);
 	}
@@ -98,7 +96,7 @@ class DomainTools
 	 * @param args additional functions for additional components
 	 */
 	template <int D, typename T, typename... Args>
-	static void _SetValuesWithGhost(std::shared_ptr<Domain<D>> domain, std::shared_ptr<Vector<D>> vec, int component_index, T func, Args... args)
+	static void _SetValuesWithGhost(const Domain<D> &domain, Vector<D> &vec, int component_index, T func, Args... args)
 	{
 		SetValuesWithGhost(domain, vec, component_index, func);
 		_SetValuesWithGhost(domain, vec, component_index + 1, args...);
@@ -187,18 +185,16 @@ class DomainTools
 	 * @param func the function
 	 */
 	template <int D>
-	static void SetValues(std::shared_ptr<Domain<D>>                                 domain,
-	                      std::shared_ptr<Vector<D>>                                 vec,
-	                      int                                                        component_index,
-	                      std::function<double(const std::array<double, (int) D> &)> func)
+	static void
+	SetValues(const Domain<D> &domain, Vector<D> &vec, int component_index, std::function<double(const std::array<double, (int) D> &)> func)
 	{
-		if (component_index >= vec->getNumComponents()) {
+		if (component_index >= vec.getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
 		}
 		std::array<double, D> real_coord;
-		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			ComponentView<double, D> ld    = vec->getComponentView(component_index, i);
-			auto                     pinfo = domain->getPatchInfoVector()[i];
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			ComponentView<double, D> ld    = vec.getComponentView(component_index, i);
+			auto                     pinfo = domain.getPatchInfoVector()[i];
 			nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 				GetRealCoord<D>(pinfo, coord, real_coord);
 				ld[coord] = func(real_coord);
@@ -213,17 +209,14 @@ class DomainTools
 	 * @param component_index the component to set
 	 * @param func the function
 	 */
-	static void SetValues(std::shared_ptr<Domain<3>>                    domain,
-	                      std::shared_ptr<Vector<3>>                    vec,
-	                      int                                           component_index,
-	                      std::function<double(double, double, double)> func)
+	static void SetValues(const Domain<3> &domain, Vector<3> &vec, int component_index, std::function<double(double, double, double)> func)
 	{
-		if (component_index >= vec->getNumComponents()) {
+		if (component_index >= vec.getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
 		}
-		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			ComponentView<double, 3> ld    = vec->getComponentView(component_index, i);
-			const PatchInfo<3> &     pinfo = domain->getPatchInfoVector()[i];
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			ComponentView<double, 3> ld    = vec.getComponentView(component_index, i);
+			const PatchInfo<3> &     pinfo = domain.getPatchInfoVector()[i];
 			double                   dx    = pinfo.spacings[0];
 			double                   dy    = pinfo.spacings[1];
 			double                   dz    = pinfo.spacings[2];
@@ -247,15 +240,14 @@ class DomainTools
 	 * @param component_index the component to set
 	 * @param func the function
 	 */
-	static void
-	SetValues(std::shared_ptr<Domain<2>> domain, std::shared_ptr<Vector<2>> vec, int component_index, std::function<double(double, double)> func)
+	static void SetValues(const Domain<2> &domain, Vector<2> &vec, int component_index, std::function<double(double, double)> func)
 	{
-		if (component_index >= vec->getNumComponents()) {
+		if (component_index >= vec.getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
 		}
-		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			ComponentView<double, 2> ld    = vec->getComponentView(component_index, i);
-			const PatchInfo<2> &     pinfo = domain->getPatchInfoVector()[i];
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			ComponentView<double, 2> ld    = vec.getComponentView(component_index, i);
+			const PatchInfo<2> &     pinfo = domain.getPatchInfoVector()[i];
 			double                   dx    = pinfo.spacings[0];
 			double                   dy    = pinfo.spacings[1];
 			for (int yi = 0; yi < pinfo.ns[1]; yi++) {
@@ -275,14 +267,14 @@ class DomainTools
 	 * @param component_index the component to set
 	 * @param func the function
 	 */
-	static void SetValues(std::shared_ptr<Domain<1>> domain, std::shared_ptr<Vector<1>> vec, int component_index, std::function<double(double)> func)
+	static void SetValues(const Domain<1> &domain, Vector<1> &vec, int component_index, std::function<double(double)> func)
 	{
-		if (component_index >= vec->getNumComponents()) {
+		if (component_index >= vec.getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
 		}
-		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			ComponentView<double, 1> ld    = vec->getComponentView(component_index, i);
-			const PatchInfo<1> &     pinfo = domain->getPatchInfoVector()[i];
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			ComponentView<double, 1> ld    = vec.getComponentView(component_index, i);
+			const PatchInfo<1> &     pinfo = domain.getPatchInfoVector()[i];
 			double                   dx    = pinfo.spacings[0];
 			for (int xi = 0; xi < pinfo.ns[0]; xi++) {
 				double x = pinfo.starts[0] + 0.5 * dx + xi * dx;
@@ -302,10 +294,7 @@ class DomainTools
 	 * @param args additional functions for additional components
 	 */
 	template <int D, typename... Args>
-	static void SetValues(std::shared_ptr<Domain<D>>                           domain,
-	                      std::shared_ptr<Vector<D>>                           vec,
-	                      std::function<double(const std::array<double, D> &)> func,
-	                      Args... args)
+	static void SetValues(const Domain<D> &domain, Vector<D> &vec, std::function<double(const std::array<double, D> &)> func, Args... args)
 	{
 		_SetValues(domain, vec, 0, func, args...);
 	}
@@ -319,18 +308,16 @@ class DomainTools
 	 * @param func the function
 	 */
 	template <int D>
-	static void SetValuesWithGhost(std::shared_ptr<Domain<D>>                                 domain,
-	                               std::shared_ptr<Vector<D>>                                 vec,
-	                               int                                                        component_index,
-	                               std::function<double(const std::array<double, (int) D> &)> func)
+	static void
+	SetValuesWithGhost(const Domain<D> &domain, Vector<D> &vec, int component_index, std::function<double(const std::array<double, (int) D> &)> func)
 	{
-		if (component_index >= vec->getNumComponents()) {
+		if (component_index >= vec.getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
 		}
 		std::array<double, D> real_coord;
-		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			ComponentView<double, D> ld    = vec->getComponentView(component_index, i);
-			auto                     pinfo = domain->getPatchInfoVector()[i];
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			ComponentView<double, D> ld    = vec.getComponentView(component_index, i);
+			auto                     pinfo = domain.getPatchInfoVector()[i];
 			nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, D> &coord) {
 				GetRealCoordGhost<D>(pinfo, coord, real_coord);
 				ld[coord] = func(real_coord);
@@ -345,17 +332,14 @@ class DomainTools
 	 * @param component_index the component to set
 	 * @param func the function
 	 */
-	static void SetValuesWithGhost(std::shared_ptr<Domain<3>>                    domain,
-	                               std::shared_ptr<Vector<3>>                    vec,
-	                               int                                           component_index,
-	                               std::function<double(double, double, double)> func)
+	static void SetValuesWithGhost(const Domain<3> &domain, Vector<3> &vec, int component_index, std::function<double(double, double, double)> func)
 	{
-		if (component_index >= vec->getNumComponents()) {
+		if (component_index >= vec.getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
 		}
-		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			ComponentView<double, 3> ld        = vec->getComponentView(component_index, i);
-			const PatchInfo<3> &     pinfo     = domain->getPatchInfoVector()[i];
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			ComponentView<double, 3> ld        = vec.getComponentView(component_index, i);
+			const PatchInfo<3> &     pinfo     = domain.getPatchInfoVector()[i];
 			int                      num_ghost = pinfo.num_ghost_cells;
 			double                   dx        = pinfo.spacings[0];
 			double                   dy        = pinfo.spacings[1];
@@ -380,17 +364,14 @@ class DomainTools
 	 * @param component_index the component to set
 	 * @param func the function
 	 */
-	static void SetValuesWithGhost(std::shared_ptr<Domain<2>>            domain,
-	                               std::shared_ptr<Vector<2>>            vec,
-	                               int                                   component_index,
-	                               std::function<double(double, double)> func)
+	static void SetValuesWithGhost(const Domain<2> &domain, Vector<2> &vec, int component_index, std::function<double(double, double)> func)
 	{
-		if (component_index >= vec->getNumComponents()) {
+		if (component_index >= vec.getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
 		}
-		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			ComponentView<double, 2> ld        = vec->getComponentView(component_index, i);
-			const PatchInfo<2> &     pinfo     = domain->getPatchInfoVector()[i];
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			ComponentView<double, 2> ld        = vec.getComponentView(component_index, i);
+			const PatchInfo<2> &     pinfo     = domain.getPatchInfoVector()[i];
 			int                      num_ghost = pinfo.num_ghost_cells;
 			double                   dx        = pinfo.spacings[0];
 			double                   dy        = pinfo.spacings[1];
@@ -411,15 +392,14 @@ class DomainTools
 	 * @param component_index the component to set
 	 * @param func the function
 	 */
-	static void
-	SetValuesWithGhost(std::shared_ptr<Domain<1>> domain, std::shared_ptr<Vector<1>> vec, int component_index, std::function<double(double)> func)
+	static void SetValuesWithGhost(const Domain<1> &domain, Vector<1> &vec, int component_index, std::function<double(double)> func)
 	{
-		if (component_index >= vec->getNumComponents()) {
+		if (component_index >= vec.getNumComponents()) {
 			throw RuntimeError("Invalid component to set");
 		}
-		for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-			ComponentView<double, 1> ld        = vec->getComponentView(component_index, i);
-			const PatchInfo<1> &     pinfo     = domain->getPatchInfoVector()[i];
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			ComponentView<double, 1> ld        = vec.getComponentView(component_index, i);
+			const PatchInfo<1> &     pinfo     = domain.getPatchInfoVector()[i];
 			int                      num_ghost = pinfo.num_ghost_cells;
 			double                   dx        = pinfo.spacings[0];
 			for (int xi = -num_ghost; xi < pinfo.ns[0] + num_ghost; xi++) {
@@ -441,10 +421,7 @@ class DomainTools
 	 * @param args additional functions for additional components
 	 */
 	template <int D, typename... Args>
-	static void SetValuesWithGhost(std::shared_ptr<Domain<D>>                           domain,
-	                               std::shared_ptr<Vector<D>>                           vec,
-	                               std::function<double(const std::array<double, D> &)> func,
-	                               Args... args)
+	static void SetValuesWithGhost(const Domain<D> &domain, Vector<D> &vec, std::function<double(const std::array<double, D> &)> func, Args... args)
 	{
 		_SetValuesWithGhost(domain, vec, 0, func, args...);
 	}
@@ -459,10 +436,7 @@ class DomainTools
 	 * @param args additional functions for additional components
 	 */
 	template <typename... Args>
-	static void SetValuesWithGhost(std::shared_ptr<Domain<3>>                    domain,
-	                               std::shared_ptr<Vector<3>>                    vec,
-	                               std::function<double(double, double, double)> func,
-	                               Args... args)
+	static void SetValuesWithGhost(const Domain<3> &domain, Vector<3> &vec, std::function<double(double, double, double)> func, Args... args)
 	{
 		_SetValuesWithGhost(domain, vec, 0, func, args...);
 	}
@@ -472,13 +446,13 @@ class DomainTools
 	 * @param u the vector
 	 * @return double the result of the integral
 	 */
-	template <int D> static double Integrate(std::shared_ptr<Domain<D>> domain, std::shared_ptr<const Vector<D>> u)
+	template <int D> static double Integrate(const Domain<D> &domain, const Vector<D> &u)
 	{
 		double sum = 0;
 
-		for (const auto &pinfo : domain->getPatchInfoVector()) {
-			for (int c = 0; c < u->getNumComponents(); c++) {
-				ComponentView<const double, D> u_data = u->getComponentView(c, pinfo.local_index);
+		for (const auto &pinfo : domain.getPatchInfoVector()) {
+			for (int c = 0; c < u.getNumComponents(); c++) {
+				ComponentView<const double, D> u_data = u.getComponentView(c, pinfo.local_index);
 
 				double patch_sum = 0;
 				nested_loop<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });

@@ -23,7 +23,6 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -43,9 +42,9 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 1);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> fine_vec(*d_fine, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_expected(*d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -53,12 +52,12 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
-	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f);
+	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f);
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(*fine_vec, *coarse_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -66,8 +65,8 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = coarse_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -94,9 +93,9 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 1);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> fine_vec(*d_fine, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_expected(*d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -104,14 +103,14 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
-	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f);
+	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f);
 
-	coarse_vec->setWithGhost(1.0);
+	coarse_vec.setWithGhost(1.0);
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(*fine_vec, *coarse_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -119,8 +118,8 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = coarse_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});

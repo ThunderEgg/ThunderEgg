@@ -23,7 +23,6 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -46,9 +45,9 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 1);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> fine_vec(*d_fine, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_expected(*d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -56,12 +55,12 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
-	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f);
+	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f);
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(*fine_vec, *coarse_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -70,8 +69,8 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		INFO("nx:             " << pinfo.ns[0]);
 		INFO("ny:             " << pinfo.ns[1]);
 		INFO("parent_orth:    " << pinfo.orth_on_parent);
-		ComponentView<double, 2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = coarse_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -106,9 +105,9 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 2);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 2);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 2);
+	Vector<2> fine_vec(*d_fine, 2);
+	Vector<2> coarse_vec(*d_coarse, 2);
+	Vector<2> coarse_expected(*d_coarse, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -121,12 +120,12 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 		return 9 + ((x * 0.9) + y * 4);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f, g);
-	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f, g);
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 2, true);
 
-	restrictor->restrict(*fine_vec, *coarse_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -135,10 +134,10 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 		INFO("nx:             " << pinfo.ns[0]);
 		INFO("ny:             " << pinfo.ns[1]);
 		INFO("parent_orth:    " << pinfo.orth_on_parent);
-		ComponentView<double, 2> vec_ld       = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld  = coarse_expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> vec_ld2      = coarse_vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 2> expected_ld2 = coarse_expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = coarse_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = coarse_expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = coarse_vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = coarse_expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
@@ -178,9 +177,9 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 1);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> fine_vec(*d_fine, 1);
+	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_expected(*d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -188,12 +187,12 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
-	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f);
+	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f);
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, false);
 
-	restrictor->restrict(*fine_vec, *coarse_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -202,14 +201,13 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 		INFO("nx:             " << pinfo.ns[0]);
 		INFO("ny:             " << pinfo.ns[1]);
 		INFO("parent_orth:    " << pinfo.orth_on_parent);
-		ComponentView<double, 2> vec_ld      = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld = coarse_expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = coarse_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost = vec_ld.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 			               [&](const array<int, 1> &coord) {
@@ -231,9 +229,9 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 2);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 2);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 2);
+	Vector<2> fine_vec(*d_fine, 2);
+	Vector<2> coarse_vec(*d_coarse, 2);
+	Vector<2> coarse_expected(*d_coarse, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -246,12 +244,12 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 		return 9 + ((x * 0.9) + y * 4);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f, g);
-	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f, g);
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 2, false);
 
-	restrictor->restrict(*fine_vec, *coarse_vec);
+	restrictor->restrict(fine_vec, coarse_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -260,19 +258,17 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 		INFO("nx:             " << pinfo.ns[0]);
 		INFO("ny:             " << pinfo.ns[1]);
 		INFO("parent_orth:    " << pinfo.orth_on_parent);
-		ComponentView<double, 2> vec_ld       = coarse_vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld  = coarse_expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> vec_ld2      = coarse_vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 2> expected_ld2 = coarse_expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = coarse_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = coarse_expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = coarse_vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = coarse_expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 			REQUIRE(vec_ld2[coord] == Catch::Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			View<double, 1> vec_ghost       = vec_ld.getSliceOn(s, {-1});
-			View<double, 1> expected_ghost  = expected_ld.getSliceOn(s, {-1});
-			View<double, 1> vec_ghost2      = vec_ld2.getSliceOn(s, {-1});
-			View<double, 1> expected_ghost2 = expected_ld2.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost  = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost2 = vec_ld2.getSliceOn(s, {-1});
 			INFO("side:      " << s);
 			nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
 			               [&](const array<int, 1> &coord) {

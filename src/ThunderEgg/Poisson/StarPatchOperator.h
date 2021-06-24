@@ -27,7 +27,7 @@
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/RuntimeError.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/Vector.h>
 
 namespace ThunderEgg
 {
@@ -146,10 +146,10 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 * @param f the right hand side vector
 	 * @param gfunc the exact solution
 	 */
-	void addDrichletBCToRHS(std::shared_ptr<Vector<D>> f, std::function<double(const std::array<double, D> &)> gfunc)
+	void addDrichletBCToRHS(Vector<D> &f, std::function<double(const std::array<double, D> &)> gfunc)
 	{
-		for (int i = 0; i < f->getNumLocalPatches(); i++) {
-			ComponentView<double, D> f_ld  = f->getComponentView(0, i);
+		for (int i = 0; i < f.getNumLocalPatches(); i++) {
+			ComponentView<double, D> f_ld  = f.getComponentView(0, i);
 			auto                     pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo.hasNbr(s)) {
@@ -171,12 +171,12 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 * @param gfunc the exact solution
 	 * @param gfunc_grad the gradient of gfunc
 	 */
-	void addNeumannBCToRHS(std::shared_ptr<Vector<D>>                                          f,
+	void addNeumannBCToRHS(Vector<D> &                                                         f,
 	                       std::function<double(const std::array<double, D> &)>                gfunc,
 	                       std::array<std::function<double(const std::array<double, D> &)>, D> gfunc_grad)
 	{
-		for (int i = 0; i < f->getNumLocalPatches(); i++) {
-			ComponentView<double, D> f_ld  = f->getComponentView(0, i);
+		for (int i = 0; i < f.getNumLocalPatches(); i++) {
+			ComponentView<double, D> f_ld  = f.getComponentView(0, i);
 			auto                     pinfo = this->domain->getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo.hasNbr(s)) {

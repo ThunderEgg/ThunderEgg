@@ -50,15 +50,12 @@ template <int D>
 class MockPatchSolver : public PatchSolver<D>
 {
 	private:
-	std::shared_ptr<Vector<D>>             u_vec;
-	std::shared_ptr<Vector<D>>             f_vec;
 	mutable std::set<const PatchInfo<D> *> patches_to_be_called;
 
 	public:
 	MockPatchSolver(std::shared_ptr<const Domain<D>>      domain_in,
-	                std::shared_ptr<const GhostFiller<D>> ghost_filler_in,
-	                std::shared_ptr<Vector<D>> u_in, std::shared_ptr<Vector<D>> f_in)
-	: PatchSolver<D>(domain_in, ghost_filler_in), u_vec(u_in), f_vec(f_in)
+	                std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
+	: PatchSolver<D>(domain_in, ghost_filler_in)
 	{
 		for (const PatchInfo<D> &pinfo : this->domain->getPatchInfoVector()) {
 			patches_to_be_called.insert(&pinfo);
@@ -72,8 +69,6 @@ class MockPatchSolver : public PatchSolver<D>
 		patches_to_be_called.erase(&pinfo);
 		std::array<int, D + 1> zero;
 		zero.fill(0);
-		CHECK(&u_vec->getPatchView(pinfo.local_index)[zero] == &us[zero]);
-		CHECK(&f_vec->getPatchView(pinfo.local_index)[zero] == &fs[zero]);
 	}
 	bool allPatchesCalled()
 	{

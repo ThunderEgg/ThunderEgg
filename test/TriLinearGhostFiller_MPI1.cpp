@@ -26,8 +26,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 1);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 1);
+	Vector<3> vec(*d, 1);
+	Vector<3> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -36,11 +36,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f);
+	DomainTools::SetValues<3>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -50,8 +50,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -83,8 +83,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 2);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 2);
+	Vector<3> vec(*d, 2);
+	Vector<3> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -99,11 +99,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
+	DomainTools::SetValues<3>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -113,10 +113,10 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -164,8 +164,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 2);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 2);
+	Vector<3> vec(*d, 2);
+	Vector<3> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -180,11 +180,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
+	DomainTools::SetValuesWithGhost<3>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -194,10 +194,10 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -245,8 +245,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 1);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 1);
+	Vector<3> vec(*d, 1);
+	Vector<3> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -255,11 +255,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f);
+	DomainTools::SetValuesWithGhost<3>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -269,8 +269,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -321,8 +321,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGh
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 1);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 1);
+	Vector<3> vec(*d, 1);
+	Vector<3> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -331,11 +331,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGh
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f);
+	DomainTools::SetValues<3>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -345,8 +345,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGh
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -391,8 +391,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 2);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 2);
+	Vector<3> vec(*d, 2);
+	Vector<3> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -407,11 +407,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
+	DomainTools::SetValues<3>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -421,10 +421,10 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -498,8 +498,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 2);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 2);
+	Vector<3> vec(*d, 2);
+	Vector<3> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -514,11 +514,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
+	DomainTools::SetValuesWithGhost<3>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -528,10 +528,10 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -605,8 +605,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 1);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 1);
+	Vector<3> vec(*d, 1);
+	Vector<3> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -615,11 +615,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f);
+	DomainTools::SetValuesWithGhost<3>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -629,8 +629,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -674,8 +674,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 1);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 1);
+	Vector<3> vec(*d, 1);
+	Vector<3> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -684,11 +684,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f);
+	DomainTools::SetValues<3>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -698,8 +698,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -753,8 +753,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 2);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 2);
+	Vector<3> vec(*d, 2);
+	Vector<3> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -769,11 +769,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
+	DomainTools::SetValues<3>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -783,10 +783,10 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -878,8 +878,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 2);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 2);
+	Vector<3> vec(*d, 2);
+	Vector<3> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -894,11 +894,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
+	DomainTools::SetValuesWithGhost<3>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -908,10 +908,10 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 3> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
@@ -1003,8 +1003,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<3>> vec      = ValVector<3>::GetNewVector(d, 1);
-	shared_ptr<ValVector<3>> expected = ValVector<3>::GetNewVector(d, 1);
+	Vector<3> vec(*d, 1);
+	Vector<3> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -1013,11 +1013,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(d, expected, f);
+	DomainTools::SetValuesWithGhost<3>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
-	tlgf.fillGhost(*vec);
+	tlgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -1027,8 +1027,8 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
 		INFO("nz:    " << pinfo.ns[2]);
-		ComponentView<double, 3> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 3> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});

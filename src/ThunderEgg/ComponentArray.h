@@ -55,6 +55,31 @@ template <int D> class ComponentArray
 	}
 
 	/**
+	 * @brief Copy constructor
+	 *
+	 * @param other the array to copy
+	 */
+	ComponentArray(const ComponentArray<D> &other)
+	: vector(other.vector),
+	  view(vector.data(), other.getStrides(), other.getGhostStart(), other.getStart(), other.getEnd(), other.getGhostEnd())
+
+	{
+	}
+
+	/**
+	 * @brief Copy assignment
+	 *
+	 * @param other the array to copy
+	 * @return PatchArray<D>&  this
+	 */
+	ComponentArray<D> &operator=(const ComponentArray<D> &other)
+	{
+		vector = other.vector;
+		view
+		= ComponentView<double, D>(vector.data(), other.getStrides(), other.getGhostStart(), other.getStart(), other.getEnd(), other.getGhostEnd());
+		return *this;
+	}
+	/**
 	 * @brief Get the slice on a given face
 	 *
 	 * @tparam M the dimension of the face

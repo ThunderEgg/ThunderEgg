@@ -2,7 +2,6 @@
 #include "utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/MPIGhostFiller.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <list>
 
@@ -29,11 +28,11 @@ TEST_CASE("No calls for 1 patch domain", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(single_mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_coarse, num_components);
+	Vector<2> vec(*d_coarse, num_components);
 
 	CallMockMPIGhostFiller<2> mgf(d_coarse, num_components, fill_type);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	CHECK(mgf.called == true);
 	mgf.checkCalls();
@@ -50,11 +49,11 @@ TEST_CASE("Calls for various domains 2d face cases", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> vec(*d_fine, num_components);
 
 	CallMockMPIGhostFiller<2> mgf(d_fine, num_components, GhostFillingType::Faces);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	CHECK(mgf.called == true);
 
@@ -72,11 +71,11 @@ TEST_CASE("Calls for various domains 2d corner cases", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> vec(*d_fine, num_components);
 
 	CallMockMPIGhostFiller<2> mgf(d_fine, num_components, GhostFillingType::Corners);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	CHECK(mgf.called == true);
 
@@ -95,11 +94,11 @@ TEST_CASE("Calls for various domains 3d face cases", "[MPIGhostFiller]")
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
+	Vector<3> vec(*d_fine, num_components);
 
 	CallMockMPIGhostFiller<3> mgf(d_fine, num_components, GhostFillingType::Faces);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	CHECK(mgf.called == true);
 
@@ -118,11 +117,11 @@ TEST_CASE("Calls for various domains 3d edge cases", "[MPIGhostFiller]")
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
+	Vector<3> vec(*d_fine, num_components);
 
 	CallMockMPIGhostFiller<3> mgf(d_fine, num_components, GhostFillingType::Edges);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	CHECK(mgf.called == true);
 
@@ -141,11 +140,11 @@ TEST_CASE("Calls for various domains 3d corner cases", "[MPIGhostFiller]")
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
+	Vector<3> vec(*d_fine, num_components);
 
 	CallMockMPIGhostFiller<3> mgf(d_fine, num_components, GhostFillingType::Corners);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	CHECK(mgf.called == true);
 
@@ -163,10 +162,10 @@ TEST_CASE("Exchange for various domains 2d face cases", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
@@ -174,7 +173,7 @@ TEST_CASE("Exchange for various domains 2d face cases", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, GhostFillingType::Faces);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }
@@ -191,10 +190,10 @@ TEST_CASE("Exchange for various domains 2d corner cases", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
@@ -202,7 +201,7 @@ TEST_CASE("Exchange for various domains 2d corner cases", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, GhostFillingType::Corners);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }
@@ -219,10 +218,10 @@ TEST_CASE("Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
+	Vector<3> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -230,7 +229,7 @@ TEST_CASE("Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Faces);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }
@@ -246,10 +245,10 @@ TEST_CASE("Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
+	Vector<3> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -257,7 +256,7 @@ TEST_CASE("Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Edges);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }
@@ -273,10 +272,10 @@ TEST_CASE("Exchange for various domains 3d corner cases", "[MPIGhostFiller]")
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
+	Vector<3> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -284,7 +283,7 @@ TEST_CASE("Exchange for various domains 3d corner cases", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Corners);
 
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }
@@ -301,10 +300,10 @@ TEST_CASE("Two Exchanges for various domains 2d face cases", "[MPIGhostFiller]")
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
@@ -312,8 +311,8 @@ TEST_CASE("Two Exchanges for various domains 2d face cases", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, GhostFillingType::Faces);
 
-	mgf.fillGhost(*vec);
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }
@@ -329,10 +328,10 @@ TEST_CASE("Two Exchanges for various domains 2d corner cases", "[MPIGhostFiller]
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
@@ -340,8 +339,8 @@ TEST_CASE("Two Exchanges for various domains 2d corner cases", "[MPIGhostFiller]
 
 	ExchangeMockMPIGhostFiller<2> mgf(d_fine, GhostFillingType::Corners);
 
-	mgf.fillGhost(*vec);
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }
@@ -357,10 +356,10 @@ TEST_CASE("Two Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
+	Vector<3> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -368,8 +367,8 @@ TEST_CASE("Two Exchange for various domains 3d face cases", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Faces);
 
-	mgf.fillGhost(*vec);
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }
@@ -385,10 +384,10 @@ TEST_CASE("Two Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
+	Vector<3> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -396,8 +395,8 @@ TEST_CASE("Two Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Edges);
 
-	mgf.fillGhost(*vec);
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }
@@ -413,10 +412,10 @@ TEST_CASE("Two Exchange for various domains 3d corner cases", "[MPIGhostFiller]"
 	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
 	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
 
-	auto vec = ValVector<3>::GetNewVector(d_fine, num_components);
+	Vector<3> vec(*d_fine, num_components);
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
-			auto data = vec->getComponentView(c, pinfo.local_index);
+			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<3>(data.getStart(), data.getEnd(),
 			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
@@ -424,8 +423,8 @@ TEST_CASE("Two Exchange for various domains 3d corner cases", "[MPIGhostFiller]"
 
 	ExchangeMockMPIGhostFiller<3> mgf(d_fine, GhostFillingType::Corners);
 
-	mgf.fillGhost(*vec);
-	mgf.fillGhost(*vec);
+	mgf.fillGhost(vec);
+	mgf.fillGhost(vec);
 
 	mgf.checkVector(vec);
 }

@@ -20,7 +20,6 @@
  ***************************************************************************/
 
 #include <ThunderEgg/GMG/CycleBuilder.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_test_macros.hpp>
 

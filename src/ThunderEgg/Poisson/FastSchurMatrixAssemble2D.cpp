@@ -346,8 +346,8 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<2>>(solver->getGhostFiller());
 	for (int j = 0; j < n; j++) {
 		// create some work vectors
-		auto                 u_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1, 1);
-		auto                 f_vec         = make_shared<ValVector<2>>(MPI_COMM_SELF, ns, 1, 1, 1);
+		auto                 u_vec         = make_shared<Vector<2>>(Communicator(MPI_COMM_SELF), ns, 1, 1, 1);
+		auto                 f_vec         = make_shared<Vector<2>>(Communicator(MPI_COMM_SELF), ns, 1, 1, 1);
 		PatchView<double, 2> u_view        = u_vec->getPatchView(0);
 		View<double, 2>      u_west_ghosts = u_view.getSliceOn(Side<2>::west(), {-1});
 		PatchView<double, 2> f_view        = f_vec->getPatchView(0);

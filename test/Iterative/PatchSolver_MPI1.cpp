@@ -1,7 +1,6 @@
 #include "../utils/DomainReader.h"
 #include "PatchSolver_MOCKS.h"
 #include <ThunderEgg/Iterative/PatchSolver.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <list>
 #include <sstream>
@@ -30,8 +29,8 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length",
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
+	auto u = make_shared<Vector<2>>(*d_fine, num_components);
+	auto f = make_shared<Vector<2>>(*d_fine, num_components);
 
 	auto mgf = make_shared<MockGhostFiller<2>>();
 	// the patch operator is just a 0.5I operator
@@ -61,8 +60,8 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
+	auto u = make_shared<Vector<2>>(*d_fine, num_components);
+	auto f = make_shared<Vector<2>>(*d_fine, num_components);
 
 	bool called = false;
 	auto mgf    = make_shared<MockGhostFiller<2>>();
@@ -101,8 +100,8 @@ TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::Patch
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
+	auto u = make_shared<Vector<2>>(*d_fine, num_components);
+	auto f = make_shared<Vector<2>>(*d_fine, num_components);
 	f->set(1);
 
 	auto mgf = make_shared<MockGhostFiller<2>>();
@@ -133,8 +132,8 @@ TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterativ
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
+	auto u = make_shared<Vector<2>>(*d_fine, num_components);
+	auto f = make_shared<Vector<2>>(*d_fine, num_components);
 	f->set(1);
 
 	auto mgf = make_shared<MockGhostFiller<2>>();

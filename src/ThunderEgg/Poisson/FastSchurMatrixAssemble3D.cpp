@@ -405,8 +405,8 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 		for (int xi = 0; xi < n; xi++) {
 			int j = xi + yi * n;
 			// create some work vectors
-			auto                 u_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1, 1);
-			auto                 f_vec         = make_shared<ValVector<3>>(MPI_COMM_SELF, ns, 1, 1, 1);
+			auto                 u_vec         = make_shared<Vector<3>>(Communicator(MPI_COMM_SELF), ns, 1, 1, 1);
+			auto                 f_vec         = make_shared<Vector<3>>(Communicator(MPI_COMM_SELF), ns, 1, 1, 1);
 			PatchView<double, 3> u_view        = u_vec->getPatchView(0);
 			View<double, 3>      u_west_ghosts = u_view.getGhostSliceOn(Side<3>::west(), {0});
 			PatchView<double, 3> f_view        = f_vec->getPatchView(0);

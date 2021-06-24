@@ -48,7 +48,12 @@ TEST_CASE("ValVectorGenerator getNewVector", "[ValVectorGenerator]")
 	CHECK(val_vector->getNumLocalCells() == d_fine->getNumLocalCells());
 	CHECK(val_vector->getNumComponents() == num_components);
 	CHECK(val_vector->getNumLocalPatches() == d_fine->getNumLocalPatches());
-	CHECK(val_vector->getMPIComm() == MPI_COMM_WORLD);
+
+	int result;
+	int err = MPI_Comm_compare(val_vector->getCommunicator().getMPIComm(), MPI_COMM_WORLD, &result);
+	REQUIRE(err == MPI_SUCCESS);
+	CHECK(result == MPI_CONGRUENT);
+
 	CHECK(val_vector->getComponentView(0, 0).getEnd()[0] + 1 == nx);
 	CHECK(val_vector->getComponentView(0, 0).getEnd()[1] + 1 == ny);
 }

@@ -23,7 +23,6 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/DirectInterpolator.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -44,13 +43,13 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto coarse_vec    = ValVector<2>::GetNewVector(d_coarse, num_components);
-	auto fine_vec      = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto fine_expected = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> coarse_vec(*d_coarse, num_components);
+	Vector<2> fine_vec(*d_fine, num_components);
+	Vector<2> fine_expected(*d_fine, num_components);
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		PatchView<double, 2> view = coarse_vec->getPatchView(pinfo.local_index);
+		PatchView<double, 2> view = coarse_vec.getPatchView(pinfo.local_index);
 		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
 			view[coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + coord[2];
 		});
@@ -58,7 +57,7 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		PatchView<double, 2> view = fine_expected->getPatchView(pinfo.local_index);
+		PatchView<double, 2> view = fine_expected.getPatchView(pinfo.local_index);
 
 		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
@@ -75,7 +74,7 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 	auto interpolator
 	= std::make_shared<GMG::DirectInterpolator<2>>(d_coarse, d_fine, num_components);
 
-	interpolator->interpolate(*coarse_vec, *fine_vec);
+	interpolator->interpolate(coarse_vec, fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -83,8 +82,8 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		PatchView<double, 2> vec_view      = fine_vec->getPatchView(pinfo.local_index);
-		PatchView<double, 2> expected_view = fine_expected->getPatchView(pinfo.local_index);
+		PatchView<double, 2> vec_view      = fine_vec.getPatchView(pinfo.local_index);
+		PatchView<double, 2> expected_view = fine_expected.getPatchView(pinfo.local_index);
 		loop_over_interior_indexes<3>(vec_view,
 		                              [&](const array<int, 3> &coord) {
 			                              REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
@@ -101,13 +100,13 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
-	auto coarse_vec    = ValVector<2>::GetNewVector(d_coarse, num_components);
-	auto fine_vec      = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto fine_expected = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> coarse_vec(*d_coarse, num_components);
+	Vector<2> fine_vec(*d_fine, num_components);
+	Vector<2> fine_expected(*d_fine, num_components);
 
 	// set coarse vector
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		PatchView<double, 2> view = coarse_vec->getPatchView(pinfo.local_index);
+		PatchView<double, 2> view = coarse_vec.getPatchView(pinfo.local_index);
 		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
 			view[coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + coord[2];
 		});
@@ -115,7 +114,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 
 	// set expected finer vector vector
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		PatchView<double, 2> view = fine_expected->getPatchView(pinfo.local_index);
+		PatchView<double, 2> view = fine_expected.getPatchView(pinfo.local_index);
 
 		Orthant<2>         orth = pinfo.orth_on_parent;
 		std::array<int, 2> starts;
@@ -129,12 +128,12 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 		});
 	}
 
-	fine_vec->set(1.0);
+	fine_vec.set(1.0);
 
 	auto interpolator
 	= std::make_shared<GMG::DirectInterpolator<2>>(d_coarse, d_fine, num_components);
 
-	interpolator->interpolate(*coarse_vec, *fine_vec);
+	interpolator->interpolate(coarse_vec, fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -142,8 +141,8 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		PatchView<double, 2> vec_view      = fine_vec->getPatchView(pinfo.local_index);
-		PatchView<double, 2> expected_view = fine_expected->getPatchView(pinfo.local_index);
+		PatchView<double, 2> vec_view      = fine_vec.getPatchView(pinfo.local_index);
+		PatchView<double, 2> expected_view = fine_expected.getPatchView(pinfo.local_index);
 		loop_over_interior_indexes<3>(vec_view,
 		                              [&](const array<int, 3> &coord) {
 			                              REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));

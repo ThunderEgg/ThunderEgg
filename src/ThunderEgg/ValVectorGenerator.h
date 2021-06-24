@@ -21,7 +21,7 @@
 
 #ifndef THUNDEREGG_VALVECTORGENERATOR_H
 #define THUNDEREGG_VALVECTORGENERATOR_H
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/Vector.h>
 #include <ThunderEgg/VectorGenerator.h>
 #include <valarray>
 namespace ThunderEgg
@@ -50,13 +50,10 @@ template <int D> class ValVectorGenerator : public VectorGenerator<D>
 	 * @param domain the Domain to generate ValVector objects for
 	 * @param num_components the number of components for each cell
 	 */
-	explicit ValVectorGenerator(std::shared_ptr<const Domain<D>> domain, int num_components)
-	: domain(domain), num_components(num_components)
-	{
-	}
+	explicit ValVectorGenerator(std::shared_ptr<const Domain<D>> domain, int num_components) : domain(domain), num_components(num_components) {}
 	std::shared_ptr<Vector<D>> getNewVector() const override
 	{
-		return ValVector<D>::GetNewVector(domain, num_components);
+		return std::make_shared<Vector<D>>(*domain, num_components);
 	}
 };
 extern template class ValVectorGenerator<1>;

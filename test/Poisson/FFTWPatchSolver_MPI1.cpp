@@ -25,7 +25,6 @@
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -65,24 +64,24 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence",
 			return sinl(M_PI * y) * cosl(2 * M_PI * x);
 		};
 
-		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
-		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
+		Vector<2> g_vec(*d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(*d_fine, g_vec, gfun);
+		Vector<2> g_vec_expected(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, g_vec_expected, gfun);
 
-		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
+		Vector<2> f_vec(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, f_vec, ffun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
 		auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 		p_operator->addDrichletBCToRHS(f_vec, gfun);
 
-		p_solver->smooth(*f_vec, *g_vec);
+		p_solver->smooth(f_vec, g_vec);
 
-		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		error_vec->addScaled(1.0, *g_vec, -1.0, *g_vec_expected);
-		errors[i - 1] = error_vec->twoNorm() / g_vec_expected->twoNorm();
+		Vector<2> error_vec(*d_fine, 1);
+		error_vec.addScaled(1.0, g_vec, -1.0, g_vec_expected);
+		errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
@@ -125,26 +124,26 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
 			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 
-		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
-		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
+		Vector<2> g_vec(*d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(*d_fine, g_vec, gfun);
+		Vector<2> g_vec_expected(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, g_vec_expected, gfun);
 
-		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
+		Vector<2> f_vec(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, f_vec, ffun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 		auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
-		p_solver->smooth(*f_vec, *g_vec);
+		p_solver->smooth(f_vec, g_vec);
 
-		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		g_vec->shift(-DomainTools::Integrate<2>(d_fine, g_vec) / d_fine->volume());
-		g_vec_expected->shift(-DomainTools::Integrate<2>(d_fine, g_vec_expected) / d_fine->volume());
-		error_vec->addScaled(1.0, *g_vec, -1.0, *g_vec_expected);
-		errors[i - 1] = error_vec->twoNorm() / g_vec_expected->twoNorm();
+		Vector<2> error_vec(*d_fine, 1);
+		g_vec.shift(-DomainTools::Integrate<2>(*d_fine, g_vec) / d_fine->volume());
+		g_vec_expected.shift(-DomainTools::Integrate<2>(*d_fine, g_vec_expected) / d_fine->volume());
+		error_vec.addScaled(1.0, g_vec, -1.0, g_vec_expected);
+		errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
@@ -188,26 +187,26 @@ TEST_CASE(
 			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 
-		auto g_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
-		auto g_vec_expected = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
+		Vector<2> g_vec(*d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(*d_fine, g_vec, gfun);
+		Vector<2> g_vec_expected(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, g_vec_expected, gfun);
 
-		auto f_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
+		Vector<2> f_vec(*d_fine, 1);
+		DomainTools::SetValues<2>(*d_fine, f_vec, ffun);
 
 		auto gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
 		auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
 		auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
 		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
-		p_solver->smooth(*f_vec, *g_vec);
+		p_solver->smooth(f_vec, g_vec);
 
-		auto error_vec = ValVector<2>::GetNewVector(d_fine, 1);
-		g_vec->shift(-DomainTools::Integrate<2>(d_fine, g_vec) / d_fine->volume());
-		g_vec_expected->shift(-DomainTools::Integrate<2>(d_fine, g_vec_expected) / d_fine->volume());
-		error_vec->addScaled(1.0, *g_vec, -1.0, *g_vec_expected);
-		errors[i - 1] = error_vec->twoNorm() / g_vec_expected->twoNorm();
+		Vector<2> error_vec(*d_fine, 1);
+		g_vec.shift(-DomainTools::Integrate<2>(*d_fine, g_vec) / d_fine->volume());
+		g_vec_expected.shift(-DomainTools::Integrate<2>(*d_fine, g_vec_expected) / d_fine->volume());
+		error_vec.addScaled(1.0, g_vec, -1.0, g_vec_expected);
+		errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
 	}
 	INFO("Errors: " << errors[0] << ", " << errors[1]);
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);

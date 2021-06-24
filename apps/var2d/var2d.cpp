@@ -257,16 +257,16 @@ int main(int argc, char *argv[])
 		shared_ptr<Vector<2>> au    = vg->getNewVector();
 		shared_ptr<Vector<2>> h     = vg->getNewVector();
 
-		DomainTools::SetValues<2>(domain, f, ffun);
-		DomainTools::SetValues<2>(domain, exact, gfun);
-		DomainTools::SetValuesWithGhost<2>(domain, h, hfun);
+		DomainTools::SetValues<2>(*domain, *f, ffun);
+		DomainTools::SetValues<2>(*domain, *exact, gfun);
+		DomainTools::SetValuesWithGhost<2>(*domain, *h, hfun);
 
 		timer->stop("Domain Initialization");
 
 		// patch operator
 		auto gf         = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
-		auto p_operator = make_shared<StarPatchOperator<2>>(h, domain, gf);
-		p_operator->addDrichletBCToRHS(f, gfun, hfun);
+		auto p_operator = make_shared<StarPatchOperator<2>>(*h, domain, gf);
+		p_operator->addDrichletBCToRHS(*f, gfun, hfun);
 
 		// set the patch solver
 		auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
@@ -313,10 +313,10 @@ int main(int argc, char *argv[])
 				auto new_gf      = make_shared<BiLinearGhostFiller>(curr_domain, GhostFillingType::Faces);
 				auto new_coeffs  = new_vg->getNewVector();
 
-				DomainTools::SetValuesWithGhost<2>(curr_domain, new_coeffs, hfun);
+				DomainTools::SetValuesWithGhost<2>(*curr_domain, *new_coeffs, hfun);
 
 				auto new_p_operator
-				= make_shared<StarPatchOperator<2>>(new_coeffs, curr_domain, new_gf);
+				= make_shared<StarPatchOperator<2>>(*new_coeffs, curr_domain, new_gf);
 
 				auto new_p_solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, new_p_operator);
 
@@ -336,10 +336,10 @@ int main(int argc, char *argv[])
 			auto coarse_vg     = make_shared<ValVectorGenerator<2>>(curr_domain, 1);
 			auto coarse_gf     = make_shared<BiLinearGhostFiller>(curr_domain, GhostFillingType::Faces);
 			auto coarse_coeffs = coarse_vg->getNewVector();
-			DomainTools::SetValuesWithGhost<2>(curr_domain, coarse_coeffs, hfun);
+			DomainTools::SetValuesWithGhost<2>(*curr_domain, *coarse_coeffs, hfun);
 
 			auto coarse_p_operator
-			= make_shared<StarPatchOperator<2>>(coarse_coeffs, curr_domain, coarse_gf);
+			= make_shared<StarPatchOperator<2>>(*coarse_coeffs, curr_domain, coarse_gf);
 
 			auto coarse_p_solver
 			= make_shared<Iterative::PatchSolver<2>>(p_bcgs, coarse_p_operator);
@@ -368,17 +368,17 @@ int main(int argc, char *argv[])
 		A->apply(*u, *au);
 
 		// residual
-		shared_ptr<ValVector<2>> resid = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<Vector<2>> resid = make_shared<Vector<2>>(*domain, 1);
 		resid->scaleThenAddScaled(0, -1, *au, 1, *f);
 		double residual = resid->twoNorm();
 		double fnorm    = f->twoNorm();
 
 		// error
-		shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain, 1);
+		shared_ptr<Vector<2>> error = make_shared<Vector<2>>(*domain, 1);
 		error->scaleThenAddScaled(0, -1, *exact, 1, *u);
 		if (neumann) {
-			double uavg = DomainTools::Integrate<2>(domain, u) / domain->volume();
-			double eavg = DomainTools::Integrate<2>(domain, exact) / domain->volume();
+			double uavg = DomainTools::Integrate<2>(*domain, *u) / domain->volume();
+			double eavg = DomainTools::Integrate<2>(*domain, *exact) / domain->volume();
 
 			if (comm.getRank() == 0) {
 				cout << "Average of computed solution: " << uavg << endl;
@@ -390,8 +390,8 @@ int main(int argc, char *argv[])
 		double error_norm = error->twoNorm();
 		double exact_norm = exact->twoNorm();
 
-		double ausum = DomainTools::Integrate<2>(domain, au);
-		double fsum  = DomainTools::Integrate<2>(domain, f);
+		double ausum = DomainTools::Integrate<2>(*domain, *au);
+		double fsum  = DomainTools::Integrate<2>(*domain, *f);
 		if (comm.getRank() == 0) {
 			std::cout << std::scientific;
 			std::cout.precision(13);

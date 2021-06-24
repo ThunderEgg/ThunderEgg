@@ -21,10 +21,9 @@
 
 #ifndef THUNDEREGG_SCHUR_InterfaceDomain_H
 #define THUNDEREGG_SCHUR_InterfaceDomain_H
-#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Schur/Interface.h>
 #include <ThunderEgg/Schur/PatchIfaceInfo.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/Vector.h>
 #include <ThunderEgg/VectorGenerator.h>
 #include <deque>
 namespace ThunderEgg

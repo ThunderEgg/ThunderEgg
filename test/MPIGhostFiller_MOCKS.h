@@ -24,7 +24,6 @@
 
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/MPIGhostFiller.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <list>
 #include <tuple>
@@ -598,7 +597,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 	ExchangeMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, GhostFillingType fill_type)
 	: MPIGhostFiller<D>(domain_in, fill_type) {}
 
-	void checkInterior(std::shared_ptr<const Vector<D>> vec)
+	void checkInterior(const Vector<D> &vec)
 	{
 		for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
 			INFO("id: " << pinfo.id);
@@ -613,9 +612,9 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 			}
 			INFO(ns);
 			INFO("num_ghost_cells: " << pinfo.num_ghost_cells);
-			for (int c = 0; c < vec->getNumComponents(); c++) {
+			for (int c = 0; c < vec.getNumComponents(); c++) {
 				INFO("c: " << c);
-				auto data = vec->getComponentView(c, pinfo.local_index);
+				auto data = vec.getComponentView(c, pinfo.local_index);
 				// check that vector was not modified on the interior
 				nested_loop<D>(data.getStart(), data.getEnd(),
 				               [&](const std::array<int, D> &coord) {
@@ -629,7 +628,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 			}
 		}
 	}
-	void checkCorners(std::shared_ptr<const Vector<D>> vec)
+	void checkCorners(const Vector<D> &vec)
 	{
 		for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
 			INFO("id: " << pinfo.id);
@@ -644,7 +643,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 			}
 			INFO(ns);
 			INFO("num_ghost_cells: " << pinfo.num_ghost_cells);
-			auto data = vec->getPatchView(pinfo.local_index);
+			auto data = vec.getPatchView(pinfo.local_index);
 			// check the ghost cells
 			for (Corner<D> corner : Corner<D>::getValues()) {
 				INFO("Corner: " << corner);
@@ -668,7 +667,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									coord_str += " " + std::to_string(coord[i]);
 								}
 								INFO(coord_str);
-								for (int c = 0; c < vec->getNumComponents(); c++) {
+								for (int c = 0; c < vec.getNumComponents(); c++) {
 									CHECK(data.getGhostSliceOn(corner, coord)[{c}] == nbrinfo.id + index);
 									index++;
 								}
@@ -692,7 +691,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									coord_str += " " + std::to_string(coord[i]);
 								}
 								INFO(coord_str);
-								for (int c = 0; c < vec->getNumComponents(); c++) {
+								for (int c = 0; c < vec.getNumComponents(); c++) {
 									CHECK(data.getGhostSliceOn(corner, coord)[{c}] == nbrinfo.ids[0] + index);
 									index++;
 								}
@@ -715,7 +714,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 									coord_str += " " + std::to_string(coord[i]);
 								}
 								INFO(coord_str);
-								for (int c = 0; c < vec->getNumComponents(); c++) {
+								for (int c = 0; c < vec.getNumComponents(); c++) {
 									CHECK(data.getGhostSliceOn(corner, coord)[{c}] == nbrinfo.id + index);
 									index++;
 								}
@@ -739,7 +738,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 							coord_str += " " + std::to_string(coord[i]);
 						}
 						INFO(coord_str);
-						for (int c = 0; c < vec->getNumComponents(); c++) {
+						for (int c = 0; c < vec.getNumComponents(); c++) {
 							CHECK(data.getSliceOn(corner, coord)[{c}] == 0);
 						}
 					});
@@ -749,7 +748,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 	}
 
 	void
-	checkEdges(std::shared_ptr<const Vector<D>> vec)
+	checkEdges(const Vector<D> &vec)
 	{
 		if constexpr (D == 3) {
 			for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
@@ -765,7 +764,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 				}
 				INFO(ns);
 				INFO("num_ghost_cells: " << pinfo.num_ghost_cells);
-				auto data = vec->getPatchView(pinfo.local_index);
+				auto data = vec.getPatchView(pinfo.local_index);
 				// check the ghost cells
 				for (Edge e : Edge::getValues()) {
 					INFO("Edge: " << e);
@@ -868,7 +867,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 		}
 	}
 
-	void checkFaces(std::shared_ptr<const Vector<D>> vec)
+	void checkFaces(const Vector<D> &vec)
 	{
 		if constexpr (D == 3) {
 			for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
@@ -884,7 +883,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 				}
 				INFO(ns);
 				INFO("num_ghost_cells: " << pinfo.num_ghost_cells);
-				auto data = vec->getPatchView(pinfo.local_index);
+				auto data = vec.getPatchView(pinfo.local_index);
 				// check the ghost cells
 				for (Side<D> s : Side<D>::getValues()) {
 					INFO("Side: " << s);
@@ -987,7 +986,7 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 		}
 	}
 
-	void checkVector(std::shared_ptr<const Vector<D>> vec)
+	void checkVector(const Vector<D> &vec)
 	{
 		INFO("NumLocalPatches: " << this->getDomain()->getNumLocalPatches());
 		INFO("NumGlobalPatches: " << this->getDomain()->getNumGlobalPatches());

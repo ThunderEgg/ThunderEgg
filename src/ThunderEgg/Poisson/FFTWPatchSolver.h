@@ -21,9 +21,10 @@
 
 #ifndef THUNDEREGG_POISSON_SCHUR_FFTWPATCHSOLVER_H
 #define THUNDEREGG_POISSON_SCHUR_FFTWPATCHSOLVER_H
+#include <ThunderEgg/PatchArray.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/Vector.h>
 #include <bitset>
 #include <fftw3.h>
 #include <map>
@@ -60,19 +61,19 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 	/**
 	 * @brief Temporary copy for the modified right hand side
 	 */
-	std::shared_ptr<ValVector<D>> f_copy;
+	mutable PatchArray<D> f_copy;
 	/**
 	 * @brief Temporary work vector
 	 */
-	std::shared_ptr<ValVector<D>> tmp;
+	mutable PatchArray<D> tmp;
 	/*
 	 * @brief Temporary work vector for solution
 	 */
-	std::shared_ptr<ValVector<D>> sol;
+	mutable PatchArray<D> sol;
 	/**
 	 * @brief Map of PatchInfo object to it's respective eigenvalue array.
 	 */
-	std::map<const PatchInfo<D>, std::valarray<double>, CompareFunction> eigen_vals;
+	std::map<const PatchInfo<D>, PatchArray<D>, CompareFunction> eigen_vals;
 	/**
 	 * @brief Neumann boundary conditions for domain
 	 */
@@ -142,11 +143,11 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 	 * @brief Get an array of eigenvalues for a patch
 	 *
 	 * @param pinfo the patch
-	 * @return std::valarray<double> the eigen values
+	 * @return PatchArray<D> the eigen values
 	 */
-	std::valarray<double> getEigenValues(const PatchInfo<D> &pinfo)
+	PatchArray<D> getEigenValues(const PatchInfo<D> &pinfo)
 	{
-		std::valarray<double> retval(this->domain->getNumCellsInPatch());
+		PatchArray<D> retval(this->getDomain()->getNs(), 1, 0);
 
 		std::valarray<size_t> all_strides(D);
 		size_t                curr_stride = 1;
@@ -159,35 +160,23 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 			int    n = pinfo.ns[axis];
 			double h = pinfo.spacings[axis];
 
-			std::valarray<size_t> sizes(D - 1);
-			std::valarray<size_t> strides(D - 1);
-			size_t                ones_size = 1;
-			for (size_t i = 0; i < axis; i++) {
-				strides[i] = all_strides[i];
-				sizes[i]   = pinfo.ns[i];
-				ones_size *= pinfo.ns[i];
-			}
-			int input_stride = (int) all_strides[axis];
-			for (size_t i = axis + 1; i < D; i++) {
-				strides[i - 1] = all_strides[i];
-				sizes[i - 1]   = pinfo.ns[i];
-				ones_size *= pinfo.ns[i];
-			}
-
-			std::valarray<double> ones(ones_size);
-			ones = 1;
-
 			if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				for (int xi = 0; xi < n; xi++) {
-					retval[std::gslice(xi * input_stride, sizes, strides)] -= 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2) * ones;
+					double          val   = 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2);
+					View<double, D> slice = retval.getSliceOn(Side<D>(2 * D), {xi});
+					loop_over_interior_indexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
 				}
 			} else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) || patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				for (int xi = 0; xi < n; xi++) {
-					retval[std::gslice(xi * input_stride, sizes, strides)] -= 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2) * ones;
+					double          val   = 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2);
+					View<double, D> slice = retval.getSliceOn(Side<D>(2 * D), {xi});
+					loop_over_interior_indexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
 				}
 			} else {
 				for (int xi = 0; xi < n; xi++) {
-					retval[std::gslice(xi * input_stride, sizes, strides)] -= 4 / (h * h) * pow(sin((xi + 1) * M_PI / (2 * n)), 2) * ones;
+					double          val   = 4 / (h * h) * pow(sin((xi + 1) * M_PI / (2 * n)), 2);
+					View<double, D> slice = retval.getSliceOn(Side<D>(2 * D), {xi});
+					loop_over_interior_indexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
 				}
 			}
 		}
@@ -198,12 +187,15 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 	/**
 	 * @brief Construct a new FftwPatchSolver object
 	 *
-	 * @param op_in the Poisson PatchOperator that cooresponds to this DftPatchSolver
+	 * @param op the Poisson PatchOperator that cooresponds to this DftPatchSolver
 	 * @param neumann true if domain has neumann boundary conditions on a side
 	 */
-	FFTWPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in, std::bitset<Side<D>::number_of> neumann)
-	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()),
-	  op(op_in),
+	FFTWPatchSolver(std::shared_ptr<const PatchOperator<D>> op, std::bitset<Side<D>::number_of> neumann)
+	: PatchSolver<D>(op->getDomain(), op->getGhostFiller()),
+	  op(op),
+	  f_copy(op->getDomain()->getNs(), 1, 0),
+	  tmp(op->getDomain()->getNs(), 1, 0),
+	  sol(op->getDomain()->getNs(), 1, 0),
 	  neumann(neumann)
 	{
 		CompareFunction compare = [&](const PatchInfo<D> &a, const PatchInfo<D> &b) {
@@ -218,11 +210,8 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 
 		plan1      = std::map<const PatchInfo<D>, fftw_plan, CompareFunction>(compare);
 		plan2      = std::map<const PatchInfo<D>, fftw_plan, CompareFunction>(compare);
-		eigen_vals = std::map<const PatchInfo<D>, std::valarray<double>, CompareFunction>(compare);
+		eigen_vals = std::map<const PatchInfo<D>, PatchArray<D>, CompareFunction>(compare);
 
-		f_copy = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1, 1);
-		tmp    = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1, 1);
-		sol    = std::make_shared<ValVector<D>>(MPI_COMM_SELF, this->domain->getNs(), 0, 1, 1);
 		// process patches
 		for (auto pinfo : this->domain->getPatchInfoVector()) {
 			addPatch(pinfo);
@@ -230,30 +219,26 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 	}
 	void solveSinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &f_view, const PatchView<double, D> &u_view) const override
 	{
-		PatchView<double, D> f_copy_view = f_copy->getPatchView(0);
+		loop_over_interior_indexes<D + 1>(f_copy, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
 
-		loop_over_interior_indexes<D + 1>(f_copy_view, [&](std::array<int, D + 1> coord) { f_copy_view[coord] = f_view[coord]; });
-
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy_view);
+		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy.getView());
 
 		fftw_execute(plan1.at(pinfo));
 
-		tmp->getValArray() /= eigen_vals.at(pinfo);
+		const PatchArray<D> &eigen_vals_view = eigen_vals.at(pinfo);
+		loop_over_interior_indexes<D + 1>(tmp, [&](std::array<int, D + 1> coord) { tmp[coord] /= eigen_vals_view[coord]; });
 
 		if (neumann.all() && !pinfo.hasNbr()) {
-			tmp->getValArray()[0] = 0;
+			tmp[tmp.getStart()] = 0;
 		}
 
 		fftw_execute(plan2.at(pinfo));
-
-		PatchView<double, D> sol_view = sol->getPatchView(0);
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {
 			scale *= 2.0 * this->domain->getNs()[axis];
 		}
-		sol->getValArray() /= scale;
-		loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] = sol_view[coord]; });
+		loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] = scale * sol[coord]; });
 	}
 	/**
 	 * @brief add a patch to the solver
@@ -274,11 +259,11 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 			std::array<fftw_r2r_kind, D> transforms_inv = getInverseTransformsForPatch(pinfo);
 
 			plan1[pinfo] = fftw_plan_r2r(
-			D, ns_reversed.data(), &f_copy->getValArray()[0], &tmp->getValArray()[0], transforms.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
+			D, ns_reversed.data(), &f_copy[f_copy.getStart()], &tmp[tmp.getStart()], transforms.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
 			plan2[pinfo] = fftw_plan_r2r(
-			D, ns_reversed.data(), &tmp->getValArray()[0], &sol->getValArray()[0], transforms_inv.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
+			D, ns_reversed.data(), &tmp[tmp.getStart()], &sol[sol.getStart()], transforms_inv.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
 
-			eigen_vals[pinfo] = getEigenValues(pinfo);
+			eigen_vals.emplace(pinfo, getEigenValues(pinfo));
 		}
 	}
 	/**

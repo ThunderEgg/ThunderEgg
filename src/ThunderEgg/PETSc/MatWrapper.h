@@ -48,7 +48,7 @@ template <int D> class MatWrapper : public Operator<D>
 	Vec getPetscVecWithoutGhost(const Vector<D> &vec) const
 	{
 		Vec petsc_vec;
-		VecCreateMPI(vec.getMPIComm(), vec.getNumLocalCells() * vec.getNumComponents(), PETSC_DETERMINE, &petsc_vec);
+		VecCreateMPI(vec.getCommunicator().getMPIComm(), vec.getNumLocalCells() * vec.getNumComponents(), PETSC_DETERMINE, &petsc_vec);
 		return petsc_vec;
 	}
 	/**

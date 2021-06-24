@@ -28,7 +28,7 @@
 #include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/Vector.h>
 #include <bitset>
 #include <map>
 
@@ -83,95 +83,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		 */
 		std::shared_ptr<Vector<D>> getNewVector() const override
 		{
-			return std::shared_ptr<Vector<D>>(new ValVector<D>(MPI_COMM_SELF, lengths, num_ghost_cells, num_components, 1));
-		}
-	};
-	/**
-	 * @brief Wrapper that provides a vector interface for the ComponentView of a patch
-	 */
-	class SinglePatchVec : public Vector<D>
-	{
-		private:
-		/**
-		 * @brief The view for the patch
-		 */
-		PatchView<double, D> view;
-
-		/**
-		 * @brief Get the number of local cells in the view object
-		 *
-		 * @param view the view
-		 * @return int the number of local cells
-		 */
-		static int GetNumLocalCells(const PatchView<double, D> &view)
-		{
-			int patch_stride = 1;
-			for (size_t i = 0; i < D; i++) {
-				patch_stride *= view.getEnd()[i] + 1;
-			}
-			return patch_stride;
-		}
-
-		public:
-		/**
-		 * @brief Construct a new SinglePatchVec object
-		 *
-		 * @param view the ComponentView for the patch
-		 */
-		SinglePatchVec(const PatchView<double, D> &view) : Vector<D>(MPI_COMM_SELF, view.getEnd()[D] + 1, 1, GetNumLocalCells(view)), view(view) {}
-		PatchView<double, D> getPatchView(int local_patch_id) override
-		{
-			return view;
-		}
-		PatchView<const double, D> getPatchView(int local_patch_id) const override
-		{
-			return view;
-		}
-	};
-	/**
-	 * @brief Wrapper that provides a vector interface for the ComponentView of a patch
-	 */
-	class SinglePatchConstVec : public Vector<D>
-	{
-		private:
-		/**
-		 * @brief The ComponentView for the patch
-		 */
-		PatchView<const double, D> view;
-
-		/**
-		 * @brief Get the number of local cells in the view
-		 *
-		 * @param view the view
-		 * @return int the number of local cells
-		 */
-		static int GetNumLocalCells(const PatchView<const double, D> &view)
-		{
-			int patch_stride = 1;
-			for (size_t i = 0; i < D; i++) {
-				patch_stride *= view.getEnd()[i] + 1;
-			}
-			return patch_stride;
-		}
-
-		public:
-		/**
-		 * @brief Construct a new SinglePatchConstVec object
-		 *
-		 * @param view the view for the patch
-		 */
-		SinglePatchConstVec(const PatchView<const double, D> &view)
-		: Vector<D>(MPI_COMM_SELF, view.getEnd()[D] + 1, 1, GetNumLocalCells(view)),
-		  view(view)
-		{
-		}
-		PatchView<double, D> getPatchView(int local_patch_id) override
-		{
-			throw RuntimeError("This is a read only vector");
-		}
-		PatchView<const double, D> getPatchView(int local_patch_id) const override
-		{
-			return view;
+			return std::shared_ptr<Vector<D>>(new Vector<D>(Communicator(MPI_COMM_SELF), lengths, num_components, 1, num_ghost_cells));
 		}
 	};
 	/**
@@ -244,8 +156,21 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		std::shared_ptr<SinglePatchOp>      single_op(new SinglePatchOp(pinfo, op));
 		std::shared_ptr<VectorGenerator<D>> vg(new SingleVG(pinfo, f_view.getEnd()[D] + 1));
 
-		std::shared_ptr<Vector<D>> f_single(new SinglePatchConstVec(f_view));
-		std::shared_ptr<Vector<D>> u_single(new SinglePatchVec(u_view));
+		std::array<int, D + 1> f_lengths;
+		for (int i = 0; i < D + 1; i++) {
+			f_lengths[i] = f_view.getEnd()[i] + 1;
+		}
+		std::shared_ptr<const Vector<D>> f_single(new Vector<D>(Communicator(MPI_COMM_SELF),
+		                                                        {const_cast<double *>(&f_view[f_view.getGhostStart()])},
+		                                                        f_view.getStrides(),
+		                                                        f_lengths,
+		                                                        this->getDomain()->getNumGhostCells()));
+		std::array<int, D + 1>           u_lengths;
+		for (int i = 0; i < D + 1; i++) {
+			u_lengths[i] = u_view.getEnd()[i] + 1;
+		}
+		std::shared_ptr<Vector<D>> u_single(new Vector<D>(
+		Communicator(MPI_COMM_SELF), {&u_view[u_view.getGhostStart()]}, u_view.getStrides(), u_lengths, this->getDomain()->getNumGhostCells()));
 
 		auto f_copy = vg->getNewVector();
 		f_copy->copy(*f_single);

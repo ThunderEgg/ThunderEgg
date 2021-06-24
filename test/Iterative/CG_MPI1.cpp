@@ -89,16 +89,16 @@ TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
-	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	auto f_vec = make_shared<Vector<2>>(*domain, 1);
+	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
+	auto residual = make_shared<Vector<2>>(*domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto g_vec = make_shared<Vector<2>>(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(f_vec, gfun);
+	p_operator->addDrichletBCToRHS(*f_vec, *gfun);
 
 	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
 
@@ -118,9 +118,9 @@ TEST_CASE("CG handles zero rhs vector", "[CG]")
 	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
 	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto f_vec = make_shared<Vector<2>>(*domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto g_vec = make_shared<Vector<2>>(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
@@ -153,16 +153,16 @@ TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
-	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	auto f_vec = make_shared<Vector<2>>(*domain, 1);
+	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
+	auto residual = make_shared<Vector<2>>(*domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto g_vec = make_shared<Vector<2>>(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(f_vec, gfun);
+	p_operator->addDrichletBCToRHS(*f_vec, *gfun);
 
 	double tolerance = 1e-7;
 
@@ -203,16 +203,16 @@ TEST_CASE("CG giving a good initial guess reduces the iterations", "[CG]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
-	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	auto f_vec = make_shared<Vector<2>>(*domain, 1);
+	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
+	auto residual = make_shared<Vector<2>>(*domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	auto g_vec = make_shared<Vector<2>>(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(f_vec, gfun);
+	p_operator->addDrichletBCToRHS(*f_vec, *gfun);
 
 	double tolerance = 1e-5;
 

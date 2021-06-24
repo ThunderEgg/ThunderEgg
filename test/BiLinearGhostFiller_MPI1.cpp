@@ -73,18 +73,17 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 
 	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
-	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 4));
+	Vector<2> vec(*d, 1);
 
-	DomainTools::SetValues<2>(d, vec, f);
+	DomainTools::SetValues<2>(*d, vec, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(*vec);
+	blgf.fillGhost(vec);
 
 	// patch 1
 	{
 		// check that center values weren't modified
-		auto patch_1 = vec->getComponentView(0, d->getPatchInfoVector()[0].local_index);
+		auto patch_1 = vec.getComponentView(0, d->getPatchInfoVector()[0].local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
@@ -126,7 +125,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	// patch 2
 	{
 		// check that center values weren't modified
-		auto patch_2 = vec->getComponentView(0, d->getPatchInfoVector()[1].local_index);
+		auto patch_2 = vec.getComponentView(0, d->getPatchInfoVector()[1].local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[1], coord, real_coord);
@@ -168,7 +167,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	// patch 3
 	{
 		// check that center values weren't modified
-		auto patch_3 = vec->getComponentView(0, d->getPatchInfoVector()[2].local_index);
+		auto patch_3 = vec.getComponentView(0, d->getPatchInfoVector()[2].local_index);
 		nested_loop<2>(patch_3.getStart(), patch_3.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[2], coord, real_coord);
@@ -210,7 +209,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller", "[BiLinearGhostFiller]
 	// patch 4
 	{
 		// check that center values weren't modified
-		auto patch_4 = vec->getComponentView(0, d->getPatchInfoVector()[3].local_index);
+		auto patch_4 = vec.getComponentView(0, d->getPatchInfoVector()[3].local_index);
 		nested_loop<2>(patch_4.getStart(), patch_4.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[3], coord, real_coord);
@@ -262,8 +261,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+	Vector<2> vec(*d, 1);
+	Vector<2> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -271,11 +270,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValues<2>(d, vec, f);
-	DomainTools::SetValuesWithGhost<2>(d, expected, f);
+	DomainTools::SetValues<2>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(*d, expected, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(*vec);
+	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -283,8 +282,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller", "[BiLinearGhostFille
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
@@ -318,8 +317,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+	Vector<2> vec(*d, 1);
+	Vector<2> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -327,11 +326,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d, vec, f);
-	DomainTools::SetValuesWithGhost<2>(d, expected, f);
+	DomainTools::SetValuesWithGhost<2>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(*d, expected, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(*vec);
+	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -339,8 +338,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set",
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
@@ -373,8 +372,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components", "[BiL
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+	Vector<2> vec(*d, 2);
+	Vector<2> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -387,11 +386,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components", "[BiL
 		return 99 + ((x * 7) + y * 0.1);
 	};
 
-	DomainTools::SetValues<2>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
+	DomainTools::SetValues<2>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d, expected, f, g);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(*vec);
+	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -399,10 +398,10 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components", "[BiL
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 2> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
@@ -452,8 +451,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+	Vector<2> vec(*d, 2);
+	Vector<2> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -466,11 +465,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 		return 99 + ((x * 7) + y * 0.1);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d, expected, f, g);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Faces);
-	blgf.fillGhost(*vec);
+	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -478,10 +477,10 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 2> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -528,8 +527,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners", "[BiLinearGh
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+	Vector<2> vec(*d, 1);
+	Vector<2> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -537,11 +536,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners", "[BiLinearGh
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValues<2>(d, vec, f);
-	DomainTools::SetValuesWithGhost<2>(d, expected, f);
+	DomainTools::SetValues<2>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(*d, expected, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
-	blgf.fillGhost(*vec);
+	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -549,8 +548,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners", "[BiLinearGh
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
@@ -593,8 +592,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+	Vector<2> vec(*d, 1);
+	Vector<2> expected(*d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -602,11 +601,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d, vec, f);
-	DomainTools::SetValuesWithGhost<2>(d, expected, f);
+	DomainTools::SetValuesWithGhost<2>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(*d, expected, f);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
-	blgf.fillGhost(*vec);
+	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -614,8 +613,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld      = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld = expected->getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
@@ -657,8 +656,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+	Vector<2> vec(*d, 2);
+	Vector<2> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -671,11 +670,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
 		return 99 + ((x * 7) + y * 0.1);
 	};
 
-	DomainTools::SetValues<2>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
+	DomainTools::SetValues<2>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d, expected, f, g);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
-	blgf.fillGhost(*vec);
+	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -683,10 +682,10 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 2> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
@@ -754,8 +753,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
 	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+	Vector<2> vec(*d, 2);
+	Vector<2> expected(*d, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -768,11 +767,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 		return 99 + ((x * 7) + y * 0.1);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(d, vec, f, g);
-	DomainTools::SetValuesWithGhost<2>(d, expected, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(*d, expected, f, g);
 
 	BiLinearGhostFiller blgf(d, GhostFillingType::Corners);
-	blgf.fillGhost(*vec);
+	blgf.fillGhost(vec);
 
 	for (auto pinfo : d->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -780,10 +779,10 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		ComponentView<double, 2> vec_ld       = vec->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> expected_ld  = expected->getComponentView(0, pinfo.local_index);
-		ComponentView<double, 2> vec_ld2      = vec->getComponentView(1, pinfo.local_index);
-		ComponentView<double, 2> expected_ld2 = expected->getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
