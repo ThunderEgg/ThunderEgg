@@ -375,7 +375,7 @@ template <int D> class Vector
 	/**
 	 * @brief `this = this + alpha * b`
 	 */
-	virtual void addScaled(double alpha, const Vector<D> &b)
+	void addScaled(double alpha, const Vector<D> &b)
 	{
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D>       view   = getPatchView(i);
@@ -386,7 +386,7 @@ template <int D> class Vector
 	/**
 	 * @brief `this = this + alpha * a + beta * b`
 	 */
-	virtual void addScaled(double alpha, const Vector<D> &a, double beta, const Vector<D> &b)
+	void addScaled(double alpha, const Vector<D> &a, double beta, const Vector<D> &b)
 	{
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D>       view   = getPatchView(i);
