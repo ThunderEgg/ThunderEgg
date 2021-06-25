@@ -37,6 +37,10 @@ void CheckErr(int err)
 	}
 }
 } // namespace
+Communicator::Communicator(MPI_Comm comm)
+{
+	CheckErr(MPI_Comm_dup(comm, &this->comm));
+}
 Communicator::Communicator(const Communicator &other)
 {
 	if (other.comm != MPI_COMM_NULL) {
@@ -50,9 +54,11 @@ Communicator &Communicator::operator=(const Communicator &other)
 	}
 	return *this;
 }
-Communicator::Communicator(MPI_Comm comm)
+Communicator::Communicator(Communicator &&other) : comm(std::exchange(other.comm, MPI_COMM_NULL)) {}
+Communicator &Communicator::operator=(Communicator &&other)
 {
-	CheckErr(MPI_Comm_dup(comm, &this->comm));
+	std::swap(comm, other.comm);
+	return *this;
 }
 Communicator::~Communicator()
 {

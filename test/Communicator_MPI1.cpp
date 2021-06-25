@@ -65,6 +65,29 @@ TEST_CASE("Comm Constructor copy assignment", "[Communicator]")
 	REQUIRE(err == MPI_SUCCESS);
 	CHECK(result == MPI_CONGRUENT);
 }
+TEST_CASE("Comm Constructor move constructor", "[Communicator]")
+{
+	MPI_Comm     world = MPI_COMM_WORLD;
+	Communicator comm(world);
+	Communicator moved_comm(std::move(comm));
+	int          result;
+	int          err = MPI_Comm_compare(world, moved_comm.getMPIComm(), &result);
+	REQUIRE(err == MPI_SUCCESS);
+	CHECK(result == MPI_CONGRUENT);
+	CHECK_THROWS_AS(comm.getMPIComm(), RuntimeError);
+}
+TEST_CASE("Comm Constructor move assignment", "[Communicator]")
+{
+	MPI_Comm     world = MPI_COMM_WORLD;
+	Communicator comm(world);
+	Communicator moved_comm;
+	moved_comm = std::move(comm);
+	int result;
+	int err = MPI_Comm_compare(world, moved_comm.getMPIComm(), &result);
+	REQUIRE(err == MPI_SUCCESS);
+	CHECK(result == MPI_CONGRUENT);
+	CHECK_THROWS_AS(comm.getMPIComm(), RuntimeError);
+}
 TEST_CASE("Comm Constructor getRank", "[Communicator]")
 {
 	Communicator comm(MPI_COMM_WORLD);
