@@ -204,6 +204,13 @@ template <int D> class Vector
 		}
 		num_local_cells *= patch_starts.size();
 	}
+	/**
+	 * @brief Copy constructor
+	 *
+	 * will copy all values
+	 *
+	 * @param other the vector to copy
+	 */
 	Vector(const Vector<D> &other)
 	: comm(other.comm),
 	  lengths(other.lengths),
@@ -223,6 +230,69 @@ template <int D> class Vector
 				patch_starts[i] = data.data() + i * patch_stride;
 			}
 		}
+	}
+	/**
+	 * @brief Copy assignment
+	 *
+	 * will copy all values
+	 *
+	 * @param other the vector to copy
+	 * @return Vector<D>& this
+	 */
+	Vector<D> &operator=(const Vector<D> &other)
+	{
+		comm            = other.comm;
+		lengths         = other.lengths;
+		num_ghost_cells = other.num_ghost_cells;
+		num_local_cells = other.num_local_cells;
+		if (other.data.empty()) {
+			determineStrides();
+			allocateData(other.getNumLocalPatches());
+			copyWithGhost(other);
+		} else {
+			strides          = other.strides;
+			data             = other.data;
+			int patch_stride = data.size() / other.getNumLocalPatches();
+			patch_starts.resize(other.patch_starts.size());
+			for (int i = 0; i < patch_starts.size(); i++) {
+				patch_starts[i] = data.data() + i * patch_stride;
+			}
+		}
+		return *this;
+	}
+	/**
+	 * @brief Move constructor
+	 *
+	 * @param other the vector to move
+	 */
+	Vector(Vector<D> &&other)
+	: comm(std::exchange(other.comm, Communicator())),
+	  patch_starts(std::exchange(other.patch_starts, std::vector<double *>())),
+	  num_ghost_cells(std::exchange(other.num_ghost_cells, 0)),
+	  data(std::exchange(other.data, std::vector<double>())),
+	  num_local_cells(std::exchange(other.num_local_cells, 0))
+	{
+		lengths.fill(0);
+		std::swap(lengths, other.lengths);
+		strides.fill(0);
+		std::swap(strides, other.strides);
+	}
+	/**
+	 * @brief Move assignment
+	 *
+	 * @param other the vector to move
+	 * @return Vector<D>&& this
+	 */
+	Vector<D> &operator=(Vector<D> &&other)
+	{
+		std::swap(comm, other.comm);
+		std::swap(lengths, other.lengths);
+		std::swap(num_ghost_cells, other.num_ghost_cells);
+		std::swap(num_local_cells, other.num_local_cells);
+		std::swap(strides, other.strides);
+		std::swap(data, other.data);
+		std::swap(patch_starts, other.patch_starts);
+		return *this;
 	}
 	/**
 	 * @brief get the MPI Comm that this vector uses

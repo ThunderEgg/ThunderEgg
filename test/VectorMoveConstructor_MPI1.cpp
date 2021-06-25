@@ -15,7 +15,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
+ *  You should have received a move of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
@@ -31,7 +31,7 @@ using namespace ThunderEgg;
 #define MESHES \
 	"mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 
-TEST_CASE("Vector<2> copy from domain constructor", "[Vector]")
+TEST_CASE("Vector<2> move from domain constructor", "[Vector]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 
@@ -49,16 +49,27 @@ TEST_CASE("Vector<2> copy from domain constructor", "[Vector]")
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 
-	Vector<2> vec_to_copy(*domain, num_components);
+	Vector<2> vec_to_move(*domain, num_components);
 
-	double *view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
+	double *view_to_move = &vec_to_move.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
 	int     size         = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components * domain->getNumLocalPatches();
 	for (size_t i = 0; i < size; i++) {
 		double x        = (i + 0.5) / size;
-		view_to_copy[i] = 10 - (x - 0.75) * (x - 0.75);
+		view_to_move[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	Vector<2> vec(vec_to_copy);
+	Vector<2> vec_to_move_copy(vec_to_move);
+	Vector<2> vec(std::move(vec_to_move));
+
+	// vec_to_move
+
+	CHECK(vec_to_move.getNumGhostCells() == 0);
+	CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
+	CHECK(vec_to_move.getNumLocalPatches() == 0);
+	CHECK(vec_to_move.getNumComponents() == 0);
+	CHECK(vec_to_move.getNumLocalCells() == 0);
+
+	// vec
 
 	CHECK(vec.getNumGhostCells() == num_ghost_cells);
 
@@ -67,12 +78,12 @@ TEST_CASE("Vector<2> copy from domain constructor", "[Vector]")
 	REQUIRE(err == MPI_SUCCESS);
 	CHECK(result == MPI_CONGRUENT);
 
-	CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-	CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-	CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+	CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
+	CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
+	CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
 
 	double *view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-	CHECK(view != view_to_copy);
+	CHECK(view == view_to_move);
 	for (int i = 0; i < domain->getNumLocalPatches(); i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
@@ -98,13 +109,13 @@ TEST_CASE("Vector<2> copy from domain constructor", "[Vector]")
 	}
 	for (int i = 0; i < domain->getNumLocalPatches(); i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
-		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
+		PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
 		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
-			CHECK(view[coord] == view_to_copy[coord]);
+			CHECK(view[coord] == view_to_move[coord]);
 		});
 	}
 }
-TEST_CASE("Vector<2> copy from managed constructor", "[Vector]")
+TEST_CASE("Vector<2> move from managed constructor", "[Vector]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 
@@ -120,16 +131,27 @@ TEST_CASE("Vector<2> copy from managed constructor", "[Vector]")
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 
-	Vector<2> vec_to_copy(comm, {nx, ny}, num_components, num_local_patches, num_ghost_cells);
+	Vector<2> vec_to_move(comm, {nx, ny}, num_components, num_local_patches, num_ghost_cells);
 
-	double *view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
+	double *view_to_move = &vec_to_move.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
 	int     size         = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components * num_local_patches;
 	for (size_t i = 0; i < size; i++) {
 		double x        = (i + 0.5) / size;
-		view_to_copy[i] = 10 - (x - 0.75) * (x - 0.75);
+		view_to_move[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	Vector<2> vec(vec_to_copy);
+	Vector<2> vec_to_move_copy(vec_to_move);
+	Vector<2> vec(std::move(vec_to_move));
+
+	// vec_to_move
+
+	CHECK(vec_to_move.getNumGhostCells() == 0);
+	CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
+	CHECK(vec_to_move.getNumLocalPatches() == 0);
+	CHECK(vec_to_move.getNumComponents() == 0);
+	CHECK(vec_to_move.getNumLocalCells() == 0);
+
+	// vec
 
 	CHECK(vec.getNumGhostCells() == num_ghost_cells);
 
@@ -138,12 +160,12 @@ TEST_CASE("Vector<2> copy from managed constructor", "[Vector]")
 	REQUIRE(err == MPI_SUCCESS);
 	CHECK(result == MPI_CONGRUENT);
 
-	CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-	CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-	CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+	CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
+	CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
+	CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
 
 	double *view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-	CHECK(view != view_to_copy);
+	CHECK(view == view_to_move);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
@@ -169,13 +191,13 @@ TEST_CASE("Vector<2> copy from managed constructor", "[Vector]")
 	}
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
-		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
+		PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
 		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
-			CHECK(view[coord] == view_to_copy[coord]);
+			CHECK(view[coord] == view_to_move[coord]);
 		});
 	}
 }
-TEST_CASE("Vector<2> copy from unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> move from unmanaged constructor", "[Vector]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 
@@ -198,16 +220,27 @@ TEST_CASE("Vector<2> copy from unmanaged constructor", "[Vector]")
 	for (int i = 0; i < num_local_patches; i++) {
 		patch_starts[i] = data + i * patch_stride;
 	}
-	Vector<2> vec_to_copy(comm, patch_starts, strides, lengths, num_ghost_cells);
+	Vector<2> vec_to_move(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-	double *view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
+	double *view_to_move = &vec_to_move.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
 	int     size         = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components * num_local_patches;
 	for (size_t i = 0; i < size; i++) {
 		double x        = (i + 0.5) / size;
-		view_to_copy[i] = 10 - (x - 0.75) * (x - 0.75);
+		view_to_move[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
-	Vector<2> vec(vec_to_copy);
+	Vector<2> vec_to_move_copy(vec_to_move);
+	Vector<2> vec(std::move(vec_to_move));
+
+	// vec_to_move
+
+	CHECK(vec_to_move.getNumGhostCells() == 0);
+	CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
+	CHECK(vec_to_move.getNumLocalPatches() == 0);
+	CHECK(vec_to_move.getNumComponents() == 0);
+	CHECK(vec_to_move.getNumLocalCells() == 0);
+
+	// vec
 
 	CHECK(vec.getNumGhostCells() == num_ghost_cells);
 
@@ -216,12 +249,12 @@ TEST_CASE("Vector<2> copy from unmanaged constructor", "[Vector]")
 	REQUIRE(err == MPI_SUCCESS);
 	CHECK(result == MPI_CONGRUENT);
 
-	CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-	CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-	CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+	CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
+	CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
+	CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
 
 	double *view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-	CHECK(view != view_to_copy);
+	CHECK(view == view_to_move);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
@@ -247,13 +280,13 @@ TEST_CASE("Vector<2> copy from unmanaged constructor", "[Vector]")
 	}
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
-		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
+		PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
 		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
-			CHECK(view[coord] == view_to_copy[coord]);
+			CHECK(view[coord] == view_to_move[coord]);
 		});
 	}
 }
-TEST_CASE("Vector<2> copy assign from domain constructor", "[Vector]")
+TEST_CASE("Vector<2> move assign from domain constructor", "[Vector]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 
@@ -271,17 +304,28 @@ TEST_CASE("Vector<2> copy assign from domain constructor", "[Vector]")
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 
-	Vector<2> vec_to_copy(*domain, num_components);
+	Vector<2> vec_to_move(*domain, num_components);
 
-	double *view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
+	double *view_to_move = &vec_to_move.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
 	int     size         = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components * domain->getNumLocalPatches();
 	for (size_t i = 0; i < size; i++) {
 		double x        = (i + 0.5) / size;
-		view_to_copy[i] = 10 - (x - 0.75) * (x - 0.75);
+		view_to_move[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
+	Vector<2> vec_to_move_copy(vec_to_move);
 	Vector<2> vec;
-	vec = vec_to_copy;
+	vec = std::move(vec_to_move);
+
+	// vec_to_move
+
+	CHECK(vec_to_move.getNumGhostCells() == 0);
+	CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
+	CHECK(vec_to_move.getNumLocalPatches() == 0);
+	CHECK(vec_to_move.getNumComponents() == 0);
+	CHECK(vec_to_move.getNumLocalCells() == 0);
+
+	// vec
 
 	CHECK(vec.getNumGhostCells() == num_ghost_cells);
 
@@ -290,12 +334,12 @@ TEST_CASE("Vector<2> copy assign from domain constructor", "[Vector]")
 	REQUIRE(err == MPI_SUCCESS);
 	CHECK(result == MPI_CONGRUENT);
 
-	CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-	CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-	CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+	CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
+	CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
+	CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
 
 	double *view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-	CHECK(view != view_to_copy);
+	CHECK(view == view_to_move);
 	for (int i = 0; i < domain->getNumLocalPatches(); i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
@@ -321,13 +365,13 @@ TEST_CASE("Vector<2> copy assign from domain constructor", "[Vector]")
 	}
 	for (int i = 0; i < domain->getNumLocalPatches(); i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
-		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
+		PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
 		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
-			CHECK(view[coord] == view_to_copy[coord]);
+			CHECK(view[coord] == view_to_move[coord]);
 		});
 	}
 }
-TEST_CASE("Vector<2> copy assign from managed constructor", "[Vector]")
+TEST_CASE("Vector<2> move assign from managed constructor", "[Vector]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 
@@ -343,17 +387,28 @@ TEST_CASE("Vector<2> copy assign from managed constructor", "[Vector]")
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 
-	Vector<2> vec_to_copy(comm, {nx, ny}, num_components, num_local_patches, num_ghost_cells);
+	Vector<2> vec_to_move(comm, {nx, ny}, num_components, num_local_patches, num_ghost_cells);
 
-	double *view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
+	double *view_to_move = &vec_to_move.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
 	int     size         = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components * num_local_patches;
 	for (size_t i = 0; i < size; i++) {
 		double x        = (i + 0.5) / size;
-		view_to_copy[i] = 10 - (x - 0.75) * (x - 0.75);
+		view_to_move[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
+	Vector<2> vec_to_move_copy(vec_to_move);
 	Vector<2> vec;
-	vec = vec_to_copy;
+	vec = std::move(vec_to_move);
+
+	// vec_to_move
+
+	CHECK(vec_to_move.getNumGhostCells() == 0);
+	CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
+	CHECK(vec_to_move.getNumLocalPatches() == 0);
+	CHECK(vec_to_move.getNumComponents() == 0);
+	CHECK(vec_to_move.getNumLocalCells() == 0);
+
+	// vec
 
 	CHECK(vec.getNumGhostCells() == num_ghost_cells);
 
@@ -362,12 +417,12 @@ TEST_CASE("Vector<2> copy assign from managed constructor", "[Vector]")
 	REQUIRE(err == MPI_SUCCESS);
 	CHECK(result == MPI_CONGRUENT);
 
-	CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-	CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-	CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+	CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
+	CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
+	CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
 
 	double *view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-	CHECK(view != view_to_copy);
+	CHECK(view == view_to_move);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
@@ -393,13 +448,13 @@ TEST_CASE("Vector<2> copy assign from managed constructor", "[Vector]")
 	}
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
-		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
+		PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
 		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
-			CHECK(view[coord] == view_to_copy[coord]);
+			CHECK(view[coord] == view_to_move[coord]);
 		});
 	}
 }
-TEST_CASE("Vector<2> copy assign from unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> move assign from unmanaged constructor", "[Vector]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 
@@ -422,17 +477,27 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor", "[Vector]")
 	for (int i = 0; i < num_local_patches; i++) {
 		patch_starts[i] = data + i * patch_stride;
 	}
-	Vector<2> vec_to_copy(comm, patch_starts, strides, lengths, num_ghost_cells);
+	Vector<2> vec_to_move(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-	double *view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
+	double *view_to_move = &vec_to_move.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
 	int     size         = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components * num_local_patches;
 	for (size_t i = 0; i < size; i++) {
 		double x        = (i + 0.5) / size;
-		view_to_copy[i] = 10 - (x - 0.75) * (x - 0.75);
+		view_to_move[i] = 10 - (x - 0.75) * (x - 0.75);
 	}
 
+	Vector<2> vec_to_move_copy(vec_to_move);
 	Vector<2> vec;
-	vec = vec_to_copy;
+	vec = std::move(vec_to_move);
+	// vec_to_move
+
+	CHECK(vec_to_move.getNumGhostCells() == 0);
+	CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
+	CHECK(vec_to_move.getNumLocalPatches() == 0);
+	CHECK(vec_to_move.getNumComponents() == 0);
+	CHECK(vec_to_move.getNumLocalCells() == 0);
+
+	// vec
 
 	CHECK(vec.getNumGhostCells() == num_ghost_cells);
 
@@ -441,12 +506,12 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor", "[Vector]")
 	REQUIRE(err == MPI_SUCCESS);
 	CHECK(result == MPI_CONGRUENT);
 
-	CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-	CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-	CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+	CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
+	CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
+	CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
 
 	double *view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-	CHECK(view != view_to_copy);
+	CHECK(view == view_to_move);
 	for (int i = 0; i < num_local_patches; i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
@@ -472,9 +537,9 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor", "[Vector]")
 	}
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
-		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
+		PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
 		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
-			CHECK(view[coord] == view_to_copy[coord]);
+			CHECK(view[coord] == view_to_move[coord]);
 		});
 	}
 }
