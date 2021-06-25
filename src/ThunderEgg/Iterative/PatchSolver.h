@@ -153,33 +153,32 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 	}
 	void solveSinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &f_view, const PatchView<double, D> &u_view) const override
 	{
-		std::shared_ptr<SinglePatchOp>      single_op(new SinglePatchOp(pinfo, op));
-		std::shared_ptr<VectorGenerator<D>> vg(new SingleVG(pinfo, f_view.getEnd()[D] + 1));
+		SinglePatchOp single_op(pinfo, op);
 
 		std::array<int, D + 1> f_lengths;
 		for (int i = 0; i < D + 1; i++) {
 			f_lengths[i] = f_view.getEnd()[i] + 1;
 		}
-		std::shared_ptr<const Vector<D>> f_single(new Vector<D>(Communicator(MPI_COMM_SELF),
-		                                                        {const_cast<double *>(&f_view[f_view.getGhostStart()])},
-		                                                        f_view.getStrides(),
-		                                                        f_lengths,
-		                                                        this->getDomain()->getNumGhostCells()));
-		std::array<int, D + 1>           u_lengths;
+		const Vector<D> f_single(Communicator(MPI_COMM_SELF),
+		                         {const_cast<double *>(&f_view[f_view.getGhostStart()])},
+		                         f_view.getStrides(),
+		                         f_lengths,
+		                         this->getDomain()->getNumGhostCells());
+
+		std::array<int, D + 1> u_lengths;
 		for (int i = 0; i < D + 1; i++) {
 			u_lengths[i] = u_view.getEnd()[i] + 1;
 		}
-		std::shared_ptr<Vector<D>> u_single(new Vector<D>(
-		Communicator(MPI_COMM_SELF), {&u_view[u_view.getGhostStart()]}, u_view.getStrides(), u_lengths, this->getDomain()->getNumGhostCells()));
+		Vector<D> u_single(
+		Communicator(MPI_COMM_SELF), {&u_view[u_view.getGhostStart()]}, u_view.getStrides(), u_lengths, this->getDomain()->getNumGhostCells());
 
-		auto f_copy = vg->getNewVector();
-		f_copy->copy(*f_single);
-		auto f_copy_view = f_copy->getPatchView(0);
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy_view);
+		Vector<D> f_copy = f_single.getZeroClone();
+		f_copy.copy(f_single);
+		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy.getPatchView(0));
 
 		int iterations = 0;
 		try {
-			iterations = solver->solve(vg, single_op, u_single, f_copy);
+			iterations = solver->solve(single_op, u_single, f_copy);
 		} catch (const BreakdownError &err) {
 			if (!continue_on_breakdown) {
 				throw err;

@@ -359,7 +359,7 @@ int main(int argc, char *argv[])
 		solver.setMaxIterations(1000);
 		solver.setTolerance(1e-12);
 		solver.setTimer(timer);
-		int its = solver.solve(vg, A, u, f, M);
+		int its = solver.solve(*A, *u, *f, M.get());
 		if (comm.getRank() == 0) {
 			cout << "Iterations: " << its << endl;
 		}

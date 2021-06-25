@@ -271,28 +271,28 @@ int main(int argc, char *argv[])
 	// Create some new vectors for the domain
 	int num_components = 1; //the poisson operator just has one value in each cell
 
-	shared_ptr<Vector<2>> exact = make_shared<Vector<2>>(*domain, num_components);
-	shared_ptr<Vector<2>> f     = make_shared<Vector<2>>(*domain, num_components);
+	Vector<2> exact(*domain, num_components);
+	Vector<2> f(*domain, num_components);
 
 	// fill the vectors with some values
-	DomainTools::SetValues<2>(*domain, *f, ffun); // fill the f vector with the associated domain using the ffun function
-	DomainTools::SetValues<2>(*domain, *exact, gfun);
+	DomainTools::SetValues<2>(*domain, f, ffun); // fill the f vector with the associated domain using the ffun function
+	DomainTools::SetValues<2>(*domain, exact, gfun);
 
 	// modify the rhs to set the boundary conditions
 	// the patch operator contains some helper functions for this
 	if (neumann) {
-		patch_operator->addNeumannBCToRHS(*f, gfun, {nfunx, nfuny});
+		patch_operator->addNeumannBCToRHS(f, gfun, {nfunx, nfuny});
 	} else {
-		patch_operator->addDrichletBCToRHS(*f, gfun);
+		patch_operator->addDrichletBCToRHS(f, gfun);
 	}
 
 	timer->stop("Domain Initialization");
 
 	if (neumann && !no_zero_rhs_avg) {
-		double fdiff = DomainTools::Integrate<2>(*domain, *f) / domain->volume();
+		double fdiff = DomainTools::Integrate<2>(*domain, f) / domain->volume();
 		if (comm.getRank() == 0)
 			cout << "Fdiff: " << fdiff << endl;
-		f->shift(-fdiff);
+		f.shift(-fdiff);
 	}
 
 	///////////////////
@@ -424,9 +424,9 @@ int main(int argc, char *argv[])
 	solver.setTimer(timer);
 	solver.setTolerance(tolerance);
 
-	shared_ptr<Vector<2>> u = make_shared<Vector<2>>(*domain, num_components);
+	Vector<2> u(*domain, num_components);
 
-	int num_iterations = solver.solve(vg, A, u, f, M, true);
+	int num_iterations = solver.solve(*A, u, f, M.get(), true);
 
 	if (comm.getRank() == 0) {
 		cout << "Iterations: " << num_iterations << endl;
@@ -434,36 +434,36 @@ int main(int argc, char *argv[])
 	timer->stop("Linear Solve");
 
 	// calculate residual
-	shared_ptr<Vector<2>> au              = make_shared<Vector<2>>(*domain, num_components);
-	shared_ptr<Vector<2>> residual_vector = make_shared<Vector<2>>(*domain, num_components);
+	Vector<2> au(*domain, num_components);
+	Vector<2> residual_vector(*domain, num_components);
 
-	A->apply(*u, *au);
+	A->apply(u, au);
 
-	residual_vector->addScaled(-1, *au, 1, *f);
+	residual_vector.addScaled(-1, au, 1, f);
 
-	double residual = residual_vector->twoNorm();
-	double fnorm    = f->twoNorm();
+	double residual = residual_vector.twoNorm();
+	double fnorm    = f.twoNorm();
 
 	// calculate error
-	shared_ptr<Vector<2>> error = make_shared<Vector<2>>(*domain, 1);
-	error->addScaled(-1, *exact, 1, *u);
+	Vector<2> error(*domain, 1);
+	error.addScaled(-1, exact, 1, u);
 	if (neumann) {
-		double u_average     = DomainTools::Integrate<2>(*domain, *u) / domain->volume();
-		double exact_average = DomainTools::Integrate<2>(*domain, *exact) / domain->volume();
+		double u_average     = DomainTools::Integrate<2>(*domain, u) / domain->volume();
+		double exact_average = DomainTools::Integrate<2>(*domain, exact) / domain->volume();
 
 		if (comm.getRank() == 0) {
 			cout << "Average of computed solution: " << u_average << endl;
 			cout << "Average of exact solution: " << exact_average << endl;
 		}
 
-		error->shift(exact_average - u_average);
+		error.shift(exact_average - u_average);
 	}
-	double error_norm     = error->twoNorm();
-	double error_norm_inf = error->infNorm();
-	double exact_norm     = exact->twoNorm();
+	double error_norm     = error.twoNorm();
+	double error_norm_inf = error.infNorm();
+	double exact_norm     = exact.twoNorm();
 
-	double au_sum = DomainTools::Integrate<2>(*domain, *au);
-	double f_sum  = DomainTools::Integrate<2>(*domain, *f);
+	double au_sum = DomainTools::Integrate<2>(*domain, au);
+	double f_sum  = DomainTools::Integrate<2>(*domain, f);
 	if (comm.getRank() == 0) {
 		std::cout << std::scientific;
 		std::cout.precision(13);

@@ -138,26 +138,26 @@ template <int D>
 class MockSolver : public Iterative::Solver<D>
 {
 	private:
-	std::function<int(std::shared_ptr<VectorGenerator<D>>, std::shared_ptr<const Operator<D>>,
-	                  std::shared_ptr<Vector<D>>, std::shared_ptr<const Vector<D>>,
-	                  std::shared_ptr<const Operator<D>>)>
+	std::function<int(const Operator<D> &,
+	                  Vector<D> &, const Vector<D> &,
+	                  const Operator<D> *)>
 	callback;
 
 	public:
 	MockSolver(
-	std::function<int(std::shared_ptr<VectorGenerator<D>>, std::shared_ptr<const Operator<D>>,
-	                  std::shared_ptr<Vector<D>>, std::shared_ptr<const Vector<D>>,
-	                  std::shared_ptr<const Operator<D>>)>
+	std::function<int(const Operator<D> &,
+	                  Vector<D> &, const Vector<D> &,
+	                  const Operator<D> *)>
 	callback)
 	: callback(callback)
 	{
 	}
-	int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
-	          std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
-	          std::shared_ptr<const Operator<D>> Mr = nullptr, bool output = false,
+	int solve(const Operator<D> &A,
+	          Vector<D> &x, const Vector<D> &b,
+	          const Operator<D> *Mr = nullptr, bool output = false,
 	          std::ostream &os = std::cout) const override
 	{
-		return callback(vg, A, x, b, Mr);
+		return callback(A, x, b, Mr);
 	}
 };
 

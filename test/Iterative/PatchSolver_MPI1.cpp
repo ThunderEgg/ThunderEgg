@@ -29,23 +29,23 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length",
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = make_shared<Vector<2>>(*d_fine, num_components);
-	auto f = make_shared<Vector<2>>(*d_fine, num_components);
+	Vector<2> u(*d_fine, num_components);
+	Vector<2> f(*d_fine, num_components);
 
 	auto mgf = make_shared<MockGhostFiller<2>>();
 	// the patch operator is just a 0.5I operator
 	auto mpo = make_shared<MockPatchOperator<2>>(d_fine, mgf);
 	auto ms  = make_shared<MockSolver<2>>(
-    [](std::shared_ptr<VectorGenerator<2>> vg, std::shared_ptr<const Operator<2>> A,
-       std::shared_ptr<Vector<2>> x, std::shared_ptr<const Vector<2>> b,
-       std::shared_ptr<const Operator<2>> Mr) {
-        CHECK(x->getNumLocalPatches() == 1);
+    [](const Operator<2> &A,
+       Vector<2> &x, const Vector<2> &b,
+       const Operator<2> *Mr) {
+        CHECK(x.getNumLocalPatches() == 1);
         return 1;
     });
 
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
-	bcgs_solver.smooth(*f, *u);
+	bcgs_solver.smooth(f, u);
 }
 TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchSolver]")
 {
@@ -60,28 +60,28 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = make_shared<Vector<2>>(*d_fine, num_components);
-	auto f = make_shared<Vector<2>>(*d_fine, num_components);
+	Vector<2> u(*d_fine, num_components);
+	Vector<2> f(*d_fine, num_components);
 
 	bool called = false;
 	auto mgf    = make_shared<MockGhostFiller<2>>();
 	// the patch operator is just a 0.5I operator
 	auto mpo = make_shared<MockPatchOperator<2>>(d_fine, mgf);
 	auto ms  = make_shared<MockSolver<2>>(
-    [&](std::shared_ptr<VectorGenerator<2>> vg, std::shared_ptr<const Operator<2>> A,
-        std::shared_ptr<Vector<2>> x, std::shared_ptr<const Vector<2>> b,
-        std::shared_ptr<const Operator<2>> Mr) {
+    [&](const Operator<2> &A,
+        Vector<2> &x, const Vector<2> &b,
+        const Operator<2> *Mr) {
         if (!called) {
             called = true;
-            CHECK(A != mpo);
-            A->apply(*b, *x);
+            CHECK(&A != mpo.get());
+            A.apply(b, x);
         }
         return 1;
     });
 
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
-	bcgs_solver.smooth(*f, *u);
+	bcgs_solver.smooth(f, u);
 	CHECK(mpo->getNumApplyCalls() == 1);
 	CHECK(mpo->rhsWasModified());
 	CHECK(mpo->boundaryConditionsEnforced());
@@ -100,24 +100,24 @@ TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::Patch
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = make_shared<Vector<2>>(*d_fine, num_components);
-	auto f = make_shared<Vector<2>>(*d_fine, num_components);
-	f->set(1);
+	Vector<2> u(*d_fine, num_components);
+	Vector<2> f(*d_fine, num_components);
+	f.set(1);
 
 	auto mgf = make_shared<MockGhostFiller<2>>();
 	// the patch operator is just a 0.5I operator
 	auto mpo = make_shared<NonLinMockPatchOperator<2>>(d_fine, mgf);
 	auto ms  = make_shared<MockSolver<2>>(
-    [](std::shared_ptr<VectorGenerator<2>> vg, std::shared_ptr<const Operator<2>> A,
-       std::shared_ptr<Vector<2>> x, std::shared_ptr<const Vector<2>> b,
-       std::shared_ptr<const Operator<2>> Mr) {
+    [](const Operator<2> &A,
+       Vector<2> &x, const Vector<2> &b,
+       const Operator<2> *Mr) {
         throw BreakdownError("Blah");
         return 1;
     });
 
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
-	CHECK_THROWS_AS(bcgs_solver.smooth(*f, *u), BreakdownError);
+	CHECK_THROWS_AS(bcgs_solver.smooth(f, u), BreakdownError);
 }
 TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterative::PatchSolver]")
 {
@@ -132,22 +132,22 @@ TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterativ
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = make_shared<Vector<2>>(*d_fine, num_components);
-	auto f = make_shared<Vector<2>>(*d_fine, num_components);
-	f->set(1);
+	Vector<2> u(*d_fine, num_components);
+	Vector<2> f(*d_fine, num_components);
+	f.set(1);
 
 	auto mgf = make_shared<MockGhostFiller<2>>();
 	// the patch operator is just a 0.5I operator
 	auto mpo = make_shared<NonLinMockPatchOperator<2>>(d_fine, mgf);
 	auto ms  = make_shared<MockSolver<2>>(
-    [](std::shared_ptr<VectorGenerator<2>> vg, std::shared_ptr<const Operator<2>> A,
-       std::shared_ptr<Vector<2>> x, std::shared_ptr<const Vector<2>> b,
-       std::shared_ptr<const Operator<2>> Mr) {
+    [](const Operator<2> &A,
+       Vector<2> &x, const Vector<2> &b,
+       const Operator<2> *Mr) {
         throw BreakdownError("Blah");
         return 1;
     });
 
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo, true);
 
-	CHECK_NOTHROW(bcgs_solver.smooth(*f, *u));
+	CHECK_NOTHROW(bcgs_solver.smooth(f, u));
 }

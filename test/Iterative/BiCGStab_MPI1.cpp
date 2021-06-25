@@ -89,27 +89,27 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = make_shared<Vector<2>>(*domain, 1);
-	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
-	auto residual = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> f_vec(*domain, 1);
+	DomainTools::SetValues<2>(*domain, f_vec, ffun);
+	Vector<2> residual(*domain, 1);
 
-	auto g_vec = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> g_vec(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(*f_vec, *gfun);
+	Poisson::StarPatchOperator<2> p_operator(domain, gf);
+	p_operator.addDrichletBCToRHS(f_vec, gfun);
 
 	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
 
 	BiCGStab<2> solver;
 	solver.setMaxIterations(1000);
 	solver.setTolerance(tolerance);
-	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
+	solver.solve(p_operator, g_vec, f_vec);
 
-	p_operator->apply(*g_vec, *residual);
-	residual->addScaled(-1, *f_vec);
-	CHECK(residual->dot(*residual) / f_vec->dot(*f_vec) <= tolerance);
+	p_operator.apply(g_vec, residual);
+	residual.addScaled(-1, f_vec);
+	CHECK(residual.dot(residual) / f_vec.dot(f_vec) <= tolerance);
 }
 TEST_CASE("BiCGStab handles zero rhs vector", "[BiCGStab]")
 {
@@ -118,22 +118,22 @@ TEST_CASE("BiCGStab handles zero rhs vector", "[BiCGStab]")
 	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
 	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
 
-	auto f_vec = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> f_vec(*domain, 1);
 
-	auto g_vec = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> g_vec(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
+	Poisson::StarPatchOperator<2> p_operator(domain, gf);
 
 	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
 
 	BiCGStab<2> solver;
 	solver.setMaxIterations(1000);
 	solver.setTolerance(tolerance);
-	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
+	solver.solve(p_operator, g_vec, f_vec);
 
-	CHECK(g_vec->infNorm() == 0);
+	CHECK(g_vec.infNorm() == 0);
 }
 TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 {
@@ -153,16 +153,16 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = make_shared<Vector<2>>(*domain, 1);
-	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
-	auto residual = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> f_vec(*domain, 1);
+	DomainTools::SetValues<2>(*domain, f_vec, ffun);
+	Vector<2> residual(*domain, 1);
 
-	auto g_vec = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> g_vec(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(*f_vec, *gfun);
+	Poisson::StarPatchOperator<2> p_operator(domain, gf);
+	p_operator.addDrichletBCToRHS(f_vec, gfun);
 
 	double tolerance = 1e-7;
 
@@ -171,7 +171,7 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 	BiCGStab<2> solver;
 	solver.setMaxIterations(1000);
 	solver.setTolerance(tolerance);
-	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec, nullptr,
+	solver.solve(p_operator, g_vec, f_vec, nullptr,
 	             true, ss);
 
 	INFO(ss.str());
@@ -203,26 +203,26 @@ TEST_CASE("giving a good initial guess reduces the iterations", "[BiCGStab]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = make_shared<Vector<2>>(*domain, 1);
-	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
-	auto residual = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> f_vec(*domain, 1);
+	DomainTools::SetValues<2>(*domain, f_vec, ffun);
+	Vector<2> residual(*domain, 1);
 
-	auto g_vec = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> g_vec(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(*f_vec, *gfun);
+	Poisson::StarPatchOperator<2> p_operator(domain, gf);
+	p_operator.addDrichletBCToRHS(f_vec, gfun);
 
 	double tolerance = 1e-5;
 
 	BiCGStab<2> solver;
 	solver.setMaxIterations(1000);
 	solver.setTolerance(tolerance);
-	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
+	solver.solve(p_operator, g_vec, f_vec);
 
 	int iterations_with_solved_guess
-	= solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
+	= solver.solve(p_operator, g_vec, f_vec);
 
 	CHECK(iterations_with_solved_guess == 0);
 }
@@ -256,24 +256,24 @@ TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
 		return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = make_shared<Vector<2>>(*domain, 1);
-	DomainTools::SetValues<2>(*domain, *f_vec, ffun);
-	auto residual = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> f_vec(*domain, 1);
+	DomainTools::SetValues<2>(*domain, f_vec, ffun);
+	Vector<2> residual(*domain, 1);
 
-	auto g_vec = make_shared<Vector<2>>(*domain, 1);
+	Vector<2> g_vec(*domain, 1);
 
 	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
-	auto op = make_shared<I2Operator>();
+	I2Operator op;
 
 	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
 
 	BiCGStab<2> solver;
 	solver.setMaxIterations(1000);
 	solver.setTolerance(tolerance);
-	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), op, g_vec, f_vec);
+	solver.solve(op, g_vec, f_vec);
 
-	op->apply(*g_vec, *residual);
-	residual->addScaled(-1, *f_vec);
-	CHECK(residual->dot(*residual) / f_vec->dot(*f_vec) <= tolerance);
+	op.apply(g_vec, residual);
+	residual.addScaled(-1, f_vec);
+	CHECK(residual.dot(residual) / f_vec.dot(f_vec) <= tolerance);
 }
