@@ -270,6 +270,11 @@ template <int D> class Vector
 	 */
 	PatchView<double, D> getPatchView(int patch_local_index)
 	{
+		if constexpr (ENABLE_DEBUG) {
+			if (patch_local_index < 0 || patch_local_index >= getNumLocalPatches()) {
+				throw RuntimeError("invalid patch index");
+			}
+		}
 		return PatchView<double, D>(patch_starts[patch_local_index], strides, lengths, num_ghost_cells);
 	}
 
@@ -282,6 +287,11 @@ template <int D> class Vector
 	 */
 	PatchView<const double, D> getPatchView(int patch_local_index) const
 	{
+		if constexpr (ENABLE_DEBUG) {
+			if (patch_local_index < 0 || patch_local_index >= getNumLocalPatches()) {
+				throw RuntimeError("invalid patch index");
+			}
+		}
 		return PatchView<const double, D>(patch_starts[patch_local_index], strides, lengths, num_ghost_cells);
 	}
 
@@ -474,6 +484,10 @@ template <int D> class Vector
 		double global_retval;
 		MPI_Allreduce(&retval, &global_retval, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
 		return global_retval;
+	}
+	Vector<D> getZeroClone() const
+	{
+		//
 	}
 };
 extern template class Vector<1>;

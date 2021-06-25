@@ -165,6 +165,12 @@ TEST_CASE("Vector<2> getComponentView domain constructor", "[Vector]")
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(num_components, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, domain->getNumLocalPatches()), RuntimeError);
+	}
 }
 TEST_CASE("Vector<2> getComponentView const domain constructor", "[Vector]")
 {
@@ -196,5 +202,77 @@ TEST_CASE("Vector<2> getComponentView const domain constructor", "[Vector]")
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(num_components, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, domain->getNumLocalPatches()), RuntimeError);
+	}
+}
+TEST_CASE("Vector<2> getPatchView domain constructor", "[Vector]")
+{
+	Communicator comm(MPI_COMM_WORLD);
+
+	auto                  mesh_file        = GENERATE(as<std::string>{}, MESHES);
+	int                   num_components   = GENERATE(1, 2, 3);
+	auto                  num_ghost_cells  = GENERATE(0, 1, 5);
+	int                   nx               = GENERATE(1, 4, 5);
+	int                   ny               = GENERATE(1, 4, 5);
+	int                   component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+	int                   patch_stride     = component_stride * num_components;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost_cells);
+	shared_ptr<Domain<2>> domain = domain_reader.getFinerDomain();
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+
+	Vector<2> vec(*domain, num_components);
+
+	double *view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
+	for (int i = 0; i < domain->getNumLocalPatches(); i++) {
+		INFO("i:                 " << i);
+		PatchView<double, 2> ld = vec.getPatchView(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()]
+		      == view + patch_stride * (i + 1) - 1);
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+		CHECK_THROWS_AS(vec.getPatchView(domain->getNumLocalPatches()), RuntimeError);
+	}
+}
+TEST_CASE("Vector<2> getPatchView const domain constructor", "[Vector]")
+{
+	Communicator comm(MPI_COMM_WORLD);
+
+	auto                  mesh_file        = GENERATE(as<std::string>{}, MESHES);
+	int                   num_components   = GENERATE(1, 2, 3);
+	auto                  num_ghost_cells  = GENERATE(0, 1, 5);
+	int                   nx               = GENERATE(1, 4, 5);
+	int                   ny               = GENERATE(1, 4, 5);
+	int                   component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+	int                   patch_stride     = component_stride * num_components;
+	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost_cells);
+	shared_ptr<Domain<2>> domain = domain_reader.getFinerDomain();
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+
+	const Vector<2> vec(*domain, num_components);
+
+	const double *view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
+	for (int i = 0; i < domain->getNumLocalPatches(); i++) {
+		INFO("i:                 " << i);
+		PatchView<const double, 2> ld = vec.getPatchView(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()]
+		      == view + patch_stride * (i + 1) - 1);
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+		CHECK_THROWS_AS(vec.getPatchView(domain->getNumLocalPatches()), RuntimeError);
 	}
 }

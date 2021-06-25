@@ -243,6 +243,11 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 
 	ComponentView<T, D> getComponentView(int component_index) const
 	{
+		if constexpr (ENABLE_DEBUG) {
+			if (component_index < this->getStart()[D] || component_index > this->getEnd()[D]) {
+				throw RuntimeError("invalid component index");
+			}
+		}
 		std::array<int, D>     new_strides;
 		std::array<int, D>     new_ghost_start;
 		std::array<int, D>     new_start;

@@ -441,7 +441,7 @@ TEST_CASE("Vector<3> getNumLocalCells unmanaged constructor", "[Vector]")
 	CHECK(vec.getNumLocalCells() == nx * ny * nz * num_local_patches);
 }
 
-TEST_CASE("Vector<1> getComponentView.h unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getComponentView unmanaged constructor", "[Vector]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 
@@ -475,6 +475,12 @@ TEST_CASE("Vector<1> getComponentView.h unmanaged constructor", "[Vector]")
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + (patch_stride * i + (c + 1) * component_stride) - 1);
 		}
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(num_components, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, num_local_patches), RuntimeError);
 	}
 }
 TEST_CASE("Vector<1> getComponentView const unmanaged constructor", "[Vector]")
@@ -511,6 +517,12 @@ TEST_CASE("Vector<1> getComponentView const unmanaged constructor", "[Vector]")
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(num_components, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, num_local_patches), RuntimeError);
 	}
 }
 TEST_CASE("Vector<2> getComponentView unmanaged constructor", "[Vector]")
@@ -550,6 +562,12 @@ TEST_CASE("Vector<2> getComponentView unmanaged constructor", "[Vector]")
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(num_components, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, num_local_patches), RuntimeError);
+	}
 }
 TEST_CASE("Vector<2> getComponentView const unmanaged constructor", "[Vector]")
 {
@@ -587,6 +605,13 @@ TEST_CASE("Vector<2> getComponentView const unmanaged constructor", "[Vector]")
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
+	}
+
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(num_components, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, num_local_patches), RuntimeError);
 	}
 }
 TEST_CASE("Vector<3> getComponentView unmanaged constructor", "[Vector]")
@@ -628,6 +653,12 @@ TEST_CASE("Vector<3> getComponentView unmanaged constructor", "[Vector]")
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(num_components, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, num_local_patches), RuntimeError);
+	}
 }
 TEST_CASE("Vector<3> getComponentView const unmanaged constructor", "[Vector]")
 {
@@ -668,5 +699,249 @@ TEST_CASE("Vector<3> getComponentView const unmanaged constructor", "[Vector]")
 			CHECK(&ld[ld.getGhostEnd()]
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(num_components, 0), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+		CHECK_THROWS_AS(vec.getComponentView(0, num_local_patches), RuntimeError);
+	}
+}
+
+TEST_CASE("Vector<1> getPatchView unmanaged constructor", "[Vector]")
+{
+	Communicator comm(MPI_COMM_WORLD);
+
+	int  num_components    = GENERATE(1, 2, 3);
+	auto num_ghost_cells   = GENERATE(0, 1, 5);
+	int  nx                = GENERATE(1, 4, 5);
+	int  num_local_patches = GENERATE(1, 13);
+	int  component_stride  = (nx + 2 * num_ghost_cells);
+	int  patch_stride      = component_stride * num_components;
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("num_local_patches: " << num_local_patches);
+
+	array<int, 2>    lengths = {nx, num_components};
+	array<int, 2>    strides = {1, nx + 2 * num_ghost_cells};
+	double           data[patch_stride * num_local_patches];
+	vector<double *> patch_starts(num_local_patches);
+	for (int i = 0; i < num_local_patches; i++) {
+		patch_starts[i] = data + i * patch_stride;
+	}
+	Vector<1> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
+
+	double *view = data;
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		PatchView<double, 1> ld = vec.getPatchView(i);
+		CHECK(&ld[ld.getGhostStart()] == view + (patch_stride * i));
+		CHECK(&ld[ld.getGhostEnd()]
+		      == view + (patch_stride * (i + 1) - 1));
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+		CHECK_THROWS_AS(vec.getPatchView(num_local_patches), RuntimeError);
+	}
+}
+TEST_CASE("Vector<1> getPatchView const unmanaged constructor", "[Vector]")
+{
+	Communicator comm(MPI_COMM_WORLD);
+
+	int  num_components    = GENERATE(1, 2, 3);
+	auto num_ghost_cells   = GENERATE(0, 1, 5);
+	int  nx                = GENERATE(1, 4, 5);
+	int  num_local_patches = GENERATE(1, 13);
+	int  component_stride  = (nx + 2 * num_ghost_cells);
+	int  patch_stride      = component_stride * num_components;
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("num_local_patches: " << num_local_patches);
+
+	array<int, 2>    lengths = {nx, num_components};
+	array<int, 2>    strides = {1, nx + 2 * num_ghost_cells};
+	double           data[patch_stride * num_local_patches];
+	vector<double *> patch_starts(num_local_patches);
+	for (int i = 0; i < num_local_patches; i++) {
+		patch_starts[i] = data + i * patch_stride;
+	}
+	const Vector<1> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
+
+	const double *view = data;
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		PatchView<const double, 1> ld = vec.getPatchView(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()]
+		      == view + patch_stride * (i + 1) - 1);
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+		CHECK_THROWS_AS(vec.getPatchView(num_local_patches), RuntimeError);
+	}
+}
+TEST_CASE("Vector<2> getPatchView unmanaged constructor", "[Vector]")
+{
+	Communicator comm(MPI_COMM_WORLD);
+
+	int  num_components    = GENERATE(1, 2, 3);
+	auto num_ghost_cells   = GENERATE(0, 1, 5);
+	int  nx                = GENERATE(1, 4, 5);
+	int  ny                = GENERATE(1, 4, 5);
+	int  num_local_patches = GENERATE(1, 13);
+	int  component_stride  = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+	int  patch_stride      = component_stride * num_components;
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("num_local_patches: " << num_local_patches);
+
+	array<int, 3>    lengths = {nx, ny, num_components};
+	array<int, 3>    strides = {1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)};
+	double           data[patch_stride * num_local_patches];
+	vector<double *> patch_starts(num_local_patches);
+	for (int i = 0; i < num_local_patches; i++) {
+		patch_starts[i] = data + i * patch_stride;
+	}
+	Vector<2> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
+
+	double *view = data;
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		PatchView<double, 2> ld = vec.getPatchView(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()]
+		      == view + patch_stride * (i + 1) - 1);
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+		CHECK_THROWS_AS(vec.getPatchView(num_local_patches), RuntimeError);
+	}
+}
+TEST_CASE("Vector<2> getPatchView const unmanaged constructor", "[Vector]")
+{
+	Communicator comm(MPI_COMM_WORLD);
+
+	int  num_components    = GENERATE(1, 2, 3);
+	auto num_ghost_cells   = GENERATE(0, 1, 5);
+	int  nx                = GENERATE(1, 4, 5);
+	int  ny                = GENERATE(1, 4, 5);
+	int  num_local_patches = GENERATE(1, 13);
+	int  component_stride  = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+	int  patch_stride      = component_stride * num_components;
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("num_local_patches: " << num_local_patches);
+
+	array<int, 3>    lengths = {nx, ny, num_components};
+	array<int, 3>    strides = {1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)};
+	double           data[patch_stride * num_local_patches];
+	vector<double *> patch_starts(num_local_patches);
+	for (int i = 0; i < num_local_patches; i++) {
+		patch_starts[i] = data + i * patch_stride;
+	}
+	const Vector<2> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
+
+	const double *view = data;
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		PatchView<const double, 2> ld = vec.getPatchView(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()]
+		      == view + patch_stride * (i + 1) - 1);
+	}
+
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+		CHECK_THROWS_AS(vec.getPatchView(num_local_patches), RuntimeError);
+	}
+}
+TEST_CASE("Vector<3> getPatchView unmanaged constructor", "[Vector]")
+{
+	Communicator comm(MPI_COMM_WORLD);
+
+	int  num_components    = GENERATE(1, 2, 3);
+	auto num_ghost_cells   = GENERATE(0, 1, 5);
+	int  nx                = GENERATE(1, 4, 5);
+	int  ny                = GENERATE(1, 4, 5);
+	int  nz                = GENERATE(1, 4, 5);
+	int  num_local_patches = GENERATE(1, 13);
+	int  component_stride
+	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+	int patch_stride = component_stride * num_components;
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+
+	array<int, 4>    lengths = {nx, ny, nz, num_components};
+	array<int, 4>    strides = {1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)};
+	double           data[patch_stride * num_local_patches];
+	vector<double *> patch_starts(num_local_patches);
+	for (int i = 0; i < num_local_patches; i++) {
+		patch_starts[i] = data + i * patch_stride;
+	}
+	Vector<3> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
+
+	double *view = data;
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		PatchView<double, 3> ld = vec.getPatchView(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()]
+		      == view + patch_stride * (i + 1) - 1);
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+		CHECK_THROWS_AS(vec.getPatchView(num_local_patches), RuntimeError);
+	}
+}
+TEST_CASE("Vector<3> getPatchView const unmanaged constructor", "[Vector]")
+{
+	Communicator comm(MPI_COMM_WORLD);
+
+	int  num_components    = GENERATE(1, 2, 3);
+	auto num_ghost_cells   = GENERATE(0, 1, 5);
+	int  nx                = GENERATE(1, 4, 5);
+	int  ny                = GENERATE(1, 4, 5);
+	int  nz                = GENERATE(1, 4, 5);
+	int  num_local_patches = GENERATE(1, 13);
+	int  component_stride
+	= (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
+	int patch_stride = component_stride * num_components;
+
+	INFO("num_ghost_cells:   " << num_ghost_cells);
+	INFO("nx:                " << nx);
+	INFO("ny:                " << ny);
+	INFO("nz:                " << nz);
+	INFO("num_local_patches: " << num_local_patches);
+
+	array<int, 4>    lengths = {nx, ny, nz, num_components};
+	array<int, 4>    strides = {1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells)};
+	double           data[patch_stride * num_local_patches];
+	vector<double *> patch_starts(num_local_patches);
+	for (int i = 0; i < num_local_patches; i++) {
+		patch_starts[i] = data + i * patch_stride;
+	}
+	const Vector<3> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
+
+	const double *view = data;
+	for (int i = 0; i < num_local_patches; i++) {
+		INFO("i:                 " << i);
+		PatchView<const double, 3> ld = vec.getPatchView(i);
+		CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
+		CHECK(&ld[ld.getGhostEnd()]
+		      == view + patch_stride * (i + 1) - 1);
+	}
+	if (ENABLE_DEBUG) {
+		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+		CHECK_THROWS_AS(vec.getPatchView(num_local_patches), RuntimeError);
 	}
 }
