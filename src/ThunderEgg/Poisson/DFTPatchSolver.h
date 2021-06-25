@@ -66,18 +66,6 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 */
 	std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction> plan2;
 	/**
-	 * @brief Temporary copy for the modified right hand side
-	 */
-	std::shared_ptr<Vector<D>> f_copy;
-	/**
-	 * @brief Temporary work vector
-	 */
-	std::shared_ptr<Vector<D>> tmp;
-	/*
-	 * @brief Temporary work vector
-	 */
-	std::shared_ptr<Vector<D>> local_tmp;
-	/**
 	 * @brief Map of PatchInfo object to it's respective eigenvalue array.
 	 */
 	std::map<const PatchInfo<D>, PatchArray<D>, CompareFunction> eigen_vals;
@@ -206,6 +194,11 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	{
 		PatchView<double, D> prev_result = in;
 
+		PatchArray<D> local_tmp;
+		if (!(D % 2)) {
+			local_tmp = PatchArray<D>(op->getDomain()->getNs(), 1, 0);
+		}
+
 		for (size_t axis = 0; axis < D; axis++) {
 			int                    n     = this->domain->getNs()[axis];
 			std::array<int, D + 1> start = in.getStart();
@@ -225,7 +218,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 				if (axis == D - 1) {
 					new_result = out;
 				} else if (axis == D - 2) {
-					new_result = local_tmp->getPatchView(0);
+					new_result = local_tmp.getView();
 				} else if (axis % 2) {
 					new_result = in;
 				} else {
@@ -377,11 +370,6 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		plan2      = std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction>(compare);
 		eigen_vals = std::map<const PatchInfo<D>, PatchArray<D>, CompareFunction>(compare);
 
-		f_copy = std::make_shared<Vector<D>>(Communicator(MPI_COMM_SELF), this->domain->getNs(), 1, 1, 0);
-		tmp    = std::make_shared<Vector<D>>(Communicator(MPI_COMM_SELF), this->domain->getNs(), 1, 1, 0);
-		if (!(D % 2)) {
-			local_tmp = std::make_shared<Vector<D>>(Communicator(MPI_COMM_SELF), this->domain->getNs(), 1, 1, 0);
-		}
 		// process patches
 		for (auto pinfo : this->domain->getPatchInfoVector()) {
 			addPatch(pinfo);
@@ -389,23 +377,23 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	}
 	void solveSinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &f_view, const PatchView<double, D> &u_view) const override
 	{
-		PatchView<double, D> f_copy_view = f_copy->getPatchView(0);
-		PatchView<double, D> tmp_view    = tmp->getPatchView(0);
+		PatchArray<D> f_copy(op->getDomain()->getNs(), 1, 0);
+		PatchArray<D> tmp(op->getDomain()->getNs(), 1, 0);
 
-		loop_over_interior_indexes<D + 1>(f_view, [&](std::array<int, D + 1> coord) { f_copy_view[coord] = f_view[coord]; });
+		loop_over_interior_indexes<D + 1>(f_view, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
 
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy_view);
+		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy.getView());
 
-		executePlan(plan1.at(pinfo), f_copy_view, tmp_view);
+		executePlan(plan1.at(pinfo), f_copy.getView(), tmp.getView());
 
 		const PatchArray<D> &eigen_vals_view = eigen_vals.at(pinfo);
-		loop_over_interior_indexes<D + 1>(tmp_view, [&](std::array<int, D + 1> coord) { tmp_view[coord] /= eigen_vals_view[coord]; });
+		loop_over_interior_indexes<D + 1>(tmp, [&](std::array<int, D + 1> coord) { tmp[coord] /= eigen_vals_view[coord]; });
 
 		if (neumann.all() && !pinfo.hasNbr()) {
-			tmp_view[tmp_view.getStart()] = 0;
+			tmp[tmp.getStart()] = 0;
 		}
 
-		executePlan(plan2.at(pinfo), tmp_view, u_view);
+		executePlan(plan2.at(pinfo), tmp.getView(), u_view);
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {

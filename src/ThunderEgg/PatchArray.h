@@ -37,7 +37,12 @@ template <int D> class PatchArray
 
 	public:
 	/**
-	 * @brief Construct a new View object
+	 * @brief Construct a new PatchArray object of size zero
+	 *
+	 */
+	PatchArray() = default;
+	/**
+	 * @brief Construct a new PatchArray object
 	 *
 	 * @param lengths the lengths in each direction
 	 * @param num_components the number of components

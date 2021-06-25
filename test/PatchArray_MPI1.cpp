@@ -3,6 +3,38 @@
 #include <catch2/generators/catch_generators.hpp>
 using namespace std;
 using namespace ThunderEgg;
+TEST_CASE("PatchArray default constructor getStart", "[PatchArray]")
+{
+	PatchArray<2> pa;
+
+	CHECK(pa.getStart()[0] == 0);
+	CHECK(pa.getStart()[1] == 0);
+	CHECK(pa.getStart()[2] == 0);
+}
+TEST_CASE("PatchArray default constructor getEnd", "[PatchArray]")
+{
+	PatchArray<2> pa;
+
+	CHECK(pa.getEnd()[0] == -1);
+	CHECK(pa.getEnd()[1] == -1);
+	CHECK(pa.getEnd()[2] == -1);
+}
+TEST_CASE("PatchArray default constructor getGhostStart", "[PatchArray]")
+{
+	PatchArray<2> pa;
+
+	CHECK(pa.getGhostStart()[0] == 0);
+	CHECK(pa.getGhostStart()[1] == 0);
+	CHECK(pa.getGhostStart()[2] == 0);
+}
+TEST_CASE("PatchArray default constructor getGhostEnd", "[PatchArray]")
+{
+	PatchArray<2> pa;
+
+	CHECK(pa.getGhostEnd()[0] == -1);
+	CHECK(pa.getGhostEnd()[1] == -1);
+	CHECK(pa.getGhostEnd()[2] == -1);
+}
 TEST_CASE("PatchArray getStart", "[PatchArray]")
 {
 	auto nx             = GENERATE(2, 3);
