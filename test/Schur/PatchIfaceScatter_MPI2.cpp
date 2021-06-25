@@ -203,7 +203,10 @@ TEST_CASE(
 
 	auto local_vector = scatter.getNewLocalPatchIfaceVector();
 
-	CHECK(local_vector->getCommunicator().getMPIComm() == MPI_COMM_SELF);
+	int result;
+	int err = MPI_Comm_compare(local_vector->getCommunicator().getMPIComm(), MPI_COMM_SELF, &result);
+	REQUIRE(err == MPI_SUCCESS);
+	CHECK(result == MPI_CONGRUENT);
 }
 /******
  *

@@ -235,7 +235,7 @@ template <int D> class InterLevelComm
 	 */
 	std::shared_ptr<Vector<D>> getNewGhostVector() const
 	{
-		return std::make_shared<Vector<D>>(finer_domain->getCommunicator(), ns, num_ghost_cells, num_components, num_ghost_patches);
+		return std::make_shared<Vector<D>>(finer_domain->getCommunicator(), ns, num_components, num_ghost_patches, num_ghost_cells);
 	}
 
 	/**
