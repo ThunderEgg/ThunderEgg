@@ -138,6 +138,7 @@ target_sources(unit_tests_mpi1 PRIVATE VectorDomainConstructor_MPI1.cpp)
 target_sources(unit_tests_mpi1 PRIVATE VectorManagedConstructor_MPI1.cpp)
 target_sources(unit_tests_mpi1 PRIVATE VectorMoveConstructor_MPI1.cpp)
 target_sources(unit_tests_mpi1 PRIVATE VectorUnmanagedConstructor_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE VectorZeroClone_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE View_MPI1.cpp)
 

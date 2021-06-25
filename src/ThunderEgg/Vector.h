@@ -578,9 +578,21 @@ template <int D> class Vector
 		MPI_Allreduce(&retval, &global_retval, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
 		return global_retval;
 	}
+	/**
+	 * @brief Get a vector of the same length initialized to zero
+	 *
+	 * @return Vector<D> the vector of the same length initialize to zero
+	 */
 	Vector<D> getZeroClone() const
 	{
-		//
+		Vector<D> clone;
+		clone.comm            = comm;
+		clone.lengths         = lengths;
+		clone.num_ghost_cells = num_ghost_cells;
+		clone.num_local_cells = num_local_cells;
+		clone.determineStrides();
+		clone.allocateData(getNumLocalPatches());
+		return clone;
 	}
 };
 extern template class Vector<1>;
