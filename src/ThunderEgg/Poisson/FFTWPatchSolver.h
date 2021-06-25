@@ -163,19 +163,19 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 			if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				for (int xi = 0; xi < n; xi++) {
 					double          val   = 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2);
-					View<double, D> slice = retval.getSliceOn(Side<D>(2 * D), {xi});
+					View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), {xi});
 					loop_over_interior_indexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
 				}
 			} else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) || patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				for (int xi = 0; xi < n; xi++) {
 					double          val   = 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2);
-					View<double, D> slice = retval.getSliceOn(Side<D>(2 * D), {xi});
+					View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), {xi});
 					loop_over_interior_indexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
 				}
 			} else {
 				for (int xi = 0; xi < n; xi++) {
 					double          val   = 4 / (h * h) * pow(sin((xi + 1) * M_PI / (2 * n)), 2);
-					View<double, D> slice = retval.getSliceOn(Side<D>(2 * D), {xi});
+					View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), {xi});
 					loop_over_interior_indexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
 				}
 			}

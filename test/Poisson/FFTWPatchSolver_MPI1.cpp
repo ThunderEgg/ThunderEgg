@@ -37,7 +37,7 @@ using namespace ThunderEgg;
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
 TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence",
-          "[Poisson::StarPatchOperator]")
+          "[Poisson::FFTWPatchSolver]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
@@ -87,7 +87,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence",
 	CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
 }
 TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann boundary",
-          "[Poisson::StarPatchOperator]")
+          "[Poisson::FFTWPatchSolver]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
@@ -150,7 +150,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
 }
 TEST_CASE(
 "Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann boundary single patch",
-"[Poisson::StarPatchOperator]")
+"[Poisson::FFTWPatchSolver]")
 {
 	auto mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
