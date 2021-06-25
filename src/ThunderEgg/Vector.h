@@ -59,7 +59,7 @@ template <int D> class Vector
 	/**
 	 * @brief The number of ghost cells
 	 */
-	int num_ghost_cells;
+	int num_ghost_cells = 0;
 
 	/**
 	 * @brief allocated data, empty of data is not managed
@@ -70,7 +70,7 @@ template <int D> class Vector
 	 * @brief The number of local cells in the vector
 	 * This exclude ghost cells
 	 */
-	int num_local_cells;
+	int num_local_cells = 0;
 
 	/**
 	 * @brief determine the strides from the lengths
@@ -102,7 +102,15 @@ template <int D> class Vector
 
 	public:
 	/**
-	 * @brief Construct a new Vector object
+	 * @brief Construct a new Vector object of size 0
+	 */
+	Vector()
+	{
+		strides.fill(0);
+		lengths.fill(0);
+	}
+	/**
+	 * @brief Construct a new Vector object with managed memory
 	 *
 	 * @param comm the MPI comm that is being used
 	 * @param num_components the number of components for each patch
@@ -135,6 +143,12 @@ template <int D> class Vector
 			patch_starts[i] = data.data() + i * patch_stride;
 		}
 	}
+	/**
+	 * @brief Construct a new Vector object for a given domain
+	 *
+	 * @param domain the domain
+	 * @param num_components  the number of components for each patch
+	 */
 	Vector(const Domain<D> &domain, int num_components)
 	: comm(domain.getCommunicator()),
 	  num_ghost_cells(domain.getNumGhostCells()),
@@ -164,6 +178,15 @@ template <int D> class Vector
 			patch_starts[i] = data.data() + i * patch_stride;
 		}
 	}
+	/**
+	 * @brief Construct a new Vector object with unmanaged memory
+	 *
+	 * @param comm  the communicator
+	 * @param patch_starts pointers to the starts of each patch
+	 * @param strides the strides
+	 * @param lengths the lengths
+	 * @param num_ghost_cells  the number of ghost cells
+	 */
 	Vector(Communicator                  comm,
 	       const std::vector<double *> & patch_starts,
 	       const std::array<int, D + 1> &strides,

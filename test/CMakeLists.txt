@@ -133,6 +133,7 @@ target_sources(unit_tests_mpi2 PRIVATE Vector_MPI2.cpp)
 target_sources(unit_tests_mpi3 PRIVATE Vector_MPI3.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE VectorCopyConstructor_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE VectorDefaultConstructor_MPI1.cpp)
 target_sources(unit_tests_mpi1 PRIVATE VectorDomainConstructor_MPI1.cpp)
 target_sources(unit_tests_mpi1 PRIVATE VectorManagedConstructor_MPI1.cpp)
 target_sources(unit_tests_mpi1 PRIVATE VectorUnmanagedConstructor_MPI1.cpp)
