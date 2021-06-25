@@ -431,7 +431,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
 	pinfos[0].num_ghost_cells = num_ghost;
 	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
-	Vector<2> vec(*d, 1);
+	Vector<2> vec(*d, 2);
 
 	DomainTools::SetValues<2>(*d, vec, f, g);
 	auto ld = vec.getComponentView(0, 0);
@@ -609,7 +609,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y", "[DomainTools]")
 	pinfos[0].num_ghost_cells = num_ghost;
 	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
 
-	Vector<2> vec(*d, 1);
+	Vector<2> vec(*d, 2);
 
 	DomainTools::SetValuesWithGhost<2>(*d, vec, f, g);
 	auto ld = vec.getComponentView(0, 0);
