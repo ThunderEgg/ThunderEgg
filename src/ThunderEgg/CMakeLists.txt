@@ -95,13 +95,8 @@ target_sources(ThunderEgg PRIVATE TriLinearGhostFiller.cpp)
 
 list(APPEND ThunderEgg_HDRS TypeDefs.h)
 
-list(APPEND ThunderEgg_HDRS ValVectorGenerator.h)
-target_sources(ThunderEgg PRIVATE ValVectorGenerator.cpp)
-
 list(APPEND ThunderEgg_HDRS Vector.h)
 target_sources(ThunderEgg PRIVATE Vector.cpp)
-
-list(APPEND ThunderEgg_HDRS VectorGenerator.h)
 
 list(APPEND ThunderEgg_HDRS View.h)
 target_sources(ThunderEgg PRIVATE View.cpp)

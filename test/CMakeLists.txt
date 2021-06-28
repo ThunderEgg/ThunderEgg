@@ -125,9 +125,6 @@ target_sources(unit_tests_mpi2 PRIVATE Timer_MPI2.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE TriLinearGhostFiller_MPI1.cpp)
 
-
-target_sources(unit_tests_mpi1 PRIVATE ValVectorGenerator_MPI1.cpp)
-
 target_sources(unit_tests_mpi1 PRIVATE Vector_MPI1.cpp)
 target_sources(unit_tests_mpi2 PRIVATE Vector_MPI2.cpp)
 target_sources(unit_tests_mpi3 PRIVATE Vector_MPI3.cpp)

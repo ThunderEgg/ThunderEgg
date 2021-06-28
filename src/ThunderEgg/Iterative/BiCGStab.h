@@ -26,7 +26,6 @@
 #include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Timer.h>
-#include <ThunderEgg/VectorGenerator.h>
 
 namespace ThunderEgg
 {

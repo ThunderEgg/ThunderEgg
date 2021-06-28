@@ -1,7 +1,6 @@
 #include "utils/DomainReader.h"
 #include <ThunderEgg/BiQuadraticGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/ValVectorGenerator.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>

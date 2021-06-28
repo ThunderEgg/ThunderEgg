@@ -40,22 +40,23 @@ template <int D> class PCShellCreator
 	 */
 	std::shared_ptr<Operator<D>> op;
 	/**
-	 * @brief The associated VectorGenerator
-	 */
-	std::shared_ptr<VectorGenerator<D>> vg;
-	/**
 	 * @brief The Mat associated with the preconditioner operator
 	 */
-	Mat A;
-
+	Mat                        A;
+	std::function<Vector<D>()> getNewVector;
 	/**
 	 * @brief Construct a new PCShellCreator object
 	 *
-	 * @param op_in the Operator we are wrapping
+	 * @param op the Operator we are wrapping
 	 * @param vg_in the VectorGenerator we are wrapping
-	 * @param A_in the Mat associated with the preconditioner Operator
+	 * @param A the Mat associated with the preconditioner Operator
 	 */
-	PCShellCreator(std::shared_ptr<Operator<D>> op_in, std::shared_ptr<VectorGenerator<D>> vg_in, Mat A_in) : op(op_in), vg(vg_in), A(A_in) {}
+	PCShellCreator(std::shared_ptr<Operator<D>> op, Mat A, const std::function<Vector<D>()> &vector_allocator)
+	: op(op),
+	  A(A),
+	  getNewVector(vector_allocator)
+	{
+	}
 	PCShellCreator(const PCShellCreator &) = delete;
 	PCShellCreator &operator=(const PCShellCreator &) = delete;
 	PCShellCreator(PCShellCreator &&) noexcept        = delete;
@@ -80,16 +81,16 @@ template <int D> class PCShellCreator
 		PCShellCreator<D> *psc = nullptr;
 		PCShellGetContext(A, (void **) &psc);
 
-		auto te_x = psc->vg->getNewVector();
-		auto te_b = psc->vg->getNewVector();
+		Vector<D> te_x = psc->getNewVector();
+		Vector<D> te_b = psc->getNewVector();
 
 		// petsc vectors don't have gost padding for patchs, so this is neccesary
 		const double *x_view;
 		VecGetArrayRead(x, &x_view);
 		int index = 0;
-		for (int p_index = 0; p_index < te_x->getNumLocalPatches(); p_index++) {
-			for (int c = 0; c < te_x->getNumComponents(); c++) {
-				ComponentView<double, D> ld = te_x->getComponentView(c, p_index);
+		for (int p_index = 0; p_index < te_x.getNumLocalPatches(); p_index++) {
+			for (int c = 0; c < te_x.getNumComponents(); c++) {
+				ComponentView<double, D> ld = te_x.getComponentView(c, p_index);
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					ld[coord] = x_view[index];
 					index++;
@@ -99,14 +100,14 @@ template <int D> class PCShellCreator
 
 		VecRestoreArrayRead(x, &x_view);
 
-		psc->op->apply(*te_x, *te_b);
+		psc->op->apply(te_x, te_b);
 
 		double *b_view;
 		VecGetArray(b, &b_view);
 		index = 0;
-		for (int p_index = 0; p_index < te_b->getNumLocalPatches(); p_index++) {
-			for (int c = 0; c < te_x->getNumComponents(); c++) {
-				ComponentView<const double, D> ld = te_b->getComponentView(c, p_index);
+		for (int p_index = 0; p_index < te_b.getNumLocalPatches(); p_index++) {
+			for (int c = 0; c < te_x.getNumComponents(); c++) {
+				ComponentView<const double, D> ld = te_b.getComponentView(c, p_index);
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					b_view[index] = ld[coord];
 					index++;
@@ -140,10 +141,10 @@ template <int D> class PCShellCreator
 	 * @param vg the VectorGenerator associated with the operators
 	 * @return PC the wrapped PC, you are responsible for calling PCDestroy on this object
 	 */
-	static PC GetNewPCShell(std::shared_ptr<Operator<D>> prec, std::shared_ptr<Operator<D>> op, std::shared_ptr<VectorGenerator<D>> vg)
+	static PC GetNewPCShell(std::shared_ptr<Operator<D>> prec, std::shared_ptr<Operator<D>> op, const std::function<Vector<D>()> &vector_allocator)
 	{
-		Mat                A   = MatShellCreator<D>::GetNewMatShell(op, vg);
-		PCShellCreator<D> *psc = new PCShellCreator(prec, vg, A);
+		Mat                A   = MatShellCreator<D>::GetNewMatShell(op, vector_allocator);
+		PCShellCreator<D> *psc = new PCShellCreator(prec, A, vector_allocator);
 		PC                 P;
 		PCCreate(MPI_COMM_WORLD, &P);
 		PCSetType(P, PCSHELL);

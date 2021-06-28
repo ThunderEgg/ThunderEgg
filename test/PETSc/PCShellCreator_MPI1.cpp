@@ -22,7 +22,6 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
-#include <ThunderEgg/ValVectorGenerator.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -53,7 +52,10 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")
 	int                   num_ghost = 0;
 	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
 	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
-	auto                  vg     = make_shared<ValVectorGenerator<2>>(d_fine, 1);
+
+	auto vector_allocator = [&] {
+		return Vector<2>(*d_fine, 1);
+	};
 
 	Vec x;
 	VecCreateMPI(MPI_COMM_WORLD, d_fine->getNumLocalCells() * 1, PETSC_DETERMINE, &x);
@@ -68,7 +70,7 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")
 
 	// create an Identity matrix
 	auto TE_A = make_shared<HalfIdentity>();
-	PC   P    = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, TE_A, vg);
+	PC   P    = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, TE_A, vector_allocator);
 
 	PCApply(P, x, b);
 
@@ -92,8 +94,10 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I and two components", "[PETSc::P
 	int                   n         = 32;
 	int                   num_ghost = 0;
 	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
-	auto                  vg     = make_shared<ValVectorGenerator<2>>(d_fine, 2);
+	shared_ptr<Domain<2>> d_fine           = domain_reader.getFinerDomain();
+	auto                  vector_allocator = [&] {
+        return Vector<2>(*d_fine, 2);
+	};
 
 	Vec x;
 	VecCreateMPI(MPI_COMM_WORLD, d_fine->getNumLocalCells() * 2, PETSC_DETERMINE, &x);
@@ -108,7 +112,7 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I and two components", "[PETSc::P
 
 	// create an Identity matrix
 	auto TE_A = make_shared<HalfIdentity>();
-	PC   P    = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, TE_A, vg);
+	PC   P    = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, TE_A, vector_allocator);
 
 	PCApply(P, x, b);
 

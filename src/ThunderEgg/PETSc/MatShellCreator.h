@@ -22,7 +22,6 @@
 #ifndef THUNDEREGG_PETSC_MATSHELLCREATOR_H
 #define THUNDEREGG_PETSC_MATSHELLCREATOR_H
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/VectorGenerator.h>
 #include <petscmat.h>
 namespace ThunderEgg
 {
@@ -39,19 +38,23 @@ template <int D> class MatShellCreator
 	/**
 	 * @brief the operator we are wrapping
 	 */
-	std::shared_ptr<Operator<D>> op;
+	std::shared_ptr<const Operator<D>> op;
+
 	/**
-	 * @brief the vector generator we are using
+	 * @brief get a new vector
 	 */
-	std::shared_ptr<VectorGenerator<D>> vg;
+	std::function<Vector<D>()> getNewVector;
 
 	/**
 	 * @brief Construct a new MatShellCreator object
 	 *
-	 * @param op_in the Operator
-	 * @param vg_in the VectorGenerator
+	 * @param op the Operator
 	 */
-	MatShellCreator(std::shared_ptr<Operator<D>> op_in, std::shared_ptr<VectorGenerator<D>> vg_in) : op(op_in), vg(vg_in) {}
+	explicit MatShellCreator(std::shared_ptr<const Operator<D>> op, const std::function<Vector<D>()> &vector_allocator)
+	: op(op),
+	  getNewVector(vector_allocator)
+	{
+	}
 	/**
 	 * @brief Apply the PETSC MatShell
 	 *
@@ -65,16 +68,16 @@ template <int D> class MatShellCreator
 		MatShellCreator<D> *msc = nullptr;
 		MatShellGetContext(A, &msc);
 
-		auto te_x = msc->vg->getNewVector();
-		auto te_b = msc->vg->getNewVector();
+		Vector<2> te_x = msc->getNewVector();
+		Vector<2> te_b = msc->getNewVector();
 
 		// petsc vectors don't have gost padding for patchs, so this is neccesary
 		const double *x_view;
 		VecGetArrayRead(x, &x_view);
 		int index = 0;
-		for (int p_index = 0; p_index < te_x->getNumLocalPatches(); p_index++) {
-			for (int c = 0; c < te_x->getNumComponents(); c++) {
-				ComponentView<double, D> ld = te_x->getComponentView(c, p_index);
+		for (int p_index = 0; p_index < te_x.getNumLocalPatches(); p_index++) {
+			for (int c = 0; c < te_x.getNumComponents(); c++) {
+				ComponentView<double, D> ld = te_x.getComponentView(c, p_index);
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					ld[coord] = x_view[index];
 					index++;
@@ -84,14 +87,14 @@ template <int D> class MatShellCreator
 
 		VecRestoreArrayRead(x, &x_view);
 
-		msc->op->apply(*te_x, *te_b);
+		msc->op->apply(te_x, te_b);
 
 		double *b_view;
 		VecGetArray(b, &b_view);
 		index = 0;
-		for (int p_index = 0; p_index < te_b->getNumLocalPatches(); p_index++) {
-			for (int c = 0; c < te_b->getNumComponents(); c++) {
-				const ComponentView<const double, D> ld = te_b->getComponentView(c, p_index);
+		for (int p_index = 0; p_index < te_b.getNumLocalPatches(); p_index++) {
+			for (int c = 0; c < te_b.getNumComponents(); c++) {
+				const ComponentView<const double, D> ld = te_b.getComponentView(c, p_index);
 				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					b_view[index] = ld[coord];
 					index++;
@@ -124,11 +127,11 @@ template <int D> class MatShellCreator
 	 * @param vg the associated vectorGenerator for that object
 	 * @return Mat the wrapped operator, you are responsible for calling MatDestroy on this
 	 */
-	static Mat GetNewMatShell(std::shared_ptr<Operator<D>> op, std::shared_ptr<VectorGenerator<D>> vg)
+	static Mat GetNewMatShell(std::shared_ptr<const Operator<D>> op, const std::function<Vector<D>()> &vector_allocator)
 	{
-		MatShellCreator<D> *msc = new MatShellCreator(op, vg);
-		auto                vec = vg->getNewVector();
-		int                 m   = vec->getNumLocalCells() * vec->getNumComponents();
+		MatShellCreator<D> *msc = new MatShellCreator(op, vector_allocator);
+		Vector<D>           vec = vector_allocator();
+		int                 m   = vec.getNumLocalCells() * vec.getNumComponents();
 		Mat                 A;
 		MatCreateShell(MPI_COMM_WORLD, m, m, PETSC_DETERMINE, PETSC_DETERMINE, msc, &A);
 		MatShellSetOperation(A, MATOP_MULT, (void (*)(void)) applyMat);

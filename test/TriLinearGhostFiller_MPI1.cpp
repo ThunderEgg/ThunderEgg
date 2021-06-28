@@ -2,7 +2,6 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
-#include <ThunderEgg/ValVectorGenerator.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>

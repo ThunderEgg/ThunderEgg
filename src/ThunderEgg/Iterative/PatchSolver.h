@@ -45,48 +45,6 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 {
 	private:
 	/**
-	 * @brief Generates a vector that is only the size of a patch
-	 */
-	class SingleVG : public VectorGenerator<D>
-	{
-		private:
-		/**
-		 * @brief number of cells along each axis
-		 */
-		std::array<int, D> lengths;
-		/**
-		 * @brief number of ghost cells
-		 */
-		int num_ghost_cells;
-		/**
-		 * @brief The number of components for each cell
-		 */
-		int num_components;
-
-		public:
-		/**
-		 * @brief Construct a new SingleVG object for a given patch
-		 *
-		 * @param pinfo the PatchInfo object for the patch
-		 * @param num_components the number of components for each cell
-		 */
-		SingleVG(const PatchInfo<D> &pinfo, int num_components)
-		: lengths(pinfo.ns),
-		  num_ghost_cells(pinfo.num_ghost_cells),
-		  num_components(num_components)
-		{
-		}
-		/**
-		 * @brief Get a newly allocated vector
-		 *
-		 * @return std::shared_ptr<Vector<D>> the vector
-		 */
-		std::shared_ptr<Vector<D>> getNewVector() const override
-		{
-			return std::shared_ptr<Vector<D>>(new Vector<D>(Communicator(MPI_COMM_SELF), lengths, num_components, 1, num_ghost_cells));
-		}
-	};
-	/**
 	 * @brief This wraps a PatchOperator object so that it only applies the operator on a specified
 	 * patch
 	 */

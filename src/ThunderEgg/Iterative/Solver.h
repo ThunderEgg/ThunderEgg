@@ -23,7 +23,6 @@
 #define THUNDEREGG_ITERATIVE_SOLVER_H
 
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/VectorGenerator.h>
 #include <iostream>
 
 namespace ThunderEgg

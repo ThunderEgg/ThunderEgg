@@ -317,9 +317,6 @@ int main(int argc, char *argv[])
 	// create a CycleBuilder and set the options
 	GMG::CycleBuilder<2> builder(copts);
 
-	// the GMG cycle needs a vector generator for domain of each level to generate temporary work vectors
-	std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain, num_components));
-
 	// Create a smoother for the finest level
 	shared_ptr<PatchSolver<2>> finest_smoother;
 	bitset<4>                  neumann_bitset = neumann ? 0xF : 0x0;
@@ -352,9 +349,6 @@ int main(int argc, char *argv[])
 			// get the coarser domain
 			coarser_domain = domain_generator->getCoarserDomain();
 
-			// vector generator
-			auto middle_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, num_components);
-
 			// create operator for middle domain
 			auto middle_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
 			auto middle_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, middle_ghost_filler);
@@ -382,9 +376,6 @@ int main(int argc, char *argv[])
 		current_domain->setTimer(timer);
 
 		//add the coarsest level to the builder
-
-		// vector generator
-		shared_ptr<VectorGenerator<2>> coarsest_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, 1);
 
 		// patch operator
 		shared_ptr<GhostFiller<2>>   coarsest_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);

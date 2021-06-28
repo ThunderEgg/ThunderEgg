@@ -23,7 +23,6 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/Iterative/BiCGStab.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
-#include <ThunderEgg/ValVectorGenerator.h>
 
 #include <sstream>
 

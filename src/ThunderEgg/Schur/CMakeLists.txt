@@ -29,8 +29,6 @@ target_sources(ThunderEgg PRIVATE PatchIfaceScatter.cpp)
 list(APPEND ThunderEgg_HDRS PatchSolverWrapper.h)
 target_sources(ThunderEgg PRIVATE PatchSolverWrapper.cpp)
 
-list(APPEND ThunderEgg_HDRS ValVectorGenerator.h)
-
 # -- install public headers
 
 install(

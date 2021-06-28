@@ -23,7 +23,6 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/ValVectorGenerator.h>
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>
 
 #include <catch2/catch_approx.hpp>

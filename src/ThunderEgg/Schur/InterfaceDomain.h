@@ -24,7 +24,6 @@
 #include <ThunderEgg/Schur/Interface.h>
 #include <ThunderEgg/Schur/PatchIfaceInfo.h>
 #include <ThunderEgg/Vector.h>
-#include <ThunderEgg/VectorGenerator.h>
 #include <deque>
 namespace ThunderEgg
 {
@@ -53,6 +52,7 @@ namespace Schur
 template <int D> class InterfaceDomain
 {
 	private:
+	std::array<int, D - 1>           iface_ns;
 	std::shared_ptr<const Domain<D>> domain;
 
 	/**
@@ -537,6 +537,7 @@ template <int D> class InterfaceDomain
 	 */
 	explicit InterfaceDomain(std::shared_ptr<const Domain<D>> domain) : domain(domain)
 	{
+		iface_ns.fill(domain->getNs()[0]);
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -617,6 +618,16 @@ template <int D> class InterfaceDomain
 	std::shared_ptr<const Domain<D>> getDomain() const
 	{
 		return domain;
+	}
+
+	/**
+	 * @brief Get a new vector for the schur compliment system
+	 *
+	 * @return Vector<D - 1> the vector
+	 */
+	Vector<D - 1> getNewVector() const
+	{
+		return Vector<D - 1>(domain->getCommunicator(), iface_ns, 1, getNumLocalInterfaces(), 0);
 	}
 };
 extern template class InterfaceDomain<2>;
