@@ -62,7 +62,9 @@ Communicator &Communicator::operator=(Communicator &&other)
 }
 Communicator::~Communicator()
 {
-	if (comm != MPI_COMM_NULL) {
+	int finalized;
+	MPI_Finalized(&finalized);
+	if (comm != MPI_COMM_NULL && !finalized) {
 		MPI_Comm_free(&comm);
 	}
 }
