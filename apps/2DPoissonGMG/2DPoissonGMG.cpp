@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
 		shared_ptr<GMG::Restrictor<2>> finest_restrictor = make_shared<GMG::LinearRestrictor<2>>(domain, coarser_domain, num_components);
 
 		//add the finest level
-		builder.addFinestLevel(patch_operator, finest_smoother, finest_restrictor, vg);
+		builder.addFinestLevel(patch_operator, finest_smoother, finest_restrictor);
 
 		shared_ptr<Domain<2>> finer_domain   = domain;
 		shared_ptr<Domain<2>> current_domain = coarser_domain;
@@ -374,7 +374,7 @@ int main(int argc, char *argv[])
 			shared_ptr<GMG::Restrictor<2>>   restrictor   = make_shared<GMG::LinearRestrictor<2>>(current_domain, coarser_domain, num_components);
 
 			// add the middle level
-			builder.addIntermediateLevel(middle_patch_operator, middle_smoother, restrictor, interpolator, middle_vector_generator);
+			builder.addIntermediateLevel(middle_patch_operator, middle_smoother, restrictor, interpolator);
 
 			finer_domain   = current_domain;
 			current_domain = coarser_domain;
@@ -404,7 +404,7 @@ int main(int argc, char *argv[])
 		shared_ptr<GMG::Interpolator<2>> interpolator = make_shared<GMG::DirectInterpolator<2>>(current_domain, finer_domain, 1);
 
 		// add the coarsest level
-		builder.addCoarsestLevel(coarsest_patch_operator, coarsest_smoother, interpolator, coarsest_vector_generator);
+		builder.addCoarsestLevel(coarsest_patch_operator, coarsest_smoother, interpolator);
 
 		// get the preconditioner operator
 		M = builder.getCycle();

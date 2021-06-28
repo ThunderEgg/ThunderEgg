@@ -51,15 +51,15 @@ template <int D> class VCycle : public Cycle<D>
 			for (int i = 0; i < num_pre_sweeps; i++) {
 				level.getSmoother()->smooth(f, u);
 			}
-			const Level<D> &           coarser_level = *level.getCoarser();
-			std::shared_ptr<Vector<D>> coarser_f     = coarser_level.getVectorGenerator()->getNewVector();
-			std::shared_ptr<Vector<D>> coarser_u     = coarser_level.getVectorGenerator()->getNewVector();
 
-			this->restrict(level, f, u, *coarser_f);
+			Vector<D> coarser_f = this->restrict(level, f, u);
 
-			this->visit(coarser_level, *coarser_f, *coarser_u);
+			const Level<D> &coarser_level = *level.getCoarser();
+			Vector<D>       coarser_u     = coarser_f.getZeroClone();
 
-			coarser_level.getInterpolator()->interpolate(*coarser_u, u);
+			this->visit(coarser_level, coarser_f, coarser_u);
+
+			coarser_level.getInterpolator()->interpolate(coarser_u, u);
 
 			for (int i = 0; i < num_post_sweeps; i++) {
 				level.getSmoother()->smooth(f, u);

@@ -46,7 +46,6 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
 	Vector<2> fine_vec(*d_fine, 1);
-	Vector<2> coarse_vec(*d_coarse, 1);
 	Vector<2> coarse_expected(*d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
@@ -60,7 +59,7 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	Vector<2> coarse_vec = restrictor->restrict(fine_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -106,7 +105,6 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
 	Vector<2> fine_vec(*d_fine, 2);
-	Vector<2> coarse_vec(*d_coarse, 2);
 	Vector<2> coarse_expected(*d_coarse, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
@@ -125,7 +123,7 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 2, true);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	Vector<2> coarse_vec = restrictor->restrict(fine_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -178,7 +176,6 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
 	Vector<2> fine_vec(*d_fine, 1);
-	Vector<2> coarse_vec(*d_coarse, 1);
 	Vector<2> coarse_expected(*d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
@@ -192,7 +189,7 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, false);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	Vector<2> coarse_vec = restrictor->restrict(fine_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
@@ -230,7 +227,6 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
 
 	Vector<2> fine_vec(*d_fine, 2);
-	Vector<2> coarse_vec(*d_coarse, 2);
 	Vector<2> coarse_expected(*d_coarse, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
@@ -249,7 +245,7 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 
 	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 2, false);
 
-	restrictor->restrict(fine_vec, coarse_vec);
+	Vector<2> coarse_vec = restrictor->restrict(fine_vec);
 
 	for (auto pinfo : d_coarse->getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);

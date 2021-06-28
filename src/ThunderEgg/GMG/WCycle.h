@@ -56,25 +56,24 @@ template <int D> class WCycle : public Cycle<D>
 				level.getSmoother()->smooth(f, u);
 			}
 
-			const Level<D> &           coarser_level = *level.getCoarser();
-			std::shared_ptr<Vector<D>> coarser_f     = coarser_level.getVectorGenerator()->getNewVector();
-			std::shared_ptr<Vector<D>> coarser_u     = coarser_level.getVectorGenerator()->getNewVector();
+			Vector<D> coarser_f = this->restrict(level, f, u);
 
-			this->restrict(level, f, u, *coarser_f);
+			const Level<D> &coarser_level = *level.getCoarser();
+			Vector<D>       coarser_u     = coarser_f.getZeroClone();
 
-			this->visit(*level.getCoarser(), *coarser_f, *coarser_u);
+			this->visit(*level.getCoarser(), coarser_f, coarser_u);
 
-			coarser_level.getInterpolator()->interpolate(*coarser_u, u);
+			coarser_level.getInterpolator()->interpolate(coarser_u, u);
 
 			for (int i = 0; i < num_mid_sweeps; i++) {
 				level.getSmoother()->smooth(f, u);
 			}
 
-			this->restrict(level, f, u, *coarser_f);
+			coarser_f = this->restrict(level, f, u);
 
-			this->visit(*level.getCoarser(), *coarser_f, *coarser_u);
+			this->visit(*level.getCoarser(), coarser_f, coarser_u);
 
-			coarser_level.getInterpolator()->interpolate(*coarser_u, u);
+			coarser_level.getInterpolator()->interpolate(coarser_u, u);
 
 			for (int i = 0; i < num_post_sweeps; i++) {
 				level.getSmoother()->smooth(f, u);

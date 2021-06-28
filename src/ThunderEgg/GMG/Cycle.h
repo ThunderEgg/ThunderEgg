@@ -49,14 +49,14 @@ template <int D> class Cycle : public Operator<D>
 	 *
 	 * @param level the current level
 	 */
-	void restrict(const Level<D> &level, const Vector<D> &f, const Vector<D> &u, Vector<D> &coarser_f) const
+	Vector<D> restrict(const Level<D> &level, const Vector<D> &f, const Vector<D> &u) const
 	{
 		// calculate residual
-		std::shared_ptr<Vector<D>> r = level.getVectorGenerator()->getNewVector();
-		level.getOperator()->apply(u, *r);
-		r->scaleThenAdd(-1, f);
+		Vector<D> r = u.getZeroClone();
+		level.getOperator()->apply(u, r);
+		r.scaleThenAdd(-1, f);
 		// create vectors for coarser levels
-		level.getRestrictor()->restrict(*r, coarser_f);
+		return level.getRestrictor()->restrict(r);
 	}
 
 	/**

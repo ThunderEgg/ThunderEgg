@@ -52,13 +52,7 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	{
 		this->ilc = ilc_in;
 	}
-	/**
-	 * @brief restriction function
-	 *
-	 * @param fine the input vector that is restricted.
-	 * @param coarse the output vector that is restricted to.
-	 */
-	void restrict(const Vector<D> &fine, Vector<D> &coarse) const override
+	Vector<D> restrict(const Vector<D> &fine) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
 			if (fine.getNumLocalPatches() != ilc->getFinerDomain()->getNumLocalPatches()) {
@@ -66,12 +60,8 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 				                   + std::to_string(ilc->getFinerDomain()->getNumLocalPatches()) + " but vector was length "
 				                   + std::to_string(fine.getNumLocalPatches()));
 			}
-			if (coarse.getNumLocalPatches() != ilc->getCoarserDomain()->getNumLocalPatches()) {
-				throw RuntimeError("coarse vector is incorrect length. Expected Lenght of "
-				                   + std::to_string(ilc->getCoarserDomain()->getNumLocalPatches()) + " but vector was length "
-				                   + std::to_string(coarse.getNumLocalPatches()));
-			}
 		}
+		Vector<D>                  coarse       = getNewCoarserVector(fine.getNumComponents());
 		std::shared_ptr<Vector<D>> coarse_ghost = ilc->getNewGhostVector();
 
 		// fill in ghost values
@@ -88,6 +78,12 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 
 		// finish scatter for ghost values
 		ilc->sendGhostPatchesFinish(coarse, *coarse_ghost);
+
+		return coarse;
+	}
+	Vector<D> getNewCoarserVector(int num_components) const override
+	{
+		return Vector<D>(*ilc->getCoarserDomain(), num_components);
 	}
 	/**
 	 * @brief Restrict values into coarse vector

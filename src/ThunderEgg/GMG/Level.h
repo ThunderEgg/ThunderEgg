@@ -21,12 +21,10 @@
 
 #ifndef THUNDEREGG_GMG_LEVEL_H
 #define THUNDEREGG_GMG_LEVEL_H
-#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/Interpolator.h>
 #include <ThunderEgg/GMG/Restrictor.h>
 #include <ThunderEgg/GMG/Smoother.h>
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/VectorGenerator.h>
 #include <memory>
 namespace ThunderEgg
 {
@@ -38,14 +36,6 @@ namespace GMG
 template <int D> class Level
 {
 	private:
-	/**
-	 * @brief The domain for this level
-	 */
-	std::shared_ptr<const Domain<D>> domain;
-	/**
-	 * @brief the VectorGenerator for this level.
-	 */
-	std::shared_ptr<VectorGenerator<D>> vg;
 	/**
 	 * @brief The operator (matrix) for this level.
 	 */
@@ -74,21 +64,8 @@ template <int D> class Level
 	public:
 	/**
 	 * @brief Create a Level object.
-	 *
-	 * @param dc pointer to the DomainCollection for this level
 	 */
-	Level(std::shared_ptr<const Domain<D>> domain, std::shared_ptr<VectorGenerator<D>> vg)
-	{
-		this->domain = domain;
-		this->vg     = vg;
-	}
-	/**
-	 * @brief Get the Domain object
-	 */
-	std::shared_ptr<const Domain<D>> getDomain() const
-	{
-		return domain;
-	}
+	Level() {}
 	/**
 	 * @brief Set the restriction operator for restricting from this level to the coarser level.
 	 *
@@ -160,15 +137,6 @@ template <int D> class Level
 	std::shared_ptr<const Smoother<D>> getSmoother() const
 	{
 		return smoother;
-	}
-	/**
-	 * @brief Get DomainCollection for this level.
-	 *
-	 * @return DomainCollection for this level.
-	 */
-	const std::shared_ptr<VectorGenerator<D>> &getVectorGenerator() const
-	{
-		return vg;
 	}
 	/**
 	 * @brief Set pointer to the coarser level.

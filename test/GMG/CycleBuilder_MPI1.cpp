@@ -47,35 +47,30 @@ class MockRestrictor : public GMG::Restrictor<2>
 {
 	public:
 	mutable int num_calls = 0;
-	void restrict(const Vector<2> &x, Vector<2> &b) const override
+	Vector<2> restrict(const Vector<2> &x) const override
 	{
+		return x.getZeroClone();
 	}
-};
-class MockVectorGenerator : public VectorGenerator<2>
-{
-	public:
-	std::shared_ptr<Vector<2>> getNewVector() const override
+	Vector<2> getNewCoarserVector(int num_components) const override
 	{
-		return nullptr;
+		return Vector<2>();
 	}
 };
 TEST_CASE("CycleBuilder with two levels", "[GMG::CycleBuilder]")
 {
-	GMG::CycleOpts                                      opts;
-	GMG::CycleBuilder<2>                                builder(opts);
-	std::array<std::shared_ptr<MockOperator>, 2>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 2>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 2> vgs;
+	GMG::CycleOpts                               opts;
+	GMG::CycleBuilder<2>                         builder(opts);
+	std::array<std::shared_ptr<MockOperator>, 2> ops;
+	std::array<std::shared_ptr<MockSmoother>, 2> smoothers;
 	for (int i = 0; i < 2; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::shared_ptr<MockRestrictor>   restrictor   = make_shared<MockRestrictor>();
 	std::shared_ptr<MockInterpolator> interpolator = make_shared<MockInterpolator>();
 
-	builder.addFinestLevel(ops[0], smoothers[0], restrictor, vgs[0]);
-	builder.addCoarsestLevel(ops[1], smoothers[1], interpolator, vgs[1]);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictor);
+	builder.addCoarsestLevel(ops[1], smoothers[1], interpolator);
 
 	auto cycle = builder.getCycle();
 
@@ -84,7 +79,6 @@ TEST_CASE("CycleBuilder with two levels", "[GMG::CycleBuilder]")
 	CHECK(finest_level->getSmoother() == smoothers[0]);
 	CHECK(finest_level->getRestrictor() == restrictor);
 	CHECK(finest_level->getInterpolator() == nullptr);
-	CHECK(finest_level->getVectorGenerator() == vgs[0]);
 	CHECK(finest_level->finest());
 	CHECK_FALSE(finest_level->coarsest());
 	CHECK_THROWS_AS(finest_level->getFiner(), std::bad_weak_ptr);
@@ -95,7 +89,6 @@ TEST_CASE("CycleBuilder with two levels", "[GMG::CycleBuilder]")
 	CHECK(coarsest_level->getSmoother() == smoothers[1]);
 	CHECK(coarsest_level->getRestrictor() == nullptr);
 	CHECK(coarsest_level->getInterpolator() == interpolator);
-	CHECK(coarsest_level->getVectorGenerator() == vgs[1]);
 	CHECK_FALSE(coarsest_level->finest());
 	CHECK(coarsest_level->coarsest());
 	CHECK(coarsest_level->getFiner() == finest_level);
@@ -103,13 +96,11 @@ TEST_CASE("CycleBuilder with two levels", "[GMG::CycleBuilder]")
 }
 TEST_CASE("CycleBuilder with three levels", "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 3>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 3>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 3> vgs;
+	std::array<std::shared_ptr<MockOperator>, 3> ops;
+	std::array<std::shared_ptr<MockSmoother>, 3> smoothers;
 	for (int i = 0; i < 3; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 2>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 2> interpolators;
@@ -120,9 +111,9 @@ TEST_CASE("CycleBuilder with three levels", "[GMG::CycleBuilder]")
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addCoarsestLevel(ops[2], smoothers[2], interpolators[1], vgs[2]);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	builder.addCoarsestLevel(ops[2], smoothers[2], interpolators[1]);
 
 	auto cycle = builder.getCycle();
 
@@ -131,7 +122,6 @@ TEST_CASE("CycleBuilder with three levels", "[GMG::CycleBuilder]")
 	CHECK(finest_level->getSmoother() == smoothers[0]);
 	CHECK(finest_level->getRestrictor() == restrictors[0]);
 	CHECK(finest_level->getInterpolator() == nullptr);
-	CHECK(finest_level->getVectorGenerator() == vgs[0]);
 	CHECK(finest_level->finest());
 	CHECK_FALSE(finest_level->coarsest());
 	CHECK_THROWS_AS(finest_level->getFiner(), std::bad_weak_ptr);
@@ -142,7 +132,6 @@ TEST_CASE("CycleBuilder with three levels", "[GMG::CycleBuilder]")
 	CHECK(second_level->getSmoother() == smoothers[1]);
 	CHECK(second_level->getRestrictor() == restrictors[1]);
 	CHECK(second_level->getInterpolator() == interpolators[0]);
-	CHECK(second_level->getVectorGenerator() == vgs[1]);
 	CHECK_FALSE(second_level->finest());
 	CHECK_FALSE(second_level->coarsest());
 	CHECK(second_level->getFiner() == finest_level);
@@ -153,7 +142,6 @@ TEST_CASE("CycleBuilder with three levels", "[GMG::CycleBuilder]")
 	CHECK(coarsest_level->getSmoother() == smoothers[2]);
 	CHECK(coarsest_level->getRestrictor() == nullptr);
 	CHECK(coarsest_level->getInterpolator() == interpolators[1]);
-	CHECK(coarsest_level->getVectorGenerator() == vgs[2]);
 	CHECK_FALSE(coarsest_level->finest());
 	CHECK(coarsest_level->coarsest());
 	CHECK(coarsest_level->getFiner() == second_level);
@@ -161,13 +149,11 @@ TEST_CASE("CycleBuilder with three levels", "[GMG::CycleBuilder]")
 }
 TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -178,10 +164,10 @@ TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
-	builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2], vgs[3]);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]);
+	builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]);
 
 	auto cycle = builder.getCycle();
 
@@ -190,7 +176,6 @@ TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
 	CHECK(finest_level->getSmoother() == smoothers[0]);
 	CHECK(finest_level->getRestrictor() == restrictors[0]);
 	CHECK(finest_level->getInterpolator() == nullptr);
-	CHECK(finest_level->getVectorGenerator() == vgs[0]);
 	CHECK(finest_level->finest());
 	CHECK_FALSE(finest_level->coarsest());
 	CHECK_THROWS_AS(finest_level->getFiner(), std::bad_weak_ptr);
@@ -201,7 +186,6 @@ TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
 	CHECK(second_level->getSmoother() == smoothers[1]);
 	CHECK(second_level->getRestrictor() == restrictors[1]);
 	CHECK(second_level->getInterpolator() == interpolators[0]);
-	CHECK(second_level->getVectorGenerator() == vgs[1]);
 	CHECK_FALSE(second_level->finest());
 	CHECK_FALSE(second_level->coarsest());
 	CHECK(second_level->getFiner() == finest_level);
@@ -212,7 +196,6 @@ TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
 	CHECK(third_level->getSmoother() == smoothers[2]);
 	CHECK(third_level->getRestrictor() == restrictors[2]);
 	CHECK(third_level->getInterpolator() == interpolators[1]);
-	CHECK(third_level->getVectorGenerator() == vgs[2]);
 	CHECK_FALSE(third_level->finest());
 	CHECK_FALSE(third_level->coarsest());
 	CHECK(third_level->getFiner() == second_level);
@@ -223,7 +206,6 @@ TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
 	CHECK(coarsest_level->getSmoother() == smoothers[3]);
 	CHECK(coarsest_level->getRestrictor() == nullptr);
 	CHECK(coarsest_level->getInterpolator() == interpolators[2]);
-	CHECK(coarsest_level->getVectorGenerator() == vgs[3]);
 	CHECK_FALSE(coarsest_level->finest());
 	CHECK(coarsest_level->coarsest());
 	CHECK(coarsest_level->getFiner() == third_level);
@@ -232,13 +214,11 @@ TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
 TEST_CASE("CycleBuilder addFinestLevel throws exception with nullptr for operator",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -249,19 +229,17 @@ TEST_CASE("CycleBuilder addFinestLevel throws exception with nullptr for operato
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	CHECK_THROWS_AS(builder.addFinestLevel(nullptr, smoothers[0], restrictors[0], vgs[0]),
+	CHECK_THROWS_AS(builder.addFinestLevel(nullptr, smoothers[0], restrictors[0]),
 	                RuntimeError);
 }
 TEST_CASE("CycleBuilder addFinestLevel throws exception with nullptr for smoother",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -272,18 +250,16 @@ TEST_CASE("CycleBuilder addFinestLevel throws exception with nullptr for smoothe
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], nullptr, restrictors[0], vgs[0]), RuntimeError);
+	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], nullptr, restrictors[0]), RuntimeError);
 }
 TEST_CASE("CycleBuilder addFinestLevel throws exception with nullptr for restrictor",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -294,41 +270,16 @@ TEST_CASE("CycleBuilder addFinestLevel throws exception with nullptr for restric
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], nullptr, vgs[0]), RuntimeError);
-}
-TEST_CASE("CycleBuilder addFinestLevel throws exception with nullptr for vector generator",
-          "[GMG::CycleBuilder]")
-{
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
-	for (int i = 0; i < 4; i++) {
-		ops[i]       = make_shared<MockOperator>();
-		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
-	}
-	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
-	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
-	for (int i = 0; i < 3; i++) {
-		restrictors[i]   = make_shared<MockRestrictor>();
-		interpolators[i] = make_shared<MockInterpolator>();
-	}
-
-	GMG::CycleOpts       opts;
-	GMG::CycleBuilder<2> builder(opts);
-	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], nullptr),
-	                RuntimeError);
+	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], nullptr), RuntimeError);
 }
 TEST_CASE("CycleBuilder addIntermediateLevel throws exception with nullptr for operator",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -339,21 +290,19 @@ TEST_CASE("CycleBuilder addIntermediateLevel throws exception with nullptr for o
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
 	CHECK_THROWS_AS(
-	builder.addIntermediateLevel(nullptr, smoothers[1], restrictors[1], interpolators[0], vgs[1]),
+	builder.addIntermediateLevel(nullptr, smoothers[1], restrictors[1], interpolators[0]),
 	RuntimeError);
 }
 TEST_CASE("CycleBuilder addIntermediateLevel throws exception with nullptr for smoother",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -364,21 +313,19 @@ TEST_CASE("CycleBuilder addIntermediateLevel throws exception with nullptr for s
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
 	CHECK_THROWS_AS(
-	builder.addIntermediateLevel(ops[1], nullptr, restrictors[1], interpolators[0], vgs[1]),
+	builder.addIntermediateLevel(ops[1], nullptr, restrictors[1], interpolators[0]),
 	RuntimeError);
 }
 TEST_CASE("CycleBuilder addIntermediateLevel throws exception with nullptr for restrictor",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -389,21 +336,19 @@ TEST_CASE("CycleBuilder addIntermediateLevel throws exception with nullptr for r
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
 	CHECK_THROWS_AS(
-	builder.addIntermediateLevel(ops[1], smoothers[1], nullptr, interpolators[0], vgs[1]),
+	builder.addIntermediateLevel(ops[1], smoothers[1], nullptr, interpolators[0]),
 	RuntimeError);
 }
 TEST_CASE("CycleBuilder addIntermediateLevel throws exception with nullptr for interpolator",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -414,46 +359,19 @@ TEST_CASE("CycleBuilder addIntermediateLevel throws exception with nullptr for i
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
 	CHECK_THROWS_AS(
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], nullptr, vgs[1]),
-	RuntimeError);
-}
-TEST_CASE("CycleBuilder addIntermediateLevel throws exception with nullptr for vector generator",
-          "[GMG::CycleBuilder]")
-{
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
-	for (int i = 0; i < 4; i++) {
-		ops[i]       = make_shared<MockOperator>();
-		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
-	}
-	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
-	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
-	for (int i = 0; i < 3; i++) {
-		restrictors[i]   = make_shared<MockRestrictor>();
-		interpolators[i] = make_shared<MockInterpolator>();
-	}
-
-	GMG::CycleOpts       opts;
-	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	CHECK_THROWS_AS(
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], nullptr),
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], nullptr),
 	RuntimeError);
 }
 TEST_CASE("CycleBuilder addCoarsestLevel throws exception with nullptr for operator",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -464,22 +382,20 @@ TEST_CASE("CycleBuilder addCoarsestLevel throws exception with nullptr for opera
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
-	CHECK_THROWS_AS(builder.addCoarsestLevel(nullptr, smoothers[3], interpolators[2], vgs[3]),
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]);
+	CHECK_THROWS_AS(builder.addCoarsestLevel(nullptr, smoothers[3], interpolators[2]),
 	                RuntimeError);
 }
 TEST_CASE("CycleBuilder addCoarsestLevel throws exception with nullptr for smoother",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -490,22 +406,20 @@ TEST_CASE("CycleBuilder addCoarsestLevel throws exception with nullptr for smoot
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
-	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], nullptr, interpolators[2], vgs[3]),
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]);
+	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], nullptr, interpolators[2]),
 	                RuntimeError);
 }
 TEST_CASE("CycleBuilder addCoarsestLevel throws exception with nullptr for interpolator",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -516,46 +430,18 @@ TEST_CASE("CycleBuilder addCoarsestLevel throws exception with nullptr for inter
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
-	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], nullptr, vgs[3]), RuntimeError);
-}
-TEST_CASE("CycleBuilder addCoarsestLevel throws exception with nullptr for vector generator",
-          "[GMG::CycleBuilder]")
-{
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
-	for (int i = 0; i < 4; i++) {
-		ops[i]       = make_shared<MockOperator>();
-		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
-	}
-	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
-	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
-	for (int i = 0; i < 3; i++) {
-		restrictors[i]   = make_shared<MockRestrictor>();
-		interpolators[i] = make_shared<MockInterpolator>();
-	}
-
-	GMG::CycleOpts       opts;
-	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
-	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2], nullptr),
-	                RuntimeError);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]);
+	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], nullptr), RuntimeError);
 }
 TEST_CASE("CycleBuilder addFinestLevel throws exception if called twice", "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -566,20 +452,18 @@ TEST_CASE("CycleBuilder addFinestLevel throws exception if called twice", "[GMG:
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]),
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]),
 	                RuntimeError);
 }
 TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addIntermediateLevel",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -590,21 +474,19 @@ TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addInter
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]),
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]),
 	                RuntimeError);
 }
 TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addCoarsestLevel",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -615,23 +497,21 @@ TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addCoars
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
-	builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2], vgs[3]);
-	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]),
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]);
+	builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]);
+	CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]),
 	                RuntimeError);
 }
 TEST_CASE("CycleBuilder addIntermediateLevel throws exception if addFinestLevel isn't called",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -643,19 +523,17 @@ TEST_CASE("CycleBuilder addIntermediateLevel throws exception if addFinestLevel 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
 	CHECK_THROWS_AS(
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]),
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]),
 	RuntimeError);
 }
 TEST_CASE("CycleBuilder addIntermediateLevel throws exception if called after addCoarsestLevel",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -666,24 +544,22 @@ TEST_CASE("CycleBuilder addIntermediateLevel throws exception if called after ad
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
-	builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2], vgs[3]);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]);
+	builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]);
 	CHECK_THROWS_AS(
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]),
+	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]),
 	RuntimeError);
 }
 TEST_CASE("CycleBuilder addCoarsestLevel throws exception if addFinestLevel isn't called",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -694,18 +570,16 @@ TEST_CASE("CycleBuilder addCoarsestLevel throws exception if addFinestLevel isn'
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2], vgs[3]),
+	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]),
 	                RuntimeError);
 }
 TEST_CASE("CycleBuilder addCoarsestLevel throws exception if called twice", "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -716,23 +590,21 @@ TEST_CASE("CycleBuilder addCoarsestLevel throws exception if called twice", "[GM
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
-	builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2], vgs[3]);
-	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2], vgs[3]),
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]);
+	builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]);
+	CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]),
 	                RuntimeError);
 }
 TEST_CASE("CycleBuilder getCycle throws exception if addCoarsestLevel isn't called",
           "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;
@@ -743,21 +615,19 @@ TEST_CASE("CycleBuilder getCycle throws exception if addCoarsestLevel isn't call
 
 	GMG::CycleOpts       opts;
 	GMG::CycleBuilder<2> builder(opts);
-	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0], vgs[0]);
-	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0], vgs[1]);
-	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1], vgs[2]);
+	builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
+	builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
+	builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]);
 
 	CHECK_THROWS_AS(builder.getCycle(), RuntimeError);
 }
 TEST_CASE("CycleBuilder getCycle throws exception if no calls are made", "[GMG::CycleBuilder]")
 {
-	std::array<std::shared_ptr<MockOperator>, 4>        ops;
-	std::array<std::shared_ptr<MockSmoother>, 4>        smoothers;
-	std::array<std::shared_ptr<MockVectorGenerator>, 4> vgs;
+	std::array<std::shared_ptr<MockOperator>, 4> ops;
+	std::array<std::shared_ptr<MockSmoother>, 4> smoothers;
 	for (int i = 0; i < 4; i++) {
 		ops[i]       = make_shared<MockOperator>();
 		smoothers[i] = make_shared<MockSmoother>();
-		vgs[i]       = make_shared<MockVectorGenerator>();
 	}
 	std::array<std::shared_ptr<MockRestrictor>, 3>   restrictors;
 	std::array<std::shared_ptr<MockInterpolator>, 3> interpolators;

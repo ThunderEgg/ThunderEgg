@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
 			= make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1, true);
 
 			GMG::CycleBuilder<2> builder(copts);
-			builder.addFinestLevel(p_operator, p_solver, restrictor, vg);
+			builder.addFinestLevel(p_operator, p_solver, restrictor);
 
 			auto prev_coeffs = h;
 			auto prev_domain = curr_domain;
@@ -324,8 +324,7 @@ int main(int argc, char *argv[])
 				= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
 				restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
 
-				builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator,
-				                             vg);
+				builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator);
 				prev_domain = curr_domain;
 				curr_domain = next_domain;
 			}
@@ -343,7 +342,7 @@ int main(int argc, char *argv[])
 
 			auto coarse_p_solver
 			= make_shared<Iterative::PatchSolver<2>>(p_bcgs, coarse_p_operator);
-			builder.addCoarsestLevel(coarse_p_operator, coarse_p_solver, interpolator, coarse_vg);
+			builder.addCoarsestLevel(coarse_p_operator, coarse_p_solver, interpolator);
 
 			M = builder.getCycle();
 
