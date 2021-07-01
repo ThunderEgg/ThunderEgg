@@ -71,10 +71,9 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 		});
 	}
 
-	auto interpolator
-	= std::make_shared<GMG::DirectInterpolator<2>>(d_coarse, d_fine, num_components);
+	GMG::DirectInterpolator<2> interpolator(*d_coarse, *d_fine);
 
-	interpolator->interpolate(coarse_vec, fine_vec);
+	interpolator.interpolate(coarse_vec, fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -130,10 +129,9 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 
 	fine_vec.set(1.0);
 
-	auto interpolator
-	= std::make_shared<GMG::DirectInterpolator<2>>(d_coarse, d_fine, num_components);
+	GMG::DirectInterpolator<2> interpolator(*d_coarse, *d_fine);
 
-	interpolator->interpolate(coarse_vec, fine_vec);
+	interpolator.interpolate(coarse_vec, fine_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);

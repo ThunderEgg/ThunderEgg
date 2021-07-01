@@ -40,7 +40,7 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	/**
 	 * @brief The communication package for restricting between levels.
 	 */
-	std::shared_ptr<InterLevelComm<D>> ilc;
+	mutable InterLevelComm<D> ilc;
 
 	public:
 	/**
@@ -48,10 +48,7 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	 *
 	 * @param ilc the communcation package for the two levels.
 	 */
-	MPIRestrictor(std::shared_ptr<InterLevelComm<D>> ilc_in)
-	{
-		this->ilc = ilc_in;
-	}
+	MPIRestrictor(const Domain<D> &coarser_domain, const Domain<D> &finer_domain) : ilc(coarser_domain, finer_domain) {}
 	Vector<D> restrict(const Vector<D> &fine) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
@@ -61,29 +58,29 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 				                   + std::to_string(fine.getNumLocalPatches()));
 			}
 		}
-		Vector<D>                  coarse       = getNewCoarserVector(fine.getNumComponents());
-		std::shared_ptr<Vector<D>> coarse_ghost = ilc->getNewGhostVector();
+		Vector<D> coarse       = getNewCoarserVector(fine.getNumComponents());
+		Vector<D> coarse_ghost = ilc.getNewGhostVector(fine.getNumComponents());
 
 		// fill in ghost values
-		restrictPatches(ilc->getPatchesWithGhostParent(), fine, *coarse_ghost);
+		restrictPatches(ilc.getPatchesWithGhostParent(), fine, coarse_ghost);
 
 		// clear values in coarse vector
 		coarse.setWithGhost(0);
 
 		// start scatter for ghost values
-		ilc->sendGhostPatchesStart(coarse, *coarse_ghost);
+		ilc.sendGhostPatchesStart(coarse, coarse_ghost);
 
 		// fill in local values
-		restrictPatches(ilc->getPatchesWithLocalParent(), fine, coarse);
+		restrictPatches(ilc.getPatchesWithLocalParent(), fine, coarse);
 
 		// finish scatter for ghost values
-		ilc->sendGhostPatchesFinish(coarse, *coarse_ghost);
+		ilc.sendGhostPatchesFinish(coarse, coarse_ghost);
 
 		return coarse;
 	}
 	Vector<D> getNewCoarserVector(int num_components) const override
 	{
-		return Vector<D>(*ilc->getCoarserDomain(), num_components);
+		return Vector<D>(ilc.getCoarserDomain(), num_components);
 	}
 	/**
 	 * @brief Restrict values into coarse vector

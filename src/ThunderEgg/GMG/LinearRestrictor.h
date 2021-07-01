@@ -138,15 +138,11 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	 *
 	 * @param fine_domain the finer Domain
 	 * @param coarse_domain the coarser Domain
-	 * @param num_components the number of components in each cell
 	 * @param extrapolate_boundary_ghosts set to true if ghost values at the boundaries should be
 	 * extrapolated
 	 */
-	LinearRestrictor(std::shared_ptr<Domain<D>> fine_domain,
-	                 std::shared_ptr<Domain<D>> coarse_domain,
-	                 int                        num_components,
-	                 bool                       extrapolate_boundary_ghosts = false)
-	: MPIRestrictor<D>(std::make_shared<InterLevelComm<D>>(coarse_domain, num_components, fine_domain)),
+	LinearRestrictor(const Domain<D> &fine_domain, const Domain<D> &coarse_domain, bool extrapolate_boundary_ghosts = false)
+	: MPIRestrictor<D>(coarse_domain, fine_domain),
 	  extrapolate_boundary_ghosts(extrapolate_boundary_ghosts)
 	{
 	}

@@ -50,11 +50,11 @@ template <int D> class InterLevelComm
 	/**
 	 * @brief The coarser domain
 	 */
-	std::shared_ptr<const Domain<D>> coarser_domain;
+	Domain<D> coarser_domain;
 	/**
 	 * @brief The finer domain
 	 */
-	std::shared_ptr<const Domain<D>> finer_domain;
+	Domain<D> finer_domain;
 	/**
 	 * @brief Dimensions of a patch
 	 */
@@ -67,10 +67,6 @@ template <int D> class InterLevelComm
 	 * @brief Number of ghost patches
 	 */
 	int num_ghost_patches;
-	/**
-	 * @brief The number of components per patch
-	 */
-	int num_components;
 	/**
 	 * @brief Number of values in a patch. (including ghost values)
 	 */
@@ -118,14 +114,13 @@ template <int D> class InterLevelComm
 	 * @param num_coarser_components the number of components for eac cell of the coarser domain
 	 * @param fine_domain the finer DomainCollection.
 	 */
-	InterLevelComm(std::shared_ptr<const Domain<D>> coarser_domain, int num_coarser_components, std::shared_ptr<const Domain<D>> finer_domain)
+	InterLevelComm(const Domain<D> &coarser_domain, const Domain<D> &finer_domain)
 	: coarser_domain(coarser_domain),
 	  finer_domain(finer_domain),
-	  ns(finer_domain->getNs()),
-	  num_ghost_cells(finer_domain->getNumGhostCells()),
-	  num_components(num_coarser_components)
+	  ns(finer_domain.getNs()),
+	  num_ghost_cells(finer_domain.getNumGhostCells())
 	{
-		int my_patch_size = num_components;
+		int my_patch_size = 1;
 		for (size_t axis = 0; axis < D; axis++) {
 			my_patch_size *= ns[axis] + 2 * num_ghost_cells;
 		}
@@ -140,10 +135,10 @@ template <int D> class InterLevelComm
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		// TODO this has to be changed when domain class is updated
 		std::map<int, int> coarser_domain_id_to_local_index_map;
-		for (const PatchInfo<D> &pinfo : coarser_domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : this->coarser_domain.getPatchInfoVector()) {
 			coarser_domain_id_to_local_index_map[pinfo.id] = pinfo.local_index;
 		}
-		for (const PatchInfo<D> &patch : finer_domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &patch : this->finer_domain.getPatchInfoVector()) {
 			if (patch.parent_rank == rank) {
 				local_parents.emplace_back(coarser_domain_id_to_local_index_map[patch.parent_id], patch);
 			} else {
@@ -161,7 +156,7 @@ template <int D> class InterLevelComm
 		                                                           // indexes). The second map is for when
 		                                                           // local indexes are iterated over, they
 		                                                           // are sorted by their cooresponding id
-		for (const PatchInfo<D> &pinfo : coarser_domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : this->coarser_domain.getPatchInfoVector()) {
 			for (int child_rank : pinfo.child_ranks) {
 				if (child_rank != -1 && child_rank != rank)
 					ranks_and_local_patches[child_rank][pinfo.id] = pinfo.local_index;
@@ -230,12 +225,12 @@ template <int D> class InterLevelComm
 
 	/**
 	 * @brief Allocate a new vector for ghost patch values
-	 *
+	 * @param num_components the number of components
 	 * @return the newly allocated vector.
 	 */
-	std::shared_ptr<Vector<D>> getNewGhostVector() const
+	Vector<D> getNewGhostVector(int num_components) const
 	{
-		return std::make_shared<Vector<D>>(finer_domain->getCommunicator(), ns, num_components, num_ghost_patches, num_ghost_cells);
+		return Vector<D>(finer_domain.getCommunicator(), ns, num_components, num_ghost_patches, num_ghost_cells);
 	}
 
 	/**
@@ -297,7 +292,7 @@ template <int D> class InterLevelComm
 		recv_requests.reserve(rank_and_local_indexes_for_vector.size());
 		for (auto rank_indexes_pair : rank_and_local_indexes_for_vector) {
 			// allocate buffer
-			recv_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
+			recv_buffers.emplace_back(vector.getNumComponents() * patch_size * rank_indexes_pair.second.size());
 
 			// post the receive
 			int rank = rank_indexes_pair.first;
@@ -309,7 +304,7 @@ template <int D> class InterLevelComm
 		// post sends
 		for (auto rank_indexes_pair : rank_and_local_indexes_for_ghost_vector) {
 			// allocate buffer
-			send_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
+			send_buffers.emplace_back(vector.getNumComponents() * patch_size * rank_indexes_pair.second.size());
 
 			// fill buffer with values
 			int buffer_idx = 0;
@@ -424,7 +419,7 @@ template <int D> class InterLevelComm
 		recv_requests.reserve(rank_and_local_indexes_for_ghost_vector.size());
 		for (auto rank_indexes_pair : rank_and_local_indexes_for_ghost_vector) {
 			// allocate buffer
-			recv_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
+			recv_buffers.emplace_back(vector.getNumComponents() * patch_size * rank_indexes_pair.second.size());
 
 			// post the recieve
 			int rank = rank_indexes_pair.first;
@@ -436,7 +431,7 @@ template <int D> class InterLevelComm
 		// post sends
 		for (auto rank_indexes_pair : rank_and_local_indexes_for_vector) {
 			// allocate buffer
-			send_buffers.emplace_back(patch_size * rank_indexes_pair.second.size());
+			send_buffers.emplace_back(vector.getNumComponents() * patch_size * rank_indexes_pair.second.size());
 
 			// fill buffer with values
 			int buffer_idx = 0;
@@ -520,11 +515,11 @@ template <int D> class InterLevelComm
 		current_ghost_vector = nullptr;
 		current_vector       = nullptr;
 	}
-	std::shared_ptr<const Domain<D>> getCoarserDomain() const
+	const Domain<D> &getCoarserDomain() const
 	{
 		return coarser_domain;
 	}
-	std::shared_ptr<const Domain<D>> getFinerDomain() const
+	const Domain<D> &getFinerDomain() const
 	{
 		return finer_domain;
 	}

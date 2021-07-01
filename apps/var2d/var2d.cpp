@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
 
 			auto next_domain = dcg->getCoarserDomain();
 			auto restrictor
-			= make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1, true);
+			= make_shared<GMG::LinearRestrictor<2>>(*curr_domain, *next_domain, true);
 
 			GMG::CycleBuilder<2> builder(copts);
 			builder.addFinestLevel(p_operator, p_solver, restrictor);
@@ -319,8 +319,8 @@ int main(int argc, char *argv[])
 				auto new_p_solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, new_p_operator);
 
 				auto interpolator
-				= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
-				restrictor = make_shared<GMG::LinearRestrictor<2>>(curr_domain, next_domain, 1);
+				= make_shared<GMG::DirectInterpolator<2>>(*curr_domain, *prev_domain);
+				restrictor = make_shared<GMG::LinearRestrictor<2>>(*curr_domain, *next_domain);
 
 				builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator);
 				prev_domain = curr_domain;
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
 			curr_domain->setTimer(timer);
 
 			auto interpolator
-			= make_shared<GMG::DirectInterpolator<2>>(curr_domain, prev_domain, 1);
+			= make_shared<GMG::DirectInterpolator<2>>(*curr_domain, *prev_domain);
 			auto      coarse_gf = make_shared<BiLinearGhostFiller>(curr_domain, GhostFillingType::Faces);
 			Vector<2> coarse_coeffs(*curr_domain, 1);
 			DomainTools::SetValuesWithGhost<2>(*curr_domain, coarse_coeffs, hfun);

@@ -45,10 +45,7 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 	 * @param fine_domain the finer Domain
 	 * @param num_components the number of components in each cell
 	 */
-	DirectInterpolator(std::shared_ptr<Domain<D>> coarse_domain, std::shared_ptr<Domain<D>> fine_domain, int num_components)
-	: MPIInterpolator<D>(std::make_shared<InterLevelComm<D>>(coarse_domain, num_components, fine_domain))
-	{
-	}
+	DirectInterpolator(const Domain<D> &coarse_domain, const Domain<D> &fine_domain) : MPIInterpolator<D>(coarse_domain, fine_domain) {}
 	void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
 	                        const Vector<D> &                                                              coarser_vector,
 	                        Vector<D> &                                                                    finer_vector) const override
