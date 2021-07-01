@@ -133,13 +133,13 @@ int main(int argc, char *argv[])
 		double alpha = 1000;
 		ffun         = [&](const array<double, 2> &coord) {
             double x  = coord[0];
-            double y  = coord[2];
+            double y  = coord[1];
             double r2 = pow((x - x0), 2) + pow((y - y0), 2);
             return exp(-alpha / 2.0 * r2) * (pow(alpha, 2) * r2 - 2 * alpha);
 		};
 		gfun = [&](const array<double, 2> &coord) {
 			double x  = coord[0];
-			double y  = coord[2];
+			double y  = coord[1];
 			double r2 = pow((x - x0), 2) + pow((y - y0), 2);
 			return exp(-alpha / 2.0 * r2);
 		};
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 	} else if (problem == "circle") {
 		ffun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			double xdist, ydist, dist;
 			// distance form center circle
 			xdist = x - 0.5;
@@ -188,12 +188,12 @@ int main(int argc, char *argv[])
 	} else if (problem == "trig_gauss") {
 		gfun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			return exp(cos(10 * M_PI * x)) - exp(cos(11 * M_PI * y));
 		};
 		ffun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			return 100 * M_PI * M_PI * (pow(sin(10 * M_PI * x), 2) - cos(10 * M_PI * x))
 			       * exp(cos(10 * M_PI * x))
 			       + 121 * M_PI * M_PI * (cos(11 * M_PI * y) - pow(sin(11 * M_PI * y), 2))
@@ -211,22 +211,22 @@ int main(int argc, char *argv[])
 	} else {
 		ffun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
 		};
 		gfun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			return sin(M_PI * y) * cos(2 * M_PI * x);
 		};
 		nfunx = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			return -2 * M_PI * sin(M_PI * y) * sin(2 * M_PI * x);
 		};
 		nfuny = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 	}

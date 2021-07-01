@@ -15,6 +15,9 @@ list(APPEND ThunderEgg_HDRS CycleOpts.h)
 list(APPEND ThunderEgg_HDRS DirectInterpolator.h)
 target_sources(ThunderEgg PRIVATE DirectInterpolator.cpp)
 
+list(APPEND ThunderEgg_HDRS FMGCycle.h)
+target_sources(ThunderEgg PRIVATE FMGCycle.cpp)
+
 list(APPEND ThunderEgg_HDRS InterLevelComm.h)
 target_sources(ThunderEgg PRIVATE InterLevelComm.cpp)
 

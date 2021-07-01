@@ -38,7 +38,7 @@ template <int D> class PCShellCreator
 	/**
 	 * @brief The operator we are wrapping
 	 */
-	std::shared_ptr<Operator<D>> op;
+	std::shared_ptr<const Operator<D>> op;
 	/**
 	 * @brief The Mat associated with the preconditioner operator
 	 */
@@ -51,7 +51,7 @@ template <int D> class PCShellCreator
 	 * @param vg_in the VectorGenerator we are wrapping
 	 * @param A the Mat associated with the preconditioner Operator
 	 */
-	PCShellCreator(std::shared_ptr<Operator<D>> op, Mat A, const std::function<Vector<D>()> &vector_allocator)
+	PCShellCreator(std::shared_ptr<const Operator<D>> op, Mat A, const std::function<Vector<D>()> &vector_allocator)
 	: op(op),
 	  A(A),
 	  getNewVector(vector_allocator)
@@ -141,7 +141,8 @@ template <int D> class PCShellCreator
 	 * @param vg the VectorGenerator associated with the operators
 	 * @return PC the wrapped PC, you are responsible for calling PCDestroy on this object
 	 */
-	static PC GetNewPCShell(std::shared_ptr<Operator<D>> prec, std::shared_ptr<Operator<D>> op, const std::function<Vector<D>()> &vector_allocator)
+	static PC
+	GetNewPCShell(std::shared_ptr<const Operator<D>> prec, std::shared_ptr<const Operator<D>> op, const std::function<Vector<D>()> &vector_allocator)
 	{
 		Mat                A   = MatShellCreator<D>::GetNewMatShell(op, vector_allocator);
 		PCShellCreator<D> *psc = new PCShellCreator(prec, A, vector_allocator);

@@ -6,6 +6,7 @@ unset(ThunderEgg_HDRS)
 
 if(TARGET PETSC::PETSC)
 
+  list(APPEND ThunderEgg_HDRS KSPSolver.h)
   list(APPEND ThunderEgg_HDRS MatWrapper.h)
   list(APPEND ThunderEgg_HDRS MatShellCreator.h)
   list(APPEND ThunderEgg_HDRS PCShellCreator.h)

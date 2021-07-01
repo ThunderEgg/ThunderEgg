@@ -68,8 +68,8 @@ template <int D> class MatShellCreator
 		MatShellCreator<D> *msc = nullptr;
 		MatShellGetContext(A, &msc);
 
-		Vector<2> te_x = msc->getNewVector();
-		Vector<2> te_b = msc->getNewVector();
+		Vector<D> te_x = msc->getNewVector();
+		Vector<D> te_b = msc->getNewVector();
 
 		// petsc vectors don't have gost padding for patchs, so this is neccesary
 		const double *x_view;
