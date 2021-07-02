@@ -54,21 +54,35 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 		}
 		// extrapolate ghost values
 		for (Side<D> s : pinfo.orth_on_parent.getExteriorSides()) {
-			if (!pinfo.hasNbr(s)) {
-				View<const double, D> fine_ghost    = fine_view.getSliceOn(s, {-1});
-				View<const double, D> fine_interior = fine_view.getSliceOn(s, {0});
-				View<double, D>       coarse_ghost  = coarse_view.getSliceOn(s, {-1});
-				loop_over_interior_indexes<D>(fine_ghost, [&](const std::array<int, D> &coord) {
-					std::array<int, D> coarse_coord;
-					for (size_t x = 0; x < s.getAxisIndex(); x++) {
-						coarse_coord[x] = (coord[x] + starts[x]) / 2;
-					}
-					for (size_t x = s.getAxisIndex() + 1; x < D; x++) {
-						coarse_coord[x - 1] = (coord[x - 1] + starts[x]) / 2;
-					}
-					coarse_coord[D - 1] = coord[D - 1];
-					coarse_ghost[coarse_coord] += (3 * fine_ghost[coord] - fine_interior[coord]) / (1 << D);
-				});
+			// if (!pinfo.hasNbr(s)) {
+			View<const double, D> fine_ghost    = fine_view.getSliceOn(s, {-1});
+			View<const double, D> fine_interior = fine_view.getSliceOn(s, {0});
+			View<double, D>       coarse_ghost  = coarse_view.getSliceOn(s, {-1});
+			loop_over_interior_indexes<D>(fine_ghost, [&](const std::array<int, D> &coord) {
+				std::array<int, D> coarse_coord;
+				for (size_t x = 0; x < s.getAxisIndex(); x++) {
+					coarse_coord[x] = (coord[x] + starts[x]) / 2;
+				}
+				for (size_t x = s.getAxisIndex() + 1; x < D; x++) {
+					coarse_coord[x - 1] = (coord[x - 1] + starts[x]) / 2;
+				}
+				coarse_coord[D - 1] = coord[D - 1];
+				coarse_ghost[coarse_coord] += (3 * fine_ghost[coord] - fine_interior[coord]) / (1 << D);
+			});
+			//}
+		}
+		if constexpr (D >= 2) {
+			Corner<D> c(pinfo.orth_on_parent.getIndex());
+			if (!pinfo.hasNbr(c)) {
+				std::array<int, D> neg_one;
+				neg_one.fill(-1);
+				std::array<int, D> zero;
+				zero.fill(0);
+				View<const double, 1> fine_ghost    = fine_view.getSliceOn(c, neg_one);
+				View<const double, 1> fine_interior = fine_view.getSliceOn(c, zero);
+				View<double, 1>       coarse_ghost  = coarse_view.getSliceOn(c, neg_one);
+				loop_over_interior_indexes<1>(
+				fine_ghost, [&](const std::array<int, 1> &coord) { coarse_ghost[coord] += (3 * fine_ghost[coord] - fine_interior[coord]); });
 			}
 		}
 	}
@@ -119,16 +133,10 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 		PatchView<double, D>       coarse_view = coarser_vector.getPatchView(parent_index);
 		PatchView<const double, D> fine_view   = finer_vector.getPatchView(pinfo.local_index);
 		// just copy the values
-		loop_over_interior_indexes<D + 1>(fine_view, [&](const std::array<int, D + 1> &coord) { coarse_view[coord] += fine_view[coord]; });
 		if (extrapolate_boundary_ghosts) {
-			// copy boundary ghost values
-			for (Side<D> s : Side<D>::getValues()) {
-				if (!pinfo.hasNbr(s)) {
-					View<const double, D> fine_ghost   = fine_view.getSliceOn(s, {-1});
-					View<double, D>       coarse_ghost = coarse_view.getGhostSliceOn(s, {0});
-					loop_over_interior_indexes<D>(fine_ghost, [&](const std::array<int, D> &coord) { coarse_ghost[coord] += fine_ghost[coord]; });
-				}
-			}
+			loop_over_all_indexes<D + 1>(fine_view, [&](const std::array<int, D + 1> &coord) { coarse_view[coord] += fine_view[coord]; });
+		} else {
+			loop_over_interior_indexes<D + 1>(fine_view, [&](const std::array<int, D + 1> &coord) { coarse_view[coord] += fine_view[coord]; });
 		}
 	}
 
