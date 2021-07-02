@@ -59,7 +59,7 @@ template <int D> class VCycle : public Cycle<D>
 
 			this->visit(coarser_level, coarser_f, coarser_u);
 
-			coarser_level.getInterpolator()->interpolate(coarser_u, u);
+			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
 			for (int i = 0; i < num_post_sweeps; i++) {
 				level.getSmoother()->smooth(f, u);

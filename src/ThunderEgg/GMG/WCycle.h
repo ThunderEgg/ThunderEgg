@@ -63,7 +63,7 @@ template <int D> class WCycle : public Cycle<D>
 
 			this->visit(*level.getCoarser(), coarser_f, coarser_u);
 
-			coarser_level.getInterpolator()->interpolate(coarser_u, u);
+			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
 			for (int i = 0; i < num_mid_sweeps; i++) {
 				level.getSmoother()->smooth(f, u);
@@ -73,7 +73,7 @@ template <int D> class WCycle : public Cycle<D>
 
 			this->visit(*level.getCoarser(), coarser_f, coarser_u);
 
-			coarser_level.getInterpolator()->interpolate(coarser_u, u);
+			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
 			for (int i = 0; i < num_post_sweeps; i++) {
 				level.getSmoother()->smooth(f, u);

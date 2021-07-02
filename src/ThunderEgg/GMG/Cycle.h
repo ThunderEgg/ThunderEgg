@@ -56,7 +56,7 @@ template <int D> class Cycle : public Operator<D>
 		level.getOperator()->apply(u, r);
 		r.scaleThenAdd(-1, f);
 		// create vectors for coarser levels
-		return level.getRestrictor()->restrict(r);
+		return level.getRestrictor().restrict(r);
 	}
 
 	/**

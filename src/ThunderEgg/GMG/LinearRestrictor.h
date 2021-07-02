@@ -154,6 +154,16 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 	  extrapolate_boundary_ghosts(extrapolate_boundary_ghosts)
 	{
 	}
+
+	/**
+	 * @brief Clone this restrictor
+	 *
+	 * @return LinearRestrictor<D>* a newly allocated copy of this restrictor
+	 */
+	LinearRestrictor<D> *clone() const override
+	{
+		return new LinearRestrictor<D>(*this);
+	}
 	void restrictPatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
 	                     const Vector<D> &                                                              finer_vector,
 	                     Vector<D> &                                                                    coarser_vector) const override

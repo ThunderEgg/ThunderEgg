@@ -46,6 +46,15 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 	 * @param num_components the number of components in each cell
 	 */
 	DirectInterpolator(const Domain<D> &coarse_domain, const Domain<D> &fine_domain) : MPIInterpolator<D>(coarse_domain, fine_domain) {}
+	/**
+	 * @brief Clone this interpolator
+	 *
+	 * @return DirectInterpolator<D>* a newly allocated copy of this interpolator
+	 */
+	DirectInterpolator<D> *clone() const override
+	{
+		return new DirectInterpolator<D>(*this);
+	}
 	void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
 	                        const Vector<D> &                                                              coarser_vector,
 	                        Vector<D> &                                                                    finer_vector) const override

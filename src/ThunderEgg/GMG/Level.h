@@ -71,36 +71,42 @@ template <int D> class Level
 	 *
 	 * @param restrictor the restriction operator.
 	 */
-	void setRestrictor(std::shared_ptr<const Restrictor<D>> restrictor)
+	void setRestrictor(const Restrictor<D> &restrictor)
 	{
-		this->restrictor = restrictor;
+		this->restrictor.reset(restrictor.clone());
 	}
 	/**
 	 * @brief Get the restriction operator for this level.
 	 *
-	 * @return Pointer to the restrictor
+	 * @return Reference to the restrictor
 	 */
-	std::shared_ptr<const Restrictor<D>> getRestrictor() const
+	const Restrictor<D> &getRestrictor() const
 	{
-		return restrictor;
+		if (restrictor == nullptr) {
+			throw RuntimeError("This level does not have a restrictor");
+		}
+		return *restrictor;
 	}
 	/**
 	 * @brief Set the interpolation operator for interpolating from this level to the finer level.
 	 *
 	 * @param interpolator the interpolation operator.
 	 */
-	void setInterpolator(std::shared_ptr<const Interpolator<D>> interpolator)
+	void setInterpolator(const Interpolator<D> &interpolator)
 	{
-		this->interpolator = interpolator;
+		this->interpolator.reset(interpolator.clone());
 	}
 	/**
 	 * @brief Get the interpolation operator for this level.
 	 *
-	 * @return Pointer to the interpolator.
+	 * @return Reference to the interpolator.
 	 */
-	std::shared_ptr<const Interpolator<D>> getInterpolator() const
+	const Interpolator<D> &getInterpolator() const
 	{
-		return interpolator;
+		if (interpolator == nullptr) {
+			throw RuntimeError("This level does not have an interpolator");
+		}
+		return *interpolator;
 	}
 	/**
 	 * @brief Set the operator (matrix) for this level.

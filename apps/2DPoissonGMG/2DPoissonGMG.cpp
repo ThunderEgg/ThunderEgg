@@ -333,7 +333,7 @@ int main(int argc, char *argv[])
 		// the next coarser domain is needed for the restrictor
 		shared_ptr<Domain<2>> coarser_domain = domain_generator->getCoarserDomain();
 
-		shared_ptr<GMG::Restrictor<2>> finest_restrictor = make_shared<GMG::LinearRestrictor<2>>(*domain, *coarser_domain);
+		GMG::LinearRestrictor<2> finest_restrictor(*domain, *coarser_domain);
 
 		//add the finest level
 		builder.addFinestLevel(patch_operator, finest_smoother, finest_restrictor);
@@ -364,8 +364,8 @@ int main(int argc, char *argv[])
 			}
 
 			// restrictor and interpolator
-			shared_ptr<GMG::Interpolator<2>> interpolator = make_shared<GMG::DirectInterpolator<2>>(*current_domain, *finer_domain);
-			shared_ptr<GMG::Restrictor<2>>   restrictor   = make_shared<GMG::LinearRestrictor<2>>(*current_domain, *coarser_domain);
+			GMG::DirectInterpolator<2> interpolator(*current_domain, *finer_domain);
+			GMG::LinearRestrictor<2>   restrictor(*current_domain, *coarser_domain);
 
 			// add the middle level
 			builder.addIntermediateLevel(middle_patch_operator, middle_smoother, restrictor, interpolator);
@@ -392,7 +392,7 @@ int main(int argc, char *argv[])
 		}
 
 		// coarsets level only needs an interpolator
-		shared_ptr<GMG::Interpolator<2>> interpolator = make_shared<GMG::DirectInterpolator<2>>(*current_domain, *finer_domain);
+		GMG::DirectInterpolator<2> interpolator(*current_domain, *finer_domain);
 
 		// add the coarsest level
 		builder.addCoarsestLevel(coarsest_patch_operator, coarsest_smoother, interpolator);

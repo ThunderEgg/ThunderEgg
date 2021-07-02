@@ -39,6 +39,12 @@ template <int D> class Interpolator
 	 */
 	virtual ~Interpolator() {}
 	/**
+	 * @brief Clone this interpolator
+	 *
+	 * @return Interpolator<D>* a newly allocated copy of this interpolator
+	 */
+	virtual Interpolator<D> *clone() const = 0;
+	/**
 	 * @brief Virtual interpolation operation that needs to be implemented in derived classes.
 	 *
 	 * @param coarse the input vector from the coarser level.

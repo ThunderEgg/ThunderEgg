@@ -39,12 +39,11 @@ template <int D> class Restrictor
 	 */
 	virtual ~Restrictor() {}
 	/**
-	 * @brief Virtual function that base classes have to implement.
+	 * @brief Clone this interpolator
 	 *
-	 * @param fine the input vector that is restricted.
-	 * @param coarse the output vector that is restricted to.
+	 * @return Interpolator<D>* a newly allocated copy of this interpolator
 	 */
-
+	virtual Restrictor<D> *clone() const = 0;
 	/**
 	 * @brief
 	 *

@@ -80,7 +80,7 @@ template <int D> class CycleBuilder
 	 * @param restrictor the Restrictor that restricts from this level to the coarser level
 	 * @param vg the VectorGenerator for the level
 	 */
-	void addFinestLevel(std::shared_ptr<Operator<D>> op, std::shared_ptr<Smoother<D>> smoother, std::shared_ptr<Restrictor<D>> restrictor)
+	void addFinestLevel(std::shared_ptr<Operator<D>> op, std::shared_ptr<Smoother<D>> smoother, const Restrictor<D> &restrictor)
 	{
 		if (has_finest) {
 			throw RuntimeError("addFinestLevel was already called");
@@ -90,9 +90,6 @@ template <int D> class CycleBuilder
 		}
 		if (smoother == nullptr) {
 			throw RuntimeError("Smoother is nullptr");
-		}
-		if (restrictor == nullptr) {
-			throw RuntimeError("Restrictor is nullptr");
 		}
 		has_finest = true;
 
@@ -112,10 +109,10 @@ template <int D> class CycleBuilder
 	 * @param interpolator the Interpolator that restricts from this level to the finer level
 	 * @param vg the VectorGenerator for the level
 	 */
-	void addIntermediateLevel(std::shared_ptr<Operator<D>>     op,
-	                          std::shared_ptr<Smoother<D>>     smoother,
-	                          std::shared_ptr<Restrictor<D>>   restrictor,
-	                          std::shared_ptr<Interpolator<D>> interpolator)
+	void addIntermediateLevel(std::shared_ptr<Operator<D>> op,
+	                          std::shared_ptr<Smoother<D>> smoother,
+	                          const Restrictor<D> &        restrictor,
+	                          const Interpolator<D> &      interpolator)
 	{
 		if (!has_finest) {
 			throw RuntimeError("addFinestLevel has not been called yet");
@@ -128,12 +125,6 @@ template <int D> class CycleBuilder
 		}
 		if (smoother == nullptr) {
 			throw RuntimeError("Smoother is nullptr");
-		}
-		if (restrictor == nullptr) {
-			throw RuntimeError("Restrictor is nullptr");
-		}
-		if (interpolator == nullptr) {
-			throw RuntimeError("Interpolator is nullptr");
 		}
 
 		auto new_level = std::make_shared<Level<D>>();
@@ -154,7 +145,7 @@ template <int D> class CycleBuilder
 	 * @param smoother the Smoother for the level
 	 * @param interpolator the Interpolator that restricts from this level to the finer level
 	 */
-	void addCoarsestLevel(std::shared_ptr<Operator<D>> op, std::shared_ptr<Smoother<D>> smoother, std::shared_ptr<Interpolator<D>> interpolator)
+	void addCoarsestLevel(std::shared_ptr<Operator<D>> op, std::shared_ptr<Smoother<D>> smoother, const Interpolator<D> &interpolator)
 	{
 		if (!has_finest) {
 			throw RuntimeError("addFinestLevel has not been called yet");
@@ -167,9 +158,6 @@ template <int D> class CycleBuilder
 		}
 		if (smoother == nullptr) {
 			throw RuntimeError("Smoother is nullptr");
-		}
-		if (interpolator == nullptr) {
-			throw RuntimeError("Interpolator is nullptr");
 		}
 		has_coarsest = true;
 
