@@ -60,6 +60,12 @@ template <int D> class PatchOperator : public Operator<D>
 	{
 	}
 	/**
+	 * @brief Clone this patch operator
+	 *
+	 * @return PatchOperator<D>* a newly allocated copy of this patch operator
+	 */
+	virtual PatchOperator<D> *clone() const = 0;
+	/**
 	 * @brief Destroy the PatchOperator object
 	 */
 	virtual ~PatchOperator() {}

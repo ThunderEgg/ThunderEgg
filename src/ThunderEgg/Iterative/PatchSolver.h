@@ -97,15 +97,21 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 	/**
 	 * @brief Construct a new IterativePatchSolver object
 	 *
-	 * @param op_in the PatchOperator to u_viewe
 	 * @param tol_in the tolerance to u_viewe for patch solves
 	 * @param max_it_in the maximum number of iterations to u_viewe for patch solves
+	 */
+
+	/**
+	 * @brief Construct a new Patch Solver object
+	 *
+	 * @param solver the solver to use
+	 * @param op the PatchOperator to use
 	 * @param continue_on_breakdown continue on breakdown exception
 	 */
-	PatchSolver(std::shared_ptr<const Iterative::Solver<D>> solver, std::shared_ptr<const PatchOperator<D>> op_in, bool continue_on_breakdown = false)
-	: ThunderEgg::PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()),
-	  solver(solver),
-	  op(op_in),
+	PatchSolver(const Iterative::Solver<D> &solver, const PatchOperator<D> &op, bool continue_on_breakdown = false)
+	: ThunderEgg::PatchSolver<D>(op.getDomain(), op.getGhostFiller()),
+	  solver(solver.clone()),
+	  op(op.clone()),
 	  continue_on_breakdown(continue_on_breakdown)
 	{
 	}

@@ -53,22 +53,27 @@ template <int D>
 class MockPatchOperator : public PatchOperator<D>
 {
 	private:
-	mutable std::set<const PatchInfo<D> *> patches_to_be_called;
+	std::shared_ptr<std::set<const PatchInfo<D> *>> patches_to_be_called;
 
 	public:
 	MockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
 	                  std::shared_ptr<const GhostFiller<D>> ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler)
 	{
+		patches_to_be_called.reset(new std::set<const PatchInfo<D> *>());
 		for (const PatchInfo<D> &pinfo : this->domain->getPatchInfoVector()) {
-			patches_to_be_called.insert(&pinfo);
+			patches_to_be_called->insert(&pinfo);
 		}
+	}
+	MockPatchOperator<D> *clone() const override
+	{
+		return new MockPatchOperator<D>(*this);
 	}
 	void applySinglePatch(const PatchInfo<D> &              pinfo,
 	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
-		CHECK(patches_to_be_called.count(&pinfo) == 1);
-		patches_to_be_called.erase(&pinfo);
+		CHECK(patches_to_be_called->count(&pinfo) == 1);
+		patches_to_be_called->erase(&pinfo);
 		INFO("LOCAL_INDEX: " << pinfo.local_index);
 		std::array<int, D + 1> zero;
 		zero.fill(0);
@@ -86,7 +91,7 @@ class MockPatchOperator : public PatchOperator<D>
 	}
 	bool allPatchesCalled()
 	{
-		return patches_to_be_called.empty();
+		return patches_to_be_called->empty();
 	}
 };
 } // namespace

@@ -268,10 +268,10 @@ int main(int argc, char *argv[])
 		p_operator->addDrichletBCToRHS(f, gfun, hfun);
 
 		// set the patch solver
-		auto p_bcgs = make_shared<Iterative::BiCGStab<2>>();
-		p_bcgs->setTolerance(ps_tol);
-		p_bcgs->setMaxIterations(ps_max_it);
-		auto p_solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, p_operator);
+		Iterative::BiCGStab<2> p_bcgs;
+		p_bcgs.setTolerance(ps_tol);
+		p_bcgs.setMaxIterations(ps_max_it);
+		auto p_solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, *p_operator);
 
 		std::shared_ptr<Operator<2>> A = p_operator;
 		std::shared_ptr<Operator<2>> M;
@@ -316,7 +316,7 @@ int main(int argc, char *argv[])
 				auto new_p_operator
 				= make_shared<StarPatchOperator<2>>(new_coeffs, curr_domain, new_gf);
 
-				auto new_p_solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, new_p_operator);
+				auto new_p_solver = make_shared<Iterative::PatchSolver<2>>(p_bcgs, *new_p_operator);
 
 				auto interpolator
 				= make_shared<GMG::DirectInterpolator<2>>(*curr_domain, *prev_domain);
@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
 			= make_shared<StarPatchOperator<2>>(coarse_coeffs, curr_domain, coarse_gf);
 
 			auto coarse_p_solver
-			= make_shared<Iterative::PatchSolver<2>>(p_bcgs, coarse_p_operator);
+			= make_shared<Iterative::PatchSolver<2>>(p_bcgs, *coarse_p_operator);
 			builder.addCoarsestLevel(coarse_p_operator, coarse_p_solver, interpolator);
 
 			M = builder.getCycle();

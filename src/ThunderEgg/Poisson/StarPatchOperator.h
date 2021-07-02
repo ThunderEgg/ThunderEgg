@@ -65,6 +65,15 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
 	}
+	/**
+	 * @brief Get a clone of this operator
+	 *
+	 * @return StarPatchOperator<D>* a newly allocated copy of this operator
+	 */
+	StarPatchOperator<D> *clone() const override
+	{
+		return new StarPatchOperator<D>(*this);
+	}
 	void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const override
 	{
 		std::array<double, D> h2 = pinfo.spacings;

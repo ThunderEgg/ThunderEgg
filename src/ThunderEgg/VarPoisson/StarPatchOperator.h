@@ -67,6 +67,15 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 		this->ghost_filler->fillGhost(this->coeffs);
 	}
+	/**
+	 * @brief Get a clone of this operator
+	 *
+	 * @return StarPatchOperator<D>* a newly allocated copy of this operator
+	 */
+	StarPatchOperator<D> *clone() const override
+	{
+		return new StarPatchOperator<D>(*this);
+	}
 	void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const override
 	{
 		PatchView<const double, D> c  = coeffs.getPatchView(pinfo.local_index);

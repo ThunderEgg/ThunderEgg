@@ -40,10 +40,10 @@ template <int D>
 class MockPatchOperator : public PatchOperator<D>
 {
 	private:
-	mutable bool rhs_was_modified   = false;
-	mutable bool bc_enforced        = false;
-	mutable bool interior_dirichlet = false;
-	mutable int  num_apply_calls    = 0;
+	std::shared_ptr<bool> rhs_was_modified   = std::make_shared<bool>(false);
+	std::shared_ptr<bool> bc_enforced        = std::make_shared<bool>(false);
+	std::shared_ptr<bool> interior_dirichlet = std::make_shared<bool>(false);
+	std::shared_ptr<int>  num_apply_calls    = std::make_shared<int>(0);
 
 	public:
 	MockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
@@ -51,55 +51,63 @@ class MockPatchOperator : public PatchOperator<D>
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
+	MockPatchOperator<D> *clone() const override
+	{
+		return new MockPatchOperator<D>(*this);
+	}
 	void applySinglePatch(const PatchInfo<D> &              pinfo,
 	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
-		num_apply_calls++;
+		(*num_apply_calls)++;
 	}
 	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
-		bc_enforced = true;
+		*bc_enforced = true;
 	}
 	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
-		interior_dirichlet = true;
+		*interior_dirichlet = true;
 	}
 	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
 	                                                   const PatchView<const double, D> &us,
 	                                                   const PatchView<double, D> &      fs) const override
 	{
-		rhs_was_modified = true;
+		*rhs_was_modified = true;
 	}
 	bool rhsWasModified()
 	{
-		return rhs_was_modified;
+		return *rhs_was_modified;
 	}
 	bool boundaryConditionsEnforced()
 	{
-		return bc_enforced;
+		return *bc_enforced;
 	}
 	bool internalBoundaryConditionsEnforced()
 	{
-		return interior_dirichlet;
+		return *interior_dirichlet;
 	}
 	int getNumApplyCalls()
 	{
-		return num_apply_calls;
+		return *num_apply_calls;
 	}
 };
 template <int D>
 class NonLinMockPatchOperator : public PatchOperator<D>
 {
 	private:
-	mutable bool rhs_was_modified   = false;
-	mutable bool bc_enforced        = false;
-	mutable bool interior_dirichlet = false;
+	std::shared_ptr<bool> rhs_was_modified   = std::make_shared<bool>(false);
+	std::shared_ptr<bool> bc_enforced        = std::make_shared<bool>(false);
+	std::shared_ptr<bool> interior_dirichlet = std::make_shared<bool>(false);
 
 	public:
 	NonLinMockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
 	                        std::shared_ptr<const GhostFiller<D>> ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler)
 	{
+	}
+	NonLinMockPatchOperator<D> *clone() const override
+	{
+		return new NonLinMockPatchOperator<D>(*this);
 	}
 	void applySinglePatch(const PatchInfo<D> &              pinfo,
 	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
@@ -109,29 +117,29 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	}
 	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
-		bc_enforced = true;
+		*bc_enforced = true;
 	}
 	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
-		interior_dirichlet = true;
+		*interior_dirichlet = true;
 	}
 	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
 	                                                   const PatchView<const double, D> &us,
 	                                                   const PatchView<double, D> &      fs) const override
 	{
-		rhs_was_modified = true;
+		*rhs_was_modified = true;
 	}
 	bool rhsWasModified()
 	{
-		return rhs_was_modified;
+		return *rhs_was_modified;
 	}
 	bool boundaryConditionsEnforced()
 	{
-		return bc_enforced;
+		return *bc_enforced;
 	}
 	bool internalBoundaryConditionsEnforced()
 	{
-		return interior_dirichlet;
+		return *interior_dirichlet;
 	}
 };
 template <int D>

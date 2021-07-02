@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
 	domain_level++;
 
 	// set the patch solver
-	auto patch_bcgs = make_shared<Iterative::BiCGStab<2>>();
+	Iterative::BiCGStab<2> patch_bcgs;
 	//p_bcgs->setTolerance(ps_tol);
 	// p_bcgs->setMaxIterations(ps_max_it);
 
@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
 	} else if (patch_solver == "fftw") {
 		finest_smoother = make_shared<FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
 	} else {
-		finest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, patch_operator);
+		finest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, *patch_operator);
 	}
 
 	std::shared_ptr<Operator<2>> M;
@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
 			} else if (patch_solver == "fftw") {
 				middle_smoother = make_shared<FFTWPatchSolver<2>>(middle_patch_operator, neumann_bitset);
 			} else {
-				middle_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, middle_patch_operator);
+				middle_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, *middle_patch_operator);
 			}
 
 			// restrictor and interpolator
@@ -388,7 +388,7 @@ int main(int argc, char *argv[])
 		} else if (patch_solver == "fftw") {
 			coarsest_smoother = make_shared<FFTWPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
 		} else {
-			coarsest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, coarsest_patch_operator);
+			coarsest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, *coarsest_patch_operator);
 		}
 
 		// coarsets level only needs an interpolator

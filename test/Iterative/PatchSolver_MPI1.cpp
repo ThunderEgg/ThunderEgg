@@ -34,8 +34,8 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length",
 
 	auto mgf = make_shared<MockGhostFiller<2>>();
 	// the patch operator is just a 0.5I operator
-	auto mpo = make_shared<MockPatchOperator<2>>(d_fine, mgf);
-	auto ms  = make_shared<MockSolver<2>>(
+	MockPatchOperator<2> mpo(d_fine, mgf);
+	MockSolver<2>        ms(
     [](const Operator<2> &A,
        Vector<2> &x, const Vector<2> &b,
        const Operator<2> *Mr) {
@@ -66,14 +66,13 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 	bool called = false;
 	auto mgf    = make_shared<MockGhostFiller<2>>();
 	// the patch operator is just a 0.5I operator
-	auto mpo = make_shared<MockPatchOperator<2>>(d_fine, mgf);
-	auto ms  = make_shared<MockSolver<2>>(
+	MockPatchOperator<2> mpo(d_fine, mgf);
+	MockSolver<2>        ms(
     [&](const Operator<2> &A,
         Vector<2> &x, const Vector<2> &b,
         const Operator<2> *Mr) {
         if (!called) {
             called = true;
-            CHECK(&A != mpo.get());
             A.apply(b, x);
         }
         return 1;
@@ -82,10 +81,10 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
 	bcgs_solver.smooth(f, u);
-	CHECK(mpo->getNumApplyCalls() == 1);
-	CHECK(mpo->rhsWasModified());
-	CHECK(mpo->boundaryConditionsEnforced());
-	CHECK(mpo->internalBoundaryConditionsEnforced());
+	CHECK(mpo.getNumApplyCalls() == 1);
+	CHECK(mpo.rhsWasModified());
+	CHECK(mpo.boundaryConditionsEnforced());
+	CHECK(mpo.internalBoundaryConditionsEnforced());
 }
 TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::PatchSolver]")
 {
@@ -106,8 +105,8 @@ TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::Patch
 
 	auto mgf = make_shared<MockGhostFiller<2>>();
 	// the patch operator is just a 0.5I operator
-	auto mpo = make_shared<NonLinMockPatchOperator<2>>(d_fine, mgf);
-	auto ms  = make_shared<MockSolver<2>>(
+	NonLinMockPatchOperator<2> mpo(d_fine, mgf);
+	MockSolver<2>              ms(
     [](const Operator<2> &A,
        Vector<2> &x, const Vector<2> &b,
        const Operator<2> *Mr) {
@@ -138,8 +137,8 @@ TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterativ
 
 	auto mgf = make_shared<MockGhostFiller<2>>();
 	// the patch operator is just a 0.5I operator
-	auto mpo = make_shared<NonLinMockPatchOperator<2>>(d_fine, mgf);
-	auto ms  = make_shared<MockSolver<2>>(
+	NonLinMockPatchOperator<2> mpo(d_fine, mgf);
+	MockSolver<2>              ms(
     [](const Operator<2> &A,
        Vector<2> &x, const Vector<2> &b,
        const Operator<2> *Mr) {
