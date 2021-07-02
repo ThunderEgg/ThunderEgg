@@ -70,6 +70,24 @@ TEST_CASE("BiCGStab set timer", "[BiCGStab]")
 	bcgs.setTimer(timer);
 	CHECK(bcgs.getTimer() == timer);
 }
+TEST_CASE("BiCGStab clone", "[BiCGStab]")
+{
+	BiCGStab<2> bcgs;
+	int         iterations = GENERATE(1, 2, 3);
+	bcgs.setMaxIterations(iterations);
+
+	double tolerance = GENERATE(1.2, 2.3, 3.4);
+	bcgs.setTolerance(tolerance);
+
+	Communicator comm(MPI_COMM_WORLD);
+	auto         timer = make_shared<Timer>(comm);
+	bcgs.setTimer(timer);
+
+	unique_ptr<BiCGStab<2>> clone(bcgs.clone());
+	CHECK(bcgs.getTimer() == clone->getTimer());
+	CHECK(bcgs.getMaxIterations() == clone->getMaxIterations());
+	CHECK(bcgs.getTolerance() == clone->getTolerance());
+}
 TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";

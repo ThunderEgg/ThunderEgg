@@ -65,6 +65,15 @@ template <int D> class BiCGStab : public Solver<D>
 
 	public:
 	/**
+	 * @brief Clone this solver
+	 *
+	 * @return BiCGStab<D>* a newly allocated copy of this solver
+	 */
+	BiCGStab<D> *clone() const override
+	{
+		return new BiCGStab<D>(*this);
+	}
+	/**
 	 * @brief Set the maximum number of iterations
 	 *
 	 * Default is 1000

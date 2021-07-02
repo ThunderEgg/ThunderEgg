@@ -38,6 +38,12 @@ template <int D> class Solver
 {
 	public:
 	/**
+	 * @brief Clone this solver
+	 *
+	 * @return Solver* a newly allocated copy of this solver
+	 */
+	virtual Solver<D> *clone() const = 0;
+	/**
 	 * @brief Destroy the Solver object
 	 */
 	virtual ~Solver() {}

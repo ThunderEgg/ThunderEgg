@@ -70,6 +70,24 @@ TEST_CASE("CG set timer", "[CG]")
 	bcgs.setTimer(timer);
 	CHECK(bcgs.getTimer() == timer);
 }
+TEST_CASE("CG clone", "[CG]")
+{
+	CG<2> bcgs;
+	int   iterations = GENERATE(1, 2, 3);
+	bcgs.setMaxIterations(iterations);
+
+	double tolerance = GENERATE(1.2, 2.3, 3.4);
+	bcgs.setTolerance(tolerance);
+
+	Communicator comm(MPI_COMM_WORLD);
+	auto         timer = make_shared<Timer>(comm);
+	bcgs.setTimer(timer);
+
+	unique_ptr<CG<2>> clone(bcgs.clone());
+	CHECK(bcgs.getTimer() == clone->getTimer());
+	CHECK(bcgs.getMaxIterations() == clone->getMaxIterations());
+	CHECK(bcgs.getTolerance() == clone->getTolerance());
+}
 TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";

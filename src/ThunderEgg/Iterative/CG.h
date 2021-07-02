@@ -65,6 +65,15 @@ template <int D> class CG : public Solver<D>
 
 	public:
 	/**
+	 * @brief Clone this solver
+	 *
+	 * @return CG<D>* a newly allocated copy of this solver
+	 */
+	CG<D> *clone() const override
+	{
+		return new CG<D>(*this);
+	}
+	/**
 	 * @brief Set the maximum number of iterations.
 	 *
 	 * Default is 1000

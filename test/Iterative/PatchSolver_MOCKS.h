@@ -144,6 +144,10 @@ class MockSolver : public Iterative::Solver<D>
 	callback;
 
 	public:
+	MockSolver<D> *clone() const override
+	{
+		return new MockSolver<D>(*this);
+	}
 	MockSolver(
 	std::function<int(const Operator<D> &,
 	                  Vector<D> &, const Vector<D> &,
