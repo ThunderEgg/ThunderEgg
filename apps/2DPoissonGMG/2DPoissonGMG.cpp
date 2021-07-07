@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
 
 	// A patch operator needs a GhostFiller object to define how to fill ghost cells for the patches.
 	// This one will use a tri-linear interpolation scheme at the refinement boundarys of the domain
-	shared_ptr<GhostFiller<2>> ghost_filler = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller ghost_filler(domain, GhostFillingType::Faces);
 
 	// create patch operator that uses a typical 2nd order 7 point poisson stencil
 	StarPatchOperator<2> patch_operator(domain, ghost_filler, neumann);
@@ -348,7 +348,7 @@ int main(int argc, char *argv[])
 			coarser_domain = domain_generator->getCoarserDomain();
 
 			// create operator for middle domain
-			auto                 middle_ghost_filler = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
+			BiLinearGhostFiller  middle_ghost_filler(current_domain, GhostFillingType::Faces);
 			StarPatchOperator<2> middle_patch_operator(current_domain, middle_ghost_filler);
 
 			// smoother
@@ -376,8 +376,8 @@ int main(int argc, char *argv[])
 		//add the coarsest level to the builder
 
 		// patch operator
-		shared_ptr<GhostFiller<2>> coarsest_ghost_filler = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
-		StarPatchOperator<2>       coarsest_patch_operator(current_domain, coarsest_ghost_filler);
+		BiLinearGhostFiller  coarsest_ghost_filler(current_domain, GhostFillingType::Faces);
+		StarPatchOperator<2> coarsest_patch_operator(current_domain, coarsest_ghost_filler);
 
 		// smoother
 		unique_ptr<GMG::Smoother<2>> coarsest_smoother;

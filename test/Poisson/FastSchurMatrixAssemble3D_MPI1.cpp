@@ -55,7 +55,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws exception for non-square pa
 	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
-	auto                          gf = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	TriLinearGhostFiller          gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<3> p_operator(d_fine, gf);
 	Poisson::FFTWPatchSolver<3>   p_solver(p_operator, neumann);
 
@@ -69,6 +69,10 @@ template <int D>
 class MockGhostFiller : public GhostFiller<D>
 {
 	public:
+	MockGhostFiller<D> *clone() const override
+	{
+		return new MockGhostFiller<D>(*this);
+	}
 	void fillGhost(const Vector<D> &u) const override {}
 };
 } // namespace
@@ -84,7 +88,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws with unsupported ghost fill
 	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
-	auto                          gf = make_shared<MockGhostFiller<3>>();
+	MockGhostFiller<3>            gf;
 	Poisson::StarPatchOperator<3> p_operator(d_fine, gf);
 	Poisson::FFTWPatchSolver<3>   p_solver(p_operator, neumann);
 
@@ -119,7 +123,7 @@ TEST_CASE(
 		}
 	}
 
-	auto                          gf = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	TriLinearGhostFiller          gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<3> p_operator(d_fine, gf);
 	Poisson::FFTWPatchSolver<3>   p_solver(p_operator, neumann);
 	Schur::PatchSolverWrapper<3>  p_solver_wrapper(iface_domain, p_solver);
@@ -186,7 +190,7 @@ TEST_CASE(
 		}
 	}
 
-	auto                          gf = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	TriLinearGhostFiller          gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<3> p_operator(d_fine, gf, true);
 	Poisson::FFTWPatchSolver<3>   p_solver(p_operator, neumann);
 	Schur::PatchSolverWrapper<3>  p_solver_wrapper(iface_domain, p_solver);

@@ -152,7 +152,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 			solver->solveSinglePatch(piinfo->pinfo, f_view, u_view);
 		}
 
-		solver->getGhostFiller()->fillGhost(u);
+		solver->getGhostFiller().fillGhost(u);
 
 		for (auto iface : iface_domain->getInterfaces()) {
 			for (auto patch : iface->patches) {
@@ -200,7 +200,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 			solver->solveSinglePatch(piinfo->pinfo, f_view, u_view);
 		}
 
-		solver->getGhostFiller()->fillGhost(u);
+		solver->getGhostFiller().fillGhost(u);
 
 		for (auto iface : iface_domain->getInterfaces()) {
 			for (auto patch : iface->patches) {

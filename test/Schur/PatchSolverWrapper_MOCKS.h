@@ -34,36 +34,44 @@ template <int D>
 class MockGhostFiller : public GhostFiller<D>
 {
 	private:
-	mutable bool called = false;
+	std::shared_ptr<bool> called = std::make_shared<bool>(false);
 
 	public:
+	MockGhostFiller<D> *clone() const override
+	{
+		return new MockGhostFiller<D>(*this);
+	}
 	void fillGhost(const Vector<D> &u) const override
 	{
-		called = true;
+		*called = true;
 	}
 	bool wasCalled()
 	{
-		return called;
+		return *called;
 	}
 };
 template <int D>
 class PatchFillingGhostFiller : public GhostFiller<D>
 {
 	private:
-	mutable bool called = false;
-	double       fill_value;
+	std::shared_ptr<bool> called = std::make_shared<bool>(false);
+	double                fill_value;
 
 	public:
 	PatchFillingGhostFiller(double fill_value)
 	: fill_value(fill_value) {}
+	PatchFillingGhostFiller<D> *clone() const override
+	{
+		return new PatchFillingGhostFiller<D>(*this);
+	}
 	void fillGhost(const Vector<D> &u) const override
 	{
 		const_cast<Vector<D> &>(u).setWithGhost(fill_value);
-		called = true;
+		*called = true;
 	}
 	bool wasCalled()
 	{
-		return called;
+		return *called;
 	}
 };
 template <int D>
@@ -73,12 +81,12 @@ class MockPatchSolver : public PatchSolver<D>
 	std::shared_ptr<std::set<int>> patch_ids_to_be_called;
 
 	public:
-	MockPatchSolver(std::shared_ptr<const Domain<D>>      domain_in,
-	                std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
+	MockPatchSolver(std::shared_ptr<const Domain<D>> domain_in,
+	                const GhostFiller<D> &           ghost_filler_in)
 	: PatchSolver<D>(domain_in, ghost_filler_in)
 	{
 		patch_ids_to_be_called = std::make_shared<std::set<int>>();
-		for (const PatchInfo<D> &pinfo : this->domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : this->getDomain()->getPatchInfoVector()) {
 			patch_ids_to_be_called->insert(pinfo.id);
 		}
 	}
@@ -106,9 +114,9 @@ class RHSGhostCheckingPatchSolver : public PatchSolver<D>
 	std::shared_ptr<bool> was_called = std::make_shared<bool>(false);
 
 	public:
-	RHSGhostCheckingPatchSolver(std::shared_ptr<const Domain<D>>      domain_in,
-	                            std::shared_ptr<const GhostFiller<D>> ghost_filler_in,
-	                            double                                schur_fill_value)
+	RHSGhostCheckingPatchSolver(std::shared_ptr<const Domain<D>> domain_in,
+	                            const GhostFiller<D> &           ghost_filler_in,
+	                            double                           schur_fill_value)
 	: PatchSolver<D>(domain_in, ghost_filler_in), schur_fill_value(schur_fill_value)
 	{
 	}

@@ -64,6 +64,12 @@ class TriLinearGhostFiller : public MPIGhostFiller<3>
 	 * @param fill_type the ghost filling type to perform
 	 */
 	TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain, GhostFillingType fill_type);
+	/**
+	 * @brief Clone this TriLienarGhostFiller
+	 *
+	 * @return TriLinearGhostFiller* a newly allocated copy
+	 */
+	TriLinearGhostFiller *clone() const override;
 };
 } // namespace ThunderEgg
 #endif

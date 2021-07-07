@@ -34,16 +34,20 @@ template <int D>
 class MockGhostFiller : public GhostFiller<D>
 {
 	private:
-	mutable bool called = false;
+	std::shared_ptr<bool> called = std::make_shared<bool>(false);
 
 	public:
+	MockGhostFiller<D> *clone() const override
+	{
+		return new MockGhostFiller<D>(*this);
+	}
 	void fillGhost(const Vector<D> &u) const override
 	{
-		called = true;
+		*called = true;
 	}
 	bool wasCalled()
 	{
-		return called;
+		return *called;
 	}
 };
 template <int D>
@@ -53,11 +57,11 @@ class MockPatchSolver : public PatchSolver<D>
 	mutable std::set<const PatchInfo<D> *> patches_to_be_called;
 
 	public:
-	MockPatchSolver(std::shared_ptr<const Domain<D>>      domain_in,
-	                std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
+	MockPatchSolver(std::shared_ptr<const Domain<D>> domain_in,
+	                const GhostFiller<D> &           ghost_filler_in)
 	: PatchSolver<D>(domain_in, ghost_filler_in)
 	{
-		for (const PatchInfo<D> &pinfo : this->domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : domain_in->getPatchInfoVector()) {
 			patches_to_be_called.insert(&pinfo);
 		}
 	}

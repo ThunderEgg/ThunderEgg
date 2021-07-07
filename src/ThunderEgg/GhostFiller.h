@@ -35,6 +35,13 @@ template <int D> class GhostFiller
 	virtual ~GhostFiller() {}
 
 	/**
+	 * @brief Clone this GhostFiller
+	 *
+	 * @return GhostFiller<D>* a newly allocated copy of this GhostFiller
+	 */
+	virtual GhostFiller<D> *clone() const = 0;
+
+	/**
 	 * @brief Fill ghost cells on a vector
 	 *
 	 * @param u  the vector

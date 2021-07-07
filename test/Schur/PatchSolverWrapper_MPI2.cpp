@@ -47,7 +47,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> throws exception for non-square patches"
 	DomainReader<2>           domain_reader(mesh_file, {nx, ny}, 1);
 	auto                      domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> iface_domain(domain);
-	auto                      ghost_filler = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2>        ghost_filler;
 	MockPatchSolver<2>        solver(domain, ghost_filler);
 
 	CHECK_THROWS_AS(Schur::PatchSolverWrapper<2>(iface_domain, solver), RuntimeError);
@@ -63,7 +63,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply fills ghost in rhs as expected",
 	DomainReader<2>                domain_reader(mesh_file, {n, n}, 1);
 	auto                           domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2>      iface_domain(domain);
-	auto                           ghost_filler = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2>             ghost_filler;
 	RHSGhostCheckingPatchSolver<2> solver(domain, ghost_filler, schur_fill_value);
 
 	Vector<1> x(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
@@ -83,13 +83,13 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 	INFO("MESH: " << mesh_file);
 	auto n = GENERATE(5, 7);
 	INFO("N: " << n);
-	auto                      schur_fill_value  = GENERATE(1, 1.3, 8, 2, -1);
-	auto                      domain_fill_value = GENERATE(1, 1.3, 8, 2, -1);
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 1);
-	auto                      domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
-	auto                      ghost_filler = make_shared<PatchFillingGhostFiller<2>>(domain_fill_value);
-	MockPatchSolver<2>        solver(domain, ghost_filler);
+	auto                       schur_fill_value  = GENERATE(1, 1.3, 8, 2, -1);
+	auto                       domain_fill_value = GENERATE(1, 1.3, 8, 2, -1);
+	DomainReader<2>            domain_reader(mesh_file, {n, n}, 1);
+	auto                       domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2>  iface_domain(domain);
+	PatchFillingGhostFiller<2> ghost_filler(domain_fill_value);
+	MockPatchSolver<2>         solver(domain, ghost_filler);
 
 	Vector<1> x(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
 	Vector<1> b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
@@ -99,7 +99,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 	Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
 	psw.apply(x, b);
 	CHECK(solver.allPatchesCalled());
-	CHECK(ghost_filler->wasCalled());
+	CHECK(ghost_filler.wasCalled());
 	for (int i = 0; i < b.getNumLocalPatches(); i++) {
 		auto local_data = b.getComponentView(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
@@ -116,13 +116,13 @@ TEST_CASE(
 	INFO("MESH: " << mesh_file);
 	auto n = GENERATE(5, 7);
 	INFO("N: " << n);
-	auto                      schur_fill_value  = GENERATE(1, 1.3, 8, 2, -1);
-	auto                      domain_fill_value = GENERATE(1, 1.3, 8, 2, -1);
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 1);
-	auto                      domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
-	auto                      ghost_filler = make_shared<PatchFillingGhostFiller<2>>(domain_fill_value);
-	MockPatchSolver<2>        solver(domain, ghost_filler);
+	auto                       schur_fill_value  = GENERATE(1, 1.3, 8, 2, -1);
+	auto                       domain_fill_value = GENERATE(1, 1.3, 8, 2, -1);
+	DomainReader<2>            domain_reader(mesh_file, {n, n}, 1);
+	auto                       domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2>  iface_domain(domain);
+	PatchFillingGhostFiller<2> ghost_filler(domain_fill_value);
+	MockPatchSolver<2>         solver(domain, ghost_filler);
 
 	Vector<1> x(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
 	Vector<1> b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
@@ -133,7 +133,7 @@ TEST_CASE(
 	Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
 	psw.apply(x, b);
 	CHECK(solver.allPatchesCalled());
-	CHECK(ghost_filler->wasCalled());
+	CHECK(ghost_filler.wasCalled());
 	for (int i = 0; i < b.getNumLocalPatches(); i++) {
 		auto local_data = b.getComponentView(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
@@ -153,7 +153,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in 
 	DomainReader<2>                domain_reader(mesh_file, {n, n}, 1);
 	auto                           domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2>      iface_domain(domain);
-	auto                           ghost_filler = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2>             ghost_filler;
 	RHSGhostCheckingPatchSolver<2> solver(domain, ghost_filler, 0);
 
 	Vector<1> schur_b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
@@ -174,12 +174,12 @@ TEST_CASE(
 	INFO("MESH: " << mesh_file);
 	auto n = GENERATE(5, 7);
 	INFO("N: " << n);
-	auto                      domain_fill_value = GENERATE(1, 1.3, 8, 2, -1);
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 1);
-	auto                      domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
-	auto                      ghost_filler = make_shared<PatchFillingGhostFiller<2>>(domain_fill_value);
-	MockPatchSolver<2>        solver(domain, ghost_filler);
+	auto                       domain_fill_value = GENERATE(1, 1.3, 8, 2, -1);
+	DomainReader<2>            domain_reader(mesh_file, {n, n}, 1);
+	auto                       domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2>  iface_domain(domain);
+	PatchFillingGhostFiller<2> ghost_filler(domain_fill_value);
+	MockPatchSolver<2>         solver(domain, ghost_filler);
 
 	Vector<1> schur_b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
 	Vector<2> domain_b(*domain, 1);
@@ -187,7 +187,7 @@ TEST_CASE(
 	Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
 	psw.getSchurRHSFromDomainRHS(domain_b, schur_b);
 	CHECK(solver.allPatchesCalled());
-	CHECK(ghost_filler->wasCalled());
+	CHECK(ghost_filler.wasCalled());
 	for (int i = 0; i < schur_b.getNumLocalPatches(); i++) {
 		auto local_data = schur_b.getComponentView(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
@@ -204,12 +204,12 @@ TEST_CASE(
 	INFO("MESH: " << mesh_file);
 	auto n = GENERATE(5, 7);
 	INFO("N: " << n);
-	auto                      domain_fill_value = GENERATE(1, 1.3, 8, 2, -1);
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 1);
-	auto                      domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
-	auto                      ghost_filler = make_shared<PatchFillingGhostFiller<2>>(domain_fill_value);
-	MockPatchSolver<2>        solver(domain, ghost_filler);
+	auto                       domain_fill_value = GENERATE(1, 1.3, 8, 2, -1);
+	DomainReader<2>            domain_reader(mesh_file, {n, n}, 1);
+	auto                       domain = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2>  iface_domain(domain);
+	PatchFillingGhostFiller<2> ghost_filler(domain_fill_value);
+	MockPatchSolver<2>         solver(domain, ghost_filler);
 
 	Vector<1> schur_b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
 	Vector<2> domain_b(*domain, 1);
@@ -219,7 +219,7 @@ TEST_CASE(
 	Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
 	psw.getSchurRHSFromDomainRHS(domain_b, schur_b);
 	CHECK(solver.allPatchesCalled());
-	CHECK(ghost_filler->wasCalled());
+	CHECK(ghost_filler.wasCalled());
 	for (int i = 0; i < schur_b.getNumLocalPatches(); i++) {
 		auto local_data = schur_b.getComponentView(0, i);
 		nested_loop<1>(local_data.getStart(), local_data.getEnd(),

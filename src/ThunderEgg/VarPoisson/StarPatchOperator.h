@@ -56,9 +56,9 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 *
 	 * @param coeffs the cell centered coefficients
 	 * @param domain the Domain associated with the operator
-	 * @param ghost_filler the GhostFiller to u_viewe before calling applySinglePatch
+	 * @param ghost_filler the GhostFiller to use before calling applySinglePatch
 	 */
-	StarPatchOperator(const Vector<D> &coeffs, std::shared_ptr<const Domain<D>> domain, std::shared_ptr<const GhostFiller<D>> ghost_filler)
+	StarPatchOperator(const Vector<D> &coeffs, std::shared_ptr<const Domain<D>> domain, const GhostFiller<D> &ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler),
 	  coeffs(coeffs)
 	{

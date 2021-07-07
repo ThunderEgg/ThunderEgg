@@ -37,7 +37,7 @@ namespace ThunderEgg
  */
 template <int D> class PatchSolver : public virtual Operator<D>, public virtual GMG::Smoother<D>
 {
-	protected:
+	private:
 	/**
 	 * @brief the domain that is being solved over
 	 */
@@ -56,11 +56,7 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @param domain the Domain
 	 * @param ghost_filler the GhostFiller
 	 */
-	PatchSolver(std::shared_ptr<const Domain<D>> domain, std::shared_ptr<const GhostFiller<D>> ghost_filler)
-	: domain(domain),
-	  ghost_filler(ghost_filler)
-	{
-	}
+	PatchSolver(std::shared_ptr<const Domain<D>> domain, const GhostFiller<D> &ghost_filler) : domain(domain), ghost_filler(ghost_filler.clone()) {}
 	/**
 	 * @brief Destroy the Patch Solver object
 	 */
@@ -83,11 +79,11 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	/**
 	 * @brief Get the GhostFiller object
 	 *
-	 * @return std::shared_ptr<const GhostFiller<D>> the GhostFiller
+	 * @return const GhostFiller<D>& the GhostFiller
 	 */
-	std::shared_ptr<const GhostFiller<D>> getGhostFiller() const
+	const GhostFiller<D> &getGhostFiller() const
 	{
-		return ghost_filler;
+		return *ghost_filler;
 	}
 	/**
 	 * @brief Perform a single solve over a patch

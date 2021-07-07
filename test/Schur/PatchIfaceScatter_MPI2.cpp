@@ -58,27 +58,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> throws exception for non-square patches",
 
 	CHECK_THROWS_AS(Schur::PatchIfaceScatter<2>(iface_domain), RuntimeError);
 }
-TEST_CASE("Schur::PatchIfaceScatter<2> scatterStart throws exception when called twice",
-          "[Schur::PatchIfaceScatter]")
-{
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
-
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
-
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
-
-	Vector<1> global_vector = iface_domain.getNewVector();
-
-	auto local_vector = scatter.getNewLocalPatchIfaceVector();
-
-	auto state = scatter.scatterStart(global_vector, *local_vector);
-	CHECK_THROWS_AS(scatter.scatterStart(global_vector, *local_vector), RuntimeError);
-}
 TEST_CASE(
 "Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different global vectors",
 "[Schur::PatchIfaceScatter]")

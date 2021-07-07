@@ -112,7 +112,7 @@ TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
 
 	Vector<2> g_vec(*domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
 	Poisson::StarPatchOperator<2> p_operator(domain, gf);
 	p_operator.addDrichletBCToRHS(f_vec, gfun);
@@ -139,7 +139,7 @@ TEST_CASE("CG handles zero rhs vector", "[CG]")
 
 	Vector<2> g_vec(*domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
 	Poisson::StarPatchOperator<2> p_operator(domain, gf);
 
@@ -176,7 +176,7 @@ TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
 
 	Vector<2> g_vec(*domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
 	Poisson::StarPatchOperator<2> p_operator(domain, gf);
 	p_operator.addDrichletBCToRHS(f_vec, gfun);
@@ -226,7 +226,7 @@ TEST_CASE("CG giving a good initial guess reduces the iterations", "[CG]")
 
 	Vector<2> g_vec(*domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
 	Poisson::StarPatchOperator<2> p_operator(domain, gf);
 	p_operator.addDrichletBCToRHS(f_vec, gfun);

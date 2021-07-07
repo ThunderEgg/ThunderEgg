@@ -32,7 +32,7 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length",
 	Vector<2> u(*d_fine, num_components);
 	Vector<2> f(*d_fine, num_components);
 
-	auto mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	// the patch operator is just a 0.5I operator
 	MockPatchOperator<2> mpo(d_fine, mgf);
 	MockSolver<2>        ms(
@@ -63,8 +63,8 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 	Vector<2> u(*d_fine, num_components);
 	Vector<2> f(*d_fine, num_components);
 
-	bool called = false;
-	auto mgf    = make_shared<MockGhostFiller<2>>();
+	bool               called = false;
+	MockGhostFiller<2> mgf;
 	// the patch operator is just a 0.5I operator
 	MockPatchOperator<2> mpo(d_fine, mgf);
 	MockSolver<2>        ms(
@@ -103,7 +103,7 @@ TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::Patch
 	Vector<2> f(*d_fine, num_components);
 	f.set(1);
 
-	auto mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	// the patch operator is just a 0.5I operator
 	NonLinMockPatchOperator<2> mpo(d_fine, mgf);
 	MockSolver<2>              ms(
@@ -135,7 +135,7 @@ TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterativ
 	Vector<2> f(*d_fine, num_components);
 	f.set(1);
 
-	auto mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	// the patch operator is just a 0.5I operator
 	NonLinMockPatchOperator<2> mpo(d_fine, mgf);
 	MockSolver<2>              ms(

@@ -102,7 +102,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	{
 		std::array<std::shared_ptr<std::valarray<double>>, D> retval;
 		for (size_t axis = 0; axis < D; axis++) {
-			retval[axis] = getTransformArray(types[axis], this->domain->getNs()[axis]);
+			retval[axis] = getTransformArray(types[axis], this->getDomain()->getNs()[axis]);
 		}
 		return retval;
 	}
@@ -200,7 +200,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		}
 
 		for (size_t axis = 0; axis < D; axis++) {
-			int                    n     = this->domain->getNs()[axis];
+			int                    n     = this->getDomain()->getNs()[axis];
 			std::array<int, D + 1> start = in.getStart();
 			std::array<int, D + 1> end   = in.getEnd();
 			end[axis]                    = 0;
@@ -371,7 +371,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		eigen_vals = std::map<const PatchInfo<D>, PatchArray<D>, CompareFunction>(compare);
 
 		// process patches
-		for (auto pinfo : this->domain->getPatchInfoVector()) {
+		for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
 			addPatch(pinfo);
 		}
 	}
@@ -406,7 +406,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {
-			scale *= 2.0 / this->domain->getNs()[axis];
+			scale *= 2.0 / this->getDomain()->getNs()[axis];
 		}
 		loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] *= scale; });
 	}

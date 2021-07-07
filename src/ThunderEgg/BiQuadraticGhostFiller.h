@@ -39,6 +39,12 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	 * @param fill_type the ghost filling type to perform
 	 */
 	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain, GhostFillingType fill_type);
+	/**
+	 * @brief Clone this BiQuadraticGhostFiller
+	 *
+	 * @return BiQuadraticGhostFiller* a newly allocated copy of this BiQuadraticGhostFiller
+	 */
+	BiQuadraticGhostFiller *clone() const override;
 
 	void fillGhostCellsForNbrPatch(const PatchInfo<2> &              pinfo,
 	                               const PatchView<const double, 2> &local_view,

@@ -53,15 +53,15 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	/**
 	 * @brief Construct a new StarPatchOperator object
 	 *
-	 * @param domain_in the Domain that the operator is associated with
-	 * @param ghost_filler_in the GhostFiller to u_viewe before calling applySinglePatch
-	 * @param neumann_in whether or not to u_viewe Neumann boundary conditions
+	 * @param domain the Domain that the operator is associated with
+	 * @param ghost_filler the GhostFiller to u_viewe before calling applySinglePatch
+	 * @param neumann whether or not to u_viewe Neumann boundary conditions
 	 */
-	StarPatchOperator(std::shared_ptr<const Domain<D>> domain_in, std::shared_ptr<const GhostFiller<D>> ghost_filler_in, bool neumann_in = false)
-	: PatchOperator<D>(domain_in, ghost_filler_in),
-	  neumann(neumann_in)
+	StarPatchOperator(std::shared_ptr<const Domain<D>> domain, const GhostFiller<D> &ghost_filler, bool neumann = false)
+	: PatchOperator<D>(domain, ghost_filler),
+	  neumann(neumann)
 	{
-		if (this->domain->getNumGhostCells() < 1) {
+		if (domain->getNumGhostCells() < 1) {
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
 	}

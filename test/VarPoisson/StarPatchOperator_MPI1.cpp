@@ -70,10 +70,9 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 	Vector<2> h_vec(*d_fine, 1);
 	DomainTools::SetValuesWithGhost<2>(*d_fine, h_vec, hfun);
 
-	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine, GhostFillingType::Faces));
-	shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
-	new VarPoisson::StarPatchOperator<2>(h_vec, d_fine, gf));
-	p_operator->addDrichletBCToRHS(f_vec, gfun, hfun);
+	BiLinearGhostFiller              gf(d_fine, GhostFillingType::Faces);
+	VarPoisson::StarPatchOperator<2> p_operator(h_vec, d_fine, gf);
+	p_operator.addDrichletBCToRHS(f_vec, gfun, hfun);
 
 	Vector<2> f_expected = f_vec;
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
@@ -95,7 +94,7 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		auto gs = g_vec.getPatchView(pinfo.local_index);
 		auto fs = f_vec.getPatchView(pinfo.local_index);
-		p_operator->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, gs, fs);
+		p_operator.modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, gs, fs);
 	}
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
@@ -135,10 +134,9 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff",
 	Vector<2> h_vec(*d_fine, 1);
 	DomainTools::SetValuesWithGhost<2>(*d_fine, h_vec, hfun);
 
-	shared_ptr<BiLinearGhostFiller>              gf(new BiLinearGhostFiller(d_fine, GhostFillingType::Faces));
-	shared_ptr<VarPoisson::StarPatchOperator<2>> p_operator(
-	new VarPoisson::StarPatchOperator<2>(h_vec, d_fine, gf));
-	p_operator->apply(f_vec, g_vec);
+	BiLinearGhostFiller              gf(d_fine, GhostFillingType::Faces);
+	VarPoisson::StarPatchOperator<2> p_operator(h_vec, d_fine, gf);
+	p_operator.apply(f_vec, g_vec);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -188,12 +186,12 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff",
 		Vector<2> h_vec(*d_fine, 1);
 		DomainTools::SetValuesWithGhost<2>(*d_fine, h_vec, hfun);
 
-		auto gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+		BiLinearGhostFiller gf(d_fine, GhostFillingType::Faces);
 
-		auto p_operator = make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf);
-		p_operator->addDrichletBCToRHS(f_vec_expected, gfun, hfun);
+		VarPoisson::StarPatchOperator<2> p_operator(h_vec, d_fine, gf);
+		p_operator.addDrichletBCToRHS(f_vec_expected, gfun, hfun);
 
-		p_operator->apply(g_vec, f_vec);
+		p_operator.apply(g_vec, f_vec);
 
 		Vector<2> error_vec(*d_fine, 1);
 		error_vec.addScaled(1.0, f_vec, -1.0, f_vec_expected);
@@ -243,12 +241,12 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff",
 		Vector<2> h_vec(*d_fine, 1);
 		DomainTools::SetValuesWithGhost<2>(*d_fine, h_vec, hfun);
 
-		auto gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+		BiLinearGhostFiller gf(d_fine, GhostFillingType::Faces);
 
-		auto p_operator = make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf);
-		p_operator->addDrichletBCToRHS(f_vec_expected, gfun, hfun);
+		VarPoisson::StarPatchOperator<2> p_operator(h_vec, d_fine, gf);
+		p_operator.addDrichletBCToRHS(f_vec_expected, gfun, hfun);
 
-		p_operator->apply(g_vec, f_vec);
+		p_operator.apply(g_vec, f_vec);
 
 		Vector<2> error_vec(*d_fine, 1);
 		error_vec.addScaled(1.0, f_vec, -1.0, f_vec_expected);
@@ -271,7 +269,7 @@ TEST_CASE("Test VarPoisson::StarPatchOperator constructor throws exception with 
 	Vector<2> h_vec(*d_fine, 1);
 	h_vec.set(1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-	CHECK_THROWS_AS(make_shared<VarPoisson::StarPatchOperator<2>>(h_vec, d_fine, gf),
+	BiLinearGhostFiller gf(d_fine, GhostFillingType::Faces);
+	CHECK_THROWS_AS(VarPoisson::StarPatchOperator<2>(h_vec, d_fine, gf),
 	                ThunderEgg::RuntimeError);
 }

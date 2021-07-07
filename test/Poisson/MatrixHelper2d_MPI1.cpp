@@ -61,15 +61,15 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 	Vector<2> g_vec(*d_fine, 1);
 	DomainTools::SetValues<2>(*d_fine, g_vec, gfun);
 
-	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	p_operator->apply(g_vec, f_vec_expected);
+	BiQuadraticGhostFiller        gf(d_fine, GhostFillingType::Faces);
+	Poisson::StarPatchOperator<2> p_operator(d_fine, gf);
+	p_operator.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper2d mh(d_fine, neumann);
-	Mat                     A          = mh.formCRSMatrix();
-	auto                    m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(g_vec, f_vec);
+	Mat                     A = mh.formCRSMatrix();
+	PETSc::MatWrapper<2>    m_operator(A);
+	m_operator.apply(g_vec, f_vec);
 
 	REQUIRE(f_vec.infNorm() > 0);
 
@@ -115,15 +115,15 @@ TEST_CASE(
 	Vector<2> g_vec(*d_fine, 1);
 	DomainTools::SetValues<2>(*d_fine, g_vec, gfun);
 
-	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-	p_operator->apply(g_vec, f_vec_expected);
+	BiQuadraticGhostFiller        gf(d_fine, GhostFillingType::Faces);
+	Poisson::StarPatchOperator<2> p_operator(d_fine, gf, true);
+	p_operator.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Poisson::MatrixHelper2d mh(d_fine, neumann);
-	Mat                     A          = mh.formCRSMatrix();
-	auto                    m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(g_vec, f_vec);
+	Mat                     A = mh.formCRSMatrix();
+	PETSc::MatWrapper<2>    m_operator(A);
+	m_operator.apply(g_vec, f_vec);
 
 	REQUIRE(f_vec.infNorm() > 0);
 

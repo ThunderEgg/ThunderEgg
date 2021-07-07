@@ -209,6 +209,10 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 	: MPIGhostFiller<D>(domain, fill_type), num_components(num_components)
 	{
 	}
+	CallMockMPIGhostFiller<D> *clone() const override
+	{
+		throw 3;
+	}
 
 	/**
 	 * @brief was any of the functions called
@@ -596,6 +600,10 @@ class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 
 	ExchangeMockMPIGhostFiller(std::shared_ptr<const Domain<D>> domain_in, GhostFillingType fill_type)
 	: MPIGhostFiller<D>(domain_in, fill_type) {}
+	ExchangeMockMPIGhostFiller<D> *clone() const override
+	{
+		return new ExchangeMockMPIGhostFiller<D>(*this);
+	}
 
 	void checkInterior(const Vector<D> &vec)
 	{

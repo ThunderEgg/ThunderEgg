@@ -54,7 +54,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws exception for non-square pa
 	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
-	auto                          gf = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
+	BiQuadraticGhostFiller        gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<2> p_operator(d_fine, gf);
 	Poisson::FFTWPatchSolver<2>   p_solver(p_operator, neumann);
 
@@ -68,6 +68,10 @@ template <int D>
 class MockGhostFiller : public GhostFiller<D>
 {
 	public:
+	MockGhostFiller<D> *clone() const override
+	{
+		return new MockGhostFiller<D>(*this);
+	}
 	void fillGhost(const Vector<D> &u) const override {}
 };
 } // namespace
@@ -83,7 +87,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws with unsupported ghost fill
 	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
-	auto                          gf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2>            gf;
 	Poisson::StarPatchOperator<2> p_operator(d_fine, gf);
 	Poisson::FFTWPatchSolver<2>   p_solver(p_operator, neumann);
 
@@ -117,7 +121,7 @@ TEST_CASE(
 		}
 	}
 
-	auto                          gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	BiLinearGhostFiller           gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<2> p_operator(d_fine, gf);
 	Poisson::FFTWPatchSolver<2>   p_solver(p_operator, neumann);
 	Schur::PatchSolverWrapper<2>  p_solver_wrapper(iface_domain, p_solver);
@@ -173,7 +177,7 @@ TEST_CASE(
 		}
 	}
 
-	auto                          gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	BiLinearGhostFiller           gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<2> p_operator(d_fine, gf, true);
 	Poisson::FFTWPatchSolver<2>   p_solver(p_operator, neumann);
 	Schur::PatchSolverWrapper<2>  p_solver_wrapper(iface_domain, p_solver);
@@ -226,7 +230,7 @@ TEST_CASE(
 		}
 	}
 
-	auto                          gf = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
+	BiQuadraticGhostFiller        gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<2> p_operator(d_fine, gf);
 	Poisson::FFTWPatchSolver<2>   p_solver(p_operator, neumann);
 	Schur::PatchSolverWrapper<2>  p_solver_wrapper(iface_domain, p_solver);
@@ -279,7 +283,7 @@ TEST_CASE(
 		}
 	}
 
-	auto                          gf = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
+	BiQuadraticGhostFiller        gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<2> p_operator(d_fine, gf, true);
 	Poisson::FFTWPatchSolver<2>   p_solver(p_operator, neumann);
 	Schur::PatchSolverWrapper<2>  p_solver_wrapper(iface_domain, p_solver);

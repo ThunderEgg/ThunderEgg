@@ -530,5 +530,9 @@ TriLinearGhostFiller::TriLinearGhostFiller(std::shared_ptr<const Domain<3>> doma
 		}
 	}
 }
+TriLinearGhostFiller *TriLinearGhostFiller::clone() const
+{
+	return new TriLinearGhostFiller(*this);
+}
 
 } // namespace ThunderEgg

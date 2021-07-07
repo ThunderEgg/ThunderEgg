@@ -52,11 +52,11 @@ template <int D> class PatchOperator : public Operator<D>
 	 *  This sets the Domain and GhostFiller
 	 *
 	 * @param domain_in  the Domain
-	 * @param ghost_filler_in the GhostFiller
+	 * @param ghost_filler the GhostFiller
 	 */
-	PatchOperator(std::shared_ptr<const Domain<D>> domain_in, std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
+	PatchOperator(std::shared_ptr<const Domain<D>> domain_in, const GhostFiller<D> &ghost_filler)
 	: domain(domain_in),
-	  ghost_filler(ghost_filler_in)
+	  ghost_filler(ghost_filler.clone())
 	{
 	}
 	/**
@@ -151,9 +151,9 @@ template <int D> class PatchOperator : public Operator<D>
 	/**
 	 * @brief Get the GhostFiller object associated with this PatchOperator
 	 */
-	std::shared_ptr<const GhostFiller<D>> getGhostFiller() const
+	const GhostFiller<D> &getGhostFiller() const
 	{
-		return ghost_filler;
+		return *ghost_filler;
 	}
 };
 } // namespace ThunderEgg

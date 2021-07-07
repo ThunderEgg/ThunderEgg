@@ -31,7 +31,7 @@ TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
 	auto      f_num_components = GENERATE(1, 2, 3);
 	Vector<2> f(*d_fine, f_num_components);
 
-	auto               mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	MockPatchSolver<2> mps(d_fine, mgf);
 
 	u.setWithGhost(1);
@@ -44,7 +44,7 @@ TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 		}
 	}
-	CHECK_FALSE(mgf->wasCalled());
+	CHECK_FALSE(mgf.wasCalled());
 	CHECK(mps.allPatchesCalled());
 }
 TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
@@ -64,7 +64,7 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 	auto      f_num_components = GENERATE(1, 2, 3);
 	Vector<2> f(*d_fine, f_num_components);
 
-	auto               mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	MockPatchSolver<2> mps(d_fine, mgf);
 
 	u.setWithGhost(1);
@@ -78,7 +78,7 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 		}
 	}
-	CHECK_FALSE(mgf->wasCalled());
+	CHECK_FALSE(mgf.wasCalled());
 	CHECK(mps.allPatchesCalled());
 	stringstream ss;
 	ss << *d_fine->getTimer();
@@ -102,7 +102,7 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 	auto      f_num_components = GENERATE(1, 2, 3);
 	Vector<2> f(*d_fine, f_num_components);
 
-	auto               mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	MockPatchSolver<2> mps(d_fine, mgf);
 
 	u.setWithGhost(1);
@@ -116,7 +116,7 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 		}
 	}
-	CHECK(mgf->wasCalled());
+	CHECK(mgf.wasCalled());
 	CHECK(mps.allPatchesCalled());
 	stringstream ss;
 	ss << *d_fine->getTimer();
@@ -139,7 +139,7 @@ TEST_CASE("PatchSolver smooth for various domains with timer", "[PatchSolver]")
 	auto      f_num_components = GENERATE(1, 2, 3);
 	Vector<2> f(*d_fine, f_num_components);
 
-	auto               mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	MockPatchSolver<2> mps(d_fine, mgf);
 
 	u.setWithGhost(1);
@@ -152,7 +152,7 @@ TEST_CASE("PatchSolver smooth for various domains with timer", "[PatchSolver]")
 			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 		}
 	}
-	CHECK(mgf->wasCalled());
+	CHECK(mgf.wasCalled());
 	CHECK(mps.allPatchesCalled());
 }
 TEST_CASE("PatchSolver getDomain", "[PatchSolver]")
@@ -169,7 +169,7 @@ TEST_CASE("PatchSolver getDomain", "[PatchSolver]")
 	Vector<2> u(*d_fine, 1);
 	Vector<2> f(*d_fine, 1);
 
-	auto               mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	MockPatchSolver<2> mps(d_fine, mgf);
 
 	CHECK(mps.getDomain() == d_fine);
@@ -188,8 +188,9 @@ TEST_CASE("PatchSolver getGhostFiller", "[PatchSolver]")
 	Vector<2> u(*d_fine, 1);
 	Vector<2> f(*d_fine, 1);
 
-	auto               mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	MockPatchSolver<2> mps(d_fine, mgf);
 
-	CHECK(mps.getGhostFiller() == mgf);
+	const GhostFiller<2> &mps_mgf = mps.getGhostFiller();
+	CHECK(typeid(mps_mgf) == typeid(mgf));
 }

@@ -66,7 +66,7 @@ template <int D> class PatchIfaceScatter
 		~StatePrivate()
 		{
 			if (communicating) {
-				MPI_Waitall(send_requests.size(), recv_requests.data(), MPI_STATUSES_IGNORE);
+				MPI_Waitall(recv_requests.size(), recv_requests.data(), MPI_STATUSES_IGNORE);
 				MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUSES_IGNORE);
 			}
 		}

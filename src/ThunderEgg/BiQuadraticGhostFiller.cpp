@@ -27,7 +27,10 @@ BiQuadraticGhostFiller::BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> 
 : MPIGhostFiller<2>(domain, fill_type)
 {
 }
-
+BiQuadraticGhostFiller *BiQuadraticGhostFiller::clone() const
+{
+	return new BiQuadraticGhostFiller(*this);
+}
 namespace
 {
 /**
