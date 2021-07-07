@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
 	shared_ptr<GhostFiller<2>> ghost_filler = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	// create patch operator that uses a typical 2nd order 7 point poisson stencil
-	shared_ptr<StarPatchOperator<2>> patch_operator = make_shared<StarPatchOperator<2>>(domain, ghost_filler, neumann);
+	StarPatchOperator<2> patch_operator(domain, ghost_filler, neumann);
 
 	timer->start("Domain Initialization");
 
@@ -281,9 +281,9 @@ int main(int argc, char *argv[])
 	// modify the rhs to set the boundary conditions
 	// the patch operator contains some helper functions for this
 	if (neumann) {
-		patch_operator->addNeumannBCToRHS(f, gfun, {nfunx, nfuny});
+		patch_operator.addNeumannBCToRHS(f, gfun, {nfunx, nfuny});
 	} else {
-		patch_operator->addDrichletBCToRHS(f, gfun);
+		patch_operator.addDrichletBCToRHS(f, gfun);
 	}
 
 	timer->stop("Domain Initialization");
@@ -299,8 +299,6 @@ int main(int argc, char *argv[])
 	// setup start
 	///////////////////
 	timer->start("Linear System Setup");
-
-	std::shared_ptr<Operator<2>> A = patch_operator; // a PatchOperator can be passed the BiCGStab to use as an operator
 
 	// preconditoners
 	timer->start("Preconditioner Setup");
@@ -325,7 +323,7 @@ int main(int argc, char *argv[])
 	} else if (patch_solver == "fftw") {
 		finest_smoother.reset(new FFTWPatchSolver<2>(patch_operator, neumann_bitset));
 	} else {
-		finest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, *patch_operator));
+		finest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, patch_operator));
 	}
 
 	std::shared_ptr<Operator<2>> M;
@@ -350,8 +348,8 @@ int main(int argc, char *argv[])
 			coarser_domain = domain_generator->getCoarserDomain();
 
 			// create operator for middle domain
-			auto middle_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
-			auto middle_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, middle_ghost_filler);
+			auto                 middle_ghost_filler = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
+			StarPatchOperator<2> middle_patch_operator(current_domain, middle_ghost_filler);
 
 			// smoother
 			unique_ptr<GMG::Smoother<2>> middle_smoother;
@@ -360,7 +358,7 @@ int main(int argc, char *argv[])
 			} else if (patch_solver == "fftw") {
 				middle_smoother.reset(new FFTWPatchSolver<2>(middle_patch_operator, neumann_bitset));
 			} else {
-				middle_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, *middle_patch_operator));
+				middle_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, middle_patch_operator));
 			}
 
 			// restrictor and interpolator
@@ -378,8 +376,8 @@ int main(int argc, char *argv[])
 		//add the coarsest level to the builder
 
 		// patch operator
-		shared_ptr<GhostFiller<2>>   coarsest_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
-		shared_ptr<PatchOperator<2>> coarsest_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, coarsest_ghost_filler);
+		shared_ptr<GhostFiller<2>> coarsest_ghost_filler = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
+		StarPatchOperator<2>       coarsest_patch_operator(current_domain, coarsest_ghost_filler);
 
 		// smoother
 		unique_ptr<GMG::Smoother<2>> coarsest_smoother;
@@ -388,7 +386,7 @@ int main(int argc, char *argv[])
 		} else if (patch_solver == "fftw") {
 			coarsest_smoother.reset(new FFTWPatchSolver<2>(coarsest_patch_operator, neumann_bitset));
 		} else {
-			coarsest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, *coarsest_patch_operator));
+			coarsest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, coarsest_patch_operator));
 		}
 
 		// coarsets level only needs an interpolator
@@ -417,7 +415,7 @@ int main(int argc, char *argv[])
 
 	Vector<2> u(*domain, num_components);
 
-	int num_iterations = solver.solve(*A, u, f, M.get(), true);
+	int num_iterations = solver.solve(patch_operator, u, f, M.get(), true);
 
 	if (comm.getRank() == 0) {
 		cout << "Iterations: " << num_iterations << endl;
@@ -428,7 +426,7 @@ int main(int argc, char *argv[])
 	Vector<2> au(*domain, num_components);
 	Vector<2> residual_vector(*domain, num_components);
 
-	A->apply(u, au);
+	patch_operator.apply(u, au);
 
 	residual_vector.addScaled(-1, au, 1, f);
 

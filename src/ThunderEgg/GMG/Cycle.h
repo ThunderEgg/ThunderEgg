@@ -53,7 +53,7 @@ template <int D> class Cycle : public Operator<D>
 	{
 		// calculate residual
 		Vector<D> r = u.getZeroClone();
-		level.getOperator()->apply(u, r);
+		level.getOperator().apply(u, r);
 		r.scaleThenAdd(-1, f);
 		// create vectors for coarser levels
 		return level.getRestrictor().restrict(r);

@@ -55,9 +55,9 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws exception for non-square pa
 	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
-	auto                        gf         = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto                        p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	Poisson::FFTWPatchSolver<3> p_solver(p_operator, neumann);
+	auto                          gf = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	Poisson::StarPatchOperator<3> p_operator(d_fine, gf);
+	Poisson::FFTWPatchSolver<3>   p_solver(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver), RuntimeError);
 }
@@ -84,9 +84,9 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws with unsupported ghost fill
 	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
-	auto                        gf         = make_shared<MockGhostFiller<3>>();
-	auto                        p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	Poisson::FFTWPatchSolver<3> p_solver(p_operator, neumann);
+	auto                          gf = make_shared<MockGhostFiller<3>>();
+	Poisson::StarPatchOperator<3> p_operator(d_fine, gf);
+	Poisson::FFTWPatchSolver<3>   p_solver(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver), RuntimeError);
 }
@@ -119,10 +119,10 @@ TEST_CASE(
 		}
 	}
 
-	auto                         gf         = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto                         p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	Poisson::FFTWPatchSolver<3>  p_solver(p_operator, neumann);
-	Schur::PatchSolverWrapper<3> p_solver_wrapper(iface_domain, p_solver);
+	auto                          gf = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	Poisson::StarPatchOperator<3> p_operator(d_fine, gf);
+	Poisson::FFTWPatchSolver<3>   p_solver(p_operator, neumann);
+	Schur::PatchSolverWrapper<3>  p_solver_wrapper(iface_domain, p_solver);
 	p_solver_wrapper.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
@@ -186,10 +186,10 @@ TEST_CASE(
 		}
 	}
 
-	auto                         gf         = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto                         p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf, true);
-	Poisson::FFTWPatchSolver<3>  p_solver(p_operator, neumann);
-	Schur::PatchSolverWrapper<3> p_solver_wrapper(iface_domain, p_solver);
+	auto                          gf = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	Poisson::StarPatchOperator<3> p_operator(d_fine, gf, true);
+	Poisson::FFTWPatchSolver<3>   p_solver(p_operator, neumann);
+	Schur::PatchSolverWrapper<3>  p_solver_wrapper(iface_domain, p_solver);
 	p_solver_wrapper.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper

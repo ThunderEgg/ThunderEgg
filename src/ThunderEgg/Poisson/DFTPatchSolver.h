@@ -348,12 +348,12 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	/**
 	 * @brief Construct a new DFTPatchSolver object
 	 *
-	 * @param op_in the Poisson PatchOperator that cooresponds to this DFTPatchSolver
+	 * @param op the Poisson PatchOperator that cooresponds to this DFTPatchSolver
 	 * @param neumann true if domain has neumann boundary conditions on a side
 	 */
-	DFTPatchSolver(std::shared_ptr<const PatchOperator<D>> op_in, std::bitset<Side<D>::number_of> neumann)
-	: PatchSolver<D>(op_in->getDomain(), op_in->getGhostFiller()),
-	  op(op_in),
+	DFTPatchSolver(const PatchOperator<D> &op, std::bitset<Side<D>::number_of> neumann)
+	: PatchSolver<D>(op.getDomain(), op.getGhostFiller()),
+	  op(op.clone()),
 	  neumann(neumann)
 	{
 		CompareFunction compare = [&](const PatchInfo<D> &a, const PatchInfo<D> &b) {

@@ -113,18 +113,21 @@ template <int D> class Level
 	 *
 	 * @param op the operator
 	 */
-	void setOperator(std::shared_ptr<const Operator<D>> op)
+	void setOperator(const Operator<D> &op)
 	{
-		this->op = op;
+		this->op.reset(op.clone());
 	}
 	/**
 	 * @brief Get the operator for this level.
 	 *
 	 * @return Pointer to the operator.
 	 */
-	std::shared_ptr<const Operator<D>> getOperator() const
+	const Operator<D> &getOperator() const
 	{
-		return op;
+		if (op == nullptr) {
+			throw RuntimeError("This level does not have an Operator");
+		}
+		return *op;
 	}
 	/**
 	 * @brief Set the smoother for this level.

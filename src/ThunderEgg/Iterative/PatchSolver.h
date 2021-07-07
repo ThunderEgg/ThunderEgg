@@ -68,13 +68,22 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		 * @param op the operator
 		 */
 		SinglePatchOp(const PatchInfo<D> &pinfo, std::shared_ptr<const PatchOperator<D>> op) : op(op), pinfo(pinfo) {}
-		void apply(const Vector<D> &x, Vector<D> &b) const
+		void apply(const Vector<D> &x, Vector<D> &b) const override
 		{
 			PatchView<const double, D> x_view = x.getPatchView(0);
 			PatchView<double, D>       b_view = b.getPatchView(0);
 			op->enforceBoundaryConditions(pinfo, x_view);
 			op->enforceZeroDirichletAtInternalBoundaries(pinfo, x_view);
 			op->applySinglePatch(pinfo, x_view, b_view);
+		}
+		/**
+		 * @brief Get a clone of this operator
+		 *
+		 * @return SinglePatchOp* a newly allocated copy
+		 */
+		SinglePatchOp *clone() const override
+		{
+			return new SinglePatchOp(*this);
 		}
 	};
 

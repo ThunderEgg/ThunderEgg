@@ -50,8 +50,8 @@ template <int D> class MatShellCreator
 	 *
 	 * @param op the Operator
 	 */
-	explicit MatShellCreator(std::shared_ptr<const Operator<D>> op, const std::function<Vector<D>()> &vector_allocator)
-	: op(op),
+	explicit MatShellCreator(const Operator<D> &op, const std::function<Vector<D>()> &vector_allocator)
+	: op(op.clone()),
 	  getNewVector(vector_allocator)
 	{
 	}
@@ -124,10 +124,10 @@ template <int D> class MatShellCreator
 	 * @brief Get a new MatShell for use with PETSc
 	 *
 	 * @param op the operator we are wrapping
-	 * @param vg the associated vectorGenerator for that object
+	 * @param vector_allocator function that allocates need TE vectors
 	 * @return Mat the wrapped operator, you are responsible for calling MatDestroy on this
 	 */
-	static Mat GetNewMatShell(std::shared_ptr<const Operator<D>> op, const std::function<Vector<D>()> &vector_allocator)
+	static Mat GetNewMatShell(const Operator<D> &op, const std::function<Vector<D>()> &vector_allocator)
 	{
 		MatShellCreator<D> *msc = new MatShellCreator(op, vector_allocator);
 		Vector<D>           vec = vector_allocator();

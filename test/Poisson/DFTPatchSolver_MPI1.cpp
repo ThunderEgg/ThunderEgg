@@ -71,10 +71,10 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::
 		Vector<2> f_vec(*d_fine, 1);
 		DomainTools::SetValues<2>(*d_fine, f_vec, ffun);
 
-		auto                       gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-		auto                       p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-		Poisson::DFTPatchSolver<2> p_solver(p_operator, neumann);
-		p_operator->addDrichletBCToRHS(f_vec, gfun);
+		auto                          gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+		Poisson::StarPatchOperator<2> p_operator(d_fine, gf);
+		Poisson::DFTPatchSolver<2>    p_solver(p_operator, neumann);
+		p_operator.addDrichletBCToRHS(f_vec, gfun);
 
 		p_solver.smooth(f_vec, g_vec);
 
@@ -131,10 +131,10 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann 
 		Vector<2> f_vec(*d_fine, 1);
 		DomainTools::SetValues<2>(*d_fine, f_vec, ffun);
 
-		auto                       gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-		auto                       p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-		Poisson::DFTPatchSolver<2> p_solver(p_operator, neumann);
-		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
+		auto                          gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+		Poisson::StarPatchOperator<2> p_operator(d_fine, gf, true);
+		Poisson::DFTPatchSolver<2>    p_solver(p_operator, neumann);
+		p_operator.addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
 		p_solver.smooth(f_vec, g_vec);
 
@@ -194,10 +194,10 @@ TEST_CASE(
 		Vector<2> f_vec(*d_fine, 1);
 		DomainTools::SetValues<2>(*d_fine, f_vec, ffun);
 
-		auto                       gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-		auto                       p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-		Poisson::DFTPatchSolver<2> p_solver(p_operator, neumann);
-		p_operator->addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
+		auto                          gf = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+		Poisson::StarPatchOperator<2> p_operator(d_fine, gf, true);
+		Poisson::DFTPatchSolver<2>    p_solver(p_operator, neumann);
+		p_operator.addNeumannBCToRHS(f_vec, gfun, {gfun_x, gfun_y});
 
 		p_solver.smooth(f_vec, g_vec);
 

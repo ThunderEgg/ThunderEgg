@@ -38,6 +38,10 @@ const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 class HalfIdentity : public Operator<2>
 {
 	public:
+	HalfIdentity *clone() const override
+	{
+		return new HalfIdentity(*this);
+	}
 	void apply(const Vector<2> &x, Vector<2> &b) const override
 	{
 		b.copy(x);
@@ -68,8 +72,8 @@ TEST_CASE("PETSc::MatShellCreator works with 0.5I", "[PETSc::MatShellCreator]")
 	VecCreateMPI(MPI_COMM_WORLD, d_fine->getNumLocalCells() * 1, PETSC_DETERMINE, &b);
 
 	// create an Identity matrix
-	auto TE_A = make_shared<HalfIdentity>();
-	Mat  A    = PETSc::MatShellCreator<2>::GetNewMatShell(TE_A, vector_allocator);
+	HalfIdentity TE_A;
+	Mat          A = PETSc::MatShellCreator<2>::GetNewMatShell(TE_A, vector_allocator);
 
 	MatMult(A, x, b);
 
@@ -110,8 +114,8 @@ TEST_CASE("PETSc::MatShellCreator works with 0.5I two components", "[PETSc::MatS
 	VecCreateMPI(MPI_COMM_WORLD, d_fine->getNumLocalCells() * 2, PETSC_DETERMINE, &b);
 
 	// create an Identity matrix
-	auto TE_A = make_shared<HalfIdentity>();
-	Mat  A    = PETSc::MatShellCreator<2>::GetNewMatShell(TE_A, vector_allocator);
+	HalfIdentity TE_A;
+	Mat          A = PETSc::MatShellCreator<2>::GetNewMatShell(TE_A, vector_allocator);
 
 	MatMult(A, x, b);
 

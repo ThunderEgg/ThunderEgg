@@ -79,6 +79,15 @@ template <int D> class VCycle : public Cycle<D>
 		num_post_sweeps   = opts.post_sweeps;
 		num_coarse_sweeps = opts.coarse_sweeps;
 	}
+	/**
+	 * @brief Get a clone of this VCycle
+	 *
+	 * @return VCycle<D>* a newly allocated copy
+	 */
+	VCycle<D> *clone() const override
+	{
+		return new VCycle(*this);
+	}
 };
 extern template class VCycle<2>;
 extern template class VCycle<3>;

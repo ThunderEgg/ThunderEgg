@@ -258,6 +258,10 @@ class I2Operator : public Operator<2>
 		y.copy(x);
 		y.scale(2);
 	}
+	I2Operator *clone() const override
+	{
+		return new I2Operator(*this);
+	}
 };
 } // namespace
 TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")

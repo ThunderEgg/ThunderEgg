@@ -179,9 +179,9 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 	 * @param op the Poisson PatchOperator that cooresponds to this DftPatchSolver
 	 * @param neumann true if domain has neumann boundary conditions on a side
 	 */
-	FFTWPatchSolver(std::shared_ptr<const PatchOperator<D>> op, std::bitset<Side<D>::number_of> neumann)
-	: PatchSolver<D>(op->getDomain(), op->getGhostFiller()),
-	  op(op),
+	FFTWPatchSolver(const PatchOperator<D> &op, std::bitset<Side<D>::number_of> neumann)
+	: PatchSolver<D>(op.getDomain(), op.getGhostFiller()),
+	  op(op.clone()),
 	  neumann(neumann)
 	{
 		CompareFunction compare = [&](const PatchInfo<D> &a, const PatchInfo<D> &b) {

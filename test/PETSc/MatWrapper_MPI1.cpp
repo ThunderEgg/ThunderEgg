@@ -64,8 +64,8 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 	MatShift(A, 0.5);
 
 	// create MatWrapper
-	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(x, b);
+	PETSc::MatWrapper<2> m_operator(A);
+	m_operator.apply(x, b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
@@ -118,8 +118,8 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 	MatShift(A, 0.5);
 
 	// create MatWrapper
-	auto m_operator = make_shared<PETSc::MatWrapper<2>>(A);
-	m_operator->apply(x, b);
+	PETSc::MatWrapper<2> m_operator(A);
+	m_operator.apply(x, b);
 
 	for (auto pinfo : d_fine->getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);

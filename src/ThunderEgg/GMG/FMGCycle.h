@@ -120,6 +120,15 @@ template <int D> class FMGCycle : public Cycle<D>
 		num_coarse_sweeps = opts.coarse_sweeps;
 		num_mid_sweeps    = opts.mid_sweeps;
 	}
+	/**
+	 * @brief Get a clone of this FMGCycle
+	 *
+	 * @return FMGCycle<D>* a newly allocated copy
+	 */
+	FMGCycle<D> *clone() const override
+	{
+		return new FMGCycle(*this);
+	}
 };
 extern template class FMGCycle<2>;
 extern template class FMGCycle<3>;

@@ -94,6 +94,15 @@ template <int D> class WCycle : public Cycle<D>
 		num_coarse_sweeps = opts.coarse_sweeps;
 		num_mid_sweeps    = opts.mid_sweeps;
 	}
+	/**
+	 * @brief Get a clone of this WCycle
+	 *
+	 * @return WCycle<D>* a newly allocated copy
+	 */
+	WCycle<D> *clone() const override
+	{
+		return new WCycle(*this);
+	}
 };
 extern template class WCycle<2>;
 extern template class WCycle<3>;

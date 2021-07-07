@@ -48,7 +48,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 	/**
 	 * @brief The scatter object
 	 */
-	mutable PatchIfaceScatter<D> scatter;
+	PatchIfaceScatter<D> scatter;
 	/**
 	 * @brief Set of patches that have only local interfaces
 	 */
@@ -85,6 +85,15 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		}
 	}
 	/**
+	 * @brief Get a clone of this PatchSolverWrapper
+	 *
+	 * @return PatchSolverWrapper<D>* a newly allocated copy of this PatchSolverWrapper
+	 */
+	PatchSolverWrapper<D> *clone() const override
+	{
+		return new PatchSolverWrapper<D>(*this);
+	}
+	/**
 	 * @brief Apply Schur matrix
 	 *
 	 * @param x the input vector.
@@ -100,7 +109,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 
 		// scatter local iface vector
 		auto local_x = scatter.getNewLocalPatchIfaceVector();
-		scatter.scatterStart(x, *local_x);
+		auto state   = scatter.scatterStart(x, *local_x);
 
 		// each patch has a local interface, go ahead and set the ghost values using those
 		// interfaces
@@ -122,7 +131,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 			solver->solveSinglePatch(piinfo->pinfo, f_view, u_view);
 		}
 
-		scatter.scatterFinish(x, *local_x);
+		scatter.scatterFinish(state, x, *local_x);
 
 		// set ghosts using interfaces that were on a neighboring rank
 		for (auto piinfo : patches_with_ifaces_on_neighbor_rank) {

@@ -80,13 +80,10 @@ template <int D> class CycleBuilder
 	 * @param restrictor the Restrictor that restricts from this level to the coarser level
 	 * @param vg the VectorGenerator for the level
 	 */
-	void addFinestLevel(std::shared_ptr<Operator<D>> op, const Smoother<D> &smoother, const Restrictor<D> &restrictor)
+	void addFinestLevel(const Operator<D> &op, const Smoother<D> &smoother, const Restrictor<D> &restrictor)
 	{
 		if (has_finest) {
 			throw RuntimeError("addFinestLevel was already called");
-		}
-		if (op == nullptr) {
-			throw RuntimeError("Operator is nullptr");
 		}
 		has_finest = true;
 
@@ -106,19 +103,14 @@ template <int D> class CycleBuilder
 	 * @param interpolator the Interpolator that restricts from this level to the finer level
 	 * @param vg the VectorGenerator for the level
 	 */
-	void addIntermediateLevel(std::shared_ptr<Operator<D>> op,
-	                          const Smoother<D> &          smoother,
-	                          const Restrictor<D> &        restrictor,
-	                          const Interpolator<D> &      interpolator)
+	void
+	addIntermediateLevel(const Operator<D> &op, const Smoother<D> &smoother, const Restrictor<D> &restrictor, const Interpolator<D> &interpolator)
 	{
 		if (!has_finest) {
 			throw RuntimeError("addFinestLevel has not been called yet");
 		}
 		if (has_coarsest) {
 			throw RuntimeError("addCoarsestLevel has been called");
-		}
-		if (op == nullptr) {
-			throw RuntimeError("Operator is nullptr");
 		}
 
 		auto new_level = std::make_shared<Level<D>>();
@@ -139,16 +131,13 @@ template <int D> class CycleBuilder
 	 * @param smoother the Smoother for the level
 	 * @param interpolator the Interpolator that restricts from this level to the finer level
 	 */
-	void addCoarsestLevel(std::shared_ptr<Operator<D>> op, Smoother<D> &smoother, const Interpolator<D> &interpolator)
+	void addCoarsestLevel(const Operator<D> &op, Smoother<D> &smoother, const Interpolator<D> &interpolator)
 	{
 		if (!has_finest) {
 			throw RuntimeError("addFinestLevel has not been called yet");
 		}
 		if (has_coarsest) {
 			throw RuntimeError("addCoarsestLevel has already been called");
-		}
-		if (op == nullptr) {
-			throw RuntimeError("Operator is nullptr");
 		}
 		has_coarsest = true;
 

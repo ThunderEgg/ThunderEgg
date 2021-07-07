@@ -115,6 +115,16 @@ template <int D> class MatWrapper : public Operator<D>
 	 * @param A_in the PETSc Mat to wrap
 	 */
 	explicit MatWrapper(Mat A_in) : A(A_in) {}
+
+	/**
+	 * @brief Clone this wrapper
+	 *
+	 * @return MatWrapper<D>* a newly allocated copy
+	 */
+	MatWrapper<D> *clone() const override
+	{
+		return new MatWrapper<D>(*this);
+	}
 	void apply(const Vector<D> &x, Vector<D> &b) const override
 	{
 		Vec petsc_x = getPetscVecWithoutGhost(x);
