@@ -38,15 +38,15 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+	auto            nx        = GENERATE(2, 10);
+	auto            ny        = GENERATE(2, 10);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
 
-	Vector<2> fine_vec(*d_fine, 1);
-	Vector<2> coarse_expected(*d_coarse, 1);
+	Vector<2> fine_vec(d_fine, 1);
+	Vector<2> coarse_expected(d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -54,14 +54,14 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f);
-	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f);
+	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
+	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
 
-	GMG::LinearRestrictor<2> restrictor(*d_fine, *d_coarse, true);
+	GMG::LinearRestrictor<2> restrictor(d_fine, d_coarse, true);
 
 	Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
-	for (auto pinfo : d_coarse->getPatchInfoVector()) {
+	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
 		INFO("x:              " << pinfo.starts[0]);
 		INFO("y:              " << pinfo.starts[1]);
@@ -97,15 +97,15 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 {
 	auto mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+	auto            nx        = GENERATE(2, 10);
+	auto            ny        = GENERATE(2, 10);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
 
-	Vector<2> fine_vec(*d_fine, 2);
-	Vector<2> coarse_expected(*d_coarse, 2);
+	Vector<2> fine_vec(d_fine, 2);
+	Vector<2> coarse_expected(d_coarse, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -118,14 +118,14 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 		return 9 + ((x * 0.9) + y * 4);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f, g);
-	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f, g);
+	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f, g);
 
-	GMG::LinearRestrictor<2> restrictor(*d_fine, *d_coarse, true);
+	GMG::LinearRestrictor<2> restrictor(d_fine, d_coarse, true);
 
 	Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
-	for (auto pinfo : d_coarse->getPatchInfoVector()) {
+	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
 		INFO("x:              " << pinfo.starts[0]);
 		INFO("y:              " << pinfo.starts[1]);
@@ -168,15 +168,15 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 {
 	auto mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+	auto            nx        = GENERATE(2, 10);
+	auto            ny        = GENERATE(2, 10);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
 
-	Vector<2> fine_vec(*d_fine, 1);
-	Vector<2> coarse_expected(*d_coarse, 1);
+	Vector<2> fine_vec(d_fine, 1);
+	Vector<2> coarse_expected(d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -184,14 +184,14 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
 		return 1 + ((x * 0.3) + y);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f);
-	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f);
+	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
+	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
 
-	GMG::LinearRestrictor<2> restrictor(*d_fine, *d_coarse, false);
+	GMG::LinearRestrictor<2> restrictor(d_fine, d_coarse, false);
 
 	Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
-	for (auto pinfo : d_coarse->getPatchInfoVector()) {
+	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
 		INFO("x:              " << pinfo.starts[0]);
 		INFO("y:              " << pinfo.starts[1]);
@@ -219,15 +219,15 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 {
 	auto mesh_file = GENERATE(as<std::string>{}, uniform_mesh_file, refined_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+	auto            nx        = GENERATE(2, 10);
+	auto            ny        = GENERATE(2, 10);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
 
-	Vector<2> fine_vec(*d_fine, 2);
-	Vector<2> coarse_expected(*d_coarse, 2);
+	Vector<2> fine_vec(d_fine, 2);
+	Vector<2> coarse_expected(d_coarse, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -240,14 +240,14 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
 		return 9 + ((x * 0.9) + y * 4);
 	};
 
-	DomainTools::SetValuesWithGhost<2>(*d_fine, fine_vec, f, g);
-	DomainTools::SetValuesWithGhost<2>(*d_coarse, coarse_expected, f, g);
+	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f, g);
 
-	GMG::LinearRestrictor<2> restrictor(*d_fine, *d_coarse, false);
+	GMG::LinearRestrictor<2> restrictor(d_fine, d_coarse, false);
 
 	Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
-	for (auto pinfo : d_coarse->getPatchInfoVector()) {
+	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		INFO("Patch:          " << pinfo.id);
 		INFO("x:              " << pinfo.starts[0]);
 		INFO("y:              " << pinfo.starts[1]);

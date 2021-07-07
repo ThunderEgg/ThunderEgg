@@ -22,11 +22,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 1);
-	Vector<3> expected(*d, 1);
+	Vector<3> vec(d, 1);
+	Vector<3> expected(d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -35,13 +35,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(*d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
+	DomainTools::SetValues<3>(d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -79,11 +79,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 2);
-	Vector<3> expected(*d, 2);
+	Vector<3> vec(d, 2);
+	Vector<3> expected(d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -98,13 +98,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components",
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(*d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
+	DomainTools::SetValues<3>(d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -160,11 +160,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 2);
-	Vector<3> expected(*d, 2);
+	Vector<3> vec(d, 2);
+	Vector<3> expected(d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -179,13 +179,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(*d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
+	DomainTools::SetValuesWithGhost<3>(d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -241,11 +241,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 1);
-	Vector<3> expected(*d, 1);
+	Vector<3> vec(d, 1);
+	Vector<3> expected(d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -254,13 +254,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set",
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(*d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
+	DomainTools::SetValuesWithGhost<3>(d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Faces);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -303,8 +303,8 @@ TEST_CASE("TriLinearGhostFiller constructor throws error with odd number of cell
 	array<int, 3> ns;
 	ns.fill(n_even);
 	ns[axis] = n_odd;
-	DomainReader<3>       domain_reader(mesh_file, ns, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, ns, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
 	CHECK_THROWS_AS(TriLinearGhostFiller(d, fill_type), RuntimeError);
 }
@@ -317,11 +317,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGh
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 1);
-	Vector<3> expected(*d, 1);
+	Vector<3> vec(d, 1);
+	Vector<3> expected(d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -330,13 +330,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGh
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(*d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
+	DomainTools::SetValues<3>(d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -387,11 +387,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 2);
-	Vector<3> expected(*d, 2);
+	Vector<3> vec(d, 2);
+	Vector<3> expected(d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -406,13 +406,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(*d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
+	DomainTools::SetValues<3>(d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -494,11 +494,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 2);
-	Vector<3> expected(*d, 2);
+	Vector<3> vec(d, 2);
+	Vector<3> expected(d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -513,13 +513,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(*d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
+	DomainTools::SetValuesWithGhost<3>(d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -601,11 +601,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 1);
-	Vector<3> expected(*d, 1);
+	Vector<3> vec(d, 1);
+	Vector<3> expected(d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -614,13 +614,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(*d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
+	DomainTools::SetValuesWithGhost<3>(d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Edges);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -670,11 +670,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 1);
-	Vector<3> expected(*d, 1);
+	Vector<3> vec(d, 1);
+	Vector<3> expected(d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -683,13 +683,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(*d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
+	DomainTools::SetValues<3>(d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -749,11 +749,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 2);
-	Vector<3> expected(*d, 2);
+	Vector<3> vec(d, 2);
+	Vector<3> expected(d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -768,13 +768,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValues<3>(*d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
+	DomainTools::SetValues<3>(d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -874,11 +874,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 2);
-	Vector<3> expected(*d, 2);
+	Vector<3> vec(d, 2);
+	Vector<3> expected(d, 2);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -893,13 +893,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
 		return 100 + 20 * x + 9 * y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(*d, vec, f, g);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f, g);
+	DomainTools::SetValuesWithGhost<3>(d, vec, f, g);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f, g);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -999,11 +999,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
 	auto nz        = GENERATE(4, 6);
 	int  num_ghost = 1;
 
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
-	Vector<3> vec(*d, 1);
-	Vector<3> expected(*d, 1);
+	Vector<3> vec(d, 1);
+	Vector<3> expected(d, 1);
 
 	auto f = [&](const std::array<double, 3> coord) -> double {
 		double x = coord[0];
@@ -1012,13 +1012,13 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
 		return 1 + 0.5 * x + y + 7 * z;
 	};
 
-	DomainTools::SetValuesWithGhost<3>(*d, vec, f);
-	DomainTools::SetValuesWithGhost<3>(*d, expected, f);
+	DomainTools::SetValuesWithGhost<3>(d, vec, f);
+	DomainTools::SetValuesWithGhost<3>(d, expected, f);
 
 	TriLinearGhostFiller tlgf(d, GhostFillingType::Corners);
 	tlgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);

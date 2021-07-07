@@ -21,16 +21,16 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length",
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 5);
+	auto            ny        = GENERATE(2, 5);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	Vector<2> u(*d_fine, num_components);
-	Vector<2> f(*d_fine, num_components);
+	Vector<2> u(d_fine, num_components);
+	Vector<2> f(d_fine, num_components);
 
 	MockGhostFiller<2> mgf;
 	// the patch operator is just a 0.5I operator
@@ -52,16 +52,16 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 5);
+	auto            ny        = GENERATE(2, 5);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	Vector<2> u(*d_fine, num_components);
-	Vector<2> f(*d_fine, num_components);
+	Vector<2> u(d_fine, num_components);
+	Vector<2> f(d_fine, num_components);
 
 	bool               called = false;
 	MockGhostFiller<2> mgf;
@@ -91,16 +91,16 @@ TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::Patch
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 5);
+	auto            ny        = GENERATE(2, 5);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	Vector<2> u(*d_fine, num_components);
-	Vector<2> f(*d_fine, num_components);
+	Vector<2> u(d_fine, num_components);
+	Vector<2> f(d_fine, num_components);
 	f.set(1);
 
 	MockGhostFiller<2> mgf;
@@ -123,16 +123,16 @@ TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterativ
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 5);
+	auto            ny        = GENERATE(2, 5);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	Vector<2> u(*d_fine, num_components);
-	Vector<2> f(*d_fine, num_components);
+	Vector<2> u(d_fine, num_components);
+	Vector<2> f(d_fine, num_components);
 	f.set(1);
 
 	MockGhostFiller<2> mgf;

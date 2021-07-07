@@ -49,8 +49,8 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::
 	double    errors[2];
 	for (int i = 1; i <= 2; i++) {
 		INFO("MULT      " << i);
-		DomainReader<2>       domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
-		shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+		DomainReader<2> domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
+		Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 		auto ffun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
@@ -63,13 +63,13 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::
 			return sinl(M_PI * y) * cosl(2 * M_PI * x);
 		};
 
-		Vector<2> g_vec(*d_fine, 1);
-		DomainTools::SetValuesWithGhost<2>(*d_fine, g_vec, gfun);
-		Vector<2> g_vec_expected(*d_fine, 1);
-		DomainTools::SetValues<2>(*d_fine, g_vec_expected, gfun);
+		Vector<2> g_vec(d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
+		Vector<2> g_vec_expected(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
 
-		Vector<2> f_vec(*d_fine, 1);
-		DomainTools::SetValues<2>(*d_fine, f_vec, ffun);
+		Vector<2> f_vec(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
 		BiLinearGhostFiller           gf(d_fine, GhostFillingType::Faces);
 		Poisson::StarPatchOperator<2> p_operator(d_fine, gf);
@@ -78,7 +78,7 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence", "[Poisson::
 
 		p_solver.smooth(f_vec, g_vec);
 
-		Vector<2> error_vec(*d_fine, 1);
+		Vector<2> error_vec(d_fine, 1);
 		error_vec.addScaled(1.0, g_vec, -1.0, g_vec_expected);
 		errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
 	}
@@ -99,8 +99,8 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann 
 	double    errors[2];
 	for (int i = 1; i <= 2; i++) {
 		INFO("MULT      " << i);
-		DomainReader<2>       domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
-		shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+		DomainReader<2> domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
+		Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 		auto ffun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
@@ -123,13 +123,13 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann 
 			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 
-		Vector<2> g_vec(*d_fine, 1);
-		DomainTools::SetValuesWithGhost<2>(*d_fine, g_vec, gfun);
-		Vector<2> g_vec_expected(*d_fine, 1);
-		DomainTools::SetValues<2>(*d_fine, g_vec_expected, gfun);
+		Vector<2> g_vec(d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
+		Vector<2> g_vec_expected(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
 
-		Vector<2> f_vec(*d_fine, 1);
-		DomainTools::SetValues<2>(*d_fine, f_vec, ffun);
+		Vector<2> f_vec(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
 		BiLinearGhostFiller           gf(d_fine, GhostFillingType::Faces);
 		Poisson::StarPatchOperator<2> p_operator(d_fine, gf, true);
@@ -138,9 +138,9 @@ TEST_CASE("Test Poisson::DFTPatchSolver gets 2nd order convergence with neumann 
 
 		p_solver.smooth(f_vec, g_vec);
 
-		Vector<2> error_vec(*d_fine, 1);
-		g_vec.shift(-DomainTools::Integrate<2>(*d_fine, g_vec) / d_fine->volume());
-		g_vec_expected.shift(-DomainTools::Integrate<2>(*d_fine, g_vec_expected) / d_fine->volume());
+		Vector<2> error_vec(d_fine, 1);
+		g_vec.shift(-DomainTools::Integrate<2>(d_fine, g_vec) / d_fine.volume());
+		g_vec_expected.shift(-DomainTools::Integrate<2>(d_fine, g_vec_expected) / d_fine.volume());
 		error_vec.addScaled(1.0, g_vec, -1.0, g_vec_expected);
 		errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
 	}
@@ -162,8 +162,8 @@ TEST_CASE(
 	double    errors[2];
 	for (int i = 1; i <= 2; i++) {
 		INFO("MULT      " << i);
-		DomainReader<2>       domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
-		shared_ptr<Domain<2>> d_fine = domain_reader.getCoarserDomain();
+		DomainReader<2> domain_reader(mesh_file, {i * nx, i * ny}, num_ghost);
+		Domain<2>       d_fine = domain_reader.getCoarserDomain();
 
 		auto ffun = [](const std::array<double, 2> &coord) {
 			double x = coord[0];
@@ -186,13 +186,13 @@ TEST_CASE(
 			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 
-		Vector<2> g_vec(*d_fine, 1);
-		DomainTools::SetValuesWithGhost<2>(*d_fine, g_vec, gfun);
-		Vector<2> g_vec_expected(*d_fine, 1);
-		DomainTools::SetValues<2>(*d_fine, g_vec_expected, gfun);
+		Vector<2> g_vec(d_fine, 1);
+		DomainTools::SetValuesWithGhost<2>(d_fine, g_vec, gfun);
+		Vector<2> g_vec_expected(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, g_vec_expected, gfun);
 
-		Vector<2> f_vec(*d_fine, 1);
-		DomainTools::SetValues<2>(*d_fine, f_vec, ffun);
+		Vector<2> f_vec(d_fine, 1);
+		DomainTools::SetValues<2>(d_fine, f_vec, ffun);
 
 		BiLinearGhostFiller           gf(d_fine, GhostFillingType::Faces);
 		Poisson::StarPatchOperator<2> p_operator(d_fine, gf, true);
@@ -201,9 +201,9 @@ TEST_CASE(
 
 		p_solver.smooth(f_vec, g_vec);
 
-		Vector<2> error_vec(*d_fine, 1);
-		g_vec.shift(-DomainTools::Integrate<2>(*d_fine, g_vec) / d_fine->volume());
-		g_vec_expected.shift(-DomainTools::Integrate<2>(*d_fine, g_vec_expected) / d_fine->volume());
+		Vector<2> error_vec(d_fine, 1);
+		g_vec.shift(-DomainTools::Integrate<2>(d_fine, g_vec) / d_fine.volume());
+		g_vec_expected.shift(-DomainTools::Integrate<2>(d_fine, g_vec_expected) / d_fine.volume());
 		error_vec.addScaled(1.0, g_vec, -1.0, g_vec_expected);
 		errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
 	}

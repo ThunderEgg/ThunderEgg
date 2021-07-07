@@ -152,7 +152,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in 
 	RHSGhostCheckingPatchSolver<2> solver(domain, ghost_filler, 0);
 
 	Vector<1> schur_b = iface_domain.getNewVector();
-	Vector<2> domain_b(*domain, 1);
+	Vector<2> domain_b(domain, 1);
 
 	domain_b.set(domain_fill_value);
 
@@ -177,7 +177,7 @@ TEST_CASE(
 	MockPatchSolver<2>         solver(domain, ghost_filler);
 
 	Vector<1> schur_b = iface_domain.getNewVector();
-	Vector<2> domain_b(*domain, 1);
+	Vector<2> domain_b(domain, 1);
 
 	Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
 	psw.getSchurRHSFromDomainRHS(domain_b, schur_b);
@@ -207,7 +207,7 @@ TEST_CASE(
 	MockPatchSolver<2>         solver(domain, ghost_filler);
 
 	Vector<1> schur_b = iface_domain.getNewVector();
-	Vector<2> domain_b(*domain, 1);
+	Vector<2> domain_b(domain, 1);
 
 	schur_b.set(99);
 

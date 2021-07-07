@@ -42,7 +42,7 @@ template <int D> class DomainGenerator
 	/**
 	 * @brief Return the finest domain
 	 */
-	virtual std::shared_ptr<Domain<D>> getFinestDomain() = 0;
+	virtual Domain<D> getFinestDomain() = 0;
 	/**
 	 * @brief return true if there is a coarser domain to be generated.
 	 */
@@ -50,7 +50,7 @@ template <int D> class DomainGenerator
 	/**
 	 * @brief Return a new coarser domain
 	 */
-	virtual std::shared_ptr<Domain<D>> getCoarserDomain() = 0;
+	virtual Domain<D> getCoarserDomain() = 0;
 };
 } // namespace ThunderEgg
 #endif

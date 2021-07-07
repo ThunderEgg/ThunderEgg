@@ -43,11 +43,11 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 1;
-	bitset<4>             neumann;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	int             n         = 32;
+	int             num_ghost = 1;
+	bitset<4>       neumann;
+	DomainReader<2> domain_reader(mesh_file, {n, n}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -55,11 +55,11 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	Vector<2> f_vec(*d_fine, 1);
-	Vector<2> f_vec_expected(*d_fine, 1);
+	Vector<2> f_vec(d_fine, 1);
+	Vector<2> f_vec_expected(d_fine, 1);
 
-	Vector<2> g_vec(*d_fine, 1);
-	DomainTools::SetValues<2>(*d_fine, g_vec, gfun);
+	Vector<2> g_vec(d_fine, 1);
+	DomainTools::SetValues<2>(d_fine, g_vec, gfun);
 
 	BiQuadraticGhostFiller        gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<2> p_operator(d_fine, gf);
@@ -73,7 +73,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 
 	REQUIRE(f_vec.infNorm() > 0);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -97,11 +97,11 @@ TEST_CASE(
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 1;
-	bitset<4>             neumann   = 0xF;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	int             n         = 32;
+	int             num_ghost = 1;
+	bitset<4>       neumann   = 0xF;
+	DomainReader<2> domain_reader(mesh_file, {n, n}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -109,11 +109,11 @@ TEST_CASE(
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	Vector<2> f_vec(*d_fine, 1);
-	Vector<2> f_vec_expected(*d_fine, 1);
+	Vector<2> f_vec(d_fine, 1);
+	Vector<2> f_vec_expected(d_fine, 1);
 
-	Vector<2> g_vec(*d_fine, 1);
-	DomainTools::SetValues<2>(*d_fine, g_vec, gfun);
+	Vector<2> g_vec(d_fine, 1);
+	DomainTools::SetValues<2>(d_fine, g_vec, gfun);
 
 	BiQuadraticGhostFiller        gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<2> p_operator(d_fine, gf, true);
@@ -127,7 +127,7 @@ TEST_CASE(
 
 	REQUIRE(f_vec.infNorm() > 0);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);

@@ -185,24 +185,22 @@ int main(int argc, char *argv[])
 	///////////////
 	// Create Mesh
 	///////////////
-	shared_ptr<Domain<2>> domain;
-	Tree<2>               t;
+	Tree<2> t;
 	t = Tree<2>(mesh_filename);
 	for (int i = 0; i < div; i++) {
 		t.refineLeaves();
 	}
 
-	shared_ptr<DomainGenerator<2>> dcg;
-	TreeToP4est                    ttp(t);
+	TreeToP4est ttp(t);
 
 	auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
 		x = unit_x;
 		y = unit_y;
 	};
 
-	dcg.reset(new P4estDomainGenerator(ttp.p4est, ns, 1, bmf));
+	P4estDomainGenerator dcg(ttp.p4est, ns, 1, bmf);
 
-	domain = dcg->getFinestDomain();
+	Domain<2> domain = dcg.getFinestDomain();
 
 	// the functions that we are using
 	function<double(const std::array<double, 2> &)> ffun;
@@ -250,15 +248,15 @@ int main(int argc, char *argv[])
 	for (int loop = 0; loop < loop_count; loop++) {
 		timer->start("Domain Initialization");
 
-		Vector<2> u(*domain, 1);
-		Vector<2> exact(*domain, 1);
-		Vector<2> f(*domain, 1);
-		Vector<2> au(*domain, 1);
-		Vector<2> h(*domain, 1);
+		Vector<2> u(domain, 1);
+		Vector<2> exact(domain, 1);
+		Vector<2> f(domain, 1);
+		Vector<2> au(domain, 1);
+		Vector<2> h(domain, 1);
 
-		DomainTools::SetValues<2>(*domain, f, ffun);
-		DomainTools::SetValues<2>(*domain, exact, gfun);
-		DomainTools::SetValuesWithGhost<2>(*domain, h, hfun);
+		DomainTools::SetValues<2>(domain, f, ffun);
+		DomainTools::SetValues<2>(domain, exact, gfun);
+		DomainTools::SetValuesWithGhost<2>(domain, h, hfun);
 
 		timer->stop("Domain Initialization");
 
@@ -287,14 +285,14 @@ int main(int argc, char *argv[])
 		if (preconditioner == "GMG") {
 			timer->start("GMG Setup");
 
-			auto curr_domain = domain;
+			Domain<2> curr_domain = domain;
 
 			int domain_level = 0;
-			curr_domain->setTimer(timer);
+			curr_domain.setTimer(timer);
 			domain_level++;
 
-			auto                     next_domain = dcg->getCoarserDomain();
-			GMG::LinearRestrictor<2> restrictor(*curr_domain, *next_domain, true);
+			Domain<2>                next_domain = dcg.getCoarserDomain();
+			GMG::LinearRestrictor<2> restrictor(curr_domain, next_domain, true);
 
 			GMG::CycleBuilder<2> builder(copts);
 			builder.addFinestLevel(*p_operator, *p_solver, restrictor);
@@ -302,33 +300,33 @@ int main(int argc, char *argv[])
 			auto prev_coeffs = h;
 			auto prev_domain = curr_domain;
 			curr_domain      = next_domain;
-			while (dcg->hasCoarserDomain()) {
-				curr_domain->setTimer(timer);
+			while (dcg.hasCoarserDomain()) {
+				curr_domain.setTimer(timer);
 				domain_level++;
 
-				auto                next_domain = dcg->getCoarserDomain();
+				auto                next_domain = dcg.getCoarserDomain();
 				BiLinearGhostFiller new_gf(curr_domain, GhostFillingType::Faces);
-				Vector<2>           new_coeffs(*curr_domain, 1);
+				Vector<2>           new_coeffs(curr_domain, 1);
 
-				DomainTools::SetValuesWithGhost<2>(*curr_domain, new_coeffs, hfun);
+				DomainTools::SetValuesWithGhost<2>(curr_domain, new_coeffs, hfun);
 
 				StarPatchOperator<2> new_p_operator(new_coeffs, curr_domain, new_gf);
 
 				Iterative::PatchSolver<2> new_p_solver(p_bcgs, new_p_operator);
 
-				GMG::DirectInterpolator<2> interpolator(*curr_domain, *prev_domain);
-				restrictor = GMG::LinearRestrictor<2>(*curr_domain, *next_domain);
+				GMG::DirectInterpolator<2> interpolator(curr_domain, prev_domain);
+				restrictor = GMG::LinearRestrictor<2>(curr_domain, next_domain);
 
 				builder.addIntermediateLevel(new_p_operator, new_p_solver, restrictor, interpolator);
 				prev_domain = curr_domain;
 				curr_domain = next_domain;
 			}
-			curr_domain->setTimer(timer);
+			curr_domain.setTimer(timer);
 
-			GMG::DirectInterpolator<2> interpolator(*curr_domain, *prev_domain);
+			GMG::DirectInterpolator<2> interpolator(curr_domain, prev_domain);
 			BiLinearGhostFiller        coarse_gf(curr_domain, GhostFillingType::Faces);
-			Vector<2>                  coarse_coeffs(*curr_domain, 1);
-			DomainTools::SetValuesWithGhost<2>(*curr_domain, coarse_coeffs, hfun);
+			Vector<2>                  coarse_coeffs(curr_domain, 1);
+			DomainTools::SetValuesWithGhost<2>(curr_domain, coarse_coeffs, hfun);
 
 			StarPatchOperator<2> coarse_p_operator(coarse_coeffs, curr_domain, coarse_gf);
 
@@ -358,17 +356,17 @@ int main(int argc, char *argv[])
 		A->apply(u, au);
 
 		// residual
-		Vector<2> resid(*domain, 1);
+		Vector<2> resid(domain, 1);
 		resid.scaleThenAddScaled(0, -1, au, 1, f);
 		double residual = resid.twoNorm();
 		double fnorm    = f.twoNorm();
 
 		// error
-		Vector<2> error(*domain, 1);
+		Vector<2> error(domain, 1);
 		error.scaleThenAddScaled(0, -1, exact, 1, u);
 		if (neumann) {
-			double uavg = DomainTools::Integrate<2>(*domain, u) / domain->volume();
-			double eavg = DomainTools::Integrate<2>(*domain, exact) / domain->volume();
+			double uavg = DomainTools::Integrate<2>(domain, u) / domain.volume();
+			double eavg = DomainTools::Integrate<2>(domain, exact) / domain.volume();
 
 			if (comm.getRank() == 0) {
 				cout << "Average of computed solution: " << uavg << endl;
@@ -380,8 +378,8 @@ int main(int argc, char *argv[])
 		double error_norm = error.twoNorm();
 		double exact_norm = exact.twoNorm();
 
-		double ausum = DomainTools::Integrate<2>(*domain, au);
-		double fsum  = DomainTools::Integrate<2>(*domain, f);
+		double ausum = DomainTools::Integrate<2>(domain, au);
+		double fsum  = DomainTools::Integrate<2>(domain, f);
 		if (comm.getRank() == 0) {
 			std::cout << std::scientific;
 			std::cout.precision(13);
@@ -390,7 +388,7 @@ int main(int argc, char *argv[])
 			std::cout << "Residual: " << residual / fnorm << endl;
 			std::cout << u8"ΣAu-Σf: " << ausum - fsum << endl;
 			cout.unsetf(std::ios_base::floatfield);
-			int total_cells = domain->getNumGlobalCells();
+			int total_cells = domain.getNumGlobalCells();
 			cout << "Total cells: " << total_cells << endl;
 		}
 

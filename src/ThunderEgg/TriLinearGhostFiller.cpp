@@ -522,9 +522,9 @@ void TriLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<3> &pinfo
 			throw RuntimeError("Unsupported GhostFillingType");
 	}
 }
-TriLinearGhostFiller::TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain, GhostFillingType fill_type) : MPIGhostFiller<3>(domain, fill_type)
+TriLinearGhostFiller::TriLinearGhostFiller(const Domain<3> &domain, GhostFillingType fill_type) : MPIGhostFiller<3>(domain, fill_type)
 {
-	for (int n : domain->getNs()) {
+	for (int n : domain.getNs()) {
 		if (n % 2 != 0) {
 			throw RuntimeError("TriLinearGhostFiller only supports even number patch sizes");
 		}

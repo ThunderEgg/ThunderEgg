@@ -40,10 +40,10 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	int             n         = 32;
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {n, n}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -51,13 +51,13 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 		return sinl(M_PI * y) * cosl(2 * M_PI * x);
 	};
 
-	Vector<2> x(*d_fine, 1);
-	DomainTools::SetValues<2>(*d_fine, x, gfun);
-	Vector<2> b(*d_fine, 1);
+	Vector<2> x(d_fine, 1);
+	DomainTools::SetValues<2>(d_fine, x, gfun);
+	Vector<2> b(d_fine, 1);
 
 	// create an Identity matrix
 	Mat A;
-	MatCreateAIJ(MPI_COMM_WORLD, d_fine->getNumLocalCells(), d_fine->getNumLocalCells(),
+	MatCreateAIJ(MPI_COMM_WORLD, d_fine.getNumLocalCells(), d_fine.getNumLocalCells(),
 	             PETSC_DETERMINE, PETSC_DETERMINE, 1, nullptr, 1, nullptr, &A);
 	MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
 	MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
@@ -67,7 +67,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 	PETSc::MatWrapper<2> m_operator(A);
 	m_operator.apply(x, b);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -89,10 +89,10 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	int             n         = 32;
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {n, n}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -105,13 +105,13 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 		return x + y;
 	};
 
-	Vector<2> x(*d_fine, 2);
-	DomainTools::SetValues<2>(*d_fine, x, gfun, ffun);
-	Vector<2> b(*d_fine, 2);
+	Vector<2> x(d_fine, 2);
+	DomainTools::SetValues<2>(d_fine, x, gfun, ffun);
+	Vector<2> b(d_fine, 2);
 
 	// create an Identity matrix
 	Mat A;
-	MatCreateAIJ(MPI_COMM_WORLD, d_fine->getNumLocalCells() * 2, d_fine->getNumLocalCells() * 2,
+	MatCreateAIJ(MPI_COMM_WORLD, d_fine.getNumLocalCells() * 2, d_fine.getNumLocalCells() * 2,
 	             PETSC_DETERMINE, PETSC_DETERMINE, 1, nullptr, 1, nullptr, &A);
 	MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
 	MatAssemblyEnd(A, MAT_FINAL_ASSEMBLY);
@@ -121,7 +121,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 	PETSc::MatWrapper<2> m_operator(A);
 	m_operator.apply(x, b);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);

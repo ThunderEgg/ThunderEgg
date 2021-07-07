@@ -18,13 +18,13 @@ TEST_CASE("Calls for various domains 2d face cases MPI3", "[MPIGhostFiller]")
 	auto num_components = GENERATE(1, 2, 3);
 	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 3);
-	auto                  ny        = GENERATE(2, 3);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 3);
+	auto            ny        = GENERATE(2, 3);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
-	Vector<2> vec(*d_fine, num_components);
+	Vector<2> vec(d_fine, num_components);
 
 	CallMockMPIGhostFiller<2> mgf(d_fine, num_components, GhostFillingType::Faces);
 
@@ -39,13 +39,13 @@ TEST_CASE("Calls for various domains 2d corner cases MPI3", "[MPIGhostFiller]")
 	auto num_components = GENERATE(1, 2, 3);
 	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 3);
-	auto                  ny        = GENERATE(2, 3);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 3);
+	auto            ny        = GENERATE(2, 3);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
-	Vector<2> vec(*d_fine, num_components);
+	Vector<2> vec(d_fine, num_components);
 
 	CallMockMPIGhostFiller<2> mgf(d_fine, num_components, GhostFillingType::Corners);
 
@@ -60,14 +60,14 @@ TEST_CASE("Exchange for various domains 2d face cases MPI3", "[MPIGhostFiller]")
 	auto num_components = GENERATE(1, 2, 3);
 	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 3);
-	auto                  ny        = GENERATE(2, 3);
-	int                   num_ghost = GENERATE(1, 2);
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 3);
+	auto            ny        = GENERATE(2, 3);
+	int             num_ghost = GENERATE(1, 2);
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
-	Vector<2> vec(*d_fine, num_components);
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	Vector<2> vec(d_fine, num_components);
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
@@ -86,14 +86,14 @@ TEST_CASE("Exchange for various domains 2d corner cases MPI3", "[MPIGhostFiller]
 	auto num_components = GENERATE(1, 2, 3);
 	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 3);
-	auto                  ny        = GENERATE(2, 3);
-	int                   num_ghost = GENERATE(1, 2);
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 3);
+	auto            ny        = GENERATE(2, 3);
+	int             num_ghost = GENERATE(1, 2);
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
-	Vector<2> vec(*d_fine, num_components);
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	Vector<2> vec(d_fine, num_components);
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
@@ -112,14 +112,14 @@ TEST_CASE("Two Exchanges for various domains 2d face cases MPI3", "[MPIGhostFill
 	auto num_components = GENERATE(1, 2, 3);
 	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 3);
-	auto                  ny        = GENERATE(2, 3);
-	int                   num_ghost = GENERATE(1, 2);
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 3);
+	auto            ny        = GENERATE(2, 3);
+	int             num_ghost = GENERATE(1, 2);
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
-	Vector<2> vec(*d_fine, num_components);
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	Vector<2> vec(d_fine, num_components);
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),
@@ -139,14 +139,14 @@ TEST_CASE("Two Exchanges for various domains 2d corner cases MPI3", "[MPIGhostFi
 	auto num_components = GENERATE(1, 2, 3);
 	auto mesh_file      = GENERATE(as<std::string>{}, uniform, refined);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 3);
-	auto                  ny        = GENERATE(2, 3);
-	int                   num_ghost = GENERATE(1, 2);
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 3);
+	auto            ny        = GENERATE(2, 3);
+	int             num_ghost = GENERATE(1, 2);
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
-	Vector<2> vec(*d_fine, num_components);
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	Vector<2> vec(d_fine, num_components);
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
 			nested_loop<2>(data.getStart(), data.getEnd(),

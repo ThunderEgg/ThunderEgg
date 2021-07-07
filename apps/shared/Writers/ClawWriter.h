@@ -27,12 +27,12 @@
 class ClawWriter
 {
 	private:
-	std::shared_ptr<ThunderEgg::Domain<2>> domain;
-	std::list<ThunderEgg::Vector<2>>       vectors;
-	void                                   writePatch(const ThunderEgg::PatchInfo<2> &d, std::ostream &os);
+	ThunderEgg::Domain<2>            domain;
+	std::list<ThunderEgg::Vector<2>> vectors;
+	void                             writePatch(const ThunderEgg::PatchInfo<2> &d, std::ostream &os);
 
 	public:
-	ClawWriter(std::shared_ptr<ThunderEgg::Domain<2>> domain);
+	ClawWriter(const ThunderEgg::Domain<2> &domain);
 	void addVector(const ThunderEgg::Vector<2> &vec);
 	void write();
 };

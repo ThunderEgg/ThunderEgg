@@ -121,11 +121,11 @@ class P4estDomainGenerator : public DomainGenerator<2>
 	~P4estDomainGenerator();
 	P4estDomainGenerator(const P4estDomainGenerator &) = delete;
 	P4estDomainGenerator(P4estDomainGenerator &&)      = delete;
-	P4estDomainGenerator &     operator=(const P4estDomainGenerator &) = delete;
-	P4estDomainGenerator &     operator=(P4estDomainGenerator &&) = delete;
-	std::shared_ptr<Domain<2>> getFinestDomain();
-	bool                       hasCoarserDomain();
-	std::shared_ptr<Domain<2>> getCoarserDomain();
+	P4estDomainGenerator &operator=(const P4estDomainGenerator &) = delete;
+	P4estDomainGenerator &operator=(P4estDomainGenerator &&) = delete;
+	Domain<2>             getFinestDomain();
+	bool                  hasCoarserDomain();
+	Domain<2>             getCoarserDomain();
 };
 } // namespace ThunderEgg
 #endif

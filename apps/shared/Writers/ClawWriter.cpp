@@ -23,9 +23,9 @@
 #include <fstream>
 using namespace std;
 using namespace ThunderEgg;
-ClawWriter::ClawWriter(std::shared_ptr<Domain<2>> domain)
+ClawWriter::ClawWriter(const Domain<2> &domain)
+: domain(domain)
 {
-	this->domain = domain;
 }
 void ClawWriter::addVector(const Vector<2> &vec)
 {
@@ -37,7 +37,7 @@ void ClawWriter::write()
 	const string tab = "\t";
 	t_file << 0.0 << tab << "time" << endl;
 	t_file << vectors.size() << tab << "meqn" << endl;
-	t_file << domain->getNumLocalPatches() << tab << "ngrids" << endl;
+	t_file << domain.getNumLocalPatches() << tab << "ngrids" << endl;
 	t_file << 2 << tab << "num_aux" << endl;
 	t_file << 2 << tab << "num_dim" << endl;
 	t_file.close();
@@ -45,7 +45,7 @@ void ClawWriter::write()
 
 	q_file.precision(10);
 	q_file << scientific;
-	for (auto &pinfo : domain->getPatchInfoVector()) {
+	for (auto &pinfo : domain.getPatchInfoVector()) {
 		writePatch(pinfo, q_file);
 	}
 	q_file.close();

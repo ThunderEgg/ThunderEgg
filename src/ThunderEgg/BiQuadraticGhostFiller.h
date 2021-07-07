@@ -38,7 +38,7 @@ class BiQuadraticGhostFiller : public MPIGhostFiller<2>
 	 * @param domain the domain that is being fill for
 	 * @param fill_type the ghost filling type to perform
 	 */
-	BiQuadraticGhostFiller(std::shared_ptr<const Domain<2>> domain, GhostFillingType fill_type);
+	BiQuadraticGhostFiller(const Domain<2> &domain, GhostFillingType fill_type);
 	/**
 	 * @brief Clone this BiQuadraticGhostFiller
 	 *

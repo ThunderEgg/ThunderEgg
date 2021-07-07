@@ -57,11 +57,11 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 * @param ghost_filler the GhostFiller to u_viewe before calling applySinglePatch
 	 * @param neumann whether or not to u_viewe Neumann boundary conditions
 	 */
-	StarPatchOperator(std::shared_ptr<const Domain<D>> domain, const GhostFiller<D> &ghost_filler, bool neumann = false)
+	StarPatchOperator(const Domain<D> &domain, const GhostFiller<D> &ghost_filler, bool neumann = false)
 	: PatchOperator<D>(domain, ghost_filler),
 	  neumann(neumann)
 	{
-		if (domain->getNumGhostCells() < 1) {
+		if (this->getDomain().getNumGhostCells() < 1) {
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
 	}
@@ -159,7 +159,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	{
 		for (int i = 0; i < f.getNumLocalPatches(); i++) {
 			ComponentView<double, D> f_ld  = f.getComponentView(0, i);
-			auto                     pinfo = this->domain->getPatchInfoVector()[i];
+			auto                     pinfo = this->getDomain().getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo.hasNbr(s)) {
 					double              h2 = pow(pinfo.spacings[s.getAxisIndex()], 2);
@@ -186,7 +186,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	{
 		for (int i = 0; i < f.getNumLocalPatches(); i++) {
 			ComponentView<double, D> f_ld  = f.getComponentView(0, i);
-			auto                     pinfo = this->domain->getPatchInfoVector()[i];
+			auto                     pinfo = this->getDomain().getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo.hasNbr(s)) {
 					double              h  = pinfo.spacings[s.getAxisIndex()];

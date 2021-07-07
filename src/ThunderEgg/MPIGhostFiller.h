@@ -451,7 +451,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	/**
 	 * @brief The domain that this ghostfiller operates on
 	 */
-	std::shared_ptr<const Domain<D>> domain;
+	Domain<D> domain;
 
 	/**
 	 * @brief the fill type to use
@@ -506,7 +506,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 			std::array<size_t, D - M>  start;
 			start.fill(0);
 			std::array<size_t, D - M> end;
-			end.fill(domain->getNumGhostCells() - 1);
+			end.fill(domain.getNumGhostCells() - 1);
 			nested_loop<D - M>(start, end, [&](const std::array<size_t, D - M> &offset) {
 				View<double, M + 1> local_slice  = local_view.getGhostSliceOn(face, offset);
 				View<double, M + 1> buffer_slice = buffer_view.getGhostSliceOn(face, offset);
@@ -557,7 +557,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	template <int M> void fillSendBuffer(const RemoteCallSet &remote_call_set, std::vector<double> &buffer, const Vector<D> &u) const
 	{
 		for (const RemoteCall<M> &call : remote_call_set.remote_calls.template get<M>()) {
-			const PatchInfo<D> &       pinfo      = domain->getPatchInfoVector()[call.local_index];
+			const PatchInfo<D> &       pinfo      = domain.getPatchInfoVector()[call.local_index];
 			Face<D, M>                 face       = call.face.opposite();
 			PatchView<const double, D> local_view = u.getPatchView(call.local_index);
 			double *                   buffer_ptr = buffer.data() + call.offset * u.getNumComponents();
@@ -640,7 +640,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	template <int M> void processLocalFills(const Vector<D> &u) const
 	{
 		for (const LocalCall<M> &call : local_calls.template get<M>()) {
-			const PatchInfo<D> &       pinfo      = domain->getPatchInfoVector()[call.local_index];
+			const PatchInfo<D> &       pinfo      = domain.getPatchInfoVector()[call.local_index];
 			PatchView<const double, D> local_view = u.getPatchView(call.local_index);
 			PatchView<const double, D> nbr_view   = u.getPatchView(call.nbr_local_index);
 			fillGhostCellsForNbrPatchPriv(pinfo, local_view, nbr_view, call.face, call.nbr_type, call.orthant);
@@ -750,7 +750,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		std::map<int, std::set<RemoteCallPrototype<M>>>    rank_to_remote_call_prototypes;
 		std::map<int, std::set<IncomingGhostPrototype<M>>> rank_to_incoming_ghost_prototypes;
 
-		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
 			for (Face<D, M> f : Face<D, M>::getValues()) {
 				if (pinfo.hasNbr(f)) {
 					switch (pinfo.getNbrType(f)) {
@@ -819,7 +819,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 				std::array<size_t, D - M> start;
 				start.fill(0);
 				std::array<size_t, D - M> end;
-				end.fill(domain->getNumGhostCells() - 1);
+				end.fill(domain.getNumGhostCells() - 1);
 				nested_loop<D - M>(start, end, [&](const std::array<size_t, D - M> &offset) {
 					View<double, M + 1> this_ghost = view.getGhostSliceOn(f, offset);
 					loop_over_interior_indexes<M + 1>(this_ghost, [&](const std::array<int, M + 1> &coord) { this_ghost[coord] = 0; });
@@ -835,7 +835,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 */
 	void zeroGhostCells(const Vector<D> &u) const
 	{
-		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
 			PatchView<const double, D> this_patch = u.getPatchView(pinfo.local_index);
 			switch (fill_type) {
 				case GhostFillingType::Corners:
@@ -862,23 +862,23 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 * @param domain  the domain being used
 	 * @param fill_type  the number of side cases to address
 	 */
-	MPIGhostFiller(std::shared_ptr<const Domain<D>> domain, GhostFillingType fill_type) : domain(domain), fill_type(fill_type)
+	MPIGhostFiller(const Domain<D> &domain, GhostFillingType fill_type) : domain(domain), fill_type(fill_type)
 	{
 		std::map<int, RemoteCallSet> rank_to_remote_call_sets;
 
 		switch (fill_type) {
 			case GhostFillingType::Corners:
 				if constexpr (D >= 2) {
-					ghost_local_data_infos.template get<0>() = GhostViewInfo<0>(*domain);
+					ghost_local_data_infos.template get<0>() = GhostViewInfo<0>(domain);
 					enumerateCalls<0>(local_calls.template get<0>(), rank_to_remote_call_sets);
 				}
 			case GhostFillingType::Edges:
 				if constexpr (D == 3) {
-					ghost_local_data_infos.template get<1>() = GhostViewInfo<1>(*domain);
+					ghost_local_data_infos.template get<1>() = GhostViewInfo<1>(domain);
 					enumerateCalls<1>(local_calls.template get<1>(), rank_to_remote_call_sets);
 				}
 			case GhostFillingType::Faces:
-				ghost_local_data_infos.template get<D - 1>() = GhostViewInfo<D - 1>(*domain);
+				ghost_local_data_infos.template get<D - 1>() = GhostViewInfo<D - 1>(domain);
 				enumerateCalls<D - 1>(local_calls.template get<D - 1>(), rank_to_remote_call_sets);
 				break;
 			default:
@@ -959,8 +959,8 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	void fillGhost(const Vector<D> &u) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (u.getNumLocalPatches() != domain->getNumLocalPatches()) {
-				throw RuntimeError("u vector is incorrect length. Expected Lenght of " + std::to_string(domain->getNumLocalPatches())
+			if (u.getNumLocalPatches() != domain.getNumLocalPatches()) {
+				throw RuntimeError("u vector is incorrect length. Expected Lenght of " + std::to_string(domain.getNumLocalPatches())
 				                   + " but vector was length " + std::to_string(u.getNumLocalPatches()));
 			}
 		}
@@ -982,7 +982,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 		std::vector<MPI_Request> send_requests = postSends(out_buffers, u);
 
 		// perform local operations
-		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
 			PatchView<const double, D> view = u.getPatchView(pinfo.local_index);
 			fillGhostCellsForLocalPatch(pinfo, view);
 		}
@@ -1009,7 +1009,7 @@ template <int D> class MPIGhostFiller : public GhostFiller<D>
 	 *
 	 * @return std::shared_ptr<const Domain<D>>  the domain
 	 */
-	std::shared_ptr<const Domain<D>> getDomain() const
+	const Domain<D> &getDomain() const
 	{
 		return domain;
 	}

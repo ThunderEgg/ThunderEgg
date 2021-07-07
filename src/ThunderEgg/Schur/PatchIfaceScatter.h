@@ -226,7 +226,7 @@ template <int D> class PatchIfaceScatter
 	 */
 	explicit PatchIfaceScatter(const InterfaceDomain<D> &iface_domain)
 	{
-		std::array<int, D> ns = iface_domain.getDomain()->getNs();
+		std::array<int, D> ns = iface_domain.getDomain().getNs();
 		for (int i = 1; i < D; i++) {
 			if (ns[0] != ns[i]) {
 				throw RuntimeError("Cannot form Schur compliment vector for Domain with non-square patches");

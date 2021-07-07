@@ -92,8 +92,8 @@ TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -106,11 +106,11 @@ TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	Vector<2> f_vec(*domain, 1);
-	DomainTools::SetValues<2>(*domain, f_vec, ffun);
-	Vector<2> residual(*domain, 1);
+	Vector<2> f_vec(domain, 1);
+	DomainTools::SetValues<2>(domain, f_vec, ffun);
+	Vector<2> residual(domain, 1);
 
-	Vector<2> g_vec(*domain, 1);
+	Vector<2> g_vec(domain, 1);
 
 	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
@@ -132,12 +132,12 @@ TEST_CASE("CG handles zero rhs vector", "[CG]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
-	Vector<2> f_vec(*domain, 1);
+	Vector<2> f_vec(domain, 1);
 
-	Vector<2> g_vec(*domain, 1);
+	Vector<2> g_vec(domain, 1);
 
 	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
@@ -156,8 +156,8 @@ TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -170,11 +170,11 @@ TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	Vector<2> f_vec(*domain, 1);
-	DomainTools::SetValues<2>(*domain, f_vec, ffun);
-	Vector<2> residual(*domain, 1);
+	Vector<2> f_vec(domain, 1);
+	DomainTools::SetValues<2>(domain, f_vec, ffun);
+	Vector<2> residual(domain, 1);
 
-	Vector<2> g_vec(*domain, 1);
+	Vector<2> g_vec(domain, 1);
 
 	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
@@ -206,8 +206,8 @@ TEST_CASE("CG giving a good initial guess reduces the iterations", "[CG]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -220,11 +220,11 @@ TEST_CASE("CG giving a good initial guess reduces the iterations", "[CG]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	Vector<2> f_vec(*domain, 1);
-	DomainTools::SetValues<2>(*domain, f_vec, ffun);
-	Vector<2> residual(*domain, 1);
+	Vector<2> f_vec(domain, 1);
+	DomainTools::SetValues<2>(domain, f_vec, ffun);
+	Vector<2> residual(domain, 1);
 
-	Vector<2> g_vec(*domain, 1);
+	Vector<2> g_vec(domain, 1);
 
 	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 

@@ -341,7 +341,7 @@ vector<set<Block>> GetBlocks(const InterfaceDomain<2> &iface_domain, std::bitset
  */
 template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<2> &pinfo, Poisson::FFTWPatchSolver<2> &solver)
 {
-	auto                     ns           = solver.getDomain()->getNs();
+	auto                     ns           = solver.getDomain().getNs();
 	int                      n            = ns[0];
 	const MPIGhostFiller<2> &ghost_filler = dynamic_cast<const MPIGhostFiller<2> &>(solver.getGhostFiller());
 	for (int j = 0; j < n; j++) {
@@ -399,7 +399,7 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
  */
 template <class Inserter> void assembleMatrix(const InterfaceDomain<2> &iface_domain, Poisson::FFTWPatchSolver<2> &solver, Inserter insertBlock)
 {
-	auto ns = iface_domain.getDomain()->getNs();
+	auto ns = iface_domain.getDomain().getNs();
 	int  n  = ns[0];
 
 	for (const set<Block> &blocks : GetBlocks(iface_domain, solver.getNeumann())) {
@@ -446,7 +446,7 @@ template <class Inserter> void assembleMatrix(const InterfaceDomain<2> &iface_do
 } // namespace
 Mat ThunderEgg::Poisson::FastSchurMatrixAssemble2D(const InterfaceDomain<2> &iface_domain, Poisson::FFTWPatchSolver<2> &solver)
 {
-	array<int, 2> ns = iface_domain.getDomain()->getNs();
+	array<int, 2> ns = iface_domain.getDomain().getNs();
 	if (ns[0] != ns[1]) {
 		throw RuntimeError("FastSchurMatrixAssembler2D does not support non-square patches");
 	}

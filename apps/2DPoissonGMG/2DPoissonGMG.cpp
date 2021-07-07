@@ -253,11 +253,11 @@ int main(int argc, char *argv[])
 	ns[1] = n;
 
 	// A DomainGenerator will create domains for the Multigrid algorithm from a tree
-	int                            num_ghost_cells  = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
-	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<P4estDomainGenerator>(ttp.p4est, ns, num_ghost_cells, bmf);
+	int                  num_ghost_cells = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
+	P4estDomainGenerator domain_generator(ttp.p4est, ns, num_ghost_cells, bmf);
 
 	// Get the finest domain from the tree
-	shared_ptr<Domain<2>> domain = domain_generator->getFinestDomain();
+	Domain<2> domain = domain_generator.getFinestDomain();
 
 	// A patch operator needs a GhostFiller object to define how to fill ghost cells for the patches.
 	// This one will use a tri-linear interpolation scheme at the refinement boundarys of the domain
@@ -271,12 +271,12 @@ int main(int argc, char *argv[])
 	// Create some new vectors for the domain
 	int num_components = 1; //the poisson operator just has one value in each cell
 
-	Vector<2> exact(*domain, num_components);
-	Vector<2> f(*domain, num_components);
+	Vector<2> exact(domain, num_components);
+	Vector<2> f(domain, num_components);
 
 	// fill the vectors with some values
-	DomainTools::SetValues<2>(*domain, f, ffun); // fill the f vector with the associated domain using the ffun function
-	DomainTools::SetValues<2>(*domain, exact, gfun);
+	DomainTools::SetValues<2>(domain, f, ffun); // fill the f vector with the associated domain using the ffun function
+	DomainTools::SetValues<2>(domain, exact, gfun);
 
 	// modify the rhs to set the boundary conditions
 	// the patch operator contains some helper functions for this
@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
 	timer->stop("Domain Initialization");
 
 	if (neumann && !no_zero_rhs_avg) {
-		double fdiff = DomainTools::Integrate<2>(*domain, f) / domain->volume();
+		double fdiff = DomainTools::Integrate<2>(domain, f) / domain.volume();
 		if (comm.getRank() == 0)
 			cout << "Fdiff: " << fdiff << endl;
 		f.shift(-fdiff);
@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
 	timer->start("Preconditioner Setup");
 
 	int domain_level = 0;
-	domain->setTimer(timer);
+	domain.setTimer(timer);
 	domain_level++;
 
 	// set the patch solver
@@ -329,23 +329,23 @@ int main(int argc, char *argv[])
 	std::shared_ptr<Operator<2>> M;
 	if (true) {
 		// the next coarser domain is needed for the restrictor
-		shared_ptr<Domain<2>> coarser_domain = domain_generator->getCoarserDomain();
+		Domain<2> coarser_domain = domain_generator.getCoarserDomain();
 
-		GMG::LinearRestrictor<2> finest_restrictor(*domain, *coarser_domain);
+		GMG::LinearRestrictor<2> finest_restrictor(domain, coarser_domain);
 
 		//add the finest level
 		builder.addFinestLevel(patch_operator, *finest_smoother, finest_restrictor);
 
-		shared_ptr<Domain<2>> finer_domain   = domain;
-		shared_ptr<Domain<2>> current_domain = coarser_domain;
+		Domain<2> finer_domain   = domain;
+		Domain<2> current_domain = coarser_domain;
 
 		//generate each of the middle levels
-		while (domain_generator->hasCoarserDomain()) {
-			current_domain->setTimer(timer);
+		while (domain_generator.hasCoarserDomain()) {
+			current_domain.setTimer(timer);
 			domain_level++;
 
 			// get the coarser domain
-			coarser_domain = domain_generator->getCoarserDomain();
+			coarser_domain = domain_generator.getCoarserDomain();
 
 			// create operator for middle domain
 			BiLinearGhostFiller  middle_ghost_filler(current_domain, GhostFillingType::Faces);
@@ -362,8 +362,8 @@ int main(int argc, char *argv[])
 			}
 
 			// restrictor and interpolator
-			GMG::DirectInterpolator<2> interpolator(*current_domain, *finer_domain);
-			GMG::LinearRestrictor<2>   restrictor(*current_domain, *coarser_domain);
+			GMG::DirectInterpolator<2> interpolator(current_domain, finer_domain);
+			GMG::LinearRestrictor<2>   restrictor(current_domain, coarser_domain);
 
 			// add the middle level
 			builder.addIntermediateLevel(middle_patch_operator, *middle_smoother, restrictor, interpolator);
@@ -371,7 +371,7 @@ int main(int argc, char *argv[])
 			finer_domain   = current_domain;
 			current_domain = coarser_domain;
 		}
-		current_domain->setTimer(timer);
+		current_domain.setTimer(timer);
 
 		//add the coarsest level to the builder
 
@@ -390,7 +390,7 @@ int main(int argc, char *argv[])
 		}
 
 		// coarsets level only needs an interpolator
-		GMG::DirectInterpolator<2> interpolator(*current_domain, *finer_domain);
+		GMG::DirectInterpolator<2> interpolator(current_domain, finer_domain);
 
 		// add the coarsest level
 		builder.addCoarsestLevel(coarsest_patch_operator, *coarsest_smoother, interpolator);
@@ -413,7 +413,7 @@ int main(int argc, char *argv[])
 	solver.setTimer(timer);
 	solver.setTolerance(tolerance);
 
-	Vector<2> u(*domain, num_components);
+	Vector<2> u(domain, num_components);
 
 	int num_iterations = solver.solve(patch_operator, u, f, M.get(), true);
 
@@ -423,8 +423,8 @@ int main(int argc, char *argv[])
 	timer->stop("Linear Solve");
 
 	// calculate residual
-	Vector<2> au(*domain, num_components);
-	Vector<2> residual_vector(*domain, num_components);
+	Vector<2> au(domain, num_components);
+	Vector<2> residual_vector(domain, num_components);
 
 	patch_operator.apply(u, au);
 
@@ -434,11 +434,11 @@ int main(int argc, char *argv[])
 	double fnorm    = f.twoNorm();
 
 	// calculate error
-	Vector<2> error(*domain, 1);
+	Vector<2> error(domain, 1);
 	error.addScaled(-1, exact, 1, u);
 	if (neumann) {
-		double u_average     = DomainTools::Integrate<2>(*domain, u) / domain->volume();
-		double exact_average = DomainTools::Integrate<2>(*domain, exact) / domain->volume();
+		double u_average     = DomainTools::Integrate<2>(domain, u) / domain.volume();
+		double exact_average = DomainTools::Integrate<2>(domain, exact) / domain.volume();
 
 		if (comm.getRank() == 0) {
 			cout << "Average of computed solution: " << u_average << endl;
@@ -451,8 +451,8 @@ int main(int argc, char *argv[])
 	double error_norm_inf = error.infNorm();
 	double exact_norm     = exact.twoNorm();
 
-	double au_sum = DomainTools::Integrate<2>(*domain, au);
-	double f_sum  = DomainTools::Integrate<2>(*domain, f);
+	double au_sum = DomainTools::Integrate<2>(domain, au);
+	double f_sum  = DomainTools::Integrate<2>(domain, f);
 	if (comm.getRank() == 0) {
 		std::cout << std::scientific;
 		std::cout.precision(13);
@@ -461,7 +461,7 @@ int main(int argc, char *argv[])
 		std::cout << "Residual: " << residual / fnorm << endl;
 		std::cout << u8"ΣAu-Σf: " << au_sum - f_sum << endl;
 		cout.unsetf(std::ios_base::floatfield);
-		int total_cells = domain->getNumGlobalCells();
+		int total_cells = domain.getNumGlobalCells();
 		cout << "Total cells: " << total_cells << endl;
 		cout << "Number of Processors: " << comm.getSize() << endl;
 	}

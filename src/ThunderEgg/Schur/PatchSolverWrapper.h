@@ -104,8 +104,8 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-		Vector<D> u(*solver->getDomain(), 1);
-		Vector<D> f(*solver->getDomain(), 1);
+		Vector<D> u(solver->getDomain(), 1);
+		Vector<D> f(solver->getDomain(), 1);
 
 		// scatter local iface vector
 		auto local_x = scatter.getNewLocalPatchIfaceVector();
@@ -181,7 +181,7 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-		Vector<D> u(*solver->getDomain(), 1);
+		Vector<D> u(solver->getDomain(), 1);
 
 		for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
 			for (Side<D> s : Side<D>::getValues()) {

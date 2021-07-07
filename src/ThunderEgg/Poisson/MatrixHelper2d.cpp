@@ -24,7 +24,7 @@
 using namespace std;
 using namespace ThunderEgg::Poisson;
 using namespace ThunderEgg;
-MatrixHelper2d::MatrixHelper2d(std::shared_ptr<Domain<2>> domain, std::bitset<4> neumann) : domain(domain), neumann(neumann) {}
+MatrixHelper2d::MatrixHelper2d(const Domain<2> &domain, std::bitset<4> neumann) : domain(domain), neumann(neumann) {}
 namespace
 {
 class StencilHelper2d
@@ -474,15 +474,15 @@ Mat MatrixHelper2d::formCRSMatrix(double lambda)
 {
 	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
-	int nx          = domain->getNs()[0];
-	int ny          = domain->getNs()[1];
-	int local_size  = domain->getNumLocalPatches() * nx * ny;
-	int global_size = domain->getNumGlobalPatches() * nx * ny;
+	int nx          = domain.getNs()[0];
+	int ny          = domain.getNs()[1];
+	int local_size  = domain.getNumLocalPatches() * nx * ny;
+	int global_size = domain.getNumGlobalPatches() * nx * ny;
 	MatSetSizes(A, local_size, local_size, global_size, global_size);
 	MatSetType(A, MATMPIAIJ);
 	MatMPIAIJSetPreallocation(A, 19, nullptr, 19, nullptr);
 
-	for (auto &pinfo : domain->getPatchInfoVector()) {
+	for (auto &pinfo : domain.getPatchInfoVector()) {
 		double h_x   = pinfo.spacings[0];
 		double h_y   = pinfo.spacings[1];
 		int    start = nx * ny * pinfo.global_index;

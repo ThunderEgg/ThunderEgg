@@ -35,11 +35,11 @@ namespace ThunderEgg
  */
 template <int D> class PatchOperator : public Operator<D>
 {
-	protected:
+	private:
 	/**
 	 * @brief the domain that is being solved over
 	 */
-	std::shared_ptr<const Domain<D>> domain;
+	Domain<D> domain;
 	/**
 	 * @brief The ghost filler, needed for smoothing
 	 */
@@ -51,14 +51,10 @@ template <int D> class PatchOperator : public Operator<D>
 	 *
 	 *  This sets the Domain and GhostFiller
 	 *
-	 * @param domain_in  the Domain
+	 * @param domain  the Domain
 	 * @param ghost_filler the GhostFiller
 	 */
-	PatchOperator(std::shared_ptr<const Domain<D>> domain_in, const GhostFiller<D> &ghost_filler)
-	: domain(domain_in),
-	  ghost_filler(ghost_filler.clone())
-	{
-	}
+	PatchOperator(const Domain<D> &domain, const GhostFiller<D> &ghost_filler) : domain(domain), ghost_filler(ghost_filler.clone()) {}
 	/**
 	 * @brief Clone this patch operator
 	 *
@@ -134,7 +130,7 @@ template <int D> class PatchOperator : public Operator<D>
 		}
 		f.setWithGhost(0);
 		ghost_filler->fillGhost(u);
-		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
+		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
 			PatchView<const double, D> u_view = u.getPatchView(pinfo.local_index);
 			enforceBoundaryConditions(pinfo, u_view);
 			PatchView<double, D> f_view = f.getPatchView(pinfo.local_index);
@@ -144,7 +140,7 @@ template <int D> class PatchOperator : public Operator<D>
 	/**
 	 * @brief Get the Domain object associated with this PatchOperator
 	 */
-	std::shared_ptr<const Domain<D>> getDomain() const
+	const Domain<D> &getDomain() const
 	{
 		return domain;
 	}

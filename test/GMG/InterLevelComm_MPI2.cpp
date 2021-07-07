@@ -37,15 +37,15 @@ TEST_CASE("Check number of local and ghost parents", "[GMG::InterLevelComm]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	auto                  nx        = GENERATE(2);
-	auto                  ny        = GENERATE(2);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	INFO("d_fine: " << d_fine->getNumLocalPatches());
-	INFO("d_coarse: " << d_coarse->getNumLocalPatches());
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	auto            nx        = GENERATE(2);
+	auto            ny        = GENERATE(2);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
+	INFO("d_fine: " << d_fine.getNumLocalPatches());
+	INFO("d_coarse: " << d_coarse.getNumLocalPatches());
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -53,7 +53,7 @@ TEST_CASE("Check number of local and ghost parents", "[GMG::InterLevelComm]")
 	size_t             num_ghost_parents = 0;
 	size_t             num_local_parents = 0;
 	map<int, set<int>> my_local_parents_to_children;
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		if (pinfo.parent_rank == rank) {
 			num_local_parents++;
 		} else {
@@ -67,15 +67,15 @@ TEST_CASE("Check that parents have unique local indexes", "[GMG::InterLevelComm]
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	auto                  nx        = GENERATE(2);
-	auto                  ny        = GENERATE(2);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	INFO("d_fine: " << d_fine->getNumLocalPatches());
-	INFO("d_coarse: " << d_coarse->getNumLocalPatches());
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	auto            nx        = GENERATE(2);
+	auto            ny        = GENERATE(2);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
+	INFO("d_fine: " << d_fine.getNumLocalPatches());
+	INFO("d_coarse: " << d_coarse.getNumLocalPatches());
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -104,9 +104,9 @@ TEST_CASE("2-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm
 	auto                   ny             = GENERATE(2, 10);
 	int                    num_ghost      = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
@@ -127,11 +127,11 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	auto                   ny             = GENERATE(2, 10);
 	int                    num_ghost      = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
@@ -180,11 +180,11 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -199,11 +199,11 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec   = ilc.getNewGhostVector(1);
 	Vector<2> ghost_vec_2 = ilc.getNewGhostVector(1);
@@ -220,12 +220,12 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
-	Vector<2> coarse_vec_2(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
+	Vector<2> coarse_vec_2(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -241,12 +241,12 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
-	Vector<2> coarse_vec_2(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
+	Vector<2> coarse_vec_2(d_coarse, 1);
 
 	Vector<2> ghost_vec   = ilc.getNewGhostVector(1);
 	Vector<2> ghost_vec_2 = ilc.getNewGhostVector(1);
@@ -263,11 +263,11 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -283,11 +283,11 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -303,11 +303,11 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -322,11 +322,11 @@ TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	auto                   ny             = GENERATE(2, 10);
 	int                    num_ghost      = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -370,11 +370,11 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -389,11 +389,11 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec   = ilc.getNewGhostVector(1);
 	Vector<2> ghost_vec_2 = ilc.getNewGhostVector(1);
@@ -410,12 +410,12 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
-	Vector<2> coarse_vec_2(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
+	Vector<2> coarse_vec_2(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -431,12 +431,12 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
-	Vector<2> coarse_vec_2(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
+	Vector<2> coarse_vec_2(d_coarse, 1);
 
 	Vector<2> ghost_vec   = ilc.getNewGhostVector(1);
 	Vector<2> ghost_vec_2 = ilc.getNewGhostVector(1);
@@ -452,11 +452,11 @@ TEST_CASE("2-processor getGhostPatches throws exception when start is called twi
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -471,11 +471,11 @@ TEST_CASE("2-processor getGhostPatches throws exception when send finish is call
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -490,11 +490,11 @@ TEST_CASE("2-processor getGhostPatches throws exception when get finish is calle
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -509,11 +509,11 @@ TEST_CASE("2-processor getGhostPatches throws exception when send start is calle
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -528,11 +528,11 @@ TEST_CASE("2-processor getGhostPatches throws exception when get start is called
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -548,11 +548,11 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -569,11 +569,11 @@ TEST_CASE(
 	auto                   ny        = GENERATE(2, 10);
 	int                    num_ghost = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	Vector<2> coarse_vec(*d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
 	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
@@ -589,16 +589,16 @@ TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::Int
 	auto                   ny             = GENERATE(2, 10);
 	int                    num_ghost      = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	for (int i = 0; i < 2; i++) {
 		INFO("Call" << i);
-		Vector<2> coarse_vec(*d_coarse, num_components);
+		Vector<2> coarse_vec(d_coarse, num_components);
 
 		Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
@@ -639,15 +639,15 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 	auto                   ny             = GENERATE(2, 10);
 	int                    num_ghost      = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	for (int i = 0; i < 2; i++) {
-		Vector<2> coarse_vec(*d_coarse, num_components);
+		Vector<2> coarse_vec(d_coarse, num_components);
 
 		Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
@@ -689,14 +689,14 @@ TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform qu
 	auto                   ny             = GENERATE(2, 10);
 	int                    num_ghost      = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	Vector<2> coarse_vec(*d_coarse, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
 	auto      ghost_vec = ilc.getNewGhostVector(num_components);
 
 	// fill vectors with rank+c+1
@@ -764,14 +764,14 @@ TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform qu
 	auto                   ny             = GENERATE(2, 10);
 	int                    num_ghost      = 1;
 	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>  d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>>  d_coarse = domain_reader.getCoarserDomain();
-	GMG::InterLevelComm<2> ilc(*d_coarse, *d_fine);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	Vector<2> coarse_vec(*d_coarse, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
 	auto      ghost_vec = ilc.getNewGhostVector(num_components);
 
 	// fill vectors with rank+c+1

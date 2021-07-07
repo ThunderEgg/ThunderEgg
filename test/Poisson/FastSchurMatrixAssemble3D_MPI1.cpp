@@ -52,7 +52,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws exception for non-square pa
 	int                       num_ghost = 1;
 	bitset<6>                 neumann;
 	DomainReader<3>           domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
+	Domain<3>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
 	TriLinearGhostFiller          gf(d_fine, GhostFillingType::Faces);
@@ -85,7 +85,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws with unsupported ghost fill
 	int                       num_ghost = 1;
 	bitset<6>                 neumann;
 	DomainReader<3>           domain_reader(mesh_file, {10, 10, 10}, num_ghost);
-	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
+	Domain<3>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
 	MockGhostFiller<3>            gf;
@@ -104,7 +104,7 @@ TEST_CASE(
 	int                       num_ghost = 1;
 	bitset<6>                 neumann;
 	DomainReader<3>           domain_reader(mesh_file, {n, n, n}, num_ghost);
-	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
+	Domain<3>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
 	Vector<2> f_vec          = iface_domain.getNewVector();
@@ -170,7 +170,7 @@ TEST_CASE(
 	int                       num_ghost = 1;
 	bitset<6>                 neumann   = 0xFF;
 	DomainReader<3>           domain_reader(mesh_file, {n, n, n}, num_ghost);
-	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
+	Domain<3>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
 	Vector<2> f_vec          = iface_domain.getNewVector();

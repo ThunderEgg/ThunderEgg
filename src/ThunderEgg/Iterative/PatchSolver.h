@@ -145,14 +145,14 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		                         {const_cast<double *>(&f_view[f_view.getGhostStart()])},
 		                         f_view.getStrides(),
 		                         f_lengths,
-		                         this->getDomain()->getNumGhostCells());
+		                         this->getDomain().getNumGhostCells());
 
 		std::array<int, D + 1> u_lengths;
 		for (int i = 0; i < D + 1; i++) {
 			u_lengths[i] = u_view.getEnd()[i] + 1;
 		}
 		Vector<D> u_single(
-		Communicator(MPI_COMM_SELF), {&u_view[u_view.getGhostStart()]}, u_view.getStrides(), u_lengths, this->getDomain()->getNumGhostCells());
+		Communicator(MPI_COMM_SELF), {&u_view[u_view.getGhostStart()]}, u_view.getStrides(), u_lengths, this->getDomain().getNumGhostCells());
 
 		Vector<D> f_copy = f_single.getZeroClone();
 		f_copy.copy(f_single);
@@ -166,8 +166,8 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 				throw err;
 			}
 		}
-		if (this->getDomain()->hasTimer()) {
-			this->getDomain()->getTimer()->addIntInfo("Iterations", iterations);
+		if (this->getDomain().hasTimer()) {
+			this->getDomain().getTimer()->addIntInfo("Iterations", iterations);
 		}
 	}
 };

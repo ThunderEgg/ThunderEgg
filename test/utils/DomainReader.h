@@ -70,13 +70,13 @@ class DomainReader
 		}
 		coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(comm, 1, ns, num_ghost, coarser_patches.begin(), coarser_patches.end());
 	}
-	std::shared_ptr<ThunderEgg::Domain<D>> getCoarserDomain()
+	ThunderEgg::Domain<D> getCoarserDomain()
 	{
-		return coarser_domain;
+		return *coarser_domain;
 	}
-	std::shared_ptr<ThunderEgg::Domain<D>> getFinerDomain()
+	ThunderEgg::Domain<D> getFinerDomain()
 	{
-		return finer_domain;
+		return *finer_domain;
 	}
 };
 extern template class DomainReader<2>;

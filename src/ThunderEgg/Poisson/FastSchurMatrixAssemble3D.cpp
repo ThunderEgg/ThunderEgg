@@ -398,7 +398,7 @@ vector<set<Block>> GetBlocks(const InterfaceDomain<3> &iface_domain, std::bitset
  */
 template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<3> &pinfo, Poisson::FFTWPatchSolver<3> &solver)
 {
-	auto                     ns           = solver.getDomain()->getNs();
+	auto                     ns           = solver.getDomain().getNs();
 	int                      n            = ns[0];
 	const MPIGhostFiller<3> &ghost_filler = dynamic_cast<const MPIGhostFiller<3> &>(solver.getGhostFiller());
 	for (int yi = 0; yi < n; yi++) {
@@ -450,7 +450,7 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 template <class Inserter>
 void AssembleMatrix(const Schur::InterfaceDomain<3> &iface_domain, Poisson::FFTWPatchSolver<3> &solver, Inserter insertBlock)
 {
-	auto ns = iface_domain.getDomain()->getNs();
+	auto ns = iface_domain.getDomain().getNs();
 	int  n  = ns[0];
 
 	for (const set<Block> &blocks : GetBlocks(iface_domain, solver.getNeumann())) {
@@ -586,7 +586,7 @@ vector<double> FlipBlock(int n, const Block &b, const vector<double> &orig)
 } // namespace
 Mat ThunderEgg::Poisson::FastSchurMatrixAssemble3D(const Schur::InterfaceDomain<3> &iface_domain, Poisson::FFTWPatchSolver<3> &solver)
 {
-	auto ns = iface_domain.getDomain()->getNs();
+	auto ns = iface_domain.getDomain().getNs();
 	if (ns[0] != ns[1] && ns[0] != ns[2]) {
 		throw RuntimeError("FastSchurMatrixAssemble3D only supports cube shaped patches");
 	}

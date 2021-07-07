@@ -35,20 +35,20 @@ const string mesh_file         = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 const string refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
 TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 {
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+	auto            num_components = GENERATE(1, 2, 3);
+	auto            nx             = GENERATE(2, 10);
+	auto            ny             = GENERATE(2, 10);
+	int             num_ghost      = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
 
-	Vector<2> coarse_vec(*d_coarse, num_components);
-	Vector<2> fine_vec(*d_fine, num_components);
-	Vector<2> fine_expected(*d_fine, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
+	Vector<2> fine_vec(d_fine, num_components);
+	Vector<2> fine_expected(d_fine, num_components);
 
 	// set coarse vector
-	for (auto pinfo : d_coarse->getPatchInfoVector()) {
+	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		PatchView<double, 2> view = coarse_vec.getPatchView(pinfo.local_index);
 		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
 			view[coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + coord[2];
@@ -56,7 +56,7 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 	}
 
 	// set expected finer vector vector
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		PatchView<double, 2> view = fine_expected.getPatchView(pinfo.local_index);
 
 		Orthant<2>         orth = pinfo.orth_on_parent;
@@ -71,11 +71,11 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 		});
 	}
 
-	GMG::DirectInterpolator<2> interpolator(*d_coarse, *d_fine);
+	GMG::DirectInterpolator<2> interpolator(d_coarse, d_fine);
 
 	interpolator.interpolate(coarse_vec, fine_vec);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -92,20 +92,20 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
 TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4",
           "[GMG::DirectInterpolator]")
 {
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+	auto            num_components = GENERATE(1, 2, 3);
+	auto            nx             = GENERATE(2, 10);
+	auto            ny             = GENERATE(2, 10);
+	int             num_ghost      = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
 
-	Vector<2> coarse_vec(*d_coarse, num_components);
-	Vector<2> fine_vec(*d_fine, num_components);
-	Vector<2> fine_expected(*d_fine, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
+	Vector<2> fine_vec(d_fine, num_components);
+	Vector<2> fine_expected(d_fine, num_components);
 
 	// set coarse vector
-	for (auto pinfo : d_coarse->getPatchInfoVector()) {
+	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		PatchView<double, 2> view = coarse_vec.getPatchView(pinfo.local_index);
 		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
 			view[coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + coord[2];
@@ -113,7 +113,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 	}
 
 	// set expected finer vector vector
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		PatchView<double, 2> view = fine_expected.getPatchView(pinfo.local_index);
 
 		Orthant<2>         orth = pinfo.orth_on_parent;
@@ -130,11 +130,11 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 
 	fine_vec.set(1.0);
 
-	GMG::DirectInterpolator<2> interpolator(*d_coarse, *d_fine);
+	GMG::DirectInterpolator<2> interpolator(d_coarse, d_fine);
 
 	interpolator.interpolate(coarse_vec, fine_vec);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -150,20 +150,20 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
 }
 TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 {
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(refined_mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+	auto            num_components = GENERATE(1, 2, 3);
+	auto            nx             = GENERATE(2, 10);
+	auto            ny             = GENERATE(2, 10);
+	int             num_ghost      = 1;
+	DomainReader<2> domain_reader(refined_mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
 
-	Vector<2> coarse_vec(*d_coarse, num_components);
-	Vector<2> fine_vec(*d_fine, num_components);
-	Vector<2> fine_expected(*d_fine, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
+	Vector<2> fine_vec(d_fine, num_components);
+	Vector<2> fine_expected(d_fine, num_components);
 
 	// set coarse vector
-	for (auto pinfo : d_coarse->getPatchInfoVector()) {
+	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		PatchView<double, 2> view = coarse_vec.getPatchView(pinfo.local_index);
 		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
 			view[coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + coord[2];
@@ -171,7 +171,7 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 	}
 
 	// set expected finer vector vector
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		PatchView<double, 2> view = fine_expected.getPatchView(pinfo.local_index);
 
 		if (pinfo.hasCoarseParent()) {
@@ -192,11 +192,11 @@ TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
 		}
 	}
 
-	GMG::DirectInterpolator<2> interpolator(*d_coarse, *d_fine);
+	GMG::DirectInterpolator<2> interpolator(d_coarse, d_fine);
 
 	interpolator.interpolate(coarse_vec, fine_vec);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);

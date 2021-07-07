@@ -38,7 +38,7 @@ class BiLinearGhostFiller : public MPIGhostFiller<2>
 	 * @param domain the domain to fill ghosts for
 	 * @param fill_type the GhostFillingType
 	 */
-	BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain, GhostFillingType fill_type);
+	BiLinearGhostFiller(const Domain<2> &domain, GhostFillingType fill_type);
 	/**
 	 * @brief Clone this BiLinearGhostFiller
 	 *

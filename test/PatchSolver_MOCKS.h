@@ -54,15 +54,15 @@ template <int D>
 class MockPatchSolver : public PatchSolver<D>
 {
 	private:
-	mutable std::set<const PatchInfo<D> *> patches_to_be_called;
+	mutable std::set<int> patches_to_be_called;
 
 	public:
-	MockPatchSolver(std::shared_ptr<const Domain<D>> domain_in,
-	                const GhostFiller<D> &           ghost_filler_in)
+	MockPatchSolver(const Domain<D> &     domain_in,
+	                const GhostFiller<D> &ghost_filler_in)
 	: PatchSolver<D>(domain_in, ghost_filler_in)
 	{
-		for (const PatchInfo<D> &pinfo : domain_in->getPatchInfoVector()) {
-			patches_to_be_called.insert(&pinfo);
+		for (const PatchInfo<D> &pinfo : domain_in.getPatchInfoVector()) {
+			patches_to_be_called.insert(pinfo.id);
 		}
 	}
 	MockPatchSolver<D> *clone() const override
@@ -73,8 +73,8 @@ class MockPatchSolver : public PatchSolver<D>
 	                      const PatchView<const double, D> &fs,
 	                      const PatchView<double, D> &      us) const override
 	{
-		CHECK(patches_to_be_called.count(&pinfo) == 1);
-		patches_to_be_called.erase(&pinfo);
+		CHECK(patches_to_be_called.count(pinfo.id) == 1);
+		patches_to_be_called.erase(pinfo.id);
 		std::array<int, D + 1> zero;
 		zero.fill(0);
 	}

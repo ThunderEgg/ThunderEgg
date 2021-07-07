@@ -92,8 +92,8 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -106,11 +106,11 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	Vector<2> f_vec(*domain, 1);
-	DomainTools::SetValues<2>(*domain, f_vec, ffun);
-	Vector<2> residual(*domain, 1);
+	Vector<2> f_vec(domain, 1);
+	DomainTools::SetValues<2>(domain, f_vec, ffun);
+	Vector<2> residual(domain, 1);
 
-	Vector<2> g_vec(*domain, 1);
+	Vector<2> g_vec(domain, 1);
 
 	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
@@ -132,12 +132,12 @@ TEST_CASE("BiCGStab handles zero rhs vector", "[BiCGStab]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
-	Vector<2> f_vec(*domain, 1);
+	Vector<2> f_vec(domain, 1);
 
-	Vector<2> g_vec(*domain, 1);
+	Vector<2> g_vec(domain, 1);
 
 	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
@@ -156,8 +156,8 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -170,11 +170,11 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	Vector<2> f_vec(*domain, 1);
-	DomainTools::SetValues<2>(*domain, f_vec, ffun);
-	Vector<2> residual(*domain, 1);
+	Vector<2> f_vec(domain, 1);
+	DomainTools::SetValues<2>(domain, f_vec, ffun);
+	Vector<2> residual(domain, 1);
 
-	Vector<2> g_vec(*domain, 1);
+	Vector<2> g_vec(domain, 1);
 
 	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
@@ -206,8 +206,8 @@ TEST_CASE("giving a good initial guess reduces the iterations", "[BiCGStab]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -220,11 +220,11 @@ TEST_CASE("giving a good initial guess reduces the iterations", "[BiCGStab]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	Vector<2> f_vec(*domain, 1);
-	DomainTools::SetValues<2>(*domain, f_vec, ffun);
-	Vector<2> residual(*domain, 1);
+	Vector<2> f_vec(domain, 1);
+	DomainTools::SetValues<2>(domain, f_vec, ffun);
+	Vector<2> residual(domain, 1);
 
-	Vector<2> g_vec(*domain, 1);
+	Vector<2> g_vec(domain, 1);
 
 	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
@@ -268,8 +268,8 @@ TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -277,11 +277,11 @@ TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
 		return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	Vector<2> f_vec(*domain, 1);
-	DomainTools::SetValues<2>(*domain, f_vec, ffun);
-	Vector<2> residual(*domain, 1);
+	Vector<2> f_vec(domain, 1);
+	DomainTools::SetValues<2>(domain, f_vec, ffun);
+	Vector<2> residual(domain, 1);
 
-	Vector<2> g_vec(*domain, 1);
+	Vector<2> g_vec(domain, 1);
 
 	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 

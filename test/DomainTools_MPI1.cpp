@@ -320,11 +320,11 @@ TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx};
 	pinfos[0].starts          = {startx};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<1> d(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<1> vec(*d, 1);
+	Vector<1> vec(d, 1);
 
-	DomainTools::SetValues<1>(*d, vec, f);
+	DomainTools::SetValues<1>(d, vec, f);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		if (coord[0] < 0 || coord[0] >= nx) {
@@ -354,11 +354,11 @@ TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx};
 	pinfos[0].starts          = {startx};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<1> d(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<1> vec(*d, 1);
+	Vector<1> vec(d, 1);
 
-	DomainTools::SetValues<1>(*d, vec, f);
+	DomainTools::SetValues<1>(d, vec, f);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		if (coord[0] < 0 || coord[0] >= nx) {
@@ -391,11 +391,11 @@ TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<2> d(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<2> vec(*d, 1);
+	Vector<2> vec(d, 1);
 
-	DomainTools::SetValues<2>(*d, vec, f);
+	DomainTools::SetValues<2>(d, vec, f);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
@@ -429,11 +429,11 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<2> d(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<2> vec(*d, 2);
+	Vector<2> vec(d, 2);
 
-	DomainTools::SetValues<2>(*d, vec, f, g);
+	DomainTools::SetValues<2>(d, vec, f, g);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
@@ -476,11 +476,11 @@ TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<2> d(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<2> vec(*d, 1);
+	Vector<2> vec(d, 1);
 
-	DomainTools::SetValues<2>(*d, vec, f);
+	DomainTools::SetValues<2>(d, vec, f);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
@@ -510,11 +510,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx};
 	pinfos[0].starts          = {startx};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<1> d(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<1> vec(*d, 1);
+	Vector<1> vec(d, 1);
 
-	DomainTools::SetValuesWithGhost<1>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<1>(d, vec, f);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		std::array<double, 1> real_coord;
@@ -540,11 +540,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx};
 	pinfos[0].starts          = {startx};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<1>> d(new Domain<1>(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<1> d(comm, 0, {nx}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<1> vec(*d, 1);
+	Vector<1> vec(d, 1);
 
-	DomainTools::SetValuesWithGhost<1>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<1>(d, vec, f);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
 		std::array<double, 1> real_coord;
@@ -573,11 +573,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<2> d(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<2> vec(*d, 1);
+	Vector<2> vec(d, 1);
 
-	DomainTools::SetValuesWithGhost<2>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, vec, f);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		std::array<double, 2> real_coord;
@@ -607,11 +607,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<2> d(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<2> vec(*d, 2);
+	Vector<2> vec(d, 2);
 
-	DomainTools::SetValuesWithGhost<2>(*d, vec, f, g);
+	DomainTools::SetValuesWithGhost<2>(d, vec, f, g);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		std::array<double, 2> real_coord;
@@ -648,11 +648,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D throws when too many functions are
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<2> d(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<2> vec(*d, 1);
+	Vector<2> vec(d, 1);
 
-	CHECK_THROWS_AS(DomainTools::SetValuesWithGhost<2>(*d, vec, f, g), RuntimeError);
+	CHECK_THROWS_AS(DomainTools::SetValuesWithGhost<2>(d, vec, f, g), RuntimeError);
 }
 TEST_CASE("DomainTools::setValues 2D throws when too many functions are given", "[DomainTools]")
 {
@@ -676,11 +676,11 @@ TEST_CASE("DomainTools::setValues 2D throws when too many functions are given", 
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<2> d(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<2> vec(*d, 1);
+	Vector<2> vec(d, 1);
 
-	CHECK_THROWS_AS(DomainTools::SetValues<2>(*d, vec, f, g), RuntimeError);
+	CHECK_THROWS_AS(DomainTools::SetValues<2>(d, vec, f, g), RuntimeError);
 }
 TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
 {
@@ -703,11 +703,11 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
 	pinfos[0].spacings        = {spacingx, spacingy};
 	pinfos[0].starts          = {startx, starty};
 	pinfos[0].num_ghost_cells = num_ghost;
-	shared_ptr<Domain<2>> d(new Domain<2>(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<2> d(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end());
 
-	Vector<2> vec(*d, 1);
+	Vector<2> vec(d, 1);
 
-	DomainTools::SetValuesWithGhost<2>(*d, vec, f);
+	DomainTools::SetValuesWithGhost<2>(d, vec, f);
 	auto ld = vec.getComponentView(0, 0);
 	nested_loop<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
 		std::array<double, 2> real_coord;
@@ -715,4 +715,3 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
 		CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
 	});
 }
-// TODO set boundary vector

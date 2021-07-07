@@ -136,7 +136,7 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 	 */
 	PatchArray<D> getEigenValues(const PatchInfo<D> &pinfo)
 	{
-		PatchArray<D> retval(this->getDomain()->getNs(), 1, 0);
+		PatchArray<D> retval(this->getDomain().getNs(), 1, 0);
 
 		std::valarray<size_t> all_strides(D);
 		size_t                curr_stride = 1;
@@ -199,7 +199,7 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 		eigen_vals = std::map<const PatchInfo<D>, PatchArray<D>, CompareFunction>(compare);
 
 		// process patches
-		for (auto pinfo : this->getDomain()->getPatchInfoVector()) {
+		for (auto pinfo : this->getDomain().getPatchInfoVector()) {
 			addPatch(pinfo);
 		}
 	}
@@ -235,7 +235,7 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {
-			scale *= 2.0 * this->getDomain()->getNs()[axis];
+			scale *= 2.0 * this->getDomain().getNs()[axis];
 		}
 		loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] = sol[coord] / scale; });
 	}

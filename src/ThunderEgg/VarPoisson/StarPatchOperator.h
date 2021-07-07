@@ -58,14 +58,14 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 * @param domain the Domain associated with the operator
 	 * @param ghost_filler the GhostFiller to use before calling applySinglePatch
 	 */
-	StarPatchOperator(const Vector<D> &coeffs, std::shared_ptr<const Domain<D>> domain, const GhostFiller<D> &ghost_filler)
+	StarPatchOperator(const Vector<D> &coeffs, const Domain<D> &domain, const GhostFiller<D> &ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler),
 	  coeffs(coeffs)
 	{
-		if (this->domain->getNumGhostCells() < 1) {
+		if (domain.getNumGhostCells() < 1) {
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
-		this->ghost_filler->fillGhost(this->coeffs);
+		ghost_filler.fillGhost(this->coeffs);
 	}
 	/**
 	 * @brief Get a clone of this operator
@@ -169,7 +169,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	{
 		for (int i = 0; i < f.getNumLocalPatches(); i++) {
 			ComponentView<double, D> f_ld  = f.getComponentView(0, i);
-			auto                     pinfo = this->domain->getPatchInfoVector()[i];
+			auto                     pinfo = this->getDomain().getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo.hasNbr(s)) {
 					double              h2 = pow(pinfo.spacings[s.getAxisIndex()], 2);

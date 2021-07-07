@@ -23,9 +23,7 @@
 #include <ThunderEgg/RuntimeError.h>
 namespace ThunderEgg
 {
-BiLinearGhostFiller::BiLinearGhostFiller(std::shared_ptr<const Domain<2>> domain, GhostFillingType fill_type) : MPIGhostFiller<2>(domain, fill_type)
-{
-}
+BiLinearGhostFiller::BiLinearGhostFiller(const Domain<2> &domain, GhostFillingType fill_type) : MPIGhostFiller<2>(domain, fill_type) {}
 BiLinearGhostFiller *BiLinearGhostFiller::clone() const
 {
 	return new BiLinearGhostFiller(*this);

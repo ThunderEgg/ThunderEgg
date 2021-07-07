@@ -52,25 +52,25 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 0;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	int             n         = 32;
+	int             num_ghost = 0;
+	DomainReader<2> domain_reader(mesh_file, {n, n}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto vector_allocator = [&] {
-		return Vector<2>(*d_fine, 1);
+		return Vector<2>(d_fine, 1);
 	};
 
 	Vec x;
-	VecCreateMPI(MPI_COMM_WORLD, d_fine->getNumLocalCells() * 1, PETSC_DETERMINE, &x);
+	VecCreateMPI(MPI_COMM_WORLD, d_fine.getNumLocalCells() * 1, PETSC_DETERMINE, &x);
 	double *x_view;
 	VecGetArray(x, &x_view);
-	for (int i = 0; i < d_fine->getNumLocalCells() * 1; i++) {
+	for (int i = 0; i < d_fine.getNumLocalCells() * 1; i++) {
 		x_view[i] = i;
 	}
 	VecRestoreArray(x, &x_view);
 	Vec b;
-	VecCreateMPI(MPI_COMM_WORLD, d_fine->getNumLocalCells() * 1, PETSC_DETERMINE, &b);
+	VecCreateMPI(MPI_COMM_WORLD, d_fine.getNumLocalCells() * 1, PETSC_DETERMINE, &b);
 
 	// create an Identity matrix
 	HalfIdentity TE_A;
@@ -81,7 +81,7 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")
 	double *b_view;
 	VecGetArray(x, &x_view);
 	VecGetArray(b, &b_view);
-	for (int i = 0; i < d_fine->getNumLocalCells() * 1; i++) {
+	for (int i = 0; i < d_fine.getNumLocalCells() * 1; i++) {
 		CHECK(x_view[i] * 0.5 == b_view[i]);
 	}
 	VecRestoreArray(x, &x_view);
@@ -95,24 +95,24 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I and two components", "[PETSc::P
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 0;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine           = domain_reader.getFinerDomain();
-	auto                  vector_allocator = [&] {
-        return Vector<2>(*d_fine, 2);
+	int             n         = 32;
+	int             num_ghost = 0;
+	DomainReader<2> domain_reader(mesh_file, {n, n}, num_ghost);
+	Domain<2>       d_fine           = domain_reader.getFinerDomain();
+	auto            vector_allocator = [&] {
+        return Vector<2>(d_fine, 2);
 	};
 
 	Vec x;
-	VecCreateMPI(MPI_COMM_WORLD, d_fine->getNumLocalCells() * 2, PETSC_DETERMINE, &x);
+	VecCreateMPI(MPI_COMM_WORLD, d_fine.getNumLocalCells() * 2, PETSC_DETERMINE, &x);
 	double *x_view;
 	VecGetArray(x, &x_view);
-	for (int i = 0; i < d_fine->getNumLocalCells() * 2; i++) {
+	for (int i = 0; i < d_fine.getNumLocalCells() * 2; i++) {
 		x_view[i] = i;
 	}
 	VecRestoreArray(x, &x_view);
 	Vec b;
-	VecCreateMPI(MPI_COMM_WORLD, d_fine->getNumLocalCells() * 2, PETSC_DETERMINE, &b);
+	VecCreateMPI(MPI_COMM_WORLD, d_fine.getNumLocalCells() * 2, PETSC_DETERMINE, &b);
 
 	// create an Identity matrix
 	HalfIdentity TE_A;
@@ -123,7 +123,7 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I and two components", "[PETSc::P
 	double *b_view;
 	VecGetArray(x, &x_view);
 	VecGetArray(b, &b_view);
-	for (int i = 0; i < d_fine->getNumLocalCells() * 2; i++) {
+	for (int i = 0; i < d_fine.getNumLocalCells() * 2; i++) {
 		CHECK(x_view[i] * 0.5 == b_view[i]);
 	}
 	VecRestoreArray(x, &x_view);

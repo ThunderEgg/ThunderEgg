@@ -41,7 +41,7 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	/**
 	 * @brief the domain that is being solved over
 	 */
-	std::shared_ptr<const Domain<D>> domain;
+	Domain<D> domain;
 	/**
 	 * @brief The ghost filler, needed for smoothing
 	 */
@@ -56,7 +56,7 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 * @param domain the Domain
 	 * @param ghost_filler the GhostFiller
 	 */
-	PatchSolver(std::shared_ptr<const Domain<D>> domain, const GhostFiller<D> &ghost_filler) : domain(domain), ghost_filler(ghost_filler.clone()) {}
+	PatchSolver(const Domain<D> &domain, const GhostFiller<D> &ghost_filler) : domain(domain), ghost_filler(ghost_filler.clone()) {}
 	/**
 	 * @brief Destroy the Patch Solver object
 	 */
@@ -70,9 +70,9 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	/**
 	 * @brief Get the Domain object
 	 *
-	 * @return std::shared_ptr<const Domain<D>> the Domain
+	 * @return const Domain<D>& the Domain
 	 */
-	std::shared_ptr<const Domain<D>> getDomain() const
+	const Domain<D> &getDomain() const
 	{
 		return domain;
 	}
@@ -102,30 +102,30 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	virtual void apply(const Vector<D> &f, Vector<D> &u) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (u.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (u.getNumLocalPatches() != this->domain.getNumLocalPatches()) {
 				throw RuntimeError("u vector is incorrect length");
 			}
-			if (f.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (f.getNumLocalPatches() != this->domain.getNumLocalPatches()) {
 				throw RuntimeError("f vector is incorrect length");
 			}
 		}
 		u.setWithGhost(0);
-		if (domain->hasTimer()) {
-			domain->getTimer()->startDomainTiming(domain->getId(), "Total Patch Solve");
+		if (domain.hasTimer()) {
+			domain.getTimer()->startDomainTiming(domain.getId(), "Total Patch Solve");
 		}
-		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			if (domain->hasTimer()) {
-				domain->getTimer()->start("Single Patch Solve");
+		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
+			if (domain.hasTimer()) {
+				domain.getTimer()->start("Single Patch Solve");
 			}
 			PatchView<const double, D> f_view = f.getPatchView(pinfo.local_index);
 			PatchView<double, D>       u_view = u.getPatchView(pinfo.local_index);
 			solveSinglePatch(pinfo, f_view, u_view);
-			if (domain->hasTimer()) {
-				domain->getTimer()->stop("Single Patch Solve");
+			if (domain.hasTimer()) {
+				domain.getTimer()->stop("Single Patch Solve");
 			}
 		}
-		if (domain->hasTimer()) {
-			domain->getTimer()->stopDomainTiming(domain->getId(), "Total Patch Solve");
+		if (domain.hasTimer()) {
+			domain.getTimer()->stopDomainTiming(domain.getId(), "Total Patch Solve");
 		}
 	}
 	/**
@@ -137,30 +137,30 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	virtual void smooth(const Vector<D> &f, Vector<D> &u) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (u.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (u.getNumLocalPatches() != this->domain.getNumLocalPatches()) {
 				throw RuntimeError("u vector is incorrect length");
 			}
-			if (f.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (f.getNumLocalPatches() != this->domain.getNumLocalPatches()) {
 				throw RuntimeError("f vector is incorrect length");
 			}
 		}
-		if (domain->hasTimer()) {
-			domain->getTimer()->startDomainTiming(domain->getId(), "Total Patch Smooth");
+		if (domain.hasTimer()) {
+			domain.getTimer()->startDomainTiming(domain.getId(), "Total Patch Smooth");
 		}
 		ghost_filler->fillGhost(u);
-		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			if (domain->hasTimer()) {
-				domain->getTimer()->startPatchTiming(pinfo.id, domain->getId(), "Single Patch Solve");
+		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
+			if (domain.hasTimer()) {
+				domain.getTimer()->startPatchTiming(pinfo.id, domain.getId(), "Single Patch Solve");
 			}
 			PatchView<const double, D> f_view = f.getPatchView(pinfo.local_index);
 			PatchView<double, D>       u_view = u.getPatchView(pinfo.local_index);
 			solveSinglePatch(pinfo, f_view, u_view);
-			if (domain->hasTimer()) {
-				domain->getTimer()->stopPatchTiming(pinfo.id, domain->getId(), "Single Patch Solve");
+			if (domain.hasTimer()) {
+				domain.getTimer()->stopPatchTiming(pinfo.id, domain.getId(), "Single Patch Solve");
 			}
 		}
-		if (domain->hasTimer()) {
-			domain->getTimer()->stopDomainTiming(domain->getId(), "Total Patch Smooth");
+		if (domain.hasTimer()) {
+			domain.getTimer()->stopDomainTiming(domain.getId(), "Total Patch Smooth");
 		}
 	}
 };

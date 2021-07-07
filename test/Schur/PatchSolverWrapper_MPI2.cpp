@@ -66,8 +66,8 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply fills ghost in rhs as expected",
 	MockGhostFiller<2>             ghost_filler;
 	RHSGhostCheckingPatchSolver<2> solver(domain, ghost_filler, schur_fill_value);
 
-	Vector<1> x(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	Vector<1> b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
+	Vector<1> x(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
+	Vector<1> b(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
 
 	x.set(schur_fill_value);
 
@@ -91,8 +91,8 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 	PatchFillingGhostFiller<2> ghost_filler(domain_fill_value);
 	MockPatchSolver<2>         solver(domain, ghost_filler);
 
-	Vector<1> x(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	Vector<1> b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
+	Vector<1> x(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
+	Vector<1> b(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
 
 	x.set(schur_fill_value);
 
@@ -124,8 +124,8 @@ TEST_CASE(
 	PatchFillingGhostFiller<2> ghost_filler(domain_fill_value);
 	MockPatchSolver<2>         solver(domain, ghost_filler);
 
-	Vector<1> x(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	Vector<1> b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
+	Vector<1> x(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
+	Vector<1> b(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
 
 	x.set(schur_fill_value);
 	b.set(99);
@@ -156,8 +156,8 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in 
 	MockGhostFiller<2>             ghost_filler;
 	RHSGhostCheckingPatchSolver<2> solver(domain, ghost_filler, 0);
 
-	Vector<1> schur_b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	Vector<2> domain_b(*domain, 1);
+	Vector<1> schur_b(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
+	Vector<2> domain_b(domain, 1);
 
 	domain_b.set(domain_fill_value);
 
@@ -181,8 +181,8 @@ TEST_CASE(
 	PatchFillingGhostFiller<2> ghost_filler(domain_fill_value);
 	MockPatchSolver<2>         solver(domain, ghost_filler);
 
-	Vector<1> schur_b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	Vector<2> domain_b(*domain, 1);
+	Vector<1> schur_b(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
+	Vector<2> domain_b(domain, 1);
 
 	Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
 	psw.getSchurRHSFromDomainRHS(domain_b, schur_b);
@@ -211,8 +211,8 @@ TEST_CASE(
 	PatchFillingGhostFiller<2> ghost_filler(domain_fill_value);
 	MockPatchSolver<2>         solver(domain, ghost_filler);
 
-	Vector<1> schur_b(domain->getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	Vector<2> domain_b(*domain, 1);
+	Vector<1> schur_b(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
+	Vector<2> domain_b(domain, 1);
 
 	schur_b.set(99);
 

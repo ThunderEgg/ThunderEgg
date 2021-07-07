@@ -40,7 +40,7 @@ class MatrixHelper
 	/**
 	 * @brief the domain
 	 */
-	std::shared_ptr<Domain<3>> domain;
+	Domain<3> domain;
 	/**
 	 * @brief boundary conditions
 	 */
@@ -53,7 +53,7 @@ class MatrixHelper
 	 * @param domain the Domain
 	 * @param neumann boundary conditions
 	 */
-	explicit MatrixHelper(std::shared_ptr<Domain<3>> domain, std::bitset<6> neumann);
+	explicit MatrixHelper(const Domain<3> &domain, std::bitset<6> neumann);
 
 	/**
 	 * @brief Form the matrix for the domain

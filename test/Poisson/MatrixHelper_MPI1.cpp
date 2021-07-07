@@ -44,13 +44,13 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	auto                  nx        = GENERATE(8, 10);
-	auto                  ny        = GENERATE(8, 10);
-	auto                  nz        = GENERATE(8, 10);
-	int                   num_ghost = 1;
-	bitset<6>             neumann;
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(8, 10);
+	auto            ny        = GENERATE(8, 10);
+	auto            nz        = GENERATE(8, 10);
+	int             num_ghost = 1;
+	bitset<6>       neumann;
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 3> &coord) {
 		double x = coord[0];
@@ -59,11 +59,11 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 		return sin(M_PI * y) * cos(2 * M_PI * x) * cos(M_PI * z);
 	};
 
-	Vector<3> f_vec(*d_fine, 1);
-	Vector<3> f_vec_expected(*d_fine, 1);
+	Vector<3> f_vec(d_fine, 1);
+	Vector<3> f_vec_expected(d_fine, 1);
 
-	Vector<3> g_vec(*d_fine, 1);
-	DomainTools::SetValues<3>(*d_fine, g_vec, gfun);
+	Vector<3> g_vec(d_fine, 1);
+	DomainTools::SetValues<3>(d_fine, g_vec, gfun);
 
 	TriLinearGhostFiller          gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<3> p_operator(d_fine, gf);
@@ -77,7 +77,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
 
 	REQUIRE(f_vec.infNorm() > 0);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -104,13 +104,13 @@ TEST_CASE(
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	auto                  nx        = GENERATE(8, 10);
-	auto                  ny        = GENERATE(8, 10);
-	auto                  nz        = GENERATE(8, 10);
-	int                   num_ghost = 1;
-	bitset<6>             neumann   = 0xFF;
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(8, 10);
+	auto            ny        = GENERATE(8, 10);
+	auto            nz        = GENERATE(8, 10);
+	int             num_ghost = 1;
+	bitset<6>       neumann   = 0xFF;
+	DomainReader<3> domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	Domain<3>       d_fine = domain_reader.getFinerDomain();
 
 	auto gfun = [](const std::array<double, 3> &coord) {
 		double x = coord[0];
@@ -119,11 +119,11 @@ TEST_CASE(
 		return sin(M_PI * y) * cos(2 * M_PI * x) * cos(M_PI * z);
 	};
 
-	Vector<3> f_vec(*d_fine, 1);
-	Vector<3> f_vec_expected(*d_fine, 1);
+	Vector<3> f_vec(d_fine, 1);
+	Vector<3> f_vec_expected(d_fine, 1);
 
-	Vector<3> g_vec(*d_fine, 1);
-	DomainTools::SetValues<3>(*d_fine, g_vec, gfun);
+	Vector<3> g_vec(d_fine, 1);
+	DomainTools::SetValues<3>(d_fine, g_vec, gfun);
 
 	TriLinearGhostFiller          gf(d_fine, GhostFillingType::Faces);
 	Poisson::StarPatchOperator<3> p_operator(d_fine, gf, true);
@@ -137,7 +137,7 @@ TEST_CASE(
 
 	REQUIRE(f_vec.infNorm() > 0);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
@@ -174,8 +174,8 @@ TEST_CASE("Poisson::MatrixHelper constructor throws error with odd number of cel
 	array<int, 3> ns;
 	ns.fill(n_even);
 	ns[axis] = n_odd;
-	DomainReader<3>       domain_reader(mesh_file, ns, num_ghost);
-	shared_ptr<Domain<3>> d = domain_reader.getFinerDomain();
+	DomainReader<3> domain_reader(mesh_file, ns, num_ghost);
+	Domain<3>       d = domain_reader.getFinerDomain();
 
 	CHECK_THROWS_AS(Poisson::MatrixHelper(d, neumann), RuntimeError);
 }

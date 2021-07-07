@@ -35,24 +35,24 @@ TEST_CASE("Vector<2> zeroclone from domain constructor", "[Vector]")
 {
 	Communicator comm(MPI_COMM_WORLD);
 
-	auto                  mesh_file        = GENERATE(as<std::string>{}, MESHES);
-	int                   num_components   = GENERATE(1, 2, 3);
-	auto                  num_ghost_cells  = GENERATE(0, 1, 5);
-	int                   nx               = GENERATE(1, 4, 5);
-	int                   ny               = GENERATE(1, 4, 5);
-	int                   component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
-	int                   patch_stride     = component_stride * num_components;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost_cells);
-	shared_ptr<Domain<2>> domain = domain_reader.getFinerDomain();
+	auto            mesh_file        = GENERATE(as<std::string>{}, MESHES);
+	int             num_components   = GENERATE(1, 2, 3);
+	auto            num_ghost_cells  = GENERATE(0, 1, 5);
+	int             nx               = GENERATE(1, 4, 5);
+	int             ny               = GENERATE(1, 4, 5);
+	int             component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
+	int             patch_stride     = component_stride * num_components;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost_cells);
+	Domain<2>       domain = domain_reader.getFinerDomain();
 
 	INFO("num_ghost_cells:   " << num_ghost_cells);
 	INFO("nx:                " << nx);
 	INFO("ny:                " << ny);
 
-	Vector<2> vec_to_copy(*domain, num_components);
+	Vector<2> vec_to_copy(domain, num_components);
 
 	double *view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-	int     size         = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components * domain->getNumLocalPatches();
+	int     size         = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * num_components * domain.getNumLocalPatches();
 	for (size_t i = 0; i < size; i++) {
 		double x        = (i + 0.5) / size;
 		view_to_copy[i] = 10 - (x - 0.75) * (x - 0.75);
@@ -73,7 +73,7 @@ TEST_CASE("Vector<2> zeroclone from domain constructor", "[Vector]")
 
 	double *view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
 	CHECK(view != view_to_copy);
-	for (int i = 0; i < domain->getNumLocalPatches(); i++) {
+	for (int i = 0; i < domain.getNumLocalPatches(); i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
@@ -86,7 +86,7 @@ TEST_CASE("Vector<2> zeroclone from domain constructor", "[Vector]")
 
 	const Vector<2> &const_vec = vec;
 
-	for (int i = 0; i < domain->getNumLocalPatches(); i++) {
+	for (int i = 0; i < domain.getNumLocalPatches(); i++) {
 		INFO("i:                 " << i);
 		for (int c = 0; c < num_components; c++) {
 			INFO("c:                 " << c);
@@ -96,7 +96,7 @@ TEST_CASE("Vector<2> zeroclone from domain constructor", "[Vector]")
 			      == view + patch_stride * i + (c + 1) * component_stride - 1);
 		}
 	}
-	for (int i = 0; i < domain->getNumLocalPatches(); i++) {
+	for (int i = 0; i < domain.getNumLocalPatches(); i++) {
 		PatchView<double, 2> view = vec.getPatchView(i);
 		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == 0);

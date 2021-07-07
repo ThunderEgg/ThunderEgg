@@ -124,9 +124,9 @@ class P8estDomainGenerator : public DomainGenerator<3>
 	P8estDomainGenerator &operator                =(const P8estDomainGenerator &);
 	P8estDomainGenerator &operator=(P8estDomainGenerator &&) = default;
 	~P8estDomainGenerator();
-	std::shared_ptr<Domain<3>> getFinestDomain();
-	bool                       hasCoarserDomain();
-	std::shared_ptr<Domain<3>> getCoarserDomain();
+	Domain<3> getFinestDomain();
+	bool      hasCoarserDomain();
+	Domain<3> getCoarserDomain();
 };
 } // namespace ThunderEgg
 #endif

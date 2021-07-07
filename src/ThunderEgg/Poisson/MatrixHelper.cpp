@@ -23,9 +23,9 @@
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Poisson;
-MatrixHelper::MatrixHelper(std::shared_ptr<Domain<3>> domain, std::bitset<6> neumann) : domain(domain), neumann(neumann)
+MatrixHelper::MatrixHelper(const Domain<3> &domain, std::bitset<6> neumann) : domain(domain), neumann(neumann)
 {
-	for (int n : domain->getNs()) {
+	for (int n : domain.getNs()) {
 		if (n % 2 != 0) {
 			throw RuntimeError("TriLinearGhostFiller only supports even number patch sizes");
 		}
@@ -816,16 +816,16 @@ Mat MatrixHelper::formCRSMatrix()
 {
 	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
-	int nx          = domain->getNs()[0];
-	int ny          = domain->getNs()[1];
-	int nz          = domain->getNs()[2];
-	int local_size  = domain->getNumLocalPatches() * nx * ny * nz;
-	int global_size = domain->getNumGlobalPatches() * nx * ny * nz;
+	int nx          = domain.getNs()[0];
+	int ny          = domain.getNs()[1];
+	int nz          = domain.getNs()[2];
+	int local_size  = domain.getNumLocalPatches() * nx * ny * nz;
+	int global_size = domain.getNumGlobalPatches() * nx * ny * nz;
 	MatSetSizes(A, local_size, local_size, global_size, global_size);
 	MatSetType(A, MATMPIAIJ);
 	MatMPIAIJSetPreallocation(A, 19, nullptr, 19, nullptr);
 
-	for (auto pinfo : domain->getPatchInfoVector()) {
+	for (auto pinfo : domain.getPatchInfoVector()) {
 		addCenterCoefficients(A, pinfo);
 		addWestCoefficients(A, pinfo);
 		addEastCoefficients(A, pinfo);

@@ -50,8 +50,8 @@ class MockPatchOperator : public PatchOperator<D>
 	std::shared_ptr<int>  num_apply_calls    = std::make_shared<int>(0);
 
 	public:
-	MockPatchOperator(std::shared_ptr<const Domain<D>> domain,
-	                  const GhostFiller<D> &           ghost_filler)
+	MockPatchOperator(const Domain<D> &     domain,
+	                  const GhostFiller<D> &ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
@@ -104,8 +104,8 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	std::shared_ptr<bool> interior_dirichlet = std::make_shared<bool>(false);
 
 	public:
-	NonLinMockPatchOperator(std::shared_ptr<const Domain<D>> domain,
-	                        const GhostFiller<D> &           ghost_filler)
+	NonLinMockPatchOperator(const Domain<D> &     domain,
+	                        const GhostFiller<D> &ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}

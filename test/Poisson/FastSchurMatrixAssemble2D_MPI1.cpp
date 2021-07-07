@@ -51,7 +51,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws exception for non-square pa
 	int                       num_ghost = 1;
 	bitset<4>                 neumann;
 	DomainReader<2>           domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Domain<2>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
 	BiQuadraticGhostFiller        gf(d_fine, GhostFillingType::Faces);
@@ -84,7 +84,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws with unsupported ghost fill
 	int                       num_ghost = 1;
 	bitset<4>                 neumann;
 	DomainReader<2>           domain_reader(mesh_file, {10, 10}, num_ghost);
-	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Domain<2>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
 	MockGhostFiller<2>            gf;
@@ -103,7 +103,7 @@ TEST_CASE(
 	int                       num_ghost = 1;
 	bitset<4>                 neumann;
 	DomainReader<2>           domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Domain<2>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
 	Vector<1> f_vec          = iface_domain.getNewVector();
@@ -159,7 +159,7 @@ TEST_CASE(
 	int                       num_ghost = 1;
 	bitset<4>                 neumann   = 0xF;
 	DomainReader<2>           domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Domain<2>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
 	auto f_vec          = iface_domain.getNewVector();
@@ -212,7 +212,7 @@ TEST_CASE(
 	int                       num_ghost = 1;
 	bitset<4>                 neumann;
 	DomainReader<2>           domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Domain<2>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
 	auto f_vec          = iface_domain.getNewVector();
@@ -265,7 +265,7 @@ TEST_CASE(
 	int                       num_ghost = 1;
 	bitset<4>                 neumann   = 0xF;
 	DomainReader<2>           domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Domain<2>                 d_fine = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
 	auto f_vec          = iface_domain.getNewVector();

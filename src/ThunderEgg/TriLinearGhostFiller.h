@@ -63,7 +63,7 @@ class TriLinearGhostFiller : public MPIGhostFiller<3>
 	 * @param domain the domain on which ghosts will be filled
 	 * @param fill_type the ghost filling type to perform
 	 */
-	TriLinearGhostFiller(std::shared_ptr<const Domain<3>> domain, GhostFillingType fill_type);
+	TriLinearGhostFiller(const Domain<3> &domain, GhostFillingType fill_type);
 	/**
 	 * @brief Clone this TriLienarGhostFiller
 	 *
