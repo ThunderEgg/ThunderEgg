@@ -131,18 +131,21 @@ template <int D> class Level
 	 *
 	 * @param smoother the smoother
 	 */
-	void setSmoother(std::shared_ptr<const Smoother<D>> smoother)
+	void setSmoother(const Smoother<D> &smoother)
 	{
-		this->smoother = smoother;
+		this->smoother.reset(smoother.clone());
 	}
 	/**
 	 * @brief Get smoother operator for this level.
 	 *
 	 * @return Pointer to the smoother operator.
 	 */
-	std::shared_ptr<const Smoother<D>> getSmoother() const
+	const Smoother<D> &getSmoother() const
 	{
-		return smoother;
+		if (smoother == nullptr) {
+			throw RuntimeError("This level does not have a smoother");
+		}
+		return *smoother;
 	}
 	/**
 	 * @brief Set pointer to the coarser level.

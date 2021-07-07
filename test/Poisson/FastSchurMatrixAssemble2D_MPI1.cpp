@@ -46,17 +46,17 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws exception for non-square pa
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   nx        = GENERATE(5, 8);
-	int                   ny        = GENERATE(7, 10);
-	int                   num_ghost = 1;
-	bitset<4>             neumann;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
+	int                       nx        = GENERATE(5, 8);
+	int                       ny        = GENERATE(7, 10);
+	int                       num_ghost = 1;
+	bitset<4>                 neumann;
+	DomainReader<2>           domain_reader(mesh_file, {nx, ny}, num_ghost);
+	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
-	auto gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
+	auto                        gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto                        p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
+	Poisson::FFTWPatchSolver<2> p_solver(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver), RuntimeError);
 }
@@ -77,15 +77,15 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws with unsupported ghost fill
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   num_ghost = 1;
-	bitset<4>             neumann;
-	DomainReader<2>       domain_reader(mesh_file, {10, 10}, num_ghost);
-	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
+	int                       num_ghost = 1;
+	bitset<4>                 neumann;
+	DomainReader<2>           domain_reader(mesh_file, {10, 10}, num_ghost);
+	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
-	auto gf         = make_shared<MockGhostFiller<2>>();
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
+	auto                        gf         = make_shared<MockGhostFiller<2>>();
+	auto                        p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
+	Poisson::FFTWPatchSolver<2> p_solver(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver), RuntimeError);
 }
@@ -95,20 +95,20 @@ TEST_CASE(
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 1;
-	bitset<4>             neumann;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
+	int                       n         = 32;
+	int                       num_ghost = 1;
+	bitset<4>                 neumann;
+	DomainReader<2>           domain_reader(mesh_file, {n, n}, num_ghost);
+	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
-	Vector<1> f_vec          = iface_domain->getNewVector();
-	Vector<1> f_vec_expected = iface_domain->getNewVector();
+	Vector<1> f_vec          = iface_domain.getNewVector();
+	Vector<1> f_vec_expected = iface_domain.getNewVector();
 
-	Vector<1> g_vec = iface_domain->getNewVector();
+	Vector<1> g_vec = iface_domain.getNewVector();
 
 	int index = 0;
-	for (auto iface_info : iface_domain->getInterfaces()) {
+	for (auto iface_info : iface_domain.getInterfaces()) {
 		View<double, 1> view = g_vec.getComponentView(0, iface_info->local_index);
 		for (int i = 0; i < n; i++) {
 			double x = (index + 0.5) / g_vec.getNumLocalCells();
@@ -117,11 +117,11 @@ TEST_CASE(
 		}
 	}
 
-	auto gf               = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
-	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
-	p_solver_wrapper->apply(g_vec, f_vec_expected);
+	auto                         gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto                         p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
+	Poisson::FFTWPatchSolver<2>  p_solver(p_operator, neumann);
+	Schur::PatchSolverWrapper<2> p_solver_wrapper(iface_domain, p_solver);
+	p_solver_wrapper.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Mat  A          = Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver);
@@ -132,7 +132,7 @@ TEST_CASE(
 	CHECK(f_vec.twoNorm() == Catch::Approx(f_vec_expected.twoNorm()));
 	REQUIRE(f_vec.infNorm() > 0);
 
-	for (auto iface : iface_domain->getInterfaces()) {
+	for (auto iface : iface_domain.getInterfaces()) {
 		INFO("ID: " << iface->id);
 		INFO("LOCAL_INDEX: " << iface->local_index);
 		INFO("type: " << iface->patches.size());
@@ -151,20 +151,20 @@ TEST_CASE(
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 1;
-	bitset<4>             neumann   = 0xF;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
+	int                       n         = 32;
+	int                       num_ghost = 1;
+	bitset<4>                 neumann   = 0xF;
+	DomainReader<2>           domain_reader(mesh_file, {n, n}, num_ghost);
+	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
-	auto f_vec          = iface_domain->getNewVector();
-	auto f_vec_expected = iface_domain->getNewVector();
+	auto f_vec          = iface_domain.getNewVector();
+	auto f_vec_expected = iface_domain.getNewVector();
 
-	Vector<1> g_vec = iface_domain->getNewVector();
+	Vector<1> g_vec = iface_domain.getNewVector();
 
 	int index = 0;
-	for (auto iface_info : iface_domain->getInterfaces()) {
+	for (auto iface_info : iface_domain.getInterfaces()) {
 		View<double, 1> view = g_vec.getComponentView(0, iface_info->local_index);
 		for (int i = 0; i < n; i++) {
 			double x = (index + 0.5) / g_vec.getNumLocalCells();
@@ -173,11 +173,11 @@ TEST_CASE(
 		}
 	}
 
-	auto gf               = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
-	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
-	p_solver_wrapper->apply(g_vec, f_vec_expected);
+	auto                         gf         = make_shared<BiLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto                         p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
+	Poisson::FFTWPatchSolver<2>  p_solver(p_operator, neumann);
+	Schur::PatchSolverWrapper<2> p_solver_wrapper(iface_domain, p_solver);
+	p_solver_wrapper.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Mat  A          = Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver);
@@ -204,20 +204,20 @@ TEST_CASE(
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 1;
-	bitset<4>             neumann;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
+	int                       n         = 32;
+	int                       num_ghost = 1;
+	bitset<4>                 neumann;
+	DomainReader<2>           domain_reader(mesh_file, {n, n}, num_ghost);
+	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
-	auto f_vec          = iface_domain->getNewVector();
-	auto f_vec_expected = iface_domain->getNewVector();
+	auto f_vec          = iface_domain.getNewVector();
+	auto f_vec_expected = iface_domain.getNewVector();
 
-	Vector<1> g_vec = iface_domain->getNewVector();
+	Vector<1> g_vec = iface_domain.getNewVector();
 
 	int index = 0;
-	for (auto iface_info : iface_domain->getInterfaces()) {
+	for (auto iface_info : iface_domain.getInterfaces()) {
 		View<double, 1> view = g_vec.getComponentView(0, iface_info->local_index);
 		for (int i = 0; i < n; i++) {
 			double x = (index + 0.5) / g_vec.getNumLocalCells();
@@ -226,11 +226,11 @@ TEST_CASE(
 		}
 	}
 
-	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
-	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
-	p_solver_wrapper->apply(g_vec, f_vec_expected);
+	auto                         gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto                         p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf);
+	Poisson::FFTWPatchSolver<2>  p_solver(p_operator, neumann);
+	Schur::PatchSolverWrapper<2> p_solver_wrapper(iface_domain, p_solver);
+	p_solver_wrapper.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Mat  A          = Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver);
@@ -257,20 +257,20 @@ TEST_CASE(
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 1;
-	bitset<4>             neumann   = 0xF;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<2>>(d_fine);
+	int                       n         = 32;
+	int                       num_ghost = 1;
+	bitset<4>                 neumann   = 0xF;
+	DomainReader<2>           domain_reader(mesh_file, {n, n}, num_ghost);
+	shared_ptr<Domain<2>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<2> iface_domain(d_fine);
 
-	auto f_vec          = iface_domain->getNewVector();
-	auto f_vec_expected = iface_domain->getNewVector();
+	auto f_vec          = iface_domain.getNewVector();
+	auto f_vec_expected = iface_domain.getNewVector();
 
-	Vector<1> g_vec = iface_domain->getNewVector();
+	Vector<1> g_vec = iface_domain.getNewVector();
 
 	int index = 0;
-	for (auto iface_info : iface_domain->getInterfaces()) {
+	for (auto iface_info : iface_domain.getInterfaces()) {
 		View<double, 1> view = g_vec.getComponentView(0, iface_info->local_index);
 		for (int i = 0; i < n; i++) {
 			double x = (index + 0.5) / g_vec.getNumLocalCells();
@@ -279,11 +279,11 @@ TEST_CASE(
 		}
 	}
 
-	auto gf               = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator       = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<2>>(p_operator, neumann);
-	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<2>>(iface_domain, p_solver);
-	p_solver_wrapper->apply(g_vec, f_vec_expected);
+	auto                         gf         = make_shared<BiQuadraticGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto                         p_operator = make_shared<Poisson::StarPatchOperator<2>>(d_fine, gf, true);
+	Poisson::FFTWPatchSolver<2>  p_solver(p_operator, neumann);
+	Schur::PatchSolverWrapper<2> p_solver_wrapper(iface_domain, p_solver);
+	p_solver_wrapper.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Mat  A          = Poisson::FastSchurMatrixAssemble2D(iface_domain, p_solver);

@@ -375,6 +375,15 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 			addPatch(pinfo);
 		}
 	}
+	/**
+	 * @brief Clone this patch solver
+	 *
+	 * @return DFTPatchSolver<D>* a newly allocated copy of this patch solver
+	 */
+	DFTPatchSolver<D> *clone() const override
+	{
+		return new DFTPatchSolver<D>(*this);
+	}
 	void solveSinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &f_view, const PatchView<double, D> &u_view) const override
 	{
 		PatchArray<D> f_copy(op->getDomain()->getNs(), 1, 0);

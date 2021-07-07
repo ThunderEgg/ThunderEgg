@@ -66,6 +66,12 @@ template <int D> class PatchSolver : public virtual Operator<D>, public virtual 
 	 */
 	virtual ~PatchSolver() {}
 	/**
+	 * @brief Clone this patch solver
+	 *
+	 * @return PatchSolver<D>* a newly allocated copy of this patch solver
+	 */
+	virtual PatchSolver<D> *clone() const override = 0;
+	/**
 	 * @brief Get the Domain object
 	 *
 	 * @return std::shared_ptr<const Domain<D>> the Domain

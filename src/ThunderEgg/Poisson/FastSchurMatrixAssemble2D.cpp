@@ -302,10 +302,10 @@ void FillBlockColumnForFineToCoarseInterface(int                                
  * @param iface_domain the InterfaceDomain
  * @return vector<set<Block>> the vector of blocks
  */
-vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<2>> iface_domain, std::bitset<4> neumann)
+vector<set<Block>> GetBlocks(const InterfaceDomain<2> &iface_domain, std::bitset<4> neumann)
 {
 	map<unsigned long, set<Block>> bc_to_blocks;
-	for (auto iface : iface_domain->getInterfaces()) {
+	for (auto iface : iface_domain.getInterfaces()) {
 		int i = iface->global_index;
 		for (auto patch : iface->patches) {
 			Side<2>                  aux   = patch.side;
@@ -339,11 +339,11 @@ vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<2>> iface_domain, 
  * @param pinfo the patchinfo that has to be solved on
  * @param solver the patch solver
  */
-template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<2> &pinfo, std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver)
+template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<2> &pinfo, Poisson::FFTWPatchSolver<2> &solver)
 {
-	auto ns           = solver->getDomain()->getNs();
+	auto ns           = solver.getDomain()->getNs();
 	int  n            = ns[0];
-	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<2>>(solver->getGhostFiller());
+	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<2>>(solver.getGhostFiller());
 	for (int j = 0; j < n; j++) {
 		// create some work vectors
 		auto                 u_vec         = make_shared<Vector<2>>(Communicator(MPI_COMM_SELF), ns, 1, 1, 1);
@@ -354,7 +354,7 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 
 		u_west_ghosts(j, 0) = 2;
 
-		solver->solveSinglePatch(pinfo, f_view, u_view);
+		solver.solveSinglePatch(pinfo, f_view, u_view);
 
 		u_west_ghosts(j, 0) = 0;
 
@@ -397,13 +397,12 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
  * @param solver the PatchSolver
  * @param insertBlock the Inserter
  */
-template <class Inserter>
-void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>> iface_domain, std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver, Inserter insertBlock)
+template <class Inserter> void assembleMatrix(const InterfaceDomain<2> &iface_domain, Poisson::FFTWPatchSolver<2> &solver, Inserter insertBlock)
 {
-	auto ns = iface_domain->getDomain()->getNs();
+	auto ns = iface_domain.getDomain()->getNs();
 	int  n  = ns[0];
 
-	for (const set<Block> &blocks : GetBlocks(iface_domain, solver->getNeumann())) {
+	for (const set<Block> &blocks : GetBlocks(iface_domain, solver.getNeumann())) {
 		// create domain representing curr_type
 		PatchInfo<2> pinfo;
 		pinfo.setNbrInfo(Side<2>::west(), new NormalNbrInfo<1>());
@@ -419,7 +418,7 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>> iface_domain, std:
 			}
 		}
 
-		solver->addPatch(pinfo);
+		solver.addPatch(pinfo);
 
 		std::vector<std::shared_ptr<PatchIfaceInfo<2>>> single_domain;
 		single_domain.push_back(piinfo);
@@ -445,22 +444,21 @@ void assembleMatrix(std::shared_ptr<const InterfaceDomain<2>> iface_domain, std:
 	}
 }
 } // namespace
-Mat ThunderEgg::Poisson::FastSchurMatrixAssemble2D(std::shared_ptr<const InterfaceDomain<2>>    iface_domain,
-                                                   std::shared_ptr<Poisson::FFTWPatchSolver<2>> solver)
+Mat ThunderEgg::Poisson::FastSchurMatrixAssemble2D(const InterfaceDomain<2> &iface_domain, Poisson::FFTWPatchSolver<2> &solver)
 {
-	array<int, 2> ns = iface_domain->getDomain()->getNs();
+	array<int, 2> ns = iface_domain.getDomain()->getNs();
 	if (ns[0] != ns[1]) {
 		throw RuntimeError("FastSchurMatrixAssembler2D does not support non-square patches");
 	}
-	if (dynamic_pointer_cast<const BiLinearGhostFiller>(solver->getGhostFiller()) == nullptr
-	    && dynamic_pointer_cast<const BiQuadraticGhostFiller>(solver->getGhostFiller()) == nullptr) {
+	if (dynamic_pointer_cast<const BiLinearGhostFiller>(solver.getGhostFiller()) == nullptr
+	    && dynamic_pointer_cast<const BiQuadraticGhostFiller>(solver.getGhostFiller()) == nullptr) {
 		throw RuntimeError("FastSchurMatrixAssembler2D only supports BiLinearGhostFiller and BiQuadraticGhostFiller");
 	}
 	int n = ns[0];
 	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
-	int local_size  = iface_domain->getNumLocalInterfaces() * n;
-	int global_size = iface_domain->getNumGlobalInterfaces() * n;
+	int local_size  = iface_domain.getNumLocalInterfaces() * n;
+	int global_size = iface_domain.getNumGlobalInterfaces() * n;
 	MatSetSizes(A, local_size, local_size, global_size, global_size);
 	MatSetType(A, MATMPIAIJ);
 	MatMPIAIJSetPreallocation(A, 19 * n, nullptr, 19 * n, nullptr);

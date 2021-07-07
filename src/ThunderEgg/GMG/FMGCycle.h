@@ -42,11 +42,11 @@ template <int D> class FMGCycle : public Cycle<D>
 	{
 		if (level.coarsest()) {
 			for (int i = 0; i < num_coarse_sweeps; i++) {
-				level.getSmoother()->smooth(f, u);
+				level.getSmoother().smooth(f, u);
 			}
 		} else {
 			for (int i = 0; i < num_pre_sweeps; i++) {
-				level.getSmoother()->smooth(f, u);
+				level.getSmoother().smooth(f, u);
 			}
 
 			Vector<D> coarser_f = this->restrict(level, f, u);
@@ -59,7 +59,7 @@ template <int D> class FMGCycle : public Cycle<D>
 			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
 			for (int i = 0; i < num_post_sweeps; i++) {
-				level.getSmoother()->smooth(f, u);
+				level.getSmoother().smooth(f, u);
 			}
 		}
 	}
@@ -75,11 +75,11 @@ template <int D> class FMGCycle : public Cycle<D>
 	{
 		if (level.coarsest()) {
 			for (int i = 0; i < num_coarse_sweeps; i++) {
-				level.getSmoother()->smooth(f, u);
+				level.getSmoother().smooth(f, u);
 			}
 		} else {
 			for (int i = 0; i < num_pre_sweeps; i++) {
-				level.getSmoother()->smooth(f, u);
+				level.getSmoother().smooth(f, u);
 			}
 
 			Vector<D> coarser_f = this->restrict(level, f, u);
@@ -92,7 +92,7 @@ template <int D> class FMGCycle : public Cycle<D>
 			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
 			for (int i = 0; i < num_mid_sweeps; i++) {
-				level.getSmoother()->smooth(f, u);
+				level.getSmoother().smooth(f, u);
 			}
 
 			coarser_f = this->restrict(level, f, u);
@@ -102,7 +102,7 @@ template <int D> class FMGCycle : public Cycle<D>
 			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
 			for (int i = 0; i < num_post_sweeps; i++) {
-				level.getSmoother()->smooth(f, u);
+				level.getSmoother().smooth(f, u);
 			}
 		}
 	}

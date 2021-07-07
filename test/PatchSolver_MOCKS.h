@@ -61,6 +61,10 @@ class MockPatchSolver : public PatchSolver<D>
 			patches_to_be_called.insert(&pinfo);
 		}
 	}
+	MockPatchSolver<D> *clone() const override
+	{
+		return new MockPatchSolver<D>(*this);
+	}
 	void solveSinglePatch(const PatchInfo<D> &              pinfo,
 	                      const PatchView<const double, D> &fs,
 	                      const PatchView<double, D> &      us) const override

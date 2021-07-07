@@ -37,6 +37,12 @@ template <int D> class Smoother
 	 */
 	virtual ~Smoother() {}
 	/**
+	 * @brief Clone this smoother
+	 *
+	 * @return Smoother<D>* a newly allocated copy of this smoother
+	 */
+	virtual Smoother<D> *clone() const = 0;
+	/**
 	 * @brief Virtual function that derived classes have to implement.
 	 *
 	 * @param f the RHS vector

@@ -65,14 +65,14 @@ template <int D> class PatchSolverWrapper : public Operator<D - 1>
 	 * @param iface_domain the InterfaceDomain for the Schur compliment system
 	 * @param solver the PatchSolver to wrap
 	 */
-	PatchSolverWrapper(std::shared_ptr<const InterfaceDomain<D>> iface_domain, std::shared_ptr<const PatchSolver<D>> solver)
-	: iface_domain(iface_domain),
-	  solver(solver),
+	PatchSolverWrapper(const InterfaceDomain<D> &iface_domain, const PatchSolver<D> &solver)
+	: iface_domain(std::make_shared<InterfaceDomain<D>>(iface_domain)),
+	  solver(solver.clone()),
 	  scatter(iface_domain)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
+		for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
 			for (Side<D> s : Side<D>::getValues()) {
 				if (piinfo->pinfo.hasNbr(s) && piinfo->getIfaceInfo(s)->rank != rank) {
 					patches_with_ifaces_on_neighbor_rank.push_back(piinfo);

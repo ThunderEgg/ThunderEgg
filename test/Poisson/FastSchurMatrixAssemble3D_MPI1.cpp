@@ -46,18 +46,18 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws exception for non-square pa
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   nx        = GENERATE(2, 8);
-	int                   ny        = GENERATE(4, 10);
-	int                   nz        = GENERATE(6, 12);
-	int                   num_ghost = 1;
-	bitset<6>             neumann;
-	DomainReader<3>       domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
-	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
+	int                       nx        = GENERATE(2, 8);
+	int                       ny        = GENERATE(4, 10);
+	int                       nz        = GENERATE(6, 12);
+	int                       num_ghost = 1;
+	bitset<6>                 neumann;
+	DomainReader<3>           domain_reader(mesh_file, {nx, ny, nz}, num_ghost);
+	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
-	auto gf         = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
+	auto                        gf         = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto                        p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
+	Poisson::FFTWPatchSolver<3> p_solver(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver), RuntimeError);
 }
@@ -78,15 +78,15 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws with unsupported ghost fill
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   num_ghost = 1;
-	bitset<6>             neumann;
-	DomainReader<3>       domain_reader(mesh_file, {10, 10, 10}, num_ghost);
-	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
+	int                       num_ghost = 1;
+	bitset<6>                 neumann;
+	DomainReader<3>           domain_reader(mesh_file, {10, 10, 10}, num_ghost);
+	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
-	auto gf         = make_shared<MockGhostFiller<3>>();
-	auto p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	auto p_solver   = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
+	auto                        gf         = make_shared<MockGhostFiller<3>>();
+	auto                        p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
+	Poisson::FFTWPatchSolver<3> p_solver(p_operator, neumann);
 
 	CHECK_THROWS_AS(Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver), RuntimeError);
 }
@@ -96,19 +96,19 @@ TEST_CASE(
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 4;
-	int                   num_ghost = 1;
-	bitset<6>             neumann;
-	DomainReader<3>       domain_reader(mesh_file, {n, n, n}, num_ghost);
-	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
+	int                       n         = 4;
+	int                       num_ghost = 1;
+	bitset<6>                 neumann;
+	DomainReader<3>           domain_reader(mesh_file, {n, n, n}, num_ghost);
+	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
-	Vector<2> f_vec          = iface_domain->getNewVector();
-	Vector<2> g_vec          = iface_domain->getNewVector();
-	Vector<2> f_vec_expected = iface_domain->getNewVector();
+	Vector<2> f_vec          = iface_domain.getNewVector();
+	Vector<2> g_vec          = iface_domain.getNewVector();
+	Vector<2> f_vec_expected = iface_domain.getNewVector();
 
 	int index = 0;
-	for (auto iface_info : iface_domain->getInterfaces()) {
+	for (auto iface_info : iface_domain.getInterfaces()) {
 		View<double, 2> view = g_vec.getComponentView(0, iface_info->local_index);
 		for (int j = 0; j < n; j++) {
 			for (int i = 0; i < n; i++) {
@@ -119,11 +119,11 @@ TEST_CASE(
 		}
 	}
 
-	auto gf               = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator       = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
-	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<3>>(iface_domain, p_solver);
-	p_solver_wrapper->apply(g_vec, f_vec_expected);
+	auto                         gf         = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto                         p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf);
+	Poisson::FFTWPatchSolver<3>  p_solver(p_operator, neumann);
+	Schur::PatchSolverWrapper<3> p_solver_wrapper(iface_domain, p_solver);
+	p_solver_wrapper.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Mat A = Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver);
@@ -143,7 +143,7 @@ TEST_CASE(
 	CHECK(f_vec.twoNorm() == Catch::Approx(f_vec_expected.twoNorm()));
 	REQUIRE(f_vec.infNorm() > 0);
 
-	for (auto iface : iface_domain->getInterfaces()) {
+	for (auto iface : iface_domain.getInterfaces()) {
 		INFO("ID: " << iface->id);
 		INFO("LOCAL_INDEX: " << iface->local_index);
 		INFO("type: " << iface->patches.size());
@@ -162,20 +162,20 @@ TEST_CASE(
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 4;
-	int                   num_ghost = 1;
-	bitset<6>             neumann   = 0xFF;
-	DomainReader<3>       domain_reader(mesh_file, {n, n, n}, num_ghost);
-	shared_ptr<Domain<3>> d_fine       = domain_reader.getFinerDomain();
-	auto                  iface_domain = make_shared<Schur::InterfaceDomain<3>>(d_fine);
+	int                       n         = 4;
+	int                       num_ghost = 1;
+	bitset<6>                 neumann   = 0xFF;
+	DomainReader<3>           domain_reader(mesh_file, {n, n, n}, num_ghost);
+	shared_ptr<Domain<3>>     d_fine = domain_reader.getFinerDomain();
+	Schur::InterfaceDomain<3> iface_domain(d_fine);
 
-	Vector<2> f_vec          = iface_domain->getNewVector();
-	Vector<2> f_vec_expected = iface_domain->getNewVector();
+	Vector<2> f_vec          = iface_domain.getNewVector();
+	Vector<2> f_vec_expected = iface_domain.getNewVector();
 
-	Vector<2> g_vec = iface_domain->getNewVector();
+	Vector<2> g_vec = iface_domain.getNewVector();
 
 	int index = 0;
-	for (auto iface_info : iface_domain->getInterfaces()) {
+	for (auto iface_info : iface_domain.getInterfaces()) {
 		View<double, 2> view = g_vec.getComponentView(0, iface_info->local_index);
 		for (int j = 0; j < n; j++) {
 			for (int i = 0; i < n; i++) {
@@ -186,11 +186,11 @@ TEST_CASE(
 		}
 	}
 
-	auto gf               = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
-	auto p_operator       = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf, true);
-	auto p_solver         = make_shared<Poisson::FFTWPatchSolver<3>>(p_operator, neumann);
-	auto p_solver_wrapper = make_shared<Schur::PatchSolverWrapper<3>>(iface_domain, p_solver);
-	p_solver_wrapper->apply(g_vec, f_vec_expected);
+	auto                         gf         = make_shared<TriLinearGhostFiller>(d_fine, GhostFillingType::Faces);
+	auto                         p_operator = make_shared<Poisson::StarPatchOperator<3>>(d_fine, gf, true);
+	Poisson::FFTWPatchSolver<3>  p_solver(p_operator, neumann);
+	Schur::PatchSolverWrapper<3> p_solver_wrapper(iface_domain, p_solver);
+	p_solver_wrapper.apply(g_vec, f_vec_expected);
 
 	// generate matrix with matrix_helper
 	Mat  A          = Poisson::FastSchurMatrixAssemble3D(iface_domain, p_solver);

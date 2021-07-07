@@ -110,14 +110,14 @@ template <int D> class PatchIfaceScatter
 	 *
 	 * @param iface_domain the InterfaceDomain
 	 */
-	void setIncomingBufferMapsAndDetermineLocalVectorSize(std::shared_ptr<const InterfaceDomain<D>> iface_domain)
+	void setIncomingBufferMapsAndDetermineLocalVectorSize(const InterfaceDomain<D> &iface_domain)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 		std::map<int, std::set<std::pair<int, int>>> incoming_ranks_to_id_local_index_pairs;
 
-		for (auto piinfo : iface_domain->getPatchIfaceInfos()) {
+		for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
 			for (Side<D> s : Side<D>::getValues()) {
 				if (piinfo->pinfo.hasNbr(s)) {
 					auto iface_info = piinfo->getIfaceInfo(s);
@@ -131,7 +131,7 @@ template <int D> class PatchIfaceScatter
 		for (auto rank_to_id_local_index_pairs : incoming_ranks_to_id_local_index_pairs) {
 			local_vector_size += rank_to_id_local_index_pairs.second.size();
 		}
-		local_vector_size += iface_domain->getNumLocalInterfaces();
+		local_vector_size += iface_domain.getNumLocalInterfaces();
 		num_local_patch_ifaces = local_vector_size;
 
 		num_recvs = incoming_ranks_to_id_local_index_pairs.size();
@@ -158,13 +158,13 @@ template <int D> class PatchIfaceScatter
 	 *
 	 * @param iface_domain the InterfaceDomain
 	 */
-	void setOutgoingBufferMaps(std::shared_ptr<const InterfaceDomain<D>> iface_domain)
+	void setOutgoingBufferMaps(const InterfaceDomain<D> &iface_domain)
 	{
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 		std::map<int, std::set<std::pair<int, int>>> outgoing_ranks_to_id_local_index_pairs;
-		for (auto iface : iface_domain->getInterfaces()) {
+		for (auto iface : iface_domain.getInterfaces()) {
 			for (auto patch : iface->patches) {
 				if ((patch.type.isNormal() || patch.type.isFineToFine() || patch.type.isCoarseToCoarse()) && patch.piinfo->pinfo.rank != rank) {
 					outgoing_ranks_to_id_local_index_pairs[patch.piinfo->pinfo.rank].emplace(iface->id, iface->local_index);
@@ -223,9 +223,9 @@ template <int D> class PatchIfaceScatter
 	 *
 	 * @param iface_domain the InterfaceDomain
 	 */
-	explicit PatchIfaceScatter(std::shared_ptr<const InterfaceDomain<D>> iface_domain)
+	explicit PatchIfaceScatter(const InterfaceDomain<D> &iface_domain)
 	{
-		std::array<int, D> ns = iface_domain->getDomain()->getNs();
+		std::array<int, D> ns = iface_domain.getDomain()->getNs();
 		for (int i = 1; i < D; i++) {
 			if (ns[0] != ns[i]) {
 				throw RuntimeError("Cannot form Schur compliment vector for Domain with non-square patches");

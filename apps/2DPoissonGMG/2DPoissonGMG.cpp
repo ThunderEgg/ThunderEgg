@@ -321,11 +321,11 @@ int main(int argc, char *argv[])
 	shared_ptr<PatchSolver<2>> finest_smoother;
 	bitset<4>                  neumann_bitset = neumann ? 0xF : 0x0;
 	if (patch_solver == "dft") {
-		finest_smoother = make_shared<DFTPatchSolver<2>>(patch_operator, neumann_bitset);
+		finest_smoother.reset(new DFTPatchSolver<2>(patch_operator, neumann_bitset));
 	} else if (patch_solver == "fftw") {
-		finest_smoother = make_shared<FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
+		finest_smoother.reset(new FFTWPatchSolver<2>(patch_operator, neumann_bitset));
 	} else {
-		finest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, *patch_operator);
+		finest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, *patch_operator));
 	}
 
 	std::shared_ptr<Operator<2>> M;
@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
 		GMG::LinearRestrictor<2> finest_restrictor(*domain, *coarser_domain);
 
 		//add the finest level
-		builder.addFinestLevel(patch_operator, finest_smoother, finest_restrictor);
+		builder.addFinestLevel(patch_operator, *finest_smoother, finest_restrictor);
 
 		shared_ptr<Domain<2>> finer_domain   = domain;
 		shared_ptr<Domain<2>> current_domain = coarser_domain;
@@ -354,13 +354,13 @@ int main(int argc, char *argv[])
 			auto middle_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, middle_ghost_filler);
 
 			// smoother
-			shared_ptr<GMG::Smoother<2>> middle_smoother;
+			unique_ptr<GMG::Smoother<2>> middle_smoother;
 			if (patch_solver == "dft") {
-				middle_smoother = make_shared<DFTPatchSolver<2>>(middle_patch_operator, neumann_bitset);
+				middle_smoother.reset(new DFTPatchSolver<2>(middle_patch_operator, neumann_bitset));
 			} else if (patch_solver == "fftw") {
-				middle_smoother = make_shared<FFTWPatchSolver<2>>(middle_patch_operator, neumann_bitset);
+				middle_smoother.reset(new FFTWPatchSolver<2>(middle_patch_operator, neumann_bitset));
 			} else {
-				middle_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, *middle_patch_operator);
+				middle_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, *middle_patch_operator));
 			}
 
 			// restrictor and interpolator
@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
 			GMG::LinearRestrictor<2>   restrictor(*current_domain, *coarser_domain);
 
 			// add the middle level
-			builder.addIntermediateLevel(middle_patch_operator, middle_smoother, restrictor, interpolator);
+			builder.addIntermediateLevel(middle_patch_operator, *middle_smoother, restrictor, interpolator);
 
 			finer_domain   = current_domain;
 			current_domain = coarser_domain;
@@ -382,20 +382,20 @@ int main(int argc, char *argv[])
 		shared_ptr<PatchOperator<2>> coarsest_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, coarsest_ghost_filler);
 
 		// smoother
-		shared_ptr<GMG::Smoother<2>> coarsest_smoother;
+		unique_ptr<GMG::Smoother<2>> coarsest_smoother;
 		if (patch_solver == "dft") {
-			coarsest_smoother = make_shared<DFTPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
+			coarsest_smoother.reset(new DFTPatchSolver<2>(coarsest_patch_operator, neumann_bitset));
 		} else if (patch_solver == "fftw") {
-			coarsest_smoother = make_shared<FFTWPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
+			coarsest_smoother.reset(new FFTWPatchSolver<2>(coarsest_patch_operator, neumann_bitset));
 		} else {
-			coarsest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, *coarsest_patch_operator);
+			coarsest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, *coarsest_patch_operator));
 		}
 
 		// coarsets level only needs an interpolator
 		GMG::DirectInterpolator<2> interpolator(*current_domain, *finer_domain);
 
 		// add the coarsest level
-		builder.addCoarsestLevel(coarsest_patch_operator, coarsest_smoother, interpolator);
+		builder.addCoarsestLevel(coarsest_patch_operator, *coarsest_smoother, interpolator);
 
 		// get the preconditioner operator
 		M = builder.getCycle();

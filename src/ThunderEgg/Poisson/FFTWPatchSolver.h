@@ -28,6 +28,7 @@
 #include <bitset>
 #include <fftw3.h>
 #include <map>
+
 namespace ThunderEgg
 {
 namespace Poisson
@@ -53,23 +54,11 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 	/**
 	 * @brief Map of patchinfo to DFT plan
 	 */
-	std::map<const PatchInfo<D>, fftw_plan, CompareFunction> plan1;
+	std::map<const PatchInfo<D>, std::shared_ptr<fftw_plan>, CompareFunction> plan1;
 	/**
 	 * @brief Map of patchinfo to inverse DFT plan
 	 */
-	std::map<const PatchInfo<D>, fftw_plan, CompareFunction> plan2;
-	/**
-	 * @brief Temporary copy for the modified right hand side
-	 */
-	mutable PatchArray<D> f_copy;
-	/**
-	 * @brief Temporary work vector
-	 */
-	mutable PatchArray<D> tmp;
-	/*
-	 * @brief Temporary work vector for solution
-	 */
-	mutable PatchArray<D> sol;
+	std::map<const PatchInfo<D>, std::shared_ptr<fftw_plan>, CompareFunction> plan2;
 	/**
 	 * @brief Map of PatchInfo object to it's respective eigenvalue array.
 	 */
@@ -193,9 +182,6 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 	FFTWPatchSolver(std::shared_ptr<const PatchOperator<D>> op, std::bitset<Side<D>::number_of> neumann)
 	: PatchSolver<D>(op->getDomain(), op->getGhostFiller()),
 	  op(op),
-	  f_copy(op->getDomain()->getNs(), 1, 0),
-	  tmp(op->getDomain()->getNs(), 1, 0),
-	  sol(op->getDomain()->getNs(), 1, 0),
 	  neumann(neumann)
 	{
 		CompareFunction compare = [&](const PatchInfo<D> &a, const PatchInfo<D> &b) {
@@ -208,8 +194,8 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 			return std::forward_as_tuple(a_neumann.to_ulong(), a.spacings[0]) < std::forward_as_tuple(b_neumann.to_ulong(), b.spacings[0]);
 		};
 
-		plan1      = std::map<const PatchInfo<D>, fftw_plan, CompareFunction>(compare);
-		plan2      = std::map<const PatchInfo<D>, fftw_plan, CompareFunction>(compare);
+		plan1      = std::map<const PatchInfo<D>, std::shared_ptr<fftw_plan>, CompareFunction>(compare);
+		plan2      = std::map<const PatchInfo<D>, std::shared_ptr<fftw_plan>, CompareFunction>(compare);
 		eigen_vals = std::map<const PatchInfo<D>, PatchArray<D>, CompareFunction>(compare);
 
 		// process patches
@@ -217,13 +203,26 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 			addPatch(pinfo);
 		}
 	}
+	/**
+	 * @brief Clone this patch solver
+	 *
+	 * @return FFTWPatchSolver<D>* a newly allocated copy of this patch solver
+	 */
+	FFTWPatchSolver<D> *clone() const override
+	{
+		return new FFTWPatchSolver<D>(*this);
+	}
 	void solveSinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &f_view, const PatchView<double, D> &u_view) const override
 	{
+		PatchArray<D> f_copy(pinfo.ns, 1, 0);
+		PatchArray<D> tmp(pinfo.ns, 1, 0);
+		PatchArray<D> sol(pinfo.ns, 1, 0);
+
 		loop_over_interior_indexes<D + 1>(f_copy, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
 
 		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy.getView());
 
-		fftw_execute(plan1.at(pinfo));
+		fftw_execute_r2r(*plan1.at(pinfo), &f_copy[f_copy.getStart()], &tmp[tmp.getStart()]);
 
 		const PatchArray<D> &eigen_vals_view = eigen_vals.at(pinfo);
 		loop_over_interior_indexes<D + 1>(tmp, [&](std::array<int, D + 1> coord) { tmp[coord] /= eigen_vals_view[coord]; });
@@ -232,7 +231,7 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 			tmp[tmp.getStart()] = 0;
 		}
 
-		fftw_execute(plan2.at(pinfo));
+		fftw_execute_r2r(*plan2.at(pinfo), &tmp[tmp.getStart()], &sol[sol.getStart()]);
 
 		double scale = 1;
 		for (size_t axis = 0; axis < D; axis++) {
@@ -258,10 +257,37 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 			std::array<fftw_r2r_kind, D> transforms     = getTransformsForPatch(pinfo);
 			std::array<fftw_r2r_kind, D> transforms_inv = getInverseTransformsForPatch(pinfo);
 
-			plan1[pinfo] = fftw_plan_r2r(
-			D, ns_reversed.data(), &f_copy[f_copy.getStart()], &tmp[tmp.getStart()], transforms.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
-			plan2[pinfo] = fftw_plan_r2r(
-			D, ns_reversed.data(), &tmp[tmp.getStart()], &sol[sol.getStart()], transforms_inv.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT);
+			PatchArray<D> f_copy(pinfo.ns, 1, 0);
+			PatchArray<D> tmp(pinfo.ns, 1, 0);
+			PatchArray<D> sol(pinfo.ns, 1, 0);
+
+			fftw_plan *fftw_plan1 = new fftw_plan();
+
+			*fftw_plan1 = fftw_plan_r2r(D,
+			                            ns_reversed.data(),
+			                            &f_copy[f_copy.getStart()],
+			                            &tmp[tmp.getStart()],
+			                            transforms.data(),
+			                            FFTW_MEASURE | FFTW_DESTROY_INPUT | FFTW_UNALIGNED);
+
+			plan1[pinfo] = std::shared_ptr<fftw_plan>(fftw_plan1, [](fftw_plan *plan) {
+				fftw_destroy_plan(*plan);
+				delete plan;
+			});
+
+			fftw_plan *fftw_plan2 = new fftw_plan();
+
+			*fftw_plan2 = fftw_plan_r2r(D,
+			                            ns_reversed.data(),
+			                            &tmp[tmp.getStart()],
+			                            &sol[sol.getStart()],
+			                            transforms_inv.data(),
+			                            FFTW_MEASURE | FFTW_DESTROY_INPUT | FFTW_UNALIGNED);
+
+			plan2[pinfo] = std::shared_ptr<fftw_plan>(fftw_plan2, [](fftw_plan *plan) {
+				fftw_destroy_plan(*plan);
+				delete plan;
+			});
 
 			eigen_vals.emplace(pinfo, getEigenValues(pinfo));
 		}

@@ -359,10 +359,10 @@ void FillBlockColumnForFineToCoarseInterface(int                                
  * @param iface_domain the InterfaceDomain
  * @return vector<set<Block>> the vector of blocks
  */
-vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<3>> iface_domain, std::bitset<6> neumann)
+vector<set<Block>> GetBlocks(const InterfaceDomain<3> &iface_domain, std::bitset<6> neumann)
 {
 	map<unsigned long, set<Block>> bc_to_blocks;
-	for (auto iface : iface_domain->getInterfaces()) {
+	for (auto iface : iface_domain.getInterfaces()) {
 		int i = iface->global_index;
 		for (auto patch : iface->patches) {
 			Side<3>                  aux   = patch.side;
@@ -396,11 +396,11 @@ vector<set<Block>> GetBlocks(shared_ptr<const InterfaceDomain<3>> iface_domain, 
  * @param pinfo the patchinfo that has to be solved on
  * @param solver the patch solver
  */
-template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<3> &pinfo, std::shared_ptr<Poisson::FFTWPatchSolver<3>> solver)
+template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<3> &pinfo, Poisson::FFTWPatchSolver<3> &solver)
 {
-	auto ns           = solver->getDomain()->getNs();
+	auto ns           = solver.getDomain()->getNs();
 	int  n            = ns[0];
-	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<3>>(solver->getGhostFiller());
+	auto ghost_filler = dynamic_pointer_cast<const MPIGhostFiller<3>>(solver.getGhostFiller());
 	for (int yi = 0; yi < n; yi++) {
 		for (int xi = 0; xi < n; xi++) {
 			int j = xi + yi * n;
@@ -413,7 +413,7 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 
 			u_west_ghosts(xi, yi, 0) = 2;
 
-			solver->solveSinglePatch(pinfo, f_view, u_view);
+			solver.solveSinglePatch(pinfo, f_view, u_view);
 
 			u_west_ghosts(xi, yi, 0) = 0;
 
@@ -448,14 +448,12 @@ template <class CoeffMap> void FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<
 	}
 }
 template <class Inserter>
-void AssembleMatrix(std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domain,
-                    std::shared_ptr<Poisson::FFTWPatchSolver<3>>     solver,
-                    Inserter                                         insertBlock)
+void AssembleMatrix(const Schur::InterfaceDomain<3> &iface_domain, Poisson::FFTWPatchSolver<3> &solver, Inserter insertBlock)
 {
-	auto ns = iface_domain->getDomain()->getNs();
+	auto ns = iface_domain.getDomain()->getNs();
 	int  n  = ns[0];
 
-	for (const set<Block> &blocks : GetBlocks(iface_domain, solver->getNeumann())) {
+	for (const set<Block> &blocks : GetBlocks(iface_domain, solver.getNeumann())) {
 		// create domain representing curr_type
 		PatchInfo<3> pinfo;
 		pinfo.setNbrInfo(Side<3>::west(), new NormalNbrInfo<2>());
@@ -467,7 +465,7 @@ void AssembleMatrix(std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domai
 				pinfo.setNbrInfo(s, new NormalNbrInfo<2>());
 			}
 		}
-		solver->addPatch(pinfo);
+		solver.addPatch(pinfo);
 
 		map<Block, shared_ptr<vector<double>>, std::function<bool(const Block &a, const Block &b)>> coeffs(
 		[](const Block &a, const Block &b) { return std::tie(a.aux, a.type) < std::tie(b.aux, b.type); });
@@ -586,21 +584,20 @@ vector<double> FlipBlock(int n, const Block &b, const vector<double> &orig)
 	return copy;
 }
 } // namespace
-Mat ThunderEgg::Poisson::FastSchurMatrixAssemble3D(std::shared_ptr<const Schur::InterfaceDomain<3>> iface_domain,
-                                                   std::shared_ptr<Poisson::FFTWPatchSolver<3>>     solver)
+Mat ThunderEgg::Poisson::FastSchurMatrixAssemble3D(const Schur::InterfaceDomain<3> &iface_domain, Poisson::FFTWPatchSolver<3> &solver)
 {
-	auto ns = iface_domain->getDomain()->getNs();
+	auto ns = iface_domain.getDomain()->getNs();
 	if (ns[0] != ns[1] && ns[0] != ns[2]) {
 		throw RuntimeError("FastSchurMatrixAssemble3D only supports cube shaped patches");
 	}
-	if (dynamic_pointer_cast<const TriLinearGhostFiller>(solver->getGhostFiller()) == nullptr) {
+	if (dynamic_pointer_cast<const TriLinearGhostFiller>(solver.getGhostFiller()) == nullptr) {
 		throw RuntimeError("FastSchurMatrixAssemble3D only supports TriLinearGhostFiller");
 	}
 	Mat A;
 	MatCreate(MPI_COMM_WORLD, &A);
 	int n           = ns[0];
-	int local_size  = iface_domain->getNumLocalInterfaces() * n * n;
-	int global_size = iface_domain->getNumGlobalInterfaces() * n * n;
+	int local_size  = iface_domain.getNumLocalInterfaces() * n * n;
+	int global_size = iface_domain.getNumGlobalInterfaces() * n * n;
 	MatSetSizes(A, local_size, local_size, global_size, global_size);
 	MatSetType(A, MATMPIAIJ);
 	MatMPIAIJSetPreallocation(A, 26 * n * n, nullptr, 26 * n * n, nullptr);

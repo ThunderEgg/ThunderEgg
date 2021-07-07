@@ -115,6 +115,15 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 	  continue_on_breakdown(continue_on_breakdown)
 	{
 	}
+	/**
+	 * @brief Clone this patch solver
+	 *
+	 * @return PatchSolver<D>* a newly allocated copy of this patch solver
+	 */
+	PatchSolver<D> *clone() const override
+	{
+		return new PatchSolver<D>(*this);
+	}
 	void solveSinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &f_view, const PatchView<double, D> &u_view) const override
 	{
 		SinglePatchOp single_op(pinfo, op);
