@@ -92,7 +92,7 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		auto gs = g_vec.getPatchView(pinfo.local_index);
 		auto fs = f_vec.getPatchView(pinfo.local_index);
-		p_operator.modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, gs, fs);
+		p_operator.modifyRHSForInternalBoundaryConditions(pinfo, gs, fs);
 	}
 
 	for (auto pinfo : d_fine.getPatchInfoVector()) {

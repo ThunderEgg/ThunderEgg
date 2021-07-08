@@ -73,7 +73,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 			PatchView<const double, D> x_view = x.getPatchView(0);
 			PatchView<double, D>       b_view = b.getPatchView(0);
 			op->enforceBoundaryConditions(pinfo, x_view);
-			op->enforceZeroDirichletAtInternalBoundaries(pinfo, x_view);
+			op->enforceInternalBoundaryConditions(pinfo, x_view);
 			op->applySinglePatch(pinfo, x_view, b_view);
 		}
 		/**
@@ -156,7 +156,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 
 		Vector<D> f_copy = f_single.getZeroClone();
 		f_copy.copy(f_single);
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy.getPatchView(0));
+		op->modifyRHSForInternalBoundaryConditions(pinfo, u_view, f_copy.getPatchView(0));
 
 		int iterations = 0;
 		try {

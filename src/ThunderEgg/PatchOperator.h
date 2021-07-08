@@ -89,15 +89,15 @@ template <int D> class PatchOperator : public Operator<D>
 	virtual void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const = 0;
 
 	/**
-	 * @brief modify values in ghost cells order to enforce zero dirichlet boundary conditions at the internal patch boundary
+	 * @brief modify values in ghost cells order to enforce the internal boundary conditions
 	 *
 	 * @param pinfo the patch info
 	 * @param u_view the left hand side
 	 */
-	virtual void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const = 0;
+	virtual void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const = 0;
 
 	/**
-	 * @brief Treat the internal patch boundaries as an dirichlet boundary condition, and modify the
+	 * @brief Treat the internal patch boundaries as domain boundaires and modify
 	 * RHS accordingly.
 	 *
 	 * This will be u_viewed in patch solvers to formulate a RHS for the individual patch to solve for.
@@ -106,9 +106,9 @@ template <int D> class PatchOperator : public Operator<D>
 	 * @param u_view the left hand side
 	 * @param f_view the right hand side
 	 */
-	virtual void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
-	                                                           const PatchView<const double, D> &u_view,
-	                                                           const PatchView<double, D> &      f_view) const = 0;
+	virtual void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &u_view,
+	                                                    const PatchView<double, D> &      f_view) const = 0;
 
 	/**
 	 * @brief Apply the operator

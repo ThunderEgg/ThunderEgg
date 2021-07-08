@@ -119,7 +119,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 	}
 
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const override
+	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const override
 	{
 		for (int axis = 0; axis < D; axis++) {
 			Side<D> lower_side(axis * 2);
@@ -137,9 +137,9 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 	}
 
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
-	                                                   const PatchView<const double, D> &u_view,
-	                                                   const PatchView<double, D> &      f_view) const override
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                            const PatchView<const double, D> &u_view,
+	                                            const PatchView<double, D> &      f_view) const override
 	{
 		PatchView<const double, D> c = coeffs.getPatchView(pinfo.local_index);
 		for (Side<D> s : Side<D>::getValues()) {

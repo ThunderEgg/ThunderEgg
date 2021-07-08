@@ -220,7 +220,7 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 
 		loop_over_interior_indexes<D + 1>(f_copy, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
 
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy.getView());
+		op->modifyRHSForInternalBoundaryConditions(pinfo, u_view, f_copy.getView());
 
 		fftw_execute_r2r(*plan1.at(pinfo), &f_copy[f_copy.getStart()], &tmp[tmp.getStart()]);
 

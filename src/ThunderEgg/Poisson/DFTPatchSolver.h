@@ -391,7 +391,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 
 		loop_over_interior_indexes<D + 1>(f_view, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
 
-		op->modifyRHSForZeroDirichletAtInternalBoundaries(pinfo, u_view, f_copy.getView());
+		op->modifyRHSForInternalBoundaryConditions(pinfo, u_view, f_copy.getView());
 
 		executePlan(plan1.at(pinfo), f_copy.getView(), tmp.getView());
 

@@ -68,13 +68,13 @@ class MockPatchOperator : public PatchOperator<D>
 	{
 		*bc_enforced = true;
 	}
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
+	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
 		*interior_dirichlet = true;
 	}
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
-	                                                   const PatchView<const double, D> &us,
-	                                                   const PatchView<double, D> &      fs) const override
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                            const PatchView<const double, D> &us,
+	                                            const PatchView<double, D> &      fs) const override
 	{
 		*rhs_was_modified = true;
 	}
@@ -123,13 +123,13 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	{
 		*bc_enforced = true;
 	}
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
+	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
 		*interior_dirichlet = true;
 	}
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
-	                                                   const PatchView<const double, D> &us,
-	                                                   const PatchView<double, D> &      fs) const override
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                            const PatchView<const double, D> &us,
+	                                            const PatchView<double, D> &      fs) const override
 	{
 		*rhs_was_modified = true;
 	}

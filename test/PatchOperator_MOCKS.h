@@ -85,12 +85,12 @@ class MockPatchOperator : public PatchOperator<D>
 	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
 	}
-	void enforceZeroDirichletAtInternalBoundaries(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
+	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
 	{
 	}
-	void modifyRHSForZeroDirichletAtInternalBoundaries(const PatchInfo<D> &              pinfo,
-	                                                   const PatchView<const double, D> &us,
-	                                                   const PatchView<double, D> &      fs) const override
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                            const PatchView<const double, D> &us,
+	                                            const PatchView<double, D> &      fs) const override
 	{
 	}
 	bool allPatchesCalled()
