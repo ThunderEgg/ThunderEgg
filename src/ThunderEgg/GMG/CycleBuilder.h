@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_GMG_CYCLEBUILDER_H
 #define THUNDEREGG_GMG_CYCLEBUILDER_H
+#include <ThunderEgg/GMG/FMGCycle.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/VCycle.h>
 #include <ThunderEgg/GMG/WCycle.h>
@@ -165,6 +166,8 @@ template <int D> class CycleBuilder
 			cycle.reset(new VCycle<D>(finest_level, opts));
 		} else if (opts.cycle_type == "W") {
 			cycle.reset(new WCycle<D>(finest_level, opts));
+		} else if (opts.cycle_type == "F") {
+			cycle.reset(new FMGCycle<D>(finest_level, opts));
 		} else {
 			throw RuntimeError("Unsupported Cycle type: " + opts.cycle_type);
 		}
