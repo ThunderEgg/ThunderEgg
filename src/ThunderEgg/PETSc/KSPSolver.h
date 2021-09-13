@@ -41,7 +41,7 @@ template <int D> class KSPSolver : public Iterative::Solver<D>
 	/**
 	 * @brief The PETSc matrix
 	 */
-	Mat A;
+	KSPType type = KSPGMRES;
 	/**
 	 * @brief Allocate a PETSc Vec without the additional padding for ghost cells
 	 *
@@ -125,6 +125,16 @@ template <int D> class KSPSolver : public Iterative::Solver<D>
 	 * @param A_in the PETSc Mat to wrap
 	 */
 	explicit KSPSolver() {}
+
+	KSPSolver<D> *clone() const override
+	{
+		return new KSPSolver<D>(*this);
+	}
+
+	void setType(KSPType new_type)
+	{
+		type = new_type;
+	}
 	int solve(const Operator<D> &A,
 	          Vector<D> &        x,
 	          const Vector<D> &  b,
@@ -132,14 +142,11 @@ template <int D> class KSPSolver : public Iterative::Solver<D>
 	          bool               output = false,
 	          std::ostream &     os     = std::cout) const override
 	{
-		Mat A_PETSC
-		= MatShellCreator<D>::GetNewMatShell(std::shared_ptr<const Operator<D>>(&A, [](const Operator<D> *) {}), [&]() { return x.getZeroClone(); });
+		Mat A_PETSC = MatShellCreator<D>::GetNewMatShell(A, [&]() { return x.getZeroClone(); });
 
 		PC Mr_PETSC = nullptr;
 		if (Mr != nullptr) {
-			Mr_PETSC = PCShellCreator<D>::GetNewPCShell(std::shared_ptr<const Operator<D>>(Mr, [](const Operator<D> *) {}),
-			                                            std::shared_ptr<const Operator<D>>(&A, [](const Operator<D> *) {}),
-			                                            [&]() { return x.getZeroClone(); });
+			Mr_PETSC = PCShellCreator<D>::GetNewPCShell(*Mr, A, [&]() { return x.getZeroClone(); });
 		}
 		Vec x_PETSC = getPetscVecWithoutGhost(x);
 		copyToPetscVec(x, x_PETSC);
@@ -149,11 +156,12 @@ template <int D> class KSPSolver : public Iterative::Solver<D>
 
 		KSP ksp;
 		KSPCreate(PETSC_COMM_WORLD, &ksp);
+		KSPSetType(ksp, type);
 		KSPSetOperators(ksp, A_PETSC, A_PETSC);
 
 		if (Mr != nullptr) {
 			KSPSetPC(ksp, Mr_PETSC);
-			KSPSetPCSide(ksp, PC_RIGHT);
+			// KSPSetPCSide(ksp, PC_RIGHT);
 		}
 
 		if (output) {
@@ -164,6 +172,10 @@ template <int D> class KSPSolver : public Iterative::Solver<D>
 
 		int iterations;
 		KSPGetIterationNumber(ksp, &iterations);
+
+		const char *converged_reason;
+		KSPGetConvergedReasonString(ksp, &converged_reason);
+		os << converged_reason << std::endl;
 
 		KSPDestroy(&ksp);
 		VecDestroy(&x_PETSC);
