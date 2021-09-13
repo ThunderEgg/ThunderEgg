@@ -135,6 +135,14 @@ else()
   set(TE_ENABLE_DEBUG "false")
 endif()
 
+if(TARGET PETSC::PETSC)
+  set(TE_PETSC_ENABLED "true")
+  set(THUNDEREGG_PETSC_ENABLED "ON")
+else()
+  set(TE_PETSC_ENABLED "false")
+endif()
+
+
 configure_file(Config.h.in Config.h)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg)
