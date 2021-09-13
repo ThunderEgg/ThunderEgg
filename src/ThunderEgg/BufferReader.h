@@ -94,11 +94,12 @@ class BufferReader
 	 *
 	 * @return  this BufferReader
 	 */
-	template <typename T>
-	typename std::enable_if<!isSerializable<T>(), BufferReader>::type &operator>>(T &obj)
+	template <typename T> typename std::enable_if<!isSerializable<T>(), BufferReader>::type &operator>>(T &obj)
 	{
-		obj = *(T *) (buffer + pos);
-		pos += sizeof(T);
+		for (size_t i = 0; i < sizeof(T); i++) {
+			reinterpret_cast<char *>(&obj)[i] = buffer[pos];
+			pos++;
+		}
 		return *this;
 	}
 };

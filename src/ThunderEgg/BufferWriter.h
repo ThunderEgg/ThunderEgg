@@ -100,12 +100,16 @@ class BufferWriter
 	 *
 	 * @return  this BufferWriter
 	 */
-	template <typename T>
-	typename std::enable_if<!isSerializable<T>(), BufferWriter>::type &operator<<(const T &obj)
+	template <typename T> typename std::enable_if<!isSerializable<T>(), BufferWriter>::type &operator<<(const T &obj)
 	{
-		if (buffer != nullptr)
-			*(T *) (buffer + pos) = obj;
-		pos += sizeof(T);
+		if (buffer != nullptr) {
+			for (size_t i = 0; i < sizeof(T); i++) {
+				buffer[pos] = reinterpret_cast<const char *>(&obj)[i];
+				pos++;
+			}
+		} else {
+			pos += sizeof(T);
+		}
 		return *this;
 	}
 };
