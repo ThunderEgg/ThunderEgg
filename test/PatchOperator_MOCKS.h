@@ -82,10 +82,8 @@ class MockPatchOperator : public PatchOperator<D>
 		std::array<int, D + 1> zero;
 		zero.fill(0);
 	}
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
-	{
-	}
-	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
 	}
 	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,

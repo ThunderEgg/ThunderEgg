@@ -83,12 +83,6 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 					               INFO("coord:  " << coord[0]);
 					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 				               });
-			} else {
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == 0);
-				               });
 			}
 		}
 	}
@@ -152,13 +146,6 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
 					               INFO("coord:  " << coord[0]);
 					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
 					               CHECK(vec_ghost2[coord] == Catch::Approx(expected_ghost2[coord]));
-				               });
-			} else {
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == 0);
-					               CHECK(vec_ghost2[coord] == 0);
 				               });
 			}
 		}

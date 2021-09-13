@@ -62,15 +62,15 @@ class MockPatchOperator : public PatchOperator<D>
 	void applySinglePatch(const PatchInfo<D> &              pinfo,
 	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
+		*bc_enforced = true;
 		(*num_apply_calls)++;
 	}
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
-		*bc_enforced = true;
-	}
-	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
-	{
+		*bc_enforced        = true;
 		*interior_dirichlet = true;
+		(*num_apply_calls)++;
 	}
 	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
 	                                            const PatchView<const double, D> &us,
@@ -116,16 +116,17 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	void applySinglePatch(const PatchInfo<D> &              pinfo,
 	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
+		*bc_enforced = true;
 		loop_over_interior_indexes<D>(fs,
 		                              [&](const std::array<int, D + 1> &coord) { fs[coord] += 1; });
 	}
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
-		*bc_enforced = true;
-	}
-	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &us) const override
-	{
+		*bc_enforced        = true;
 		*interior_dirichlet = true;
+		loop_over_interior_indexes<D>(fs,
+		                              [&](const std::array<int, D + 1> &coord) { fs[coord] += 1; });
 	}
 	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
 	                                            const PatchView<const double, D> &us,
