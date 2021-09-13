@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include "Communicator.h"
+#include <utility>
 
 namespace ThunderEgg
 {
