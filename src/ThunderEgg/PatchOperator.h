@@ -72,29 +72,10 @@ template <int D> class PatchOperator : public Operator<D>
 	 * The ghost values in u will be updated to the latest values, and should not need to be modified
 	 *
 	 * @param pinfo  the patch
-	 * @param u_view the right hand side
+	 * @param u_view the solution
 	 * @param f_view the left hand side
-	 * @param treat_interior_boundary_as_dirichlet if true, the stencil of the patch should be
-	 * modified so that the interior boundaries are assumed to be zero, and the ghost values should
-	 * not be u_viewed
 	 */
 	virtual void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const = 0;
-
-	/**
-	 * @brief modify values in ghost cells in order to enforce boundary conditions
-	 *
-	 * @param pinfo the patch info
-	 * @param u_view the left hand side
-	 */
-	virtual void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const = 0;
-
-	/**
-	 * @brief modify values in ghost cells order to enforce the internal boundary conditions
-	 *
-	 * @param pinfo the patch info
-	 * @param u_view the left hand side
-	 */
-	virtual void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const = 0;
 
 	/**
 	 * @brief Treat the internal patch boundaries as domain boundaires and modify
@@ -109,6 +90,19 @@ template <int D> class PatchOperator : public Operator<D>
 	virtual void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
 	                                                    const PatchView<const double, D> &u_view,
 	                                                    const PatchView<double, D> &      f_view) const = 0;
+
+	/**
+	 * @brief Apply the operator to a single patch
+	 *
+	 * The ghost values in u will be updated to the latest values, and should not need to be modified
+	 *
+	 * @param pinfo  the patch
+	 * @param u_view the solution
+	 * @param f_view the left hand side
+	 */
+	virtual void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                            const PatchView<const double, D> &u_view,
+	                                                            const PatchView<double, D> &      f_view) const = 0;
 
 	/**
 	 * @brief Apply the operator
@@ -132,8 +126,7 @@ template <int D> class PatchOperator : public Operator<D>
 		ghost_filler->fillGhost(u);
 		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
 			PatchView<const double, D> u_view = u.getPatchView(pinfo.local_index);
-			enforceBoundaryConditions(pinfo, u_view);
-			PatchView<double, D> f_view = f.getPatchView(pinfo.local_index);
+			PatchView<double, D>       f_view = f.getPatchView(pinfo.local_index);
 			applySinglePatch(pinfo, u_view, f_view);
 		}
 	}

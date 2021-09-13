@@ -76,8 +76,14 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	{
 		return new StarPatchOperator<D>(*this);
 	}
-	void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const override
+	void
+	applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view, bool interior) const
 	{
+		if (interior) {
+			enforceInternalBoundaryConditions(pinfo, u_view);
+		}
+		enforceBoundaryConditions(pinfo, u_view);
+
 		PatchView<const double, D> c  = coeffs.getPatchView(pinfo.local_index);
 		std::array<double, D>      h2 = pinfo.spacings;
 		for (size_t i = 0; i < D; i++) {
@@ -101,7 +107,18 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		});
 	}
 
-	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const override
+	void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const override
+	{
+		applySinglePatch(pinfo, u_view, f_view, false);
+	}
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &u_view,
+	                                                    const PatchView<double, D> &      f_view) const override
+	{
+		applySinglePatch(pinfo, u_view, f_view, true);
+	}
+
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const
 	{
 		for (int axis = 0; axis < D; axis++) {
 			Side<D> lower_side(axis * 2);
@@ -119,7 +136,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 		}
 	}
 
-	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const override
+	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const
 	{
 		for (int axis = 0; axis < D; axis++) {
 			Side<D> lower_side(axis * 2);
