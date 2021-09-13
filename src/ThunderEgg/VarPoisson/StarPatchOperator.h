@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  This program is distributed in the hope that it will be u_vieweful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -27,7 +27,7 @@
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/RuntimeError.h>
-#include <ThunderEgg/ValVector.h>
+#include <ThunderEgg/Vector.h>
 
 namespace ThunderEgg
 {
@@ -43,7 +43,7 @@ namespace VarPoisson
 template <int D> class StarPatchOperator : public PatchOperator<D>
 {
 	protected:
-	std::shared_ptr<const Vector<D>> coeffs;
+	Vector<D> coeffs;
 
 	constexpr int addValue(int axis) const
 	{
@@ -54,74 +54,121 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	/**
 	 * @brief Construct a new StarPatchOperator object
 	 *
-	 * @param coeffs_in the cell centered coefficients
-	 * @param domain_in the Domain associated with the operator
-	 * @param ghost_filler_in the GhostFiller to use before calling applySinglePatch
+	 * @param coeffs the cell centered coefficients
+	 * @param domain the Domain associated with the operator
+	 * @param ghost_filler the GhostFiller to use before calling applySinglePatch
 	 */
-	StarPatchOperator(std::shared_ptr<const Vector<D>>      coeffs_in,
-	                  std::shared_ptr<const Domain<D>>      domain_in,
-	                  std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
-	: PatchOperator<D>(domain_in, ghost_filler_in),
-	  coeffs(coeffs_in)
+	StarPatchOperator(const Vector<D> &coeffs, const Domain<D> &domain, const GhostFiller<D> &ghost_filler)
+	: PatchOperator<D>(domain, ghost_filler),
+	  coeffs(coeffs)
 	{
-		if (this->domain->getNumGhostCells() < 1) {
+		if (domain.getNumGhostCells() < 1) {
 			throw RuntimeError("StarPatchOperator needs at least one set of ghost cells");
 		}
-		this->ghost_filler->fillGhost(this->coeffs);
+		ghost_filler.fillGhost(this->coeffs);
 	}
-	void applySinglePatch(const PatchInfo<D> &             pinfo,
-	                      const std::vector<LocalData<D>> &us,
-	                      std::vector<LocalData<D>> &      fs,
-	                      bool                             treat_interior_boundary_as_dirichlet) const override
+	/**
+	 * @brief Get a clone of this operator
+	 *
+	 * @return StarPatchOperator<D>* a newly allocated copy of this operator
+	 */
+	StarPatchOperator<D> *clone() const override
 	{
-		const LocalData<D>    c  = coeffs->getLocalData(0, pinfo.local_index);
-		std::array<double, D> h2 = pinfo.spacings;
+		return new StarPatchOperator<D>(*this);
+	}
+	void
+	applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view, bool interior) const
+	{
+		if (interior) {
+			enforceInternalBoundaryConditions(pinfo, u_view);
+		}
+		enforceBoundaryConditions(pinfo, u_view);
+
+		PatchView<const double, D> c  = coeffs.getPatchView(pinfo.local_index);
+		std::array<double, D>      h2 = pinfo.spacings;
 		for (size_t i = 0; i < D; i++) {
 			h2[i] *= h2[i];
 		}
 		loop<0, D - 1>([&](int axis) {
-			Side<D> lower_side(axis * 2);
-			Side<D> upper_side(axis * 2 + 1);
-			if (!pinfo.hasNbr(lower_side) || treat_interior_boundary_as_dirichlet) {
-				LocalData<D - 1>       lower = us[0].getSliceOn(lower_side, {-1});
-				const LocalData<D - 1> mid   = us[0].getSliceOn(lower_side, {0});
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { lower[coord] = -mid[coord]; });
-			}
-			if (!pinfo.hasNbr(upper_side) || treat_interior_boundary_as_dirichlet) {
-				LocalData<D - 1>       upper = us[0].getSliceOn(upper_side, {-1});
-				const LocalData<D - 1> mid   = us[0].getSliceOn(upper_side, {0});
-				nested_loop<D - 1>(mid.getStart(), mid.getEnd(), [&](std::array<int, D - 1> coord) { upper[coord] = -mid[coord]; });
-			}
-			int stride   = us[0].getStrides()[axis];
+			int stride   = u_view.getStrides()[axis];
 			int c_stride = c.getStrides()[axis];
-			nested_loop<D>(us[0].getStart(), us[0].getEnd(), [&](std::array<int, D> coord) {
-				const double *ptr     = us[0].getPtr(coord);
-				const double *c_ptr   = c.getPtr(coord);
+			loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) {
+				const double *ptr     = &u_view[coord];
+				const double *c_ptr   = &c[coord];
 				double        lower   = *(ptr - stride);
 				double        mid     = *ptr;
 				double        upper   = *(ptr + stride);
 				double        c_lower = *(c_ptr - c_stride);
 				double        c_mid   = *c_ptr;
 				double        c_upper = *(c_ptr + c_stride);
-				fs[0][coord]
-				= addValue(axis) * fs[0][coord] + ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower)) / (2 * h2[axis]);
+				f_view[coord]
+				= addValue(axis) * f_view[coord] + ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower)) / (2 * h2[axis]);
 			});
 		});
 	}
-	void addGhostToRHS(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs) const override
+
+	void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const override
 	{
-		const LocalData<D> c = coeffs->getLocalData(0, pinfo.local_index);
+		applySinglePatch(pinfo, u_view, f_view, false);
+	}
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &u_view,
+	                                                    const PatchView<double, D> &      f_view) const override
+	{
+		applySinglePatch(pinfo, u_view, f_view, true);
+	}
+
+	void enforceBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const
+	{
+		for (int axis = 0; axis < D; axis++) {
+			Side<D> lower_side(axis * 2);
+			Side<D> upper_side(axis * 2 + 1);
+			if (!pinfo.hasNbr(lower_side)) {
+				View<double, D>       lower = u_view.getGhostSliceOn(lower_side, {0});
+				View<const double, D> mid   = u_view.getSliceOn(lower_side, {0});
+				loop_over_interior_indexes<D>(mid, [&](std::array<int, D> coord) { lower[coord] = -mid[coord]; });
+			}
+			if (!pinfo.hasNbr(upper_side)) {
+				View<double, D>       upper = u_view.getGhostSliceOn(upper_side, {0});
+				View<const double, D> mid   = u_view.getSliceOn(upper_side, {0});
+				loop_over_interior_indexes<D>(mid, [&](std::array<int, D> coord) { upper[coord] = -mid[coord]; });
+			}
+		}
+	}
+
+	void enforceInternalBoundaryConditions(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view) const
+	{
+		for (int axis = 0; axis < D; axis++) {
+			Side<D> lower_side(axis * 2);
+			Side<D> upper_side(axis * 2 + 1);
+			if (pinfo.hasNbr(lower_side)) {
+				View<double, D>       lower = u_view.getGhostSliceOn(lower_side, {0});
+				View<const double, D> mid   = u_view.getSliceOn(lower_side, {0});
+				loop_over_interior_indexes<D>(mid, [&](std::array<int, D> coord) { lower[coord] = -mid[coord]; });
+			}
+			if (pinfo.hasNbr(upper_side)) {
+				View<double, D>       upper = u_view.getGhostSliceOn(upper_side, {0});
+				View<const double, D> mid   = u_view.getSliceOn(upper_side, {0});
+				loop_over_interior_indexes<D>(mid, [&](std::array<int, D> coord) { upper[coord] = -mid[coord]; });
+			}
+		}
+	}
+
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                            const PatchView<const double, D> &u_view,
+	                                            const PatchView<double, D> &      f_view) const override
+	{
+		PatchView<const double, D> c = coeffs.getPatchView(pinfo.local_index);
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo.hasNbr(s)) {
-				double                 h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
-				LocalData<D - 1>       f_inner = fs[0].getSliceOn(s, {0});
-				LocalData<D - 1>       u_ghost = us[0].getSliceOn(s, {-1});
-				const LocalData<D - 1> u_inner = us[0].getSliceOn(s, {0});
-				const LocalData<D - 1> c_ghost = c.getSliceOn(s, {-1});
-				const LocalData<D - 1> c_inner = c.getSliceOn(s, {0});
-				nested_loop<D - 1>(f_inner.getStart(), f_inner.getEnd(), [&](const std::array<int, D - 1> &coord) {
-					f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) * (c_inner[coord] + c_ghost[coord]) / (2 * h2);
-					u_ghost[coord] = 0;
+				double                h2      = pow(pinfo.spacings[s.getAxisIndex()], 2);
+				View<double, D>       fner    = f_view.getSliceOn(s, {0});
+				View<double, D>       u_ghost = u_view.getGhostSliceOn(s, {0});
+				View<const double, D> uner    = u_view.getSliceOn(s, {0});
+				View<const double, D> c_ghost = c.getSliceOn(s, {-1});
+				View<const double, D> cner    = c.getSliceOn(s, {0});
+				loop_over_interior_indexes<D>(fner, [&](const std::array<int, D> &coord) {
+					fner[coord] -= (u_ghost[coord] + uner[coord]) * (cner[coord] + c_ghost[coord]) / (2 * h2);
 				});
 			}
 		}
@@ -133,17 +180,17 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 * @param gfunc the exact solution
 	 * @param hfunc the coefficients
 	 */
-	void addDrichletBCToRHS(std::shared_ptr<Vector<D>>                           f,
+	void addDrichletBCToRHS(Vector<D> &                                          f,
 	                        std::function<double(const std::array<double, D> &)> gfunc,
 	                        std::function<double(const std::array<double, D> &)> hfunc)
 	{
-		for (int i = 0; i < f->getNumLocalPatches(); i++) {
-			LocalData<D> f_ld  = f->getLocalData(0, i);
-			auto         pinfo = this->domain->getPatchInfoVector()[i];
+		for (int i = 0; i < f.getNumLocalPatches(); i++) {
+			ComponentView<double, D> f_ld  = f.getComponentView(0, i);
+			auto                     pinfo = this->getDomain().getPatchInfoVector()[i];
 			for (Side<D> s : Side<D>::getValues()) {
 				if (!pinfo.hasNbr(s)) {
-					double           h2 = pow(pinfo.spacings[s.getAxisIndex()], 2);
-					LocalData<D - 1> ld = f_ld.getSliceOn(s, {0});
+					double              h2 = pow(pinfo.spacings[s.getAxisIndex()], 2);
+					View<double, D - 1> ld = f_ld.getSliceOn(s, {0});
 					nested_loop<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 						std::array<double, D> real_coord;
 						DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);

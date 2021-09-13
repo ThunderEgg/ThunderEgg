@@ -23,7 +23,6 @@
 #define THUNDEREGG_ITERATIVE_SOLVER_H
 
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/VectorGenerator.h>
 #include <iostream>
 
 namespace ThunderEgg
@@ -39,13 +38,18 @@ template <int D> class Solver
 {
 	public:
 	/**
+	 * @brief Clone this solver
+	 *
+	 * @return Solver* a newly allocated copy of this solver
+	 */
+	virtual Solver<D> *clone() const = 0;
+	/**
 	 * @brief Destroy the Solver object
 	 */
 	virtual ~Solver() {}
 	/**
 	 * @brief Perform an iterative solve
 	 *
-	 * @param vg a VectorGenerator that allows for the creation of temporary work vectors
 	 * @param A the matrix
 	 * @param x the initial LHS guess.
 	 * @param b the RHS vector.
@@ -55,13 +59,12 @@ template <int D> class Solver
 	 *
 	 * @return the number of iterations
 	 */
-	virtual int solve(std::shared_ptr<VectorGenerator<D>> vg,
-	                  std::shared_ptr<const Operator<D>>  A,
-	                  std::shared_ptr<Vector<D>>          x,
-	                  std::shared_ptr<const Vector<D>>    b,
-	                  std::shared_ptr<const Operator<D>>  Mr     = nullptr,
-	                  bool                                output = false,
-	                  std::ostream &                      os     = std::cout) const = 0;
+	virtual int solve(const Operator<D> &A,
+	                  Vector<D> &        x,
+	                  const Vector<D> &  b,
+	                  const Operator<D> *Mr     = nullptr,
+	                  bool               output = false,
+	                  std::ostream &     os     = std::cout) const = 0;
 };
 //
 } // namespace Iterative

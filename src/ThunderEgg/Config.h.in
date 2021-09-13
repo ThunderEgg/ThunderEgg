@@ -1,0 +1,9 @@
+#ifndef THUNDEREGG_CONFIG_H
+#define THUNDEREGG_CONFIG_H
+#cmakedefine THUNDEREGG_PETSC_ENABLED
+namespace ThunderEgg
+{
+constexpr bool ENABLE_DEBUG  = @TE_ENABLE_DEBUG@;
+constexpr bool PETSC_ENABLED = @TE_PETSC_ENABLED@;
+} // namespace ThunderEgg
+#endif

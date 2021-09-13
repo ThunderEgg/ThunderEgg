@@ -40,7 +40,7 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	/**
 	 * @brief The communication package for restricting between levels.
 	 */
-	std::shared_ptr<InterLevelComm<D>> ilc;
+	mutable InterLevelComm<D> ilc;
 
 	public:
 	/**
@@ -48,7 +48,7 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	 *
 	 * @param ilc the communcation package for the two levels.
 	 */
-	explicit MPIInterpolator(std::shared_ptr<InterLevelComm<D>> ilc) : ilc(ilc) {}
+	MPIInterpolator(const Domain<D> &coarser_domain, const Domain<D> &finer_domain) : ilc(coarser_domain, finer_domain) {}
 	/**
 	 * @brief Interpolate values from coarse vector to the finer vector
 	 *
@@ -63,8 +63,8 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	 * @param coarser_vector the coaser vector
 	 */
 	virtual void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
-	                                std::shared_ptr<const Vector<D>>                                               coarser_vector,
-	                                std::shared_ptr<Vector<D>>                                                     finer_vector) const = 0;
+	                                const Vector<D> &                                                              coarser_vector,
+	                                Vector<D> &                                                                    finer_vector) const = 0;
 
 	/**
 	 * @brief interpolation function
@@ -72,21 +72,33 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	 * @param coarse the input vector that is interpolated from
 	 * @param fine the output vector that is interpolated to.
 	 */
-	void interpolate(std::shared_ptr<const Vector<D>> coarse, std::shared_ptr<Vector<D>> fine) const
+	void interpolate(const Vector<D> &coarse, Vector<D> &fine) const
 	{
-		std::shared_ptr<Vector<D>> coarse_ghost = ilc->getNewGhostVector();
+		if constexpr (ENABLE_DEBUG) {
+			if (coarse.getNumLocalPatches() != ilc->getCoarserDomain()->getNumLocalPatches()) {
+				throw RuntimeError("coarse vector is incorrect length. Expected Lenght of "
+				                   + std::to_string(ilc->getCoarserDomain()->getNumLocalPatches()) + " but vector was length "
+				                   + std::to_string(coarse.getNumLocalPatches()));
+			}
+			if (fine.getNumLocalPatches() != ilc->getFinerDomain()->getNumLocalPatches()) {
+				throw RuntimeError("fine vector is incorrect length. Expected Lenght of "
+				                   + std::to_string(ilc->getFinerDomain()->getNumLocalPatches()) + " but vector was length "
+				                   + std::to_string(fine.getNumLocalPatches()));
+			}
+		}
+		Vector<D> coarse_ghost = ilc.getNewGhostVector(coarse.getNumComponents());
 
 		// start scatter for ghost values
-		ilc->getGhostPatchesStart(coarse, coarse_ghost);
+		ilc.getGhostPatchesStart(coarse, coarse_ghost);
 
 		// interpolate form local values
-		interpolatePatches(ilc->getPatchesWithLocalParent(), coarse, fine);
+		interpolatePatches(ilc.getPatchesWithLocalParent(), coarse, fine);
 
 		// finish scatter for ghost values
-		ilc->getGhostPatchesFinish(coarse, coarse_ghost);
+		ilc.getGhostPatchesFinish(coarse, coarse_ghost);
 
 		// interpolator from ghost values
-		interpolatePatches(ilc->getPatchesWithGhostParent(), coarse_ghost, fine);
+		interpolatePatches(ilc.getPatchesWithGhostParent(), coarse_ghost, fine);
 	}
 };
 } // namespace GMG

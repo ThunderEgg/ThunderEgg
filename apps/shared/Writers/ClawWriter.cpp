@@ -23,11 +23,11 @@
 #include <fstream>
 using namespace std;
 using namespace ThunderEgg;
-ClawWriter::ClawWriter(std::shared_ptr<Domain<2>> domain)
+ClawWriter::ClawWriter(const Domain<2> &domain)
+: domain(domain)
 {
-	this->domain = domain;
 }
-void ClawWriter::addVector(std::shared_ptr<Vector<2>> vec)
+void ClawWriter::addVector(const Vector<2> &vec)
 {
 	vectors.push_back(vec);
 }
@@ -37,7 +37,7 @@ void ClawWriter::write()
 	const string tab = "\t";
 	t_file << 0.0 << tab << "time" << endl;
 	t_file << vectors.size() << tab << "meqn" << endl;
-	t_file << domain->getNumLocalPatches() << tab << "ngrids" << endl;
+	t_file << domain.getNumLocalPatches() << tab << "ngrids" << endl;
 	t_file << 2 << tab << "num_aux" << endl;
 	t_file << 2 << tab << "num_dim" << endl;
 	t_file.close();
@@ -45,7 +45,7 @@ void ClawWriter::write()
 
 	q_file.precision(10);
 	q_file << scientific;
-	for (auto &pinfo : domain->getPatchInfoVector()) {
+	for (auto &pinfo : domain.getPatchInfoVector()) {
 		writePatch(pinfo, q_file);
 	}
 	q_file.close();
@@ -64,9 +64,9 @@ void ClawWriter::writePatch(const PatchInfo<2> &pinfo, std::ostream &os)
 	os << pinfo.spacings[0] << tab << "dx" << endl;
 	os << pinfo.spacings[1] << tab << "dy" << endl;
 	os << endl;
-	list<LocalData<2>> lds;
-	for (auto vec : vectors) {
-		lds.push_back(vec->getLocalData(0, pinfo.local_index));
+	list<ComponentView<const double, 2>> lds;
+	for (const auto &vec : vectors) {
+		lds.push_back(vec.getComponentView(0, pinfo.local_index));
 	}
 	for (int y = 0; y < pinfo.ns[1]; y++) {
 		for (int x = 0; x < pinfo.ns[0]; x++) {

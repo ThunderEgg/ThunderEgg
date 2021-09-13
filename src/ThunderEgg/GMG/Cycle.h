@@ -44,47 +44,19 @@ template <int D> class Cycle : public Operator<D>
 	std::shared_ptr<Level<D>> finest_level;
 
 	protected:
-	using VecList      = std::list<std::shared_ptr<Vector<D>>>;
-	using ConstVecList = std::list<std::shared_ptr<const Vector<D>>>;
 	/**
 	 * @brief Prepare vectors for coarser level.
 	 *
 	 * @param level the current level
 	 */
-	void prepCoarser(const Level<D> &level, VecList &u_vectors, ConstVecList &f_vectors) const
+	Vector<D> restrict(const Level<D> &level, const Vector<D> &f, const Vector<D> &u) const
 	{
 		// calculate residual
-		std::shared_ptr<Vector<D>> r = level.getVectorGenerator()->getNewVector();
-		level.getOperator()->apply(u_vectors.front(), r);
-		r->scaleThenAdd(-1, f_vectors.front());
+		Vector<D> r = u.getZeroClone();
+		level.getOperator().apply(u, r);
+		r.scaleThenAdd(-1, f);
 		// create vectors for coarser levels
-		std::shared_ptr<Vector<D>> new_u = level.getCoarser()->getVectorGenerator()->getNewVector();
-		std::shared_ptr<Vector<D>> new_f = level.getCoarser()->getVectorGenerator()->getNewVector();
-		level.getRestrictor()->restrict(r, new_f);
-		u_vectors.push_front(new_u);
-		f_vectors.push_front(new_f);
-	}
-	/**
-	 * @brief Prepare vectors for finer level
-	 *
-	 * @param level the current level
-	 */
-	void prepFiner(const Level<D> &level, VecList &u_vectors, ConstVecList &f_vectors) const
-	{
-		std::shared_ptr<Vector<D>> old_u = u_vectors.front();
-		u_vectors.pop_front();
-		f_vectors.pop_front();
-		level.getInterpolator()->interpolate(old_u, u_vectors.front());
-	}
-
-	/**
-	 * @brief run iteration of smoother on solution
-	 *
-	 * @param level the current level
-	 */
-	void smooth(const Level<D> &level, VecList &u_vectors, ConstVecList &f_vectors) const
-	{
-		level.getSmoother()->smooth(f_vectors.front(), u_vectors.front());
+		return level.getRestrictor().restrict(r);
 	}
 
 	/**
@@ -92,8 +64,7 @@ template <int D> class Cycle : public Operator<D>
 	 *
 	 * @param level the level currently begin visited.
 	 */
-	virtual void visit(const Level<D> &level, VecList &u_vectors,
-	                   ConstVecList &f_vectors) const = 0;
+	virtual void visit(const Level<D> &level, const Vector<D> &f, Vector<D> &u) const = 0;
 
 	public:
 	/**
@@ -111,16 +82,10 @@ template <int D> class Cycle : public Operator<D>
 	 * @param f the RHS vector.
 	 * @param u the current solution vector. Output will be updated solution vector.
 	 */
-	void apply(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const
+	void apply(const Vector<D> &f, Vector<D> &u) const
 	{
-		u->set(0);
-		VecList      u_vectors;
-		ConstVecList f_vectors;
-		f_vectors.push_back(f); /* Appends */
-		u_vectors.push_back(u);
-		visit(*finest_level, u_vectors, f_vectors);
-		f_vectors.pop_front();
-		u_vectors.pop_front();
+		u.setWithGhost(0);
+		visit(*finest_level, f, u);
 	}
 	/**
 	 * @brief Get the finest Level object

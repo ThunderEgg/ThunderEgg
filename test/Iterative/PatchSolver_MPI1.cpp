@@ -1,7 +1,6 @@
 #include "../utils/DomainReader.h"
 #include "PatchSolver_MOCKS.h"
 #include <ThunderEgg/Iterative/PatchSolver.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <list>
 #include <sstream>
@@ -22,25 +21,25 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length",
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 5);
+	auto            ny        = GENERATE(2, 5);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> u(d_fine, num_components);
+	Vector<2> f(d_fine, num_components);
 
-	auto mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	// the patch operator is just a 0.5I operator
-	auto mpo = make_shared<MockPatchOperator<2>>(d_fine, mgf);
-	auto ms  = make_shared<MockSolver<2>>(
-    [](std::shared_ptr<VectorGenerator<2>> vg, std::shared_ptr<const Operator<2>> A,
-       std::shared_ptr<Vector<2>> x, std::shared_ptr<const Vector<2>> b,
-       std::shared_ptr<const Operator<2>> Mr) {
-        CHECK(x->getNumLocalPatches() == 1);
+	MockPatchOperator<2> mpo(d_fine, mgf);
+	MockSolver<2>        ms(
+    [](const Operator<2> &A,
+       Vector<2> &x, const Vector<2> &b,
+       const Operator<2> *Mr) {
+        CHECK(x.getNumLocalPatches() == 1);
         return 1;
     });
 
@@ -53,29 +52,28 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 5);
+	auto            ny        = GENERATE(2, 5);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
+	Vector<2> u(d_fine, num_components);
+	Vector<2> f(d_fine, num_components);
 
-	bool called = false;
-	auto mgf    = make_shared<MockGhostFiller<2>>();
+	bool               called = false;
+	MockGhostFiller<2> mgf;
 	// the patch operator is just a 0.5I operator
-	auto mpo = make_shared<MockPatchOperator<2>>(d_fine, mgf);
-	auto ms  = make_shared<MockSolver<2>>(
-    [&](std::shared_ptr<VectorGenerator<2>> vg, std::shared_ptr<const Operator<2>> A,
-        std::shared_ptr<Vector<2>> x, std::shared_ptr<const Vector<2>> b,
-        std::shared_ptr<const Operator<2>> Mr) {
+	MockPatchOperator<2> mpo(d_fine, mgf);
+	MockSolver<2>        ms(
+    [&](const Operator<2> &A,
+        Vector<2> &x, const Vector<2> &b,
+        const Operator<2> *Mr) {
         if (!called) {
             called = true;
-            CHECK(A != mpo);
-            A->apply(b, x);
+            A.apply(b, x);
         }
         return 1;
     });
@@ -83,33 +81,35 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
 	bcgs_solver.smooth(f, u);
-	CHECK(mpo->getNumApplyCalls() == 1);
-	CHECK(mpo->rhsWasModified());
+	CHECK(mpo.getNumApplyCalls() == 1);
+	CHECK(mpo.rhsWasModified());
+	CHECK(mpo.boundaryConditionsEnforced());
+	CHECK(mpo.internalBoundaryConditionsEnforced());
 }
 TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::PatchSolver]")
 {
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 5);
+	auto            ny        = GENERATE(2, 5);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
-	f->set(1);
+	Vector<2> u(d_fine, num_components);
+	Vector<2> f(d_fine, num_components);
+	f.set(1);
 
-	auto mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	// the patch operator is just a 0.5I operator
-	auto mpo = make_shared<NonLinMockPatchOperator<2>>(d_fine, mgf);
-	auto ms  = make_shared<MockSolver<2>>(
-    [](std::shared_ptr<VectorGenerator<2>> vg, std::shared_ptr<const Operator<2>> A,
-       std::shared_ptr<Vector<2>> x, std::shared_ptr<const Vector<2>> b,
-       std::shared_ptr<const Operator<2>> Mr) {
+	NonLinMockPatchOperator<2> mpo(d_fine, mgf);
+	MockSolver<2>              ms(
+    [](const Operator<2> &A,
+       Vector<2> &x, const Vector<2> &b,
+       const Operator<2> *Mr) {
         throw BreakdownError("Blah");
         return 1;
     });
@@ -123,25 +123,25 @@ TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterativ
 	auto mesh_file
 	= GENERATE(as<std::string>{}, single_mesh_file, refined_mesh_file, cross_mesh_file);
 	INFO("MESH: " << mesh_file);
-	auto                  nx        = GENERATE(2, 5);
-	auto                  ny        = GENERATE(2, 5);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
+	auto            nx        = GENERATE(2, 5);
+	auto            ny        = GENERATE(2, 5);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
 	auto num_components = GENERATE(1, 2, 3);
 	INFO("num_components: " << num_components);
-	auto u = ValVector<2>::GetNewVector(d_fine, num_components);
-	auto f = ValVector<2>::GetNewVector(d_fine, num_components);
-	f->set(1);
+	Vector<2> u(d_fine, num_components);
+	Vector<2> f(d_fine, num_components);
+	f.set(1);
 
-	auto mgf = make_shared<MockGhostFiller<2>>();
+	MockGhostFiller<2> mgf;
 	// the patch operator is just a 0.5I operator
-	auto mpo = make_shared<NonLinMockPatchOperator<2>>(d_fine, mgf);
-	auto ms  = make_shared<MockSolver<2>>(
-    [](std::shared_ptr<VectorGenerator<2>> vg, std::shared_ptr<const Operator<2>> A,
-       std::shared_ptr<Vector<2>> x, std::shared_ptr<const Vector<2>> b,
-       std::shared_ptr<const Operator<2>> Mr) {
+	NonLinMockPatchOperator<2> mpo(d_fine, mgf);
+	MockSolver<2>              ms(
+    [](const Operator<2> &A,
+       Vector<2> &x, const Vector<2> &b,
+       const Operator<2> *Mr) {
         throw BreakdownError("Blah");
         return 1;
     });

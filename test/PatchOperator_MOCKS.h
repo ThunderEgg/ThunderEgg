@@ -37,61 +37,63 @@ template <int D>
 class MockGhostFiller : public GhostFiller<D>
 {
 	private:
-	mutable bool called = false;
+	std::shared_ptr<bool> called = std::make_shared<bool>(false);
 
 	public:
-	void fillGhost(std::shared_ptr<const Vector<D>> u) const override
+	MockGhostFiller<D> *clone() const override
 	{
-		called = true;
+		return new MockGhostFiller<D>(*this);
+	}
+	void fillGhost(const Vector<D> &u) const override
+	{
+		*called = true;
 	}
 	bool wasCalled()
 	{
-		return called;
+		return *called;
 	}
 };
 template <int D>
 class MockPatchOperator : public PatchOperator<D>
 {
 	private:
-	std::shared_ptr<Vector<D>>             u_vec;
-	std::shared_ptr<Vector<D>>             f_vec;
-	mutable std::set<const PatchInfo<D> *> patches_to_be_called;
+	std::shared_ptr<std::set<int>> patches_to_be_called;
 
 	public:
-	MockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
-	                  std::shared_ptr<const GhostFiller<D>> ghost_filler,
-	                  std::shared_ptr<Vector<D>> u, std::shared_ptr<Vector<D>> f)
-	: PatchOperator<D>(domain, ghost_filler), u_vec(u), f_vec(f)
+	MockPatchOperator(const Domain<D> &     domain,
+	                  const GhostFiller<D> &ghost_filler)
+	: PatchOperator<D>(domain, ghost_filler)
 	{
-		for (const PatchInfo<D> &pinfo : this->domain->getPatchInfoVector()) {
-			patches_to_be_called.insert(&pinfo);
+		patches_to_be_called.reset(new std::set<int>());
+		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
+			patches_to_be_called->insert(pinfo.id);
 		}
 	}
-	void applySinglePatch(const PatchInfo<D> &             pinfo,
-	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
-	                      bool treat_interior_boundary_as_dirichlet) const override
+	MockPatchOperator<D> *clone() const override
 	{
-		CHECK_FALSE(treat_interior_boundary_as_dirichlet);
-		CHECK(patches_to_be_called.count(&pinfo) == 1);
-		patches_to_be_called.erase(&pinfo);
+		return new MockPatchOperator<D>(*this);
+	}
+	void applySinglePatch(const PatchInfo<D> &              pinfo,
+	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
+	{
+		CHECK(patches_to_be_called->count(pinfo.id) == 1);
+		patches_to_be_called->erase(pinfo.id);
 		INFO("LOCAL_INDEX: " << pinfo.local_index);
-		for (int c = 0; c < u_vec->getNumComponents(); c++) {
-			INFO("c: " << c);
-			CHECK(u_vec->getLocalData(c, pinfo.local_index).getPtr() == us[c].getPtr());
-		}
-		for (int c = 0; c < f_vec->getNumComponents(); c++) {
-			INFO("c: " << c);
-			CHECK(f_vec->getLocalData(c, pinfo.local_index).getPtr() == fs[c].getPtr());
-		}
+		std::array<int, D + 1> zero;
+		zero.fill(0);
 	}
-	void addGhostToRHS(const PatchInfo<D> &             pinfo,
-	                   const std::vector<LocalData<D>> &us,
-	                   std::vector<LocalData<D>> &      fs) const override
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
+	{
+	}
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                            const PatchView<const double, D> &us,
+	                                            const PatchView<double, D> &      fs) const override
 	{
 	}
 	bool allPatchesCalled()
 	{
-		return patches_to_be_called.empty();
+		return patches_to_be_called->empty();
 	}
 };
 } // namespace

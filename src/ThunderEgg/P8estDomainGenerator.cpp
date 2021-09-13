@@ -218,6 +218,27 @@ P8estDomainGenerator::~P8estDomainGenerator()
 	p8est_destroy(my_p8est);
 }
 
+P8estDomainGenerator::P8estDomainGenerator(P8estDomainGenerator &other)
+: domain_patches(other.domain_patches),
+  ns(other.ns),
+  num_ghost_cells(other.num_ghost_cells),
+  curr_level(other.curr_level),
+  bmf(other.bmf)
+{
+	my_p8est = p8est_copy(other.my_p8est, true);
+}
+
+P8estDomainGenerator &P8estDomainGenerator::operator=(const P8estDomainGenerator &other)
+{
+	domain_patches  = other.domain_patches;
+	ns              = other.ns;
+	num_ghost_cells = other.num_ghost_cells;
+	curr_level      = other.curr_level;
+	bmf             = other.bmf;
+	p8est_destroy(my_p8est);
+	my_p8est = p8est_copy(other.my_p8est, true);
+	return *this;
+}
 void P8estDomainGenerator::extractLevel()
 {
 	if (domain_patches.size() > 0) {
@@ -811,23 +832,25 @@ void P8estDomainGenerator::updateParentRanksOfPreviousDomain()
 	}
 }
 
-std::shared_ptr<Domain<3>> P8estDomainGenerator::getCoarserDomain()
+Domain<3> P8estDomainGenerator::getCoarserDomain()
 {
 	if (curr_level >= 0) {
 		extractLevel();
 	}
-	std::shared_ptr<Domain<3>> domain = make_shared<Domain<3>>(id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
+	Communicator comm(my_p8est->mpicomm);
+	Domain<3>    domain(comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
 	domain_patches.pop_back();
 	id++;
 	return domain;
 }
 
-std::shared_ptr<Domain<3>> P8estDomainGenerator::getFinestDomain()
+Domain<3> P8estDomainGenerator::getFinestDomain()
 {
 	if (curr_level >= 0) {
 		extractLevel();
 	}
-	std::shared_ptr<Domain<3>> domain = make_shared<Domain<3>>(id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
+	Communicator comm(my_p8est->mpicomm);
+	Domain<3>    domain(comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
 	domain_patches.pop_back();
 	id++;
 	return domain;

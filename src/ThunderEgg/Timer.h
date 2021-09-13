@@ -21,11 +21,11 @@
 
 #ifndef THUNDEREGG_TIMER_H
 #define THUNDEREGG_TIMER_H
+#include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/tpl/json.hpp>
 #include <list>
 #include <map>
-#include <mpi.h>
 #include <ostream>
 #include <string>
 namespace ThunderEgg
@@ -59,7 +59,7 @@ class Timer
 	/**
 	 * @brief The mpi communicator
 	 */
-	MPI_Comm comm;
+	Communicator comm;
 	/**
 	 * @brief Simple structure for keeping track of a timing
 	 */
@@ -79,7 +79,7 @@ class Timer
 	/**
 	 * @brief Construct a new empty Timer object
 	 */
-	explicit Timer(MPI_Comm comm);
+	explicit Timer(const Communicator &comm);
 	/**
 	 * @brief Destruct a Timer object
 	 */

@@ -18,6 +18,10 @@ int refine_fn(p4est_t *p4est, p4est_topidx_t which_tree, p4est_quadrant_t *quadr
 	}
 	return node.hasChildren();
 }
+int refine_all(p4est_t *p4est, p4est_topidx_t which_tree, p4est_quadrant_t *quadrant)
+{
+	return true;
+}
 TreeToP4est::TreeToP4est(Tree<2> t)
 {
 	conn  = p4est_connectivity_new_unitsquare();
@@ -26,4 +30,9 @@ TreeToP4est::TreeToP4est(Tree<2> t)
 	p4est_partition(p4est, true, nullptr);
 	ghost = p4est_ghost_new(p4est, P4EST_CONNECT_FULL);
 	mesh  = p4est_mesh_new_ext(p4est, ghost, 1, 1, P4EST_CONNECT_FULL);
+}
+void TreeToP4est::divide()
+{
+	p4est_refine(p4est, false, refine_all, nullptr);
+	p4est_partition(p4est, true, nullptr);
 }

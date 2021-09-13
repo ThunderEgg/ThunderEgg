@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
 
 	// A patch operator needs a GhostFiller object to define how to fill ghost cells for the patches.
 	// This one will use a tri-linear interpolation scheme at the refinement boundarys of the domain
-	shared_ptr<GhostFiller<3>> ghost_filler = make_shared<TriLinearGhostFiller>(domain);
+	shared_ptr<GhostFiller<3>> ghost_filler = make_shared<TriLinearGhostFiller>(domain, GhostFillingType::Faces);
 
 	// create patch operator that uses a typical 2nd order 7 point poisson stencil
 	shared_ptr<StarPatchOperator<3>> patch_operator = make_shared<StarPatchOperator<3>>(domain, ghost_filler, neumann);
@@ -347,7 +347,7 @@ int main(int argc, char *argv[])
 		auto middle_vector_generator = make_shared<ValVectorGenerator<3>>(current_domain, num_components);
 
 		// create operator for middle domain
-		auto middle_ghost_filler   = make_shared<TriLinearGhostFiller>(current_domain);
+		auto middle_ghost_filler   = make_shared<TriLinearGhostFiller>(current_domain, GhostFillingType::Faces);
 		auto middle_patch_operator = make_shared<StarPatchOperator<3>>(current_domain, middle_ghost_filler);
 
 		// smoother
@@ -378,7 +378,7 @@ int main(int argc, char *argv[])
 	shared_ptr<VectorGenerator<3>> coarsest_vector_generator = make_shared<ValVectorGenerator<3>>(current_domain, 1);
 
 	// patch operator
-	shared_ptr<GhostFiller<3>>   coarsest_ghost_filler   = make_shared<TriLinearGhostFiller>(current_domain);
+	shared_ptr<GhostFiller<3>>   coarsest_ghost_filler   = make_shared<TriLinearGhostFiller>(current_domain, GhostFillingType::Faces);
 	shared_ptr<PatchOperator<3>> coarsest_patch_operator = make_shared<StarPatchOperator<3>>(current_domain, coarsest_ghost_filler);
 
 	// smoother

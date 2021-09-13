@@ -21,7 +21,6 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -38,15 +37,15 @@ TEST_CASE("Check number of local and ghost parents", "[GMG::InterLevelComm]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	auto                  nx        = GENERATE(2);
-	auto                  ny        = GENERATE(2);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	INFO("d_fine: " << d_fine->getNumLocalPatches());
-	INFO("d_coarse: " << d_coarse->getNumLocalPatches());
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto            nx        = GENERATE(2);
+	auto            ny        = GENERATE(2);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
+	INFO("d_fine: " << d_fine.getNumLocalPatches());
+	INFO("d_coarse: " << d_coarse.getNumLocalPatches());
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -54,43 +53,43 @@ TEST_CASE("Check number of local and ghost parents", "[GMG::InterLevelComm]")
 	size_t             num_ghost_parents = 0;
 	size_t             num_local_parents = 0;
 	map<int, set<int>> my_local_parents_to_children;
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
+	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		if (pinfo.parent_rank == rank) {
 			num_local_parents++;
 		} else {
 			num_ghost_parents++;
 		}
 	}
-	CHECK(ilc->getPatchesWithGhostParent().size() == num_ghost_parents);
-	CHECK(ilc->getPatchesWithLocalParent().size() == num_local_parents);
+	CHECK(ilc.getPatchesWithGhostParent().size() == num_ghost_parents);
+	CHECK(ilc.getPatchesWithLocalParent().size() == num_local_parents);
 }
 TEST_CASE("Check that parents have unique local indexes", "[GMG::InterLevelComm]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	auto                  nx        = GENERATE(2);
-	auto                  ny        = GENERATE(2);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	INFO("d_fine: " << d_fine->getNumLocalPatches());
-	INFO("d_coarse: " << d_coarse->getNumLocalPatches());
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto            nx        = GENERATE(2);
+	auto            ny        = GENERATE(2);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
+	INFO("d_fine: " << d_fine.getNumLocalPatches());
+	INFO("d_coarse: " << d_coarse.getNumLocalPatches());
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	INFO("RANK " << rank);
 
 	map<int, set<int>> local_index_id_map;
-	for (auto pair : ilc->getPatchesWithLocalParent()) {
+	for (auto pair : ilc.getPatchesWithLocalParent()) {
 		local_index_id_map[pair.first].insert(pair.second.get().parent_id);
 	}
 	for (auto pair : local_index_id_map) {
 		CHECK(pair.second.size() == 1);
 	}
 	map<int, set<int>> ghost_local_index_id_map;
-	for (auto pair : ilc->getPatchesWithGhostParent()) {
+	for (auto pair : ilc.getPatchesWithGhostParent()) {
 		ghost_local_index_id_map[pair.first].insert(pair.second.get().parent_id);
 	}
 	for (auto pair : ghost_local_index_id_map) {
@@ -99,42 +98,42 @@ TEST_CASE("Check that parents have unique local indexes", "[GMG::InterLevelComm]
 }
 TEST_CASE("2-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file      = GENERATE(as<std::string>{}, MESHES);
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                   mesh_file      = GENERATE(as<std::string>{}, MESHES);
+	auto                   num_components = GENERATE(1, 2, 3);
+	auto                   nx             = GENERATE(2, 10);
+	auto                   ny             = GENERATE(2, 10);
+	int                    num_ghost      = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
-	CHECK(ghost_vec->getNumComponents() == num_components);
+	CHECK(ghost_vec.getNumComponents() == num_components);
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
-		CHECK(ghost_vec->getNumLocalPatches() == 0);
+		CHECK(ghost_vec.getNumLocalPatches() == 0);
 	} else {
-		CHECK(ghost_vec->getNumLocalPatches() == 1);
+		CHECK(ghost_vec.getNumLocalPatches() == 1);
 	}
 }
 TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file      = GENERATE(as<std::string>{}, MESHES);
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                   mesh_file      = GENERATE(as<std::string>{}, MESHES);
+	auto                   num_components = GENERATE(1, 2, 3);
+	auto                   nx             = GENERATE(2, 10);
+	auto                   ny             = GENERATE(2, 10);
+	int                    num_ghost      = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -145,39 +144,30 @@ TEST_CASE("2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	INFO("rank: " << rank);
 
 	// fill vectors with rank+c+1
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
-	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
-		auto local_datas = coarse_vec->getLocalDatas(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               INFO("c " << c);
-				               INFO("xi: " << coord[0]);
-				               INFO("yi: " << coord[1]);
-				               CHECK(local_datas[c][coord] == 3 + 2 * c);
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 3 + 2 * coord[2]);
+		                         });
 	} else {
 	}
 }
@@ -185,528 +175,507 @@ TEST_CASE(
 "2-processor sendGhostPatches throws exception when start isn't called before finish on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2);
-	auto                  ny        = GENERATE(2);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2);
+	auto                   ny        = GENERATE(2);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2);
-	auto                  ny        = GENERATE(2);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2);
+	auto                   ny        = GENERATE(2);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec   = ilc->getNewGhostVector();
-	auto ghost_vec_2 = ilc->getNewGhostVector();
+	Vector<2> ghost_vec   = ilc.getNewGhostVector(1);
+	Vector<2> ghost_vec_2 = ilc.getNewGhostVector(1);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec_2), RuntimeError);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
+	Vector<2> coarse_vec_2(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec), RuntimeError);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesFinish(coarse_vec_2, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
+	Vector<2> coarse_vec_2(d_coarse, 1);
 
-	auto ghost_vec   = ilc->getNewGhostVector();
-	auto ghost_vec_2 = ilc->getNewGhostVector();
+	Vector<2> ghost_vec   = ilc.getNewGhostVector(1);
+	Vector<2> ghost_vec_2 = ilc.getNewGhostVector(1);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec_2), RuntimeError);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesFinish(coarse_vec_2, ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when start is called twice on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when get start is called after send start on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor sendGhostPatches throws exception when sned start is called after get start on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file      = GENERATE(as<std::string>{}, MESHES);
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                   mesh_file      = GENERATE(as<std::string>{}, MESHES);
+	auto                   num_components = GENERATE(1, 2, 3);
+	auto                   nx             = GENERATE(2, 10);
+	auto                   ny             = GENERATE(2, 10);
+	int                    num_ghost      = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	// fill vectors with rank+c+1
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
-	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	ilc.getGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
-		auto local_datas = ghost_vec->getLocalDatas(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               CHECK(local_datas[c][coord] == 1 + c);
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 1 + coord[2]);
+		                         });
 	}
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when start isn't called before finish on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	CHECK_THROWS_AS(ilc.getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when start and finish are called on different ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec   = ilc->getNewGhostVector();
-	auto ghost_vec_2 = ilc->getNewGhostVector();
+	Vector<2> ghost_vec   = ilc.getNewGhostVector(1);
+	Vector<2> ghost_vec_2 = ilc.getNewGhostVector(1);
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec_2), RuntimeError);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.getGhostPatchesFinish(coarse_vec, ghost_vec_2), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when start and finish are called on different vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
+	Vector<2> coarse_vec_2(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec_2, ghost_vec), RuntimeError);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesFinish(coarse_vec_2, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when start and finish are called on different vectors and ghost vectors on uniform quad",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec   = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_vec_2 = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
+	Vector<2> coarse_vec_2(d_coarse, 1);
 
-	auto ghost_vec   = ilc->getNewGhostVector();
-	auto ghost_vec_2 = ilc->getNewGhostVector();
+	Vector<2> ghost_vec   = ilc.getNewGhostVector(1);
+	Vector<2> ghost_vec_2 = ilc.getNewGhostVector(1);
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec_2, ghost_vec_2), RuntimeError);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.getGhostPatchesFinish(coarse_vec_2, ghost_vec_2), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when start is called twice on uniform quad",
           "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when send finish is called on get start",
           "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when get finish is called on send start",
           "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when send start is called after get start",
           "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches throws exception when get start is called after send start",
           "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.getGhostPatchesStart(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when send finish is called after get start and finish",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	ilc.getGhostPatchesFinish(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE(
 "2-processor getGhostPatches throws exception when get finish is called after send start and finish",
 "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file = GENERATE(as<std::string>{}, MESHES);
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto                   mesh_file = GENERATE(as<std::string>{}, MESHES);
+	auto                   nx        = GENERATE(2, 10);
+	auto                   ny        = GENERATE(2, 10);
+	int                    num_ghost = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> coarse_vec(d_coarse, 1);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(1);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
-	CHECK_THROWS_AS(ilc->getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec);
+	CHECK_THROWS_AS(ilc.getGhostPatchesFinish(coarse_vec, ghost_vec), RuntimeError);
 }
 TEST_CASE("2-processor getGhostPatches called twice on uniform quad", "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file      = GENERATE(as<std::string>{}, MESHES);
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                   mesh_file      = GENERATE(as<std::string>{}, MESHES);
+	auto                   num_components = GENERATE(1, 2, 3);
+	auto                   nx             = GENERATE(2, 10);
+	auto                   ny             = GENERATE(2, 10);
+	int                    num_ghost      = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	for (int i = 0; i < 2; i++) {
 		INFO("Call" << i);
-		auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
+		Vector<2> coarse_vec(d_coarse, num_components);
 
-		auto ghost_vec = ilc->getNewGhostVector();
+		Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
 		// fill vectors with rank+c+1
-		for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-			auto local_datas = coarse_vec->getLocalDatas(i);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               local_datas[c][coord] = rank + c + 1;
-				               }
-			               });
+		for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+			PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         local_view[coord] = rank + coord[2] + 1;
+			                         });
 		}
-		for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-			auto local_datas = ghost_vec->getLocalDatas(i);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               local_datas[c][coord] = rank + c + 1;
-				               }
-			               });
+		for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
+			PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         local_view[coord] = rank + coord[2] + 1;
+			                         });
 		}
 
-		ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-		ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
+		ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+		ilc.getGhostPatchesFinish(coarse_vec, ghost_vec);
 		if (rank == 0) {
 		} else {
 			// the coarse vec should be filled with 1+c
-			auto local_datas = ghost_vec->getLocalDatas(0);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               CHECK(local_datas[c][coord] == 1 + c);
-				               }
-			               });
+			PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         CHECK(local_view[coord] == 1 + coord[2]);
+			                         });
 		}
 	}
 }
 TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file      = GENERATE(as<std::string>{}, MESHES);
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                   mesh_file      = GENERATE(as<std::string>{}, MESHES);
+	auto                   num_components = GENERATE(1, 2, 3);
+	auto                   nx             = GENERATE(2, 10);
+	auto                   ny             = GENERATE(2, 10);
+	int                    num_ghost      = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	for (int i = 0; i < 2; i++) {
-		auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
+		Vector<2> coarse_vec(d_coarse, num_components);
 
-		auto ghost_vec = ilc->getNewGhostVector();
+		Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
-		// fill vectors with rank+1
-		for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-			auto local_datas = coarse_vec->getLocalDatas(i);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               local_datas[c][coord] = rank + c + 1;
-				               }
-			               });
+		// fill vectors with rank+c+1
+		for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+			PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         local_view[coord] = rank + coord[2] + 1;
+			                         });
 		}
-		for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-			auto local_datas = ghost_vec->getLocalDatas(i);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               local_datas[c][coord] = rank + c + 1;
-				               }
-			               });
+		for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
+			PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         local_view[coord] = rank + coord[2] + 1;
+			                         });
 		}
 
-		ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-		ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
+		ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+		ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec);
 		if (rank == 0) {
 			// the coarse vec should be filled with 3+2*c
-			auto local_datas = coarse_vec->getLocalDatas(0);
-			nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-			               [&](const std::array<int, 2> &coord) {
-				               for (int c = 0; c < num_components; c++) {
-					               INFO("c " << c);
-					               INFO("xi: " << coord[0]);
-					               INFO("yi: " << coord[1]);
-					               CHECK(local_datas[c][coord] == 3 + 2 * c);
-				               }
-			               });
+			PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
+			loop_over_all_indexes<3>(local_view,
+			                         [&](const std::array<int, 3> &coord) {
+				                         CHECK(local_view[coord] == 3 + 2 * coord[2]);
+			                         });
 		} else {
 		}
 	}
@@ -714,180 +683,150 @@ TEST_CASE("2-processor sendGhostPatches called twice on uniform quad", "[GMG::In
 TEST_CASE("2-processor sendGhostPatches then getGhostPaches called on uniform quad",
           "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file      = GENERATE(as<std::string>{}, MESHES);
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                   mesh_file      = GENERATE(as<std::string>{}, MESHES);
+	auto                   num_components = GENERATE(1, 2, 3);
+	auto                   nx             = GENERATE(2, 10);
+	auto                   ny             = GENERATE(2, 10);
+	int                    num_ghost      = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
-	auto ghost_vec  = ilc->getNewGhostVector();
+	Vector<2> coarse_vec(d_coarse, num_components);
+	auto      ghost_vec = ilc.getNewGhostVector(num_components);
 
-	// fill vectors with rank+1
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	// fill vectors with rank+c+1
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
-	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
-		auto local_datas = coarse_vec->getLocalDatas(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               INFO("c " << c);
-				               INFO("xi: " << coord[0]);
-				               INFO("yi: " << coord[1]);
-				               CHECK(local_datas[c][coord] == 3 + 2 * c);
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 3 + 2 * coord[2]);
+		                         });
 	} else {
 	}
 
-	// fill vectors with rank+1
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	// fill vectors with rank+c+1
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
-	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	ilc.getGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
-		auto local_datas = ghost_vec->getLocalDatas(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               CHECK(local_datas[c][coord] == 1 + c);
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 1 + coord[2]);
+		                         });
 	}
 }
 TEST_CASE("2-processor getGhostPatches then sendGhostPaches called on uniform quad",
           "[GMG::InterLevelComm]")
 {
-	auto                  mesh_file      = GENERATE(as<std::string>{}, MESHES);
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                   mesh_file      = GENERATE(as<std::string>{}, MESHES);
+	auto                   num_components = GENERATE(1, 2, 3);
+	auto                   nx             = GENERATE(2, 10);
+	auto                   ny             = GENERATE(2, 10);
+	int                    num_ghost      = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	auto coarse_vec = ValVector<2>::GetNewVector(d_coarse, num_components);
-	auto ghost_vec  = ilc->getNewGhostVector();
+	Vector<2> coarse_vec(d_coarse, num_components);
+	auto      ghost_vec = ilc.getNewGhostVector(num_components);
 
-	// fill vectors with rank+1
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	// fill vectors with rank+c+1
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
-	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
-	ilc->getGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->getGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
+	ilc.getGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 	} else {
 		// the coarse vec should be filled with 1+c
-		auto local_datas = ghost_vec->getLocalDatas(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               CHECK(local_datas[c][coord] == 1 + c);
-			               }
-		               });
+		PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 1 + coord[2]);
+		                         });
 	}
 
-	// fill vectors with rank+1
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto local_datas = coarse_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	// fill vectors with rank+c+1
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
-	for (int i = 0; i < ghost_vec->getNumLocalPatches(); i++) {
-		auto local_datas = ghost_vec->getLocalDatas(i);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               local_datas[c][coord] = rank + c + 1;
-			               }
-		               });
+	for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         local_view[coord] = rank + coord[2] + 1;
+		                         });
 	}
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec);
 	if (rank == 0) {
 		// the coarse vec should be filled with 3+2*c
-		auto local_datas = coarse_vec->getLocalDatas(0);
-		nested_loop<2>(local_datas[0].getGhostStart(), local_datas[0].getGhostEnd(),
-		               [&](const std::array<int, 2> &coord) {
-			               for (int c = 0; c < num_components; c++) {
-				               INFO("c " << c);
-				               INFO("xi: " << coord[0]);
-				               INFO("yi: " << coord[1]);
-				               CHECK(local_datas[c][coord] == 3 + 2 * c);
-			               }
-		               });
+		PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
+		loop_over_all_indexes<3>(local_view,
+		                         [&](const std::array<int, 3> &coord) {
+			                         CHECK(local_view[coord] == 3 + 2 * coord[2]);
+		                         });
 	} else {
 	}
 }

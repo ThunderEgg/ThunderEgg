@@ -38,12 +38,19 @@ template <int D> class Operator
 	virtual ~Operator() {}
 
 	/**
+	 * @brief Clone this operator
+	 *
+	 * @return Operator<D>* a newly allocated copy of this operator
+	 */
+	virtual Operator<D> *clone() const = 0;
+
+	/**
 	 * @brief Virtual function that base classes have to implement.
 	 *
 	 * @param x the input vector.
 	 * @param b the output vector.
 	 */
-	virtual void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const = 0;
+	virtual void apply(const Vector<D> &x, Vector<D> &b) const = 0;
 };
 } // namespace ThunderEgg
 #endif

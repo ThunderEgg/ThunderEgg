@@ -21,7 +21,6 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -34,21 +33,21 @@ const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
 TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLevelComm]")
 {
-	auto                  nx        = GENERATE(2);
-	auto                  ny        = GENERATE(2);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	INFO("d_fine: " << d_fine->getNumLocalPatches());
-	INFO("d_coarse: " << d_coarse->getNumLocalPatches());
-	auto ilc = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, 1, d_fine);
+	auto            nx        = GENERATE(2);
+	auto            ny        = GENERATE(2);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
+	INFO("d_fine: " << d_fine.getNumLocalPatches());
+	INFO("d_coarse: " << d_coarse.getNumLocalPatches());
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	CHECK(ilc->getPatchesWithGhostParent().size() == 0);
-	CHECK(ilc->getPatchesWithLocalParent().size() == 16);
+	CHECK(ilc.getPatchesWithGhostParent().size() == 0);
+	CHECK(ilc.getPatchesWithLocalParent().size() == 16);
 
 	map<int, set<int>> parents_to_children;
-	for (auto pair : ilc->getPatchesWithLocalParent()) {
+	for (auto pair : ilc.getPatchesWithLocalParent()) {
 		parents_to_children[pair.first].insert(pair.second.get().id);
 	}
 	CHECK(parents_to_children.size() == 4);
@@ -79,35 +78,35 @@ TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLe
 }
 TEST_CASE("1-processor getNewGhostVector on uniform 4x4", "[GMG::InterLevelComm]")
 {
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                   num_components = GENERATE(1, 2, 3);
+	auto                   nx             = GENERATE(2, 10);
+	auto                   ny             = GENERATE(2, 10);
+	int                    num_ghost      = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
-	CHECK(ghost_vec->getNumLocalPatches() == 0);
-	CHECK(ghost_vec->getNumComponents() == num_components);
+	CHECK(ghost_vec.getNumLocalPatches() == 0);
+	CHECK(ghost_vec.getNumComponents() == num_components);
 }
 TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]")
 {
-	auto                  num_components = GENERATE(1, 2, 3);
-	auto                  nx             = GENERATE(2, 10);
-	auto                  ny             = GENERATE(2, 10);
-	int                   num_ghost      = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-	auto                  ilc      = std::make_shared<GMG::InterLevelComm<2>>(d_coarse, num_components, d_fine);
+	auto                   num_components = GENERATE(1, 2, 3);
+	auto                   nx             = GENERATE(2, 10);
+	auto                   ny             = GENERATE(2, 10);
+	int                    num_ghost      = 1;
+	DomainReader<2>        domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>              d_fine   = domain_reader.getFinerDomain();
+	Domain<2>              d_coarse = domain_reader.getCoarserDomain();
+	GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, num_components);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, num_components);
+	Vector<2> coarse_vec(d_coarse, num_components);
+	Vector<2> coarse_expected(d_coarse, num_components);
 
-	auto ghost_vec = ilc->getNewGhostVector();
+	Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
 	// info
 	INFO("nx: " << nx);
@@ -118,27 +117,23 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 
 	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_vec, f);
 	int idx = 0;
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto vec_lds = coarse_vec->getLocalDatas(i);
-		nested_loop<2>(vec_lds[0].getStart(), vec_lds[0].getEnd(), [&](const array<int, 2> &coord) {
-			for (size_t c = 0; c < vec_lds.size(); c++) {
-				vec_lds[c][coord] = idx;
-				idx++;
-			}
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> vec_view = coarse_vec.getPatchView(i);
+		loop_over_interior_indexes<3>(vec_view, [&](const array<int, 3> &coord) {
+			vec_view[coord] = idx;
+			idx++;
 		});
 	}
 	// since there are not ghost patches, the coarse vec should not be modified
-	coarse_expected->copy(coarse_vec);
+	coarse_expected.copy(coarse_vec);
 
-	ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
-	ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
-	for (int i = 0; i < coarse_vec->getNumLocalPatches(); i++) {
-		auto vec_lds      = coarse_vec->getLocalDatas(i);
-		auto expected_lds = coarse_expected->getLocalDatas(i);
-		nested_loop<2>(vec_lds[0].getStart(), vec_lds[0].getEnd(), [&](const array<int, 2> &coord) {
-			for (size_t c = 0; c < vec_lds.size(); c++) {
-				REQUIRE(vec_lds[c][coord] == Catch::Approx(expected_lds[c][coord]));
-			}
+	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
+	ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec);
+	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
+		PatchView<double, 2> vec_view      = coarse_vec.getPatchView(i);
+		PatchView<double, 2> expected_view = coarse_expected.getPatchView(i);
+		loop_over_interior_indexes<3>(vec_view, [&](const array<int, 3> &coord) {
+			REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
 		});
 	}
 }

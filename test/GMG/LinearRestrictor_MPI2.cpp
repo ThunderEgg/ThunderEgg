@@ -23,7 +23,6 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
-#include <ThunderEgg/ValVector.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -36,67 +35,15 @@ const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi2.json";
 
 TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
 {
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
+	auto            nx        = GENERATE(2, 10);
+	auto            ny        = GENERATE(2, 10);
+	int             num_ghost = 1;
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d_fine   = domain_reader.getFinerDomain();
+	Domain<2>       d_coarse = domain_reader.getCoarserDomain();
 
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 1);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
-
-	auto f = [&](const std::array<double, 2> coord) -> double {
-		double x = coord[0];
-		double y = coord[1];
-		return 1 + ((x * 0.3) + y);
-	};
-
-	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
-	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
-
-	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
-
-	restrictor->restrict(fine_vec, coarse_vec);
-
-	for (auto pinfo : d_coarse->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo.id);
-		INFO("x:     " << pinfo.starts[0]);
-		INFO("y:     " << pinfo.starts[1]);
-		INFO("nx:    " << pinfo.ns[0]);
-		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
-			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
-		});
-		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
-			if (!pinfo.hasNbr(s)) {
-				INFO("side:      " << s);
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
-				               });
-			}
-		}
-	}
-}
-TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearRestrictor]")
-{
-	auto                  nx        = GENERATE(2, 10);
-	auto                  ny        = GENERATE(2, 10);
-	int                   num_ghost = 1;
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d_fine   = domain_reader.getFinerDomain();
-	shared_ptr<Domain<2>> d_coarse = domain_reader.getCoarserDomain();
-
-	auto fine_vec        = ValVector<2>::GetNewVector(d_fine, 1);
-	auto coarse_vec      = ValVector<2>::GetNewVector(d_coarse, 1);
-	auto coarse_expected = ValVector<2>::GetNewVector(d_coarse, 1);
+	Vector<2> fine_vec(d_fine, 1);
+	Vector<2> coarse_expected(d_coarse, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -107,26 +54,24 @@ TEST_CASE("Linear Test LinearRestrictor with values already set", "[GMG::LinearR
 	DomainTools::SetValuesWithGhost<2>(d_fine, fine_vec, f);
 	DomainTools::SetValuesWithGhost<2>(d_coarse, coarse_expected, f);
 
-	coarse_vec->setWithGhost(1.0);
+	GMG::LinearRestrictor<2> restrictor(d_fine, d_coarse, true);
 
-	auto restrictor = std::make_shared<GMG::LinearRestrictor<2>>(d_fine, d_coarse, 1, true);
+	Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
-	restrictor->restrict(fine_vec, coarse_vec);
-
-	for (auto pinfo : d_coarse->getPatchInfoVector()) {
+	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld      = coarse_vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld = coarse_expected->getLocalData(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = coarse_vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (!pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),

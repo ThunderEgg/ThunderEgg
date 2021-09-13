@@ -38,8 +38,7 @@ namespace Poisson
  * @param solver the patch solver to use for the formation
  * @return Mat the PETSc matrix, user is responsible for destroying
  */
-Mat FastSchurMatrixAssemble2D(std::shared_ptr<const Schur::InterfaceDomain<2>> iface_domain,
-                              std::shared_ptr<Poisson::FFTWPatchSolver<2>>     solver);
+Mat FastSchurMatrixAssemble2D(const Schur::InterfaceDomain<2> &iface_domain, Poisson::FFTWPatchSolver<2> &solver);
 } // namespace Poisson
 } // namespace ThunderEgg
 #endif

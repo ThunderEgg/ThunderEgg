@@ -40,6 +40,8 @@ int main(int argc, char *argv[])
 {
 	MPI_Init(&argc, &argv);
 
+	Communicator comm(MPI_COMM_WORLD);
+
 	// command line options
 	CLI::App app{"ThunderEgg 2d poisson solver example"};
 
@@ -56,7 +58,7 @@ int main(int argc, char *argv[])
 	app.add_flag("--nozerof", no_zero_rhs_avg,
 	             "Make the average of the rhs on neumann problems zero");
 
-	double tolerance = 1e-12;
+	double tolerance = 1e-8;
 	app.add_option("-t,--tolerance", tolerance, "Tolerance of Krylov solver");
 
 	bool neumann;
@@ -118,12 +120,6 @@ int main(int argc, char *argv[])
 		file_out.close();
 	}
 
-	int num_procs;
-	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
-
-	int my_global_rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &my_global_rank);
-
 	// the functions that we are using
 	function<double(const std::array<double, 2> &)> ffun; // rhs
 	function<double(const std::array<double, 2> &)> gfun; // lhs
@@ -137,13 +133,13 @@ int main(int argc, char *argv[])
 		double alpha = 1000;
 		ffun         = [&](const array<double, 2> &coord) {
             double x  = coord[0];
-            double y  = coord[2];
+            double y  = coord[1];
             double r2 = pow((x - x0), 2) + pow((y - y0), 2);
             return exp(-alpha / 2.0 * r2) * (pow(alpha, 2) * r2 - 2 * alpha);
 		};
 		gfun = [&](const array<double, 2> &coord) {
 			double x  = coord[0];
-			double y  = coord[2];
+			double y  = coord[1];
 			double r2 = pow((x - x0), 2) + pow((y - y0), 2);
 			return exp(-alpha / 2.0 * r2);
 		};
@@ -157,7 +153,7 @@ int main(int argc, char *argv[])
 	} else if (problem == "circle") {
 		ffun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			double xdist, ydist, dist;
 			// distance form center circle
 			xdist = x - 0.5;
@@ -192,12 +188,12 @@ int main(int argc, char *argv[])
 	} else if (problem == "trig_gauss") {
 		gfun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			return exp(cos(10 * M_PI * x)) - exp(cos(11 * M_PI * y));
 		};
 		ffun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
+			double y = coord[1];
 			return 100 * M_PI * M_PI * (pow(sin(10 * M_PI * x), 2) - cos(10 * M_PI * x))
 			       * exp(cos(10 * M_PI * x))
 			       + 121 * M_PI * M_PI * (cos(11 * M_PI * y) - pow(sin(11 * M_PI * y), 2))
@@ -215,36 +211,36 @@ int main(int argc, char *argv[])
 	} else {
 		ffun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
-			return -5 * M_PI * M_PI * sinl(M_PI * y) * cosl(2 * M_PI * x);
+			double y = coord[1];
+			return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
 		};
 		gfun = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
-			return sinl(M_PI * y) * cosl(2 * M_PI * x);
+			double y = coord[1];
+			return sin(M_PI * y) * cos(2 * M_PI * x);
 		};
 		nfunx = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
-			return -2 * M_PI * sinl(M_PI * y) * sinl(2 * M_PI * x);
+			double y = coord[1];
+			return -2 * M_PI * sin(M_PI * y) * sin(2 * M_PI * x);
 		};
 		nfuny = [](const array<double, 2> &coord) {
 			double x = coord[0];
-			double y = coord[2];
-			return M_PI * cosl(M_PI * y) * cosl(2 * M_PI * x);
+			double y = coord[1];
+			return M_PI * cos(M_PI * y) * cos(2 * M_PI * x);
 		};
 	}
 
 	// create a Timer object to keep track of timings
-	std::shared_ptr<Timer> timer = make_shared<Timer>(MPI_COMM_WORLD);
+	std::shared_ptr<Timer> timer = make_shared<Timer>(comm);
 
 	// read in a tree from file
 	Tree<2> t;
 	t = Tree<2>(mesh_filename);
-	for (int i = 0; i < div; i++) {
-		t.refineLeaves();
-	}
 	TreeToP4est ttp(t);
+	for (int i = 0; i < div; i++) {
+		ttp.divide();
+	}
 
 	auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
 		x = unit_x;
@@ -257,27 +253,26 @@ int main(int argc, char *argv[])
 	ns[1] = n;
 
 	// A DomainGenerator will create domains for the Multigrid algorithm from a tree
-	int                            num_ghost_cells  = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
-	shared_ptr<DomainGenerator<2>> domain_generator = make_shared<P4estDomainGenerator>(ttp.p4est, ns, num_ghost_cells, bmf);
+	int                  num_ghost_cells = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
+	P4estDomainGenerator domain_generator(ttp.p4est, ns, num_ghost_cells, bmf);
 
 	// Get the finest domain from the tree
-	shared_ptr<Domain<2>> domain = domain_generator->getFinestDomain();
+	Domain<2> domain = domain_generator.getFinestDomain();
 
 	// A patch operator needs a GhostFiller object to define how to fill ghost cells for the patches.
 	// This one will use a tri-linear interpolation scheme at the refinement boundarys of the domain
-	shared_ptr<GhostFiller<2>> ghost_filler = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller ghost_filler(domain, GhostFillingType::Faces);
 
 	// create patch operator that uses a typical 2nd order 7 point poisson stencil
-	shared_ptr<StarPatchOperator<2>> patch_operator = make_shared<StarPatchOperator<2>>(domain, ghost_filler, neumann);
+	StarPatchOperator<2> patch_operator(domain, ghost_filler, neumann);
 
 	timer->start("Domain Initialization");
 
 	// Create some new vectors for the domain
 	int num_components = 1; //the poisson operator just has one value in each cell
 
-	shared_ptr<ValVector<2>> u     = ValVector<2>::GetNewVector(domain, num_components);
-	shared_ptr<ValVector<2>> exact = ValVector<2>::GetNewVector(domain, num_components);
-	shared_ptr<ValVector<2>> f     = ValVector<2>::GetNewVector(domain, num_components);
+	Vector<2> exact(domain, num_components);
+	Vector<2> f(domain, num_components);
 
 	// fill the vectors with some values
 	DomainTools::SetValues<2>(domain, f, ffun); // fill the f vector with the associated domain using the ffun function
@@ -286,18 +281,18 @@ int main(int argc, char *argv[])
 	// modify the rhs to set the boundary conditions
 	// the patch operator contains some helper functions for this
 	if (neumann) {
-		patch_operator->addDrichletBCToRHS(f, gfun);
+		patch_operator.addNeumannBCToRHS(f, gfun, {nfunx, nfuny});
 	} else {
-		patch_operator->addNeumannBCToRHS(f, gfun, {nfunx, nfuny});
+		patch_operator.addDrichletBCToRHS(f, gfun);
 	}
 
 	timer->stop("Domain Initialization");
 
 	if (neumann && !no_zero_rhs_avg) {
-		double fdiff = domain->integrate(f) / domain->volume();
-		if (my_global_rank == 0)
+		double fdiff = DomainTools::Integrate<2>(domain, f) / domain.volume();
+		if (comm.getRank() == 0)
 			cout << "Fdiff: " << fdiff << endl;
-		f->shift(-fdiff);
+		f.shift(-fdiff);
 	}
 
 	///////////////////
@@ -305,112 +300,106 @@ int main(int argc, char *argv[])
 	///////////////////
 	timer->start("Linear System Setup");
 
-	std::shared_ptr<Operator<2>> A = patch_operator; // a PatchOperator can be passed the BiCGStab to use as an operator
-
 	// preconditoners
 	timer->start("Preconditioner Setup");
 
 	int domain_level = 0;
-	domain->setTimer(timer);
+	domain.setTimer(timer);
 	domain_level++;
 
 	// set the patch solver
-	auto patch_bcgs = make_shared<Iterative::BiCGStab<2>>();
-	// p_bcgs->setTolerance(ps_tol);
+	Iterative::BiCGStab<2> patch_bcgs;
+	//p_bcgs->setTolerance(ps_tol);
 	// p_bcgs->setMaxIterations(ps_max_it);
 
 	// create a CycleBuilder and set the options
 	GMG::CycleBuilder<2> builder(copts);
 
-	// the GMG cycle needs a vector generator for domain of each level to generate temporary work vectors
-	std::shared_ptr<VectorGenerator<2>> vg(new ValVectorGenerator<2>(domain, num_components));
-
 	// Create a smoother for the finest level
-	shared_ptr<GMG::Smoother<2>> finest_smoother;
-	bitset<4>                    neumann_bitset = neumann ? 0xF : 0x0;
+	shared_ptr<PatchSolver<2>> finest_smoother;
+	bitset<4>                  neumann_bitset = neumann ? 0xF : 0x0;
 	if (patch_solver == "dft") {
-		finest_smoother = make_shared<DFTPatchSolver<2>>(patch_operator, neumann_bitset);
+		finest_smoother.reset(new DFTPatchSolver<2>(patch_operator, neumann_bitset));
 	} else if (patch_solver == "fftw") {
-		finest_smoother = make_shared<FFTWPatchSolver<2>>(patch_operator, neumann_bitset);
+		finest_smoother.reset(new FFTWPatchSolver<2>(patch_operator, neumann_bitset));
 	} else {
-		finest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, patch_operator);
+		finest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, patch_operator));
 	}
 
-	// the next coarser domain is needed for the restrictor
-	shared_ptr<Domain<2>> coarser_domain = domain_generator->getCoarserDomain();
+	std::shared_ptr<Operator<2>> M;
+	if (true) {
+		// the next coarser domain is needed for the restrictor
+		Domain<2> coarser_domain = domain_generator.getCoarserDomain();
 
-	shared_ptr<GMG::Restrictor<2>> finest_restrictor = make_shared<GMG::LinearRestrictor<2>>(domain, coarser_domain, num_components);
+		GMG::LinearRestrictor<2> finest_restrictor(domain, coarser_domain);
 
-	//add the finest level
-	builder.addFinestLevel(patch_operator, finest_smoother, finest_restrictor, vg);
+		//add the finest level
+		builder.addFinestLevel(patch_operator, *finest_smoother, finest_restrictor);
 
-	shared_ptr<Domain<2>> finer_domain   = domain;
-	shared_ptr<Domain<2>> current_domain = coarser_domain;
+		Domain<2> finer_domain   = domain;
+		Domain<2> current_domain = coarser_domain;
 
-	//generate each of the middle levels
-	while (domain_generator->hasCoarserDomain()) {
-		current_domain->setTimer(timer);
-		domain_level++;
+		//generate each of the middle levels
+		while (domain_generator.hasCoarserDomain()) {
+			current_domain.setTimer(timer);
+			domain_level++;
 
-		// get the coarser domain
-		coarser_domain = domain_generator->getCoarserDomain();
+			// get the coarser domain
+			coarser_domain = domain_generator.getCoarserDomain();
 
-		// vector generator
-		auto middle_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, num_components);
+			// create operator for middle domain
+			BiLinearGhostFiller  middle_ghost_filler(current_domain, GhostFillingType::Faces);
+			StarPatchOperator<2> middle_patch_operator(current_domain, middle_ghost_filler);
 
-		// create operator for middle domain
-		auto middle_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
-		auto middle_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, middle_ghost_filler);
+			// smoother
+			unique_ptr<GMG::Smoother<2>> middle_smoother;
+			if (patch_solver == "dft") {
+				middle_smoother.reset(new DFTPatchSolver<2>(middle_patch_operator, neumann_bitset));
+			} else if (patch_solver == "fftw") {
+				middle_smoother.reset(new FFTWPatchSolver<2>(middle_patch_operator, neumann_bitset));
+			} else {
+				middle_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, middle_patch_operator));
+			}
+
+			// restrictor and interpolator
+			GMG::DirectInterpolator<2> interpolator(current_domain, finer_domain);
+			GMG::LinearRestrictor<2>   restrictor(current_domain, coarser_domain);
+
+			// add the middle level
+			builder.addIntermediateLevel(middle_patch_operator, *middle_smoother, restrictor, interpolator);
+
+			finer_domain   = current_domain;
+			current_domain = coarser_domain;
+		}
+		current_domain.setTimer(timer);
+
+		//add the coarsest level to the builder
+
+		// patch operator
+		BiLinearGhostFiller  coarsest_ghost_filler(current_domain, GhostFillingType::Faces);
+		StarPatchOperator<2> coarsest_patch_operator(current_domain, coarsest_ghost_filler);
 
 		// smoother
-		shared_ptr<GMG::Smoother<2>> middle_smoother;
+		unique_ptr<GMG::Smoother<2>> coarsest_smoother;
 		if (patch_solver == "dft") {
-			middle_smoother = make_shared<DFTPatchSolver<2>>(middle_patch_operator, neumann_bitset);
+			coarsest_smoother.reset(new DFTPatchSolver<2>(coarsest_patch_operator, neumann_bitset));
 		} else if (patch_solver == "fftw") {
-			middle_smoother = make_shared<FFTWPatchSolver<2>>(middle_patch_operator, neumann_bitset);
+			coarsest_smoother.reset(new FFTWPatchSolver<2>(coarsest_patch_operator, neumann_bitset));
 		} else {
-			middle_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, middle_patch_operator);
+			coarsest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, coarsest_patch_operator));
 		}
 
-		// restrictor and interpolator
-		shared_ptr<GMG::Interpolator<2>> interpolator = make_shared<GMG::DirectInterpolator<2>>(current_domain, finer_domain, num_components);
-		shared_ptr<GMG::Restrictor<2>>   restrictor   = make_shared<GMG::LinearRestrictor<2>>(current_domain, coarser_domain, num_components);
+		// coarsets level only needs an interpolator
+		GMG::DirectInterpolator<2> interpolator(current_domain, finer_domain);
 
-		// add the middle level
-		builder.addIntermediateLevel(middle_patch_operator, middle_smoother, restrictor, interpolator, middle_vector_generator);
+		// add the coarsest level
+		builder.addCoarsestLevel(coarsest_patch_operator, *coarsest_smoother, interpolator);
 
-		finer_domain   = current_domain;
-		current_domain = coarser_domain;
-	}
-	current_domain->setTimer(timer);
-
-	//add the coarsest level to the builder
-
-	// vector generator
-	shared_ptr<VectorGenerator<2>> coarsest_vector_generator = make_shared<ValVectorGenerator<2>>(current_domain, 1);
-
-	// patch operator
-	shared_ptr<GhostFiller<2>>   coarsest_ghost_filler   = make_shared<BiLinearGhostFiller>(current_domain, GhostFillingType::Faces);
-	shared_ptr<PatchOperator<2>> coarsest_patch_operator = make_shared<StarPatchOperator<2>>(current_domain, coarsest_ghost_filler);
-
-	// smoother
-	shared_ptr<GMG::Smoother<2>> coarsest_smoother;
-	if (patch_solver == "dft") {
-		coarsest_smoother = make_shared<DFTPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
-	} else if (patch_solver == "fftw") {
-		coarsest_smoother = make_shared<FFTWPatchSolver<2>>(coarsest_patch_operator, neumann_bitset);
+		// get the preconditioner operator
+		M = builder.getCycle();
 	} else {
-		coarsest_smoother = make_shared<Iterative::PatchSolver<2>>(patch_bcgs, coarsest_patch_operator);
+		M = finest_smoother;
 	}
-
-	// coarsets level only needs an interpolator
-	shared_ptr<GMG::Interpolator<2>> interpolator = make_shared<GMG::DirectInterpolator<2>>(current_domain, finer_domain, 1);
-
-	// add the coarsest level
-	builder.addCoarsestLevel(coarsest_patch_operator, coarsest_smoother, interpolator, coarsest_vector_generator);
-
-	// get the preconditioner operator
-	std::shared_ptr<Operator<2>> M = builder.getCycle();
 
 	timer->stop("Preconditioner Setup");
 
@@ -424,45 +413,47 @@ int main(int argc, char *argv[])
 	solver.setTimer(timer);
 	solver.setTolerance(tolerance);
 
-	int num_iterations = solver.solve(vg, A, u, f, M, true);
+	Vector<2> u(domain, num_components);
 
-	if (my_global_rank == 0) {
+	int num_iterations = solver.solve(patch_operator, u, f, M.get(), true);
+
+	if (comm.getRank() == 0) {
 		cout << "Iterations: " << num_iterations << endl;
 	}
 	timer->stop("Linear Solve");
 
 	// calculate residual
-	shared_ptr<ValVector<2>> au              = ValVector<2>::GetNewVector(domain, num_components);
-	shared_ptr<ValVector<2>> residual_vector = ValVector<2>::GetNewVector(domain, num_components);
+	Vector<2> au(domain, num_components);
+	Vector<2> residual_vector(domain, num_components);
 
-	A->apply(u, au);
+	patch_operator.apply(u, au);
 
-	residual_vector->addScaled(-1, au, 1, f);
+	residual_vector.addScaled(-1, au, 1, f);
 
-	double residual = residual_vector->twoNorm();
-	double fnorm    = f->twoNorm();
+	double residual = residual_vector.twoNorm();
+	double fnorm    = f.twoNorm();
 
 	// calculate error
-	shared_ptr<ValVector<2>> error = ValVector<2>::GetNewVector(domain, 1);
-	error->addScaled(-1, exact, 1, u);
+	Vector<2> error(domain, 1);
+	error.addScaled(-1, exact, 1, u);
 	if (neumann) {
-		double u_average     = domain->integrate(u) / domain->volume();
-		double exact_average = domain->integrate(exact) / domain->volume();
+		double u_average     = DomainTools::Integrate<2>(domain, u) / domain.volume();
+		double exact_average = DomainTools::Integrate<2>(domain, exact) / domain.volume();
 
-		if (my_global_rank == 0) {
+		if (comm.getRank() == 0) {
 			cout << "Average of computed solution: " << u_average << endl;
 			cout << "Average of exact solution: " << exact_average << endl;
 		}
 
-		error->shift(exact_average - u_average);
+		error.shift(exact_average - u_average);
 	}
-	double error_norm     = error->twoNorm();
-	double error_norm_inf = error->infNorm();
-	double exact_norm     = exact->twoNorm();
+	double error_norm     = error.twoNorm();
+	double error_norm_inf = error.infNorm();
+	double exact_norm     = exact.twoNorm();
 
-	double au_sum = domain->integrate(au);
-	double f_sum  = domain->integrate(f);
-	if (my_global_rank == 0) {
+	double au_sum = DomainTools::Integrate<2>(domain, au);
+	double f_sum  = DomainTools::Integrate<2>(domain, f);
+	if (comm.getRank() == 0) {
 		std::cout << std::scientific;
 		std::cout.precision(13);
 		std::cout << "Error (2-norm):   " << error_norm / exact_norm << endl;
@@ -470,9 +461,9 @@ int main(int argc, char *argv[])
 		std::cout << "Residual: " << residual / fnorm << endl;
 		std::cout << u8"ΣAu-Σf: " << au_sum - f_sum << endl;
 		cout.unsetf(std::ios_base::floatfield);
-		int total_cells = domain->getNumGlobalCells();
+		int total_cells = domain.getNumGlobalCells();
 		cout << "Total cells: " << total_cells << endl;
-		cout << "Number of Processors: " << num_procs << endl;
+		cout << "Number of Processors: " << comm.getSize() << endl;
 	}
 
 #ifdef HAVE_VTK

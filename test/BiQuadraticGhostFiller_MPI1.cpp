@@ -1,7 +1,6 @@
 #include "utils/DomainReader.h"
 #include <ThunderEgg/BiQuadraticGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/ValVectorGenerator.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -16,6 +15,8 @@ constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.j
 constexpr auto cross_mesh_file   = "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json";
 TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostFiller]")
 {
+	Communicator comm(MPI_COMM_WORLD);
+
 	auto   nx        = GENERATE(10, 13);
 	auto   ny        = GENERATE(10, 13);
 	double startx    = 0;
@@ -69,10 +70,9 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	pinfos[3].setNbrInfo(Side<2>::west(), new NormalNbrInfo<1>(2));
 	pinfos[3].setNbrInfo(Side<2>::south(), new NormalNbrInfo<1>(1));
 
-	shared_ptr<Domain<2>> d(new Domain<2>(0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end()));
+	Domain<2> d(comm, 0, {nx, ny}, num_ghost, pinfos.begin(), pinfos.end());
 
-	shared_ptr<ValVector<2>> vec(
-	new ValVector<2>(MPI_COMM_WORLD, pinfos[0].ns, num_ghost, 1, 4));
+	Vector<2> vec(d, 1);
 
 	DomainTools::SetValues<2>(d, vec, f);
 
@@ -82,7 +82,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	// patch 1
 	{
 		// check that center values weren't modified
-		auto patch_1 = vec->getLocalData(0, d->getPatchInfoVector()[0].local_index);
+		auto patch_1 = vec.getComponentView(0, d.getPatchInfoVector()[0].local_index);
 		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
@@ -124,7 +124,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	// patch 2
 	{
 		// check that center values weren't modified
-		auto patch_2 = vec->getLocalData(0, d->getPatchInfoVector()[1].local_index);
+		auto patch_2 = vec.getComponentView(0, d.getPatchInfoVector()[1].local_index);
 		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[1], coord, real_coord);
@@ -166,7 +166,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	// patch 3
 	{
 		// check that center values weren't modified
-		auto patch_3 = vec->getLocalData(0, d->getPatchInfoVector()[2].local_index);
+		auto patch_3 = vec.getComponentView(0, d.getPatchInfoVector()[2].local_index);
 		nested_loop<2>(patch_3.getStart(), patch_3.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[2], coord, real_coord);
@@ -208,7 +208,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	// patch 4
 	{
 		// check that center values weren't modified
-		auto patch_4 = vec->getLocalData(0, d->getPatchInfoVector()[3].local_index);
+		auto patch_4 = vec.getComponentView(0, d.getPatchInfoVector()[3].local_index);
 		nested_loop<2>(patch_4.getStart(), patch_4.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[3], coord, real_coord);
@@ -257,11 +257,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller", "[BiQuadraticGhos
 	auto ny        = GENERATE(10, 13);
 	int  num_ghost = 1;
 
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+	Vector<2> vec(d, 1);
+	Vector<2> expected(d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -275,21 +275,21 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller", "[BiQuadraticGhos
 	BiQuadraticGhostFiller blgf(d, GhostFillingType::Faces);
 	blgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld = expected->getLocalData(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -313,11 +313,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set",
 	auto ny        = GENERATE(10, 13);
 	int  num_ghost = 1;
 
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+	Vector<2> vec(d, 1);
+	Vector<2> expected(d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -331,21 +331,21 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set",
 	BiQuadraticGhostFiller blgf(d, GhostFillingType::Faces);
 	blgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld = expected->getLocalData(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -369,11 +369,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components",
 	auto ny        = GENERATE(10, 13);
 	int  num_ghost = 1;
 
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+	Vector<2> vec(d, 2);
+	Vector<2> expected(d, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -392,23 +392,23 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components",
 	BiQuadraticGhostFiller blgf(d, GhostFillingType::Faces);
 	blgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld       = vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld  = expected->getLocalData(0, pinfo.local_index);
-		LocalData<2> vec_ld2      = vec->getLocalData(1, pinfo.local_index);
-		LocalData<2> expected_ld2 = expected->getLocalData(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -424,8 +424,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components",
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -448,11 +448,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 	auto ny        = GENERATE(10, 13);
 	int  num_ghost = 1;
 
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+	Vector<2> vec(d, 2);
+	Vector<2> expected(d, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -471,23 +471,23 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 	BiQuadraticGhostFiller blgf(d, GhostFillingType::Faces);
 	blgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld       = vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld  = expected->getLocalData(0, pinfo.local_index);
-		LocalData<2> vec_ld2      = vec->getLocalData(1, pinfo.local_index);
-		LocalData<2> expected_ld2 = expected->getLocalData(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -503,8 +503,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -526,11 +526,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller corners", "[BiQuadr
 	auto ny        = GENERATE(10, 13);
 	int  num_ghost = 1;
 
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+	Vector<2> vec(d, 1);
+	Vector<2> expected(d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -544,21 +544,21 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller corners", "[BiQuadr
 	BiQuadraticGhostFiller blgf(d, GhostFillingType::Corners);
 	blgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld = expected->getLocalData(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -571,8 +571,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller corners", "[BiQuadr
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			LocalData<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
-			LocalData<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			View<double, 0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			View<double, 0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -591,11 +591,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set c
 	auto ny        = GENERATE(10, 13);
 	int  num_ghost = 1;
 
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 1);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 1);
+	Vector<2> vec(d, 1);
+	Vector<2> expected(d, 1);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -609,21 +609,21 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set c
 	BiQuadraticGhostFiller blgf(d, GhostFillingType::Corners);
 	blgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld      = vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld = expected->getLocalData(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -636,8 +636,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set c
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			LocalData<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
-			LocalData<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			View<double, 0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			View<double, 0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -656,11 +656,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
 	auto ny        = GENERATE(10, 13);
 	int  num_ghost = 1;
 
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+	Vector<2> vec(d, 2);
+	Vector<2> expected(d, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -679,23 +679,23 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
 	BiQuadraticGhostFiller blgf(d, GhostFillingType::Corners);
 	blgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld       = vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld  = expected->getLocalData(0, pinfo.local_index);
-		LocalData<2> vec_ld2      = vec->getLocalData(1, pinfo.local_index);
-		LocalData<2> expected_ld2 = expected->getLocalData(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -708,8 +708,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			LocalData<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
-			LocalData<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			View<double, 0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			View<double, 0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -720,8 +720,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -733,8 +733,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			LocalData<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
-			LocalData<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
+			View<double, 0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
+			View<double, 0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -753,11 +753,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 	auto ny        = GENERATE(10, 13);
 	int  num_ghost = 1;
 
-	DomainReader<2>       domain_reader(mesh_file, {nx, ny}, num_ghost);
-	shared_ptr<Domain<2>> d = domain_reader.getFinerDomain();
+	DomainReader<2> domain_reader(mesh_file, {nx, ny}, num_ghost);
+	Domain<2>       d = domain_reader.getFinerDomain();
 
-	shared_ptr<ValVector<2>> vec      = ValVector<2>::GetNewVector(d, 2);
-	shared_ptr<ValVector<2>> expected = ValVector<2>::GetNewVector(d, 2);
+	Vector<2> vec(d, 2);
+	Vector<2> expected(d, 2);
 
 	auto f = [&](const std::array<double, 2> coord) -> double {
 		double x = coord[0];
@@ -776,23 +776,23 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 	BiQuadraticGhostFiller blgf(d, GhostFillingType::Corners);
 	blgf.fillGhost(vec);
 
-	for (auto pinfo : d->getPatchInfoVector()) {
+	for (auto pinfo : d.getPatchInfoVector()) {
 		INFO("Patch: " << pinfo.id);
 		INFO("x:     " << pinfo.starts[0]);
 		INFO("y:     " << pinfo.starts[1]);
 		INFO("nx:    " << pinfo.ns[0]);
 		INFO("ny:    " << pinfo.ns[1]);
-		LocalData<2> vec_ld       = vec->getLocalData(0, pinfo.local_index);
-		LocalData<2> expected_ld  = expected->getLocalData(0, pinfo.local_index);
-		LocalData<2> vec_ld2      = vec->getLocalData(1, pinfo.local_index);
-		LocalData<2> expected_ld2 = expected->getLocalData(1, pinfo.local_index);
+		ComponentView<double, 2> vec_ld       = vec.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
+		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
+		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
 		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -805,8 +805,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			LocalData<0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
-			LocalData<0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
+			View<double, 0> vec_ghost      = vec_ld.getSliceOn(c, {-1, -1});
+			View<double, 0> expected_ghost = expected_ld.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));
@@ -817,8 +817,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
-			LocalData<1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
-			LocalData<1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
+			View<double, 1> vec_ghost      = vec_ld2.getSliceOn(s, {-1});
+			View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, {-1});
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
@@ -830,8 +830,8 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
-			LocalData<0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
-			LocalData<0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
+			View<double, 0> vec_ghost      = vec_ld2.getSliceOn(c, {-1, -1});
+			View<double, 0> expected_ghost = expected_ld2.getSliceOn(c, {-1, -1});
 			if (pinfo.hasNbr(c)) {
 				INFO("side:      " << c);
 				INFO("nbr-type:  " << pinfo.getNbrType(c));

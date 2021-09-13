@@ -42,7 +42,7 @@ TEST_CASE("Schur::Interface insert Normal interface", "[Schur::Interface]")
 	DomainReader<2>                              domain_reader("mesh_inputs/2d_uniform_1x2_mpi1.json", {10, 10}, 0);
 	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
-	for (auto patch : domain->getPatchInfoVector()) {
+	for (auto patch : domain.getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 	int                 id = piinfos[0]->getNormalIfaceInfo(Side<2>::east())->id;
@@ -66,7 +66,7 @@ TEST_CASE("Schur::Interface insert Coarse interface", "[Schur::Interface]")
 	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
 	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
-	for (auto patch : domain->getPatchInfoVector()) {
+	for (auto patch : domain.getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 	int                 id = piinfos[0]->getFineIfaceInfo(Side<2>::east())->id;
@@ -105,7 +105,7 @@ TEST_CASE("Schur::Interface insert Fine interface", "[Schur::Interface]")
 	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
 	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
-	for (auto patch : domain->getPatchInfoVector()) {
+	for (auto patch : domain.getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 	int                 id = piinfos[0]->getFineIfaceInfo(Side<2>::east())->fine_ids[0];
@@ -133,7 +133,7 @@ TEST_CASE("Schur::Interface merge Fine interface", "[Schur::Interface]")
 	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
 	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
-	for (auto patch : domain->getPatchInfoVector()) {
+	for (auto patch : domain.getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 	int id = piinfos[0]->getFineIfaceInfo(Side<2>::east())->fine_ids[0];
@@ -162,7 +162,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
 	DomainReader<2>                                    domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
 	auto                                               domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<const Schur::PatchIfaceInfo<2>>> piinfos;
-	for (auto patch : domain->getPatchInfoVector()) {
+	for (auto patch : domain.getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 
@@ -325,7 +325,7 @@ TEST_CASE("Schur::Interface serialize Normal interface", "[Schur::Interface]")
 	DomainReader<2>                              domain_reader("mesh_inputs/2d_uniform_1x2_mpi1.json", {10, 10}, 0);
 	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
-	for (auto patch : domain->getPatchInfoVector()) {
+	for (auto patch : domain.getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 	int                 id = piinfos[0]->getNormalIfaceInfo(Side<2>::east())->id;
@@ -354,7 +354,7 @@ TEST_CASE("Schur::Interface serialize Coarse interface", "[Schur::Interface]")
 	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
 	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
-	for (auto patch : domain->getPatchInfoVector()) {
+	for (auto patch : domain.getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 	int                 id = piinfos[0]->getFineIfaceInfo(Side<2>::east())->id;
@@ -394,7 +394,7 @@ TEST_CASE("Schur::Interface serialize Fine interface", "[Schur::Interface]")
 	DomainReader<2>                              domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", {10, 10}, 0);
 	auto                                         domain = domain_reader.getFinerDomain();
 	vector<shared_ptr<Schur::PatchIfaceInfo<2>>> piinfos;
-	for (auto patch : domain->getPatchInfoVector()) {
+	for (auto patch : domain.getPatchInfoVector()) {
 		piinfos.push_back(make_shared<Schur::PatchIfaceInfo<2>>(patch));
 	}
 	int                 id = piinfos[0]->getFineIfaceInfo(Side<2>::east())->fine_ids[0];

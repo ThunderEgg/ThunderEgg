@@ -45,30 +45,39 @@ template <int D> class WCycle : public Cycle<D>
 	 *
 	 * @param level the current level that is being visited.
 	 */
-	void visit(const Level<D> &level, std::list<std::shared_ptr<Vector<D>>> &u_vectors,
-	           std::list<std::shared_ptr<const Vector<D>>> &f_vectors) const
+	void visit(const Level<D> &level, const Vector<D> &f, Vector<D> &u) const override
 	{
 		if (level.coarsest()) {
 			for (int i = 0; i < num_coarse_sweeps; i++) {
-				this->smooth(level, u_vectors, f_vectors);
+				level.getSmoother().smooth(f, u);
 			}
 		} else {
 			for (int i = 0; i < num_pre_sweeps; i++) {
-				this->smooth(level, u_vectors, f_vectors);
+				level.getSmoother().smooth(f, u);
 			}
-			this->prepCoarser(level, u_vectors, f_vectors);
-			this->visit(*level.getCoarser(), u_vectors, f_vectors);
+
+			Vector<D> coarser_f = this->restrict(level, f, u);
+
+			const Level<D> &coarser_level = *level.getCoarser();
+			Vector<D>       coarser_u     = coarser_f.getZeroClone();
+
+			this->visit(*level.getCoarser(), coarser_f, coarser_u);
+
+			coarser_level.getInterpolator().interpolate(coarser_u, u);
+
 			for (int i = 0; i < num_mid_sweeps; i++) {
-				this->smooth(level, u_vectors, f_vectors);
+				level.getSmoother().smooth(f, u);
 			}
-			this->prepCoarser(level, u_vectors, f_vectors);
-			this->visit(*level.getCoarser(), u_vectors, f_vectors);
+
+			coarser_f = this->restrict(level, f, u);
+
+			this->visit(*level.getCoarser(), coarser_f, coarser_u);
+
+			coarser_level.getInterpolator().interpolate(coarser_u, u);
+
 			for (int i = 0; i < num_post_sweeps; i++) {
-				this->smooth(level, u_vectors, f_vectors);
+				level.getSmoother().smooth(f, u);
 			}
-		}
-		if (!level.finest()) {
-			this->prepFiner(level, u_vectors, f_vectors);
 		}
 	}
 
@@ -84,6 +93,15 @@ template <int D> class WCycle : public Cycle<D>
 		num_post_sweeps   = opts.post_sweeps;
 		num_coarse_sweeps = opts.coarse_sweeps;
 		num_mid_sweeps    = opts.mid_sweeps;
+	}
+	/**
+	 * @brief Get a clone of this WCycle
+	 *
+	 * @return WCycle<D>* a newly allocated copy
+	 */
+	WCycle<D> *clone() const override
+	{
+		return new WCycle(*this);
 	}
 };
 extern template class WCycle<2>;

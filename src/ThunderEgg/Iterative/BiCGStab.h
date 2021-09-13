@@ -26,7 +26,6 @@
 #include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Timer.h>
-#include <ThunderEgg/VectorGenerator.h>
 
 namespace ThunderEgg
 {
@@ -53,23 +52,27 @@ template <int D> class BiCGStab : public Solver<D>
 	 */
 	std::shared_ptr<Timer> timer = nullptr;
 
-	void applyWithPreconditioner(std::shared_ptr<VectorGenerator<D>> vg,
-	                             std::shared_ptr<const Operator<D>>  M_l,
-	                             std::shared_ptr<const Operator<D>>  A,
-	                             std::shared_ptr<const Operator<D>>  M_r,
-	                             std::shared_ptr<const Vector<D>>    x,
-	                             std::shared_ptr<Vector<D>>          b) const
+	void applyWithPreconditioner(const Operator<D> *M_l, const Operator<D> &A, const Operator<D> *M_r, const Vector<D> &x, Vector<D> &b) const
 	{
 		if (M_l == nullptr && M_r == nullptr) {
-			A->apply(x, b);
+			A.apply(x, b);
 		} else if (M_l == nullptr && M_r != nullptr) {
-			std::shared_ptr<Vector<D>> tmp = vg->getNewVector();
+			Vector<D> tmp = b.getZeroClone();
 			M_r->apply(x, tmp);
-			A->apply(tmp, b);
+			A.apply(tmp, b);
 		}
 	}
 
 	public:
+	/**
+	 * @brief Clone this solver
+	 *
+	 * @return BiCGStab<D>* a newly allocated copy of this solver
+	 */
+	BiCGStab<D> *clone() const override
+	{
+		return new BiCGStab<D>(*this);
+	}
 	/**
 	 * @brief Set the maximum number of iterations
 	 *
@@ -135,40 +138,39 @@ template <int D> class BiCGStab : public Solver<D>
 	}
 
 	public:
-	int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
-	          std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
-	          std::shared_ptr<const Operator<D>> Mr = nullptr, bool output = false,
-	          std::ostream &os = std::cout) const override
+	int solve(const Operator<D> &A,
+	          Vector<D> &        x,
+	          const Vector<D> &  b,
+	          const Operator<D> *Mr     = nullptr,
+	          bool               output = false,
+	          std::ostream &     os     = std::cout) const override
 	{
-		std::shared_ptr<Vector<D>> resid = vg->getNewVector();
+		Vector<D> resid = b.getZeroClone();
 
-		A->apply(x, resid);
-		resid->scaleThenAdd(-1, b);
+		A.apply(x, resid);
+		resid.scaleThenAdd(-1, b);
 
-		std::shared_ptr<Vector<D>> initial_guess = vg->getNewVector();
-		initial_guess->copy(x);
-		x->set(0);
+		Vector<D> initial_guess = x;
+		x.set(0);
 
-		double                     r0_norm = b->twoNorm();
-		std::shared_ptr<Vector<D>> rhat    = vg->getNewVector();
-		rhat->copy(resid);
-		std::shared_ptr<Vector<D>> p = vg->getNewVector();
-		p->copy(resid);
-		std::shared_ptr<Vector<D>> ap = vg->getNewVector();
-		std::shared_ptr<Vector<D>> as = vg->getNewVector();
+		double    r0_norm = b.twoNorm();
+		Vector<D> rhat    = resid;
+		Vector<D> p       = resid;
+		Vector<D> ap      = b.getZeroClone();
+		Vector<D> as      = b.getZeroClone();
 
-		std::shared_ptr<Vector<D>> s   = vg->getNewVector();
-		double                     rho = rhat->dot(resid);
+		Vector<D> s   = x.getZeroClone();
+		double    rho = rhat.dot(resid);
 
-		int num_its = 0;
-		if (r0_norm == 0) {
-			return num_its;
-		}
-		double residual = resid->twoNorm() / r0_norm;
+		int    num_its  = 0;
+		double residual = resid.twoNorm() / r0_norm;
 		if (output) {
 			char buf[100];
 			sprintf(buf, "%5d %16.8e\n", num_its, residual);
 			os << std::string(buf);
+		}
+		if (r0_norm == 0) {
+			return num_its;
 		}
 		while (residual > tolerance && num_its < max_iterations) {
 			if (timer) {
@@ -176,41 +178,35 @@ template <int D> class BiCGStab : public Solver<D>
 			}
 
 			if (rho == 0) {
-				throw BreakdownError("BiCGStab broke down, rho was 0 on iteration "
-				                     + std::to_string(num_its));
+				throw BreakdownError("BiCGStab broke down, rho was 0 on iteration " + std::to_string(num_its));
 			}
 
-			applyWithPreconditioner(vg, nullptr, A, Mr, p, ap);
-			double alpha = rho / rhat->dot(ap);
-			s->copy(resid);
-			s->addScaled(-alpha, ap);
-			if (s->twoNorm() / r0_norm <= tolerance) {
-				x->addScaled(alpha, p);
+			applyWithPreconditioner(nullptr, A, Mr, p, ap);
+			double alpha = rho / rhat.dot(ap);
+			s.copy(resid);
+			s.addScaled(-alpha, ap);
+			if (s.twoNorm() / r0_norm <= tolerance) {
+				x.addScaled(alpha, p);
 				if (timer) {
 					timer->stop("Iteration");
 				}
 				break;
 			}
-			applyWithPreconditioner(vg, nullptr, A, Mr, s, as);
-			double omega = as->dot(s) / as->dot(as);
-			x->addScaled(alpha, p, omega, s);
-			resid->addScaled(-alpha, ap);
-			resid->addScaled(-omega, as);
+			applyWithPreconditioner(nullptr, A, Mr, s, as);
+			double omega = as.dot(s) / as.dot(as);
+			x.addScaled(alpha, p, omega, s);
+			resid.addScaled(-alpha, ap);
+			resid.addScaled(-omega, as);
 
-			double rho_new = resid->dot(rhat);
+			double rho_new = resid.dot(rhat);
 			double beta    = rho_new * alpha / (rho * omega);
-			p->addScaled(-omega, ap);
-			p->scaleThenAdd(beta, resid);
+			p.addScaled(-omega, ap);
+			p.scaleThenAdd(beta, resid);
 
 			num_its++;
 			rho      = rho_new;
-			residual = resid->twoNorm() / r0_norm;
+			residual = resid.twoNorm() / r0_norm;
 
-			if (residual > 1e6) {
-				throw DivergenceError("BiCGStab reached divergence criteria on iteration "
-				                      + std::to_string(num_its) + " with residual two norm "
-				                      + std::to_string(residual));
-			}
 			if (output) {
 				char buf[100];
 				sprintf(buf, "%5d %16.8e\n", num_its, residual);
@@ -222,9 +218,9 @@ template <int D> class BiCGStab : public Solver<D>
 		}
 		if (Mr != nullptr) {
 			Mr->apply(x, resid);
-			x->copy(resid);
+			x.copy(resid);
 		}
-		x->add(initial_guess);
+		x.add(initial_guess);
 		return num_its;
 	}
 };

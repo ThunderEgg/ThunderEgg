@@ -19,7 +19,15 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <ThunderEgg/ValVectorGenerator.h>
-template class ThunderEgg::ValVectorGenerator<1>;
-template class ThunderEgg::ValVectorGenerator<2>;
-template class ThunderEgg::ValVectorGenerator<3>;
+#include "View.h"
+namespace ThunderEgg
+{
+template class View<double, 1>;
+template class View<double, 2>;
+template class View<double, 3>;
+template class View<double, 4>;
+template class View<const double, 1>;
+template class View<const double, 2>;
+template class View<const double, 3>;
+template class View<const double, 4>;
+} // namespace ThunderEgg

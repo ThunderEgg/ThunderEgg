@@ -23,7 +23,6 @@
 #define THUNDEREGG_PETSC_MATWRAPPER_H
 
 #include <ThunderEgg/Operator.h>
-#include <ThunderEgg/PETSc/VecWrapper.h>
 #include <petscmat.h>
 
 namespace ThunderEgg
@@ -46,18 +45,10 @@ template <int D> class MatWrapper : public Operator<D>
 	 * @param vec the ThunderEgg Vector
 	 * @return Vec the PETSc Vec
 	 */
-	Vec getPetscVecWithoutGhost(std::shared_ptr<const Vector<D>> vec) const
+	Vec getPetscVecWithoutGhost(const Vector<D> &vec) const
 	{
-		Vec                                         petsc_vec;
-		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
-		if (petsc_vec_ptr != nullptr && petsc_vec_ptr->getNumGhostCells() == 0) {
-			petsc_vec = petsc_vec_ptr->getVec();
-		} else {
-			// have to create a new petsc vector without ghostcells for petsc call
-			VecCreateMPI(vec->getMPIComm(), vec->getNumLocalCells() * vec->getNumComponents(),
-			             PETSC_DETERMINE, &petsc_vec);
-		}
+		Vec petsc_vec;
+		VecCreateMPI(vec.getCommunicator().getMPIComm(), vec.getNumLocalCells() * vec.getNumComponents(), PETSC_DETERMINE, &petsc_vec);
 		return petsc_vec;
 	}
 	/**
@@ -66,26 +57,21 @@ template <int D> class MatWrapper : public Operator<D>
 	 * @param vec the ThunderEgg Vector
 	 * @param petsc_vec the PETSc Vec to copy to
 	 */
-	void copyToPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
+	void copyToPetscVec(const Vector<D> &vec, Vec petsc_vec) const
 	{
-		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
-		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
-			double *petsc_vec_view;
-			size_t  curr_index = 0;
-			VecGetArray(petsc_vec, &petsc_vec_view);
-			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-				for (int c = 0; c < vec->getNumComponents(); c++) {
-					const LocalData<D> ld = vec->getLocalData(c, i);
-					nested_loop<D>(ld.getStart(), ld.getEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               petsc_vec_view[curr_index] = ld[coord];
-						               curr_index++;
-					               });
-				}
+		double *petsc_vec_view;
+		size_t  curr_index = 0;
+		VecGetArray(petsc_vec, &petsc_vec_view);
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			for (int c = 0; c < vec.getNumComponents(); c++) {
+				const ComponentView<const double, D> ld = vec.getComponentView(c, i);
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+					petsc_vec_view[curr_index] = ld[coord];
+					curr_index++;
+				});
 			}
-			VecRestoreArray(petsc_vec, &petsc_vec_view);
 		}
+		VecRestoreArray(petsc_vec, &petsc_vec_view);
 	}
 	/**
 	 * @brief Copy from a PETSc Vec to a ThunderEgg Vector
@@ -93,26 +79,21 @@ template <int D> class MatWrapper : public Operator<D>
 	 * @param petsc_vec the PETSc Vec
 	 * @param vec the ThunderEgg Vector
 	 */
-	void copyToVec(Vec petsc_vec, std::shared_ptr<Vector<D>> vec) const
+	void copyToVec(Vec petsc_vec, Vector<D> &vec) const
 	{
-		std::shared_ptr<PETSc::VecWrapper<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<PETSc::VecWrapper<D>>(vec);
-		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
-			const double *petsc_vec_view;
-			size_t        curr_index = 0;
-			VecGetArrayRead(petsc_vec, &petsc_vec_view);
-			for (int i = 0; i < vec->getNumLocalPatches(); i++) {
-				for (int c = 0; c < vec->getNumComponents(); c++) {
-					LocalData<D> ld = vec->getLocalData(c, i);
-					nested_loop<D>(ld.getStart(), ld.getEnd(),
-					               [&](const std::array<int, D> &coord) {
-						               ld[coord] = petsc_vec_view[curr_index];
-						               curr_index++;
-					               });
-				}
+		const double *petsc_vec_view;
+		size_t        curr_index = 0;
+		VecGetArrayRead(petsc_vec, &petsc_vec_view);
+		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
+			for (int c = 0; c < vec.getNumComponents(); c++) {
+				ComponentView<double, D> ld = vec.getComponentView(c, i);
+				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+					ld[coord] = petsc_vec_view[curr_index];
+					curr_index++;
+				});
 			}
-			VecRestoreArrayRead(petsc_vec, &petsc_vec_view);
 		}
+		VecRestoreArrayRead(petsc_vec, &petsc_vec_view);
 	}
 	/**
 	 * @brief Deallocate the PETSc vector
@@ -120,13 +101,9 @@ template <int D> class MatWrapper : public Operator<D>
 	 * @param vec the corresponding ThunderEgg Vector
 	 * @param petsc_vec the PETSc Vec to deallocate
 	 */
-	void destroyPetscVec(std::shared_ptr<const Vector<D>> vec, Vec petsc_vec) const
+	void destroyPetscVec(const Vector<D> &vec, Vec petsc_vec) const
 	{
-		std::shared_ptr<const PETSc::VecWrapper<D>> petsc_vec_ptr
-		= std::dynamic_pointer_cast<const PETSc::VecWrapper<D>>(vec);
-		if (petsc_vec_ptr == nullptr || petsc_vec_ptr->getNumGhostCells() > 0) {
-			VecDestroy(&petsc_vec);
-		}
+		VecDestroy(&petsc_vec);
 	}
 
 	public:
@@ -138,7 +115,17 @@ template <int D> class MatWrapper : public Operator<D>
 	 * @param A_in the PETSc Mat to wrap
 	 */
 	explicit MatWrapper(Mat A_in) : A(A_in) {}
-	void apply(std::shared_ptr<const Vector<D>> x, std::shared_ptr<Vector<D>> b) const
+
+	/**
+	 * @brief Clone this wrapper
+	 *
+	 * @return MatWrapper<D>* a newly allocated copy
+	 */
+	MatWrapper<D> *clone() const override
+	{
+		return new MatWrapper<D>(*this);
+	}
+	void apply(const Vector<D> &x, Vector<D> &b) const override
 	{
 		Vec petsc_x = getPetscVecWithoutGhost(x);
 		copyToPetscVec(x, petsc_x);

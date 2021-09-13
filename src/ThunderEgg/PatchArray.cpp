@@ -19,10 +19,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "LocalData.h"
+#include "PatchArray.h"
 namespace ThunderEgg
 {
-template class LocalData<1>;
-template class LocalData<2>;
-template class LocalData<3>;
+template class PatchArray<1>;
+template class PatchArray<2>;
+template class PatchArray<3>;
 } // namespace ThunderEgg

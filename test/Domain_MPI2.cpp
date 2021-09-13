@@ -18,9 +18,9 @@ TEST_CASE("Domain<3> numLocalPatches",
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
-		CHECK(domain->getNumLocalPatches() == 14);
+		CHECK(domain.getNumLocalPatches() == 14);
 	} else {
-		CHECK(domain->getNumLocalPatches() == 1);
+		CHECK(domain.getNumLocalPatches() == 1);
 	}
 }
 TEST_CASE("Domain<3> numGlobalPatches",
@@ -29,7 +29,7 @@ TEST_CASE("Domain<3> numGlobalPatches",
 	DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi2.json", {10, 10, 10}, 0);
 	auto            domain = domain_reader.getFinerDomain();
 
-	CHECK(domain->getNumGlobalPatches() == 15);
+	CHECK(domain.getNumGlobalPatches() == 15);
 }
 TEST_CASE("Domain<3> numLocalCells",
           "[Schur::InterfaceDomain]")
@@ -40,9 +40,9 @@ TEST_CASE("Domain<3> numLocalCells",
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
-		CHECK(domain->getNumLocalCells() == 14 * 10 * 10 * 10);
+		CHECK(domain.getNumLocalCells() == 14 * 10 * 10 * 10);
 	} else {
-		CHECK(domain->getNumLocalCells() == 1 * 10 * 10 * 10);
+		CHECK(domain.getNumLocalCells() == 1 * 10 * 10 * 10);
 	}
 }
 TEST_CASE("Domain<3> numGlobalCells",
@@ -51,14 +51,14 @@ TEST_CASE("Domain<3> numGlobalCells",
 	DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi2.json", {10, 10, 10}, 0);
 	auto            domain = domain_reader.getFinerDomain();
 
-	CHECK(domain->getNumGlobalCells() == 15 * 10 * 10 * 10);
+	CHECK(domain.getNumGlobalCells() == 15 * 10 * 10 * 10);
 }
 TEST_CASE("Domain<3> getNumGhostCells",
           "[Schur::InterfaceDomain]")
 {
 	DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi2.json", {10, 10, 10}, 2);
 	auto            domain = domain_reader.getFinerDomain();
-	CHECK(domain->getNumGhostCells() == 2);
+	CHECK(domain.getNumGhostCells() == 2);
 }
 TEST_CASE("Domain<3> numLocalCellsWithGhost",
           "[Schur::InterfaceDomain]")
@@ -69,9 +69,9 @@ TEST_CASE("Domain<3> numLocalCellsWithGhost",
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
-		CHECK(domain->getNumLocalCellsWithGhost() == 14 * 14 * 14 * 14);
+		CHECK(domain.getNumLocalCellsWithGhost() == 14 * 14 * 14 * 14);
 	} else {
-		CHECK(domain->getNumLocalCellsWithGhost() == 1 * 14 * 14 * 14);
+		CHECK(domain.getNumLocalCellsWithGhost() == 1 * 14 * 14 * 14);
 	}
 }
 TEST_CASE("Domain<3> getNs",
@@ -80,9 +80,9 @@ TEST_CASE("Domain<3> getNs",
 	DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi2.json", {10, 11, 12}, 2);
 	auto            domain = domain_reader.getFinerDomain();
 
-	CHECK(domain->getNs()[0] == 10);
-	CHECK(domain->getNs()[1] == 11);
-	CHECK(domain->getNs()[2] == 12);
+	CHECK(domain.getNs()[0] == 10);
+	CHECK(domain.getNs()[1] == 11);
+	CHECK(domain.getNs()[2] == 12);
 }
 TEST_CASE("Domain<3> getPatchInfoVector size",
           "[Schur::InterfaceDomain]")
@@ -93,9 +93,9 @@ TEST_CASE("Domain<3> getPatchInfoVector size",
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	if (rank == 0) {
-		CHECK(domain->getPatchInfoVector().size() == 14);
+		CHECK(domain.getPatchInfoVector().size() == 14);
 	} else {
-		CHECK(domain->getPatchInfoVector().size() == 1);
+		CHECK(domain.getPatchInfoVector().size() == 1);
 	}
 }
 TEST_CASE("Domain<3> local indexes match position in pinfo vector",
@@ -104,7 +104,7 @@ TEST_CASE("Domain<3> local indexes match position in pinfo vector",
 	DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi2.json", {10, 10, 10}, 0);
 	auto            domain = domain_reader.getFinerDomain();
 
-	auto pinfo_vector = domain->getPatchInfoVector();
+	auto pinfo_vector = domain.getPatchInfoVector();
 	for (size_t i = 0; i < pinfo_vector.size(); i++) {
 		CHECK(pinfo_vector[i].local_index == (int) i);
 	}
@@ -117,7 +117,7 @@ TEST_CASE("Schur::InterfaceDomain<3> local indexes in neighbor info are consiste
 
 	map<int, int> id_to_local_index_map;
 
-	for (auto pinfo : domain->getPatchInfoVector()) {
+	for (auto pinfo : domain.getPatchInfoVector()) {
 		id_to_local_index_map[pinfo.id] = pinfo.local_index;
 	}
 
@@ -129,7 +129,7 @@ TEST_CASE("Schur::InterfaceDomain<3> local indexes in neighbor info are consiste
 			CHECK(local_index == -1);
 		}
 	};
-	for (auto pinfo : domain->getPatchInfoVector()) {
+	for (auto pinfo : domain.getPatchInfoVector()) {
 		for (Side<3> s : Side<3>::getValues()) {
 			if (pinfo.hasNbr(s)) {
 				NbrType type = pinfo.getNbrType(s);
@@ -197,7 +197,7 @@ TEST_CASE("Domain<3> global indexes match position in pinfo vector",
 	} else {
 		start_i = 14;
 	}
-	auto pinfo_vector = domain->getPatchInfoVector();
+	auto pinfo_vector = domain.getPatchInfoVector();
 	for (size_t i = 0; i < pinfo_vector.size(); i++) {
 		CHECK(pinfo_vector[i].global_index == start_i + (int) i);
 	}
@@ -208,10 +208,10 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 	DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi2.json", {10, 10, 10}, 0);
 	auto            domain = domain_reader.getFinerDomain();
 
-	std::vector<int> global_index_to_id_in(domain->getNumGlobalPatches());
-	std::vector<int> global_index_to_id_out(domain->getNumGlobalPatches());
+	std::vector<int> global_index_to_id_in(domain.getNumGlobalPatches());
+	std::vector<int> global_index_to_id_out(domain.getNumGlobalPatches());
 
-	for (auto pinfo : domain->getPatchInfoVector()) {
+	for (auto pinfo : domain.getPatchInfoVector()) {
 		global_index_to_id_in[pinfo.global_index] = pinfo.id;
 	}
 
@@ -225,7 +225,7 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent",
 	auto checkIdAndLocalIndex = [&](int id, int global_index) {
 		CHECK(global_index == id_to_global_index_map.at(id));
 	};
-	for (auto pinfo : domain->getPatchInfoVector()) {
+	for (auto pinfo : domain.getPatchInfoVector()) {
 		for (Side<3> s : Side<3>::getValues()) {
 			if (pinfo.hasNbr(s)) {
 				NbrType type = pinfo.getNbrType(s);

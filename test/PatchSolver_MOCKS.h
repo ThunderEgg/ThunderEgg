@@ -34,48 +34,49 @@ template <int D>
 class MockGhostFiller : public GhostFiller<D>
 {
 	private:
-	mutable bool called = false;
+	std::shared_ptr<bool> called = std::make_shared<bool>(false);
 
 	public:
-	void fillGhost(std::shared_ptr<const Vector<D>> u) const override
+	MockGhostFiller<D> *clone() const override
 	{
-		called = true;
+		return new MockGhostFiller<D>(*this);
+	}
+	void fillGhost(const Vector<D> &u) const override
+	{
+		*called = true;
 	}
 	bool wasCalled()
 	{
-		return called;
+		return *called;
 	}
 };
 template <int D>
 class MockPatchSolver : public PatchSolver<D>
 {
 	private:
-	std::shared_ptr<Vector<D>>             u_vec;
-	std::shared_ptr<Vector<D>>             f_vec;
-	mutable std::set<const PatchInfo<D> *> patches_to_be_called;
+	mutable std::set<int> patches_to_be_called;
 
 	public:
-	MockPatchSolver(std::shared_ptr<const Domain<D>>      domain_in,
-	                std::shared_ptr<const GhostFiller<D>> ghost_filler_in,
-	                std::shared_ptr<Vector<D>> u_in, std::shared_ptr<Vector<D>> f_in)
-	: PatchSolver<D>(domain_in, ghost_filler_in), u_vec(u_in), f_vec(f_in)
+	MockPatchSolver(const Domain<D> &     domain_in,
+	                const GhostFiller<D> &ghost_filler_in)
+	: PatchSolver<D>(domain_in, ghost_filler_in)
 	{
-		for (const PatchInfo<D> &pinfo : this->domain->getPatchInfoVector()) {
-			patches_to_be_called.insert(&pinfo);
+		for (const PatchInfo<D> &pinfo : domain_in.getPatchInfoVector()) {
+			patches_to_be_called.insert(pinfo.id);
 		}
 	}
-	void solveSinglePatch(const PatchInfo<D> &             pinfo,
-	                      const std::vector<LocalData<D>> &fs,
-	                      std::vector<LocalData<D>> &      us) const override
+	MockPatchSolver<D> *clone() const override
 	{
-		CHECK(patches_to_be_called.count(&pinfo) == 1);
-		patches_to_be_called.erase(&pinfo);
-		for (int c = 0; c < u_vec->getNumComponents(); c++) {
-			CHECK(u_vec->getLocalData(c, pinfo.local_index).getPtr() == us[c].getPtr());
-		}
-		for (int c = 0; c < f_vec->getNumComponents(); c++) {
-			CHECK(f_vec->getLocalData(c, pinfo.local_index).getPtr() == fs[c].getPtr());
-		}
+		return new MockPatchSolver<D>(*this);
+	}
+	void solveSinglePatch(const PatchInfo<D> &              pinfo,
+	                      const PatchView<const double, D> &fs,
+	                      const PatchView<double, D> &      us) const override
+	{
+		CHECK(patches_to_be_called.count(pinfo.id) == 1);
+		patches_to_be_called.erase(pinfo.id);
+		std::array<int, D + 1> zero;
+		zero.fill(0);
 	}
 	bool allPatchesCalled()
 	{

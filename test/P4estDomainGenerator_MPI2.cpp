@@ -33,7 +33,7 @@ using namespace ThunderEgg;
 
 namespace
 {
-std::vector<PatchInfo<2>> GetAllPatchesOnRank0(std::shared_ptr<const Domain<2>> domain)
+std::vector<PatchInfo<2>> GetAllPatchesOnRank0(const Domain<2> &domain)
 {
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -45,7 +45,7 @@ std::vector<PatchInfo<2>> GetAllPatchesOnRank0(std::shared_ptr<const Domain<2>> 
 
 	if (rank == 1) {
 		nlohmann::json patches;
-		for (auto patch : domain->getPatchInfoVector()) {
+		for (auto patch : domain.getPatchInfoVector()) {
 			patches.push_back(patch);
 		}
 		string patches_string = patches.dump();
@@ -64,13 +64,13 @@ std::vector<PatchInfo<2>> GetAllPatchesOnRank0(std::shared_ptr<const Domain<2>> 
 		if (patches != nullptr) {
 			patches.get_to(all_patches);
 			for (auto &patch : all_patches) {
-				patch.ns = domain->getNs();
+				patch.ns = domain.getNs();
 				for (int i = 0; i < 2; i++) {
 					patch.spacings[i] /= patch.ns[i];
 				}
 			}
 		}
-		for (auto patch : domain->getPatchInfoVector()) {
+		for (auto patch : domain.getPatchInfoVector()) {
 			all_patches.push_back(patch);
 		}
 	}
@@ -116,46 +116,46 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 
 	P4estDomainGenerator dg(p4est, {nx, ny}, num_ghost_cells, bmf);
 
-	auto domain_2 = dg.getFinestDomain();
-	auto domain_1 = dg.getCoarserDomain();
-	auto domain_0 = dg.getCoarserDomain();
+	Domain<2> domain_2 = dg.getFinestDomain();
+	Domain<2> domain_1 = dg.getCoarserDomain();
+	Domain<2> domain_0 = dg.getCoarserDomain();
 
 	//SECTION("correct number of patches")
 	{
-		CHECK(domain_2->getNumGlobalPatches() == 16);
-		CHECK(domain_1->getNumGlobalPatches() == 4);
-		CHECK(domain_0->getNumGlobalPatches() == 1);
+		CHECK(domain_2.getNumGlobalPatches() == 16);
+		CHECK(domain_1.getNumGlobalPatches() == 4);
+		CHECK(domain_0.getNumGlobalPatches() == 1);
 	}
 	//SECTION("patches have correct spacings")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
 			CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
 			CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
 			CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
 		}
 	}
 	//SECTION("patches have correct ns")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
@@ -163,43 +163,43 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 
 	//SECTION("patches have refine_level set")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.refine_level == 2);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.refine_level == 1);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.refine_level == 0);
 		}
 	}
 	//SECTION("patches have ranks set")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
 		}
 	}
 	//SECTION("patches have num_ghost_cells set")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 	}
@@ -988,53 +988,53 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 
 	P4estDomainGenerator dg(p4est, {nx, ny}, num_ghost_cells, bmf);
 
-	auto domain_2 = dg.getFinestDomain();
-	auto domain_1 = dg.getCoarserDomain();
-	auto domain_0 = dg.getCoarserDomain();
+	Domain<2> domain_2 = dg.getFinestDomain();
+	Domain<2> domain_1 = dg.getCoarserDomain();
+	Domain<2> domain_0 = dg.getCoarserDomain();
 
 	//SECTION("patches have correct ns")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
 	}
 	//SECTION("patches have ranks set")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
 		}
 	}
 
 	//SECTION("patches have num_ghost_cells set")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 	}
@@ -1584,37 +1584,37 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 
 	P4estDomainGenerator dg(p4est, {nx, ny}, num_ghost_cells, bmf);
 
-	auto domain_3 = dg.getFinestDomain();
-	auto domain_2 = dg.getCoarserDomain();
-	auto domain_1 = dg.getCoarserDomain();
-	auto domain_0 = dg.getCoarserDomain();
+	Domain<2> domain_3 = dg.getFinestDomain();
+	Domain<2> domain_2 = dg.getCoarserDomain();
+	Domain<2> domain_1 = dg.getCoarserDomain();
+	Domain<2> domain_0 = dg.getCoarserDomain();
 
 	//SECTION("correct number of patches")
 	{
-		CHECK(domain_3->getNumGlobalPatches() == 19);
-		CHECK(domain_2->getNumGlobalPatches() == 16);
-		CHECK(domain_1->getNumGlobalPatches() == 4);
-		CHECK(domain_0->getNumGlobalPatches() == 1);
+		CHECK(domain_3.getNumGlobalPatches() == 19);
+		CHECK(domain_2.getNumGlobalPatches() == 16);
+		CHECK(domain_1.getNumGlobalPatches() == 4);
+		CHECK(domain_0.getNumGlobalPatches() == 1);
 	}
 
 	//SECTION("patches have correct ns")
 	{
-		for (auto patch : domain_3->getPatchInfoVector()) {
+		for (auto patch : domain_3.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
 
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.ns[0] == nx);
 			CHECK(patch.ns[1] == ny);
 		}
@@ -1622,29 +1622,29 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 
 	//SECTION("patches have ranks set")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.rank == rank);
 		}
 	}
 	//SECTION("patches have num_ghost_cells set")
 	{
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.num_ghost_cells == num_ghost_cells);
 		}
 	}
@@ -1950,17 +1950,17 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK(domain_3_ne_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
 			CHECK(domain_3_ne_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
 		}
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
 			CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
 			CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
 			CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
 		}
@@ -1994,15 +1994,15 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 			CHECK(domain_3_ne_ne_patch->refine_level == 2);
 		}
 
-		for (auto patch : domain_2->getPatchInfoVector()) {
+		for (auto patch : domain_2.getPatchInfoVector()) {
 			CHECK(patch.refine_level == 2);
 		}
 
-		for (auto patch : domain_1->getPatchInfoVector()) {
+		for (auto patch : domain_1.getPatchInfoVector()) {
 			CHECK(patch.refine_level == 1);
 		}
 
-		for (auto patch : domain_0->getPatchInfoVector()) {
+		for (auto patch : domain_0.getPatchInfoVector()) {
 			CHECK(patch.refine_level == 0);
 		}
 	}

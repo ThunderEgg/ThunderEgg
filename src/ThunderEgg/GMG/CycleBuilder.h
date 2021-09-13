@@ -21,6 +21,7 @@
 
 #ifndef THUNDEREGG_GMG_CYCLEBUILDER_H
 #define THUNDEREGG_GMG_CYCLEBUILDER_H
+#include <ThunderEgg/GMG/FMGCycle.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/VCycle.h>
 #include <ThunderEgg/GMG/WCycle.h>
@@ -80,28 +81,14 @@ template <int D> class CycleBuilder
 	 * @param restrictor the Restrictor that restricts from this level to the coarser level
 	 * @param vg the VectorGenerator for the level
 	 */
-	void addFinestLevel(std::shared_ptr<Operator<D>> op, std::shared_ptr<Smoother<D>> smoother,
-	                    std::shared_ptr<Restrictor<D>>      restrictor,
-	                    std::shared_ptr<VectorGenerator<D>> vg)
+	void addFinestLevel(const Operator<D> &op, const Smoother<D> &smoother, const Restrictor<D> &restrictor)
 	{
 		if (has_finest) {
 			throw RuntimeError("addFinestLevel was already called");
 		}
-		if (op == nullptr) {
-			throw RuntimeError("Operator is nullptr");
-		}
-		if (smoother == nullptr) {
-			throw RuntimeError("Smoother is nullptr");
-		}
-		if (restrictor == nullptr) {
-			throw RuntimeError("Restrictor is nullptr");
-		}
-		if (vg == nullptr) {
-			throw RuntimeError("VectorGenerator is nullptr");
-		}
 		has_finest = true;
 
-		finest_level = std::make_shared<Level<D>>(nullptr, vg);
+		finest_level = std::make_shared<Level<D>>();
 		finest_level->setOperator(op);
 		finest_level->setSmoother(smoother);
 		finest_level->setRestrictor(restrictor);
@@ -117,11 +104,8 @@ template <int D> class CycleBuilder
 	 * @param interpolator the Interpolator that restricts from this level to the finer level
 	 * @param vg the VectorGenerator for the level
 	 */
-	void addIntermediateLevel(std::shared_ptr<Operator<D>>        op,
-	                          std::shared_ptr<Smoother<D>>        smoother,
-	                          std::shared_ptr<Restrictor<D>>      restrictor,
-	                          std::shared_ptr<Interpolator<D>>    interpolator,
-	                          std::shared_ptr<VectorGenerator<D>> vg)
+	void
+	addIntermediateLevel(const Operator<D> &op, const Smoother<D> &smoother, const Restrictor<D> &restrictor, const Interpolator<D> &interpolator)
 	{
 		if (!has_finest) {
 			throw RuntimeError("addFinestLevel has not been called yet");
@@ -129,23 +113,8 @@ template <int D> class CycleBuilder
 		if (has_coarsest) {
 			throw RuntimeError("addCoarsestLevel has been called");
 		}
-		if (op == nullptr) {
-			throw RuntimeError("Operator is nullptr");
-		}
-		if (smoother == nullptr) {
-			throw RuntimeError("Smoother is nullptr");
-		}
-		if (restrictor == nullptr) {
-			throw RuntimeError("Restrictor is nullptr");
-		}
-		if (interpolator == nullptr) {
-			throw RuntimeError("Interpolator is nullptr");
-		}
-		if (vg == nullptr) {
-			throw RuntimeError("VectorGenerator is nullptr");
-		}
 
-		auto new_level = std::make_shared<Level<D>>(nullptr, vg);
+		auto new_level = std::make_shared<Level<D>>();
 		new_level->setOperator(op);
 		new_level->setSmoother(smoother);
 		new_level->setInterpolator(interpolator);
@@ -162,11 +131,8 @@ template <int D> class CycleBuilder
 	 * @param op the Operator for the level
 	 * @param smoother the Smoother for the level
 	 * @param interpolator the Interpolator that restricts from this level to the finer level
-	 * @param vg the VectorGenerator for the level
 	 */
-	void addCoarsestLevel(std::shared_ptr<Operator<D>> op, std::shared_ptr<Smoother<D>> smoother,
-	                      std::shared_ptr<Interpolator<D>>    interpolator,
-	                      std::shared_ptr<VectorGenerator<D>> vg)
+	void addCoarsestLevel(const Operator<D> &op, Smoother<D> &smoother, const Interpolator<D> &interpolator)
 	{
 		if (!has_finest) {
 			throw RuntimeError("addFinestLevel has not been called yet");
@@ -174,21 +140,9 @@ template <int D> class CycleBuilder
 		if (has_coarsest) {
 			throw RuntimeError("addCoarsestLevel has already been called");
 		}
-		if (op == nullptr) {
-			throw RuntimeError("Operator is nullptr");
-		}
-		if (smoother == nullptr) {
-			throw RuntimeError("Smoother is nullptr");
-		}
-		if (interpolator == nullptr) {
-			throw RuntimeError("Interpolator is nullptr");
-		}
-		if (vg == nullptr) {
-			throw RuntimeError("VectorGenerator is nullptr");
-		}
 		has_coarsest = true;
 
-		auto new_level = std::make_shared<Level<D>>(nullptr, vg);
+		auto new_level = std::make_shared<Level<D>>();
 		new_level->setOperator(op);
 		new_level->setSmoother(smoother);
 		new_level->setInterpolator(interpolator);
@@ -212,6 +166,8 @@ template <int D> class CycleBuilder
 			cycle.reset(new VCycle<D>(finest_level, opts));
 		} else if (opts.cycle_type == "W") {
 			cycle.reset(new WCycle<D>(finest_level, opts));
+		} else if (opts.cycle_type == "F") {
+			cycle.reset(new FMGCycle<D>(finest_level, opts));
 		} else {
 			throw RuntimeError("Unsupported Cycle type: " + opts.cycle_type);
 		}

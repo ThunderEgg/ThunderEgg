@@ -39,13 +39,24 @@ template <int D> class Restrictor
 	 */
 	virtual ~Restrictor() {}
 	/**
-	 * @brief Virtual function that base classes have to implement.
+	 * @brief Clone this interpolator
 	 *
-	 * @param fine the input vector that is restricted.
-	 * @param coarse the output vector that is restricted to.
+	 * @return Interpolator<D>* a newly allocated copy of this interpolator
 	 */
-	virtual void restrict(std::shared_ptr<const Vector<D>> fine,
-	                      std::shared_ptr<Vector<D>>       coarse) const = 0;
+	virtual Restrictor<D> *clone() const = 0;
+	/**
+	 * @brief
+	 *
+	 * @param fine
+	 */
+	virtual Vector<D> restrict(const Vector<D> &fine) const = 0;
+	/**
+	 * @brief Get get a new vector for the coarser domain
+	 *
+	 * @param num_components the number of components in the vector
+	 * @return Vector<D> the vector
+	 */
+	virtual Vector<D> getNewCoarserVector(int num_components) const = 0;
 };
 } // namespace GMG
 } // namespace ThunderEgg

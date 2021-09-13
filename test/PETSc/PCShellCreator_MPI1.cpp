@@ -22,8 +22,6 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
-#include <ThunderEgg/PETSc/VecWrapper.h>
-#include <ThunderEgg/ValVectorGenerator.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -40,109 +38,98 @@ const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 class HalfIdentity : public Operator<2>
 {
 	public:
-	void apply(std::shared_ptr<const Vector<2>> x, std::shared_ptr<Vector<2>> b) const override
+	HalfIdentity *clone() const override
 	{
-		b->copy(x);
-		b->scale(0.5);
+		return new HalfIdentity(*this);
+	}
+	void apply(const Vector<2> &x, Vector<2> &b) const override
+	{
+		b.copy(x);
+		b.scale(0.5);
 	}
 };
 TEST_CASE("PETSc::PCShellCreator works with 0.5I", "[PETSc::PCShellCreator]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 0;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
-	auto                  vg     = make_shared<ValVectorGenerator<2>>(d_fine, 1);
+	int             n         = 32;
+	int             num_ghost = 0;
+	DomainReader<2> domain_reader(mesh_file, {n, n}, num_ghost);
+	Domain<2>       d_fine = domain_reader.getFinerDomain();
 
-	auto gfun = [](const std::array<double, 2> &coord) {
-		double x = coord[0];
-		double y = coord[1];
-		return sinl(M_PI * y) * cosl(2 * M_PI * x);
+	auto vector_allocator = [&] {
+		return Vector<2>(d_fine, 1);
 	};
 
-	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
-	DomainTools::SetValues<2>(d_fine, x, gfun);
-	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine, 1);
+	Vec x;
+	VecCreateMPI(MPI_COMM_WORLD, d_fine.getNumLocalCells() * 1, PETSC_DETERMINE, &x);
+	double *x_view;
+	VecGetArray(x, &x_view);
+	for (int i = 0; i < d_fine.getNumLocalCells() * 1; i++) {
+		x_view[i] = i;
+	}
+	VecRestoreArray(x, &x_view);
+	Vec b;
+	VecCreateMPI(MPI_COMM_WORLD, d_fine.getNumLocalCells() * 1, PETSC_DETERMINE, &b);
 
 	// create an Identity matrix
-	auto TE_A = make_shared<HalfIdentity>();
-	PC   P    = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, TE_A, vg);
+	HalfIdentity TE_A;
+	PC           P = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, TE_A, vector_allocator);
 
-	PCApply(P, x->getVec(), b->getVec());
+	PCApply(P, x, b);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo.id);
-		INFO("x:     " << pinfo.starts[0]);
-		INFO("y:     " << pinfo.starts[1]);
-		INFO("nx:    " << pinfo.ns[0]);
-		INFO("ny:    " << pinfo.ns[1]);
-		INFO("dx:    " << pinfo.spacings[0]);
-		INFO("dy:    " << pinfo.spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(0, pinfo.local_index);
-		LocalData<2> b_ld = b->getLocalData(0, pinfo.local_index);
-		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
-			INFO("xi:    " << coord[0]);
-			INFO("yi:    " << coord[1]);
-			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
-		});
+	double *b_view;
+	VecGetArray(x, &x_view);
+	VecGetArray(b, &b_view);
+	for (int i = 0; i < d_fine.getNumLocalCells() * 1; i++) {
+		CHECK(x_view[i] * 0.5 == b_view[i]);
 	}
+	VecRestoreArray(x, &x_view);
+	VecRestoreArray(b, &b_view);
+
 	PCDestroy(&P);
+	VecDestroy(&x);
+	VecDestroy(&b);
 }
 TEST_CASE("PETSc::PCShellCreator works with 0.5I and two components", "[PETSc::PCShellCreator]")
 {
 	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
 	INFO("MESH FILE " << mesh_file);
-	int                   n         = 32;
-	int                   num_ghost = 0;
-	DomainReader<2>       domain_reader(mesh_file, {n, n}, num_ghost);
-	shared_ptr<Domain<2>> d_fine = domain_reader.getFinerDomain();
-	auto                  vg     = make_shared<ValVectorGenerator<2>>(d_fine, 2);
-
-	auto gfun = [](const std::array<double, 2> &coord) {
-		double x = coord[0];
-		double y = coord[1];
-		return sinl(M_PI * y) * cosl(2 * M_PI * x);
-	};
-	auto ffun = [](const std::array<double, 2> &coord) {
-		double x = coord[0];
-		double y = coord[1];
-		return x + y;
+	int             n         = 32;
+	int             num_ghost = 0;
+	DomainReader<2> domain_reader(mesh_file, {n, n}, num_ghost);
+	Domain<2>       d_fine           = domain_reader.getFinerDomain();
+	auto            vector_allocator = [&] {
+        return Vector<2>(d_fine, 2);
 	};
 
-	auto x = PETSc::VecWrapper<2>::GetNewVector(d_fine, 2);
-	DomainTools::SetValues<2>(d_fine, x, gfun, ffun);
-	auto b = PETSc::VecWrapper<2>::GetNewVector(d_fine, 2);
+	Vec x;
+	VecCreateMPI(MPI_COMM_WORLD, d_fine.getNumLocalCells() * 2, PETSC_DETERMINE, &x);
+	double *x_view;
+	VecGetArray(x, &x_view);
+	for (int i = 0; i < d_fine.getNumLocalCells() * 2; i++) {
+		x_view[i] = i;
+	}
+	VecRestoreArray(x, &x_view);
+	Vec b;
+	VecCreateMPI(MPI_COMM_WORLD, d_fine.getNumLocalCells() * 2, PETSC_DETERMINE, &b);
 
 	// create an Identity matrix
-	auto TE_A = make_shared<HalfIdentity>();
-	PC   P    = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, TE_A, vg);
+	HalfIdentity TE_A;
+	PC           P = PETSc::PCShellCreator<2>::GetNewPCShell(TE_A, TE_A, vector_allocator);
 
-	PCApply(P, x->getVec(), b->getVec());
+	PCApply(P, x, b);
 
-	for (auto pinfo : d_fine->getPatchInfoVector()) {
-		INFO("Patch: " << pinfo.id);
-		INFO("x:     " << pinfo.starts[0]);
-		INFO("y:     " << pinfo.starts[1]);
-		INFO("nx:    " << pinfo.ns[0]);
-		INFO("ny:    " << pinfo.ns[1]);
-		INFO("dx:    " << pinfo.spacings[0]);
-		INFO("dy:    " << pinfo.spacings[1]);
-		LocalData<2> x_ld = x->getLocalData(0, pinfo.local_index);
-		LocalData<2> b_ld = b->getLocalData(0, pinfo.local_index);
-		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
-			INFO("xi:    " << coord[0]);
-			INFO("yi:    " << coord[1]);
-			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
-		});
-		LocalData<2> x_ld2 = x->getLocalData(1, pinfo.local_index);
-		LocalData<2> b_ld2 = b->getLocalData(1, pinfo.local_index);
-		nested_loop<2>(x_ld2.getStart(), x_ld2.getEnd(), [&](const array<int, 2> &coord) {
-			INFO("xi:    " << coord[0]);
-			INFO("yi:    " << coord[1]);
-			CHECK(0.5 * x_ld2[coord] == Catch::Approx(b_ld2[coord]));
-		});
+	double *b_view;
+	VecGetArray(x, &x_view);
+	VecGetArray(b, &b_view);
+	for (int i = 0; i < d_fine.getNumLocalCells() * 2; i++) {
+		CHECK(x_view[i] * 0.5 == b_view[i]);
 	}
+	VecRestoreArray(x, &x_view);
+	VecRestoreArray(b, &b_view);
+
 	PCDestroy(&P);
+	VecDestroy(&x);
+	VecDestroy(&b);
 }

@@ -21,14 +21,12 @@
 
 #ifndef THUNDEREGG_VECTOR_H
 #define THUNDEREGG_VECTOR_H
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Face.h>
-#include <ThunderEgg/LocalData.h>
 #include <ThunderEgg/Loops.h>
-#include <algorithm>
+#include <ThunderEgg/PatchView.h>
 #include <cmath>
-#include <memory>
 #include <mpi.h>
-#include <numeric>
 namespace ThunderEgg
 {
 /**
@@ -40,62 +38,281 @@ template <int D> class Vector
 {
 	private:
 	/**
-	 * @brief The number of components for a patch
+	 * @brief the communicator
 	 */
-	int num_components;
+	Communicator comm;
+
 	/**
-	 * @brief The number of local patches in the vector
+	 * @brief the pointers to patch starts
 	 */
-	int num_local_patches;
+	std::vector<double *> patch_starts;
+
+	/**
+	 * @brief the strides for each axis of the patch
+	 */
+	std::array<int, D + 1> strides;
+	/**
+	 * @brief the number of non-ghost cells in each direction of the patch
+	 */
+	std::array<int, D + 1> lengths;
+
+	/**
+	 * @brief The number of ghost cells
+	 */
+	int num_ghost_cells = 0;
+
+	/**
+	 * @brief allocated data, empty of data is not managed
+	 */
+	std::vector<double> data;
+
 	/**
 	 * @brief The number of local cells in the vector
 	 * This exclude ghost cells
 	 */
-	int num_local_cells;
+	int num_local_cells = 0;
+
 	/**
-	 * @brief the mpi comm
+	 * @brief determine the strides from the lengths
 	 */
-	MPI_Comm comm;
+	void determineStrides()
+	{
+		int curr_stride = 1;
+		for (int i = 0; i < D; i++) {
+			strides[i] = curr_stride;
+			curr_stride *= lengths[i] + 2 * num_ghost_cells;
+		}
+		strides[D] = curr_stride;
+	}
+
+	/**
+	 * @brief allocate the data vector and set patch_starts
+	 *
+	 * @param num_local_patches number of local patches
+	 */
+	void allocateData(int num_local_patches)
+	{
+		int patch_stride = strides[D] * lengths[D];
+		data.resize(patch_stride * num_local_patches);
+		patch_starts.resize(num_local_patches);
+		for (int i = 0; i < num_local_patches; i++) {
+			patch_starts[i] = data.data() + i * patch_stride;
+		}
+	}
 
 	public:
 	/**
-	 * @brief Construct a new Vector object
+	 * @brief Construct a new Vector object of size 0
+	 */
+	Vector()
+	{
+		strides.fill(0);
+		lengths.fill(0);
+	}
+	/**
+	 * @brief Construct a new Vector object with managed memory
 	 *
 	 * @param comm the MPI comm that is being used
 	 * @param num_components the number of components for each patch
 	 * @param num_local_patches the number of local patches in this vector
 	 * @param num_local_cells the number of local (non-ghost) cells in this vector
 	 */
-	explicit Vector(MPI_Comm comm, int num_components, int num_local_patches, int num_local_cells)
-	: num_components(num_components),
-	  num_local_patches(num_local_patches),
-	  num_local_cells(num_local_cells),
-	  comm(comm)
+	Vector(Communicator comm, const std::array<int, D> &ns, int num_components, int num_local_patches, int num_ghost_cells)
+	: comm(comm),
+	  num_ghost_cells(num_ghost_cells)
 	{
+		for (int i = 0; i < D; i++) {
+			lengths[i] = ns[i];
+		}
+		lengths[D]      = num_components;
+		int size        = 1;
+		num_local_cells = 1;
+		for (int i = 0; i < D; i++) {
+			strides[i] = size;
+			size *= lengths[i] + 2 * num_ghost_cells;
+			num_local_cells *= lengths[i];
+		}
+		strides[D] = size;
+		size *= lengths[D];
+		int patch_stride = size;
+		size *= num_local_patches;
+		num_local_cells *= num_local_patches;
+		data.resize(size);
+		patch_starts.resize(num_local_patches);
+		for (int i = 0; i < num_local_patches; i++) {
+			patch_starts[i] = data.data() + i * patch_stride;
+		}
 	}
 	/**
-	 * @brief Destroy the Vector object
+	 * @brief Construct a new Vector object for a given domain
+	 *
+	 * @param domain the domain
+	 * @param num_components  the number of components for each patch
 	 */
-	virtual ~Vector(){};
+	Vector(const Domain<D> &domain, int num_components)
+	: comm(domain.getCommunicator()),
+	  num_ghost_cells(domain.getNumGhostCells()),
+	  num_local_cells(domain.getNumLocalCells())
+	{
+		const std::array<int, D> &ns                = domain.getNs();
+		int                       num_local_patches = domain.getNumLocalPatches();
+		for (int i = 0; i < D; i++) {
+			lengths[i] = ns[i];
+		}
+		lengths[D]      = num_components;
+		int size        = 1;
+		num_local_cells = 1;
+		for (int i = 0; i < D; i++) {
+			strides[i] = size;
+			size *= lengths[i] + 2 * num_ghost_cells;
+			num_local_cells *= lengths[i];
+		}
+		strides[D] = size;
+		size *= lengths[D];
+		int patch_stride = size;
+		size *= num_local_patches;
+		num_local_cells *= num_local_patches;
+		data.resize(size);
+		patch_starts.resize(num_local_patches);
+		for (int i = 0; i < num_local_patches; i++) {
+			patch_starts[i] = data.data() + i * patch_stride;
+		}
+	}
+	/**
+	 * @brief Construct a new Vector object with unmanaged memory
+	 *
+	 * @param comm  the communicator
+	 * @param patch_starts pointers to the starts of each patch
+	 * @param strides the strides
+	 * @param lengths the lengths
+	 * @param num_ghost_cells  the number of ghost cells
+	 */
+	Vector(Communicator                  comm,
+	       const std::vector<double *> & patch_starts,
+	       const std::array<int, D + 1> &strides,
+	       const std::array<int, D + 1> &lengths,
+	       int                           num_ghost_cells)
+	: comm(comm),
+	  patch_starts(patch_starts),
+	  strides(strides),
+	  lengths(lengths),
+	  num_ghost_cells(num_ghost_cells)
+	{
+		num_local_cells = 1;
+		for (int i = 0; i < D; i++) {
+			num_local_cells *= lengths[i];
+		}
+		num_local_cells *= patch_starts.size();
+	}
+	/**
+	 * @brief Copy constructor
+	 *
+	 * will copy all values
+	 *
+	 * @param other the vector to copy
+	 */
+	Vector(const Vector<D> &other)
+	: comm(other.comm),
+	  lengths(other.lengths),
+	  num_ghost_cells(other.num_ghost_cells),
+	  num_local_cells(other.num_local_cells)
+	{
+		if (other.data.empty()) {
+			determineStrides();
+			allocateData(other.getNumLocalPatches());
+			copyWithGhost(other);
+		} else {
+			strides          = other.strides;
+			data             = other.data;
+			int patch_stride = data.size() / other.getNumLocalPatches();
+			patch_starts.resize(other.patch_starts.size());
+			for (int i = 0; i < patch_starts.size(); i++) {
+				patch_starts[i] = data.data() + i * patch_stride;
+			}
+		}
+	}
+	/**
+	 * @brief Copy assignment
+	 *
+	 * will copy all values
+	 *
+	 * @param other the vector to copy
+	 * @return Vector<D>& this
+	 */
+	Vector<D> &operator=(const Vector<D> &other)
+	{
+		comm            = other.comm;
+		lengths         = other.lengths;
+		num_ghost_cells = other.num_ghost_cells;
+		num_local_cells = other.num_local_cells;
+		if (other.data.empty()) {
+			determineStrides();
+			allocateData(other.getNumLocalPatches());
+			copyWithGhost(other);
+		} else {
+			strides          = other.strides;
+			data             = other.data;
+			int patch_stride = data.size() / other.getNumLocalPatches();
+			patch_starts.resize(other.patch_starts.size());
+			for (int i = 0; i < patch_starts.size(); i++) {
+				patch_starts[i] = data.data() + i * patch_stride;
+			}
+		}
+		return *this;
+	}
+	/**
+	 * @brief Move constructor
+	 *
+	 * @param other the vector to move
+	 */
+	Vector(Vector<D> &&other)
+	: comm(std::exchange(other.comm, Communicator())),
+	  patch_starts(std::exchange(other.patch_starts, std::vector<double *>())),
+	  num_ghost_cells(std::exchange(other.num_ghost_cells, 0)),
+	  data(std::exchange(other.data, std::vector<double>())),
+	  num_local_cells(std::exchange(other.num_local_cells, 0))
+	{
+		lengths.fill(0);
+		std::swap(lengths, other.lengths);
+		strides.fill(0);
+		std::swap(strides, other.strides);
+	}
+	/**
+	 * @brief Move assignment
+	 *
+	 * @param other the vector to move
+	 * @return Vector<D>&& this
+	 */
+	Vector<D> &operator=(Vector<D> &&other)
+	{
+		std::swap(comm, other.comm);
+		std::swap(lengths, other.lengths);
+		std::swap(num_ghost_cells, other.num_ghost_cells);
+		std::swap(num_local_cells, other.num_local_cells);
+		std::swap(strides, other.strides);
+		std::swap(data, other.data);
+		std::swap(patch_starts, other.patch_starts);
+		return *this;
+	}
 	/**
 	 * @brief get the MPI Comm that this vector uses
 	 *
 	 * @return MPI_Comm the comm
 	 */
-	MPI_Comm getMPIComm() const
+	const Communicator &getCommunicator() const
 	{
 		return comm;
 	}
 	int getNumComponents() const
 	{
-		return num_components;
+		return lengths[D];
 	}
 	/**
 	 * @brief Get the number of local patches
 	 */
 	int getNumLocalPatches() const
 	{
-		return num_local_patches;
+		return patch_starts.size();
 	}
 	/**
 	 * @brief Get the number of local cells int he vector (excluding ghost cells)
@@ -107,52 +324,68 @@ template <int D> class Vector
 		return num_local_cells;
 	}
 	/**
-	 * @brief Get the LocalData object for the specified patch and component
+	 * @brief Get the number of ghost cells
 	 *
-	 * @param component_index the index of the component access
-	 * @param patch_local_index the local index of the patch
-	 * @return LocalData<D> the LocalData object
+	 * @return int the number of ghost cells
 	 */
-	virtual LocalData<D> getLocalData(int component_index, int patch_local_index) = 0;
-	/**
-	 * @brief Get the LocalData object for the specified patch and component
-	 *
-	 * @param component_index the index of the component access
-	 * @param patch_local_index the local index of the patch
-	 * @return LocalData<D> the LocalData object
-	 */
-	virtual const LocalData<D> getLocalData(int component_index, int patch_local_index) const = 0;
-	/**
-	 * @brief Get the LocalData objects for the specified patch
-	 * index of LocalData object will correspond to component index
-	 *
-	 * @param patch_local_index the local index of the patch
-	 * @return LocalData<D> the LocalData object
-	 */
-	std::vector<LocalData<D>> getLocalDatas(int patch_local_index)
+	int getNumGhostCells() const
 	{
-		std::vector<LocalData<D>> local_datas;
-		local_datas.reserve(num_components);
-		for (int c = 0; c < num_components; c++) {
-			local_datas.emplace_back(std::move(getLocalData(c, patch_local_index)));
-		}
-		return local_datas;
+		return num_ghost_cells;
 	}
 	/**
-	 * @brief Get the LocalData objects for the specified patch
-	 * index of LocalData object will correspond to component index
+	 * @brief Get the ComponentView for the specified patch and component
+	 *
+	 * @param component_index the index of the component access
+	 * @param patch_local_index the local index of the patch
+	 * @return ComponentView<D> the View object
+	 */
+	ComponentView<double, D> getComponentView(int component_index, int patch_local_index)
+	{
+		return getPatchView(patch_local_index).getComponentView(component_index);
+	}
+	/**
+	 * @brief Get the ComponentView for the specified patch and component
+	 *
+	 * @param component_index the index of the component access
+	 * @param patch_local_index the local index of the patch
+	 * @return ComponentView<D> the View object
+	 */
+	ComponentView<const double, D> getComponentView(int component_index, int patch_local_index) const
+	{
+		return getPatchView(patch_local_index).getComponentView(component_index);
+	}
+	/**
+	 * @brief Get the View objects for the specified patch
+	 * index of View object will correspond to component index
 	 *
 	 * @param patch_local_index the local index of the patch
-	 * @return LocalData<D> the LocalData object
+	 * @return View<D> the View object
 	 */
-	const std::vector<LocalData<D>> getLocalDatas(int patch_local_index) const
+	PatchView<double, D> getPatchView(int patch_local_index)
 	{
-		std::vector<LocalData<D>> local_datas;
-		local_datas.reserve(num_components);
-		for (int c = 0; c < num_components; c++) {
-			local_datas.emplace_back(std::move(getLocalData(c, patch_local_index)));
+		if constexpr (ENABLE_DEBUG) {
+			if (patch_local_index < 0 || patch_local_index >= getNumLocalPatches()) {
+				throw RuntimeError("invalid patch index");
+			}
 		}
-		return local_datas;
+		return PatchView<double, D>(patch_starts[patch_local_index], strides, lengths, num_ghost_cells);
+	}
+
+	/**
+	 * @brief Get the View objects for the specified patch
+	 * index of View object will correspond to component index
+	 *
+	 * @param patch_local_index the local index of the patch
+	 * @return View<D> the View object
+	 */
+	PatchView<const double, D> getPatchView(int patch_local_index) const
+	{
+		if constexpr (ENABLE_DEBUG) {
+			if (patch_local_index < 0 || patch_local_index >= getNumLocalPatches()) {
+				throw RuntimeError("invalid patch index");
+			}
+		}
+		return PatchView<const double, D>(patch_starts[patch_local_index], strides, lengths, num_ghost_cells);
 	}
 
 	/**
@@ -160,13 +393,11 @@ template <int D> class Vector
 	 *
 	 * @param alpha the value ot be set
 	 */
-	virtual void set(double alpha)
+	void set(double alpha)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			for (auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] = alpha; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = alpha; });
 		}
 	}
 	/**
@@ -174,13 +405,11 @@ template <int D> class Vector
 	 *
 	 * @param alpha the value ot be set
 	 */
-	virtual void setWithGhost(double alpha)
+	void setWithGhost(double alpha)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			for (auto &ld : lds) {
-				nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, D> coord) { ld[coord] = alpha; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D> view = getPatchView(i);
+			loop_over_all_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = alpha; });
 		}
 	}
 	/**
@@ -188,13 +417,11 @@ template <int D> class Vector
 	 *
 	 * @param alpha the value to scale by
 	 */
-	virtual void scale(double alpha)
+	void scale(double alpha)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			for (auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] *= alpha; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] *= alpha; });
 		}
 	}
 	/**
@@ -202,13 +429,11 @@ template <int D> class Vector
 	 *
 	 * @param delta the value to shift by
 	 */
-	virtual void shift(double delta)
+	void shift(double delta)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			for (auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { ld[coord] += delta; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += delta; });
 		}
 	}
 	/**
@@ -216,14 +441,25 @@ template <int D> class Vector
 	 *
 	 * @param b the other vector
 	 */
-	virtual void copy(std::shared_ptr<const Vector<D>> b)
+	void copy(const Vector<D> &b)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] = lds_b[c][coord]; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = b_view[coord]; });
+		}
+	}
+	/**
+	 * @brief copy the values of the other vector include ghost cell values
+	 *
+	 * @param b the other vector
+	 */
+	void copyWithGhost(const Vector<D> &b)
+	{
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			loop_over_all_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = b_view[coord]; });
 		}
 	}
 	/**
@@ -231,138 +467,132 @@ template <int D> class Vector
 	 *
 	 * @param b the other vector
 	 */
-	virtual void add(std::shared_ptr<const Vector<D>> b)
+	void add(const Vector<D> &b)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord]; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord]; });
 		}
 	}
 	/**
 	 * @brief `this = this + alpha * b`
 	 */
-	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> b)
+	void addScaled(double alpha, const Vector<D> &b)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] += lds_b[c][coord] * alpha; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord] * alpha; });
 		}
 	}
 	/**
 	 * @brief `this = this + alpha * a + beta * b`
 	 */
-	virtual void addScaled(double alpha, std::shared_ptr<const Vector<D>> a, double beta, std::shared_ptr<const Vector<D>> b)
+	void addScaled(double alpha, const Vector<D> &a, double beta, const Vector<D> &b)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_a = a->getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
-					lds[c][coord] += lds_a[c][coord] * alpha + lds_b[c][coord] * beta;
-				});
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> a_view = a.getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			loop_over_interior_indexes<D + 1>(
+			view, [&](const std::array<int, D + 1> &coord) { view[coord] += a_view[coord] * alpha + b_view[coord] * beta; });
 		}
 	}
 	/**
 	 * @brief `this = alpha * this + b`
 	 */
-	virtual void scaleThenAdd(double alpha, std::shared_ptr<const Vector<D>> b)
+	void scaleThenAdd(double alpha, const Vector<D> &b)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(
-				lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { lds[c][coord] = alpha * lds[c][coord] + lds_b[c][coord]; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord]; });
 		}
 	}
 	/**
 	 * @brief `this = alpha * this + beta * b`
 	 */
-	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b)
+	void scaleThenAddScaled(double alpha, double beta, const Vector<D> &b)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) {
-					lds[c][coord] = alpha * lds[c][coord] + beta * lds_b[c][coord];
-				});
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view,
+			                                  [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord] * beta; });
 		}
 	}
 	/**
 	 * @brief `this = alpha * this + beta * b + gamma * c`
 	 */
-	virtual void scaleThenAddScaled(double alpha, double beta, std::shared_ptr<const Vector<D>> b, double gamma, std::shared_ptr<const Vector<D>> c)
+	void scaleThenAddScaled(double alpha, double beta, const Vector<D> &b, double gamma, const Vector<D> &c)
 	{
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_c = c->getLocalDatas(i);
-			for (int comp = 0; comp < num_components; comp++) {
-				nested_loop<D>(lds[comp].getStart(), lds[comp].getEnd(), [&](std::array<int, D> coord) {
-					lds[comp][coord] = alpha * lds[comp][coord] + beta * lds_b[comp][coord] + gamma * lds_c[comp][coord];
-				});
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<double, D>       view   = getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			PatchView<const double, D> c_view = c.getPatchView(i);
+			loop_over_interior_indexes<D + 1>(
+			view, [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord] * beta + c_view[coord] * gamma; });
 		}
 	}
 	/**
 	 * @brief get the l2norm
 	 */
-	virtual double twoNorm() const
+	double twoNorm() const
 	{
 		double sum = 0;
-		for (int i = 0; i < num_local_patches; i++) {
-			const std::vector<LocalData<D>> lds = getLocalDatas(i);
-			for (const auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { sum += ld[coord] * ld[coord]; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<const double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { sum += view[coord] * view[coord]; });
 		}
 		double global_sum;
-		MPI_Allreduce(&sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, comm);
+		MPI_Allreduce(&sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
 		return sqrt(global_sum);
 	}
 	/**
 	 * @brief get the infnorm
 	 */
-	virtual double infNorm() const
+	double infNorm() const
 	{
 		double max = 0;
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>> lds = getLocalDatas(i);
-			for (const auto &ld : lds) {
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](std::array<int, D> coord) { max = fmax(fabs(ld[coord]), max); });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<const double, D> view = getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { max = fmax(view[coord], max); });
 		}
 		double global_max;
-		MPI_Allreduce(&max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm);
+		MPI_Allreduce(&max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm.getMPIComm());
 		return global_max;
 	}
 	/**
 	 * @brief get the dot product
 	 */
-	virtual double dot(std::shared_ptr<const Vector<D>> b) const
+	double dot(const Vector<D> &b) const
 	{
 		double retval = 0;
-		for (int i = 0; i < num_local_patches; i++) {
-			std::vector<LocalData<D>>       lds   = getLocalDatas(i);
-			const std::vector<LocalData<D>> lds_b = b->getLocalDatas(i);
-			for (int c = 0; c < num_components; c++) {
-				nested_loop<D>(lds[c].getStart(), lds[c].getEnd(), [&](std::array<int, D> coord) { retval += lds[c][coord] * lds_b[c][coord]; });
-			}
+		for (int i = 0; i < getNumLocalPatches(); i++) {
+			PatchView<const double, D> view   = getPatchView(i);
+			PatchView<const double, D> b_view = b.getPatchView(i);
+			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { retval += view[coord] * b_view[coord]; });
 		}
 		double global_retval;
-		MPI_Allreduce(&retval, &global_retval, 1, MPI_DOUBLE, MPI_SUM, comm);
+		MPI_Allreduce(&retval, &global_retval, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
 		return global_retval;
+	}
+	/**
+	 * @brief Get a vector of the same length initialized to zero
+	 *
+	 * @return Vector<D> the vector of the same length initialize to zero
+	 */
+	Vector<D> getZeroClone() const
+	{
+		Vector<D> clone;
+		clone.comm            = comm;
+		clone.lengths         = lengths;
+		clone.num_ghost_cells = num_ghost_cells;
+		clone.num_local_cells = num_local_cells;
+		clone.determineStrides();
+		clone.allocateData(getNumLocalPatches());
+		return clone;
 	}
 };
 extern template class Vector<1>;

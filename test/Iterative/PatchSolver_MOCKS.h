@@ -34,110 +34,147 @@ template <int D>
 class MockGhostFiller : public GhostFiller<D>
 {
 	public:
-	void fillGhost(std::shared_ptr<const Vector<D>> u) const override {}
+	MockGhostFiller<D> *clone() const override
+	{
+		return new MockGhostFiller<D>(*this);
+	}
+	void fillGhost(const Vector<D> &u) const override {}
 };
 template <int D>
 class MockPatchOperator : public PatchOperator<D>
 {
 	private:
-	mutable bool rhs_was_modified   = false;
-	mutable bool interior_dirichlet = false;
-	mutable int  num_apply_calls    = 0;
+	std::shared_ptr<bool> rhs_was_modified   = std::make_shared<bool>(false);
+	std::shared_ptr<bool> bc_enforced        = std::make_shared<bool>(false);
+	std::shared_ptr<bool> interior_dirichlet = std::make_shared<bool>(false);
+	std::shared_ptr<int>  num_apply_calls    = std::make_shared<int>(0);
 
 	public:
-	MockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
-	                  std::shared_ptr<const GhostFiller<D>> ghost_filler)
+	MockPatchOperator(const Domain<D> &     domain,
+	                  const GhostFiller<D> &ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
-	void applySinglePatch(const PatchInfo<D> &             pinfo,
-	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
-	                      bool treat_interior_boundary_as_dirichlet) const override
+	MockPatchOperator<D> *clone() const override
 	{
-		interior_dirichlet |= true;
-		num_apply_calls++;
+		return new MockPatchOperator<D>(*this);
 	}
-	void addGhostToRHS(const PatchInfo<D> &             pinfo,
-	                   const std::vector<LocalData<D>> &us,
-	                   std::vector<LocalData<D>> &      fs) const override
+	void applySinglePatch(const PatchInfo<D> &              pinfo,
+	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
-		rhs_was_modified = true;
+		*bc_enforced = true;
+		(*num_apply_calls)++;
+	}
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
+	{
+		*bc_enforced        = true;
+		*interior_dirichlet = true;
+		(*num_apply_calls)++;
+	}
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                            const PatchView<const double, D> &us,
+	                                            const PatchView<double, D> &      fs) const override
+	{
+		*rhs_was_modified = true;
 	}
 	bool rhsWasModified()
 	{
-		return rhs_was_modified;
+		return *rhs_was_modified;
 	}
-	bool interiorDirichlet()
+	bool boundaryConditionsEnforced()
 	{
-		return interior_dirichlet;
+		return *bc_enforced;
+	}
+	bool internalBoundaryConditionsEnforced()
+	{
+		return *interior_dirichlet;
 	}
 	int getNumApplyCalls()
 	{
-		return num_apply_calls;
+		return *num_apply_calls;
 	}
 };
 template <int D>
 class NonLinMockPatchOperator : public PatchOperator<D>
 {
 	private:
-	mutable bool rhs_was_modified   = false;
-	mutable bool interior_dirichlet = false;
+	std::shared_ptr<bool> rhs_was_modified   = std::make_shared<bool>(false);
+	std::shared_ptr<bool> bc_enforced        = std::make_shared<bool>(false);
+	std::shared_ptr<bool> interior_dirichlet = std::make_shared<bool>(false);
 
 	public:
-	NonLinMockPatchOperator(std::shared_ptr<const Domain<D>>      domain,
-	                        std::shared_ptr<const GhostFiller<D>> ghost_filler)
+	NonLinMockPatchOperator(const Domain<D> &     domain,
+	                        const GhostFiller<D> &ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler)
 	{
 	}
-	void applySinglePatch(const PatchInfo<D> &             pinfo,
-	                      const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs,
-	                      bool treat_interior_boundary_as_dirichlet) const override
+	NonLinMockPatchOperator<D> *clone() const override
 	{
-		interior_dirichlet |= treat_interior_boundary_as_dirichlet;
-		for (size_t c = 0; c < fs.size(); c++) {
-			nested_loop<D>(fs[c].getStart(), fs[c].getEnd(),
-			               [&](const std::array<int, D> &coord) { fs[c][coord] += 1; });
-		}
+		return new NonLinMockPatchOperator<D>(*this);
 	}
-	void addGhostToRHS(const PatchInfo<D> &             pinfo,
-	                   const std::vector<LocalData<D>> &us,
-	                   std::vector<LocalData<D>> &      fs) const override
+	void applySinglePatch(const PatchInfo<D> &              pinfo,
+	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
-		rhs_was_modified = true;
+		*bc_enforced = true;
+		loop_over_interior_indexes<D>(fs,
+		                              [&](const std::array<int, D + 1> &coord) { fs[coord] += 1; });
+	}
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
+	{
+		*bc_enforced        = true;
+		*interior_dirichlet = true;
+		loop_over_interior_indexes<D>(fs,
+		                              [&](const std::array<int, D + 1> &coord) { fs[coord] += 1; });
+	}
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                            const PatchView<const double, D> &us,
+	                                            const PatchView<double, D> &      fs) const override
+	{
+		*rhs_was_modified = true;
 	}
 	bool rhsWasModified()
 	{
-		return rhs_was_modified;
+		return *rhs_was_modified;
 	}
-	bool interiorDirichlet()
+	bool boundaryConditionsEnforced()
 	{
-		return interior_dirichlet;
+		return *bc_enforced;
+	}
+	bool internalBoundaryConditionsEnforced()
+	{
+		return *interior_dirichlet;
 	}
 };
 template <int D>
 class MockSolver : public Iterative::Solver<D>
 {
 	private:
-	std::function<int(std::shared_ptr<VectorGenerator<D>>, std::shared_ptr<const Operator<D>>,
-	                  std::shared_ptr<Vector<D>>, std::shared_ptr<const Vector<D>>,
-	                  std::shared_ptr<const Operator<D>>)>
+	std::function<int(const Operator<D> &,
+	                  Vector<D> &, const Vector<D> &,
+	                  const Operator<D> *)>
 	callback;
 
 	public:
+	MockSolver<D> *clone() const override
+	{
+		return new MockSolver<D>(*this);
+	}
 	MockSolver(
-	std::function<int(std::shared_ptr<VectorGenerator<D>>, std::shared_ptr<const Operator<D>>,
-	                  std::shared_ptr<Vector<D>>, std::shared_ptr<const Vector<D>>,
-	                  std::shared_ptr<const Operator<D>>)>
+	std::function<int(const Operator<D> &,
+	                  Vector<D> &, const Vector<D> &,
+	                  const Operator<D> *)>
 	callback)
 	: callback(callback)
 	{
 	}
-	int solve(std::shared_ptr<VectorGenerator<D>> vg, std::shared_ptr<const Operator<D>> A,
-	          std::shared_ptr<Vector<D>> x, std::shared_ptr<const Vector<D>> b,
-	          std::shared_ptr<const Operator<D>> Mr = nullptr, bool output = false,
+	int solve(const Operator<D> &A,
+	          Vector<D> &x, const Vector<D> &b,
+	          const Operator<D> *Mr = nullptr, bool output = false,
 	          std::ostream &os = std::cout) const override
 	{
-		return callback(vg, A, x, b, Mr);
+		return callback(A, x, b, Mr);
 	}
 };
 

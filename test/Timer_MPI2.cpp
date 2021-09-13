@@ -10,7 +10,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-static Domain<2> GetDomain()
+static Domain<2> GetDomain(const Communicator &comm)
 {
 	vector<PatchInfo<2>> pinfos(1);
 
@@ -23,11 +23,9 @@ static Domain<2> GetDomain()
 	pinfos[0].spacings.fill(spacing);
 	pinfos[0].num_ghost_cells = num_ghost;
 
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	pinfos[0].rank = rank;
+	pinfos[0].rank = comm.getRank();
 
-	Domain<2> d(1, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
+	Domain<2> d(comm, 1, {n, n}, num_ghost, pinfos.begin(), pinfos.end());
 	return d;
 }
 static int occurrences(const std::string &s, const std::string &target)
@@ -42,14 +40,16 @@ static int occurrences(const std::string &s, const std::string &target)
 }
 TEST_CASE("Timer to_json empty timer", "[Timer]")
 {
-	Timer          timer(MPI_COMM_WORLD);
+	Communicator   comm(MPI_COMM_WORLD);
+	Timer          timer(comm);
 	nlohmann::json j = timer;
 	INFO(j.dump(4));
 	REQUIRE(j == nullptr);
 }
 TEST_CASE("Timer to_json unassociated timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 
 	timer.start("A");
 	timer.stop("A");
@@ -57,9 +57,7 @@ TEST_CASE("Timer to_json unassociated timing", "[Timer]")
 	const nlohmann::json j = timer;
 	INFO(j.dump(4));
 
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		REQUIRE(j != nullptr);
 		CHECK(j.size() == 2);
 		CHECK(j["comm_size"] == 2);
@@ -84,12 +82,11 @@ TEST_CASE("Timer to_json unassociated timing", "[Timer]")
 }
 TEST_CASE("Timer to_json unassociated timing with int info", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	int   rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 
 	timer.start("A");
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		timer.addIntInfo("Example", 0);
 	} else {
 		timer.addIntInfo("Example", 1);
@@ -99,7 +96,7 @@ TEST_CASE("Timer to_json unassociated timing with int info", "[Timer]")
 	const nlohmann::json j = timer;
 	INFO(j.dump(4));
 
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		REQUIRE(j != nullptr);
 		CHECK(j.size() == 2);
 		CHECK(j["comm_size"] == 2);
@@ -141,12 +138,11 @@ TEST_CASE("Timer to_json unassociated timing with int info", "[Timer]")
 }
 TEST_CASE("Timer to_json unassociated timing with double info", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	int   rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 
 	timer.start("A");
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		timer.addDoubleInfo("Example", 0);
 	} else {
 		timer.addDoubleInfo("Example", 1);
@@ -156,7 +152,7 @@ TEST_CASE("Timer to_json unassociated timing with double info", "[Timer]")
 	const nlohmann::json j = timer;
 	INFO(j.dump(4));
 
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		REQUIRE(j != nullptr);
 		CHECK(j.size() == 2);
 		CHECK(j["comm_size"] == 2);
@@ -198,7 +194,8 @@ TEST_CASE("Timer to_json unassociated timing with double info", "[Timer]")
 }
 TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.stop("A");
 	timer.start("B");
@@ -206,9 +203,7 @@ TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
 	const nlohmann::json j = timer;
 	INFO(j.dump(4));
 
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		REQUIRE(j != nullptr);
 		CHECK(j.size() == 2);
 		CHECK(j["comm_size"] == 2);
@@ -249,16 +244,15 @@ TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
 }
 TEST_CASE("Timer to_json nested timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.start("B");
 	timer.stop("B");
 	timer.stop("A");
 	const nlohmann::json j = timer;
 	INFO(j.dump(4));
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		REQUIRE(j != nullptr);
 		CHECK(j.size() == 2);
 		CHECK(j["comm_size"] == 2);
@@ -289,15 +283,14 @@ TEST_CASE("Timer to_json nested timing", "[Timer]")
 }
 TEST_CASE("Timer to_json domain timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	const nlohmann::json j = timer;
 	INFO(j.dump(4));
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		REQUIRE(j != nullptr);
 		CHECK(j.size() == 3);
 		CHECK(j["comm_size"] == 2);
@@ -336,18 +329,17 @@ TEST_CASE("Timer to_json domain timing", "[Timer]")
 }
 TEST_CASE("Timer to_json domain timing only on rank 0", "[Timer]")
 {
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	Communicator comm(MPI_COMM_WORLD);
 
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	if (rank == 0) {
+	Timer timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	if (comm.getRank() == 0) {
 		timer.startDomainTiming(0, "A");
 		timer.stopDomainTiming(0, "A");
 	}
 	const nlohmann::json j = timer;
 	INFO(j.dump(4));
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		REQUIRE(j != nullptr);
 		CHECK(j.size() == 3);
 		CHECK(j["comm_size"] == 2);
@@ -378,18 +370,17 @@ TEST_CASE("Timer to_json domain timing only on rank 0", "[Timer]")
 }
 TEST_CASE("Timer to_json domain timing only on rank 1", "[Timer]")
 {
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	Communicator comm(MPI_COMM_WORLD);
 
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	if (rank == 1) {
+	Timer timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	if (comm.getRank() == 1) {
 		timer.startDomainTiming(0, "A");
 		timer.stopDomainTiming(0, "A");
 	}
 	const nlohmann::json j = timer;
 	INFO(j.dump(4));
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		REQUIRE(j != nullptr);
 		CHECK(j.size() == 3);
 		CHECK(j["comm_size"] == 2);
@@ -420,14 +411,13 @@ TEST_CASE("Timer to_json domain timing only on rank 1", "[Timer]")
 }
 TEST_CASE("Timer ostream empty timing", "[Timer]")
 {
-	Timer        timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	stringstream ss;
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "No timings to report") == 1);
 	} else {
 		CHECK(s.size() == 0);
@@ -435,16 +425,15 @@ TEST_CASE("Timer ostream empty timing", "[Timer]")
 }
 TEST_CASE("Timer ostream unassociated timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.stop("A");
 	stringstream ss;
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "A") == 1);
 		CHECK(occurrences(s, "time (sec)") == 0);
 		CHECK(occurrences(s, "average (sec)") == 1);
@@ -457,7 +446,8 @@ TEST_CASE("Timer ostream unassociated timing", "[Timer]")
 }
 TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.start("B");
 	timer.stop("B");
@@ -466,9 +456,7 @@ TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "A") == 2);
 		CHECK(occurrences(s, "B") == 1);
 		CHECK(occurrences(s, "time (sec)") == 0);
@@ -482,7 +470,8 @@ TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
 }
 TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
 	timer.start("A");
 	timer.stop("A");
 	timer.start("A");
@@ -491,9 +480,7 @@ TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "A") == 1);
 		CHECK(occurrences(s, "time (sec)") == 0);
 		CHECK(occurrences(s, "average (sec)") == 1);
@@ -506,17 +493,16 @@ TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
 }
 TEST_CASE("Timer ostream domain timing", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	stringstream ss;
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "A") == 1);
 		CHECK(occurrences(s, "time (sec)") == 0);
 		CHECK(occurrences(s, "average (sec)") == 1);
@@ -529,9 +515,10 @@ TEST_CASE("Timer ostream domain timing", "[Timer]")
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
 	timer.startDomainTiming(1, "A");
@@ -540,9 +527,7 @@ TEST_CASE("Timer ostream domain timing two different domains sequential", "[Time
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "A") == 1);
 		CHECK(occurrences(s, "time (sec)") == 0);
 		CHECK(occurrences(s, "average (sec)") == 1);
@@ -557,14 +542,13 @@ TEST_CASE(
 "Timer ostream domain timing two different domains sequential rank 0 has unrelated timing",
 "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.stopDomainTiming(0, "A");
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		timer.startDomainTiming(0, "B");
 		timer.stopDomainTiming(0, "B");
 	}
@@ -574,7 +558,7 @@ TEST_CASE(
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "A") == 1);
 		CHECK(occurrences(s, "B") == 1);
 		CHECK(occurrences(s, "time (sec)") == 1);
@@ -588,9 +572,10 @@ TEST_CASE(
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential nested", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -603,9 +588,7 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested",
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "A") == 2);
 		CHECK(occurrences(s, "B") == 1);
 		CHECK(occurrences(s, "time (sec)") == 0);
@@ -621,9 +604,10 @@ TEST_CASE(
 "Timer ostream domain timing two different domains sequential nested first domain has extra timing",
 "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "C");
 	timer.stopDomainTiming(0, "C");
@@ -638,9 +622,7 @@ TEST_CASE(
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "A") == 3);
 		CHECK(occurrences(s, "B") == 1);
 		CHECK(occurrences(s, "C") == 1);
@@ -657,9 +639,10 @@ TEST_CASE(
 "Timer ostream domain timing two different domains sequential nested second domain has extra timing",
 "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -674,9 +657,7 @@ TEST_CASE(
 	ss << timer;
 	std::string s = ss.str();
 	INFO(s);
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK(occurrences(s, "A") == 3);
 		CHECK(occurrences(s, "B") == 1);
 		CHECK(occurrences(s, "C") == 1);
@@ -691,9 +672,10 @@ TEST_CASE(
 }
 TEST_CASE("Timer saveToFile new empty file", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -705,15 +687,13 @@ TEST_CASE("Timer saveToFile new empty file", "[Timer]")
 	timer.stopDomainTiming(1, "B");
 	timer.stopDomainTiming(1, "A");
 
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		std::remove("timerne2.json");
 	}
 	timer.saveToFile("timerne2.json");
 	nlohmann::json j = timer;
 
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		ifstream       input("timerne2.json");
 		nlohmann::json file_j;
 		input >> file_j;
@@ -726,9 +706,10 @@ TEST_CASE("Timer saveToFile new empty file", "[Timer]")
 }
 TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -740,16 +721,14 @@ TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
 	timer.stopDomainTiming(1, "B");
 	timer.stopDomainTiming(1, "A");
 
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		std::remove("timerow2.json");
 	}
 	timer.saveToFile("timerow2.json");
 	timer.saveToFile("timerow2.json");
 	nlohmann::json j = timer;
 
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		ifstream       input("timerow2.json");
 		nlohmann::json file_j;
 		input >> file_j;
@@ -762,9 +741,10 @@ TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
 }
 TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
 {
-	Timer timer(MPI_COMM_WORLD);
-	timer.addDomain(0, GetDomain());
-	timer.addDomain(1, GetDomain());
+	Communicator comm(MPI_COMM_WORLD);
+	Timer        timer(comm);
+	timer.addDomain(0, GetDomain(comm));
+	timer.addDomain(1, GetDomain(comm));
 	timer.startDomainTiming(0, "A");
 	timer.startDomainTiming(0, "B");
 	timer.stopDomainTiming(0, "B");
@@ -776,9 +756,7 @@ TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
 	timer.stopDomainTiming(1, "B");
 	timer.stopDomainTiming(1, "A");
 
-	int rank;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	if (rank == 0) {
+	if (comm.getRank() == 0) {
 		CHECK_THROWS_AS(timer.saveToFile("surely/this/directory/does/not/exist/timer.json"),
 		                RuntimeError);
 	} else {

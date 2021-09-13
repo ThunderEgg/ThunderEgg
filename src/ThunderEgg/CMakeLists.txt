@@ -12,6 +12,15 @@ list(APPEND ThunderEgg_HDRS BufferWriter.h)
 
 list(APPEND ThunderEgg_HDRS CoarseNbrInfo.h)
 
+list(APPEND ThunderEgg_HDRS Communicator.h)
+target_sources(ThunderEgg PRIVATE Communicator.cpp)
+
+list(APPEND ThunderEgg_HDRS ComponentArray.h)
+target_sources(ThunderEgg PRIVATE ComponentArray.cpp)
+
+list(APPEND ThunderEgg_HDRS ComponentView.h)
+target_sources(ThunderEgg PRIVATE ComponentView.cpp)
+
 list(APPEND ThunderEgg_HDRS DivergenceError.h)
 
 list(APPEND ThunderEgg_HDRS DimensionalArray.h)
@@ -33,11 +42,6 @@ list(APPEND ThunderEgg_HDRS GhostFiller.h)
 list(APPEND ThunderEgg_HDRS GhostFillingType.h)
 
 list(APPEND ThunderEgg_HDRS Loops.h)
-
-list(APPEND ThunderEgg_HDRS LocalData.h)
-target_sources(ThunderEgg PRIVATE LocalData.cpp)
-
-list(APPEND ThunderEgg_HDRS LocalDataManager.h)
 
 list(APPEND ThunderEgg_HDRS MPIGhostFiller.h)
 target_sources(ThunderEgg PRIVATE MPIGhostFiller.cpp)
@@ -73,6 +77,12 @@ target_sources(ThunderEgg PRIVATE PatchOperator.cpp)
 
 list(APPEND ThunderEgg_HDRS PatchSolver.h)
 
+list(APPEND ThunderEgg_HDRS PatchArray.h)
+target_sources(ThunderEgg PRIVATE PatchArray.cpp)
+
+list(APPEND ThunderEgg_HDRS PatchView.h)
+target_sources(ThunderEgg PRIVATE PatchView.cpp)
+
 list(APPEND ThunderEgg_HDRS RuntimeError.h)
 
 list(APPEND ThunderEgg_HDRS Serializable.h)
@@ -85,16 +95,11 @@ target_sources(ThunderEgg PRIVATE TriLinearGhostFiller.cpp)
 
 list(APPEND ThunderEgg_HDRS TypeDefs.h)
 
-list(APPEND ThunderEgg_HDRS ValVector.h)
-target_sources(ThunderEgg PRIVATE ValVector.cpp)
-
-list(APPEND ThunderEgg_HDRS ValVectorGenerator.h)
-target_sources(ThunderEgg PRIVATE ValVectorGenerator.cpp)
-
 list(APPEND ThunderEgg_HDRS Vector.h)
 target_sources(ThunderEgg PRIVATE Vector.cpp)
 
-list(APPEND ThunderEgg_HDRS VectorGenerator.h)
+list(APPEND ThunderEgg_HDRS View.h)
+target_sources(ThunderEgg PRIVATE View.cpp)
 
 # -- install public headers
 
@@ -123,3 +128,26 @@ list(APPEND ALL_ThunderEgg_HDRS ${ThunderEgg_HDRS})
 set(ALL_ThunderEgg_HDRS ${ALL_ThunderEgg_HDRS} PARENT_SCOPE)
 
 
+# -- config header
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(TE_ENABLE_DEBUG "true")
+else()
+  set(TE_ENABLE_DEBUG "false")
+endif()
+
+if(TARGET PETSC::PETSC)
+  set(TE_PETSC_ENABLED "true")
+  set(THUNDEREGG_PETSC_ENABLED "ON")
+else()
+  set(TE_PETSC_ENABLED "false")
+endif()
+
+
+configure_file(Config.h.in Config.h)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg)
+
+target_include_directories(
+  ThunderEgg
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)

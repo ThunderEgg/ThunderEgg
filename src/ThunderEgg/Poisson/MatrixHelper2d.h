@@ -35,8 +35,8 @@ namespace Poisson
 class MatrixHelper2d
 {
 	private:
-	std::shared_ptr<Domain<2>> domain;
-	std::bitset<4>             neumann;
+	Domain<2>      domain;
+	std::bitset<4> neumann;
 
 	public:
 	/**
@@ -45,7 +45,7 @@ class MatrixHelper2d
 	 * @param domain the domain
 	 * @param neumann the boundary conditions
 	 */
-	MatrixHelper2d(std::shared_ptr<Domain<2>> domain, std::bitset<4> neumann);
+	MatrixHelper2d(const Domain<2> &domain, std::bitset<4> neumann);
 
 	/**
 	 * @brief Form the matrix

@@ -1,0 +1,7 @@
+#ifndef THUNDEREGG_TESTCONFIG_H
+#define THUNDEREGG_TESTCONFIG_H
+namespace ThunderEgg
+{
+constexpr char TEST_SRC_DIR[] = "@TE_TEST_SRC_DIR@/";
+} // namespace ThunderEgg
+#endif

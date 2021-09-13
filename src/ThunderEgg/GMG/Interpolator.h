@@ -39,13 +39,18 @@ template <int D> class Interpolator
 	 */
 	virtual ~Interpolator() {}
 	/**
+	 * @brief Clone this interpolator
+	 *
+	 * @return Interpolator<D>* a newly allocated copy of this interpolator
+	 */
+	virtual Interpolator<D> *clone() const = 0;
+	/**
 	 * @brief Virtual interpolation operation that needs to be implemented in derived classes.
 	 *
 	 * @param coarse the input vector from the coarser level.
 	 * @param fine the output vector for the fine level.
 	 */
-	virtual void interpolate(std::shared_ptr<const Vector<D>> coarse,
-	                         std::shared_ptr<Vector<D>>       fine) const = 0;
+	virtual void interpolate(const Vector<D> &coarse, Vector<D> &fine) const = 0;
 };
 } // namespace GMG
 } // namespace ThunderEgg

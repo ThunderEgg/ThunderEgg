@@ -23,7 +23,6 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/Iterative/CG.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
-#include <ThunderEgg/ValVectorGenerator.h>
 
 #include <sstream>
 
@@ -65,17 +64,36 @@ TEST_CASE("CG default timer", "[CG]")
 }
 TEST_CASE("CG set timer", "[CG]")
 {
-	CG<2> bcgs;
-	auto  timer = make_shared<Timer>(MPI_COMM_WORLD);
+	Communicator comm(MPI_COMM_WORLD);
+	CG<2>        bcgs;
+	auto         timer = make_shared<Timer>(comm);
 	bcgs.setTimer(timer);
 	CHECK(bcgs.getTimer() == timer);
+}
+TEST_CASE("CG clone", "[CG]")
+{
+	CG<2> bcgs;
+	int   iterations = GENERATE(1, 2, 3);
+	bcgs.setMaxIterations(iterations);
+
+	double tolerance = GENERATE(1.2, 2.3, 3.4);
+	bcgs.setTolerance(tolerance);
+
+	Communicator comm(MPI_COMM_WORLD);
+	auto         timer = make_shared<Timer>(comm);
+	bcgs.setTimer(timer);
+
+	unique_ptr<CG<2>> clone(bcgs.clone());
+	CHECK(bcgs.getTimer() == clone->getTimer());
+	CHECK(bcgs.getMaxIterations() == clone->getMaxIterations());
+	CHECK(bcgs.getTolerance() == clone->getTolerance());
 }
 TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -88,58 +106,58 @@ TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> f_vec(domain, 1);
 	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> residual(domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> g_vec(domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(f_vec, gfun);
+	Poisson::StarPatchOperator<2> p_operator(domain, gf);
+	p_operator.addDrichletBCToRHS(f_vec, gfun);
 
 	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
 
 	CG<2> solver;
 	solver.setMaxIterations(1000);
 	solver.setTolerance(tolerance);
-	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
+	solver.solve(p_operator, g_vec, f_vec);
 
-	p_operator->apply(g_vec, residual);
-	residual->addScaled(-1, f_vec);
-	CHECK(residual->dot(residual) / f_vec->dot(f_vec) <= tolerance);
+	p_operator.apply(g_vec, residual);
+	residual.addScaled(-1, f_vec);
+	CHECK(residual.dot(residual) / f_vec.dot(f_vec) <= tolerance);
 }
 TEST_CASE("CG handles zero rhs vector", "[CG]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> f_vec(domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> g_vec(domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
+	Poisson::StarPatchOperator<2> p_operator(domain, gf);
 
 	double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
 
 	CG<2> solver;
 	solver.setMaxIterations(1000);
 	solver.setTolerance(tolerance);
-	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
+	solver.solve(p_operator, g_vec, f_vec);
 
-	CHECK(g_vec->infNorm() == 0);
+	CHECK(g_vec.infNorm() == 0);
 }
 TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -152,16 +170,16 @@ TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> f_vec(domain, 1);
 	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> residual(domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> g_vec(domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(f_vec, gfun);
+	Poisson::StarPatchOperator<2> p_operator(domain, gf);
+	p_operator.addDrichletBCToRHS(f_vec, gfun);
 
 	double tolerance = 1e-7;
 
@@ -170,7 +188,7 @@ TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
 	CG<2> solver;
 	solver.setMaxIterations(1000);
 	solver.setTolerance(tolerance);
-	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec, nullptr,
+	solver.solve(p_operator, g_vec, f_vec, nullptr,
 	             true, ss);
 
 	INFO(ss.str());
@@ -188,8 +206,8 @@ TEST_CASE("CG giving a good initial guess reduces the iterations", "[CG]")
 {
 	string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 	INFO("MESH FILE " << mesh_file);
-	DomainReader<2>       domain_reader(mesh_file, {32, 32}, 1);
-	shared_ptr<Domain<2>> domain = domain_reader.getCoarserDomain();
+	DomainReader<2> domain_reader(mesh_file, {32, 32}, 1);
+	Domain<2>       domain = domain_reader.getCoarserDomain();
 
 	auto ffun = [](const std::array<double, 2> &coord) {
 		double x = coord[0];
@@ -202,82 +220,26 @@ TEST_CASE("CG giving a good initial guess reduces the iterations", "[CG]")
 		return sin(M_PI * y) * cos(2 * M_PI * x);
 	};
 
-	auto f_vec = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> f_vec(domain, 1);
 	DomainTools::SetValues<2>(domain, f_vec, ffun);
-	auto residual = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> residual(domain, 1);
 
-	auto g_vec = ValVector<2>::GetNewVector(domain, 1);
+	Vector<2> g_vec(domain, 1);
 
-	auto gf = make_shared<BiLinearGhostFiller>(domain, GhostFillingType::Faces);
+	BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
-	auto p_operator = make_shared<Poisson::StarPatchOperator<2>>(domain, gf);
-	p_operator->addDrichletBCToRHS(f_vec, gfun);
+	Poisson::StarPatchOperator<2> p_operator(domain, gf);
+	p_operator.addDrichletBCToRHS(f_vec, gfun);
 
 	double tolerance = 1e-5;
 
 	CG<2> solver;
 	solver.setMaxIterations(1000);
 	solver.setTolerance(tolerance);
-	solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
+	solver.solve(p_operator, g_vec, f_vec);
 
 	int iterations_with_solved_guess
-	= solver.solve(make_shared<ValVectorGenerator<2>>(domain, 1), p_operator, g_vec, f_vec);
+	= solver.solve(p_operator, g_vec, f_vec);
 
 	CHECK(iterations_with_solved_guess == 0);
-}
-namespace
-{
-class MockVector : public Vector<2>
-{
-	public:
-	mutable int norm_calls = 0;
-	double      dot_value;
-	MockVector(double dot_value)
-	: Vector<2>(MPI_COMM_WORLD, 1, 0, 10), dot_value(dot_value) {}
-	LocalData<2> getLocalData(int, int) override
-	{
-		return LocalData<2>();
-	}
-	const LocalData<2> getLocalData(int, int) const override
-	{
-		return LocalData<2>();
-	}
-	double dot(std::shared_ptr<const Vector<2>>) const override
-	{
-		return dot_value;
-	}
-	double twoNorm() const override
-	{
-		norm_calls++;
-		if (norm_calls == 1) {
-			return 1;
-		} else {
-			return norm_calls * 1e6;
-		}
-	}
-};
-class MockVectorGenerator : public VectorGenerator<2>
-{
-	public:
-	std::shared_ptr<MockVector> vec;
-	MockVectorGenerator(std::shared_ptr<MockVector> vec)
-	: vec(vec) {}
-	std::shared_ptr<Vector<2>> getNewVector() const override
-	{
-		return vec;
-	}
-};
-class MockOperator : public Operator<2>
-{
-	public:
-	void apply(std::shared_ptr<const Vector<2>>, std::shared_ptr<Vector<2>>) const override {}
-};
-} // namespace
-TEST_CASE("CG throws breakdown exception when rho is 0", "[CG]")
-{
-	auto  vec = make_shared<MockVector>(0);
-	CG<2> solver;
-	CHECK_THROWS_AS(
-	solver.solve(make_shared<MockVectorGenerator>(vec), make_shared<MockOperator>(), vec, vec),
-	BreakdownError);
 }

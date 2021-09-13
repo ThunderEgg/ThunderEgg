@@ -11,5 +11,6 @@ class TreeToP4est
 	p4est_ghost_t *       ghost;
 	p4est_mesh_t *        mesh;
 	TreeToP4est(ThunderEgg::Experimental::Tree<2> t);
+	void divide();
 };
 #endif

@@ -37,12 +37,18 @@ template <int D> class Smoother
 	 */
 	virtual ~Smoother() {}
 	/**
+	 * @brief Clone this smoother
+	 *
+	 * @return Smoother<D>* a newly allocated copy of this smoother
+	 */
+	virtual Smoother<D> *clone() const = 0;
+	/**
 	 * @brief Virtual function that derived classes have to implement.
 	 *
 	 * @param f the RHS vector
 	 * @param u the solution vector, updated upon return.
 	 */
-	virtual void smooth(std::shared_ptr<const Vector<D>> f, std::shared_ptr<Vector<D>> u) const = 0;
+	virtual void smooth(const Vector<D> &f, Vector<D> &u) const = 0;
 };
 } // namespace GMG
 } // namespace ThunderEgg

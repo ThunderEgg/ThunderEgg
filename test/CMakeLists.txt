@@ -12,11 +12,15 @@ FetchContent_MakeAvailable(catch2)
 include(CTest)
 include(ParseAndAddCatchTests)
 
+set(TE_TEST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+configure_file(TestConfig.h.in TestConfig.h)
+
 add_executable(unit_tests_mpi1)
 add_executable(unit_tests_mpi2)
 add_executable(unit_tests_mpi3)
 
 add_library(test_shared test.cpp)
+target_include_directories(test_shared PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 # -- add subdirectories
 
@@ -36,6 +40,12 @@ target_sources(unit_tests_mpi1 PRIVATE BiQuadraticGhostFiller_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE CoarseNbrInfo_MPI1.cpp)
 
+target_sources(unit_tests_mpi1 PRIVATE Communicator_MPI1.cpp)
+
+target_sources(unit_tests_mpi1 PRIVATE ComponentArray_MPI1.cpp)
+
+target_sources(unit_tests_mpi1 PRIVATE ComponentView_MPI1.cpp)
+
 target_sources(unit_tests_mpi1 PRIVATE Corner_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE Domain_MPI1.cpp)
@@ -49,7 +59,6 @@ target_sources(unit_tests_mpi1 PRIVATE Face_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE FineNbrInfo_MPI1.cpp)
 
-target_sources(unit_tests_mpi1 PRIVATE LocalData_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE MPIGhostFiller_MPI1.cpp)
 target_sources(unit_tests_mpi2 PRIVATE MPIGhostFiller_MPI2.cpp)
@@ -105,6 +114,10 @@ target_sources(unit_tests_mpi1 PRIVATE PatchOperator_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE PatchSolver_MPI1.cpp)
 
+target_sources(unit_tests_mpi1 PRIVATE PatchArray_MPI1.cpp)
+
+target_sources(unit_tests_mpi1 PRIVATE PatchView_MPI1.cpp)
+
 target_sources(unit_tests_mpi1 PRIVATE Side_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE Timer_MPI1.cpp)
@@ -112,13 +125,19 @@ target_sources(unit_tests_mpi2 PRIVATE Timer_MPI2.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE TriLinearGhostFiller_MPI1.cpp)
 
-target_sources(unit_tests_mpi1 PRIVATE ValVector_MPI1.cpp)
-
-target_sources(unit_tests_mpi1 PRIVATE ValVectorGenerator_MPI1.cpp)
-
 target_sources(unit_tests_mpi1 PRIVATE Vector_MPI1.cpp)
 target_sources(unit_tests_mpi2 PRIVATE Vector_MPI2.cpp)
 target_sources(unit_tests_mpi3 PRIVATE Vector_MPI3.cpp)
+
+target_sources(unit_tests_mpi1 PRIVATE VectorCopyConstructor_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE VectorDefaultConstructor_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE VectorDomainConstructor_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE VectorManagedConstructor_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE VectorMoveConstructor_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE VectorUnmanagedConstructor_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE VectorZeroClone_MPI1.cpp)
+
+target_sources(unit_tests_mpi1 PRIVATE View_MPI1.cpp)
 
 
 # -- determine compile flags

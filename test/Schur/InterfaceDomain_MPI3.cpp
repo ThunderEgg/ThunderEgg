@@ -33,7 +33,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	int min_local_index = numeric_limits<int>::max();
@@ -53,7 +53,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	set<int> local_indexes;
@@ -77,7 +77,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	map<int, set<int>> id_to_local_indexes;
@@ -102,7 +102,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	map<int, set<int>> local_index_to_ids;
@@ -126,7 +126,7 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_refined_c
           "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	int min_local_index = numeric_limits<int>::max();
@@ -150,7 +150,7 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_refined
           "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	set<int> local_indexes;
@@ -178,7 +178,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	map<int, set<int>> id_to_local_indexes;
@@ -207,7 +207,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	map<int, set<int>> local_index_to_ids;
@@ -235,7 +235,7 @@ TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0 2d_refined_c
           "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	int min_local_index = numeric_limits<int>::max();
@@ -283,7 +283,7 @@ TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous 2d_refined
           "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	set<int> local_indexes;
@@ -333,7 +333,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	map<int, set<int>> id_to_local_indexes;
@@ -387,7 +387,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	map<int, set<int>> local_index_to_ids;
@@ -432,7 +432,7 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0 2d_refined_comp
           "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	int min_global_index = numeric_limits<int>::max();
@@ -488,7 +488,7 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous 2d_refined_co
           "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	int rank;
@@ -516,7 +516,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	map<int, set<int>> id_to_global_indexes;
@@ -593,7 +593,7 @@ TEST_CASE(
 "[Schur::InterfaceDomain]")
 {
 	DomainReader<2>           domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", {10, 10}, 0);
-	auto                      domain = domain_reader.getFinerDomain();
+	Domain<2>                 domain = domain_reader.getFinerDomain();
 	Schur::InterfaceDomain<2> interface_domain(domain);
 
 	map<int, set<int>> global_index_to_ids;

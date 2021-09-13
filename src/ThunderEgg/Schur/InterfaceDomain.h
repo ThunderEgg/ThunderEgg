@@ -21,11 +21,9 @@
 
 #ifndef THUNDEREGG_SCHUR_InterfaceDomain_H
 #define THUNDEREGG_SCHUR_InterfaceDomain_H
-#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Schur/Interface.h>
 #include <ThunderEgg/Schur/PatchIfaceInfo.h>
-#include <ThunderEgg/ValVector.h>
-#include <ThunderEgg/VectorGenerator.h>
+#include <ThunderEgg/Vector.h>
 #include <deque>
 namespace ThunderEgg
 {
@@ -54,7 +52,8 @@ namespace Schur
 template <int D> class InterfaceDomain
 {
 	private:
-	std::shared_ptr<const Domain<D>> domain;
+	std::array<int, D - 1> iface_ns;
+	Domain<D>              domain;
 
 	/**
 	 * @brief Vector of PatchIfaceInfo pointers where index in the vector corresponds to the patch's
@@ -536,15 +535,16 @@ template <int D> class InterfaceDomain
 	 *
 	 * @param domain the Domain
 	 */
-	explicit InterfaceDomain(std::shared_ptr<const Domain<D>> domain) : domain(domain)
+	explicit InterfaceDomain(const Domain<D> &domain) : domain(domain)
 	{
+		iface_ns.fill(domain.getNs()[0]);
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 		std::vector<std::shared_ptr<PatchIfaceInfo<D>>> piinfos_non_const;
-		piinfos.reserve(domain->getNumLocalPatches());
-		piinfos_non_const.reserve(domain->getNumLocalPatches());
-		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
+		piinfos.reserve(domain.getNumLocalPatches());
+		piinfos_non_const.reserve(domain.getNumLocalPatches());
+		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
 			piinfos_non_const.emplace_back(new PatchIfaceInfo<D>(pinfo));
 			piinfos.push_back(piinfos_non_const.back());
 		}
@@ -615,9 +615,19 @@ template <int D> class InterfaceDomain
 	 *
 	 * @return std::shared_ptr<Domain<D>> the Domain object
 	 */
-	std::shared_ptr<const Domain<D>> getDomain() const
+	const Domain<D> &getDomain() const
 	{
 		return domain;
+	}
+
+	/**
+	 * @brief Get a new vector for the schur compliment system
+	 *
+	 * @return Vector<D - 1> the vector
+	 */
+	Vector<D - 1> getNewVector() const
+	{
+		return Vector<D - 1>(domain.getCommunicator(), iface_ns, 1, getNumLocalInterfaces(), 0);
 	}
 };
 extern template class InterfaceDomain<2>;

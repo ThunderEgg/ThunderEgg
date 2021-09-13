@@ -10,7 +10,7 @@
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  This program is distributed in the hope that it will be u_vieweful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
@@ -35,11 +35,11 @@ namespace ThunderEgg
  */
 template <int D> class PatchOperator : public Operator<D>
 {
-	protected:
+	private:
 	/**
 	 * @brief the domain that is being solved over
 	 */
-	std::shared_ptr<const Domain<D>> domain;
+	Domain<D> domain;
 	/**
 	 * @brief The ghost filler, needed for smoothing
 	 */
@@ -51,14 +51,16 @@ template <int D> class PatchOperator : public Operator<D>
 	 *
 	 *  This sets the Domain and GhostFiller
 	 *
-	 * @param domain_in  the Domain
-	 * @param ghost_filler_in the GhostFiller
+	 * @param domain  the Domain
+	 * @param ghost_filler the GhostFiller
 	 */
-	PatchOperator(std::shared_ptr<const Domain<D>> domain_in, std::shared_ptr<const GhostFiller<D>> ghost_filler_in)
-	: domain(domain_in),
-	  ghost_filler(ghost_filler_in)
-	{
-	}
+	PatchOperator(const Domain<D> &domain, const GhostFiller<D> &ghost_filler) : domain(domain), ghost_filler(ghost_filler.clone()) {}
+	/**
+	 * @brief Clone this patch operator
+	 *
+	 * @return PatchOperator<D>* a newly allocated copy of this patch operator
+	 */
+	virtual PatchOperator<D> *clone() const override = 0;
 	/**
 	 * @brief Destroy the PatchOperator object
 	 */
@@ -67,30 +69,40 @@ template <int D> class PatchOperator : public Operator<D>
 	/**
 	 * @brief Apply the operator to a single patch
 	 *
-	 * The ghost values in u will be updated to the latest values
+	 * The ghost values in u will be updated to the latest values, and should not need to be modified
 	 *
 	 * @param pinfo  the patch
-	 * @param us the right hand side
-	 * @param fs the left hand side
-	 * @param treat_interior_boundary_as_dirichlet if true, the stencil of the patch should be
-	 * modified so that the interior boundaries are assumed to be zero, and the ghost values should
-	 * not be used
+	 * @param u_view the solution
+	 * @param f_view the left hand side
 	 */
-	virtual void applySinglePatch(const PatchInfo<D> &             pinfo,
-	                              const std::vector<LocalData<D>> &us,
-	                              std::vector<LocalData<D>> &      fs,
-	                              bool                             treat_interior_boundary_as_dirichlet) const = 0;
+	virtual void applySinglePatch(const PatchInfo<D> &pinfo, const PatchView<const double, D> &u_view, const PatchView<double, D> &f_view) const = 0;
+
 	/**
-	 * @brief Treat the internal patch boundaries as an dirichlet boundary condition, and modify the
+	 * @brief Treat the internal patch boundaries as domain boundaires and modify
 	 * RHS accordingly.
 	 *
-	 * This will be used in patch solvers to formulate a RHS for the individual patch to solve for.
+	 * This will be u_viewed in patch solvers to formulate a RHS for the individual patch to solve for.
 	 *
 	 * @param pinfo the patch
-	 * @param us the left hand side
-	 * @param fs the right hand side
+	 * @param u_view the left hand side
+	 * @param f_view the right hand side
 	 */
-	virtual void addGhostToRHS(const PatchInfo<D> &pinfo, const std::vector<LocalData<D>> &us, std::vector<LocalData<D>> &fs) const = 0;
+	virtual void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                    const PatchView<const double, D> &u_view,
+	                                                    const PatchView<double, D> &      f_view) const = 0;
+
+	/**
+	 * @brief Apply the operator to a single patch
+	 *
+	 * The ghost values in u will be updated to the latest values, and should not need to be modified
+	 *
+	 * @param pinfo  the patch
+	 * @param u_view the solution
+	 * @param f_view the left hand side
+	 */
+	virtual void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	                                                            const PatchView<const double, D> &u_view,
+	                                                            const PatchView<double, D> &      f_view) const = 0;
 
 	/**
 	 * @brief Apply the operator
@@ -100,28 +112,37 @@ template <int D> class PatchOperator : public Operator<D>
 	 * @param u the left hand side
 	 * @param f the right hand side
 	 */
-	void apply(std::shared_ptr<const Vector<D>> u, std::shared_ptr<Vector<D>> f) const override
+	void apply(const Vector<D> &u, Vector<D> &f) const override
 	{
+		if constexpr (ENABLE_DEBUG) {
+			if (u.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+				throw RuntimeError("u vector is incorrect length");
+			}
+			if (f.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+				throw RuntimeError("f vector is incorrect length");
+			}
+		}
+		f.setWithGhost(0);
 		ghost_filler->fillGhost(u);
-		for (const PatchInfo<D> &pinfo : domain->getPatchInfoVector()) {
-			auto us = u->getLocalDatas(pinfo.local_index);
-			auto fs = f->getLocalDatas(pinfo.local_index);
-			applySinglePatch(pinfo, us, fs, false);
+		for (const PatchInfo<D> &pinfo : domain.getPatchInfoVector()) {
+			PatchView<const double, D> u_view = u.getPatchView(pinfo.local_index);
+			PatchView<double, D>       f_view = f.getPatchView(pinfo.local_index);
+			applySinglePatch(pinfo, u_view, f_view);
 		}
 	}
 	/**
 	 * @brief Get the Domain object associated with this PatchOperator
 	 */
-	std::shared_ptr<const Domain<D>> getDomain() const
+	const Domain<D> &getDomain() const
 	{
 		return domain;
 	}
 	/**
 	 * @brief Get the GhostFiller object associated with this PatchOperator
 	 */
-	std::shared_ptr<const GhostFiller<D>> getGhostFiller() const
+	const GhostFiller<D> &getGhostFiller() const
 	{
-		return ghost_filler;
+		return *ghost_filler;
 	}
 };
 } // namespace ThunderEgg

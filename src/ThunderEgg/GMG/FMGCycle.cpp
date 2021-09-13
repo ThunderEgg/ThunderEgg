@@ -19,38 +19,6 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_VECTORGENERATOR_H
-#define THUNDEREGG_VECTORGENERATOR_H
-#include <ThunderEgg/Face.h>
-#include <ThunderEgg/Loops.h>
-#include <ThunderEgg/Vector.h>
-#include <algorithm>
-#include <cmath>
-#include <memory>
-#include <mpi.h>
-#include <numeric>
-namespace ThunderEgg
-{
-/**
- * @brief Generates temporary work vectors
- *
- * This is used in various ThunderEgg classes to generate needed work vectors
- *
- * @tparam D the number of Cartesian dimensions
- */
-template <int D> class VectorGenerator
-{
-	public:
-	/**
-	 * @brief Destroy the VectorGenerator object
-	 */
-	virtual ~VectorGenerator() {}
-	/**
-	 * @brief Get a new Vector
-	 *
-	 * @return std::shared_ptr<Vector<D>> the Vector
-	 */
-	virtual std::shared_ptr<Vector<D>> getNewVector() const = 0;
-};
-} // namespace ThunderEgg
-#endif
+#include <ThunderEgg/GMG/FMGCycle.h>
+template class ThunderEgg::GMG::FMGCycle<2>;
+template class ThunderEgg::GMG::FMGCycle<3>;
