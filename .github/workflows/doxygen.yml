@@ -1,0 +1,18 @@
+name: Main ThunderEgg Build / Test / Analyze
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      CXXFLAGS: -g -O0 -Wall -Wno-system-headers -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline
+      LDFLAGS: -lgcov
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build doxygen
+    - uses: actions/checkout@v2
+    - name: Cmake Configure
+      run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ -GNinja .
+    - name: Generate Doxygen
+      run: ninja doc
