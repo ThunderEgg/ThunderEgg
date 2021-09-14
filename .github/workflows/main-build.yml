@@ -1,5 +1,8 @@
 name: Main ThunderEgg Build / Test / Analyze
-on: [push]
+on: 
+  push:
+    paths-ignore:
+      - '.github/workflows/doxygen.yml'
 env:
   SONAR_WRAPPER_URL: https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
   SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.0.2311-linux.zip
