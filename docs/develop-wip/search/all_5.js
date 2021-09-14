@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['face_81',['Face',['../classThunderEgg_1_1Face.html',1,'ThunderEgg::Face&lt; D, M &gt;'],['../classThunderEgg_1_1Face.html#ada6ca67f2581d7ca22b6e62507a85558',1,'ThunderEgg::Face::Face()']]],
+  ['face_3c_20d_20_3e_82',['Face&lt; D &gt;',['../classThunderEgg_1_1Face.html',1,'ThunderEgg']]],
+  ['faces_83',['Faces',['../namespaceThunderEgg.html#af01a98607ceca696a709c06eb349c01aa4f93ea0836ba76b6f9b81e3eee53a3af',1,'ThunderEgg']]],
+  ['fftwchunk_84',['FftwChunk',['../structFftwChunk.html',1,'']]],
+  ['fftwchunkx_85',['FftwChunkX',['../structFftwChunkX.html',1,'']]],
+  ['fftwchunky_86',['FftwChunkY',['../structFftwChunkY.html',1,'']]],
+  ['fftwchunkz_87',['FftwChunkZ',['../structFftwChunkZ.html',1,'']]],
+  ['fftwpatchsolver_88',['FFTWPatchSolver',['../classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html',1,'ThunderEgg::Poisson::FFTWPatchSolver&lt; D &gt;'],['../classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html#a3dfc2e69af9303251d6d2784c885639a',1,'ThunderEgg::Poisson::FFTWPatchSolver::FFTWPatchSolver()']]],
+  ['fillghost_89',['fillGhost',['../classThunderEgg_1_1GhostFiller.html#a3b78636117a09d9be411ab0d888d2968',1,'ThunderEgg::GhostFiller::fillGhost()'],['../classThunderEgg_1_1MPIGhostFiller.html#a2b8d5d4fa688a46564de37a4f15a99ff',1,'ThunderEgg::MPIGhostFiller::fillGhost()']]],
+  ['fillghostcellsforcornernbrpatch_90',['fillGhostCellsForCornerNbrPatch',['../classThunderEgg_1_1MPIGhostFiller.html#a98fac4aaef252925efbae00e6c3106af',1,'ThunderEgg::MPIGhostFiller']]],
+  ['fillghostcellsforedgenbrpatch_91',['fillGhostCellsForEdgeNbrPatch',['../classThunderEgg_1_1MPIGhostFiller.html#a2a0baabe414b133ca27d0c5ae9188d9a',1,'ThunderEgg::MPIGhostFiller']]],
+  ['fillghostcellsforlocalpatch_92',['fillGhostCellsForLocalPatch',['../classThunderEgg_1_1MPIGhostFiller.html#ac1c3294713b4554d19cf2041f967171f',1,'ThunderEgg::MPIGhostFiller']]],
+  ['fillghostcellsfornbrpatch_93',['fillGhostCellsForNbrPatch',['../classThunderEgg_1_1MPIGhostFiller.html#ac3bc0b636313b33f05a25003fcde73cd',1,'ThunderEgg::MPIGhostFiller']]],
+  ['fine_94',['Fine',['../namespaceThunderEgg.html#a49f4aa7867b8d56b98e80a1d04635464a5999b8900bb8b90cfa1af137d355ff14',1,'ThunderEgg']]],
+  ['fine_5fcol_5flocal_5findexes_95',['fine_col_local_indexes',['../classThunderEgg_1_1Schur_1_1FineIfaceInfo.html#a25248cd9f1d3b36f4d70a963e606c5b2',1,'ThunderEgg::Schur::FineIfaceInfo']]],
+  ['fine_5fglobal_5findexes_96',['fine_global_indexes',['../classThunderEgg_1_1Schur_1_1FineIfaceInfo.html#afefbee3819acee5be5e778a638c346ec',1,'ThunderEgg::Schur::FineIfaceInfo']]],
+  ['fine_5fids_97',['fine_ids',['../classThunderEgg_1_1Schur_1_1FineIfaceInfo.html#a4897320599ea812f4c6d1cd1d20574a3',1,'ThunderEgg::Schur::FineIfaceInfo']]],
+  ['fine_5franks_98',['fine_ranks',['../classThunderEgg_1_1Schur_1_1FineIfaceInfo.html#ac46627a875997adcbfecc32f712157d4',1,'ThunderEgg::Schur::FineIfaceInfo']]],
+  ['fineifaceinfo_99',['FineIfaceInfo',['../classThunderEgg_1_1Schur_1_1FineIfaceInfo.html',1,'ThunderEgg::Schur::FineIfaceInfo&lt; D &gt;'],['../classThunderEgg_1_1Schur_1_1FineIfaceInfo.html#acdc33494df202c41eed58e6763a0870b',1,'ThunderEgg::Schur::FineIfaceInfo::FineIfaceInfo()']]],
+  ['finenbrinfo_100',['FineNbrInfo',['../classThunderEgg_1_1FineNbrInfo.html',1,'ThunderEgg::FineNbrInfo&lt; D &gt;'],['../classThunderEgg_1_1FineNbrInfo.html#a66c6e694d2a77cad336530d2a9a69117',1,'ThunderEgg::FineNbrInfo::FineNbrInfo()'],['../classThunderEgg_1_1FineNbrInfo.html#a581f03269248fd27ae91d96567caeeb7',1,'ThunderEgg::FineNbrInfo::FineNbrInfo(std::array&lt; int, Orthant&lt; D &gt;::num_orthants &gt; ids)']]],
+  ['finest_101',['finest',['../classThunderEgg_1_1GMG_1_1Level.html#adcfea0c5b042af511342a24123424b4b',1,'ThunderEgg::GMG::Level']]],
+  ['finetocoarse_102',['FineToCoarse',['../classThunderEgg_1_1Schur_1_1IfaceType.html#a66617d4e3d76e66d6445ccd86de538c3',1,'ThunderEgg::Schur::IfaceType']]],
+  ['finetofine_103',['FineToFine',['../classThunderEgg_1_1Schur_1_1IfaceType.html#a01c840ed0af23a4861445e7a2842da68',1,'ThunderEgg::Schur::IfaceType']]],
+  ['fmgcycle_104',['FMGCycle',['../classThunderEgg_1_1GMG_1_1FMGCycle.html',1,'ThunderEgg::GMG::FMGCycle&lt; D &gt;'],['../classThunderEgg_1_1GMG_1_1FMGCycle.html#a396e0322d7f6a5beca646d539f4a0595',1,'ThunderEgg::GMG::FMGCycle::FMGCycle()']]],
+  ['formcrsmatrix_105',['formCRSMatrix',['../classThunderEgg_1_1Poisson_1_1MatrixHelper.html#af2d2f9a1a1156bf13ab5ddbe71f7d084',1,'ThunderEgg::Poisson::MatrixHelper::formCRSMatrix()'],['../classThunderEgg_1_1Poisson_1_1MatrixHelper2d.html#af9ef634de2d3a40322e89f45f4723d18',1,'ThunderEgg::Poisson::MatrixHelper2d::formCRSMatrix()'],['../classIfaceMatrixHelper.html#a201ab2fe01246a73ed3a57bf5895633b',1,'IfaceMatrixHelper::formCRSMatrix()']]]
+];

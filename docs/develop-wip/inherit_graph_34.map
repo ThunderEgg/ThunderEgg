@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classThunderEgg_1_1GMG_1_1Interpolator.html" title="base class for interpolation operators from finer levels to coarser levels." alt="" coords="5,5,268,32"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1GMG_1_1MPIInterpolator.html" title="Interpolator that implements the necessary mpi calls, derived classes only have to implement interpol..." alt="" coords="316,5,603,32"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1GMG_1_1DirectInterpolator.html" title="Simple class that directly places values from coarse cell into the corresponding fine cells." alt="" coords="651,5,953,32"/>
+</map>

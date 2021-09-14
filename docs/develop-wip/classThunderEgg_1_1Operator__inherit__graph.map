@@ -1,0 +1,15 @@
+<map id="ThunderEgg::Operator&lt; D &gt;" name="ThunderEgg::Operator&lt; D &gt;">
+<area shape="rect" id="node1" title="Base class for operators." alt="" coords="5,264,209,291"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,..." alt="" coords="265,81,488,108"/>
+<area shape="rect" id="node6" href="$classThunderEgg_1_1PatchOperator.html" title="This is an Operator where derived classes only have to implement the two virtual functions that opera..." alt="" coords="257,231,496,257"/>
+<area shape="rect" id="node9" href="$classThunderEgg_1_1PatchSolver.html" title="Solves the problem on the patches using a specified interface value." alt="" coords="265,296,488,323"/>
+<area shape="rect" id="node13" href="$classThunderEgg_1_1PETSc_1_1MatWrapper.html" title="Wraps a PETSc Mat object for use as a ThunderEgg Operator." alt="" coords="299,347,454,389"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1GMG_1_1FMGCycle.html" title="Implementation of a W&#45;cycle." alt="" coords="544,5,797,32"/>
+<area shape="rect" id="node4" href="$classThunderEgg_1_1GMG_1_1VCycle.html" title="Implementation of a V&#45;cycle." alt="" coords="555,56,787,83"/>
+<area shape="rect" id="node5" href="$classThunderEgg_1_1GMG_1_1WCycle.html" title="Implementation of a W&#45;cycle." alt="" coords="553,107,789,133"/>
+<area shape="rect" id="node7" href="$classThunderEgg_1_1Poisson_1_1StarPatchOperator.html" title="Implements 2nd order laplacian operator." alt="" coords="577,158,765,199"/>
+<area shape="rect" id="node8" href="$classThunderEgg_1_1VarPoisson_1_1StarPatchOperator.html" title="Implements a variable coefficient Laplacian f=Div[h*Grad[u]]." alt="" coords="577,223,765,265"/>
+<area shape="rect" id="node10" href="$classThunderEgg_1_1Iterative_1_1PatchSolver.html" title="Solves the patches u_viewing a Iterative iterative solver on each patch." alt="" coords="589,289,752,330"/>
+<area shape="rect" id="node11" href="$classThunderEgg_1_1Poisson_1_1DFTPatchSolver.html" title="This patch solver uses DFT transforms to solve for the Poisson equation." alt="" coords="585,354,756,395"/>
+<area shape="rect" id="node12" href="$classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html" title="This patch solver uses FFT transforms to solve for the Poisson equation." alt="" coords="579,419,762,461"/>
+</map>

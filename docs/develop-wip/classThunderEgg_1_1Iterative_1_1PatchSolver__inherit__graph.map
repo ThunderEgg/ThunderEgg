@@ -1,0 +1,6 @@
+<map id="ThunderEgg::Iterative::PatchSolver&lt; D &gt;" name="ThunderEgg::Iterative::PatchSolver&lt; D &gt;">
+<area shape="rect" id="node1" title="Solves the patches u_viewing a Iterative iterative solver on each patch." alt="" coords="151,155,314,196"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1PatchSolver.html" title="Solves the problem on the patches using a specified interface value." alt="" coords="121,80,344,107"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1Operator.html" title="Base class for operators." alt="" coords="5,5,209,32"/>
+<area shape="rect" id="node4" href="$classThunderEgg_1_1GMG_1_1Smoother.html" title="Base class for multi&#45;grid smoothing operators." alt="" coords="234,5,485,32"/>
+</map>

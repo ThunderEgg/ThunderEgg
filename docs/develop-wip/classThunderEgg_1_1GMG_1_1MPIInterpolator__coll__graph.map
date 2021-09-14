@@ -1,0 +1,4 @@
+<map id="ThunderEgg::GMG::MPIInterpolator&lt; D &gt;" name="ThunderEgg::GMG::MPIInterpolator&lt; D &gt;">
+<area shape="rect" id="node1" title="Interpolator that implements the necessary mpi calls, derived classes only have to implement interpol..." alt="" coords="5,80,292,107"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1GMG_1_1Interpolator.html" title="base class for interpolation operators from finer levels to coarser levels." alt="" coords="17,5,280,32"/>
+</map>

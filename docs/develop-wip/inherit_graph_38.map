@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classThunderEgg_1_1Iterative_1_1Solver.html" title="Represents an iterative solver." alt="" coords="5,71,168,112"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1Iterative_1_1BiCGStab.html" title="ThunderEgg implementation of BiCGStab iterative solver." alt="" coords="216,5,379,47"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1Iterative_1_1CG.html" title="ThunderEgg implementation of CG iterative solver." alt="" coords="216,71,379,112"/>
+<area shape="rect" id="node4" href="$classThunderEgg_1_1PETSc_1_1KSPSolver.html" title="Wraps a PETSc Mat object for use as a ThunderEgg Operator." alt="" coords="220,136,375,177"/>
+</map>

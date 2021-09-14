@@ -1,0 +1,4 @@
+<map id="ThunderEgg::PETSc::MatWrapper&lt; D &gt;" name="ThunderEgg::PETSc::MatWrapper&lt; D &gt;">
+<area shape="rect" id="node1" title="Wraps a PETSc Mat object for use as a ThunderEgg Operator." alt="" coords="30,80,185,121"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1Operator.html" title="Base class for operators." alt="" coords="5,5,209,32"/>
+</map>
