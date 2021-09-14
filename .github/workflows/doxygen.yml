@@ -26,6 +26,6 @@ jobs:
       run: |
         [ -d "docs/${GITHUB_REF##*/}" ] && git rm -rf docs/${GITHUB_REF##*/} || true
     - name: Cmake Configure
-      run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ -GNinja .
+      run: cmake -DTHUNDEREGG_HTML_OUTPUT_DIR=$(pwd)/thunderegg.github.io/docs/${GIHTUB_REF##*/} -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ -GNinja .
     - name: Generate Doxygen
       run: ninja doc
