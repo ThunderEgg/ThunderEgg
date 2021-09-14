@@ -19,7 +19,8 @@ jobs:
         path: thunderegg.github.io
     - name: Delete Old Documentation
       working-directory: ./thunderegg.github.io
-      run: git rm -rf docs/${GITHUB_REF##*/}
+      run: |
+        [ -d "docs/${GITHUB_REF##*/}" ] && git rm -rf docs/${GITHUB_REF##*/} || true
     - name: Cmake Configure
       run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ -GNinja .
     - name: Generate Doxygen
