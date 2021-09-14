@@ -1,5 +1,9 @@
 name: Doxygen Generation
-on: [push]
+on:
+  push:
+    branches:
+      - develop
+      - develop-wip
 jobs:
   build:
     runs-on: ubuntu-20.04

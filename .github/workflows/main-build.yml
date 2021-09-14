@@ -1,9 +1,6 @@
 name: Main ThunderEgg Build / Test / Analyze
 on: 
   push:
-    branches:
-      - develop
-      - develop-wip
     paths-ignore:
       - '.github/workflows/doxygen.yml'
 env:
