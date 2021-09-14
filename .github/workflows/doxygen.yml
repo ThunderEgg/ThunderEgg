@@ -32,3 +32,4 @@ jobs:
         publish_branch: main
         publish_dir: ./doc/html
         destination_dir: docs/${{ steps.extract_branch.outputs.branch }}
+        enable_jekyll: true
