@@ -15,7 +15,10 @@ jobs:
     - uses: actions/checkout@v2
       with:
         repository: ThunderEgg/thunderegg.github.io
+        ref: main
         path: thunderegg.github.io
+    - name: Delete Old Documentation
+      run: git rm -r thunderegg.github.io/doc/${GITHUB_REF##*/}
     - name: Cmake Configure
       run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ -GNinja .
     - name: Generate Doxygen
