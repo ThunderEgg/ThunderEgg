@@ -1,0 +1,4 @@
+<map id="ThunderEgg::GMG::MPIRestrictor&lt; D &gt;" name="ThunderEgg::GMG::MPIRestrictor&lt; D &gt;">
+<area shape="rect" id="node1" title="Restrictor that implements the necessary mpi calls, derived classes only have to implement restrictor..." alt="" coords="5,80,280,107"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1GMG_1_1Restrictor.html" title="Base class for multi&#45;grid restriction operators." alt="" coords="17,5,268,32"/>
+</map>

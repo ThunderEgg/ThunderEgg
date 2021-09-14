@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,31,116,57"/>
+<area shape="rect" id="node2" href="$structThunderEgg_1_1RuntimeError.html" title="ThunderEgg runtime exception." alt="" coords="164,31,357,57"/>
+<area shape="rect" id="node3" href="$structThunderEgg_1_1BreakdownError.html" title="ThunderEgg breakdown exception for iterative methods." alt="" coords="406,5,617,32"/>
+<area shape="rect" id="node4" href="$structThunderEgg_1_1DivergenceError.html" title="ThunderEgg divergence exception for iterative methods." alt="" coords="405,56,617,83"/>
+</map>

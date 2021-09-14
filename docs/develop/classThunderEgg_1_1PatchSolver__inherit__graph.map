@@ -1,0 +1,8 @@
+<map id="ThunderEgg::PatchSolver&lt; D &gt;" name="ThunderEgg::PatchSolver&lt; D &gt;">
+<area shape="rect" id="node1" title="Solves the problem on the patches using a specified interface value." alt="" coords="304,78,527,105"/>
+<area shape="rect" id="node4" href="$classThunderEgg_1_1Iterative_1_1PatchSolver.html" title="Solves the patches u_viewing a Iterative iterative solver on each patch." alt="" coords="585,5,747,47"/>
+<area shape="rect" id="node5" href="$classThunderEgg_1_1Poisson_1_1DFTPatchSolver.html" title="This patch solver uses DFT transforms to solve for the Poisson equation." alt="" coords="581,71,751,112"/>
+<area shape="rect" id="node6" href="$classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html" title="This patch solver uses FFT transforms to solve for the Poisson equation." alt="" coords="575,136,757,177"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1Operator.html" title="Base class for operators." alt="" coords="29,53,233,79"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1GMG_1_1Smoother.html" title="Base class for multi&#45;grid smoothing operators." alt="" coords="5,103,256,130"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="ThunderEgg::BiQuadraticGhostFiller" name="ThunderEgg::BiQuadraticGhostFiller">
+<area shape="rect" id="node1" title="Exchanges ghost cells on patches, handles refinement boundaries with a biquadratic interpolation sche..." alt="" coords="14,155,235,196"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1MPIGhostFiller.html" title=" " alt="" coords="5,80,244,107"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1GhostFiller.html" title="Fills ghost cells on patches." alt="" coords="16,5,233,32"/>
+</map>

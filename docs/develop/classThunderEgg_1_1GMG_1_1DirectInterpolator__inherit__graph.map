@@ -1,0 +1,5 @@
+<map id="ThunderEgg::GMG::DirectInterpolator&lt; D &gt;" name="ThunderEgg::GMG::DirectInterpolator&lt; D &gt;">
+<area shape="rect" id="node1" title="Simple class that directly places values from coarse cell into the corresponding fine cells." alt="" coords="5,155,308,181"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1GMG_1_1MPIInterpolator.html" title="Interpolator that implements the necessary mpi calls, derived classes only have to implement interpol..." alt="" coords="13,80,300,107"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1GMG_1_1Interpolator.html" title="base class for interpolation operators from finer levels to coarser levels." alt="" coords="25,5,288,32"/>
+</map>

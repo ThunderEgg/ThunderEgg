@@ -1,0 +1,6 @@
+<map id="ThunderEgg::PatchOperator&lt; D &gt;" name="ThunderEgg::PatchOperator&lt; D &gt;">
+<area shape="rect" id="node1" title="This is an Operator where derived classes only have to implement the two virtual functions that opera..." alt="" coords="257,46,496,73"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1Poisson_1_1StarPatchOperator.html" title="Implements 2nd order laplacian operator." alt="" coords="544,5,732,47"/>
+<area shape="rect" id="node4" href="$classThunderEgg_1_1VarPoisson_1_1StarPatchOperator.html" title="Implements a variable coefficient Laplacian f=Div[h*Grad[u]]." alt="" coords="544,71,732,112"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1Operator.html" title="Base class for operators." alt="" coords="5,46,209,73"/>
+</map>

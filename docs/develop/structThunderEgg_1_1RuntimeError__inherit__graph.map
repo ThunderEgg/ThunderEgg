@@ -1,0 +1,6 @@
+<map id="ThunderEgg::RuntimeError" name="ThunderEgg::RuntimeError">
+<area shape="rect" id="node1" title="ThunderEgg runtime exception." alt="" coords="131,80,325,107"/>
+<area shape="rect" id="node3" href="$structThunderEgg_1_1BreakdownError.html" title="ThunderEgg breakdown exception for iterative methods." alt="" coords="5,155,216,181"/>
+<area shape="rect" id="node4" href="$structThunderEgg_1_1DivergenceError.html" title="ThunderEgg divergence exception for iterative methods." alt="" coords="239,155,451,181"/>
+<area shape="rect" id="node2" title=" " alt="" coords="159,5,297,32"/>
+</map>

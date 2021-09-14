@@ -1,0 +1,5 @@
+<map id="ThunderEgg::Poisson::StarPatchOperator&lt; D &gt;" name="ThunderEgg::Poisson::StarPatchOperator&lt; D &gt;">
+<area shape="rect" id="node1" title="Implements 2nd order laplacian operator." alt="" coords="31,155,219,196"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1PatchOperator.html" title="This is an Operator where derived classes only have to implement the two virtual functions that opera..." alt="" coords="5,80,244,107"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1Operator.html" title="Base class for operators." alt="" coords="23,5,227,32"/>
+</map>
