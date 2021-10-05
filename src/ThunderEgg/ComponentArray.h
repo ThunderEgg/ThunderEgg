@@ -22,6 +22,11 @@
 #ifndef THUNDEREGG_COMPONENTARRAY_H
 #define THUNDEREGG_COMPONENTARRAY_H
 #include <ThunderEgg/ComponentView.h>
+/**
+ * @file
+ *
+ * @brief ComponentArray class
+ */
 namespace ThunderEgg
 {
 /**

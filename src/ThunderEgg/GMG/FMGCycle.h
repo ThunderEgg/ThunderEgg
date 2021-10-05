@@ -21,14 +21,17 @@
 
 #ifndef THUNDEREGG_GMG_FMGCYCLE_H
 #define THUNDEREGG_GMG_FMGCYCLE_H
+/**
+ * @file
+ *
+ * @brief FMGCycle class
+ */
 #include <ThunderEgg/GMG/Cycle.h>
 #include <ThunderEgg/GMG/CycleOpts.h>
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief Implementation of a W-cycle
+ * @brief Implementation of a full multigrid cycle
  */
 template <int D> class FMGCycle : public Cycle<D>
 {
@@ -51,7 +54,7 @@ template <int D> class FMGCycle : public Cycle<D>
 
 			Vector<D> coarser_f = this->restrict(level, f, u);
 
-			const Level<D> &coarser_level = *level.getCoarser();
+			const Level<D> &coarser_level = level.getCoarser();
 			Vector<D>       coarser_u     = coarser_f.getZeroClone();
 
 			this->visit(coarser_level, coarser_f, coarser_u);
@@ -65,12 +68,6 @@ template <int D> class FMGCycle : public Cycle<D>
 	}
 
 	protected:
-	/**
-	 * @brief Implements W-cycle. Pre-smooth, visit coarser level, smooth, visit coarse level, and
-	 * then post-smooth.
-	 *
-	 * @param level the current level that is being visited.
-	 */
 	void visit(const Level<D> &level, const Vector<D> &f, Vector<D> &u) const override
 	{
 		if (level.coarsest()) {
@@ -84,10 +81,10 @@ template <int D> class FMGCycle : public Cycle<D>
 
 			Vector<D> coarser_f = this->restrict(level, f, u);
 
-			const Level<D> &coarser_level = *level.getCoarser();
+			const Level<D> &coarser_level = level.getCoarser();
 			Vector<D>       coarser_u     = coarser_f.getZeroClone();
 
-			this->visit(*level.getCoarser(), coarser_f, coarser_u);
+			this->visit(coarser_level, coarser_f, coarser_u);
 
 			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
@@ -97,7 +94,7 @@ template <int D> class FMGCycle : public Cycle<D>
 
 			coarser_f = this->restrict(level, f, u);
 
-			v_visit(*level.getCoarser(), coarser_f, coarser_u);
+			v_visit(coarser_level, coarser_f, coarser_u);
 
 			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
@@ -109,11 +106,12 @@ template <int D> class FMGCycle : public Cycle<D>
 
 	public:
 	/**
-	 * @brief Create new W-cycle
+	 * @brief Create new FMGCycle
 	 *
-	 * @param finest_level a pointer to the finest level
+	 * @param finest_level the finest level
+	 * @param opts the options for the cycle pre, post, coarse, and mid sweeps are used
 	 */
-	FMGCycle(std::shared_ptr<Level<D>> finest_level, const CycleOpts &opts) : Cycle<D>(finest_level)
+	FMGCycle(const Level<D> &finest_level, const CycleOpts &opts) : Cycle<D>(finest_level)
 	{
 		num_pre_sweeps    = opts.pre_sweeps;
 		num_post_sweeps   = opts.post_sweeps;
@@ -132,6 +130,5 @@ template <int D> class FMGCycle : public Cycle<D>
 };
 extern template class FMGCycle<2>;
 extern template class FMGCycle<3>;
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_SCHUR_InterfaceDomain_H
 #define THUNDEREGG_SCHUR_InterfaceDomain_H
+/**
+ * @file
+ *
+ * @brief InterfaceDomain class
+ */
 #include <ThunderEgg/Schur/Interface.h>
 #include <ThunderEgg/Schur/PatchIfaceInfo.h>
 #include <ThunderEgg/Vector.h>

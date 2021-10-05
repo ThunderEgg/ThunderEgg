@@ -21,15 +21,18 @@
 
 #ifndef THUNDEREGG_GMG_RESTRICTOR_H
 #define THUNDEREGG_GMG_RESTRICTOR_H
+/**
+ * @file
+ *
+ * @brief Restrictor class
+ */
 
 #include <ThunderEgg/Vector.h>
 
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief Base class for multi-grid restriction operators.
+ * @brief Abstract class for restriction operators.
  */
 template <int D> class Restrictor
 {
@@ -50,14 +53,6 @@ template <int D> class Restrictor
 	 * @param fine
 	 */
 	virtual Vector<D> restrict(const Vector<D> &fine) const = 0;
-	/**
-	 * @brief Get get a new vector for the coarser domain
-	 *
-	 * @param num_components the number of components in the vector
-	 * @return Vector<D> the vector
-	 */
-	virtual Vector<D> getNewCoarserVector(int num_components) const = 0;
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

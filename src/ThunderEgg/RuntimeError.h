@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_RUNTIMEERROR_H
 #define THUNDEREGG_RUNTIMEERROR_H
+/**
+ * @file
+ *
+ * @brief RuntimeError struct
+ */
 
 #include <stdexcept>
 #include <string>

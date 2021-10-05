@@ -22,6 +22,12 @@
 #ifndef THUNDEREGG_PATCHVIEW_H
 #define THUNDEREGG_PATCHVIEW_H
 #include <ThunderEgg/ComponentView.h>
+/**
+ * @file
+ *
+ * @brief PatchView class
+ */
+
 namespace ThunderEgg
 {
 /**

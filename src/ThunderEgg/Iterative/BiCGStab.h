@@ -21,18 +21,21 @@
 
 #ifndef THUNDEREGG_ITERATIVE_BICGSTAB_H
 #define THUNDEREGG_ITERATIVE_BICGSTAB_H
-#include <ThunderEgg/BreakdownError.h>
-#include <ThunderEgg/DivergenceError.h>
+/**
+ * @file
+ *
+ * @brief BiCGStab class
+ */
+
+#include <ThunderEgg/Iterative/BreakdownError.h>
 #include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Timer.h>
 
-namespace ThunderEgg
-{
-namespace Iterative
+namespace ThunderEgg::Iterative
 {
 /**
- * @brief ThunderEgg implementation of BiCGStab iterative solver.
+ * @brief BiCGStab iterative solver.
  *
  * @tparam D the number of Cartesian dimensions
  */
@@ -224,8 +227,7 @@ template <int D> class BiCGStab : public Solver<D>
 		return num_its;
 	}
 };
-} // namespace Iterative
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Iterative
 extern template class ThunderEgg::Iterative::BiCGStab<2>;
 extern template class ThunderEgg::Iterative::BiCGStab<3>;
 #endif

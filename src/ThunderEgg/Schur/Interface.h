@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_SCHUR_INTERFACE_H
 #define THUNDEREGG_SCHUR_INTERFACE_H
+/**
+ * @file
+ *
+ * @brief Interface class
+ */
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/Schur/IfaceType.h>

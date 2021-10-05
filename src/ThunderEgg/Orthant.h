@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_ORTHANT_H
 #define THUNDEREGG_ORTHANT_H
+/**
+ * @file
+ *
+ * @brief Orthant class
+ */
 #include <ThunderEgg/Face.h>
 #include <array>
 #include <iostream>
@@ -527,13 +532,13 @@ inline std::ostream &operator<<(std::ostream &os, const Orthant<3> &o)
 	}
 	return os;
 }
-void to_json(nlohmann::json &j, const Orthant<0> &o);
-void to_json(nlohmann::json &j, const Orthant<1> &o);
-void to_json(nlohmann::json &j, const Orthant<2> &o);
-void to_json(nlohmann::json &j, const Orthant<3> &o);
-void from_json(const nlohmann::json &j, Orthant<0> &o);
-void from_json(const nlohmann::json &j, Orthant<1> &o);
-void from_json(const nlohmann::json &j, Orthant<2> &o);
-void from_json(const nlohmann::json &j, Orthant<3> &o);
+void to_json(tpl::nlohmann::json &j, const Orthant<0> &o);
+void to_json(tpl::nlohmann::json &j, const Orthant<1> &o);
+void to_json(tpl::nlohmann::json &j, const Orthant<2> &o);
+void to_json(tpl::nlohmann::json &j, const Orthant<3> &o);
+void from_json(const tpl::nlohmann::json &j, Orthant<0> &o);
+void from_json(const tpl::nlohmann::json &j, Orthant<1> &o);
+void from_json(const tpl::nlohmann::json &j, Orthant<2> &o);
+void from_json(const tpl::nlohmann::json &j, Orthant<3> &o);
 } // namespace ThunderEgg
 #endif

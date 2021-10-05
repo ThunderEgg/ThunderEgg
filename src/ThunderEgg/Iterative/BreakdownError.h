@@ -19,15 +19,20 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_BREAKDOWNERROR_H
-#define THUNDEREGG_BREAKDOWNERROR_H
+#ifndef THUNDEREGG_ITERATIVE_BREAKDOWNERROR_H
+#define THUNDEREGG_ITERATIVE_BREAKDOWNERROR_H
+/**
+ * @file
+ *
+ * @brief BreakdownError struct
+ */
 
 #include <ThunderEgg/RuntimeError.h>
 
-namespace ThunderEgg
+namespace ThunderEgg::Iterative
 {
 /**
- * @brief ThunderEgg breakdown exception for iterative methods
+ * @brief Breakdown exception for iterative methods
  */
 struct BreakdownError : RuntimeError {
 	/**
@@ -37,5 +42,5 @@ struct BreakdownError : RuntimeError {
 	 */
 	BreakdownError(std::string message) : RuntimeError(message){};
 };
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Iterative
 #endif

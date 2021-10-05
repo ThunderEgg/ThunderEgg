@@ -21,18 +21,20 @@
 
 #ifndef THUNDEREGG_GMG_MPIRESTRICTOR_H
 #define THUNDEREGG_GMG_MPIRESTRICTOR_H
+/**
+ * @file
+ *
+ * @brief MPIRestrictor class
+ */
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/Restrictor.h>
-#include <memory>
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief Restrictor that implements the necessary mpi calls, derived classes only have to
- * implement restrictorPatches method
+ * @brief Base class that makes the necessary mpi calls, derived classes only have to
+ * implement restrictPatches() method
  */
 template <int D> class MPIRestrictor : public Restrictor<D>
 {
@@ -52,13 +54,12 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	Vector<D> restrict(const Vector<D> &fine) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (fine.getNumLocalPatches() != ilc->getFinerDomain()->getNumLocalPatches()) {
-				throw RuntimeError("fine vector is incorrect length. Expected Lenght of "
-				                   + std::to_string(ilc->getFinerDomain()->getNumLocalPatches()) + " but vector was length "
-				                   + std::to_string(fine.getNumLocalPatches()));
+			if (fine.getNumLocalPatches() != ilc.getFinerDomain().getNumLocalPatches()) {
+				throw RuntimeError("fine vector is incorrect length. Expected Length of " + std::to_string(ilc.getFinerDomain().getNumLocalPatches())
+				                   + " but vector was length " + std::to_string(fine.getNumLocalPatches()));
 			}
 		}
-		Vector<D> coarse       = getNewCoarserVector(fine.getNumComponents());
+		Vector<D> coarse(ilc.getCoarserDomain(), fine.getNumComponents());
 		Vector<D> coarse_ghost = ilc.getNewGhostVector(fine.getNumComponents());
 
 		// fill in ghost values
@@ -78,10 +79,6 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 
 		return coarse;
 	}
-	Vector<D> getNewCoarserVector(int num_components) const override
-	{
-		return Vector<D>(ilc.getCoarserDomain(), num_components);
-	}
 	/**
 	 * @brief Restrict values into coarse vector
 	 *
@@ -92,14 +89,13 @@ template <int D> class MPIRestrictor : public Restrictor<D>
 	 * @param patches pairs where the first value is the index in the coarse vector and the second
 	 * value is a reference to the PatchInfo object
 	 * @param finer_vector the finer vector
-	 * @param coarser_vector the coaser vector
+	 * @param coarser_vector the coarser vector
 	 */
 	virtual void restrictPatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
 	                             const Vector<D> &                                                              finer_vector,
 	                             Vector<D> &                                                                    coarser_vector) const = 0;
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 // explicit instantiation
 extern template class ThunderEgg::GMG::MPIRestrictor<2>;
 extern template class ThunderEgg::GMG::MPIRestrictor<3>;

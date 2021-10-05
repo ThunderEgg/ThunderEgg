@@ -5,6 +5,8 @@
 
 using namespace std;
 using namespace ThunderEgg;
+using namespace ThunderEgg::tpl;
+
 TEST_CASE("FineNbrInfo Serialization/Deserialization", "[FineNbrInfo]")
 {
 	FineNbrInfo<2> info;

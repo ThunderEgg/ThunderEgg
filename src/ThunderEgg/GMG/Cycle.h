@@ -21,19 +21,22 @@
 
 #ifndef THUNDEREGG_GMG_CYCLE_H
 #define THUNDEREGG_GMG_CYCLE_H
+/**
+ * @file
+ *
+ * @brief Cycle class
+ */
 
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/Vector.h>
 #include <list>
 
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief Base class for cycles. Includes functions for preparing vectors for finer and coarser
- * levels, and a function to run an iteration of smoothing on a level. Derived cycle classes
- * need to implement the visit function.
+ * @brief Base abstract class for cycles.
+ *
+ * There is an abstract visit() function for base classes to implement.
  */
 template <int D> class Cycle : public Operator<D>
 {
@@ -41,13 +44,16 @@ template <int D> class Cycle : public Operator<D>
 	/**
 	 * @brief pointer to the finest level
 	 */
-	std::shared_ptr<Level<D>> finest_level;
+	std::shared_ptr<const Level<D>> finest_level;
 
 	protected:
 	/**
 	 * @brief Prepare vectors for coarser level.
 	 *
 	 * @param level the current level
+	 * @param f the rhs vector cooresponding to the level
+	 * @param u the solution vector cooresponding to the level
+	 * @return Vector<D> the restricted residual vector
 	 */
 	Vector<D> restrict(const Level<D> &level, const Vector<D> &f, const Vector<D> &u) const
 	{
@@ -63,6 +69,8 @@ template <int D> class Cycle : public Operator<D>
 	 * @brief Virtual visit function that needs to be implemented in derived classes.
 	 *
 	 * @param level the level currently begin visited.
+	 * @param f the rhs vector cooresponding to the level
+	 * @param u the solution vector cooresponding to the level
 	 */
 	virtual void visit(const Level<D> &level, const Vector<D> &f, Vector<D> &u) const = 0;
 
@@ -70,17 +78,17 @@ template <int D> class Cycle : public Operator<D>
 	/**
 	 * @brief Create new cycle object.
 	 *
-	 * @param finest_level pointer to the finest level object.
+	 * @param finest_level the finest level object.
 	 */
-	Cycle(std::shared_ptr<Level<D>> finest_level)
-	{
-		this->finest_level = finest_level;
-	}
+	Cycle(const Level<D> &finest_level) : finest_level(new Level<D>(finest_level)) {}
 	/**
 	 * @brief Run one iteration of the cycle.
 	 *
+	 * Performs one cycle on on the system `Au=f` where `A` is the operator for the
+	 * finest level.
+	 *
 	 * @param f the RHS vector.
-	 * @param u the current solution vector. Output will be updated solution vector.
+	 * @param u the solution vector.
 	 */
 	void apply(const Vector<D> &f, Vector<D> &u) const
 	{
@@ -88,17 +96,16 @@ template <int D> class Cycle : public Operator<D>
 		visit(*finest_level, f, u);
 	}
 	/**
-	 * @brief Get the finest Level object
+	 * @brief Get the finest Level
 	 *
-	 * @return std::shared_ptr<const Level<D>> the Level
+	 * @return const Level<D>& the Level
 	 */
-	std::shared_ptr<const Level<D>> getFinestLevel() const
+	const Level<D> &getFinestLevel() const
 	{
-		return finest_level;
+		return *finest_level;
 	}
 };
 extern template class Cycle<2>;
 extern template class Cycle<3>;
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

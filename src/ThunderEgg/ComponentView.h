@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_COMPONENTVIEW_H
 #define THUNDEREGG_COMPONENTVIEW_H
+/**
+ * @file
+ *
+ * @brief ComponentView class
+ */
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/View.h>
 #include <memory>

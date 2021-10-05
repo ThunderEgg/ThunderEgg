@@ -21,10 +21,24 @@
 
 #ifndef THUNDEREGG_FACE_H
 #define THUNDEREGG_FACE_H
+/**
+ * @file
+ *
+ * @brief Face class
+ */
+
 #include <ThunderEgg/tpl/json.hpp>
 #include <array>
 namespace ThunderEgg
 {
+/**
+ * @brief Enum-style class for the faces of an n-dimensional cube
+ *
+ * @tparam D the dimension
+ * @tparam M the dimensionality of the face
+ *
+ * For 3D, this class represents corners (`M = 0`), edges (`M = 1`), and faces (`M = 2`).
+ */
 template <int D, int M> class Face
 {
 	private:
@@ -37,7 +51,6 @@ template <int D, int M> class Face
 	 * @brief 2^N
 	 */
 	static constexpr size_t twopow(size_t N)
-
 	{
 		return 0b1 << N;
 	}
@@ -74,7 +87,7 @@ template <int D, int M> class Face
 	/**
 	 * @brief Construct a new Face object
 	 *
-	 * @param value the value of the face to give
+	 * @param value the value of the face
 	 */
 	explicit Face(unsigned char value) : value(value)
 	{
@@ -82,12 +95,20 @@ template <int D, int M> class Face
 		static_assert(M >= 0 && M < D, "Invalid M value");
 	}
 
+	/**
+	 * @brief Construct a new Face object with a null value
+	 */
 	Face()
 	{
 		static_assert(D <= 3 && D >= 0, "Only up to 3 dimensions supported");
 		static_assert(M >= 0 && M < D, "Invalid M value");
 	}
 
+	/**
+	 * @brief null value
+	 *
+	 * @return Face<D, M>  the null value
+	 */
 	static Face<D, M> null()
 	{
 		return Face<D, M>(number_of);
@@ -97,134 +118,224 @@ template <int D, int M> class Face
 	 * these can be cleaned up when version is bumped to c++20
 	 */
 
+	/**
+	 * @brief west side
+	 */
 	template <int N = 0> static auto west() -> typename std::enable_if<D <= 3 && M == D - 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b000);
 	}
+	/**
+	 * @brief east side
+	 */
 	template <int N = 0> static auto east() -> typename std::enable_if<D <= 3 && M == D - 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b001);
 	}
+	/**
+	 * @brief south side
+	 */
 	template <int N = 0> static auto south() -> typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b010);
 	}
+	/**
+	 * @brief north side
+	 */
 	template <int N = 0> static auto north() -> typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b011);
 	}
+	/**
+	 * @brief bottom side
+	 */
 	template <int N = 0> static auto bottom() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b100);
 	}
+	/**
+	 * @brief top side
+	 */
 	template <int N = 0> static auto top() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b101);
 	}
 
+	/**
+	 * @brief southwest corner
+	 */
 	template <int N = 0> static auto sw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b00);
 	}
+	/**
+	 * @brief southeast corner
+	 */
 	template <int N = 0> static auto se() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b01);
 	}
+	/**
+	 * @brief northwest corner
+	 */
 	template <int N = 0> static auto nw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b10);
 	}
+	/**
+	 * @brief northeast corner
+	 */
 	template <int N = 0> static auto ne() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b11);
 	}
 
+	/**
+	 * @brief bottom-south-west corner
+	 */
 	template <int N = 0> static auto bsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b000);
 	}
+	/**
+	 * @brief bottom-south-east corner
+	 */
 	template <int N = 0> static auto bse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b001);
 	}
+	/**
+	 * @brief bottom-north-west corner
+	 */
 	template <int N = 0> static auto bnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b010);
 	}
+	/**
+	 * @brief bottom-north-east corner
+	 */
 	template <int N = 0> static auto bne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b011);
 	}
+	/**
+	 * @brief top-south-west corner
+	 */
 	template <int N = 0> static auto tsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b100);
 	}
+	/**
+	 * @brief top-south-east corner
+	 */
 	template <int N = 0> static auto tse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b101);
 	}
+	/**
+	 * @brief top-north-west corner
+	 */
 	template <int N = 0> static auto tnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b110);
 	}
+	/**
+	 * @brief top-north-east corner
+	 */
 	template <int N = 0> static auto tne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b111);
 	}
 
+	/**
+	 * @brief bottom-south edge
+	 */
 	template <int N = 0> static auto bs() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b0000);
 	}
+	/**
+	 * @brief bottom-north edge
+	 */
 	template <int N = 0> static auto bn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b0001);
 	}
+	/**
+	 * @brief top-south edge
+	 */
 	template <int N = 0> static auto ts() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b0010);
 	}
+	/**
+	 * @brief top-north edge
+	 */
 	template <int N = 0> static auto tn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b0011);
 	}
+	/**
+	 * @brief bottom-west edge
+	 */
 	template <int N = 0> static auto bw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b0100);
 	}
+	/**
+	 * @brief bottom-east edge
+	 */
 	template <int N = 0> static auto be() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b0101);
 	}
+	/**
+	 * @brief top-west edge
+	 */
 	template <int N = 0> static auto tw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b0110);
 	}
+	/**
+	 * @brief top-east edge
+	 */
 	template <int N = 0> static auto te() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b0111);
 	}
+	/**
+	 * @brief south-west edge
+	 */
 	template <int N = 0> static auto sw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b1000);
 	}
+	/**
+	 * @brief south-east edge
+	 */
 	template <int N = 0> static auto se() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b1001);
 	}
+	/**
+	 * @brief north-west edge
+	 */
 	template <int N = 0> static auto nw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b1010);
 	}
+	/**
+	 * @brief north-east edge
+	 */
 	template <int N = 0> static auto ne() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
 	{
 		return Face<D, M>(0b1011);
 	}
 
 	/**
-	 * @brief Range class for Edge
+	 * @brief Range class for Face
 	 *
-	 * It provides the begin and end fuctions for iterator loops
+	 * This provides the begin and end fuctions for iterator loops
 	 */
 	class Range
 	{
@@ -440,6 +551,11 @@ template <int D, int M> class Face
 	}
 };
 
+/**
+ * @brief Side class
+ *
+ * @tparam D the number of Cartesian dimensions
+ */
 template <int D> using Side = Face<D, D - 1>;
 /**
  * @brief Get the higher side on a given axis
@@ -463,12 +579,12 @@ template <int D> Side<D> LowerSideOnAxis(size_t axis)
 {
 	return Side<D>(axis << 1);
 }
-void to_json(nlohmann::json &j, const Side<1> &s);
-void to_json(nlohmann::json &j, const Side<2> &s);
-void to_json(nlohmann::json &j, const Side<3> &s);
-void from_json(const nlohmann::json &j, Side<1> &s);
-void from_json(const nlohmann::json &j, Side<2> &s);
-void from_json(const nlohmann::json &j, Side<3> &s);
+void to_json(tpl::nlohmann::json &j, const Side<1> &s);
+void to_json(tpl::nlohmann::json &j, const Side<2> &s);
+void to_json(tpl::nlohmann::json &j, const Side<3> &s);
+void from_json(const tpl::nlohmann::json &j, Side<1> &s);
+void from_json(const tpl::nlohmann::json &j, Side<2> &s);
+void from_json(const tpl::nlohmann::json &j, Side<3> &s);
 /**
  * @brief ostream operator that prints a string representation of side enum.
  *
@@ -503,6 +619,9 @@ std::ostream &operator<<(std::ostream &os, const Side<2> &s);
  */
 std::ostream &operator<<(std::ostream &os, const Side<3> &s);
 
+/**
+ * @brief Edge class
+ */
 using Edge = Face<3, 1>;
 /**
  * @brief ostream operator that prints a string representation of edge enum.
@@ -515,9 +634,14 @@ using Edge = Face<3, 1>;
  * @return  the ostream
  */
 std::ostream &operator<<(std::ostream &os, const Edge &o);
-void          to_json(nlohmann::json &j, const Edge &o);
-void          from_json(const nlohmann::json &j, Edge &o);
+void          to_json(tpl::nlohmann::json &j, const Edge &o);
+void          from_json(const tpl::nlohmann::json &j, Edge &o);
 
+/**
+ * @brief Corner class
+ *
+ * @tparam D the number of Cartesian dimensions
+ */
 template <int D> using Corner = Face<D, 0>;
 /**
  * @brief ostream operator that prints a string representation of quadrant enum.
@@ -541,9 +665,9 @@ std::ostream &operator<<(std::ostream &os, const Corner<2> &o);
  * @return  the ostream
  */
 std::ostream &operator<<(std::ostream &os, const Corner<3> &o);
-void          to_json(nlohmann::json &j, const Corner<2> &o);
-void          to_json(nlohmann::json &j, const Corner<3> &o);
-void          from_json(const nlohmann::json &j, Corner<2> &o);
-void          from_json(const nlohmann::json &j, Corner<3> &o);
+void          to_json(tpl::nlohmann::json &j, const Corner<2> &o);
+void          to_json(tpl::nlohmann::json &j, const Corner<3> &o);
+void          from_json(const tpl::nlohmann::json &j, Corner<2> &o);
+void          from_json(const tpl::nlohmann::json &j, Corner<3> &o);
 } // namespace ThunderEgg
 #endif

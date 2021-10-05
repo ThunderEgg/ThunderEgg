@@ -44,7 +44,7 @@ std::vector<PatchInfo<2>> GetAllPatchesOnRank0(const Domain<2> &domain)
 	std::vector<PatchInfo<2>> all_patches;
 
 	if (rank == 1) {
-		nlohmann::json patches;
+		ThunderEgg::tpl::nlohmann::json patches;
 		for (auto patch : domain.getPatchInfoVector()) {
 			patches.push_back(patch);
 		}
@@ -60,7 +60,7 @@ std::vector<PatchInfo<2>> GetAllPatchesOnRank0(const Domain<2> &domain)
 		char patches_string[buffer_size];
 		MPI_Recv(patches_string, buffer_size, MPI_CHAR, 1, 0, MPI_COMM_WORLD, &status);
 
-		nlohmann::json patches = nlohmann::json::parse(patches_string);
+		ThunderEgg::tpl::nlohmann::json patches = ThunderEgg::tpl::nlohmann::json::parse(patches_string);
 		if (patches != nullptr) {
 			patches.get_to(all_patches);
 			for (auto &patch : all_patches) {

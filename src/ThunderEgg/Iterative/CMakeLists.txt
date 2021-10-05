@@ -7,6 +7,8 @@ unset(ThunderEgg_HDRS)
 list(APPEND ThunderEgg_HDRS BiCGStab.h)
 target_sources(ThunderEgg PRIVATE BiCGStab.cpp)
 
+list(APPEND ThunderEgg_HDRS BreakdownError.h)
+
 list(APPEND ThunderEgg_HDRS CG.h)
 target_sources(ThunderEgg PRIVATE CG.cpp)
 

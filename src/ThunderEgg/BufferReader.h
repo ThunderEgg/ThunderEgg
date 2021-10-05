@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_BUFFERREADER_H
 #define THUNDEREGG_BUFFERREADER_H
+/**
+ * @file
+ *
+ * @brief BufferReader class
+ */
 
 #include <ThunderEgg/Serializable.h>
 #include <cstddef>

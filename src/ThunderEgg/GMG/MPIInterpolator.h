@@ -21,18 +21,20 @@
 
 #ifndef THUNDEREGG_GMG_MPIINTERPOLATOR_H
 #define THUNDEREGG_GMG_MPIINTERPOLATOR_H
+/**
+ * @file
+ *
+ * @brief MPIInterpolator class
+ */
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/Interpolator.h>
 #include <ThunderEgg/GMG/Level.h>
-#include <memory>
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief Interpolator that implements the necessary mpi calls, derived classes only have to
- * implement interpolatePatches method
+ * @brief Base class that makes the necessary mpi calls, derived classes only have to
+ * implement interpolatePatches() method
  */
 template <int D> class MPIInterpolator : public Interpolator<D>
 {
@@ -60,7 +62,7 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	 * @param patches pairs where the first value is the index in the coarse vector and the second
 	 * value is a reference to the PatchInfo object
 	 * @param finer_vector the finer vector
-	 * @param coarser_vector the coaser vector
+	 * @param coarser_vector the coarser vector
 	 */
 	virtual void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
 	                                const Vector<D> &                                                              coarser_vector,
@@ -75,15 +77,14 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 	void interpolate(const Vector<D> &coarse, Vector<D> &fine) const
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (coarse.getNumLocalPatches() != ilc->getCoarserDomain()->getNumLocalPatches()) {
-				throw RuntimeError("coarse vector is incorrect length. Expected Lenght of "
-				                   + std::to_string(ilc->getCoarserDomain()->getNumLocalPatches()) + " but vector was length "
+			if (coarse.getNumLocalPatches() != ilc.getCoarserDomain().getNumLocalPatches()) {
+				throw RuntimeError("coarse vector is incorrect length. Expected Length of "
+				                   + std::to_string(ilc.getCoarserDomain().getNumLocalPatches()) + " but vector was length "
 				                   + std::to_string(coarse.getNumLocalPatches()));
 			}
-			if (fine.getNumLocalPatches() != ilc->getFinerDomain()->getNumLocalPatches()) {
-				throw RuntimeError("fine vector is incorrect length. Expected Lenght of "
-				                   + std::to_string(ilc->getFinerDomain()->getNumLocalPatches()) + " but vector was length "
-				                   + std::to_string(fine.getNumLocalPatches()));
+			if (fine.getNumLocalPatches() != ilc.getFinerDomain().getNumLocalPatches()) {
+				throw RuntimeError("fine vector is incorrect length. Expected Length of " + std::to_string(ilc.getFinerDomain().getNumLocalPatches())
+				                   + " but vector was length " + std::to_string(fine.getNumLocalPatches()));
 			}
 		}
 		Vector<D> coarse_ghost = ilc.getNewGhostVector(coarse.getNumComponents());
@@ -101,8 +102,7 @@ template <int D> class MPIInterpolator : public Interpolator<D>
 		interpolatePatches(ilc.getPatchesWithGhostParent(), coarse_ghost, fine);
 	}
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 // explicit instantiation
 extern template class ThunderEgg::GMG::MPIInterpolator<2>;
 extern template class ThunderEgg::GMG::MPIInterpolator<3>;

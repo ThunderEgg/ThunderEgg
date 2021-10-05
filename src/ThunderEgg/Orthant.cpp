@@ -22,11 +22,11 @@
 #include <ThunderEgg/Orthant.h>
 namespace ThunderEgg
 {
-void to_json(nlohmann::json &j, const Orthant<0> &)
+void to_json(tpl::nlohmann::json &j, const Orthant<0> &)
 {
 	j = nullptr;
 }
-void to_json(nlohmann::json &j, const Orthant<1> &o)
+void to_json(tpl::nlohmann::json &j, const Orthant<1> &o)
 {
 	if (o == Orthant<1>::lower()) {
 		j = "LOWER";
@@ -36,7 +36,7 @@ void to_json(nlohmann::json &j, const Orthant<1> &o)
 		j = nullptr;
 	}
 }
-void to_json(nlohmann::json &j, const Orthant<2> &o)
+void to_json(tpl::nlohmann::json &j, const Orthant<2> &o)
 {
 	if (o == Orthant<2>::sw()) {
 		j = "SW";
@@ -50,7 +50,7 @@ void to_json(nlohmann::json &j, const Orthant<2> &o)
 		j = nullptr;
 	}
 }
-void to_json(nlohmann::json &j, const Orthant<3> &o)
+void to_json(tpl::nlohmann::json &j, const Orthant<3> &o)
 {
 	if (o == Orthant<3>::bsw()) {
 		j = "BSW";
@@ -72,11 +72,11 @@ void to_json(nlohmann::json &j, const Orthant<3> &o)
 		j = nullptr;
 	}
 }
-void from_json(const nlohmann::json &, Orthant<0> &o)
+void from_json(const tpl::nlohmann::json &, Orthant<0> &o)
 {
 	o = Orthant<0>::null();
 }
-void from_json(const nlohmann::json &j, Orthant<1> &o)
+void from_json(const tpl::nlohmann::json &j, Orthant<1> &o)
 {
 	if (j == "LOWER") {
 		o = Orthant<1>::lower();
@@ -86,7 +86,7 @@ void from_json(const nlohmann::json &j, Orthant<1> &o)
 		o = Orthant<1>::null();
 	}
 }
-void from_json(const nlohmann::json &j, Orthant<2> &o)
+void from_json(const tpl::nlohmann::json &j, Orthant<2> &o)
 {
 	if (j == "SW") {
 		o = Orthant<2>::sw();
@@ -100,7 +100,7 @@ void from_json(const nlohmann::json &j, Orthant<2> &o)
 		o = Orthant<2>::null();
 	}
 }
-void from_json(const nlohmann::json &j, Orthant<3> &o)
+void from_json(const tpl::nlohmann::json &j, Orthant<3> &o)
 {
 	if (j == "BSW") {
 		o = Orthant<3>::bsw();

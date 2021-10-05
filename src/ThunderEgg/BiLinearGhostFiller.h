@@ -21,6 +21,12 @@
 
 #ifndef THUNDEREGG_BILINEARGHOSTFILLER_H
 #define THUNDEREGG_BILINEARGHOSTFILLER_H
+/**
+ * @file
+ *
+ * @brief BiLinearGhostFiller class
+ */
+
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/MPIGhostFiller.h>
 namespace ThunderEgg

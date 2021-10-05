@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_SCHUR_IFACEINFO_H
 #define THUNDEREGG_SCHUR_IFACEINFO_H
+/**
+ * @file
+ *
+ * @brief IfaceInfo class
+ */
 #include <ThunderEgg/Schur/IfaceType.h>
 #include <deque>
 #include <map>

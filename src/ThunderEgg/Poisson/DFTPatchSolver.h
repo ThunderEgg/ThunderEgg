@@ -32,12 +32,10 @@
 
 extern "C" void dgemv_(char &, int &, int &, double &, double *, int &, double *, int &, double &, double *, int &);
 
-namespace ThunderEgg
-{
-namespace Poisson
+namespace ThunderEgg::Poisson
 {
 /**
- * @brief This patch solver uses DFT transforms to solve for the Poisson equation
+ * @brief Use DFT transforms to solve for the Poisson equation
  *
  * @tparam D the number of Cartesian dimensions
  */
@@ -414,6 +412,5 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 
 extern template class DFTPatchSolver<2>;
 extern template class DFTPatchSolver<3>;
-} // namespace Poisson
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Poisson
 #endif

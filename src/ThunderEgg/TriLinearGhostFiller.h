@@ -21,6 +21,12 @@
 
 #ifndef THUNDEREGG_TRILINEARGHOSTFILLER_H
 #define THUNDEREGG_TRILINEARGHOSTFILLER_H
+/**
+ * @file
+ *
+ * @brief TriLinearGhostFiller class
+ */
+
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/MPIGhostFiller.h>
 namespace ThunderEgg

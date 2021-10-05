@@ -21,16 +21,19 @@
 
 #ifndef THUNDEREGG_PETSC_MATWRAPPER_H
 #define THUNDEREGG_PETSC_MATWRAPPER_H
+/**
+ * @file
+ *
+ * @brief MatWrapper class
+ */
 
 #include <ThunderEgg/Operator.h>
 #include <petscmat.h>
 
-namespace ThunderEgg
-{
-namespace PETSc
+namespace ThunderEgg::PETSc
 {
 /**
- * @brief Wraps a PETSc Mat object for use as a ThunderEgg Operator
+ * @brief Wraps a PETSc Mat object for use as an Operator
  */
 template <int D> class MatWrapper : public Operator<D>
 {
@@ -140,6 +143,5 @@ template <int D> class MatWrapper : public Operator<D>
 		destroyPetscVec(b, petsc_b);
 	}
 };
-} // namespace PETSc
-} // namespace ThunderEgg
+} // namespace ThunderEgg::PETSc
 #endif

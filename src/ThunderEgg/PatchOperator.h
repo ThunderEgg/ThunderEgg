@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_PATCHOPERATOR_H
 #define THUNDEREGG_PATCHOPERATOR_H
+/**
+ * @file
+ *
+ * @brief PatchOperator class
+ */
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/Operator.h>
@@ -115,10 +120,10 @@ template <int D> class PatchOperator : public Operator<D>
 	void apply(const Vector<D> &u, Vector<D> &f) const override
 	{
 		if constexpr (ENABLE_DEBUG) {
-			if (u.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (u.getNumLocalPatches() != domain.getNumLocalPatches()) {
 				throw RuntimeError("u vector is incorrect length");
 			}
-			if (f.getNumLocalPatches() != this->domain->getNumLocalPatches()) {
+			if (f.getNumLocalPatches() != domain.getNumLocalPatches()) {
 				throw RuntimeError("f vector is incorrect length");
 			}
 		}

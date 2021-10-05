@@ -20,6 +20,11 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_NORMALNBRINFO_H
 #define THUNDEREGG_NORMALNBRINFO_H
+/**
+ * @file
+ *
+ * @brief NormalNbrType class
+ */
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/NbrInfo.h>
@@ -106,13 +111,13 @@ template <int D> class NormalNbrInfo : public NbrInfo<D>
 		return std::make_unique<NormalNbrInfo<D>>(*this);
 	}
 };
-template <int D> void to_json(nlohmann::json &j, const NormalNbrInfo<D> &n)
+template <int D> void to_json(tpl::nlohmann::json &j, const NormalNbrInfo<D> &n)
 {
 	j["type"]  = NbrType::Normal;
 	j["ids"]   = {n.id};
 	j["ranks"] = {n.rank};
 }
-template <int D> void from_json(const nlohmann::json &j, NormalNbrInfo<D> &n)
+template <int D> void from_json(const tpl::nlohmann::json &j, NormalNbrInfo<D> &n)
 {
 	n.id   = j["ids"][0];
 	n.rank = j["ranks"][0];

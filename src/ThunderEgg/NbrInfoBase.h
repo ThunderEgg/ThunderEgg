@@ -20,6 +20,11 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_NBRINFOBASE_H
 #define THUNDEREGG_NBRINFOBASE_H
+/**
+ * @file
+ *
+ * @brief NbrInfoBase class
+ */
 #include <ThunderEgg/NbrType.h>
 #include <ThunderEgg/Serializable.h>
 #include <deque>

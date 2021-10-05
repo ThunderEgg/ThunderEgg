@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_SCHUR_PATCHSOLVERWRAPPER_H
 #define THUNDEREGG_SCHUR_PATCHSOLVERWRAPPER_H
+/**
+ * @file
+ *
+ * @brief PatchSolverWrapper class
+ */
 
 #include <ThunderEgg/PatchSolver.h>
 #include <ThunderEgg/Schur/PatchIfaceScatter.h>

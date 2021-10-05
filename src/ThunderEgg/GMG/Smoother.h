@@ -21,13 +21,16 @@
 
 #ifndef THUNDEREGG_GMG_SMOOTHER_H
 #define THUNDEREGG_GMG_SMOOTHER_H
+/**
+ * @file
+ *
+ * @brief Smoother class
+ */
 #include <ThunderEgg/Vector.h>
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief Base class for multi-grid smoothing operators.
+ * @brief Abstract class for smoothing operators.
  */
 template <int D> class Smoother
 {
@@ -50,6 +53,5 @@ template <int D> class Smoother
 	 */
 	virtual void smooth(const Vector<D> &f, Vector<D> &u) const = 0;
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

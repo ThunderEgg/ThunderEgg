@@ -19,14 +19,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include "Init.h"
 #include "Writers/ClawWriter.h"
 #include <ThunderEgg.h>
 #ifdef HAVE_VTK
 #include "Writers/VtkWriter2d.h"
 #endif
 #include "CLI11.hpp"
-#include "TreeToP4est.h"
+#include "GetP4estDomainGenerator.h"
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -40,7 +39,6 @@
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace ThunderEgg::Experimental;
 using namespace ThunderEgg::VarPoisson;
 int main(int argc, char *argv[])
 {
@@ -117,13 +115,6 @@ int main(int argc, char *argv[])
 
 	GMG::CycleOpts copts;
 
-	gmg->add_option("--max_levels", copts.max_levels,
-	                "The max number of levels in GMG cycle. 0 means no limit.");
-
-	gmg->add_option(
-	"--patches_per_proc", copts.patches_per_proc,
-	"Lowest level is guaranteed to have at least this number of patches per processor.");
-
 	gmg->add_option("--pre_sweeps", copts.pre_sweeps, "Number of sweeps on down cycle");
 
 	gmg->add_option("--post_sweeps", copts.post_sweeps, "Number of sweeps on up cycle");
@@ -185,20 +176,13 @@ int main(int argc, char *argv[])
 	///////////////
 	// Create Mesh
 	///////////////
-	Tree<2> t;
-	t = Tree<2>(mesh_filename);
-	for (int i = 0; i < div; i++) {
-		t.refineLeaves();
-	}
-
-	TreeToP4est ttp(t);
-
 	auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
 		x = unit_x;
 		y = unit_y;
 	};
 
-	P4estDomainGenerator dcg(ttp.p4est, ns, 1, bmf);
+	p4est_connectivity * conn = p4est_connectivity_new_brick(1, 1, false, false);
+	P4estDomainGenerator dcg  = getP4estDomainGenerator(conn, mesh_filename, ns, 1, bmf);
 
 	Domain<2> domain = dcg.getFinestDomain();
 

@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_P8ESTDOMAINGENERATOR_H
 #define THUNDEREGG_P8ESTDOMAINGENERATOR_H
+/**
+ * @file
+ *
+ * @brief P8estDomainGenerator class
+ */
 #include <ThunderEgg/DomainGenerator.h>
 #include <functional>
 #include <p8est.h>

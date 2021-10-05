@@ -21,6 +21,12 @@
 
 #ifndef THUNDEREGG_TIMER_H
 #define THUNDEREGG_TIMER_H
+/**
+ * @file
+ *
+ * @brief Timer class
+ */
+
 #include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/tpl/json.hpp>
@@ -73,7 +79,7 @@ class Timer
 	 * in the other.
 	 */
 	std::list<std::reference_wrapper<Timing>> stack;
-	std::map<int, nlohmann::json>             domains;
+	std::map<int, tpl::nlohmann::json>        domains;
 
 	public:
 	/**
@@ -105,7 +111,7 @@ class Timer
 	 * @param domain the domain
 	 * @exception RuntimerError if domain with same id was already added
 	 */
-	void addDomain(int domain_id, nlohmann::json domain);
+	void addDomain(int domain_id, tpl::nlohmann::json domain);
 	/**
 	 * @brief Start a new Domain associated timing
 	 *
@@ -186,7 +192,7 @@ class Timer
 	 * @param j resulting json
 	 * @param timer the timer
 	 */
-	friend void to_json(nlohmann::json &j, const Timer &timer);
+	friend void to_json(tpl::nlohmann::json &j, const Timer &timer);
 	/**
 	 * @brief Save a json representation of the timer to the file. This is collective over all
 	 * processes.

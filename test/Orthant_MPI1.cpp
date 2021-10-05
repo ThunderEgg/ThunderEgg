@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace ThunderEgg;
+using namespace ThunderEgg::tpl;
 
 TEST_CASE("Orthant<0> unsigned char constructor works", "[Orthant]")
 {

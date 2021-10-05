@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_P4ESTDOMAINGENERATOR_H
 #define THUNDEREGG_P4ESTDOMAINGENERATOR_H
+/**
+ * @file
+ *
+ * @brief P4estDomainGenerator class
+ */
 #include <ThunderEgg/DomainGenerator.h>
 #include <functional>
 #include <list>
@@ -119,10 +124,10 @@ class P4estDomainGenerator : public DomainGenerator<2>
 	 */
 	P4estDomainGenerator(p4est_t *p4est, const std::array<int, 2> &ns, int num_ghost_cells, const BlockMapFunc &bmf);
 	~P4estDomainGenerator();
-	P4estDomainGenerator(const P4estDomainGenerator &) = delete;
-	P4estDomainGenerator(P4estDomainGenerator &&)      = delete;
-	P4estDomainGenerator &operator=(const P4estDomainGenerator &) = delete;
-	P4estDomainGenerator &operator=(P4estDomainGenerator &&) = delete;
+	P4estDomainGenerator(const P4estDomainGenerator &);
+	P4estDomainGenerator(P4estDomainGenerator &&) = default;
+	P4estDomainGenerator &operator                =(const P4estDomainGenerator &);
+	P4estDomainGenerator &operator=(P4estDomainGenerator &&) = default;
 	Domain<2>             getFinestDomain();
 	bool                  hasCoarserDomain();
 	Domain<2>             getCoarserDomain();

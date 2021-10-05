@@ -1,8 +1,7 @@
 #determine sources first
-list(APPEND UTILS_SRCS Init.cpp Init.h)
 if(TARGET P4EST::P4EST)
-    list(APPEND UTILS_SRCS TreeToP4est.cpp TreeToP4est.h)
-    list(APPEND UTILS_SRCS TreeToP8est.cpp TreeToP8est.h)
+    list(APPEND UTILS_SRCS GetP8estDomainGenerator.cpp)
+    list(APPEND UTILS_SRCS GetP4estDomainGenerator.cpp)
 endif()
 
 add_library(UTILS ${UTILS_SRCS})

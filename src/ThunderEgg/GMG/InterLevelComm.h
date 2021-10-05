@@ -21,16 +21,19 @@
 
 #ifndef THUNDEREGG_GMG_INTERLEVELCOMM_H
 #define THUNDEREGG_GMG_INTERLEVELCOMM_H
+/**
+ * @file
+ *
+ * @brief InterLevelComm class
+ */
 
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
 
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief A communicator between a finer domain and a coarser domain.
+ * @brief Facilitates communication between a finer domain and a coarser domain.
  *
  * This class will determine the following things:
  *
@@ -41,12 +44,18 @@ namespace GMG
  * Which patches in the finer domain have a parent patch in the coarser domain on a different rank?
  * 	- getPatchesWithGhostParent() will return a vector of these patches and the local indexes in the
  * 	  ghost vector.
- * 	- getNewGhostVector() will allocate a new vector for these ghost values.
+ * 	- getNewGhostVector() will allocate a new vector for these coarse ghost values.
  *
+ *
+ * Scatter functions are provided for scattering to and from the coarse vector to the coarse ghost vector.
  */
 template <int D> class InterLevelComm
 {
 	private:
+	/**
+	 * @brief The communicator
+	 */
+	Communicator comm;
 	/**
 	 * @brief The coarser domain
 	 */
@@ -111,11 +120,11 @@ template <int D> class InterLevelComm
 	 * @brief Create a new InterLevelComm object.
 	 *
 	 * @param coarse_domain the coarser DomainCollection.
-	 * @param num_coarser_components the number of components for eac cell of the coarser domain
 	 * @param fine_domain the finer DomainCollection.
 	 */
 	InterLevelComm(const Domain<D> &coarser_domain, const Domain<D> &finer_domain)
-	: coarser_domain(coarser_domain),
+	: comm(coarser_domain.getCommunicator()),
+	  coarser_domain(coarser_domain),
 	  finer_domain(finer_domain),
 	  ns(finer_domain.getNs()),
 	  num_ghost_cells(finer_domain.getNumGhostCells())
@@ -132,7 +141,7 @@ template <int D> class InterLevelComm
 		std::set<int>                                                          ghost_parents_ids;
 
 		int rank;
-		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Comm_rank(comm.getMPIComm(), &rank);
 		// TODO this has to be changed when domain class is updated
 		std::map<int, int> coarser_domain_id_to_local_index_map;
 		for (const PatchInfo<D> &pinfo : this->coarser_domain.getPatchInfoVector()) {
@@ -238,7 +247,7 @@ template <int D> class InterLevelComm
 	 *
 	 * The vector will consist of pair values:
 	 * 		- First value: the local index of the parent patch
-	 * 		- Second value: the local index of the child patch
+	 * 		- Second value: a reference to the child patch
 	 *
 	 * @return const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& the vector
 	 */
@@ -252,7 +261,7 @@ template <int D> class InterLevelComm
 	 *
 	 * The vector will consist of pair values:
 	 * 		- First value: the local index in the ghost vector of the parent patch
-	 * 		- Second value: the local index of the child patch
+	 * 		- Second value: a reference to the child patch
 	 *
 	 * @return const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& the vector
 	 */
@@ -268,7 +277,7 @@ template <int D> class InterLevelComm
 	 * This is essentially a reverse scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
-	 * computations to happen while the communication is happening.
+	 * computations to happen while the communicating.
 	 *
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
@@ -297,7 +306,7 @@ template <int D> class InterLevelComm
 			// post the receive
 			int rank = rank_indexes_pair.first;
 			recv_requests.emplace_back();
-			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0, MPI_COMM_WORLD, &recv_requests.back());
+			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0, comm.getMPIComm(), &recv_requests.back());
 		}
 		send_buffers.reserve(rank_and_local_indexes_for_ghost_vector.size());
 		send_requests.reserve(rank_and_local_indexes_for_ghost_vector.size());
@@ -319,7 +328,7 @@ template <int D> class InterLevelComm
 			// post the send
 			int rank = rank_indexes_pair.first;
 			send_requests.emplace_back();
-			MPI_Isend(send_buffers.back().data(), send_buffers.back().size(), MPI_DOUBLE, rank, 0, MPI_COMM_WORLD, &send_requests.back());
+			MPI_Isend(send_buffers.back().data(), send_buffers.back().size(), MPI_DOUBLE, rank, 0, comm.getMPIComm(), &send_requests.back());
 		}
 
 		// set state
@@ -333,7 +342,7 @@ template <int D> class InterLevelComm
 	 * vector. This is essentially a reverse scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
-	 * computations to happen while the communication is happening.
+	 * computations to happen while the communicating.
 	 *
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
@@ -395,7 +404,7 @@ template <int D> class InterLevelComm
 	 * values in the ghost vector. This is essentially a forward scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
-	 * computations to happen while the communication is happening.
+	 * computations to happen while the communicating.
 	 *
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
@@ -424,7 +433,7 @@ template <int D> class InterLevelComm
 			// post the recieve
 			int rank = rank_indexes_pair.first;
 			recv_requests.emplace_back();
-			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0, MPI_COMM_WORLD, &recv_requests.back());
+			MPI_Irecv(recv_buffers.back().data(), recv_buffers.back().size(), MPI_DOUBLE, rank, 0, comm.getMPIComm(), &recv_requests.back());
 		}
 		send_buffers.reserve(rank_and_local_indexes_for_vector.size());
 		send_requests.reserve(rank_and_local_indexes_for_vector.size());
@@ -446,7 +455,7 @@ template <int D> class InterLevelComm
 			// post the send
 			int rank = rank_indexes_pair.first;
 			send_requests.emplace_back();
-			MPI_Isend(send_buffers.back().data(), send_buffers.back().size(), MPI_DOUBLE, rank, 0, MPI_COMM_WORLD, &send_requests.back());
+			MPI_Isend(send_buffers.back().data(), send_buffers.back().size(), MPI_DOUBLE, rank, 0, comm.getMPIComm(), &send_requests.back());
 		}
 
 		// set state
@@ -460,7 +469,7 @@ template <int D> class InterLevelComm
 	 * values in the ghost vector. This is essentially a forward scatter.
 	 *
 	 * This function is seperated into a Start and Finish function, this allows for other
-	 * computations to happen while the communication is happening.
+	 * computations to happen while communicating.
 	 *
 	 * @param vector the vector
 	 * @param ghost_vector the associated ghost vector
@@ -515,10 +524,20 @@ template <int D> class InterLevelComm
 		current_ghost_vector = nullptr;
 		current_vector       = nullptr;
 	}
+	/**
+	 * @brief Get the coarser Domain
+	 *
+	 * @return const Domain<D>& the coarser Domain
+	 */
 	const Domain<D> &getCoarserDomain() const
 	{
 		return coarser_domain;
 	}
+	/**
+	 * @brief Get the finer Domain
+	 *
+	 * @return const Domain<D>& the finer Domain
+	 */
 	const Domain<D> &getFinerDomain() const
 	{
 		return finer_domain;
@@ -526,6 +545,5 @@ template <int D> class InterLevelComm
 };
 extern template class InterLevelComm<2>;
 extern template class InterLevelComm<3>;
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

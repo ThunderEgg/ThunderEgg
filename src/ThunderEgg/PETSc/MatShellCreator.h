@@ -21,14 +21,17 @@
 
 #ifndef THUNDEREGG_PETSC_MATSHELLCREATOR_H
 #define THUNDEREGG_PETSC_MATSHELLCREATOR_H
+/**
+ * @file
+ *
+ * @brief MatShellCreator class
+ */
 #include <ThunderEgg/Operator.h>
 #include <petscmat.h>
-namespace ThunderEgg
-{
-namespace PETSc
+namespace ThunderEgg::PETSc
 {
 /**
- * @brief Wraps a ThunderEgg operator for use as a PETSc Mat
+ * @brief Wraps an Operator for use as a PETSc Mat
  *
  * @tparam D the number of Cartesian dimensions
  */
@@ -56,12 +59,12 @@ template <int D> class MatShellCreator
 	{
 	}
 	/**
-	 * @brief Apply the PETSC MatShell
+	 * @brief Apply the PETSc MatShell
 	 *
 	 * @param A the MatShell
 	 * @param x the x vector (input)
 	 * @param b the b vector (output)
-	 * @return int PETSC error
+	 * @return int PETSc error
 	 */
 	static int applyMat(Mat A, Vec x, Vec b)
 	{
@@ -125,7 +128,7 @@ template <int D> class MatShellCreator
 	 *
 	 * @param op the operator we are wrapping
 	 * @param vector_allocator function that allocates need TE vectors
-	 * @return Mat the wrapped operator, you are responsible for calling MatDestroy on this
+	 * @return Mat the wrapped operator, user is responsible for calling MatDestroy on this
 	 */
 	static Mat GetNewMatShell(const Operator<D> &op, const std::function<Vector<D>()> &vector_allocator)
 	{
@@ -139,6 +142,5 @@ template <int D> class MatShellCreator
 		return A;
 	}
 };
-} // namespace PETSc
-} // namespace ThunderEgg
+} // namespace ThunderEgg::PETSc
 #endif

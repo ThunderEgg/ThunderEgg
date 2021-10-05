@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_OPERATOR_H
 #define THUNDEREGG_OPERATOR_H
+/**
+ * @file
+ *
+ * @brief Operator class
+ */
 
 #include <ThunderEgg/Vector.h>
 

@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace ThunderEgg;
+using namespace ThunderEgg::tpl;
 TEST_CASE("Test num_sides for Side<1>", "[Side][Face]")
 {
 	size_t sides = Side<1>::number_of;

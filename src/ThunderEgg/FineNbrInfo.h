@@ -20,6 +20,11 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_FINENBRINFO_H
 #define THUNDEREGG_FINENBRINFO_H
+/**
+ * @file
+ *
+ * @brief FineNbrInfo class
+ */
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/NbrInfo.h>
@@ -123,13 +128,13 @@ template <int D> class FineNbrInfo : public NbrInfo<D>
 		return std::make_unique<FineNbrInfo<D>>(*this);
 	}
 };
-template <int D> void to_json(nlohmann::json &j, const FineNbrInfo<D> &n)
+template <int D> void to_json(tpl::nlohmann::json &j, const FineNbrInfo<D> &n)
 {
 	j["type"]  = NbrType::Fine;
 	j["ids"]   = n.ids;
 	j["ranks"] = n.ranks;
 }
-template <int D> void from_json(const nlohmann::json &j, FineNbrInfo<D> &n)
+template <int D> void from_json(const tpl::nlohmann::json &j, FineNbrInfo<D> &n)
 {
 	n.ids   = j["ids"].get<std::array<int, Orthant<D>::num_orthants>>();
 	n.ranks = j["ranks"].get<std::array<int, Orthant<D>::num_orthants>>();

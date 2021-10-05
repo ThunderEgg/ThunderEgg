@@ -20,6 +20,11 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_NBRTYPE_H
 #define THUNDEREGG_NBRTYPE_H
+/**
+ * @file
+ *
+ * @brief NbrType class
+ */
 #include <ThunderEgg/tpl/json.hpp>
 #include <ostream>
 
@@ -60,8 +65,6 @@ inline std::ostream &operator<<(std::ostream &os, const NbrType &type)
 	}
 	return os;
 }
-NLOHMANN_JSON_SERIALIZE_ENUM(NbrType, {{NbrType::Normal, "NORMAL"},
-                                       {NbrType::Coarse, "COARSE"},
-                                       {NbrType::Fine, "FINE"}});
+NLOHMANN_JSON_SERIALIZE_ENUM(NbrType, {{NbrType::Normal, "NORMAL"}, {NbrType::Coarse, "COARSE"}, {NbrType::Fine, "FINE"}});
 } // namespace ThunderEgg
 #endif

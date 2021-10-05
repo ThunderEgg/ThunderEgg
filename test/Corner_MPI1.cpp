@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace ThunderEgg;
+using namespace ThunderEgg::tpl;
 
 TEST_CASE("Corner<2> num_corners", "[Corner][Face]")
 {

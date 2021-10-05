@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_GHOSTFILLINGTYPE_H
 #define THUNDEREGG_GHOSTFILLINGTYPE_H
+/**
+ * @file
+ *
+ * @brief GhostFillingType enum
+ */
 
 namespace ThunderEgg
 {

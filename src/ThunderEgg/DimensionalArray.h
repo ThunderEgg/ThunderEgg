@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_DIMENSIONALARRAY_H
 #define THUNDEREGG_DIMENSIONALARRAY_H
+/**
+ * @file
+ *
+ * @brief DimensionalArray class
+ */
 
 namespace ThunderEgg
 {

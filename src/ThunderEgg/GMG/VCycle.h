@@ -21,11 +21,14 @@
 
 #ifndef THUNDEREGG_GMG_VCYCLE_H
 #define THUNDEREGG_GMG_VCYCLE_H
+/**
+ * @file
+ *
+ * @brief VCycle class
+ */
 #include <ThunderEgg/GMG/Cycle.h>
 #include <ThunderEgg/GMG/CycleOpts.h>
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
  * @brief Implementation of a V-cycle
@@ -54,7 +57,7 @@ template <int D> class VCycle : public Cycle<D>
 
 			Vector<D> coarser_f = this->restrict(level, f, u);
 
-			const Level<D> &coarser_level = *level.getCoarser();
+			const Level<D> &coarser_level = level.getCoarser();
 			Vector<D>       coarser_u     = coarser_f.getZeroClone();
 
 			this->visit(coarser_level, coarser_f, coarser_u);
@@ -73,7 +76,7 @@ template <int D> class VCycle : public Cycle<D>
 	 *
 	 * @param finest_level a pointer to the finest level
 	 */
-	VCycle(std::shared_ptr<Level<D>> finest_level, const CycleOpts &opts) : Cycle<D>(finest_level)
+	VCycle(const Level<D> &finest_level, const CycleOpts &opts) : Cycle<D>(finest_level)
 	{
 		num_pre_sweeps    = opts.pre_sweeps;
 		num_post_sweeps   = opts.post_sweeps;
@@ -91,6 +94,5 @@ template <int D> class VCycle : public Cycle<D>
 };
 extern template class VCycle<2>;
 extern template class VCycle<3>;
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

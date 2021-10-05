@@ -21,6 +21,11 @@
 #ifndef THUNDEREGG_NBRINFO_H
 #define THUNDEREGG_NBRINFO_H
 #include <ThunderEgg/NbrInfoBase.h>
+/**
+ * @file
+ *
+ * @brief NbrInfo class
+ */
 
 namespace ThunderEgg
 {

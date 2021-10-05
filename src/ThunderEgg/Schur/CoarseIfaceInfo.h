@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_SCHUR_COARSEIFACEINFO_H
 #define THUNDEREGG_SCHUR_COARSEIFACEINFO_H
+/**
+ * @file
+ *
+ * @brief CoarseIfaceInfo class
+ */
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/Schur/IfaceInfo.h>
 namespace ThunderEgg

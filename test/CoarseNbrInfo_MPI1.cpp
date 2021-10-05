@@ -29,7 +29,7 @@ TEST_CASE("CoarseNbrInfo to_json", "[CoarseNbrInfo]")
 	info.rank           = GENERATE(0, 1, 2);
 	info.orth_on_coarse = GENERATE(Orthant<2>::sw(), Orthant<3>::se(), Orthant<2>::nw());
 
-	nlohmann::json j = info;
+	ThunderEgg::tpl::nlohmann::json j = info;
 
 	CHECK(j["type"] == "COARSE");
 	REQUIRE(j["ids"].is_array());
@@ -46,7 +46,7 @@ TEST_CASE("CoarseNbrInfo from_json", "[CoarseNbrInfo]")
 	int        rank           = GENERATE(0, 1, 2);
 	Orthant<2> orth_on_coarse = GENERATE(Orthant<2>::sw(), Orthant<3>::se(), Orthant<2>::nw());
 
-	nlohmann::json j;
+	ThunderEgg::tpl::nlohmann::json j;
 	j["type"]           = "COARSE";
 	j["ids"]            = {id};
 	j["ranks"]          = {rank};

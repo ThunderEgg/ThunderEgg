@@ -21,19 +21,23 @@
 
 #ifndef THUNDEREGG_GMG_DRCTINTP_H
 #define THUNDEREGG_GMG_DRCTINTP_H
+/**
+ * @file
+ *
+ * @brief DirectInterpolator class
+ */
 
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/MPIInterpolator.h>
 #include <memory>
 
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief Simple class that directly places values from coarse cell into the corresponding fine
- * cells.
+ * @brief Directly places values from coarse cell into the corresponding fine cells.
+ *
+ * This is a piecewise constant interpolation scheme.
  */
 template <int D> class DirectInterpolator : public MPIInterpolator<D>
 {
@@ -87,6 +91,5 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 };
 extern template class DirectInterpolator<2>;
 extern template class DirectInterpolator<3>;
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

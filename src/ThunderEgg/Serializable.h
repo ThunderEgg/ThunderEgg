@@ -19,8 +19,14 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef Serializable_H
-#define Serializable_H
+#ifndef SERIALIZABLE_H
+#define SERIALIZABLE_H
+/**
+ * @file
+ *
+ * @brief Serializable class
+ */
+
 #include <memory>
 namespace ThunderEgg
 {

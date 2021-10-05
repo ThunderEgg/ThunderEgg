@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_SCHUR_PATCHIFACEINFO_H
 #define THUNDEREGG_SCHUR_PATCHIFACEINFO_H
+/**
+ * @file
+ *
+ * @brief PatchIfaceInfo class
+ */
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Schur/CoarseIfaceInfo.h>
 #include <ThunderEgg/Schur/FineIfaceInfo.h>

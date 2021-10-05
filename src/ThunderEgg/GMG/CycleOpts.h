@@ -21,20 +21,18 @@
 
 #ifndef THUNDEREGG_GMG_CYCLEOPTS_H
 #define THUNDEREGG_GMG_CYCLEOPTS_H
+/**
+ * @file
+ *
+ * @brief CycleOpts struct
+ */
 #include <string>
-namespace ThunderEgg
+namespace ThunderEgg::GMG
 {
-namespace GMG
-{
+/**
+ * @brief Options for Cycle classes
+ */
 struct CycleOpts {
-	/**
-	 * @brief The max number of levels in GMG cycle. 0 means no limit.
-	 */
-	int max_levels = 0;
-	/**
-	 * @brief Lowest level is guaranteed to have at least this number of patches per processor.
-	 */
-	double patches_per_proc = 0;
 	/**
 	 * @brief Number of sweeps on down cycle
 	 */
@@ -56,6 +54,5 @@ struct CycleOpts {
 	 */
 	std::string cycle_type = "V";
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

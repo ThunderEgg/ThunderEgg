@@ -3,6 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 using namespace ThunderEgg;
+using namespace ThunderEgg::tpl;
 TEST_CASE("NbrType to_json", "[NbrType]")
 {
 	nlohmann::json j;

@@ -20,6 +20,11 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_COARSENBRINFO_H
 #define THUNDEREGG_COARSENBRINFO_H
+/**
+ * @file
+ *
+ * @brief CoarseNbrInfo class
+ */
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/NbrInfo.h>
@@ -116,14 +121,14 @@ template <int D> class CoarseNbrInfo : public NbrInfo<D>
 		return std::make_unique<CoarseNbrInfo<D>>(*this);
 	}
 };
-template <int D> void to_json(nlohmann::json &j, const CoarseNbrInfo<D> &n)
+template <int D> void to_json(tpl::nlohmann::json &j, const CoarseNbrInfo<D> &n)
 {
 	j["type"]           = NbrType::Coarse;
 	j["ids"]            = {n.id};
 	j["ranks"]          = {n.rank};
 	j["orth_on_coarse"] = n.orth_on_coarse;
 }
-template <int D> void from_json(const nlohmann::json &j, CoarseNbrInfo<D> &n)
+template <int D> void from_json(const tpl::nlohmann::json &j, CoarseNbrInfo<D> &n)
 {
 	n.id   = j["ids"][0];
 	n.rank = j["ranks"][0];

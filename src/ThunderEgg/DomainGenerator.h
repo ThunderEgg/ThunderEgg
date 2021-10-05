@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_DOMAINGENERATOR_H
 #define THUNDEREGG_DOMAINGENERATOR_H
+/**
+ * @file
+ *
+ * @brief DomainGenerator class
+ */
 #include <ThunderEgg/Domain.h>
 namespace ThunderEgg
 {

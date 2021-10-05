@@ -21,11 +21,13 @@
 
 #ifndef THUNDEREGG_GMG_LINEARRESTRICTOR_H
 #define THUNDEREGG_GMG_LINEARRESTRICTOR_H
+/**
+ * @file
+ *
+ * @brief LinearRestrictor class
+ */
 #include <ThunderEgg/GMG/MPIRestrictor.h>
-#include <memory>
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
  * @brief Restrictor that averages the corresponding fine cells into each coarse cell.
@@ -177,8 +179,7 @@ template <int D> class LinearRestrictor : public MPIRestrictor<D>
 		}
 	}
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 // explicit instantiation
 extern template class ThunderEgg::GMG::LinearRestrictor<2>;
 extern template class ThunderEgg::GMG::LinearRestrictor<3>;

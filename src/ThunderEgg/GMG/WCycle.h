@@ -21,11 +21,14 @@
 
 #ifndef THUNDEREGG_GMG_WCYCLE_H
 #define THUNDEREGG_GMG_WCYCLE_H
+/**
+ * @file
+ *
+ * @brief WCycle class
+ */
 #include <ThunderEgg/GMG/Cycle.h>
 #include <ThunderEgg/GMG/CycleOpts.h>
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
  * @brief Implementation of a W-cycle
@@ -58,10 +61,10 @@ template <int D> class WCycle : public Cycle<D>
 
 			Vector<D> coarser_f = this->restrict(level, f, u);
 
-			const Level<D> &coarser_level = *level.getCoarser();
+			const Level<D> &coarser_level = level.getCoarser();
 			Vector<D>       coarser_u     = coarser_f.getZeroClone();
 
-			this->visit(*level.getCoarser(), coarser_f, coarser_u);
+			this->visit(coarser_level, coarser_f, coarser_u);
 
 			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
@@ -71,7 +74,7 @@ template <int D> class WCycle : public Cycle<D>
 
 			coarser_f = this->restrict(level, f, u);
 
-			this->visit(*level.getCoarser(), coarser_f, coarser_u);
+			this->visit(coarser_level, coarser_f, coarser_u);
 
 			coarser_level.getInterpolator().interpolate(coarser_u, u);
 
@@ -87,7 +90,7 @@ template <int D> class WCycle : public Cycle<D>
 	 *
 	 * @param finest_level a pointer to the finest level
 	 */
-	WCycle(std::shared_ptr<Level<D>> finest_level, const CycleOpts &opts) : Cycle<D>(finest_level)
+	WCycle(const Level<D> &finest_level, const CycleOpts &opts) : Cycle<D>(finest_level)
 	{
 		num_pre_sweeps    = opts.pre_sweeps;
 		num_post_sweeps   = opts.post_sweeps;
@@ -106,6 +109,5 @@ template <int D> class WCycle : public Cycle<D>
 };
 extern template class WCycle<2>;
 extern template class WCycle<3>;
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

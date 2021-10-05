@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_POISSON_STARPATCHOPERATOR_H
 #define THUNDEREGG_POISSON_STARPATCHOPERATOR_H
+/**
+ * @file
+ *
+ * @brief StarPatchOperator class
+ */
 
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/Level.h>
@@ -29,12 +34,10 @@
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
 
-namespace ThunderEgg
-{
-namespace Poisson
+namespace ThunderEgg::Poisson
 {
 /**
- * @brief Implements 2nd order laplacian operator
+ * @brief Implements 2nd order finite-difference Laplacian operator
  *
  * Supports both Dirichlet and Neumann boundary conditions
  *
@@ -54,8 +57,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 * @brief Construct a new StarPatchOperator object
 	 *
 	 * @param domain the Domain that the operator is associated with
-	 * @param ghost_filler the GhostFiller to u_viewe before calling applySinglePatch
-	 * @param neumann whether or not to u_viewe Neumann boundary conditions
+	 * @param ghost_filler the GhostFiller to use before calling applySinglePatch
+	 * @param neumann whether or not to use Neumann boundary conditions
 	 */
 	StarPatchOperator(const Domain<D> &domain, const GhostFiller<D> &ghost_filler, bool neumann = false)
 	: PatchOperator<D>(domain, ghost_filler),
@@ -228,7 +231,5 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 };
 extern template class StarPatchOperator<2>;
 extern template class StarPatchOperator<3>;
-
-} // namespace Poisson
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Poisson
 #endif

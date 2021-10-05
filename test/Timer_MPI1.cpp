@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace ThunderEgg;
+using namespace ThunderEgg::tpl;
 
 static Domain<2> GetDomain(const Communicator &comm)
 {

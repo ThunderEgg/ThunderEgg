@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_DOMAIN_TOOLS_H
 #define THUNDEREGG_DOMAIN_TOOLS_H
+/**
+ * @file
+ *
+ * @brief DomainTools class
+ */
 
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>

@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_SCHUR_PATCHIFACESCATTER_H
 #define THUNDEREGG_SCHUR_PATCHIFACESCATTER_H
+/**
+ * @file
+ *
+ * @brief PatchIfaceScatter class
+ */
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <ThunderEgg/Vector.h>

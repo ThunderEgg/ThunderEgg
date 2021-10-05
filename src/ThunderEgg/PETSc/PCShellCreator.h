@@ -21,14 +21,17 @@
 
 #ifndef THUNDEREGG_PETSC_PCSHELLCREATOR_H
 #define THUNDEREGG_PETSC_PCSHELLCREATOR_H
+/**
+ * @file
+ *
+ * @brief PCShellCreator class
+ */
 #include <ThunderEgg/PETSc/MatShellCreator.h>
 #include <petscpc.h>
-namespace ThunderEgg
-{
-namespace PETSc
+namespace ThunderEgg::PETSc
 {
 /**
- * @brief Wraps a ThunderEgg operator for use as a PETSc PC
+ * @brief Wraps an Operator for use as a PETSc PC
  *
  * @tparam D the number of Cartesian dimensions
  */
@@ -155,6 +158,5 @@ template <int D> class PCShellCreator
 		return P;
 	}
 };
-} // namespace PETSc
-} // namespace ThunderEgg
+} // namespace ThunderEgg::PETSc
 #endif

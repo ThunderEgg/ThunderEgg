@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_MPIGHOSTFILLER_H
 #define THUNDEREGG_MPIGHOSTFILLER_H
+/**
+ * @file
+ *
+ * @brief MPIGhostFiller class
+ */
 
 #include <ThunderEgg/DimensionalArray.h>
 #include <ThunderEgg/Domain.h>

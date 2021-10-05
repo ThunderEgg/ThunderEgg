@@ -21,14 +21,17 @@
 
 #ifndef THUNDEREGG_GMG_LEVEL_H
 #define THUNDEREGG_GMG_LEVEL_H
+/**
+ * @file
+ *
+ * @brief Level class
+ */
 #include <ThunderEgg/GMG/Interpolator.h>
 #include <ThunderEgg/GMG/Restrictor.h>
 #include <ThunderEgg/GMG/Smoother.h>
 #include <ThunderEgg/Operator.h>
 #include <memory>
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
  * @brief Represents a level in geometric multi-grid.
@@ -55,11 +58,7 @@ template <int D> class Level
 	/**
 	 * @brief Pointer to coarser level
 	 */
-	std::shared_ptr<Level> coarser;
-	/**
-	 * @brief Pointer to finer level
-	 */
-	std::weak_ptr<Level> finer;
+	std::shared_ptr<const Level> coarser;
 
 	public:
 	/**
@@ -155,7 +154,7 @@ template <int D> class Level
 	 *
 	 * @param coarser the pointer to the coarser level.
 	 */
-	void setCoarser(std::shared_ptr<Level> coarser)
+	void setCoarser(std::shared_ptr<const Level> coarser)
 	{
 		this->coarser = coarser;
 	}
@@ -164,32 +163,12 @@ template <int D> class Level
 	 *
 	 * @return reference to the coarser level.
 	 */
-	std::shared_ptr<const Level> getCoarser() const
+	const Level &getCoarser() const
 	{
-		return coarser;
-	}
-	/**
-	 * @brief Set the pointer to the finer level.
-	 *
-	 * @param finer pointer to the finer level.
-	 */
-	void setFiner(std::shared_ptr<Level> finer)
-	{
-		this->finer = finer;
-	}
-	/**
-	 * @brief Get the finer level
-	 */
-	std::shared_ptr<Level> getFiner()
-	{
-		return finer;
-	}
-	/**
-	 * @brief Get the finer level
-	 */
-	std::shared_ptr<const Level> getFiner() const
-	{
-		return std::shared_ptr<const Level>(finer);
+		if (coarser == nullptr) {
+			throw RuntimeError("This level does not have a coarser level.");
+		}
+		return *coarser;
 	}
 	/**
 	 * @brief Check if this level is the finest level.
@@ -198,7 +177,7 @@ template <int D> class Level
 	 */
 	bool finest() const
 	{
-		return finer.expired();
+		return interpolator == nullptr;
 	}
 	/**
 	 * @brief Check if this level is the coarsest level.
@@ -210,6 +189,7 @@ template <int D> class Level
 		return coarser == nullptr;
 	}
 };
-} // namespace GMG
-} // namespace ThunderEgg
+extern template class Level<2>;
+extern template class Level<3>;
+} // namespace ThunderEgg::GMG
 #endif

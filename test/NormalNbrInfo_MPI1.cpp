@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace ThunderEgg;
+using namespace ThunderEgg::tpl;
 
 TEST_CASE("NormalNbrInfo getNbrType works", "[NormalNbrInfo]")
 {

@@ -24,7 +24,7 @@
 #ifdef HAVE_VTK
 #include "Writers/VtkWriter.h"
 #endif
-#include "TreeToP4est.h"
+#include "GetP4estDomainGenerator.h"
 #include <cmath>
 
 // =========== //
@@ -33,7 +33,6 @@
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace ThunderEgg::Experimental;
 using namespace ThunderEgg::Poisson;
 
 int main(int argc, char *argv[])
@@ -78,13 +77,6 @@ int main(int argc, char *argv[])
 	auto gmg = app.add_subcommand("GMG", "GMG solver options");
 
 	GMG::CycleOpts copts;
-
-	gmg->add_option("--max_levels", copts.max_levels,
-	                "The max number of levels in GMG cycle. 0 means no limit.");
-
-	gmg->add_option(
-	"--patches_per_proc", copts.patches_per_proc,
-	"Lowest level is guaranteed to have at least this number of patches per processor.");
 
 	gmg->add_option("--pre_sweeps", copts.pre_sweeps, "Number of sweeps on down cycle");
 
@@ -234,14 +226,6 @@ int main(int argc, char *argv[])
 	// create a Timer object to keep track of timings
 	std::shared_ptr<Timer> timer = make_shared<Timer>(comm);
 
-	// read in a tree from file
-	Tree<2> t;
-	t = Tree<2>(mesh_filename);
-	TreeToP4est ttp(t);
-	for (int i = 0; i < div; i++) {
-		ttp.divide();
-	}
-
 	auto bmf = [](int block_no, double unit_x, double unit_y, double &x, double &y) {
 		x = unit_x;
 		y = unit_y;
@@ -253,8 +237,10 @@ int main(int argc, char *argv[])
 	ns[1] = n;
 
 	// A DomainGenerator will create domains for the Multigrid algorithm from a tree
-	int                  num_ghost_cells = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
-	P4estDomainGenerator domain_generator(ttp.p4est, ns, num_ghost_cells, bmf);
+	int num_ghost_cells = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
+
+	p4est_connectivity * conn             = p4est_connectivity_new_brick(1, 1, false, false);
+	P4estDomainGenerator domain_generator = getP4estDomainGenerator(conn, mesh_filename, ns, num_ghost_cells, bmf);
 
 	// Get the finest domain from the tree
 	Domain<2> domain = domain_generator.getFinestDomain();

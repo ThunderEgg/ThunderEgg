@@ -21,13 +21,16 @@
 
 #ifndef THUNDEREGG_POISSON_MATRIXHELPER2D_H
 #define THUNDEREGG_POISSON_MATRIXHELPER2D_H
+/**
+ * @file
+ *
+ * @brief MatrixHelper2D class
+ */
 
 #include <ThunderEgg/Domain.h>
 #include <petscmat.h>
 
-namespace ThunderEgg
-{
-namespace Poisson
+namespace ThunderEgg::Poisson
 {
 /**
  * @brief Create a matrix for the 2D second-order Laplacian operator
@@ -54,6 +57,5 @@ class MatrixHelper2d
 	 */
 	Mat formCRSMatrix(double lambda = 0);
 };
-} // namespace Poisson
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Poisson
 #endif

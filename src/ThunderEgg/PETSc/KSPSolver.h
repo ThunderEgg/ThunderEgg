@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_PETSC_KSPSOLVER_H
 #define THUNDEREGG_PETSC_KSPSOLVER_H
+/**
+ * @file
+ *
+ * @brief KSPSolver class
+ */
 
 #include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/PETSc/MatShellCreator.h>
@@ -28,12 +33,10 @@
 #include <petscksp.h>
 #include <petscmat.h>
 
-namespace ThunderEgg
-{
-namespace PETSc
+namespace ThunderEgg::PETSc
 {
 /**
- * @brief Wraps a PETSc Mat object for use as a ThunderEgg Operator
+ * @brief Wraps a PETSc KSP solver for use use as a Solver
  */
 template <int D> class KSPSolver : public Iterative::Solver<D>
 {
@@ -185,6 +188,5 @@ template <int D> class KSPSolver : public Iterative::Solver<D>
 		return iterations;
 	}
 };
-} // namespace PETSc
-} // namespace ThunderEgg
+} // namespace ThunderEgg::PETSc
 #endif

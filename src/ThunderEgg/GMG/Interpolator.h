@@ -21,15 +21,17 @@
 
 #ifndef THUNDEREGG_GMG_INTERPOLATOR_H
 #define THUNDEREGG_GMG_INTERPOLATOR_H
-
+/**
+ * @file
+ *
+ * @brief Interpolator class
+ */
 #include <ThunderEgg/Vector.h>
 
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief base class for interpolation operators from finer levels to coarser levels.
+ * @brief Abstract class for interpolation operators.
  */
 template <int D> class Interpolator
 {
@@ -52,6 +54,5 @@ template <int D> class Interpolator
 	 */
 	virtual void interpolate(const Vector<D> &coarse, Vector<D> &fine) const = 0;
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

@@ -22,7 +22,7 @@
 #include <ThunderEgg/Face.h>
 namespace ThunderEgg
 {
-void to_json(nlohmann::json &j, const Side<1> &s)
+void to_json(tpl::nlohmann::json &j, const Side<1> &s)
 {
 	if (s == Side<1>::west()) {
 		j = "WEST";
@@ -32,7 +32,7 @@ void to_json(nlohmann::json &j, const Side<1> &s)
 		j = nullptr;
 	}
 }
-void to_json(nlohmann::json &j, const Side<2> &s)
+void to_json(tpl::nlohmann::json &j, const Side<2> &s)
 {
 	if (s == Side<2>::west()) {
 		j = "WEST";
@@ -46,7 +46,7 @@ void to_json(nlohmann::json &j, const Side<2> &s)
 		j = nullptr;
 	}
 }
-void to_json(nlohmann::json &j, const Side<3> &s)
+void to_json(tpl::nlohmann::json &j, const Side<3> &s)
 {
 	if (s == Side<3>::west()) {
 		j = "WEST";
@@ -64,7 +64,7 @@ void to_json(nlohmann::json &j, const Side<3> &s)
 		j = nullptr;
 	}
 }
-void from_json(const nlohmann::json &j, Side<1> &s)
+void from_json(const tpl::nlohmann::json &j, Side<1> &s)
 {
 	if (j == "WEST") {
 		s = Side<1>::west();
@@ -74,7 +74,7 @@ void from_json(const nlohmann::json &j, Side<1> &s)
 		s = Side<1>::null();
 	}
 }
-void from_json(const nlohmann::json &j, Side<2> &s)
+void from_json(const tpl::nlohmann::json &j, Side<2> &s)
 {
 	if (j == "WEST") {
 		s = Side<2>::west();
@@ -88,7 +88,7 @@ void from_json(const nlohmann::json &j, Side<2> &s)
 		s = Side<2>::null();
 	}
 }
-void from_json(const nlohmann::json &j, Side<3> &s)
+void from_json(const tpl::nlohmann::json &j, Side<3> &s)
 {
 	if (j == "WEST") {
 		s = Side<3>::west();
@@ -157,7 +157,7 @@ std::ostream &operator<<(std::ostream &os, const Side<3> &s)
 	}
 	return os;
 }
-void to_json(nlohmann::json &j, const Edge &o)
+void to_json(tpl::nlohmann::json &j, const Edge &o)
 {
 	if (o == Edge::bs()) {
 		j = "BS";
@@ -187,7 +187,7 @@ void to_json(nlohmann::json &j, const Edge &o)
 		j = nullptr;
 	}
 }
-void from_json(const nlohmann::json &j, Edge &o)
+void from_json(const tpl::nlohmann::json &j, Edge &o)
 {
 	if (j == "BS") {
 		o = Edge::bs();
@@ -294,7 +294,7 @@ std::ostream &operator<<(std::ostream &os, const Corner<3> &o)
 	}
 	return os;
 }
-void to_json(nlohmann::json &j, const Corner<2> &o)
+void to_json(tpl::nlohmann::json &j, const Corner<2> &o)
 {
 	if (o == Corner<2>::sw()) {
 		j = "SW";
@@ -308,7 +308,7 @@ void to_json(nlohmann::json &j, const Corner<2> &o)
 		j = nullptr;
 	}
 }
-void to_json(nlohmann::json &j, const Corner<3> &o)
+void to_json(tpl::nlohmann::json &j, const Corner<3> &o)
 {
 	if (o == Corner<3>::bsw()) {
 		j = "BSW";
@@ -330,7 +330,7 @@ void to_json(nlohmann::json &j, const Corner<3> &o)
 		j = nullptr;
 	}
 }
-void from_json(const nlohmann::json &j, Corner<2> &o)
+void from_json(const tpl::nlohmann::json &j, Corner<2> &o)
 {
 	if (j == "SW") {
 		o = Corner<2>::sw();
@@ -344,7 +344,7 @@ void from_json(const nlohmann::json &j, Corner<2> &o)
 		o = Corner<2>::null();
 	}
 }
-void from_json(const nlohmann::json &j, Corner<3> &o)
+void from_json(const tpl::nlohmann::json &j, Corner<3> &o)
 {
 	if (j == "BSW") {
 		o = Corner<3>::bsw();

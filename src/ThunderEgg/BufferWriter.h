@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_BUFFERWRITER_H
 #define THUNDEREGG_BUFFERWRITER_H
+/**
+ * @file
+ *
+ * @brief BufferWriter class
+ */
 
 #include <ThunderEgg/Serializable.h>
 #include <cstddef>

@@ -110,13 +110,13 @@ TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::Patch
     [](const Operator<2> &A,
        Vector<2> &x, const Vector<2> &b,
        const Operator<2> *Mr) {
-        throw BreakdownError("Blah");
+        throw Iterative::BreakdownError("Blah");
         return 1;
     });
 
 	Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
-	CHECK_THROWS_AS(bcgs_solver.smooth(f, u), BreakdownError);
+	CHECK_THROWS_AS(bcgs_solver.smooth(f, u), Iterative::BreakdownError);
 }
 TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterative::PatchSolver]")
 {
@@ -142,7 +142,7 @@ TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterativ
     [](const Operator<2> &A,
        Vector<2> &x, const Vector<2> &b,
        const Operator<2> *Mr) {
-        throw BreakdownError("Blah");
+        throw Iterative::BreakdownError("Blah");
         return 1;
     });
 

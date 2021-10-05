@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_VARPOISSON_STARPATCHOPERATOR_H
 #define THUNDEREGG_VARPOISSON_STARPATCHOPERATOR_H
+/**
+ * @file
+ *
+ * @brief StarPatchOperator class
+ */
 
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/Level.h>

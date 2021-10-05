@@ -197,6 +197,27 @@ P4estDomainGenerator::~P4estDomainGenerator()
 	p4est_destroy(my_p4est);
 }
 
+P4estDomainGenerator::P4estDomainGenerator(const P4estDomainGenerator &other)
+: domain_patches(other.domain_patches),
+  ns(other.ns),
+  num_ghost_cells(other.num_ghost_cells),
+  curr_level(other.curr_level),
+  bmf(other.bmf)
+{
+	my_p4est = p4est_copy(other.my_p4est, true);
+}
+
+P4estDomainGenerator &P4estDomainGenerator::operator=(const P4estDomainGenerator &other)
+{
+	domain_patches  = other.domain_patches;
+	ns              = other.ns;
+	num_ghost_cells = other.num_ghost_cells;
+	curr_level      = other.curr_level;
+	bmf             = other.bmf;
+	p4est_destroy(my_p4est);
+	my_p4est = p4est_copy(other.my_p4est, true);
+	return *this;
+}
 void P4estDomainGenerator::extractLevel()
 {
 	if (domain_patches.size() > 0) {

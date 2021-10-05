@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_COMMUNICATOR_H
 #define THUNDEREGG_COMMUNICATOR_H
+/**
+ * @file
+ *
+ * @brief Communicator class
+ */
 #include <ThunderEgg/RuntimeError.h>
 #include <mpi.h>
 

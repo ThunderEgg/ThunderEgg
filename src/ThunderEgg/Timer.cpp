@@ -24,6 +24,7 @@
 #include <fstream>
 #include <iomanip>
 
+using namespace ThunderEgg::tpl;
 namespace
 {
 /**

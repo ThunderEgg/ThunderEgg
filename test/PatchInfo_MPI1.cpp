@@ -4,6 +4,7 @@
 
 using namespace std;
 using namespace ThunderEgg;
+using namespace ThunderEgg::tpl;
 
 TEST_CASE("PatchInfo getNbrIds NormalNbrInfo", "[PatchInfo]")
 {

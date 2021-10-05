@@ -21,10 +21,15 @@
 
 #ifndef THUNDEREGG_ITERATIVE_PATCHSOLVER_H
 #define THUNDEREGG_ITERATIVE_PATCHSOLVER_H
+/**
+ * @file
+ *
+ * @brief PatchSolver class
+ */
 
-#include <ThunderEgg/BreakdownError.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/Level.h>
+#include <ThunderEgg/Iterative/BreakdownError.h>
 #include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
@@ -32,12 +37,10 @@
 #include <bitset>
 #include <map>
 
-namespace ThunderEgg
-{
-namespace Iterative
+namespace ThunderEgg::Iterative
 {
 /**
- * @brief Solves the patches u_viewing a Iterative iterative solver on each patch
+ * @brief Solves the patches using an iterative Solver on each patch
  *
  * @tparam D the number of cartesian dimensions
  */
@@ -104,8 +107,8 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 	/**
 	 * @brief Construct a new IterativePatchSolver object
 	 *
-	 * @param tol_in the tolerance to u_viewe for patch solves
-	 * @param max_it_in the maximum number of iterations to u_viewe for patch solves
+	 * @param tol_in the tolerance to use for patch solves
+	 * @param max_it_in the maximum number of iterations to use for patch solves
 	 */
 
 	/**
@@ -169,8 +172,7 @@ template <int D> class PatchSolver : public ThunderEgg::PatchSolver<D>
 		}
 	}
 };
-} // namespace Iterative
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Iterative
 extern template class ThunderEgg::Iterative::PatchSolver<2>;
 extern template class ThunderEgg::Iterative::PatchSolver<3>;
 #endif

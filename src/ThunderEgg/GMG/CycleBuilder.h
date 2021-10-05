@@ -21,23 +21,35 @@
 
 #ifndef THUNDEREGG_GMG_CYCLEBUILDER_H
 #define THUNDEREGG_GMG_CYCLEBUILDER_H
+/**
+ * @file
+ *
+ * @brief CycleBuilder class
+ */
+
 #include <ThunderEgg/GMG/FMGCycle.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/VCycle.h>
 #include <ThunderEgg/GMG/WCycle.h>
 #include <ThunderEgg/RuntimeError.h>
-namespace ThunderEgg
-{
-namespace GMG
+namespace ThunderEgg::GMG
 {
 /**
- * @brief Builder for building GMG cycles.
+ * @brief Builder for GMG cycles.
  *
- * User will provide Operator,Smoother,Restrictor, and Interpolator objects for each level.
+ * The user provides an Operator, Smoother, Restrictor, and Interpolator object for each level.
  *
- * addFinestLevel has to be called first, then addIntermediateLevel (if there are any), and finally
- * addCoarsestLevel. Then getCycle can be called to get the completed Cycle. If these are called in
- * the wrong order, an exception will be thrown.
+ * The user is expected to make these calls in the following order:
+ *
+ * 		builder.addFinestLevel()
+ * 		for each intermediate level (if any)
+ * 		{
+ * 			builder.addIntermediateLevel()
+ * 		}
+ * 		builder.addCoarsestLevel()
+ * 		M = builder.getCycle();
+ *
+ * If these are called in the wrong order, an exception will be thrown.
  *
  * @tparam D the number of cartesian dimensions
  */
@@ -120,7 +132,6 @@ template <int D> class CycleBuilder
 		new_level->setInterpolator(interpolator);
 		new_level->setRestrictor(restrictor);
 
-		new_level->setFiner(prev_level);
 		prev_level->setCoarser(new_level);
 
 		prev_level = new_level;
@@ -147,7 +158,6 @@ template <int D> class CycleBuilder
 		new_level->setSmoother(smoother);
 		new_level->setInterpolator(interpolator);
 
-		new_level->setFiner(prev_level);
 		prev_level->setCoarser(new_level);
 	}
 	/**
@@ -163,11 +173,11 @@ template <int D> class CycleBuilder
 		}
 		std::shared_ptr<Cycle<D>> cycle;
 		if (opts.cycle_type == "V") {
-			cycle.reset(new VCycle<D>(finest_level, opts));
+			cycle.reset(new VCycle<D>(*finest_level, opts));
 		} else if (opts.cycle_type == "W") {
-			cycle.reset(new WCycle<D>(finest_level, opts));
+			cycle.reset(new WCycle<D>(*finest_level, opts));
 		} else if (opts.cycle_type == "F") {
-			cycle.reset(new FMGCycle<D>(finest_level, opts));
+			cycle.reset(new FMGCycle<D>(*finest_level, opts));
 		} else {
 			throw RuntimeError("Unsupported Cycle type: " + opts.cycle_type);
 		}
@@ -176,7 +186,6 @@ template <int D> class CycleBuilder
 };
 extern template class CycleBuilder<2>;
 extern template class CycleBuilder<3>;
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 
 #endif

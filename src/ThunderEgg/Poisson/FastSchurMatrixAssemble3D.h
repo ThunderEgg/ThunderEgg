@@ -21,24 +21,26 @@
 
 #ifndef THUNDEREGG_POISSON_FASTSCHURMATRIXASSEMBLE3D_H
 #define THUNDEREGG_POISSON_FASTSCHURMATRIXASSEMBLE3D_H
+/**
+ * @file
+ *
+ * @brief FastSchurMatrixAssemble3D class
+ */
 #include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <petscmat.h>
-namespace ThunderEgg
-{
-namespace Poisson
+namespace ThunderEgg::Poisson
 {
 /**
  * @brief A fast algorithm for forming the Schur compliment matrix
  *
- * Currently this algorithm only supports the FFTWPatchSovler and it has to use
+ * Currently this algorithm only supports the FFTWPatchSolver and it has to use
  * TriLinearGhostFiller
  *
- * @param iface_domain the interface domain that we are forming the schur compliment matrix for
+ * @param iface_domain the interface domain to form the schur compliment matrix for
  * @param solver the patch solver to use for the formation
  * @return Mat the PETSc matrix, user is responsible for destroying
  */
 Mat FastSchurMatrixAssemble3D(const Schur::InterfaceDomain<3> &iface_domain, Poisson::FFTWPatchSolver<3> &solver);
-} // namespace Poisson
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Poisson
 #endif

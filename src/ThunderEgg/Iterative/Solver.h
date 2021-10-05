@@ -21,16 +21,19 @@
 
 #ifndef THUNDEREGG_ITERATIVE_SOLVER_H
 #define THUNDEREGG_ITERATIVE_SOLVER_H
+/**
+ * @file
+ *
+ * @brief Solver class
+ */
 
 #include <ThunderEgg/Operator.h>
 #include <iostream>
 
-namespace ThunderEgg
-{
-namespace Iterative
+namespace ThunderEgg::Iterative
 {
 /**
- * @brief Represents an iterative solver
+ * @brief Abstract interface for Iterative solvers
  *
  * @tparam D the number of cartesian dimensions
  */
@@ -66,7 +69,5 @@ template <int D> class Solver
 	                  bool               output = false,
 	                  std::ostream &     os     = std::cout) const = 0;
 };
-//
-} // namespace Iterative
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Iterative
 #endif

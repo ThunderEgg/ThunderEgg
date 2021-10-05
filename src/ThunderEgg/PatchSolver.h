@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_PATCHSOLVER_H
 #define THUNDEREGG_PATCHSOLVER_H
+/**
+ * @file
+ *
+ * @brief PatchSolver class
+ */
 
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/Smoother.h>

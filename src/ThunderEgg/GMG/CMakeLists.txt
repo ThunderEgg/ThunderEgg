@@ -24,6 +24,7 @@ target_sources(ThunderEgg PRIVATE InterLevelComm.cpp)
 list(APPEND ThunderEgg_HDRS Interpolator.h)
 
 list(APPEND ThunderEgg_HDRS Level.h)
+target_sources(ThunderEgg PRIVATE Level.cpp)
 
 list(APPEND ThunderEgg_HDRS LinearRestrictor.h)
 target_sources(ThunderEgg PRIVATE LinearRestrictor.cpp)

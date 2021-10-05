@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_PATCHARRAY_H
 #define THUNDEREGG_PATCHARRAY_H
+/**
+ * @file
+ *
+ * @brief PatchArray class
+ */
 #include <ThunderEgg/PatchView.h>
 namespace ThunderEgg
 {

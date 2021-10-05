@@ -19,8 +19,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_GHOSTEFILLER_H
-#define THUNDEREGG_GHOSTEFILLER_H
+#ifndef THUNDEREGG_GHOSTFILLER_H
+#define THUNDEREGG_GHOSTFILLER_H
+/**
+ * @file
+ *
+ * @brief GhostFiller class
+ */
 #include <ThunderEgg/Vector.h>
 namespace ThunderEgg
 {

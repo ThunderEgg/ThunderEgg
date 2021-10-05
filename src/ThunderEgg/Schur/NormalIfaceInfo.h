@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_SCHUR_NORMALIFACEINFO_H
 #define THUNDEREGG_SCHUR_NORMALIFACEINFO_H
+/**
+ * @file
+ *
+ * @brief NormalIfaceInfo class
+ */
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/Schur/IfaceInfo.h>
 namespace ThunderEgg

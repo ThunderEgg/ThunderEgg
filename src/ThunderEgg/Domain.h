@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_DOMAIN_H
 #define THUNDEREGG_DOMAIN_H
+/**
+ * @file
+ *
+ * @brief Domain class
+ */
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/Timer.h>
 #include <map>
@@ -361,7 +366,7 @@ template <int D> class Domain
 	}
 };
 
-template <int D> void to_json(nlohmann::json &j, const Domain<D> &domain)
+template <int D> void to_json(tpl::nlohmann::json &j, const Domain<D> &domain)
 {
 	for (auto pinfo : domain.getPatchInfoVector()) {
 		j.push_back(pinfo);
@@ -370,7 +375,7 @@ template <int D> void to_json(nlohmann::json &j, const Domain<D> &domain)
 
 extern template class Domain<2>;
 extern template class Domain<3>;
-extern template void to_json<2>(nlohmann::json &j, const Domain<2> &domain);
-extern template void to_json<3>(nlohmann::json &j, const Domain<3> &domain);
+extern template void to_json<2>(tpl::nlohmann::json &j, const Domain<2> &domain);
+extern template void to_json<3>(tpl::nlohmann::json &j, const Domain<3> &domain);
 } // namespace ThunderEgg
 #endif

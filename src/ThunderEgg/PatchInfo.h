@@ -20,13 +20,17 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_PATCHINFO_H
 #define THUNDEREGG_PATCHINFO_H
+/**
+ * @file
+ *
+ * @brief PatchInfo class
+ */
 #include <ThunderEgg/CoarseNbrInfo.h>
 #include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NormalNbrInfo.h>
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Serializable.h>
-#include <ThunderEgg/TypeDefs.h>
 #include <bitset>
 
 namespace ThunderEgg
@@ -449,7 +453,7 @@ template <int D> class PatchInfo : public Serializable
 		return reader.getPos();
 	}
 };
-template <int D> void to_json(nlohmann::json &j, const PatchInfo<D> &pinfo)
+template <int D> void to_json(tpl::nlohmann::json &j, const PatchInfo<D> &pinfo)
 {
 	j["id"]             = pinfo.id;
 	j["parent_id"]      = pinfo.parent_id;
@@ -462,7 +466,7 @@ template <int D> void to_json(nlohmann::json &j, const PatchInfo<D> &pinfo)
 	for (int i = 0; i < D; i++) {
 		j["lengths"][i] = pinfo.spacings[i] * pinfo.ns[i];
 	}
-	j["nbrs"] = nlohmann::json::array();
+	j["nbrs"] = tpl::nlohmann::json::array();
 	for (Side<D> s : Side<D>::getValues()) {
 		if (pinfo.hasNbr(s)) {
 			switch (pinfo.getNbrType(s)) {
@@ -483,7 +487,7 @@ template <int D> void to_json(nlohmann::json &j, const PatchInfo<D> &pinfo)
 		}
 	}
 	if constexpr (D == 3) {
-		j["edge_nbrs"] = nlohmann::json::array();
+		j["edge_nbrs"] = tpl::nlohmann::json::array();
 		for (Edge e : Edge::getValues()) {
 			if (pinfo.hasNbr(e)) {
 				switch (pinfo.getNbrType(e)) {
@@ -505,7 +509,7 @@ template <int D> void to_json(nlohmann::json &j, const PatchInfo<D> &pinfo)
 		}
 	}
 	if constexpr (D >= 2) {
-		j["corner_nbrs"] = nlohmann::json::array();
+		j["corner_nbrs"] = tpl::nlohmann::json::array();
 		for (Corner<D> c : Corner<D>::getValues()) {
 			if (pinfo.hasNbr(c)) {
 				switch (pinfo.getNbrType(c)) {
@@ -531,7 +535,7 @@ template <int D> void to_json(nlohmann::json &j, const PatchInfo<D> &pinfo)
 		j["child_ranks"] = pinfo.child_ranks;
 	}
 }
-template <int D> void from_json(const nlohmann::json &j, PatchInfo<D> &pinfo)
+template <int D> void from_json(const tpl::nlohmann::json &j, PatchInfo<D> &pinfo)
 {
 	pinfo.id          = j["id"];
 	pinfo.parent_id   = j["parent_id"];

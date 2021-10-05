@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_POISSON_SCHUR_FFTWPATCHSOLVER_H
 #define THUNDEREGG_POISSON_SCHUR_FFTWPATCHSOLVER_H
+/**
+ * @file
+ *
+ * @brief FFTWPatchSolver class
+ */
 #include <ThunderEgg/PatchArray.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
@@ -29,12 +34,10 @@
 #include <fftw3.h>
 #include <map>
 
-namespace ThunderEgg
-{
-namespace Poisson
+namespace ThunderEgg::Poisson
 {
 /**
- * @brief This patch solver uses FFT transforms to solve for the Poisson equation
+ * @brief Use FFT transforms to solve for the Poisson equation
  *
  * @tparam D the number of Cartesian dimensions
  */
@@ -304,6 +307,5 @@ template <int D> class FFTWPatchSolver : public PatchSolver<D>
 };
 extern template class FFTWPatchSolver<2>;
 extern template class FFTWPatchSolver<3>;
-} // namespace Poisson
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Poisson
 #endif

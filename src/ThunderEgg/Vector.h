@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_VECTOR_H
 #define THUNDEREGG_VECTOR_H
+/**
+ * @file
+ *
+ * @brief Vector class
+ */
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>

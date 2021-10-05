@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_LOOPS_H
 #define THUNDEREGG_LOOPS_H
+/**
+ * @file
+ *
+ * @brief Loop templates
+ */
 
 #include <array>
 
