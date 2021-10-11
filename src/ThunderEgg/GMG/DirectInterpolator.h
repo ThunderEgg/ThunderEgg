@@ -60,11 +60,11 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 		return new DirectInterpolator<D>(*this);
 	}
 	void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
-	                        const Vector<D> &                                                              coarser_vector,
-	                        Vector<D> &                                                                    finer_vector) const override
+	                        const Vector<D>                                                               &coarser_vector,
+	                        Vector<D>                                                                     &finer_vector) const override
 	{
 		for (auto pair : patches) {
-			const PatchInfo<D> &       pinfo       = pair.second.get();
+			const PatchInfo<D>        &pinfo       = pair.second.get();
 			PatchView<const double, D> coarse_view = coarser_vector.getPatchView(pair.first);
 			PatchView<double, D>       fine_view   = finer_vector.getPatchView(pinfo.local_index);
 
@@ -75,7 +75,7 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 					starts[i] = orth.isLowerOnAxis(i) ? 0 : (coarse_view.getEnd()[i] + 1);
 				}
 
-				loop_over_interior_indexes<D + 1>(fine_view, [&](const std::array<int, D + 1> &coord) {
+				Loop::OverInteriorIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1> &coord) {
 					std::array<int, D + 1> coarse_coord;
 					for (size_t x = 0; x < D; x++) {
 						coarse_coord[x] = (coord[x] + starts[x]) / 2;
@@ -84,7 +84,7 @@ template <int D> class DirectInterpolator : public MPIInterpolator<D>
 					fine_view[coord] += coarse_view[coarse_coord];
 				});
 			} else {
-				loop_over_interior_indexes<D + 1>(fine_view, [&](const std::array<int, D + 1> &coord) { fine_view[coord] += coarse_view[coord]; });
+				Loop::OverInteriorIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1> &coord) { fine_view[coord] += coarse_view[coord]; });
 			}
 		}
 	}

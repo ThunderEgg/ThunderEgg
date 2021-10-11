@@ -83,7 +83,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	{
 		// check that center values weren't modified
 		auto patch_1 = vec.getComponentView(0, d.getPatchInfoVector()[0].local_index);
-		nested_loop<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
+		Loop::Nested<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
 			CHECK(patch_1[coord] == f(real_coord));
@@ -91,13 +91,13 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that west values are not modified
 		{
 			auto west_ghost = patch_1.getSliceOn(Side<2>::west(), {-1});
-			nested_loop<1>(west_ghost.getStart(), west_ghost.getEnd(),
-			               [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
+			Loop::Nested<1>(west_ghost.getStart(), west_ghost.getEnd(),
+			                [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
 		}
 		// check that east values are correct
 		{
 			auto east_ghost = patch_1.getSliceOn(Side<2>::east(), {-1});
-			nested_loop<1>(
+			Loop::Nested<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
 				DomainTools::GetRealCoordGhost<2>(pinfos[0], {nx, coord[0]}, real_coord);
@@ -107,13 +107,13 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that south values are not modified
 		{
 			auto south_ghost = patch_1.getSliceOn(Side<2>::south(), {-1});
-			nested_loop<1>(south_ghost.getStart(), south_ghost.getEnd(),
-			               [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
+			Loop::Nested<1>(south_ghost.getStart(), south_ghost.getEnd(),
+			                [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
 		}
 		// check that north values are correct
 		{
 			auto north_ghost = patch_1.getSliceOn(Side<2>::north(), {-1});
-			nested_loop<1>(
+			Loop::Nested<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
 				DomainTools::GetRealCoordGhost<2>(pinfos[0], {coord[0], ny}, real_coord);
@@ -125,7 +125,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	{
 		// check that center values weren't modified
 		auto patch_2 = vec.getComponentView(0, d.getPatchInfoVector()[1].local_index);
-		nested_loop<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
+		Loop::Nested<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[1], coord, real_coord);
 			CHECK(patch_2[coord] == f(real_coord));
@@ -133,7 +133,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that west values correct
 		{
 			auto west_ghost = patch_2.getSliceOn(Side<2>::west(), {-1});
-			nested_loop<1>(
+			Loop::Nested<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
 				DomainTools::GetRealCoordGhost<2>(pinfos[1], {-1, coord[0]}, real_coord);
@@ -143,19 +143,19 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that east values are not modified
 		{
 			auto east_ghost = patch_2.getSliceOn(Side<2>::east(), {-1});
-			nested_loop<1>(east_ghost.getStart(), east_ghost.getEnd(),
-			               [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
+			Loop::Nested<1>(east_ghost.getStart(), east_ghost.getEnd(),
+			                [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
 		}
 		// check that south values are not modified
 		{
 			auto south_ghost = patch_2.getSliceOn(Side<2>::south(), {-1});
-			nested_loop<1>(south_ghost.getStart(), south_ghost.getEnd(),
-			               [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
+			Loop::Nested<1>(south_ghost.getStart(), south_ghost.getEnd(),
+			                [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
 		}
 		// check that north values are correct
 		{
 			auto north_ghost = patch_2.getSliceOn(Side<2>::north(), {-1});
-			nested_loop<1>(
+			Loop::Nested<1>(
 			north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
 				DomainTools::GetRealCoordGhost<2>(pinfos[1], {coord[0], ny}, real_coord);
@@ -167,7 +167,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 	{
 		// check that center values weren't modified
 		auto patch_3 = vec.getComponentView(0, d.getPatchInfoVector()[2].local_index);
-		nested_loop<2>(patch_3.getStart(), patch_3.getEnd(), [&](const std::array<int, 2> coord) {
+		Loop::Nested<2>(patch_3.getStart(), patch_3.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[2], coord, real_coord);
 			CHECK(patch_3[coord] == f(real_coord));
@@ -175,13 +175,13 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that west values are not modified
 		{
 			auto west_ghost = patch_3.getSliceOn(Side<2>::west(), {-1});
-			nested_loop<1>(west_ghost.getStart(), west_ghost.getEnd(),
-			               [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
+			Loop::Nested<1>(west_ghost.getStart(), west_ghost.getEnd(),
+			                [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
 		}
 		// check that east values are correct
 		{
 			auto east_ghost = patch_3.getSliceOn(Side<2>::east(), {-1});
-			nested_loop<1>(
+			Loop::Nested<1>(
 			east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
 				DomainTools::GetRealCoordGhost<2>(pinfos[2], {nx, coord[0]}, real_coord);
@@ -191,7 +191,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that south values are not modified
 		{
 			auto south_ghost = patch_3.getSliceOn(Side<2>::south(), {-1});
-			nested_loop<1>(
+			Loop::Nested<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
 				DomainTools::GetRealCoordGhost<2>(pinfos[2], {coord[0], -1}, real_coord);
@@ -201,15 +201,15 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that north values are correct
 		{
 			auto north_ghost = patch_3.getSliceOn(Side<2>::north(), {-1});
-			nested_loop<1>(north_ghost.getStart(), north_ghost.getEnd(),
-			               [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
+			Loop::Nested<1>(north_ghost.getStart(), north_ghost.getEnd(),
+			                [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
 		}
 	}
 	// patch 4
 	{
 		// check that center values weren't modified
 		auto patch_4 = vec.getComponentView(0, d.getPatchInfoVector()[3].local_index);
-		nested_loop<2>(patch_4.getStart(), patch_4.getEnd(), [&](const std::array<int, 2> coord) {
+		Loop::Nested<2>(patch_4.getStart(), patch_4.getEnd(), [&](const std::array<int, 2> coord) {
 			std::array<double, 2> real_coord;
 			DomainTools::GetRealCoord<2>(pinfos[3], coord, real_coord);
 			CHECK(patch_4[coord] == f(real_coord));
@@ -217,7 +217,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that west values correct
 		{
 			auto west_ghost = patch_4.getSliceOn(Side<2>::west(), {-1});
-			nested_loop<1>(
+			Loop::Nested<1>(
 			west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
 				DomainTools::GetRealCoordGhost<2>(pinfos[3], {-1, coord[0]}, real_coord);
@@ -227,13 +227,13 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that east values are not modified
 		{
 			auto east_ghost = patch_4.getSliceOn(Side<2>::east(), {-1});
-			nested_loop<1>(east_ghost.getStart(), east_ghost.getEnd(),
-			               [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
+			Loop::Nested<1>(east_ghost.getStart(), east_ghost.getEnd(),
+			                [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
 		}
 		// check that south values are correct
 		{
 			auto south_ghost = patch_4.getSliceOn(Side<2>::south(), {-1});
-			nested_loop<1>(
+			Loop::Nested<1>(
 			south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
 				std::array<double, 2> real_coord;
 				DomainTools::GetRealCoordGhost<2>(pinfos[3], {coord[0], -1}, real_coord);
@@ -243,8 +243,8 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
 		// check that north values are not modified
 		{
 			auto north_ghost = patch_4.getSliceOn(Side<2>::north(), {-1});
-			nested_loop<1>(north_ghost.getStart(), north_ghost.getEnd(),
-			               [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
+			Loop::Nested<1>(north_ghost.getStart(), north_ghost.getEnd(),
+			                [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
 		}
 	}
 }
@@ -283,7 +283,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller", "[BiQuadraticGhos
 		INFO("ny:    " << pinfo.ns[1]);
 		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -293,12 +293,12 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller", "[BiQuadraticGhos
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               ///
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                ///
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 	}
@@ -339,7 +339,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set",
 		INFO("ny:    " << pinfo.ns[1]);
 		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -349,12 +349,12 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set",
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               ///
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                ///
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 	}
@@ -402,7 +402,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components",
 		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
 		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -412,15 +412,15 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components",
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               ///
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                ///
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
-		nested_loop<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
@@ -429,11 +429,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components",
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 	}
@@ -481,7 +481,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
 		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -491,15 +491,15 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               ///
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                ///
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
-		nested_loop<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
@@ -508,11 +508,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 	}
@@ -552,7 +552,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller corners", "[BiQuadr
 		INFO("ny:    " << pinfo.ns[1]);
 		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -562,12 +562,12 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller corners", "[BiQuadr
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               ///
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                ///
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
@@ -617,7 +617,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set c
 		INFO("ny:    " << pinfo.ns[1]);
 		ComponentView<double, 2> vec_ld      = vec.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -627,12 +627,12 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set c
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               ///
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                ///
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
@@ -689,7 +689,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
 		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
 		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -699,12 +699,12 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               ///
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                ///
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
@@ -716,7 +716,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
 				CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
 			}
 		}
-		nested_loop<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
@@ -725,11 +725,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
@@ -786,7 +786,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 		ComponentView<double, 2> expected_ld  = expected.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> vec_ld2      = vec.getComponentView(1, pinfo.local_index);
 		ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			///
 			REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
 		});
@@ -796,12 +796,12 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               ///
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                ///
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {
@@ -813,7 +813,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 				CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
 			}
 		}
-		nested_loop<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2> &coord) {
 			REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord]));
 		});
 		for (Side<2> s : Side<2>::getValues()) {
@@ -822,11 +822,11 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
 			if (pinfo.hasNbr(s)) {
 				INFO("side:      " << s);
 				INFO("nbr-type:  " << pinfo.getNbrType(s));
-				nested_loop<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
-				               [&](const array<int, 1> &coord) {
-					               INFO("coord:  " << coord[0]);
-					               CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
-				               });
+				Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(),
+				                [&](const array<int, 1> &coord) {
+					                INFO("coord:  " << coord[0]);
+					                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+				                });
 			}
 		}
 		for (Corner<2> c : Corner<2>::getValues()) {

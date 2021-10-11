@@ -83,7 +83,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 		INFO("dy:    " << pinfo.spacings[1]);
 		ComponentView<double, 2> f_vec_ld          = f_vec.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> f_vec_expected_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
@@ -137,7 +137,7 @@ TEST_CASE(
 		INFO("dy:    " << pinfo.spacings[1]);
 		ComponentView<double, 2> f_vec_ld          = f_vec.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> f_vec_expected_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));

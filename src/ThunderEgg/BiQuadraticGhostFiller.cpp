@@ -86,7 +86,7 @@ void FillGhostForNormalNbr(const PatchView<const double, 2> &local_view, const P
 {
 	View<const double, 2> local_slice = local_view.getSliceOn(side, {0});
 	View<double, 2>       nbr_ghosts  = nbr_view.getGhostSliceOn(side.opposite(), {0});
-	loop_over_interior_indexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
+	Loop::OverInteriorIndexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 }
 /**
  * @brief Fill the ghost values for a coarse neighbor when this patch is on the lower part of the coarser neighbors side
@@ -339,7 +339,7 @@ void FillLocalGhostCellsOnCorners(const PatchInfo<2> &pinfo, const PatchView<con
 }
 } // namespace
 
-void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &              pinfo,
+void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2>               &pinfo,
                                                        const PatchView<const double, 2> &local_view,
                                                        const PatchView<const double, 2> &nbr_view,
                                                        Side<2>                           side,
@@ -369,7 +369,7 @@ void BiQuadraticGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &     
 	}
 }
 
-void BiQuadraticGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<2> &              pinfo,
+void BiQuadraticGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<2>               &pinfo,
                                                            const PatchView<const double, 2> &local_view,
                                                            const PatchView<const double, 2> &nbr_view,
                                                            Edge                              edge,
@@ -379,7 +379,7 @@ void BiQuadraticGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<2> & 
 	// no edges for 2d
 }
 
-void BiQuadraticGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &              pinfo,
+void BiQuadraticGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2>               &pinfo,
                                                              const PatchView<const double, 2> &local_view,
                                                              const PatchView<const double, 2> &nbr_view,
                                                              Corner<2>                         corner,

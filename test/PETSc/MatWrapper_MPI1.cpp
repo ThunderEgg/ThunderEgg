@@ -77,7 +77,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I", "[PETSc::MatWrapper
 		INFO("dy:    " << pinfo.spacings[1]);
 		ComponentView<double, 2> x_ld = x.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> b_ld = b.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
@@ -131,14 +131,14 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components", "[PE
 		INFO("dy:    " << pinfo.spacings[1]);
 		ComponentView<double, 2> x_ld = x.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> b_ld = b.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
 		});
 		ComponentView<double, 2> x_ld2 = x.getComponentView(1, pinfo.local_index);
 		ComponentView<double, 2> b_ld2 = b.getComponentView(1, pinfo.local_index);
-		nested_loop<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(0.5 * x_ld2[coord] == Catch::Approx(b_ld2[coord]));

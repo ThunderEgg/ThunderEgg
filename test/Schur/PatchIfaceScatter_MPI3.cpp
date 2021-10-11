@@ -206,19 +206,19 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied",
 	for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
 		auto iface      = iface_domain.getInterfaces()[i];
 		auto local_data = global_vector.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               local_data[coord] = iface->global_index + 1 + coord[0];
-		               });
+		Loop::Nested<1>(local_data.getStart(), local_data.getEnd(),
+		                [&](const std::array<int, 1> &coord) {
+			                local_data[coord] = iface->global_index + 1 + coord[0];
+		                });
 	}
 	auto state = scatter.scatterStart(global_vector, *local_vector);
 	for (auto iface : iface_domain.getInterfaces()) {
 		INFO("IFACE_ID: " << iface->id);
 		auto local_data = local_vector->getComponentView(0, iface->local_index);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Catch::Approx(iface->global_index + 1 + coord[0]));
-		               });
+		Loop::Nested<1>(local_data.getStart(), local_data.getEnd(),
+		                [&](const std::array<int, 1> &coord) {
+			                CHECK(local_data[coord] == Catch::Approx(iface->global_index + 1 + coord[0]));
+		                });
 	}
 }
 TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
@@ -240,10 +240,10 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
 	for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
 		auto iface      = iface_domain.getInterfaces()[i];
 		auto local_data = global_vector.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               local_data[coord] = iface->global_index + 1 + coord[0];
-		               });
+		Loop::Nested<1>(local_data.getStart(), local_data.getEnd(),
+		                [&](const std::array<int, 1> &coord) {
+			                local_data[coord] = iface->global_index + 1 + coord[0];
+		                });
 	}
 	auto state = scatter.scatterStart(global_vector, *local_vector);
 	scatter.scatterFinish(state, global_vector, *local_vector);
@@ -254,7 +254,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
 				INFO("Side: " << s);
 				auto iface_info = piinfo->getIfaceInfo(s);
 				auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
-				nested_loop<1>(
+				Loop::Nested<1>(
 				local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1> &coord) {
 					CHECK(local_data[coord] == Catch::Approx(iface_info->global_index + 1 + coord[0]));
 				});
@@ -281,10 +281,10 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice", "[Schur::PatchIfaceScatte
 	for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
 		auto iface      = iface_domain.getInterfaces()[i];
 		auto local_data = global_vector.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               local_data[coord] = iface->global_index + 1 + coord[0];
-		               });
+		Loop::Nested<1>(local_data.getStart(), local_data.getEnd(),
+		                [&](const std::array<int, 1> &coord) {
+			                local_data[coord] = iface->global_index + 1 + coord[0];
+		                });
 	}
 	auto state = scatter.scatterStart(global_vector, *local_vector);
 	scatter.scatterFinish(state, global_vector, *local_vector);
@@ -297,7 +297,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice", "[Schur::PatchIfaceScatte
 				INFO("Side: " << s);
 				auto iface_info = piinfo->getIfaceInfo(s);
 				auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
-				nested_loop<1>(
+				Loop::Nested<1>(
 				local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1> &coord) {
 					CHECK(local_data[coord] == Catch::Approx(iface_info->global_index + 1 + coord[0]));
 				});
@@ -326,10 +326,10 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled"
 	for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
 		auto iface      = iface_domain.getInterfaces()[i];
 		auto local_data = global_vector.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               local_data[coord] = iface->global_index + 1 + coord[0];
-		               });
+		Loop::Nested<1>(local_data.getStart(), local_data.getEnd(),
+		                [&](const std::array<int, 1> &coord) {
+			                local_data[coord] = iface->global_index + 1 + coord[0];
+		                });
 	}
 	auto state = scatter.scatterStart(global_vector, *local_vector);
 	scatter.scatterFinish(state, global_vector, *local_vector);
@@ -340,7 +340,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled"
 				INFO("Side: " << s);
 				auto iface_info = piinfo->getIfaceInfo(s);
 				auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
-				nested_loop<1>(
+				Loop::Nested<1>(
 				local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1> &coord) {
 					CHECK(local_data[coord] == Catch::Approx(iface_info->global_index + 1 + coord[0]));
 				});

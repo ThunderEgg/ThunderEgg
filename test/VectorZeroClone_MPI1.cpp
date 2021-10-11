@@ -98,7 +98,7 @@ TEST_CASE("Vector<2> zeroclone from domain constructor", "[Vector]")
 	}
 	for (int i = 0; i < domain.getNumLocalPatches(); i++) {
 		PatchView<double, 2> view = vec.getPatchView(i);
-		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
+		Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == 0);
 		});
 	}
@@ -168,7 +168,7 @@ TEST_CASE("Vector<2> zeroclone from managed constructor", "[Vector]")
 	}
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view = vec.getPatchView(i);
-		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
+		Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == 0);
 		});
 	}
@@ -245,7 +245,7 @@ TEST_CASE("Vector<2> zeroclone from unmanaged constructor", "[Vector]")
 	}
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view = vec.getPatchView(i);
-		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
+		Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == 0);
 		});
 	}

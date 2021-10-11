@@ -21,6 +21,11 @@
 
 #ifndef THUNDEREGG_POISSON_DFTPATCHSOLVER_H
 #define THUNDEREGG_POISSON_DFTPATCHSOLVER_H
+/**
+ * @file
+ *
+ * @brief DFTPatchSolver class
+ */
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/PatchArray.h>
 #include <ThunderEgg/PatchOperator.h>
@@ -187,8 +192,8 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 	 * @param inverse weather we a re calculate
 	 */
 	void executePlan(const std::array<std::shared_ptr<std::valarray<double>>, D> &plan,
-	                 const PatchView<double, D> &                                 in,
-	                 const PatchView<double, D> &                                 out) const
+	                 const PatchView<double, D>                                  &in,
+	                 const PatchView<double, D>                                  &out) const
 	{
 		PatchView<double, D> prev_result = in;
 
@@ -230,7 +235,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 			char   T    = 'T';
 			double one  = 1;
 			double zero = 0;
-			nested_loop<D + 1>(start, end, [&](std::array<int, D + 1> coord) {
+			Loop::Nested<D + 1>(start, end, [&](std::array<int, D + 1> coord) {
 				dgemv_(T, n, n, one, &matrix[0], n, &prev_result[coord], pstride, zero, &new_result[coord], nstride);
 			});
 
@@ -308,19 +313,19 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 				for (int xi = 0; xi < n; xi++) {
 					double          val   = 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2);
 					View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), {xi});
-					loop_over_interior_indexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
+					Loop::OverInteriorIndexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
 				}
 			} else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) || patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
 				for (int xi = 0; xi < n; xi++) {
 					double          val   = 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2);
 					View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), {xi});
-					loop_over_interior_indexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
+					Loop::OverInteriorIndexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
 				}
 			} else {
 				for (int xi = 0; xi < n; xi++) {
 					double          val   = 4 / (h * h) * pow(sin((xi + 1) * M_PI / (2 * n)), 2);
 					View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), {xi});
-					loop_over_interior_indexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
+					Loop::OverInteriorIndexes<D>(slice, [&](const std::array<int, D> &coord) { slice[coord] -= val; });
 				}
 			}
 		}
@@ -387,14 +392,14 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		PatchArray<D> f_copy(op->getDomain().getNs(), 1, 0);
 		PatchArray<D> tmp(op->getDomain().getNs(), 1, 0);
 
-		loop_over_interior_indexes<D + 1>(f_view, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
+		Loop::OverInteriorIndexes<D + 1>(f_view, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
 
 		op->modifyRHSForInternalBoundaryConditions(pinfo, u_view, f_copy.getView());
 
 		executePlan(plan1.at(pinfo), f_copy.getView(), tmp.getView());
 
 		const PatchArray<D> &eigen_vals_view = eigen_vals.at(pinfo);
-		loop_over_interior_indexes<D + 1>(tmp, [&](std::array<int, D + 1> coord) { tmp[coord] /= eigen_vals_view[coord]; });
+		Loop::OverInteriorIndexes<D + 1>(tmp, [&](std::array<int, D + 1> coord) { tmp[coord] /= eigen_vals_view[coord]; });
 
 		if (neumann.all() && !pinfo.hasNbr()) {
 			tmp[tmp.getStart()] = 0;
@@ -406,7 +411,7 @@ template <int D> class DFTPatchSolver : public PatchSolver<D>
 		for (size_t axis = 0; axis < D; axis++) {
 			scale *= 2.0 / this->getDomain().getNs()[axis];
 		}
-		loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] *= scale; });
+		Loop::OverInteriorIndexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] *= scale; });
 	}
 };
 

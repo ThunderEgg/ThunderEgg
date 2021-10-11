@@ -91,9 +91,9 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			h2[i] *= h2[i];
 		}
 
-		loop<0, D - 1>([&](int axis) {
+		Loop::Unroll<0, D - 1>([&](int axis) {
 			int stride = u_view.getStrides()[axis];
-			loop_over_interior_indexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) {
+			Loop::OverInteriorIndexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) {
 				const double *ptr   = &u_view[coord];
 				double        lower = *(ptr - stride);
 				double        mid   = *ptr;
@@ -106,9 +106,9 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	{
 		applySinglePatch(pinfo, u_view, f_view, false);
 	}
-	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>               &pinfo,
 	                                                    const PatchView<const double, D> &u_view,
-	                                                    const PatchView<double, D> &      f_view) const override
+	                                                    const PatchView<double, D>       &f_view) const override
 	{
 		applySinglePatch(pinfo, u_view, f_view, true);
 	}
@@ -121,18 +121,18 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 				View<double, D>       lower     = u_view.getGhostSliceOn(lower_side, {0});
 				View<const double, D> lower_mid = u_view.getSliceOn(lower_side, {0});
 				if (neumann) {
-					loop_over_interior_indexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = lower_mid[coord]; });
+					Loop::OverInteriorIndexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = lower_mid[coord]; });
 				} else {
-					loop_over_interior_indexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
+					Loop::OverInteriorIndexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
 				}
 			}
 			if (!pinfo.hasNbr(upper_side)) {
 				View<double, D>       upper     = u_view.getGhostSliceOn(upper_side, {0});
 				View<const double, D> upper_mid = u_view.getSliceOn(upper_side, {0});
 				if (neumann) {
-					loop_over_interior_indexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = upper_mid[coord]; });
+					Loop::OverInteriorIndexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = upper_mid[coord]; });
 				} else {
-					loop_over_interior_indexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
+					Loop::OverInteriorIndexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
 				}
 			}
 		}
@@ -145,18 +145,18 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 			if (pinfo.hasNbr(lower_side)) {
 				View<double, D>       lower     = u_view.getGhostSliceOn(lower_side, {0});
 				View<const double, D> lower_mid = u_view.getSliceOn(lower_side, {0});
-				loop_over_interior_indexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
+				Loop::OverInteriorIndexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
 			}
 			if (pinfo.hasNbr(upper_side)) {
 				View<double, D>       upper     = u_view.getGhostSliceOn(upper_side, {0});
 				View<const double, D> upper_mid = u_view.getSliceOn(upper_side, {0});
-				loop_over_interior_indexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
+				Loop::OverInteriorIndexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
 			}
 		}
 	}
-	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>               &pinfo,
 	                                            const PatchView<const double, D> &u_view,
-	                                            const PatchView<double, D> &      f_view) const override
+	                                            const PatchView<double, D>       &f_view) const override
 	{
 		for (Side<D> s : Side<D>::getValues()) {
 			if (pinfo.hasNbr(s)) {
@@ -164,8 +164,8 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 				View<double, D>       f_inner = f_view.getSliceOn(s, {0});
 				View<const double, D> u_ghost = u_view.getSliceOn(s, {-1});
 				View<const double, D> u_inner = u_view.getSliceOn(s, {0});
-				loop_over_interior_indexes<D>(f_inner,
-				                              [&](const std::array<int, D> &coord) { f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2; });
+				Loop::OverInteriorIndexes<D>(f_inner,
+				                             [&](const std::array<int, D> &coord) { f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2; });
 			}
 		}
 	}
@@ -184,7 +184,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 				if (!pinfo.hasNbr(s)) {
 					double              h2 = pow(pinfo.spacings[s.getAxisIndex()], 2);
 					View<double, D - 1> ld = f_ld.getSliceOn(s, {0});
-					nested_loop<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
+					Loop::Nested<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 						std::array<double, D> real_coord;
 						DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 						ld[coord] += -2.0 * gfunc(real_coord) / h2;
@@ -200,7 +200,7 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 	 * @param gfunc the exact solution
 	 * @param gfunc_grad the gradient of gfunc
 	 */
-	void addNeumannBCToRHS(Vector<D> &                                                         f,
+	void addNeumannBCToRHS(Vector<D>                                                          &f,
 	                       std::function<double(const std::array<double, D> &)>                gfunc,
 	                       std::array<std::function<double(const std::array<double, D> &)>, D> gfunc_grad)
 	{
@@ -212,13 +212,13 @@ template <int D> class StarPatchOperator : public PatchOperator<D>
 					double              h  = pinfo.spacings[s.getAxisIndex()];
 					View<double, D - 1> ld = f_ld.getSliceOn(s, {0});
 					if (s.isLowerOnAxis()) {
-						nested_loop<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
+						Loop::Nested<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 							std::array<double, D> real_coord;
 							DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 							ld[coord] += gfunc_grad[s.getAxisIndex()](real_coord) / h;
 						});
 					} else {
-						nested_loop<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
+						Loop::Nested<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1> &coord) {
 							std::array<double, D> real_coord;
 							DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
 							ld[coord] -= gfunc_grad[s.getAxisIndex()](real_coord) / h;

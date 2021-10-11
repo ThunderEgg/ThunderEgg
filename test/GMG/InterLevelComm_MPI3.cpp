@@ -119,21 +119,21 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
 		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
-		loop_over_all_indexes<3>(local_view,
-		                         [&](const std::array<int, 3> &coord) {
-			                         for (int c = 0; c < num_components; c++) {
-				                         local_view[coord] = rank + coord[2] + 1;
-			                         }
-		                         });
+		Loop::OverAllIndexes<3>(local_view,
+		                        [&](const std::array<int, 3> &coord) {
+			                        for (int c = 0; c < num_components; c++) {
+				                        local_view[coord] = rank + coord[2] + 1;
+			                        }
+		                        });
 	}
 	for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
 		PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
-		loop_over_all_indexes<3>(local_view,
-		                         [&](const std::array<int, 3> &coord) {
-			                         for (int c = 0; c < num_components; c++) {
-				                         local_view[coord] = rank + coord[2] + 1;
-			                         }
-		                         });
+		Loop::OverAllIndexes<3>(local_view,
+		                        [&](const std::array<int, 3> &coord) {
+			                        for (int c = 0; c < num_components; c++) {
+				                        local_view[coord] = rank + coord[2] + 1;
+			                        }
+		                        });
 	}
 
 	ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
@@ -141,15 +141,15 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]
 	if (rank == 0) {
 		// the coarse vec should be filled with 6+2*c
 		PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
-		loop_over_all_indexes<3>(local_view,
-		                         [&](const std::array<int, 3> &coord) {
-			                         for (int c = 0; c < num_components; c++) {
-				                         INFO("xi: " << coord[0]);
-				                         INFO("yi: " << coord[1]);
-				                         INFO("c " << coord[2]);
-				                         CHECK(local_view[coord] == 1 + 2 + 3 + 3 * coord[2]);
-			                         }
-		                         });
+		Loop::OverAllIndexes<3>(local_view,
+		                        [&](const std::array<int, 3> &coord) {
+			                        for (int c = 0; c < num_components; c++) {
+				                        INFO("xi: " << coord[0]);
+				                        INFO("yi: " << coord[1]);
+				                        INFO("c " << coord[2]);
+				                        CHECK(local_view[coord] == 1 + 2 + 3 + 3 * coord[2]);
+			                        }
+		                        });
 	} else {
 	}
 }
@@ -272,17 +272,17 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	// fill vectors with rank+c+1
 	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
 		PatchView<double, 2> local_view = coarse_vec.getPatchView(i);
-		loop_over_all_indexes<3>(local_view,
-		                         [&](const std::array<int, 3> &coord) {
-			                         local_view[coord] = rank + coord[2] + 1;
-		                         });
+		Loop::OverAllIndexes<3>(local_view,
+		                        [&](const std::array<int, 3> &coord) {
+			                        local_view[coord] = rank + coord[2] + 1;
+		                        });
 	}
 	for (int i = 0; i < ghost_vec.getNumLocalPatches(); i++) {
 		PatchView<double, 2> local_view = ghost_vec.getPatchView(i);
-		loop_over_all_indexes<3>(local_view,
-		                         [&](const std::array<int, 3> &coord) {
-			                         local_view[coord] = rank + coord[2] + 1;
-		                         });
+		Loop::OverAllIndexes<3>(local_view,
+		                        [&](const std::array<int, 3> &coord) {
+			                        local_view[coord] = rank + coord[2] + 1;
+		                        });
 	}
 
 	ilc.getGhostPatchesStart(coarse_vec, ghost_vec);
@@ -291,10 +291,10 @@ TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]"
 	} else {
 		// the coarse vec should be filled with 1+c
 		PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
-		loop_over_all_indexes<3>(local_view,
-		                         [&](const std::array<int, 3> &coord) {
-			                         CHECK(local_view[coord] == 1 + coord[2]);
-		                         });
+		Loop::OverAllIndexes<3>(local_view,
+		                        [&](const std::array<int, 3> &coord) {
+			                        CHECK(local_view[coord] == 1 + coord[2]);
+		                        });
 	}
 }
 TEST_CASE(

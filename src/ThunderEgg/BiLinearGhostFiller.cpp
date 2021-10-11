@@ -41,7 +41,7 @@ void FillGhostForNormalNbr(const PatchView<const double, 2> &local_view, const P
 {
 	View<const double, 2> local_slice = local_view.getSliceOn(side, {0});
 	View<double, 2>       nbr_ghosts  = nbr_view.getGhostSliceOn(side.opposite(), {0});
-	loop_over_interior_indexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
+	Loop::OverInteriorIndexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 }
 /**
  * @brief Fill the ghost values for a coarse neighbor
@@ -66,7 +66,7 @@ void FillGhostForCoarseNbr(const PatchView<const double, 2> &local_view,
 	}
 	View<const double, 2> local_slice = local_view.getSliceOn(side, {0});
 	View<double, 2>       nbr_ghosts  = nbr_view.getGhostSliceOn(side.opposite(), {0});
-	loop_over_interior_indexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) {
+	Loop::OverInteriorIndexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) {
 		nbr_ghosts[{(coord[0] + offset) / 2, coord[1]}] += 2.0 / 3.0 * local_slice[coord];
 	});
 }
@@ -93,7 +93,7 @@ void FillGhostForFineNbr(const PatchView<const double, 2> &local_view,
 	}
 	View<const double, 2> local_slice = local_view.getSliceOn(side, {0});
 	View<double, 2>       nbr_ghosts  = nbr_view.getGhostSliceOn(side.opposite(), {0});
-	loop_over_interior_indexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) {
+	Loop::OverInteriorIndexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) {
 		nbr_ghosts[coord] += 2.0 / 3.0 * local_slice[{(coord[0] + offset) / 2, coord[1]}];
 	});
 }
@@ -116,7 +116,7 @@ void FillLocalGhostsForCoarseNbr(const PatchInfo<2> &pinfo, const PatchView<cons
 	if (pinfo.getCoarseNbrInfo(side).orth_on_coarse == Orthant<1>::upper()) {
 		offset = view.getEnd()[!side.getAxisIndex()] + 1;
 	}
-	nested_loop<2>(local_ghosts.getStart(), local_ghosts.getEnd(), [&](const std::array<int, 2> &coord) {
+	Loop::OverInteriorIndexes<2>(local_ghosts, [&](const std::array<int, 2> &coord) {
 		local_ghosts[coord] += 2.0 / 3.0 * local_slice[coord];
 		if ((coord[0] + offset) % 2 == 0) {
 			local_ghosts[{coord[0] + 1, coord[1]}] += -1.0 / 3.0 * local_slice[coord];
@@ -139,7 +139,7 @@ void FillLocalGhostsForFineNbr(const PatchView<const double, 2> &view, const Sid
 {
 	View<const double, 2> local_slice  = view.getSliceOn(side, {0});
 	View<double, 2>       local_ghosts = view.getGhostSliceOn(side, {0});
-	loop_over_interior_indexes<2>(local_ghosts, [&](const std::array<int, 2> &coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
+	Loop::OverInteriorIndexes<2>(local_ghosts, [&](const std::array<int, 2> &coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
 }
 /**
  * @brief This is just a simple copy of values
@@ -283,7 +283,7 @@ void FillLocalGhostCellsOnCorners(const PatchInfo<2> &pinfo, const PatchView<con
 	}
 }
 } // namespace
-void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &              pinfo,
+void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2>               &pinfo,
                                                     const PatchView<const double, 2> &local_view,
                                                     const PatchView<const double, 2> &nbr_view,
                                                     Side<2>                           side,
@@ -304,7 +304,7 @@ void BiLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<2> &        
 			throw RuntimeError("Unsupported Nbr Type");
 	}
 }
-void BiLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<2> &              pinfo,
+void BiLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<2>               &pinfo,
                                                         const PatchView<const double, 2> &local_view,
                                                         const PatchView<const double, 2> &nbr_view,
                                                         Edge                              edge,
@@ -314,7 +314,7 @@ void BiLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<2> &    
 	// 2D, edges not needed
 }
 
-void BiLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2> &              pinfo,
+void BiLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<2>               &pinfo,
                                                           const PatchView<const double, 2> &local_view,
                                                           const PatchView<const double, 2> &nbr_view,
                                                           Corner<2>                         corner,

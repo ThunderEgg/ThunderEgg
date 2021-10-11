@@ -78,12 +78,18 @@ MPI_Comm Communicator::getMPIComm() const
 }
 int Communicator::getRank() const
 {
+	if (comm == MPI_COMM_NULL) {
+		throw RuntimeError("Null communicator");
+	}
 	int rank;
 	CheckErr(MPI_Comm_rank(comm, &rank));
 	return rank;
 }
 int Communicator::getSize() const
 {
+	if (comm == MPI_COMM_NULL) {
+		throw RuntimeError("Null communicator");
+	}
 	int size;
 	CheckErr(MPI_Comm_size(comm, &size));
 	return size;

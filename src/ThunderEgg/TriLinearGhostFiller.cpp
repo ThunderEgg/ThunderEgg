@@ -63,7 +63,7 @@ void FillGhostCellsForNormalNbr(const PatchView<const double, 3> &local_view, co
 {
 	View<const double, 3> local_slice = local_view.getSliceOn(side, {0});
 	View<double, 3>       nbr_ghosts  = nbr_view.getGhostSliceOn(side.opposite(), {0});
-	loop_over_interior_indexes<3>(nbr_ghosts, [&](const std::array<int, 3> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
+	Loop::OverInteriorIndexes<3>(nbr_ghosts, [&](const std::array<int, 3> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 }
 /**
  * @brief Fill ghost cells for coarser neighbor
@@ -104,7 +104,7 @@ void FillGhostCellsForLocalWithFineNbr(const PatchView<const double, 3> &view, S
 {
 	View<const double, 3> local_slice  = view.getSliceOn(side, {0});
 	View<double, 3>       local_ghosts = view.getGhostSliceOn(side, {0});
-	loop_over_interior_indexes<3>(local_ghosts, [&](const std::array<int, 3> &coord) { local_ghosts[coord] -= 1.0 / 3.0 * local_slice[coord]; });
+	Loop::OverInteriorIndexes<3>(local_ghosts, [&](const std::array<int, 3> &coord) { local_ghosts[coord] -= 1.0 / 3.0 * local_slice[coord]; });
 }
 /**
  * @brief Fill ghost cells for a finer neighbor
@@ -179,7 +179,7 @@ void FillGhostCellsForNormalEdgeNbr(const PatchView<const double, 3> &local_view
 {
 	View<const double, 2> local_slice = local_view.getSliceOn(edge, {0, 0});
 	View<double, 2>       nbr_ghosts  = nbr_view.getGhostSliceOn(edge.opposite(), {0, 0});
-	loop_over_interior_indexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
+	Loop::OverInteriorIndexes<2>(nbr_ghosts, [&](const std::array<int, 2> &coord) { nbr_ghosts[coord] = local_slice[coord]; });
 }
 /**
  * @brief Fill ghost cells for coarser neighbor
@@ -279,7 +279,7 @@ void FillGhostCellsForLocalWithFineEdgeNbr(const PatchView<const double, 3> &vie
 {
 	View<const double, 2> local_slice  = view.getSliceOn(edge, {0, 0});
 	View<double, 2>       local_ghosts = view.getGhostSliceOn(edge, {0, 0});
-	loop_over_interior_indexes<2>(local_ghosts, [&](const std::array<int, 2> &coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
+	Loop::OverInteriorIndexes<2>(local_ghosts, [&](const std::array<int, 2> &coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
 }
 
 //////////
@@ -297,7 +297,7 @@ void FillGhostCellsForNormalCornerNbr(const PatchView<const double, 3> &local_vi
 {
 	View<const double, 1> local_slice = local_view.getSliceOn(corner, {0, 0, 0});
 	View<double, 1>       nbr_ghost   = nbr_view.getGhostSliceOn(corner.opposite(), {0, 0, 0});
-	loop_over_interior_indexes<1>(local_slice, [&](const std::array<int, 1> &coord) { nbr_ghost[coord] = local_slice[coord]; });
+	Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1> &coord) { nbr_ghost[coord] = local_slice[coord]; });
 }
 
 /**
@@ -314,7 +314,7 @@ void FillGhostCellsForCoarseCornerNbr(const PatchView<const double, 3> &local_vi
 {
 	View<const double, 1> local_slice = local_view.getSliceOn(corner, {0, 0, 0});
 	View<double, 1>       nbr_ghost   = nbr_view.getGhostSliceOn(corner.opposite(), {0, 0, 0});
-	loop_over_interior_indexes<1>(local_slice, [&](const std::array<int, 1> &coord) { nbr_ghost[coord] += 4.0 * local_slice[coord] / 3.0; });
+	Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1> &coord) { nbr_ghost[coord] += 4.0 * local_slice[coord] / 3.0; });
 }
 /**
  * @brief Fill ghost cells for a finer neighbor
@@ -331,7 +331,7 @@ void FillGhostCellsForFineCornerNbr(const PatchView<const double, 3> &local_view
 {
 	View<const double, 1> local_slice = local_view.getSliceOn(corner, {0, 0, 0});
 	View<double, 1>       nbr_ghost   = nbr_view.getGhostSliceOn(corner.opposite(), {0, 0, 0});
-	loop_over_interior_indexes<1>(local_slice, [&](const std::array<int, 1> &coord) { nbr_ghost[coord] += 2.0 * local_slice[coord] / 3.0; });
+	Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1> &coord) { nbr_ghost[coord] += 2.0 * local_slice[coord] / 3.0; });
 }
 /**
  * @brief Add in the values need for this patch's ghost cells when there is a coarse neighbor
@@ -345,7 +345,7 @@ void FillGhostCellsForLocalWithCoarseCornerNbr(const PatchView<const double, 3> 
 {
 	View<const double, 1> local_slice = view.getSliceOn(corner, {0, 0, 0});
 	View<double, 1>       local_ghost = view.getGhostSliceOn(corner, {0, 0, 0});
-	loop_over_interior_indexes<1>(local_slice, [&](const std::array<int, 1> &coord) { local_ghost[coord] += local_slice[coord] / 3.0; });
+	Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1> &coord) { local_ghost[coord] += local_slice[coord] / 3.0; });
 }
 /**
  * @brief Add in the values need for this patches ghost cells when there is a fine neighbor
@@ -359,7 +359,7 @@ void FillGhostCellsForLocalWithFineCornerNbr(const PatchView<const double, 3> &v
 {
 	View<const double, 1> local_slice = view.getSliceOn(corner, {0, 0, 0});
 	View<double, 1>       local_ghost = view.getGhostSliceOn(corner, {0, 0, 0});
-	loop_over_interior_indexes<1>(local_slice, [&](const std::array<int, 1> &coord) { local_ghost[coord] += -local_slice[coord] / 3.0; });
+	Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1> &coord) { local_ghost[coord] += -local_slice[coord] / 3.0; });
 }
 /**
  * @brief Add in extra information needed from the local patch on the sides
@@ -441,7 +441,7 @@ void FillLocalGhostCellsOnCorners(const PatchInfo<3> &pinfo, const PatchView<con
 }
 } // namespace
 
-void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3> &              pinfo,
+void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3>               &pinfo,
                                                      const PatchView<const double, 3> &local_view,
                                                      const PatchView<const double, 3> &nbr_view,
                                                      Side<3>                           side,
@@ -463,7 +463,7 @@ void TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3> &       
 	}
 }
 
-void TriLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<3> &              pinfo,
+void TriLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<3>               &pinfo,
                                                          const PatchView<const double, 3> &local_view,
                                                          const PatchView<const double, 3> &nbr_view,
                                                          Edge                              edge,
@@ -485,7 +485,7 @@ void TriLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<3> &   
 	}
 }
 
-void TriLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<3> &              pinfo,
+void TriLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<3>               &pinfo,
                                                            const PatchView<const double, 3> &local_view,
                                                            const PatchView<const double, 3> &nbr_view,
                                                            Corner<3>                         corner,

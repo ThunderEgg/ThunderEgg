@@ -140,8 +140,8 @@ TEST_CASE("Exchange for various domains 2d face cases MPI2", "[MPIGhostFiller]")
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<2>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<2>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 
@@ -166,8 +166,8 @@ TEST_CASE("Exchange for various domains 2d corner cases MPI2", "[MPIGhostFiller]
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<2>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<2>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 
@@ -193,8 +193,8 @@ TEST_CASE("Exchange for various domains 3d face cases MPI2", "[MPIGhostFiller]")
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<3>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<3>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 
@@ -220,8 +220,8 @@ TEST_CASE("Exchange for various domains 3d edge cases MPI2", "[MPIGhostFiller]")
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<3>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<3>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 
@@ -247,8 +247,8 @@ TEST_CASE("Exchange for various domains 3d corner cases MPI2", "[MPIGhostFiller]
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<3>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<3>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 
@@ -273,8 +273,8 @@ TEST_CASE("Two Exchanges for various domains 2d face cases MPI2", "[MPIGhostFill
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<2>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<2>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 
@@ -300,8 +300,8 @@ TEST_CASE("Two Exchanges for various domains 2d corner cases MPI2", "[MPIGhostFi
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<2>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<2>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 2> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 
@@ -328,8 +328,8 @@ TEST_CASE("Two Exchange for various domains 3d face cases MPI2", "[MPIGhostFille
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<3>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<3>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 
@@ -356,8 +356,8 @@ TEST_CASE("Two Exchange for various domains 3d edge cases MPI2", "[MPIGhostFille
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<3>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<3>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 
@@ -384,8 +384,8 @@ TEST_CASE("Two Exchange for various domains 3d corner cases MPI2", "[MPIGhostFil
 	for (auto pinfo : d_fine.getPatchInfoVector()) {
 		for (int c = 0; c < num_components; c++) {
 			auto data = vec.getComponentView(c, pinfo.local_index);
-			nested_loop<3>(data.getStart(), data.getEnd(),
-			               [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
+			Loop::Nested<3>(data.getStart(), data.getEnd(),
+			                [&](const std::array<int, 3> &coord) { data[coord] = pinfo.id; });
 		}
 	}
 

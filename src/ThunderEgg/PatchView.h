@@ -74,7 +74,7 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 	template <int M> static std::array<int, M + 1> DetermineEnd(const std::array<int, M + 1> &lengths)
 	{
 		std::array<int, M + 1> end = lengths;
-		loop<0, M>([&](int i) { end[i]--; });
+		Loop::Unroll<0, M>([&](int i) { end[i]--; });
 		return end;
 	}
 
@@ -84,7 +84,7 @@ template <typename T, int D> class PatchView : public View<T, D + 1>
 	template <int M> static std::array<int, M + 1> DetermineGhostEnd(const std::array<int, M + 1> &lengths, int num_ghost_cells)
 	{
 		std::array<int, M + 1> end = lengths;
-		loop<0, M - 1>([&](int i) { end[i] += num_ghost_cells - 1; });
+		Loop::Unroll<0, M - 1>([&](int i) { end[i] += num_ghost_cells - 1; });
 		end[M] = lengths[M] - 1;
 		return end;
 	}

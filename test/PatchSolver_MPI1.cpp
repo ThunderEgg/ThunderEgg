@@ -40,8 +40,8 @@ TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
 	for (int i = 0; i < u.getNumLocalPatches(); i++) {
 		for (int c = 0; c < u.getNumComponents(); c++) {
 			auto ld = u.getComponentView(c, i);
-			nested_loop<2>(ld.getStart(), ld.getEnd(),
-			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
+			Loop::Nested<2>(ld.getStart(), ld.getEnd(),
+			                [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 		}
 	}
 	CHECK_FALSE(mgf.wasCalled());
@@ -74,8 +74,8 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
 	for (int i = 0; i < u.getNumLocalPatches(); i++) {
 		for (int c = 0; c < u.getNumComponents(); c++) {
 			auto ld = u.getComponentView(c, i);
-			nested_loop<2>(ld.getStart(), ld.getEnd(),
-			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
+			Loop::Nested<2>(ld.getStart(), ld.getEnd(),
+			                [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 0); });
 		}
 	}
 	CHECK_FALSE(mgf.wasCalled());
@@ -112,8 +112,8 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
 	for (int i = 0; i < u.getNumLocalPatches(); i++) {
 		for (int c = 0; c < u.getNumComponents(); c++) {
 			auto ld = u.getComponentView(c, i);
-			nested_loop<2>(ld.getStart(), ld.getEnd(),
-			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
+			Loop::Nested<2>(ld.getStart(), ld.getEnd(),
+			                [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 		}
 	}
 	CHECK(mgf.wasCalled());
@@ -148,8 +148,8 @@ TEST_CASE("PatchSolver smooth for various domains with timer", "[PatchSolver]")
 	for (int i = 0; i < u.getNumLocalPatches(); i++) {
 		for (int c = 0; c < u.getNumComponents(); c++) {
 			auto ld = u.getComponentView(c, i);
-			nested_loop<2>(ld.getStart(), ld.getEnd(),
-			               [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
+			Loop::Nested<2>(ld.getStart(), ld.getEnd(),
+			                [&](const std::array<int, 2> &coord) { CHECK(ld[coord] == 1); });
 		}
 	}
 	CHECK(mgf.wasCalled());

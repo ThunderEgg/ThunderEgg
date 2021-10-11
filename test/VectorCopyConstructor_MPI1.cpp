@@ -99,7 +99,7 @@ TEST_CASE("Vector<2> copy from domain constructor", "[Vector]")
 	for (int i = 0; i < domain.getNumLocalPatches(); i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
 		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
+		Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == view_to_copy[coord]);
 		});
 	}
@@ -170,7 +170,7 @@ TEST_CASE("Vector<2> copy from managed constructor", "[Vector]")
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
 		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
+		Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == view_to_copy[coord]);
 		});
 	}
@@ -248,7 +248,7 @@ TEST_CASE("Vector<2> copy from unmanaged constructor", "[Vector]")
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
 		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
+		Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == view_to_copy[coord]);
 		});
 	}
@@ -322,7 +322,7 @@ TEST_CASE("Vector<2> copy assign from domain constructor", "[Vector]")
 	for (int i = 0; i < domain.getNumLocalPatches(); i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
 		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
+		Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == view_to_copy[coord]);
 		});
 	}
@@ -394,7 +394,7 @@ TEST_CASE("Vector<2> copy assign from managed constructor", "[Vector]")
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
 		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
+		Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == view_to_copy[coord]);
 		});
 	}
@@ -473,7 +473,7 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor", "[Vector]")
 	for (int i = 0; i < num_local_patches; i++) {
 		PatchView<double, 2> view         = vec.getPatchView(i);
 		PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-		loop_over_all_indexes<3>(view, [&](const std::array<int, 3> coord) {
+		Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) {
 			CHECK(view[coord] == view_to_copy[coord]);
 		});
 	}

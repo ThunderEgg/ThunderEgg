@@ -50,7 +50,7 @@ class MockPatchOperator : public PatchOperator<D>
 	std::shared_ptr<int>  num_apply_calls    = std::make_shared<int>(0);
 
 	public:
-	MockPatchOperator(const Domain<D> &     domain,
+	MockPatchOperator(const Domain<D>      &domain,
 	                  const GhostFiller<D> &ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler)
 	{
@@ -59,22 +59,22 @@ class MockPatchOperator : public PatchOperator<D>
 	{
 		return new MockPatchOperator<D>(*this);
 	}
-	void applySinglePatch(const PatchInfo<D> &              pinfo,
+	void applySinglePatch(const PatchInfo<D>               &pinfo,
 	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
 		*bc_enforced = true;
 		(*num_apply_calls)++;
 	}
-	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>               &pinfo,
 	                                                    const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
 		*bc_enforced        = true;
 		*interior_dirichlet = true;
 		(*num_apply_calls)++;
 	}
-	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>               &pinfo,
 	                                            const PatchView<const double, D> &us,
-	                                            const PatchView<double, D> &      fs) const override
+	                                            const PatchView<double, D>       &fs) const override
 	{
 		*rhs_was_modified = true;
 	}
@@ -104,7 +104,7 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	std::shared_ptr<bool> interior_dirichlet = std::make_shared<bool>(false);
 
 	public:
-	NonLinMockPatchOperator(const Domain<D> &     domain,
+	NonLinMockPatchOperator(const Domain<D>      &domain,
 	                        const GhostFiller<D> &ghost_filler)
 	: PatchOperator<D>(domain, ghost_filler)
 	{
@@ -113,24 +113,24 @@ class NonLinMockPatchOperator : public PatchOperator<D>
 	{
 		return new NonLinMockPatchOperator<D>(*this);
 	}
-	void applySinglePatch(const PatchInfo<D> &              pinfo,
+	void applySinglePatch(const PatchInfo<D>               &pinfo,
 	                      const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
 		*bc_enforced = true;
-		loop_over_interior_indexes<D>(fs,
-		                              [&](const std::array<int, D + 1> &coord) { fs[coord] += 1; });
+		Loop::OverInteriorIndexes<D>(fs,
+		                             [&](const std::array<int, D + 1> &coord) { fs[coord] += 1; });
 	}
-	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>               &pinfo,
 	                                                    const PatchView<const double, D> &us, const PatchView<double, D> &fs) const override
 	{
 		*bc_enforced        = true;
 		*interior_dirichlet = true;
-		loop_over_interior_indexes<D>(fs,
-		                              [&](const std::array<int, D + 1> &coord) { fs[coord] += 1; });
+		Loop::OverInteriorIndexes<D>(fs,
+		                             [&](const std::array<int, D + 1> &coord) { fs[coord] += 1; });
 	}
-	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D> &              pinfo,
+	void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>               &pinfo,
 	                                            const PatchView<const double, D> &us,
-	                                            const PatchView<double, D> &      fs) const override
+	                                            const PatchView<double, D>       &fs) const override
 	{
 		*rhs_was_modified = true;
 	}

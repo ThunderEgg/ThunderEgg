@@ -142,7 +142,7 @@ TEST_CASE(
 		INFO("type: " << iface->patches.size());
 		ComponentView<double, 1> f_vec_ld          = f_vec.getComponentView(0, iface->local_index);
 		ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, iface->local_index);
-		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
+		Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
@@ -195,7 +195,7 @@ TEST_CASE(
 	for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
 		ComponentView<double, 1> f_vec_ld          = f_vec.getComponentView(0, i);
 		ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
-		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
+		Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
@@ -248,7 +248,7 @@ TEST_CASE(
 	for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
 		ComponentView<double, 1> f_vec_ld          = f_vec.getComponentView(0, i);
 		ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
-		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
+		Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});
@@ -301,7 +301,7 @@ TEST_CASE(
 	for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
 		ComponentView<double, 1> f_vec_ld          = f_vec.getComponentView(0, i);
 		ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
-		nested_loop<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
+		Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1> &coord) {
 			INFO("xi:    " << coord[0]);
 			CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
 		});

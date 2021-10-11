@@ -50,7 +50,7 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 	// set coarse vector
 	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		PatchView<double, 2> view = coarse_vec.getPatchView(pinfo.local_index);
-		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
+		Loop::OverInteriorIndexes<3>(view, [&](const array<int, 3> &coord) {
 			view[coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + coord[2];
 		});
 	}
@@ -65,7 +65,7 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : (view.getEnd()[i] + 1);
 		}
 
-		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
+		Loop::OverInteriorIndexes<3>(view, [&](const array<int, 3> &coord) {
 			view[coord] = 1 + pinfo.parent_id * nx * ny + (coord[0] + starts[0]) / 2
 			              + (coord[1] + starts[1]) / 2 * nx + coord[2];
 		});
@@ -83,10 +83,10 @@ TEST_CASE("Test DirectInterpolator", "[GMG::DirectInterpolator]")
 		INFO("ny:    " << pinfo.ns[1]);
 		PatchView<double, 2> vec_view      = fine_vec.getPatchView(pinfo.local_index);
 		PatchView<double, 2> expected_view = fine_expected.getPatchView(pinfo.local_index);
-		loop_over_interior_indexes<3>(vec_view,
-		                              [&](const array<int, 3> &coord) {
-			                              REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
-		                              });
+		Loop::OverInteriorIndexes<3>(vec_view,
+		                             [&](const array<int, 3> &coord) {
+			                             REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
+		                             });
 	}
 }
 TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::DirectInterpolator]")
@@ -106,7 +106,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 	// set coarse vector
 	for (auto pinfo : d_coarse.getPatchInfoVector()) {
 		PatchView<double, 2> view = coarse_vec.getPatchView(pinfo.local_index);
-		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
+		Loop::OverInteriorIndexes<3>(view, [&](const array<int, 3> &coord) {
 			view[coord] = 1 + pinfo.id * nx * ny + coord[0] + coord[1] * nx + coord[2];
 		});
 	}
@@ -121,7 +121,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 			starts[i] = orth.isOnSide(Side<2>(2 * i)) ? 0 : (view.getEnd()[i] + 1);
 		}
 
-		loop_over_interior_indexes<3>(view, [&](const array<int, 3> &coord) {
+		Loop::OverInteriorIndexes<3>(view, [&](const array<int, 3> &coord) {
 			view[coord] = 2 + pinfo.parent_id * nx * ny + (coord[0] + starts[0]) / 2
 			              + (coord[1] + starts[1]) / 2 * nx + coord[2];
 		});
@@ -141,9 +141,9 @@ TEST_CASE("Linear Test DirectInterpolator with values already set", "[GMG::Direc
 		INFO("ny:    " << pinfo.ns[1]);
 		PatchView<double, 2> vec_view      = fine_vec.getPatchView(pinfo.local_index);
 		PatchView<double, 2> expected_view = fine_expected.getPatchView(pinfo.local_index);
-		loop_over_interior_indexes<3>(vec_view,
-		                              [&](const array<int, 3> &coord) {
-			                              REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
-		                              });
+		Loop::OverInteriorIndexes<3>(vec_view,
+		                             [&](const array<int, 3> &coord) {
+			                             REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
+		                             });
 	}
 }

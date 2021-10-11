@@ -194,7 +194,7 @@ template <int D> class Vector
 	 * @param num_ghost_cells  the number of ghost cells
 	 */
 	Vector(Communicator                  comm,
-	       const std::vector<double *> & patch_starts,
+	       const std::vector<double *>  &patch_starts,
 	       const std::array<int, D + 1> &strides,
 	       const std::array<int, D + 1> &lengths,
 	       int                           num_ghost_cells)
@@ -403,7 +403,7 @@ template <int D> class Vector
 	{
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D> view = getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = alpha; });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = alpha; });
 		}
 	}
 	/**
@@ -415,7 +415,7 @@ template <int D> class Vector
 	{
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D> view = getPatchView(i);
-			loop_over_all_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = alpha; });
+			Loop::OverAllIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = alpha; });
 		}
 	}
 	/**
@@ -427,7 +427,7 @@ template <int D> class Vector
 	{
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D> view = getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] *= alpha; });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] *= alpha; });
 		}
 	}
 	/**
@@ -439,7 +439,7 @@ template <int D> class Vector
 	{
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D> view = getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += delta; });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += delta; });
 		}
 	}
 	/**
@@ -452,7 +452,7 @@ template <int D> class Vector
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D>       view   = getPatchView(i);
 			PatchView<const double, D> b_view = b.getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = b_view[coord]; });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = b_view[coord]; });
 		}
 	}
 	/**
@@ -465,7 +465,7 @@ template <int D> class Vector
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D>       view   = getPatchView(i);
 			PatchView<const double, D> b_view = b.getPatchView(i);
-			loop_over_all_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = b_view[coord]; });
+			Loop::OverAllIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = b_view[coord]; });
 		}
 	}
 	/**
@@ -478,7 +478,7 @@ template <int D> class Vector
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D>       view   = getPatchView(i);
 			PatchView<const double, D> b_view = b.getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord]; });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord]; });
 		}
 	}
 	/**
@@ -489,7 +489,7 @@ template <int D> class Vector
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D>       view   = getPatchView(i);
 			PatchView<const double, D> b_view = b.getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord] * alpha; });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] += b_view[coord] * alpha; });
 		}
 	}
 	/**
@@ -501,7 +501,7 @@ template <int D> class Vector
 			PatchView<double, D>       view   = getPatchView(i);
 			PatchView<const double, D> a_view = a.getPatchView(i);
 			PatchView<const double, D> b_view = b.getPatchView(i);
-			loop_over_interior_indexes<D + 1>(
+			Loop::OverInteriorIndexes<D + 1>(
 			view, [&](const std::array<int, D + 1> &coord) { view[coord] += a_view[coord] * alpha + b_view[coord] * beta; });
 		}
 	}
@@ -513,7 +513,7 @@ template <int D> class Vector
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D>       view   = getPatchView(i);
 			PatchView<const double, D> b_view = b.getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord]; });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord]; });
 		}
 	}
 	/**
@@ -524,8 +524,8 @@ template <int D> class Vector
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<double, D>       view   = getPatchView(i);
 			PatchView<const double, D> b_view = b.getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view,
-			                                  [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord] * beta; });
+			Loop::OverInteriorIndexes<D + 1>(view,
+			                                 [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord] * beta; });
 		}
 	}
 	/**
@@ -537,7 +537,7 @@ template <int D> class Vector
 			PatchView<double, D>       view   = getPatchView(i);
 			PatchView<const double, D> b_view = b.getPatchView(i);
 			PatchView<const double, D> c_view = c.getPatchView(i);
-			loop_over_interior_indexes<D + 1>(
+			Loop::OverInteriorIndexes<D + 1>(
 			view, [&](const std::array<int, D + 1> &coord) { view[coord] = view[coord] * alpha + b_view[coord] * beta + c_view[coord] * gamma; });
 		}
 	}
@@ -549,7 +549,7 @@ template <int D> class Vector
 		double sum = 0;
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<const double, D> view = getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { sum += view[coord] * view[coord]; });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { sum += view[coord] * view[coord]; });
 		}
 		double global_sum;
 		MPI_Allreduce(&sum, &global_sum, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
@@ -563,7 +563,7 @@ template <int D> class Vector
 		double max = 0;
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<const double, D> view = getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { max = fmax(view[coord], max); });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { max = fmax(view[coord], max); });
 		}
 		double global_max;
 		MPI_Allreduce(&max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm.getMPIComm());
@@ -578,7 +578,7 @@ template <int D> class Vector
 		for (int i = 0; i < getNumLocalPatches(); i++) {
 			PatchView<const double, D> view   = getPatchView(i);
 			PatchView<const double, D> b_view = b.getPatchView(i);
-			loop_over_interior_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { retval += view[coord] * b_view[coord]; });
+			Loop::OverInteriorIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) { retval += view[coord] * b_view[coord]; });
 		}
 		double global_retval;
 		MPI_Allreduce(&retval, &global_retval, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());

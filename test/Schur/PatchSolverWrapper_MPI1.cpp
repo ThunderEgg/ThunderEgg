@@ -97,10 +97,10 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 	CHECK(ghost_filler.wasCalled());
 	for (int i = 0; i < b.getNumLocalPatches(); i++) {
 		auto local_data = b.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value));
-		               });
+		Loop::Nested<1>(local_data.getStart(), local_data.getEnd(),
+		                [&](const std::array<int, 1> &coord) {
+			                CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value));
+		                });
 	}
 }
 TEST_CASE(
@@ -131,10 +131,10 @@ TEST_CASE(
 	CHECK(ghost_filler.wasCalled());
 	for (int i = 0; i < b.getNumLocalPatches(); i++) {
 		auto local_data = b.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value));
-		               });
+		Loop::Nested<1>(local_data.getStart(), local_data.getEnd(),
+		                [&](const std::array<int, 1> &coord) {
+			                CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value));
+		                });
 	}
 }
 TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in rhs as expected",
@@ -185,10 +185,10 @@ TEST_CASE(
 	CHECK(ghost_filler.wasCalled());
 	for (int i = 0; i < schur_b.getNumLocalPatches(); i++) {
 		auto local_data = schur_b.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Catch::Approx(domain_fill_value));
-		               });
+		Loop::Nested<1>(local_data.getStart(), local_data.getEnd(),
+		                [&](const std::array<int, 1> &coord) {
+			                CHECK(local_data[coord] == Catch::Approx(domain_fill_value));
+		                });
 	}
 }
 TEST_CASE(
@@ -217,9 +217,9 @@ TEST_CASE(
 	CHECK(ghost_filler.wasCalled());
 	for (int i = 0; i < schur_b.getNumLocalPatches(); i++) {
 		auto local_data = schur_b.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Catch::Approx(domain_fill_value));
-		               });
+		Loop::Nested<1>(local_data.getStart(), local_data.getEnd(),
+		                [&](const std::array<int, 1> &coord) {
+			                CHECK(local_data[coord] == Catch::Approx(domain_fill_value));
+		                });
 	}
 }

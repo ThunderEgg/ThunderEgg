@@ -319,7 +319,7 @@ template <int D> class InterLevelComm
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
 				PatchView<const double, D> view = ghost_vector.getPatchView(local_index);
-				loop_over_all_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) {
+				Loop::OverAllIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) {
 					send_buffers.back()[buffer_idx] = view[coord];
 					buffer_idx++;
 				});
@@ -376,7 +376,7 @@ template <int D> class InterLevelComm
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
 				PatchView<double, D> view = vector.getPatchView(local_index);
-				loop_over_all_indexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) {
+				Loop::OverAllIndexes<D + 1>(view, [&](const std::array<int, D + 1> &coord) {
 					view[coord] += buffer[buffer_idx];
 					buffer_idx++;
 				});
@@ -446,7 +446,7 @@ template <int D> class InterLevelComm
 			int buffer_idx = 0;
 			for (int local_index : rank_indexes_pair.second) {
 				PatchView<const double, D> local_view = vector.getPatchView(local_index);
-				loop_over_all_indexes<D + 1>(local_view, [&](const std::array<int, D + 1> &coord) {
+				Loop::OverAllIndexes<D + 1>(local_view, [&](const std::array<int, D + 1> &coord) {
 					send_buffers.back()[buffer_idx] = local_view[coord];
 					buffer_idx++;
 				});
@@ -503,7 +503,7 @@ template <int D> class InterLevelComm
 			int                  buffer_idx = 0;
 			for (int local_index : local_indexes) {
 				PatchView<double, D> local_view = ghost_vector.getPatchView(local_index);
-				loop_over_all_indexes<D + 1>(local_view, [&](const std::array<int, D + 1> &coord) {
+				Loop::OverAllIndexes<D + 1>(local_view, [&](const std::array<int, D + 1> &coord) {
 					local_view[coord] = buffer[buffer_idx];
 					buffer_idx++;
 				});

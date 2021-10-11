@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
 	// A DomainGenerator will create domains for the Multigrid algorithm from a tree
 	int num_ghost_cells = 1; // the poission operator needs 1 row/column of ghost cells on the edges of a patch
 
-	p4est_connectivity * conn             = p4est_connectivity_new_brick(1, 1, false, false);
+	p4est_connectivity  *conn             = p4est_connectivity_new_brick(1, 1, false, false);
 	P4estDomainGenerator domain_generator = getP4estDomainGenerator(conn, mesh_filename, ns, num_ghost_cells, bmf);
 
 	// Get the finest domain from the tree
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
 	timer->start("Domain Initialization");
 
 	// Create some new vectors for the domain
-	int num_components = 1; //the poisson operator just has one value in each cell
+	int num_components = 1; // the poisson operator just has one value in each cell
 
 	Vector<2> exact(domain, num_components);
 	Vector<2> f(domain, num_components);
@@ -295,8 +295,8 @@ int main(int argc, char *argv[])
 
 	// set the patch solver
 	Iterative::BiCGStab<2> patch_bcgs;
-	//p_bcgs->setTolerance(ps_tol);
-	// p_bcgs->setMaxIterations(ps_max_it);
+	// p_bcgs->setTolerance(ps_tol);
+	//  p_bcgs->setMaxIterations(ps_max_it);
 
 	// create a CycleBuilder and set the options
 	GMG::CycleBuilder<2> builder(copts);
@@ -306,8 +306,10 @@ int main(int argc, char *argv[])
 	bitset<4>                  neumann_bitset = neumann ? 0xF : 0x0;
 	if (patch_solver == "dft") {
 		finest_smoother.reset(new DFTPatchSolver<2>(patch_operator, neumann_bitset));
+#if THUNDEREGG_FFTW_ENABLED
 	} else if (patch_solver == "fftw") {
 		finest_smoother.reset(new FFTWPatchSolver<2>(patch_operator, neumann_bitset));
+#endif
 	} else {
 		finest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, patch_operator));
 	}
@@ -319,13 +321,13 @@ int main(int argc, char *argv[])
 
 		GMG::LinearRestrictor<2> finest_restrictor(domain, coarser_domain);
 
-		//add the finest level
+		// add the finest level
 		builder.addFinestLevel(patch_operator, *finest_smoother, finest_restrictor);
 
 		Domain<2> finer_domain   = domain;
 		Domain<2> current_domain = coarser_domain;
 
-		//generate each of the middle levels
+		// generate each of the middle levels
 		while (domain_generator.hasCoarserDomain()) {
 			current_domain.setTimer(timer);
 			domain_level++;
@@ -341,8 +343,10 @@ int main(int argc, char *argv[])
 			unique_ptr<GMG::Smoother<2>> middle_smoother;
 			if (patch_solver == "dft") {
 				middle_smoother.reset(new DFTPatchSolver<2>(middle_patch_operator, neumann_bitset));
+#if THUNDEREGG_FFTW_ENABLED
 			} else if (patch_solver == "fftw") {
 				middle_smoother.reset(new FFTWPatchSolver<2>(middle_patch_operator, neumann_bitset));
+#endif
 			} else {
 				middle_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, middle_patch_operator));
 			}
@@ -359,7 +363,7 @@ int main(int argc, char *argv[])
 		}
 		current_domain.setTimer(timer);
 
-		//add the coarsest level to the builder
+		// add the coarsest level to the builder
 
 		// patch operator
 		BiLinearGhostFiller  coarsest_ghost_filler(current_domain, GhostFillingType::Faces);
@@ -369,8 +373,10 @@ int main(int argc, char *argv[])
 		unique_ptr<GMG::Smoother<2>> coarsest_smoother;
 		if (patch_solver == "dft") {
 			coarsest_smoother.reset(new DFTPatchSolver<2>(coarsest_patch_operator, neumann_bitset));
+#if THUNDEREGG_FFTW_ENABLED
 		} else if (patch_solver == "fftw") {
 			coarsest_smoother.reset(new FFTWPatchSolver<2>(coarsest_patch_operator, neumann_bitset));
+#endif
 		} else {
 			coarsest_smoother.reset(new Iterative::PatchSolver<2>(patch_bcgs, coarsest_patch_operator));
 		}

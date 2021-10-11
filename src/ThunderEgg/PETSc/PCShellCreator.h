@@ -94,7 +94,7 @@ template <int D> class PCShellCreator
 		for (int p_index = 0; p_index < te_x.getNumLocalPatches(); p_index++) {
 			for (int c = 0; c < te_x.getNumComponents(); c++) {
 				ComponentView<double, D> ld = te_x.getComponentView(c, p_index);
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+				Loop::Nested<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					ld[coord] = x_view[index];
 					index++;
 				});
@@ -111,7 +111,7 @@ template <int D> class PCShellCreator
 		for (int p_index = 0; p_index < te_b.getNumLocalPatches(); p_index++) {
 			for (int c = 0; c < te_x.getNumComponents(); c++) {
 				ComponentView<const double, D> ld = te_b.getComponentView(c, p_index);
-				nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+				Loop::Nested<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 					b_view[index] = ld[coord];
 					index++;
 				});

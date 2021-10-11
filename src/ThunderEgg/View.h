@@ -91,7 +91,7 @@ template <typename T, int D> class View
 	inline int getIndex(const std::array<int, D> &coord) const
 	{
 		int idx = 0;
-		loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
+		Loop::Unroll<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
 		return idx;
 	}
 
@@ -190,7 +190,7 @@ template <typename T, int D> class View
 				checkCoordIsInBounds(coord);
 			}
 			int idx = 0;
-			loop<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
+			Loop::Unroll<0, D - 1>([&](int i) { idx += strides[i] * coord[i]; });
 			const_cast<double *>(data)[idx] = value;
 		} else {
 			if constexpr (ENABLE_DEBUG) {

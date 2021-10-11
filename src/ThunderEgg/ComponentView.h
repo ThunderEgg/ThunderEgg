@@ -74,7 +74,7 @@ template <typename T, int D> class ComponentView : public View<T, D>
 	template <int M> static std::array<int, M> DetermineEnd(const std::array<int, M> &lengths)
 	{
 		std::array<int, M> end = lengths;
-		loop<0, M - 1>([&](int i) { end[i]--; });
+		Loop::Unroll<0, M - 1>([&](int i) { end[i]--; });
 		return end;
 	}
 
@@ -84,7 +84,7 @@ template <typename T, int D> class ComponentView : public View<T, D>
 	template <int M> static std::array<int, M> DetermineGhostEnd(const std::array<int, M> &lengths, int num_ghost_cells)
 	{
 		std::array<int, M> end = lengths;
-		loop<0, M - 1>([&](int i) { end[i] += num_ghost_cells - 1; });
+		Loop::Unroll<0, M - 1>([&](int i) { end[i] += num_ghost_cells - 1; });
 		return end;
 	}
 

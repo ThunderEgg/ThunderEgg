@@ -171,7 +171,8 @@ target_link_libraries(unit_tests_mpi3 test_shared)
 set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
 
 function(add_mpi_test ARG1 ARG2)
-  set(OptionalCatchTestLauncher ${MPIEXEC} "--oversubscribe" ${MPIEXEC_NUMPROC_FLAG}  ${ARG2})
+  #set(OptionalCatchTestLauncher ${MPIEXEC} "--oversubscribe" ${MPIEXEC_NUMPROC_FLAG}  ${ARG2})
+  set(OptionalCatchTestLauncher ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG}  ${ARG2})
 
   parseandaddcatchtests(${ARG1})
 

@@ -82,7 +82,7 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 				auto   f_slice = f.getSliceOn(s, {0});
 				auto   u_inner = u.getSliceOn(s, {0});
 				auto   u_ghost = u.getSliceOn(s, {-1});
-				nested_loop<1>(f_slice.getStart(), f_slice.getEnd(), [&](std::array<int, 1> coord) {
+				Loop::Nested<1>(f_slice.getStart(), f_slice.getEnd(), [&](std::array<int, 1> coord) {
 					f_slice[coord] += -(u_inner[coord] + u_ghost[coord]) / (h2);
 				});
 			}
@@ -103,7 +103,7 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
 		INFO("ny:    " << pinfo.ns[1]);
 		ComponentView<double, 2> vec_ld      = f_vec.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> expected_ld = f_expected.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
@@ -149,7 +149,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff",
 		INFO("ny:    " << pinfo.ns[1]);
 		ComponentView<double, 2> vec_ld          = f_vec.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> expected_vec_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(vec_ld[coord] + 1 == Catch::Approx(1 + expected_vec_ld[coord]));
@@ -197,7 +197,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
 		INFO("ny:    " << pinfo.ns[1]);
 		ComponentView<double, 2> vec_ld           = f_vec.getComponentView(0, pinfo.local_index);
 		ComponentView<double, 2> exptected_vec_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
-		nested_loop<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
+		Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2> &coord) {
 			INFO("xi:    " << coord[0]);
 			INFO("yi:    " << coord[1]);
 			CHECK(vec_ld[coord] + 1 == Catch::Approx(1 + exptected_vec_ld[coord]));

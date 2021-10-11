@@ -121,7 +121,7 @@ class DomainTools
 	 */
 	template <int D> static void GetRealCoord(const PatchInfo<D> &pinfo, const std::array<int, D> &coord, std::array<double, D> &real_coord)
 	{
-		loop<0, D - 1>([&](int dir) {
+		Loop::Unroll<0, D - 1>([&](int dir) {
 			if (coord[dir] == -1) {
 				real_coord[dir] = pinfo.starts[dir];
 			} else if (coord[dir] == pinfo.ns[dir]) {
@@ -141,7 +141,7 @@ class DomainTools
 	 */
 	template <int D> static void GetRealCoordGhost(const PatchInfo<D> &pinfo, const std::array<int, D> &coord, std::array<double, D> &real_coord)
 	{
-		loop<0, D - 1>([&](int dir) { real_coord[dir] = pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir]; });
+		Loop::Unroll<0, D - 1>([&](int dir) { real_coord[dir] = pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir]; });
 	}
 	/**
 	 * @brief Given a path info object and a side of the patch, get the coordinate from a given
@@ -200,7 +200,7 @@ class DomainTools
 		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 			ComponentView<double, D> ld    = vec.getComponentView(component_index, i);
 			auto                     pinfo = domain.getPatchInfoVector()[i];
-			nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
+			Loop::Nested<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D> &coord) {
 				GetRealCoord<D>(pinfo, coord, real_coord);
 				ld[coord] = func(real_coord);
 			});
@@ -221,7 +221,7 @@ class DomainTools
 		}
 		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 			ComponentView<double, 3> ld    = vec.getComponentView(component_index, i);
-			const PatchInfo<3> &     pinfo = domain.getPatchInfoVector()[i];
+			const PatchInfo<3>      &pinfo = domain.getPatchInfoVector()[i];
 			double                   dx    = pinfo.spacings[0];
 			double                   dy    = pinfo.spacings[1];
 			double                   dz    = pinfo.spacings[2];
@@ -252,7 +252,7 @@ class DomainTools
 		}
 		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 			ComponentView<double, 2> ld    = vec.getComponentView(component_index, i);
-			const PatchInfo<2> &     pinfo = domain.getPatchInfoVector()[i];
+			const PatchInfo<2>      &pinfo = domain.getPatchInfoVector()[i];
 			double                   dx    = pinfo.spacings[0];
 			double                   dy    = pinfo.spacings[1];
 			for (int yi = 0; yi < pinfo.ns[1]; yi++) {
@@ -279,7 +279,7 @@ class DomainTools
 		}
 		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 			ComponentView<double, 1> ld    = vec.getComponentView(component_index, i);
-			const PatchInfo<1> &     pinfo = domain.getPatchInfoVector()[i];
+			const PatchInfo<1>      &pinfo = domain.getPatchInfoVector()[i];
 			double                   dx    = pinfo.spacings[0];
 			for (int xi = 0; xi < pinfo.ns[0]; xi++) {
 				double x = pinfo.starts[0] + 0.5 * dx + xi * dx;
@@ -323,7 +323,7 @@ class DomainTools
 		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 			ComponentView<double, D> ld    = vec.getComponentView(component_index, i);
 			auto                     pinfo = domain.getPatchInfoVector()[i];
-			nested_loop<D>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, D> &coord) {
+			Loop::Nested<D>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, D> &coord) {
 				GetRealCoordGhost<D>(pinfo, coord, real_coord);
 				ld[coord] = func(real_coord);
 			});
@@ -344,7 +344,7 @@ class DomainTools
 		}
 		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 			ComponentView<double, 3> ld        = vec.getComponentView(component_index, i);
-			const PatchInfo<3> &     pinfo     = domain.getPatchInfoVector()[i];
+			const PatchInfo<3>      &pinfo     = domain.getPatchInfoVector()[i];
 			int                      num_ghost = pinfo.num_ghost_cells;
 			double                   dx        = pinfo.spacings[0];
 			double                   dy        = pinfo.spacings[1];
@@ -376,7 +376,7 @@ class DomainTools
 		}
 		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 			ComponentView<double, 2> ld        = vec.getComponentView(component_index, i);
-			const PatchInfo<2> &     pinfo     = domain.getPatchInfoVector()[i];
+			const PatchInfo<2>      &pinfo     = domain.getPatchInfoVector()[i];
 			int                      num_ghost = pinfo.num_ghost_cells;
 			double                   dx        = pinfo.spacings[0];
 			double                   dy        = pinfo.spacings[1];
@@ -404,7 +404,7 @@ class DomainTools
 		}
 		for (int i = 0; i < vec.getNumLocalPatches(); i++) {
 			ComponentView<double, 1> ld        = vec.getComponentView(component_index, i);
-			const PatchInfo<1> &     pinfo     = domain.getPatchInfoVector()[i];
+			const PatchInfo<1>      &pinfo     = domain.getPatchInfoVector()[i];
 			int                      num_ghost = pinfo.num_ghost_cells;
 			double                   dx        = pinfo.spacings[0];
 			for (int xi = -num_ghost; xi < pinfo.ns[0] + num_ghost; xi++) {
@@ -460,7 +460,7 @@ class DomainTools
 				ComponentView<const double, D> u_data = u.getComponentView(c, pinfo.local_index);
 
 				double patch_sum = 0;
-				nested_loop<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
+				Loop::Nested<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
 
 				for (size_t i = 0; i < D; i++) {
 					patch_sum *= pinfo.spacings[i];

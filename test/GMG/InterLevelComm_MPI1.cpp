@@ -119,7 +119,7 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	int idx = 0;
 	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
 		PatchView<double, 2> vec_view = coarse_vec.getPatchView(i);
-		loop_over_interior_indexes<3>(vec_view, [&](const array<int, 3> &coord) {
+		Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3> &coord) {
 			vec_view[coord] = idx;
 			idx++;
 		});
@@ -132,7 +132,7 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
 	for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
 		PatchView<double, 2> vec_view      = coarse_vec.getPatchView(i);
 		PatchView<double, 2> expected_view = coarse_expected.getPatchView(i);
-		loop_over_interior_indexes<3>(vec_view, [&](const array<int, 3> &coord) {
+		Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3> &coord) {
 			REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
 		});
 	}
