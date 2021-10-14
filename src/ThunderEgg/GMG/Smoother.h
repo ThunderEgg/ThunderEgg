@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2018-2021 Scott Aiton
@@ -26,31 +26,31 @@
  * @brief Smoother class
  */
 #include <ThunderEgg/Vector.h>
-namespace ThunderEgg::GMG
-{
+namespace ThunderEgg::GMG {
 /**
  * @brief Abstract class for smoothing operators.
  */
-template <int D> class Smoother
+template<int D>
+class Smoother
 {
-	public:
-	/**
-	 * @brief Destroy the Smoother object
-	 */
-	virtual ~Smoother() {}
-	/**
-	 * @brief Clone this smoother
-	 *
-	 * @return Smoother<D>* a newly allocated copy of this smoother
-	 */
-	virtual Smoother<D> *clone() const = 0;
-	/**
-	 * @brief Virtual function that derived classes have to implement.
-	 *
-	 * @param f the RHS vector
-	 * @param u the solution vector, updated upon return.
-	 */
-	virtual void smooth(const Vector<D> &f, Vector<D> &u) const = 0;
+public:
+  /**
+   * @brief Destroy the Smoother object
+   */
+  virtual ~Smoother() {}
+  /**
+   * @brief Clone this smoother
+   *
+   * @return Smoother<D>* a newly allocated copy of this smoother
+   */
+  virtual Smoother<D>* clone() const = 0;
+  /**
+   * @brief Virtual function that derived classes have to implement.
+   *
+   * @param f the RHS vector
+   * @param u the solution vector, updated upon return.
+   */
+  virtual void smooth(const Vector<D>& f, Vector<D>& u) const = 0;
 };
 } // namespace ThunderEgg::GMG
 #endif

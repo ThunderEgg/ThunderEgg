@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2020-2021 Scott Aiton
@@ -27,10 +27,8 @@
  */
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/Schur/IfaceInfo.h>
-namespace ThunderEgg
-{
-namespace Schur
-{
+namespace ThunderEgg {
+namespace Schur {
 /**
  * @brief Represents the interfaces where the neighbors are at a finer refinement level.
  *
@@ -39,56 +37,58 @@ namespace Schur
  *
  * @tparam D the number of Cartesian dimensions in a patch
  */
-template <int D> class FineIfaceInfo : public IfaceInfo<D>
+template<int D>
+class FineIfaceInfo : public IfaceInfo<D>
 {
-	private:
-	/**
-	 * @brief Get the id for the interface on a given side of the patch
-	 *
-	 * @param pinfo the patch
-	 * @param s the side
-	 * @return int the id
-	 */
-	static int GetId(const PatchInfo<D> &pinfo, Side<D> s)
-	{
-		return (int) (pinfo.id * Side<D>::number_of + s.getIndex());
-	}
+private:
+  /**
+   * @brief Get the id for the interface on a given side of the patch
+   *
+   * @param pinfo the patch
+   * @param s the side
+   * @return int the id
+   */
+  static int GetId(const PatchInfo<D>& pinfo, Side<D> s)
+  {
+    return (int)(pinfo.id * Side<D>::number_of + s.getIndex());
+  }
 
-	public:
-	/**
-	 * @brief the ranks of the fine patches' interfaces
-	 */
-	std::array<int, Orthant<D - 1>::num_orthants> fine_ranks;
-	/**
-	 * @brief the ids of the fine patches' interfaces
-	 */
-	std::array<int, Orthant<D - 1>::num_orthants> fine_ids;
-	/**
-	 * @brief the local column indexes of the fine patches' interfaces
-	 */
-	std::array<int, Orthant<D - 1>::num_orthants> fine_col_local_indexes;
-	/**
-	 * @brief the global indexes of the fine patches' interfaces
-	 */
-	std::array<int, Orthant<D - 1>::num_orthants> fine_global_indexes;
-	/**
-	 * @brief Construct a new FineIfaceInfo object
-	 *
-	 * indexes will be set to -1
-	 *
-	 * @param pinfo the associated PatchInfo object
-	 * @param s the side of the patch that the interface is on
-	 */
-	FineIfaceInfo(const PatchInfo<D> &pinfo, Side<D> s) : IfaceInfo<D>(pinfo.rank, GetId(pinfo, s))
-	{
-		auto nbr_info = pinfo.getFineNbrInfo(s);
-		for (size_t i = 0; i < fine_ids.size(); i++) {
-			fine_ids[i]   = nbr_info.ids[i] * Side<D>::number_of + s.opposite().getIndex();
-			fine_ranks[i] = nbr_info.ranks[i];
-		}
-		fine_col_local_indexes.fill(-1);
-		fine_global_indexes.fill(-1);
-	}
+public:
+  /**
+   * @brief the ranks of the fine patches' interfaces
+   */
+  std::array<int, Orthant<D - 1>::num_orthants> fine_ranks;
+  /**
+   * @brief the ids of the fine patches' interfaces
+   */
+  std::array<int, Orthant<D - 1>::num_orthants> fine_ids;
+  /**
+   * @brief the local column indexes of the fine patches' interfaces
+   */
+  std::array<int, Orthant<D - 1>::num_orthants> fine_col_local_indexes;
+  /**
+   * @brief the global indexes of the fine patches' interfaces
+   */
+  std::array<int, Orthant<D - 1>::num_orthants> fine_global_indexes;
+  /**
+   * @brief Construct a new FineIfaceInfo object
+   *
+   * indexes will be set to -1
+   *
+   * @param pinfo the associated PatchInfo object
+   * @param s the side of the patch that the interface is on
+   */
+  FineIfaceInfo(const PatchInfo<D>& pinfo, Side<D> s)
+    : IfaceInfo<D>(pinfo.rank, GetId(pinfo, s))
+  {
+    auto nbr_info = pinfo.getFineNbrInfo(s);
+    for (size_t i = 0; i < fine_ids.size(); i++) {
+      fine_ids[i] = nbr_info.ids[i] * Side<D>::number_of + s.opposite().getIndex();
+      fine_ranks[i] = nbr_info.ranks[i];
+    }
+    fine_col_local_indexes.fill(-1);
+    fine_global_indexes.fill(-1);
+  }
 };
 } // namespace Schur
 } // namespace ThunderEgg

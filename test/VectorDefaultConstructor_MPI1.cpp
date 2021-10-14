@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2021      Scott Aiton
@@ -28,230 +28,230 @@ using namespace ThunderEgg;
 
 TEST_CASE("Vector<1> getNumGhostCells default constructor", "[Vector]")
 {
-	Communicator comm(MPI_COMM_WORLD);
+  Communicator comm(MPI_COMM_WORLD);
 
-	Vector<1> vec;
+  Vector<1> vec;
 
-	CHECK(vec.getNumGhostCells() == 0);
+  CHECK(vec.getNumGhostCells() == 0);
 }
 TEST_CASE("Vector<1> getMPIComm default constructor", "[Vector]")
 {
-	Communicator comm(MPI_COMM_WORLD);
+  Communicator comm(MPI_COMM_WORLD);
 
-	Vector<1> vec;
+  Vector<1> vec;
 
-	CHECK_THROWS_AS(vec.getCommunicator().getMPIComm(), RuntimeError);
+  CHECK_THROWS_AS(vec.getCommunicator().getMPIComm(), RuntimeError);
 }
 TEST_CASE("Vector<1> getNumLocalPatches default constructor", "[Vector]")
 {
-	Communicator comm(MPI_COMM_WORLD);
+  Communicator comm(MPI_COMM_WORLD);
 
-	Vector<1> vec;
+  Vector<1> vec;
 
-	CHECK(vec.getNumLocalPatches() == 0);
+  CHECK(vec.getNumLocalPatches() == 0);
 }
 TEST_CASE("Vector<1> getNumComponents default constructor", "[Vector]")
 {
-	Communicator comm(MPI_COMM_WORLD);
+  Communicator comm(MPI_COMM_WORLD);
 
-	Vector<1> vec;
+  Vector<1> vec;
 
-	CHECK(vec.getNumComponents() == 0);
+  CHECK(vec.getNumComponents() == 0);
 }
 TEST_CASE("Vector<1> getNumLocalCells default constructor", "[Vector]")
 {
-	Communicator comm(MPI_COMM_WORLD);
+  Communicator comm(MPI_COMM_WORLD);
 
-	Vector<1> vec;
+  Vector<1> vec;
 
-	CHECK(vec.getNumLocalCells() == 0);
+  CHECK(vec.getNumLocalCells() == 0);
 }
 TEST_CASE("Vector<2> getNumGhostCells default constructor", "[Vector]")
 {
-	Communicator comm(MPI_COMM_WORLD);
+  Communicator comm(MPI_COMM_WORLD);
 
-	Vector<2> vec;
+  Vector<2> vec;
 
-	CHECK(vec.getNumGhostCells() == 0);
+  CHECK(vec.getNumGhostCells() == 0);
 }
 TEST_CASE("Vector<2> getMPIComm default constructor", "[Vector]")
 {
-	Vector<2> vec;
+  Vector<2> vec;
 
-	CHECK_THROWS_AS(vec.getCommunicator().getMPIComm(), RuntimeError);
+  CHECK_THROWS_AS(vec.getCommunicator().getMPIComm(), RuntimeError);
 }
 TEST_CASE("Vector<2> getNumLocalPatches default constructor", "[Vector]")
 {
-	Vector<2> vec;
+  Vector<2> vec;
 
-	CHECK(vec.getNumLocalPatches() == 0);
+  CHECK(vec.getNumLocalPatches() == 0);
 }
 TEST_CASE("Vector<2> getNumComponents default constructor", "[Vector]")
 {
-	Vector<2> vec;
+  Vector<2> vec;
 
-	CHECK(vec.getNumComponents() == 0);
+  CHECK(vec.getNumComponents() == 0);
 }
 TEST_CASE("Vector<2> getNumLocalCells default constructor", "[Vector]")
 {
-	Vector<2> vec;
+  Vector<2> vec;
 
-	CHECK(vec.getNumLocalCells() == 0);
+  CHECK(vec.getNumLocalCells() == 0);
 }
 TEST_CASE("Vector<3> getNumGhostCells default constructor", "[Vector]")
 {
-	Vector<3> vec;
+  Vector<3> vec;
 
-	CHECK(vec.getNumGhostCells() == 0);
+  CHECK(vec.getNumGhostCells() == 0);
 }
 TEST_CASE("Vector<3> getMPIComm default constructor", "[Vector]")
 {
-	Vector<3> vec;
+  Vector<3> vec;
 
-	CHECK_THROWS_AS(vec.getCommunicator().getMPIComm(), RuntimeError);
+  CHECK_THROWS_AS(vec.getCommunicator().getMPIComm(), RuntimeError);
 }
 TEST_CASE("Vector<3> getNumLocalPatches default constructor", "[Vector]")
 {
-	Vector<3> vec;
+  Vector<3> vec;
 
-	CHECK(vec.getNumLocalPatches() == 0);
+  CHECK(vec.getNumLocalPatches() == 0);
 }
 TEST_CASE("Vector<3> getNumComponents default constructor", "[Vector]")
 {
-	Vector<3> vec;
+  Vector<3> vec;
 
-	CHECK(vec.getNumComponents() == 0);
+  CHECK(vec.getNumComponents() == 0);
 }
 TEST_CASE("Vector<3> getNumLocalCells default constructor", "[Vector]")
 {
-	Vector<3> vec;
+  Vector<3> vec;
 
-	CHECK(vec.getNumLocalCells() == 0);
+  CHECK(vec.getNumLocalCells() == 0);
 }
 
 TEST_CASE("Vector<1> getComponentView.h default constructor", "[Vector]")
 {
-	Vector<1> vec;
+  Vector<1> vec;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<1> getComponentView const default constructor", "[Vector]")
 {
-	Vector<1>        vec_non_const;
-	const Vector<1> &vec = vec_non_const;
+  Vector<1> vec_non_const;
+  const Vector<1>& vec = vec_non_const;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<2> getComponentView default constructor", "[Vector]")
 {
-	Vector<2> vec;
+  Vector<2> vec;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<2> getComponentView const default constructor", "[Vector]")
 {
-	Vector<2>        vec_non_const;
-	const Vector<2> &vec = vec_non_const;
+  Vector<2> vec_non_const;
+  const Vector<2>& vec = vec_non_const;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<3> getComponentView default constructor", "[Vector]")
 {
-	Vector<3> vec;
+  Vector<3> vec;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<3> getComponentView const default constructor", "[Vector]")
 {
-	Vector<3>        vec_non_const;
-	const Vector<3> &vec = vec_non_const;
+  Vector<3> vec_non_const;
+  const Vector<3>& vec = vec_non_const;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
-		CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getComponentView(-1, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, -1), RuntimeError);
+    CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<1> getPatchView default constructor", "[Vector]")
 {
-	Vector<1> vec;
+  Vector<1> vec;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
-		CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+    CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<1> getPatchView const default constructor", "[Vector]")
 {
-	Vector<1>        vec_non_const;
-	const Vector<1> &vec = vec_non_const;
+  Vector<1> vec_non_const;
+  const Vector<1>& vec = vec_non_const;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
-		CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+    CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<2> getPatchView default constructor", "[Vector]")
 {
-	Vector<2> vec;
+  Vector<2> vec;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
-		CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+    CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<2> getPatchView const default constructor", "[Vector]")
 {
-	Vector<2>        vec_non_const;
-	const Vector<2> &vec = vec_non_const;
+  Vector<2> vec_non_const;
+  const Vector<2>& vec = vec_non_const;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
-		CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+    CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<3> getPatchView default constructor", "[Vector]")
 {
-	Vector<3> vec;
+  Vector<3> vec;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
-		CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+    CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
+  }
 }
 TEST_CASE("Vector<3> getPatchView const default constructor", "[Vector]")
 {
-	Vector<3>        vec_non_const;
-	const Vector<3> &vec = vec_non_const;
+  Vector<3> vec_non_const;
+  const Vector<3>& vec = vec_non_const;
 
-	if (ENABLE_DEBUG) {
-		CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
-		CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
-	}
+  if (ENABLE_DEBUG) {
+    CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
+    CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
+  }
 }

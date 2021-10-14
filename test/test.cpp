@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2019-2021 Scott Aiton
@@ -27,30 +27,31 @@
 #include <petscsys.h>
 #endif
 
-int main(int argc, char *argv[])
+int
+main(int argc, char* argv[])
 {
 #if TEST_P4EST
-	sc_set_log_defaults(NULL, NULL, SC_LP_SILENT);
+  sc_set_log_defaults(NULL, NULL, SC_LP_SILENT);
 #endif
-	// global setup...
+  // global setup...
 #if TEST_PETSC
-	PetscInitialize(nullptr, nullptr, nullptr, nullptr);
+  PetscInitialize(nullptr, nullptr, nullptr, nullptr);
 #else
-	MPI_Init(nullptr, nullptr);
+  MPI_Init(nullptr, nullptr);
 #endif
 
-	int result = Catch::Session().run(argc, argv);
+  int result = Catch::Session().run(argc, argv);
 
-	// abort if failure, some tests can hang otherwise
-	if (result > 0) {
-		MPI_Abort(MPI_COMM_WORLD, result);
-	}
+  // abort if failure, some tests can hang otherwise
+  if (result > 0) {
+    MPI_Abort(MPI_COMM_WORLD, result);
+  }
 
-	// global clean-up...
+  // global clean-up...
 #if TEST_PETSC
-	PetscFinalize();
+  PetscFinalize();
 #else
-	MPI_Finalize();
+  MPI_Finalize();
 #endif
-	return result;
+  return result;
 }

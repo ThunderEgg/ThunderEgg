@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2018-2021 Scott Aiton
@@ -27,32 +27,31 @@
  */
 
 #include <memory>
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Interface for serializing objects
  */
 class Serializable
 {
-	public:
-	/**
-	 * @brief Destroy the Serializable object
-	 */
-	virtual ~Serializable() = default;
-	/**
-	 * @brief Serialize object into buffer
-	 *
-	 * @param buffer the buffer. Can be set to nullptr if you just want the size
-	 * @return int the size of the serialized object
-	 */
-	virtual int serialize(char *buffer) const = 0;
-	/**
-	 * @brief Deserialize an object
-	 *
-	 * @param buffer the buffer
-	 * @return int the size of object that was deserialized
-	 */
-	virtual int deserialize(char *buffer) = 0;
+public:
+  /**
+   * @brief Destroy the Serializable object
+   */
+  virtual ~Serializable() = default;
+  /**
+   * @brief Serialize object into buffer
+   *
+   * @param buffer the buffer. Can be set to nullptr if you just want the size
+   * @return int the size of the serialized object
+   */
+  virtual int serialize(char* buffer) const = 0;
+  /**
+   * @brief Deserialize an object
+   *
+   * @param buffer the buffer
+   * @return int the size of object that was deserialized
+   */
+  virtual int deserialize(char* buffer) = 0;
 };
 } // namespace ThunderEgg
 #endif

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2018-2021 Scott Aiton
@@ -30,79 +30,78 @@
 #include <ThunderEgg/Vector.h>
 #include <list>
 
-namespace ThunderEgg::GMG
-{
+namespace ThunderEgg::GMG {
 /**
  * @brief Base abstract class for cycles.
  *
  * There is an abstract visit() function for base classes to implement.
  */
-template <int D> class Cycle : public Operator<D>
+template<int D>
+class Cycle : public Operator<D>
 {
-	private:
-	/**
-	 * @brief pointer to the finest level
-	 */
-	std::shared_ptr<const Level<D>> finest_level;
+private:
+  /**
+   * @brief pointer to the finest level
+   */
+  std::shared_ptr<const Level<D>> finest_level;
 
-	protected:
-	/**
-	 * @brief Prepare vectors for coarser level.
-	 *
-	 * @param level the current level
-	 * @param f the rhs vector cooresponding to the level
-	 * @param u the solution vector cooresponding to the level
-	 * @return Vector<D> the restricted residual vector
-	 */
-	Vector<D> restrict(const Level<D> &level, const Vector<D> &f, const Vector<D> &u) const
-	{
-		// calculate residual
-		Vector<D> r = u.getZeroClone();
-		level.getOperator().apply(u, r);
-		r.scaleThenAdd(-1, f);
-		// create vectors for coarser levels
-		return level.getRestrictor().restrict(r);
-	}
+protected:
+  /**
+   * @brief Prepare vectors for coarser level.
+   *
+   * @param level the current level
+   * @param f the rhs vector cooresponding to the level
+   * @param u the solution vector cooresponding to the level
+   * @return Vector<D> the restricted residual vector
+   */
+  Vector<D> restrict(const Level<D>& level, const Vector<D>& f, const Vector<D>& u) const
+  {
+    // calculate residual
+    Vector<D> r = u.getZeroClone();
+    level.getOperator().apply(u, r);
+    r.scaleThenAdd(-1, f);
+    // create vectors for coarser levels
+    return level.getRestrictor().restrict(r);
+  }
 
-	/**
-	 * @brief Virtual visit function that needs to be implemented in derived classes.
-	 *
-	 * @param level the level currently begin visited.
-	 * @param f the rhs vector cooresponding to the level
-	 * @param u the solution vector cooresponding to the level
-	 */
-	virtual void visit(const Level<D> &level, const Vector<D> &f, Vector<D> &u) const = 0;
+  /**
+   * @brief Virtual visit function that needs to be implemented in derived classes.
+   *
+   * @param level the level currently begin visited.
+   * @param f the rhs vector cooresponding to the level
+   * @param u the solution vector cooresponding to the level
+   */
+  virtual void visit(const Level<D>& level, const Vector<D>& f, Vector<D>& u) const = 0;
 
-	public:
-	/**
-	 * @brief Create new cycle object.
-	 *
-	 * @param finest_level the finest level object.
-	 */
-	Cycle(const Level<D> &finest_level) : finest_level(new Level<D>(finest_level)) {}
-	/**
-	 * @brief Run one iteration of the cycle.
-	 *
-	 * Performs one cycle on on the system `Au=f` where `A` is the operator for the
-	 * finest level.
-	 *
-	 * @param f the RHS vector.
-	 * @param u the solution vector.
-	 */
-	void apply(const Vector<D> &f, Vector<D> &u) const
-	{
-		u.setWithGhost(0);
-		visit(*finest_level, f, u);
-	}
-	/**
-	 * @brief Get the finest Level
-	 *
-	 * @return const Level<D>& the Level
-	 */
-	const Level<D> &getFinestLevel() const
-	{
-		return *finest_level;
-	}
+public:
+  /**
+   * @brief Create new cycle object.
+   *
+   * @param finest_level the finest level object.
+   */
+  Cycle(const Level<D>& finest_level)
+    : finest_level(new Level<D>(finest_level))
+  {}
+  /**
+   * @brief Run one iteration of the cycle.
+   *
+   * Performs one cycle on on the system `Au=f` where `A` is the operator for the
+   * finest level.
+   *
+   * @param f the RHS vector.
+   * @param u the solution vector.
+   */
+  void apply(const Vector<D>& f, Vector<D>& u) const
+  {
+    u.setWithGhost(0);
+    visit(*finest_level, f, u);
+  }
+  /**
+   * @brief Get the finest Level
+   *
+   * @return const Level<D>& the Level
+   */
+  const Level<D>& getFinestLevel() const { return *finest_level; }
 };
 extern template class Cycle<2>;
 extern template class Cycle<3>;

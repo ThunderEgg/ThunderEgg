@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2020-2021 Scott Aiton
@@ -28,18 +28,19 @@
 
 #include <ThunderEgg/RuntimeError.h>
 
-namespace ThunderEgg::Iterative
-{
+namespace ThunderEgg::Iterative {
 /**
  * @brief Breakdown exception for iterative methods
  */
-struct BreakdownError : RuntimeError {
-	/**
-	 * @brief Construct a new RuntimeError object
-	 *
-	 * @param message the message to print
-	 */
-	BreakdownError(std::string message) : RuntimeError(message){};
+struct BreakdownError : RuntimeError
+{
+  /**
+   * @brief Construct a new RuntimeError object
+   *
+   * @param message the message to print
+   */
+  BreakdownError(std::string message)
+    : RuntimeError(message){};
 };
 } // namespace ThunderEgg::Iterative
 #endif

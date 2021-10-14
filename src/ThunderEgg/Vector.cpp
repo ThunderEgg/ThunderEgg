@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2019-2020 Scott Aiton
@@ -19,8 +19,7 @@
  ***************************************************************************/
 
 #include "Vector.h"
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 template class Vector<1>;
 template class Vector<2>;
 template class Vector<3>;

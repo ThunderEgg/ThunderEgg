@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2020-2021 Scott Aiton
@@ -26,15 +26,14 @@
  * @brief NbrInfo class
  */
 
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Represents information about a patch's neighbor.
  *
  * Includes information like neighbor id and and indexes.
  */
-template <int D> class NbrInfo : public NbrInfoBase
-{
-};
+template<int D>
+class NbrInfo : public NbrInfoBase
+{};
 } // namespace ThunderEgg
 #endif

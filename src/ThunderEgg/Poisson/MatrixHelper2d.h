@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2018-2021 Scott Aiton
@@ -29,32 +29,31 @@
 #include <ThunderEgg/Domain.h>
 #include <petscmat.h>
 
-namespace ThunderEgg::Poisson
-{
+namespace ThunderEgg::Poisson {
 /**
  * @brief Create a matrix for the 2D second-order Laplacian operator
  */
 class MatrixHelper2d
 {
-	private:
-	Domain<2>      domain;
-	std::bitset<4> neumann;
+private:
+  Domain<2> domain;
+  std::bitset<4> neumann;
 
-	public:
-	/**
-	 * @brief Create a MatrixHelper for a given domain
-	 *
-	 * @param domain the domain
-	 * @param neumann the boundary conditions
-	 */
-	MatrixHelper2d(const Domain<2> &domain, std::bitset<4> neumann);
+public:
+  /**
+   * @brief Create a MatrixHelper for a given domain
+   *
+   * @param domain the domain
+   * @param neumann the boundary conditions
+   */
+  MatrixHelper2d(const Domain<2>& domain, std::bitset<4> neumann);
 
-	/**
-	 * @brief Form the matrix
-	 *
-	 * @return the formed matrix
-	 */
-	Mat formCRSMatrix(double lambda = 0);
+  /**
+   * @brief Form the matrix
+   *
+   * @return the formed matrix
+   */
+  Mat formCRSMatrix(double lambda = 0);
 };
 } // namespace ThunderEgg::Poisson
 #endif

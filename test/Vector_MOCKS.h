@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2020      Scott Aiton
@@ -19,8 +19,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Vector.h>
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Check if a coordinate is a ghost coordinate
  *
@@ -31,14 +30,15 @@ namespace ThunderEgg
  * @return true if it is a ghost coordinate
  * @return false if it is not a ghost coordinate
  */
-template <size_t D>
-bool isGhost(const std::array<int, D> &coord, const std::array<int, D> &ns, int num_ghost_cells)
+template<size_t D>
+bool
+isGhost(const std::array<int, D>& coord, const std::array<int, D>& ns, int num_ghost_cells)
 {
-	for (size_t i = 0; i < D; i++) {
-		if (coord[i] < 0 || coord[i] >= ns[i]) {
-			return true;
-		}
-	}
-	return false;
+  for (size_t i = 0; i < D; i++) {
+    if (coord[i] < 0 || coord[i] >= ns[i]) {
+      return true;
+    }
+  }
+  return false;
 }
 } // namespace ThunderEgg

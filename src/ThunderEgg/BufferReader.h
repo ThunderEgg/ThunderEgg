@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2018-2021 Scott Aiton
@@ -31,81 +31,76 @@
 #include <iostream>
 #include <type_traits>
 
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Class that is used to help read serialized objects from a buffer.
  */
 class BufferReader
 {
-	private:
-	/**
-	 * @brief The pointer to the buffer
-	 */
-	char *buffer = nullptr;
-	/**
-	 * @brief The current position in the buffer
-	 */
-	int pos = 0;
-	/**
-	 * @brief return if T is derived from Serializable
-	 *
-	 * @tparam T the type
-	 * @return true if derived from Serializable
-	 * @return false if not derived from Serializable
-	 */
-	template <typename T> static constexpr bool isSerializable()
-	{
-		return std::is_base_of<Serializable, T>::value;
-	}
+private:
+  /**
+   * @brief The pointer to the buffer
+   */
+  char* buffer = nullptr;
+  /**
+   * @brief The current position in the buffer
+   */
+  int pos = 0;
+  /**
+   * @brief return if T is derived from Serializable
+   *
+   * @tparam T the type
+   * @return true if derived from Serializable
+   * @return false if not derived from Serializable
+   */
+  template<typename T>
+  static constexpr bool isSerializable()
+  {
+    return std::is_base_of<Serializable, T>::value;
+  }
 
-	public:
-	/**
-	 * @brief Create a new BufferReader with given buffer.
-	 *
-	 * @param buffer the pointer to the beginning of the buffer.
-	 */
-	BufferReader(char *buffer)
-	{
-		this->buffer = buffer;
-	}
-	/**
-	 * @brief get the current position in the buffer
-	 *
-	 * @return the current position
-	 */
-	int getPos()
-	{
-		return pos;
-	}
-	/**
-	 * @brief Get an object of the buffer.
-	 *
-	 * @param obj the Serializable object.
-	 *
-	 * @return  this BufferReader
-	 */
-	BufferReader &operator>>(Serializable &obj)
-	{
-		pos += obj.deserialize(buffer + pos);
-		return *this;
-	}
-	/**
-	 * @brief Get an object from the buffer.
-	 *
-	 * @tparam T the type of the object.
-	 * @param obj the object. This object must be in serialized form.
-	 *
-	 * @return  this BufferReader
-	 */
-	template <typename T> typename std::enable_if<!isSerializable<T>(), BufferReader>::type &operator>>(T &obj)
-	{
-		for (size_t i = 0; i < sizeof(T); i++) {
-			reinterpret_cast<char *>(&obj)[i] = buffer[pos];
-			pos++;
-		}
-		return *this;
-	}
+public:
+  /**
+   * @brief Create a new BufferReader with given buffer.
+   *
+   * @param buffer the pointer to the beginning of the buffer.
+   */
+  BufferReader(char* buffer) { this->buffer = buffer; }
+  /**
+   * @brief get the current position in the buffer
+   *
+   * @return the current position
+   */
+  int getPos() { return pos; }
+  /**
+   * @brief Get an object of the buffer.
+   *
+   * @param obj the Serializable object.
+   *
+   * @return  this BufferReader
+   */
+  BufferReader& operator>>(Serializable& obj)
+  {
+    pos += obj.deserialize(buffer + pos);
+    return *this;
+  }
+  /**
+   * @brief Get an object from the buffer.
+   *
+   * @tparam T the type of the object.
+   * @param obj the object. This object must be in serialized form.
+   *
+   * @return  this BufferReader
+   */
+  template<typename T>
+  typename std::enable_if<!isSerializable<T>(), BufferReader>::type& operator>>(T& obj)
+  {
+    for (size_t i = 0; i < sizeof(T); i++) {
+      reinterpret_cast<char*>(&obj)[i] = buffer[pos];
+      pos++;
+    }
+    return *this;
+  }
 };
 } // namespace ThunderEgg
 #endif

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2019-2021 Scott Aiton
@@ -22,5 +22,7 @@
 
 template class ThunderEgg::Domain<2>;
 template class ThunderEgg::Domain<3>;
-template void ThunderEgg::to_json<2>(ThunderEgg::tpl::nlohmann::json &j, const Domain<2> &domain);
-template void ThunderEgg::to_json<3>(ThunderEgg::tpl::nlohmann::json &j, const Domain<3> &domain);
+template void
+ThunderEgg::to_json<2>(ThunderEgg::tpl::nlohmann::json& j, const Domain<2>& domain);
+template void
+ThunderEgg::to_json<3>(ThunderEgg::tpl::nlohmann::json& j, const Domain<3>& domain);

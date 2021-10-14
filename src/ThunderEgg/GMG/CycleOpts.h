@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2019-2021 Scott Aiton
@@ -26,32 +26,32 @@
  * @brief CycleOpts struct
  */
 #include <string>
-namespace ThunderEgg::GMG
-{
+namespace ThunderEgg::GMG {
 /**
  * @brief Options for Cycle classes
  */
-struct CycleOpts {
-	/**
-	 * @brief Number of sweeps on down cycle
-	 */
-	int pre_sweeps = 1;
-	/**
-	 * @brief Number of sweeps on up cycle
-	 */
-	int post_sweeps = 1;
-	/**
-	 * @brief Number of sweeps inbetween up and down
-	 */
-	int mid_sweeps = 1;
-	/**
-	 * @brief Number of sweeps on coarse level
-	 */
-	int coarse_sweeps = 1;
-	/**
-	 * @brief Cycle type
-	 */
-	std::string cycle_type = "V";
+struct CycleOpts
+{
+  /**
+   * @brief Number of sweeps on down cycle
+   */
+  int pre_sweeps = 1;
+  /**
+   * @brief Number of sweeps on up cycle
+   */
+  int post_sweeps = 1;
+  /**
+   * @brief Number of sweeps inbetween up and down
+   */
+  int mid_sweeps = 1;
+  /**
+   * @brief Number of sweeps on coarse level
+   */
+  int coarse_sweeps = 1;
+  /**
+   * @brief Cycle type
+   */
+  std::string cycle_type = "V";
 };
 } // namespace ThunderEgg::GMG
 #endif

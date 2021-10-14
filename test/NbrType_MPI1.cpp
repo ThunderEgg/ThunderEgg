@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2020-2021 Scott Aiton
@@ -25,21 +25,21 @@ using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 TEST_CASE("NbrType to_json", "[NbrType]")
 {
-	nlohmann::json j;
-	j["normal"] = NbrType::Normal;
-	j["coarse"] = NbrType::Coarse;
-	j["fine"]   = NbrType::Fine;
-	CHECK(j["normal"] == "NORMAL");
-	CHECK(j["coarse"] == "COARSE");
-	CHECK(j["fine"] == "FINE");
+  nlohmann::json j;
+  j["normal"] = NbrType::Normal;
+  j["coarse"] = NbrType::Coarse;
+  j["fine"] = NbrType::Fine;
+  CHECK(j["normal"] == "NORMAL");
+  CHECK(j["coarse"] == "COARSE");
+  CHECK(j["fine"] == "FINE");
 }
 TEST_CASE("NbrType from_json", "[NbrType]")
 {
-	nlohmann::json j;
-	j["normal"] = "NORMAL";
-	j["coarse"] = "COARSE";
-	j["fine"]   = "FINE";
-	CHECK(j["normal"].get<NbrType>() == NbrType::Normal);
-	CHECK(j["coarse"].get<NbrType>() == NbrType::Coarse);
-	CHECK(j["fine"].get<NbrType>() == NbrType::Fine);
+  nlohmann::json j;
+  j["normal"] = "NORMAL";
+  j["coarse"] = "COARSE";
+  j["fine"] = "FINE";
+  CHECK(j["normal"].get<NbrType>() == NbrType::Normal);
+  CHECK(j["coarse"].get<NbrType>() == NbrType::Coarse);
+  CHECK(j["fine"].get<NbrType>() == NbrType::Fine);
 }

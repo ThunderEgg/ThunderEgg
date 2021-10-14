@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2021      Scott Aiton
@@ -25,7 +25,8 @@ using namespace ThunderEgg;
 
 #include <catch2/catch_test_macros.hpp>
 
-void Check4x4x4RefinedBSWDomainCornerNeighborOrths(const PatchVector &domain)
+void
+Check4x4x4RefinedBSWDomainCornerNeighborOrths(const PatchVector& domain)
 {
-	CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Corner<3>::tne()).orth_on_coarse == Orthant<0>(0));
+  CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Corner<3>::tne()).orth_on_coarse == Orthant<0>(0));
 }

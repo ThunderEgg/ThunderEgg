@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2020-2021 Scott Aiton
@@ -29,89 +29,89 @@ using namespace ThunderEgg;
 
 TEST_CASE("Schur::IfaceType default constructor", "[Schur::IfaceType]")
 {
-	Schur::IfaceType<2> type;
-	CHECK_FALSE(type.isNormal());
-	CHECK_FALSE(type.isCoarseToCoarse());
-	CHECK_FALSE(type.isCoarseToFine());
-	CHECK_FALSE(type.isFineToFine());
-	CHECK_FALSE(type.isFineToCoarse());
-	CHECK(type.getOrthant() == Orthant<1>::null());
+  Schur::IfaceType<2> type;
+  CHECK_FALSE(type.isNormal());
+  CHECK_FALSE(type.isCoarseToCoarse());
+  CHECK_FALSE(type.isCoarseToFine());
+  CHECK_FALSE(type.isFineToFine());
+  CHECK_FALSE(type.isFineToCoarse());
+  CHECK(type.getOrthant() == Orthant<1>::null());
 }
 TEST_CASE("Schur::IfaceType Normal constructor", "[Schur::IfaceType]")
 {
-	Schur::IfaceType<2> type = Schur::IfaceType<2>::Normal();
-	CHECK(type.isNormal());
-	CHECK_FALSE(type.isCoarseToCoarse());
-	CHECK_FALSE(type.isCoarseToFine());
-	CHECK_FALSE(type.isFineToFine());
-	CHECK_FALSE(type.isFineToCoarse());
-	CHECK(type.getOrthant() == Orthant<1>::null());
+  Schur::IfaceType<2> type = Schur::IfaceType<2>::Normal();
+  CHECK(type.isNormal());
+  CHECK_FALSE(type.isCoarseToCoarse());
+  CHECK_FALSE(type.isCoarseToFine());
+  CHECK_FALSE(type.isFineToFine());
+  CHECK_FALSE(type.isFineToCoarse());
+  CHECK(type.getOrthant() == Orthant<1>::null());
 }
 TEST_CASE("Schur::IfaceType CoarseToCoarse constructor", "[Schur::IfaceType]")
 {
-	Schur::IfaceType<2> type = Schur::IfaceType<2>::CoarseToCoarse();
-	CHECK_FALSE(type.isNormal());
-	CHECK(type.isCoarseToCoarse());
-	CHECK_FALSE(type.isCoarseToFine());
-	CHECK_FALSE(type.isFineToFine());
-	CHECK_FALSE(type.isFineToCoarse());
-	CHECK(type.getOrthant() == Orthant<1>::null());
+  Schur::IfaceType<2> type = Schur::IfaceType<2>::CoarseToCoarse();
+  CHECK_FALSE(type.isNormal());
+  CHECK(type.isCoarseToCoarse());
+  CHECK_FALSE(type.isCoarseToFine());
+  CHECK_FALSE(type.isFineToFine());
+  CHECK_FALSE(type.isFineToCoarse());
+  CHECK(type.getOrthant() == Orthant<1>::null());
 }
 TEST_CASE("Schur::IfaceType CoarseToFine constructor", "[Schur::IfaceType]")
 {
-	for (Orthant<1> orth : Orthant<1>::getValues()) {
-		Schur::IfaceType<2> type = Schur::IfaceType<2>::CoarseToFine(orth);
-		CHECK_FALSE(type.isNormal());
-		CHECK_FALSE(type.isCoarseToCoarse());
-		CHECK(type.isCoarseToFine());
-		CHECK_FALSE(type.isFineToFine());
-		CHECK_FALSE(type.isFineToCoarse());
-		CHECK(type.getOrthant() == orth);
-	}
+  for (Orthant<1> orth : Orthant<1>::getValues()) {
+    Schur::IfaceType<2> type = Schur::IfaceType<2>::CoarseToFine(orth);
+    CHECK_FALSE(type.isNormal());
+    CHECK_FALSE(type.isCoarseToCoarse());
+    CHECK(type.isCoarseToFine());
+    CHECK_FALSE(type.isFineToFine());
+    CHECK_FALSE(type.isFineToCoarse());
+    CHECK(type.getOrthant() == orth);
+  }
 }
 TEST_CASE("Schur::IfaceType FineToFine constructor", "[Schur::IfaceType]")
 {
-	for (Orthant<1> orth : Orthant<1>::getValues()) {
-		Schur::IfaceType<2> type = Schur::IfaceType<2>::FineToFine(orth);
-		CHECK_FALSE(type.isNormal());
-		CHECK_FALSE(type.isCoarseToCoarse());
-		CHECK_FALSE(type.isCoarseToFine());
-		CHECK(type.isFineToFine());
-		CHECK_FALSE(type.isFineToCoarse());
-		CHECK(type.getOrthant() == orth);
-	}
+  for (Orthant<1> orth : Orthant<1>::getValues()) {
+    Schur::IfaceType<2> type = Schur::IfaceType<2>::FineToFine(orth);
+    CHECK_FALSE(type.isNormal());
+    CHECK_FALSE(type.isCoarseToCoarse());
+    CHECK_FALSE(type.isCoarseToFine());
+    CHECK(type.isFineToFine());
+    CHECK_FALSE(type.isFineToCoarse());
+    CHECK(type.getOrthant() == orth);
+  }
 }
 TEST_CASE("Schur::IfaceType FineToCoarse constructor", "[Schur::IfaceType]")
 {
-	for (Orthant<1> orth : Orthant<1>::getValues()) {
-		Schur::IfaceType<2> type = Schur::IfaceType<2>::FineToCoarse(orth);
-		CHECK_FALSE(type.isNormal());
-		CHECK_FALSE(type.isCoarseToCoarse());
-		CHECK_FALSE(type.isCoarseToFine());
-		CHECK_FALSE(type.isFineToFine());
-		CHECK(type.isFineToCoarse());
-		CHECK(type.getOrthant() == orth);
-	}
+  for (Orthant<1> orth : Orthant<1>::getValues()) {
+    Schur::IfaceType<2> type = Schur::IfaceType<2>::FineToCoarse(orth);
+    CHECK_FALSE(type.isNormal());
+    CHECK_FALSE(type.isCoarseToCoarse());
+    CHECK_FALSE(type.isCoarseToFine());
+    CHECK_FALSE(type.isFineToFine());
+    CHECK(type.isFineToCoarse());
+    CHECK(type.getOrthant() == orth);
+  }
 }
 TEST_CASE("Schur::IfaceType <", "[Schur::IfaceType]")
 {
-	// this is an indirect test
-	set<Schur::IfaceType<2>> ifaces;
-	ifaces.insert(Schur::IfaceType<2>());
-	ifaces.insert(Schur::IfaceType<2>::Normal());
-	ifaces.insert(Schur::IfaceType<2>::CoarseToCoarse());
-	for (Orthant<1> orth : Orthant<1>::getValues()) {
-		ifaces.insert(Schur::IfaceType<2>::CoarseToFine(orth));
-		ifaces.insert(Schur::IfaceType<2>::FineToFine(orth));
-		ifaces.insert(Schur::IfaceType<2>::FineToCoarse(orth));
-	}
-	CHECK(ifaces.size() == 9);
+  // this is an indirect test
+  set<Schur::IfaceType<2>> ifaces;
+  ifaces.insert(Schur::IfaceType<2>());
+  ifaces.insert(Schur::IfaceType<2>::Normal());
+  ifaces.insert(Schur::IfaceType<2>::CoarseToCoarse());
+  for (Orthant<1> orth : Orthant<1>::getValues()) {
+    ifaces.insert(Schur::IfaceType<2>::CoarseToFine(orth));
+    ifaces.insert(Schur::IfaceType<2>::FineToFine(orth));
+    ifaces.insert(Schur::IfaceType<2>::FineToCoarse(orth));
+  }
+  CHECK(ifaces.size() == 9);
 }
 TEST_CASE("Schur::IfaceType setOrthant", "[Schur::IfaceType]")
 {
-	Schur::IfaceType<2> type = Schur::IfaceType<2>::CoarseToFine(Orthant<1>::null());
-	for (Orthant<1> orth : Orthant<1>::getValues()) {
-		type.setOrthant(orth);
-		CHECK(type.getOrthant() == orth);
-	}
+  Schur::IfaceType<2> type = Schur::IfaceType<2>::CoarseToFine(Orthant<1>::null());
+  for (Orthant<1> orth : Orthant<1>::getValues()) {
+    type.setOrthant(orth);
+    CHECK(type.getOrthant() == orth);
+  }
 }

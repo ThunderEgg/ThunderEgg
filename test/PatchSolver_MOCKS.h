@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2020-2021 Scott Aiton
@@ -25,62 +25,44 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-namespace ThunderEgg
-{
-namespace
-{
-template <int D>
+namespace ThunderEgg {
+namespace {
+template<int D>
 class MockGhostFiller : public GhostFiller<D>
 {
-	private:
-	std::shared_ptr<bool> called = std::make_shared<bool>(false);
+private:
+  std::shared_ptr<bool> called = std::make_shared<bool>(false);
 
-	public:
-	MockGhostFiller<D> *clone() const override
-	{
-		return new MockGhostFiller<D>(*this);
-	}
-	void fillGhost(const Vector<D> &u) const override
-	{
-		*called = true;
-	}
-	bool wasCalled()
-	{
-		return *called;
-	}
+public:
+  MockGhostFiller<D>* clone() const override { return new MockGhostFiller<D>(*this); }
+  void fillGhost(const Vector<D>& u) const override { *called = true; }
+  bool wasCalled() { return *called; }
 };
-template <int D>
+template<int D>
 class MockPatchSolver : public PatchSolver<D>
 {
-	private:
-	mutable std::set<int> patches_to_be_called;
+private:
+  mutable std::set<int> patches_to_be_called;
 
-	public:
-	MockPatchSolver(const Domain<D> &     domain_in,
-	                const GhostFiller<D> &ghost_filler_in)
-	: PatchSolver<D>(domain_in, ghost_filler_in)
-	{
-		for (const PatchInfo<D> &pinfo : domain_in.getPatchInfoVector()) {
-			patches_to_be_called.insert(pinfo.id);
-		}
-	}
-	MockPatchSolver<D> *clone() const override
-	{
-		return new MockPatchSolver<D>(*this);
-	}
-	void solveSinglePatch(const PatchInfo<D> &              pinfo,
-	                      const PatchView<const double, D> &fs,
-	                      const PatchView<double, D> &      us) const override
-	{
-		CHECK(patches_to_be_called.count(pinfo.id) == 1);
-		patches_to_be_called.erase(pinfo.id);
-		std::array<int, D + 1> zero;
-		zero.fill(0);
-	}
-	bool allPatchesCalled()
-	{
-		return patches_to_be_called.empty();
-	}
+public:
+  MockPatchSolver(const Domain<D>& domain_in, const GhostFiller<D>& ghost_filler_in)
+    : PatchSolver<D>(domain_in, ghost_filler_in)
+  {
+    for (const PatchInfo<D>& pinfo : domain_in.getPatchInfoVector()) {
+      patches_to_be_called.insert(pinfo.id);
+    }
+  }
+  MockPatchSolver<D>* clone() const override { return new MockPatchSolver<D>(*this); }
+  void solveSinglePatch(const PatchInfo<D>& pinfo,
+                        const PatchView<const double, D>& fs,
+                        const PatchView<double, D>& us) const override
+  {
+    CHECK(patches_to_be_called.count(pinfo.id) == 1);
+    patches_to_be_called.erase(pinfo.id);
+    std::array<int, D + 1> zero;
+    zero.fill(0);
+  }
+  bool allPatchesCalled() { return patches_to_be_called.empty(); }
 };
 } // namespace
 } // namespace ThunderEgg

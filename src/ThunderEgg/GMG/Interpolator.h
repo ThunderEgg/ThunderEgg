@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2018-2021 Scott Aiton
@@ -27,31 +27,31 @@
  */
 #include <ThunderEgg/Vector.h>
 
-namespace ThunderEgg::GMG
-{
+namespace ThunderEgg::GMG {
 /**
  * @brief Abstract class for interpolation operators.
  */
-template <int D> class Interpolator
+template<int D>
+class Interpolator
 {
-	public:
-	/**
-	 * @brief Destroy the Interpolator object
-	 */
-	virtual ~Interpolator() {}
-	/**
-	 * @brief Clone this interpolator
-	 *
-	 * @return Interpolator<D>* a newly allocated copy of this interpolator
-	 */
-	virtual Interpolator<D> *clone() const = 0;
-	/**
-	 * @brief Virtual interpolation operation that needs to be implemented in derived classes.
-	 *
-	 * @param coarse the input vector from the coarser level.
-	 * @param fine the output vector for the fine level.
-	 */
-	virtual void interpolate(const Vector<D> &coarse, Vector<D> &fine) const = 0;
+public:
+  /**
+   * @brief Destroy the Interpolator object
+   */
+  virtual ~Interpolator() {}
+  /**
+   * @brief Clone this interpolator
+   *
+   * @return Interpolator<D>* a newly allocated copy of this interpolator
+   */
+  virtual Interpolator<D>* clone() const = 0;
+  /**
+   * @brief Virtual interpolation operation that needs to be implemented in derived classes.
+   *
+   * @param coarse the input vector from the coarser level.
+   * @param fine the output vector for the fine level.
+   */
+  virtual void interpolate(const Vector<D>& coarse, Vector<D>& fine) const = 0;
 };
 } // namespace ThunderEgg::GMG
 #endif

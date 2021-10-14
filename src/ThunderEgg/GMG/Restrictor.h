@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2018-2021 Scott Aiton
@@ -28,30 +28,30 @@
 
 #include <ThunderEgg/Vector.h>
 
-namespace ThunderEgg::GMG
-{
+namespace ThunderEgg::GMG {
 /**
  * @brief Abstract class for restriction operators.
  */
-template <int D> class Restrictor
+template<int D>
+class Restrictor
 {
-	public:
-	/**
-	 * @brief Destroy the Restrictor object
-	 */
-	virtual ~Restrictor() {}
-	/**
-	 * @brief Clone this interpolator
-	 *
-	 * @return Interpolator<D>* a newly allocated copy of this interpolator
-	 */
-	virtual Restrictor<D> *clone() const = 0;
-	/**
-	 * @brief
-	 *
-	 * @param fine
-	 */
-	virtual Vector<D> restrict(const Vector<D> &fine) const = 0;
+public:
+  /**
+   * @brief Destroy the Restrictor object
+   */
+  virtual ~Restrictor() {}
+  /**
+   * @brief Clone this interpolator
+   *
+   * @return Interpolator<D>* a newly allocated copy of this interpolator
+   */
+  virtual Restrictor<D>* clone() const = 0;
+  /**
+   * @brief
+   *
+   * @param fine
+   */
+  virtual Vector<D> restrict(const Vector<D>& fine) const = 0;
 };
 } // namespace ThunderEgg::GMG
 #endif

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2021      Scott Aiton
@@ -26,24 +26,24 @@
  * @brief GhostFillingType enum
  */
 
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief type of ghost filling.
  */
-enum class GhostFillingType {
-	/**
-	 * @brief Fill only faces
-	 */
-	Faces,
-	/**
-	 * @brief Fill faces and edges
-	 */
-	Edges,
-	/**
-	 * @brief Fill faces, edges, and corners. (or faces and corners in the 2d case)
-	 */
-	Corners
+enum class GhostFillingType
+{
+  /**
+   * @brief Fill only faces
+   */
+  Faces,
+  /**
+   * @brief Fill faces and edges
+   */
+  Edges,
+  /**
+   * @brief Fill faces, edges, and corners. (or faces and corners in the 2d case)
+   */
+  Corners
 };
 } // namespace ThunderEgg
 

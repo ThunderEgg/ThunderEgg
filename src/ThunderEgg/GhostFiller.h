@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2019-2021 Scott Aiton
@@ -26,31 +26,31 @@
  * @brief GhostFiller class
  */
 #include <ThunderEgg/Vector.h>
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Fills ghost cells on patches
  *
  * @tparam D the number of Cartesian dimensions in the patches.
  */
-template <int D> class GhostFiller
+template<int D>
+class GhostFiller
 {
-	public:
-	virtual ~GhostFiller() {}
+public:
+  virtual ~GhostFiller() {}
 
-	/**
-	 * @brief Clone this GhostFiller
-	 *
-	 * @return GhostFiller<D>* a newly allocated copy of this GhostFiller
-	 */
-	virtual GhostFiller<D> *clone() const = 0;
+  /**
+   * @brief Clone this GhostFiller
+   *
+   * @return GhostFiller<D>* a newly allocated copy of this GhostFiller
+   */
+  virtual GhostFiller<D>* clone() const = 0;
 
-	/**
-	 * @brief Fill ghost cells on a vector
-	 *
-	 * @param u  the vector
-	 */
-	virtual void fillGhost(const Vector<D> &u) const = 0;
+  /**
+   * @brief Fill ghost cells on a vector
+   *
+   * @param u  the vector
+   */
+  virtual void fillGhost(const Vector<D>& u) const = 0;
 };
 } // namespace ThunderEgg
 #endif

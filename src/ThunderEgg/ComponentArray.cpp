@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2021      Scott Aiton
@@ -19,8 +19,7 @@
  ***************************************************************************/
 
 #include "ComponentArray.h"
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 template class ComponentArray<1>;
 template class ComponentArray<2>;
 template class ComponentArray<3>;

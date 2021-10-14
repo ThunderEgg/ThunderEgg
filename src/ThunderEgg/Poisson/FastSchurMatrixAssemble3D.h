@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2019-2021 Scott Aiton
@@ -28,8 +28,7 @@
 #include <ThunderEgg/Poisson/FFTWPatchSolver.h>
 #include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <petscmat.h>
-namespace ThunderEgg::Poisson
-{
+namespace ThunderEgg::Poisson {
 /**
  * @brief A fast algorithm for forming the Schur compliment matrix
  *
@@ -40,6 +39,8 @@ namespace ThunderEgg::Poisson
  * @param solver the patch solver to use for the formation
  * @return Mat the PETSc matrix, user is responsible for destroying
  */
-Mat FastSchurMatrixAssemble3D(const Schur::InterfaceDomain<3> &iface_domain, Poisson::FFTWPatchSolver<3> &solver);
+Mat
+FastSchurMatrixAssemble3D(const Schur::InterfaceDomain<3>& iface_domain,
+                          Poisson::FFTWPatchSolver<3>& solver);
 } // namespace ThunderEgg::Poisson
 #endif

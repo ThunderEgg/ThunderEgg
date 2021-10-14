@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2018-2021 Scott Aiton
@@ -29,33 +29,33 @@
 
 #include <ThunderEgg/Vector.h>
 
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Base class for operators
  */
-template <int D> class Operator
+template<int D>
+class Operator
 {
-	public:
-	/**
-	 * @brief Destroy the Operator object
-	 */
-	virtual ~Operator() {}
+public:
+  /**
+   * @brief Destroy the Operator object
+   */
+  virtual ~Operator() {}
 
-	/**
-	 * @brief Clone this operator
-	 *
-	 * @return Operator<D>* a newly allocated copy of this operator
-	 */
-	virtual Operator<D> *clone() const = 0;
+  /**
+   * @brief Clone this operator
+   *
+   * @return Operator<D>* a newly allocated copy of this operator
+   */
+  virtual Operator<D>* clone() const = 0;
 
-	/**
-	 * @brief Virtual function that base classes have to implement.
-	 *
-	 * @param x the input vector.
-	 * @param b the output vector.
-	 */
-	virtual void apply(const Vector<D> &x, Vector<D> &b) const = 0;
+  /**
+   * @brief Virtual function that base classes have to implement.
+   *
+   * @param x the input vector.
+   * @param b the output vector.
+   */
+  virtual void apply(const Vector<D>& x, Vector<D>& b) const = 0;
 };
 } // namespace ThunderEgg
 #endif

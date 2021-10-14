@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2020-2021 Scott Aiton
@@ -27,43 +27,47 @@
 #include <ThunderEgg/tpl/json.hpp>
 #include <ostream>
 
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief The type of neighbor
  */
-enum class NbrType {
-	/**
-	 * @brief The neighbor is at the same refinement level.
-	 */
-	Normal,
-	/**
-	 * @brief The neighbor is at a coarser refinement level.
-	 */
-	Coarse,
-	/**
-	 * @brief The nighbor is at a finer refinement level.
-	 */
-	Fine
+enum class NbrType
+{
+  /**
+   * @brief The neighbor is at the same refinement level.
+   */
+  Normal,
+  /**
+   * @brief The neighbor is at a coarser refinement level.
+   */
+  Coarse,
+  /**
+   * @brief The nighbor is at a finer refinement level.
+   */
+  Fine
 };
 /**
  * @brief ostream operator that prints a string representation of NbrType enum.
  */
-inline std::ostream &operator<<(std::ostream &os, const NbrType &type)
+inline std::ostream&
+operator<<(std::ostream& os, const NbrType& type)
 {
-	switch (type) {
-		case NbrType::Coarse:
-			os << "NbrType::Coarse";
-			break;
-		case NbrType::Fine:
-			os << "NbrType::Fine";
-			break;
-		case NbrType::Normal:
-			os << "NbrType::Normal";
-			break;
-	}
-	return os;
+  switch (type) {
+    case NbrType::Coarse:
+      os << "NbrType::Coarse";
+      break;
+    case NbrType::Fine:
+      os << "NbrType::Fine";
+      break;
+    case NbrType::Normal:
+      os << "NbrType::Normal";
+      break;
+  }
+  return os;
 }
-NLOHMANN_JSON_SERIALIZE_ENUM(NbrType, {{NbrType::Normal, "NORMAL"}, {NbrType::Coarse, "COARSE"}, {NbrType::Fine, "FINE"}});
+NLOHMANN_JSON_SERIALIZE_ENUM(NbrType,
+                             { { NbrType::Normal, "NORMAL" },
+                               { NbrType::Coarse, "COARSE" },
+                               { NbrType::Fine, "FINE" } });
 } // namespace ThunderEgg
 #endif
