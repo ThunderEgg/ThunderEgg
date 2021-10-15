@@ -173,7 +173,7 @@ target_link_libraries(unit_tests_mpi3 test_shared)
 set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
 
 function(add_mpi_test TARGET NUMPROC)
-  set_target_properties(${TARGET} PROPERTIES CROSSCOMPILING_EMULATOR "${MPIEXEC};${MPIEXEC_NUMPROC_FLAG};${NUMPROC}")
+  set_target_properties(${TARGET} PROPERTIES CROSSCOMPILING_EMULATOR "${MPIEXEC};${MPIEXEC_NUMPROC_FLAG};${NUMPROC};${THUNDEREGG_MPIEXEC_FLAGS}")
   catch_discover_tests(${TARGET} TEST_PREFIX "${TARGET}___" PROPERTIES PROCESSORS ${NUMPROC})
 endfunction(add_mpi_test)
 
