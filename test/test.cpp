@@ -30,6 +30,15 @@
 int
 main(int argc, char* argv[])
 {
+  bool catch_add_tests = false;
+  for (int i = 0; i < argc; i++) {
+    catch_add_tests = strcmp(argv[i], "--list-tests") == 0;
+    if (catch_add_tests)
+      break;
+    catch_add_tests = strcmp(argv[i], "--list-reporters") == 0;
+    if (catch_add_tests)
+      break;
+  }
 #if TEST_P4EST
   sc_set_log_defaults(NULL, NULL, SC_LP_SILENT);
 #endif
@@ -39,11 +48,16 @@ main(int argc, char* argv[])
 #else
   MPI_Init(nullptr, nullptr);
 #endif
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  int result = Catch::Session().run(argc, argv);
+  int result = 0;
+  if (!catch_add_tests || rank == 0) {
+    result = Catch::Session().run(argc, argv);
+  }
 
   // abort if failure, some tests can hang otherwise
-  if (result > 0) {
+  if (!catch_add_tests && result > 0) {
     MPI_Abort(MPI_COMM_WORLD, result);
   }
 

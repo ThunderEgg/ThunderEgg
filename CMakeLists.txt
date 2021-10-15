@@ -46,9 +46,11 @@ add_subdirectory(src)
 if(examples)
   add_subdirectory(apps)
 endif(examples)
-if(unit_tests)
+
+include(CTest)
+if(BUILD_TESTING)
   add_subdirectory(test)
-endif(unit_tests)
+endif(BUILD_TESTING)
 
 find_package(Doxygen)
 if(Doxygen_FOUND)
