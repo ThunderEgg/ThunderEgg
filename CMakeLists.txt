@@ -39,13 +39,8 @@ else()
   include(cmake/p4est.cmake)
 endif()
 
-add_subdirectory(tpl)
 add_subdirectory(src)
 
-
-if(examples)
-  add_subdirectory(apps)
-endif(examples)
 
 include(CTest)
 if(BUILD_TESTING)
@@ -81,9 +76,9 @@ configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/Config.cmake.in
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindPackageMultipass.cmake
   DESTINATION lib/cmake/Modules)
 
-#write_basic_package_version_file(
-#  ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
-#  COMPATIBILITY SameMinorVersion)
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
+  COMPATIBILITY SameMinorVersion)
 
 install(TARGETS ThunderEgg EXPORT ThunderEggTargets)
 
@@ -93,7 +88,7 @@ install(EXPORT ${PROJECT_NAME}Targets
 
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake
-#  ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
   DESTINATION lib/cmake/${PROJECT_NAME})
 
 export(EXPORT ${PROJECT_NAME}Targets

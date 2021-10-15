@@ -36,12 +36,3 @@ An example of looping over a 2D Vector's data:
 			}
 		}
 	}
-
-Patch Solver
-============
-patch operator something
-patch solver something
-
-Geometric Multigrid
-===================
-if you have a patch operator and a patch solver you can create a Geometric Multigrid preconditioner.
