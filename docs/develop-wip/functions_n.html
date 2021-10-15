@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -47,6 +51,22 @@ $(function() {
 /* @license-end */</script>
 <div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('functions_n.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -65,20 +85,12 @@ $(function() {
 <div class="textblock">Here is a list of all documented class members with links to the class documentation for each member:</div>
 
 <h3><a id="index_n"></a>- n -</h3><ul>
-<li>nbr_id
-: <a class="el" href="structThunderEgg_1_1Experimental_1_1Node.html#a1dd9a08446ae236f643416978f517230">ThunderEgg::Experimental::Node&lt; D &gt;</a>
-</li>
-<li>nbrId()
-: <a class="el" href="structThunderEgg_1_1Experimental_1_1Node.html#ae9c6ea3cc8cc8cb006c2ff4ec5840957">ThunderEgg::Experimental::Node&lt; D &gt;</a>
-</li>
 <li>ne()
-: <a class="el" href="classThunderEgg_1_1Orthant.html#aeddb39e1e1927cc2682ed3a94641f99c">ThunderEgg::Orthant&lt; D &gt;</a>
+: <a class="el" href="classThunderEgg_1_1Face.html#a12884710db019384c018029a5edcd5d2">ThunderEgg::Face&lt; D, M &gt;</a>
+, <a class="el" href="classThunderEgg_1_1Orthant.html#aeddb39e1e1927cc2682ed3a94641f99c">ThunderEgg::Orthant&lt; D &gt;</a>
 </li>
-<li>Node()
-: <a class="el" href="structThunderEgg_1_1Experimental_1_1Node.html#a195656692dfcfdfb41c6f85f81552711">ThunderEgg::Experimental::Node&lt; D &gt;</a>
-</li>
-<li>nodes
-: <a class="el" href="structThunderEgg_1_1Experimental_1_1Tree.html#a926ecf6e50ac24cf3cb86e848402f216">ThunderEgg::Experimental::Tree&lt; D &gt;</a>
+<li>Nested()
+: <a class="el" href="classThunderEgg_1_1Loop.html#ab338d3e90c1ed3b4747db9399143edff">ThunderEgg::Loop</a>
 </li>
 <li>Normal()
 : <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceType.html#a488604708cf8d1b5c1b5dfd1b5e497a4">ThunderEgg::Schur::IfaceType&lt; D &gt;</a>
@@ -87,19 +99,20 @@ $(function() {
 : <a class="el" href="classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html#a2f531f874480cfdb6b6e3653f2917ab1">ThunderEgg::Schur::NormalIfaceInfo&lt; D &gt;</a>
 </li>
 <li>NormalNbrInfo()
-: <a class="el" href="classThunderEgg_1_1NormalNbrInfo.html#a2e39504edcbe12db5f2b63e61996a741">ThunderEgg::NormalNbrInfo&lt; D &gt;</a>
+: <a class="el" href="classThunderEgg_1_1NormalNbrInfo.html#aecf88944b3ed897d7e7baa8d3fd08deb">ThunderEgg::NormalNbrInfo&lt; D &gt;</a>
+</li>
+<li>north()
+: <a class="el" href="classThunderEgg_1_1Face.html#a23682e39d0715ddbdb8466fbf6c00650">ThunderEgg::Face&lt; D, M &gt;</a>
 </li>
 <li>ns
 : <a class="el" href="classThunderEgg_1_1PatchInfo.html#a8b5088be35be8a1a924365d3e42f46dd">ThunderEgg::PatchInfo&lt; D &gt;</a>
 </li>
 <li>null()
-: <a class="el" href="classThunderEgg_1_1Orthant.html#ac27ef0346a1fa7f592a46a8bd629d700">ThunderEgg::Orthant&lt; D &gt;</a>
+: <a class="el" href="classThunderEgg_1_1Face.html#a3ee3708e73fee6bf55dc6d7965e628bc">ThunderEgg::Face&lt; D, M &gt;</a>
+, <a class="el" href="classThunderEgg_1_1Orthant.html#ac27ef0346a1fa7f592a46a8bd629d700">ThunderEgg::Orthant&lt; D &gt;</a>
 </li>
 <li>num_ghost_cells
 : <a class="el" href="classThunderEgg_1_1PatchInfo.html#a95fa872e35b6f6a9987973c5d9882c26">ThunderEgg::PatchInfo&lt; D &gt;</a>
-</li>
-<li>num_levels
-: <a class="el" href="structThunderEgg_1_1Experimental_1_1Tree.html#a51ef6ec18da8b3041520fdb627986b49">ThunderEgg::Experimental::Tree&lt; D &gt;</a>
 </li>
 <li>num_local_patch_ifaces
 : <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceScatter.html#a88c44f7625d9afb25a20bca238e3db9f">ThunderEgg::Schur::PatchIfaceScatter&lt; D &gt;</a>
@@ -114,15 +127,19 @@ $(function() {
 : <a class="el" href="classThunderEgg_1_1Face.html#abfa7aa6bbe38be64b5c251c91dc746a5">ThunderEgg::Face&lt; D, M &gt;</a>
 </li>
 <li>nw()
-: <a class="el" href="classThunderEgg_1_1Orthant.html#ac1dfe3a4ffb085bf3cbb25ea6f9c9eab">ThunderEgg::Orthant&lt; D &gt;</a>
+: <a class="el" href="classThunderEgg_1_1Face.html#a4764df4386bc879145aa099b02010ddb">ThunderEgg::Face&lt; D, M &gt;</a>
+, <a class="el" href="classThunderEgg_1_1Orthant.html#ac1dfe3a4ffb085bf3cbb25ea6f9c9eab">ThunderEgg::Orthant&lt; D &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
 </body>
 </html>

@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +50,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,11 +81,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="namespaceThunderEgg_1_1Schur.html">Schur</a></li><li class="navelem"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">PatchIfaceInfo</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
@@ -87,7 +103,7 @@ Inheritance diagram for ThunderEgg::Schur::PatchIfaceInfo&lt; D &gt;:</div>
 <area shape="rect" title="This decorates a PatchInfo object with a IfaceInfo object for each side of the patch." alt="" coords="19,80,174,121"/>
 <area shape="rect" href="classThunderEgg_1_1Serializable.html" title="Interface for serializing objects." alt="" coords="5,5,188,32"/>
 </map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for ThunderEgg::Schur::PatchIfaceInfo&lt; D &gt;:</div>
 <div class="dyncontent">
@@ -96,7 +112,7 @@ Collaboration diagram for ThunderEgg::Schur::PatchIfaceInfo&lt; D &gt;:</div>
 <area shape="rect" title="This decorates a PatchInfo object with a IfaceInfo object for each side of the patch." alt="" coords="19,80,174,121"/>
 <area shape="rect" href="classThunderEgg_1_1Serializable.html" title="Interface for serializing objects." alt="" coords="5,5,188,32"/>
 </map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -107,31 +123,31 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac5b7205cb7e8ad42239b5047e8e29298"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#ac5b7205cb7e8ad42239b5047e8e29298">PatchIfaceInfo</a> (const <a class="el" href="classThunderEgg_1_1PatchInfo.html">PatchInfo</a>&lt; D &gt; &amp;<a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#ab343d1e7f5ec542d753dd8c2fa2f2285">pinfo</a>)</td></tr>
 <tr class="memdesc:ac5b7205cb7e8ad42239b5047e8e29298"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html" title="This decorates a PatchInfo object with a IfaceInfo object for each side of the patch.">PatchIfaceInfo</a> object.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#ac5b7205cb7e8ad42239b5047e8e29298">More...</a><br /></td></tr>
 <tr class="separator:ac5b7205cb7e8ad42239b5047e8e29298"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48dee1fa540e04de99d97466b12ca37c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a48dee1fa540e04de99d97466b12ca37c">setIfaceInfo</a> (<a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt; s, std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt; D &gt;&gt; info)</td></tr>
+<tr class="memitem:a48dee1fa540e04de99d97466b12ca37c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a48dee1fa540e04de99d97466b12ca37c">setIfaceInfo</a> (<a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt; s, std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt; D &gt;&gt; info)</td></tr>
 <tr class="memdesc:a48dee1fa540e04de99d97466b12ca37c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html" title="The IfaceInfo class represents the information for an interface on a given side of the patch.">IfaceInfo</a> object on a given side of the patch.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a48dee1fa540e04de99d97466b12ca37c">More...</a><br /></td></tr>
 <tr class="separator:a48dee1fa540e04de99d97466b12ca37c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb4e6cae5116790a36859b9fa7f53030"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#acb4e6cae5116790a36859b9fa7f53030">getIfaceInfo</a> (<a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt; s)</td></tr>
+<tr class="memitem:acb4e6cae5116790a36859b9fa7f53030"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#acb4e6cae5116790a36859b9fa7f53030">getIfaceInfo</a> (<a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt; s)</td></tr>
 <tr class="memdesc:acb4e6cae5116790a36859b9fa7f53030"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html" title="The IfaceInfo class represents the information for an interface on a given side of the patch.">IfaceInfo</a> object on a given side of the patch.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#acb4e6cae5116790a36859b9fa7f53030">More...</a><br /></td></tr>
 <tr class="separator:acb4e6cae5116790a36859b9fa7f53030"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ae55414db5e6a5ee6e4b4e6ddad04a4"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a1ae55414db5e6a5ee6e4b4e6ddad04a4">getIfaceInfo</a> (<a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt; s) const</td></tr>
+<tr class="memitem:a1ae55414db5e6a5ee6e4b4e6ddad04a4"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a1ae55414db5e6a5ee6e4b4e6ddad04a4">getIfaceInfo</a> (<a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt; s) const</td></tr>
 <tr class="memdesc:a1ae55414db5e6a5ee6e4b4e6ddad04a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html" title="The IfaceInfo class represents the information for an interface on a given side of the patch.">IfaceInfo</a> object on a given side of the patch.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a1ae55414db5e6a5ee6e4b4e6ddad04a4">More...</a><br /></td></tr>
 <tr class="separator:a1ae55414db5e6a5ee6e4b4e6ddad04a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f62a767fbf7ba40b6f3081719f08b6b"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html">NormalIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a3f62a767fbf7ba40b6f3081719f08b6b">getNormalIfaceInfo</a> (<a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt; s)</td></tr>
+<tr class="memitem:a3f62a767fbf7ba40b6f3081719f08b6b"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html">NormalIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a3f62a767fbf7ba40b6f3081719f08b6b">getNormalIfaceInfo</a> (<a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt; s)</td></tr>
 <tr class="memdesc:a3f62a767fbf7ba40b6f3081719f08b6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html" title="This represents an interface where the neighbor is at the same refinement level.">NormalIfaceInfo</a> object on a given side of the patch.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a3f62a767fbf7ba40b6f3081719f08b6b">More...</a><br /></td></tr>
 <tr class="separator:a3f62a767fbf7ba40b6f3081719f08b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20bd50f926952b3016f7bce73e238265"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html">NormalIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a20bd50f926952b3016f7bce73e238265">getNormalIfaceInfo</a> (<a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt; s) const</td></tr>
+<tr class="memitem:a20bd50f926952b3016f7bce73e238265"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html">NormalIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a20bd50f926952b3016f7bce73e238265">getNormalIfaceInfo</a> (<a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt; s) const</td></tr>
 <tr class="memdesc:a20bd50f926952b3016f7bce73e238265"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html" title="This represents an interface where the neighbor is at the same refinement level.">NormalIfaceInfo</a> object on a given side of the patch.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a20bd50f926952b3016f7bce73e238265">More...</a><br /></td></tr>
 <tr class="separator:a20bd50f926952b3016f7bce73e238265"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a9c3d729ffbb318beda761f4f242520"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html">CoarseIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a1a9c3d729ffbb318beda761f4f242520">getCoarseIfaceInfo</a> (<a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt; s)</td></tr>
+<tr class="memitem:a1a9c3d729ffbb318beda761f4f242520"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html">CoarseIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a1a9c3d729ffbb318beda761f4f242520">getCoarseIfaceInfo</a> (<a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt; s)</td></tr>
 <tr class="memdesc:a1a9c3d729ffbb318beda761f4f242520"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html" title="Represents the interfaces where the neighbor is at a coarser refinement level.">CoarseIfaceInfo</a> object on a given side of the patch.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a1a9c3d729ffbb318beda761f4f242520">More...</a><br /></td></tr>
 <tr class="separator:a1a9c3d729ffbb318beda761f4f242520"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4eb9ffabfd07d48b53d9c7026941b7a"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html">CoarseIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#ab4eb9ffabfd07d48b53d9c7026941b7a">getCoarseIfaceInfo</a> (<a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt; s) const</td></tr>
+<tr class="memitem:ab4eb9ffabfd07d48b53d9c7026941b7a"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html">CoarseIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#ab4eb9ffabfd07d48b53d9c7026941b7a">getCoarseIfaceInfo</a> (<a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt; s) const</td></tr>
 <tr class="memdesc:ab4eb9ffabfd07d48b53d9c7026941b7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html" title="Represents the interfaces where the neighbor is at a coarser refinement level.">CoarseIfaceInfo</a> object on a given side of the patch.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#ab4eb9ffabfd07d48b53d9c7026941b7a">More...</a><br /></td></tr>
 <tr class="separator:ab4eb9ffabfd07d48b53d9c7026941b7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e8ffd2359b02861dcb78d72ec270564"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1FineIfaceInfo.html">FineIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a0e8ffd2359b02861dcb78d72ec270564">getFineIfaceInfo</a> (<a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt; s)</td></tr>
+<tr class="memitem:a0e8ffd2359b02861dcb78d72ec270564"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1FineIfaceInfo.html">FineIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a0e8ffd2359b02861dcb78d72ec270564">getFineIfaceInfo</a> (<a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt; s)</td></tr>
 <tr class="memdesc:a0e8ffd2359b02861dcb78d72ec270564"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classThunderEgg_1_1Schur_1_1FineIfaceInfo.html" title="Represents the interfaces where the neighbors are at a finer refinement level.">FineIfaceInfo</a> object on a given side of the patch.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a0e8ffd2359b02861dcb78d72ec270564">More...</a><br /></td></tr>
 <tr class="separator:a0e8ffd2359b02861dcb78d72ec270564"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45040733a1ee628196c898207c74b91e"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1Schur_1_1FineIfaceInfo.html">FineIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a45040733a1ee628196c898207c74b91e">getFineIfaceInfo</a> (<a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt; s) const</td></tr>
+<tr class="memitem:a45040733a1ee628196c898207c74b91e"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1Schur_1_1FineIfaceInfo.html">FineIfaceInfo</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a45040733a1ee628196c898207c74b91e">getFineIfaceInfo</a> (<a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt; s) const</td></tr>
 <tr class="memdesc:a45040733a1ee628196c898207c74b91e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="classThunderEgg_1_1Schur_1_1FineIfaceInfo.html" title="Represents the interfaces where the neighbors are at a finer refinement level.">FineIfaceInfo</a> object on a given side of the patch.  <a href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a45040733a1ee628196c898207c74b91e">More...</a><br /></td></tr>
 <tr class="separator:a45040733a1ee628196c898207c74b91e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a628f0684a5479b3c3eadb15314be440a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a628f0684a5479b3c3eadb15314be440a">serialize</a> (char *buffer) const</td></tr>
@@ -153,7 +169,7 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:ab343d1e7f5ec542d753dd8c2fa2f2285"><td class="mdescLeft">&#160;</td><td class="mdescRight">associated <a class="el" href="classThunderEgg_1_1PatchInfo.html" title="Contains metadata for a patch.">PatchInfo</a> object <br /></td></tr>
 <tr class="separator:ab343d1e7f5ec542d753dd8c2fa2f2285"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e16c0aa45428fe976a21300084066a6"><td class="memItemLeft" align="right" valign="top"><a id="a8e16c0aa45428fe976a21300084066a6"></a>
-std::array&lt; std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt; D &gt; &gt;, <a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;::number_of &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a8e16c0aa45428fe976a21300084066a6">iface_info</a></td></tr>
+std::array&lt; std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt; D &gt; &gt;, <a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;::number_of &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a8e16c0aa45428fe976a21300084066a6">iface_info</a></td></tr>
 <tr class="memdesc:a8e16c0aa45428fe976a21300084066a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html" title="The IfaceInfo class represents the information for an interface on a given side of the patch.">IfaceInfo</a> objects. <br /></td></tr>
 <tr class="separator:a8e16c0aa45428fe976a21300084066a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -254,7 +270,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">std::shared_ptr&lt;<a class="el" href="classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html">CoarseIfaceInfo</a>&lt;D&gt; &gt; <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">ThunderEgg::Schur::PatchIfaceInfo</a>&lt; D &gt;::getCoarseIfaceInfo </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
         </tr>
@@ -291,7 +307,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">std::shared_ptr&lt;const <a class="el" href="classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html">CoarseIfaceInfo</a>&lt;D&gt; &gt; <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">ThunderEgg::Schur::PatchIfaceInfo</a>&lt; D &gt;::getCoarseIfaceInfo </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -328,7 +344,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">std::shared_ptr&lt;<a class="el" href="classThunderEgg_1_1Schur_1_1FineIfaceInfo.html">FineIfaceInfo</a>&lt;D&gt; &gt; <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">ThunderEgg::Schur::PatchIfaceInfo</a>&lt; D &gt;::getFineIfaceInfo </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
         </tr>
@@ -365,7 +381,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">std::shared_ptr&lt;const <a class="el" href="classThunderEgg_1_1Schur_1_1FineIfaceInfo.html">FineIfaceInfo</a>&lt;D&gt; &gt; <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">ThunderEgg::Schur::PatchIfaceInfo</a>&lt; D &gt;::getFineIfaceInfo </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -402,7 +418,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">std::shared_ptr&lt;<a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt;D&gt; &gt; <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">ThunderEgg::Schur::PatchIfaceInfo</a>&lt; D &gt;::getIfaceInfo </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
         </tr>
@@ -439,7 +455,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">std::shared_ptr&lt;const <a class="el" href="classThunderEgg_1_1Schur_1_1IfaceInfo.html">IfaceInfo</a>&lt;D&gt; &gt; <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">ThunderEgg::Schur::PatchIfaceInfo</a>&lt; D &gt;::getIfaceInfo </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -476,7 +492,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">std::shared_ptr&lt;<a class="el" href="classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html">NormalIfaceInfo</a>&lt;D&gt; &gt; <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">ThunderEgg::Schur::PatchIfaceInfo</a>&lt; D &gt;::getNormalIfaceInfo </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
         </tr>
@@ -513,7 +529,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">std::shared_ptr&lt;const <a class="el" href="classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html">NormalIfaceInfo</a>&lt;D&gt; &gt; <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">ThunderEgg::Schur::PatchIfaceInfo</a>&lt; D &gt;::getNormalIfaceInfo </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -589,7 +605,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">ThunderEgg::Schur::PatchIfaceInfo</a>&lt; D &gt;::setIfaceInfo </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classThunderEgg_1_1Face.html">Side</a>&lt; D &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespaceThunderEgg.html#ab9ea12f7263424b9aa778be631835a49">Side</a>&lt; D &gt;&#160;</td>
           <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
@@ -626,11 +642,15 @@ template&lt;int D&gt; </div>
 <li>src/ThunderEgg/Schur/<a class="el" href="PatchIfaceInfo_8h_source.html">PatchIfaceInfo.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="namespaceThunderEgg_1_1Schur.html">Schur</a></li><li class="navelem"><a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html">PatchIfaceInfo</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
 </body>
 </html>

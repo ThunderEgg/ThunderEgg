@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +50,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('classThunderEgg_1_1PETSc_1_1MatWrapper.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,11 +81,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="namespaceThunderEgg_1_1PETSc.html">PETSc</a></li><li class="navelem"><a class="el" href="classThunderEgg_1_1PETSc_1_1MatWrapper.html">MatWrapper</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
@@ -74,7 +90,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Wraps a <a class="el" href="namespaceThunderEgg_1_1PETSc.html" title="A collection of wrappers for operating with PETSc.">PETSc</a> Mat object for use as a <a class="el" href="namespaceThunderEgg.html" title="The ThunderEgg namespace.">ThunderEgg</a> <a class="el" href="classThunderEgg_1_1Operator.html" title="Base class for operators.">Operator</a>.  
+<p>Wraps a <a class="el" href="namespaceThunderEgg_1_1PETSc.html" title="A collection of wrappers for operating with PETSc.">PETSc</a> Mat object for use as an <a class="el" href="classThunderEgg_1_1Operator.html" title="Base class for operators.">Operator</a>.  
  <a href="classThunderEgg_1_1PETSc_1_1MatWrapper.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="MatWrapper_8h_source.html">MatWrapper.h</a>&gt;</code></p>
@@ -83,24 +99,24 @@ Inheritance diagram for ThunderEgg::PETSc::MatWrapper&lt; D &gt;:</div>
 <div class="dyncontent">
 <div class="center"><img src="classThunderEgg_1_1PETSc_1_1MatWrapper__inherit__graph.png" border="0" usemap="#ThunderEgg_1_1PETSc_1_1MatWrapper_3_01D_01_4_inherit__map" alt="Inheritance graph"/></div>
 <map name="ThunderEgg_1_1PETSc_1_1MatWrapper_3_01D_01_4_inherit__map" id="ThunderEgg_1_1PETSc_1_1MatWrapper_3_01D_01_4_inherit__map">
-<area shape="rect" title="Wraps a PETSc Mat object for use as a ThunderEgg Operator." alt="" coords="30,80,185,121"/>
+<area shape="rect" title="Wraps a PETSc Mat object for use as an Operator." alt="" coords="30,80,185,121"/>
 <area shape="rect" href="classThunderEgg_1_1Operator.html" title="Base class for operators." alt="" coords="5,5,209,32"/>
 </map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for ThunderEgg::PETSc::MatWrapper&lt; D &gt;:</div>
 <div class="dyncontent">
 <div class="center"><img src="classThunderEgg_1_1PETSc_1_1MatWrapper__coll__graph.png" border="0" usemap="#ThunderEgg_1_1PETSc_1_1MatWrapper_3_01D_01_4_coll__map" alt="Collaboration graph"/></div>
 <map name="ThunderEgg_1_1PETSc_1_1MatWrapper_3_01D_01_4_coll__map" id="ThunderEgg_1_1PETSc_1_1MatWrapper_3_01D_01_4_coll__map">
-<area shape="rect" title="Wraps a PETSc Mat object for use as a ThunderEgg Operator." alt="" coords="30,80,185,121"/>
+<area shape="rect" title="Wraps a PETSc Mat object for use as an Operator." alt="" coords="30,80,185,121"/>
 <area shape="rect" href="classThunderEgg_1_1Operator.html" title="Base class for operators." alt="" coords="5,5,209,32"/>
 </map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aa342e88e06c51a5fee7afd8559aa7d78"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1PETSc_1_1MatWrapper.html#aa342e88e06c51a5fee7afd8559aa7d78">MatWrapper</a> (Mat A_in)</td></tr>
-<tr class="memdesc:aa342e88e06c51a5fee7afd8559aa7d78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classThunderEgg_1_1PETSc_1_1MatWrapper.html" title="Wraps a PETSc Mat object for use as a ThunderEgg Operator.">MatWrapper</a> object.  <a href="classThunderEgg_1_1PETSc_1_1MatWrapper.html#aa342e88e06c51a5fee7afd8559aa7d78">More...</a><br /></td></tr>
+<tr class="memdesc:aa342e88e06c51a5fee7afd8559aa7d78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classThunderEgg_1_1PETSc_1_1MatWrapper.html" title="Wraps a PETSc Mat object for use as an Operator.">MatWrapper</a> object.  <a href="classThunderEgg_1_1PETSc_1_1MatWrapper.html#aa342e88e06c51a5fee7afd8559aa7d78">More...</a><br /></td></tr>
 <tr class="separator:aa342e88e06c51a5fee7afd8559aa7d78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2232980ffc1c082ce05809391129dd63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classThunderEgg_1_1PETSc_1_1MatWrapper.html">MatWrapper</a>&lt; D &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1PETSc_1_1MatWrapper.html#a2232980ffc1c082ce05809391129dd63">clone</a> () const override</td></tr>
 <tr class="memdesc:a2232980ffc1c082ce05809391129dd63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clone this wrapper.  <a href="classThunderEgg_1_1PETSc_1_1MatWrapper.html#a2232980ffc1c082ce05809391129dd63">More...</a><br /></td></tr>
@@ -118,7 +134,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="textblock"><h3>template&lt;int D&gt;<br />
 class ThunderEgg::PETSc::MatWrapper&lt; D &gt;</h3>
 
-<p>Wraps a <a class="el" href="namespaceThunderEgg_1_1PETSc.html" title="A collection of wrappers for operating with PETSc.">PETSc</a> Mat object for use as a <a class="el" href="namespaceThunderEgg.html" title="The ThunderEgg namespace.">ThunderEgg</a> <a class="el" href="classThunderEgg_1_1Operator.html" title="Base class for operators.">Operator</a>. </p>
+<p>Wraps a <a class="el" href="namespaceThunderEgg_1_1PETSc.html" title="A collection of wrappers for operating with PETSc.">PETSc</a> Mat object for use as an <a class="el" href="classThunderEgg_1_1Operator.html" title="Base class for operators.">Operator</a>. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa342e88e06c51a5fee7afd8559aa7d78"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa342e88e06c51a5fee7afd8559aa7d78">&#9670;&nbsp;</a></span>MatWrapper()</h2>
@@ -146,7 +162,7 @@ template&lt;int D&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Construct a new <a class="el" href="classThunderEgg_1_1PETSc_1_1MatWrapper.html" title="Wraps a PETSc Mat object for use as a ThunderEgg Operator.">MatWrapper</a> object. </p>
+<p>Construct a new <a class="el" href="classThunderEgg_1_1PETSc_1_1MatWrapper.html" title="Wraps a PETSc Mat object for use as an Operator.">MatWrapper</a> object. </p>
 <p>This object will not deallocate the <a class="el" href="namespaceThunderEgg_1_1PETSc.html" title="A collection of wrappers for operating with PETSc.">PETSc</a> Mat, you are responsible for deallocating it.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -243,11 +259,15 @@ template&lt;int D&gt; </div>
 <li>src/ThunderEgg/PETSc/<a class="el" href="MatWrapper_8h_source.html">MatWrapper.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="namespaceThunderEgg_1_1PETSc.html">PETSc</a></li><li class="navelem"><a class="el" href="classThunderEgg_1_1PETSc_1_1MatWrapper.html">MatWrapper</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
 </body>
 </html>

@@ -1,10 +1,13 @@
 var searchData=
 [
-  ['bicgstab_426',['BiCGStab',['../classThunderEgg_1_1Iterative_1_1BiCGStab.html',1,'ThunderEgg::Iterative']]],
-  ['bilinearghostfiller_427',['BiLinearGhostFiller',['../classThunderEgg_1_1BiLinearGhostFiller.html',1,'ThunderEgg']]],
-  ['biquadraticghostfiller_428',['BiQuadraticGhostFiller',['../classThunderEgg_1_1BiQuadraticGhostFiller.html',1,'ThunderEgg']]],
-  ['blockjacobismoother_429',['BlockJacobiSmoother',['../structThunderEgg_1_1Experimental_1_1BlockJacobiSmoother.html',1,'ThunderEgg::Experimental']]],
-  ['breakdownerror_430',['BreakdownError',['../structThunderEgg_1_1BreakdownError.html',1,'ThunderEgg']]],
-  ['bufferreader_431',['BufferReader',['../classThunderEgg_1_1BufferReader.html',1,'ThunderEgg']]],
-  ['bufferwriter_432',['BufferWriter',['../classThunderEgg_1_1BufferWriter.html',1,'ThunderEgg']]]
+  ['cg_495',['CG',['../classThunderEgg_1_1Iterative_1_1CG.html',1,'ThunderEgg::Iterative']]],
+  ['coarseifaceinfo_496',['CoarseIfaceInfo',['../classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html',1,'ThunderEgg::Schur']]],
+  ['coarsenbrinfo_497',['CoarseNbrInfo',['../classThunderEgg_1_1CoarseNbrInfo.html',1,'ThunderEgg']]],
+  ['communicator_498',['Communicator',['../classThunderEgg_1_1Communicator.html',1,'ThunderEgg']]],
+  ['componentarray_499',['ComponentArray',['../classThunderEgg_1_1ComponentArray.html',1,'ThunderEgg']]],
+  ['componentview_500',['ComponentView',['../classThunderEgg_1_1ComponentView.html',1,'ThunderEgg']]],
+  ['componentview_3c_20double_2c_20d_20_3e_501',['ComponentView&lt; double, D &gt;',['../classThunderEgg_1_1ComponentView.html',1,'ThunderEgg']]],
+  ['cycle_502',['Cycle',['../classThunderEgg_1_1GMG_1_1Cycle.html',1,'ThunderEgg::GMG']]],
+  ['cyclebuilder_503',['CycleBuilder',['../classThunderEgg_1_1GMG_1_1CycleBuilder.html',1,'ThunderEgg::GMG']]],
+  ['cycleopts_504',['CycleOpts',['../structThunderEgg_1_1GMG_1_1CycleOpts.html',1,'ThunderEgg::GMG']]]
 ];

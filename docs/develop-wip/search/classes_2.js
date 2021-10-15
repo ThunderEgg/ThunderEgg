@@ -1,14 +1,18 @@
 var searchData=
 [
-  ['cg_433',['CG',['../classThunderEgg_1_1Iterative_1_1CG.html',1,'ThunderEgg::Iterative']]],
-  ['coarseifaceinfo_434',['CoarseIfaceInfo',['../classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html',1,'ThunderEgg::Schur']]],
-  ['coarsenbrinfo_435',['CoarseNbrInfo',['../classThunderEgg_1_1CoarseNbrInfo.html',1,'ThunderEgg']]],
-  ['communicator_436',['Communicator',['../classThunderEgg_1_1Communicator.html',1,'ThunderEgg']]],
-  ['componentarray_437',['ComponentArray',['../classThunderEgg_1_1ComponentArray.html',1,'ThunderEgg']]],
-  ['componentview_438',['ComponentView',['../classThunderEgg_1_1ComponentView.html',1,'ThunderEgg']]],
-  ['componentview_3c_20double_2c_20d_20_3e_439',['ComponentView&lt; double, D &gt;',['../classThunderEgg_1_1ComponentView.html',1,'ThunderEgg']]],
-  ['contigfftwsolver_440',['ContigFftwSolver',['../classContigFftwSolver.html',1,'']]],
-  ['cycle_441',['Cycle',['../classThunderEgg_1_1GMG_1_1Cycle.html',1,'ThunderEgg::GMG']]],
-  ['cyclebuilder_442',['CycleBuilder',['../classThunderEgg_1_1GMG_1_1CycleBuilder.html',1,'ThunderEgg::GMG']]],
-  ['cycleopts_443',['CycleOpts',['../structThunderEgg_1_1GMG_1_1CycleOpts.html',1,'ThunderEgg::GMG']]]
+  ['dftpatchsolver_505',['DFTPatchSolver',['../classThunderEgg_1_1Poisson_1_1DFTPatchSolver.html',1,'ThunderEgg::Poisson']]],
+  ['dimensionalarray_506',['DimensionalArray',['../classThunderEgg_1_1DimensionalArray.html',1,'ThunderEgg']]],
+  ['dimensionalarray_3c_201_2c_20t_20_3e_507',['DimensionalArray&lt; 1, T &gt;',['../classThunderEgg_1_1DimensionalArray_3_011_00_01T_01_4.html',1,'ThunderEgg']]],
+  ['dimensionalarray_3c_20d_2c_20ghostviewinfo_20_3e_508',['DimensionalArray&lt; D, GhostViewInfo &gt;',['../classThunderEgg_1_1DimensionalArray.html',1,'ThunderEgg']]],
+  ['dimensionalarray_3c_20d_2c_20incomingghostdeque_20_3e_509',['DimensionalArray&lt; D, IncomingGhostDeque &gt;',['../classThunderEgg_1_1DimensionalArray.html',1,'ThunderEgg']]],
+  ['dimensionalarray_3c_20d_2c_20localcalldeque_20_3e_510',['DimensionalArray&lt; D, LocalCallDeque &gt;',['../classThunderEgg_1_1DimensionalArray.html',1,'ThunderEgg']]],
+  ['dimensionalarray_3c_20d_2c_20remotecalldeque_20_3e_511',['DimensionalArray&lt; D, RemoteCallDeque &gt;',['../classThunderEgg_1_1DimensionalArray.html',1,'ThunderEgg']]],
+  ['directinterpolator_512',['DirectInterpolator',['../classThunderEgg_1_1GMG_1_1DirectInterpolator.html',1,'ThunderEgg::GMG']]],
+  ['domain_513',['Domain',['../classThunderEgg_1_1Domain.html',1,'ThunderEgg']]],
+  ['domain_3c_202_20_3e_514',['Domain&lt; 2 &gt;',['../classThunderEgg_1_1Domain.html',1,'ThunderEgg']]],
+  ['domain_3c_203_20_3e_515',['Domain&lt; 3 &gt;',['../classThunderEgg_1_1Domain.html',1,'ThunderEgg']]],
+  ['domaingenerator_516',['DomainGenerator',['../classThunderEgg_1_1DomainGenerator.html',1,'ThunderEgg']]],
+  ['domaingenerator_3c_202_20_3e_517',['DomainGenerator&lt; 2 &gt;',['../classThunderEgg_1_1DomainGenerator.html',1,'ThunderEgg']]],
+  ['domaingenerator_3c_203_20_3e_518',['DomainGenerator&lt; 3 &gt;',['../classThunderEgg_1_1DomainGenerator.html',1,'ThunderEgg']]],
+  ['domaintools_519',['DomainTools',['../classThunderEgg_1_1DomainTools.html',1,'ThunderEgg']]]
 ];

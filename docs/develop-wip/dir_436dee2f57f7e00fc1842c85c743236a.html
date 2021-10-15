@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +50,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('dir_436dee2f57f7e00fc1842c85c743236a.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,22 +81,48 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b47b924eee3cf44069a0cc939df68d1d.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="dir_436dee2f57f7e00fc1842c85c743236a.html">PETSc</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="headertitle">
 <div class="title">PETSc Directory Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+<div class="dynheader">
+Directory dependency graph for PETSc:</div>
+<div class="dyncontent">
+<div class="center"><img src="dir_436dee2f57f7e00fc1842c85c743236a_dep.png" border="0" usemap="#dir__436dee2f57f7e00fc1842c85c743236a__dep" alt="src/ThunderEgg/PETSc"/></div>
+<map name="dir__436dee2f57f7e00fc1842c85c743236a__dep" id="dir__436dee2f57f7e00fc1842c85c743236a__dep">
+<area shape="rect" href="dir_436dee2f57f7e00fc1842c85c743236a.html" title="PETSc" alt="" coords="29,52,101,100"/>
+<area shape="rect" href="dir_17ba5029f47e4a25a996c347286a997a.html" title="Iterative" alt="" coords="27,148,104,196"/>
+<area shape="rect" href="dir_000004_000003.html" title="1" alt="" coords="69,122,78,137"/>
+<area shape="rect" href="dir_b47b924eee3cf44069a0cc939df68d1d.html" title="ThunderEgg" alt="" coords="16,16,115,111"/>
+</map>
+</div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="files"></a>
+Files</h2></td></tr>
+<tr class="memitem:KSPSolver_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="KSPSolver_8h.html">KSPSolver.h</a> <a href="KSPSolver_8h_source.html">[code]</a></td></tr>
+<tr class="memdesc:KSPSolver_8h"><td class="mdescLeft">&#160;</td><td class="mdescRight">KSPSolver class. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:MatShellCreator_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MatShellCreator_8h.html">MatShellCreator.h</a> <a href="MatShellCreator_8h_source.html">[code]</a></td></tr>
+<tr class="memdesc:MatShellCreator_8h"><td class="mdescLeft">&#160;</td><td class="mdescRight">MatShellCreator class. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:MatWrapper_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="MatWrapper_8h.html">MatWrapper.h</a> <a href="MatWrapper_8h_source.html">[code]</a></td></tr>
+<tr class="memdesc:MatWrapper_8h"><td class="mdescLeft">&#160;</td><td class="mdescRight">MatWrapper class. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:PCShellCreator_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="PCShellCreator_8h.html">PCShellCreator.h</a> <a href="PCShellCreator_8h_source.html">[code]</a></td></tr>
+<tr class="memdesc:PCShellCreator_8h"><td class="mdescLeft">&#160;</td><td class="mdescRight">PCShellCreator class. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b47b924eee3cf44069a0cc939df68d1d.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="dir_436dee2f57f7e00fc1842c85c743236a.html">PETSc</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
 </body>
 </html>

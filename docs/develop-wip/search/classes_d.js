@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['range_523',['Range',['../classThunderEgg_1_1Face_1_1Range.html',1,'ThunderEgg::Face&lt; D, M &gt;::Range'],['../classThunderEgg_1_1Orthant_1_1Range.html',1,'ThunderEgg::Orthant&lt; D &gt;::Range']]],
-  ['restrictor_524',['Restrictor',['../classThunderEgg_1_1GMG_1_1Restrictor.html',1,'ThunderEgg::GMG']]],
-  ['runtimeerror_525',['RuntimeError',['../structThunderEgg_1_1RuntimeError.html',1,'ThunderEgg']]]
+  ['serializable_571',['Serializable',['../classThunderEgg_1_1Serializable.html',1,'ThunderEgg']]],
+  ['sidetypepiinfo_572',['SideTypePiinfo',['../classThunderEgg_1_1Schur_1_1Interface_1_1SideTypePiinfo.html',1,'ThunderEgg::Schur::Interface']]],
+  ['smoother_573',['Smoother',['../classThunderEgg_1_1GMG_1_1Smoother.html',1,'ThunderEgg::GMG']]],
+  ['solver_574',['Solver',['../classThunderEgg_1_1Iterative_1_1Solver.html',1,'ThunderEgg::Iterative']]],
+  ['starpatchoperator_575',['StarPatchOperator',['../classThunderEgg_1_1VarPoisson_1_1StarPatchOperator.html',1,'ThunderEgg::VarPoisson::StarPatchOperator&lt; D &gt;'],['../classThunderEgg_1_1Poisson_1_1StarPatchOperator.html',1,'ThunderEgg::Poisson::StarPatchOperator&lt; D &gt;']]]
 ];

@@ -9,6 +9,10 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
@@ -46,6 +50,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('classThunderEgg_1_1GMG_1_1CycleBuilder.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -60,11 +81,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><b>GMG</b></li><li class="navelem"><a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html">CycleBuilder</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
@@ -74,7 +90,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Builder for building GMG cycles.  
+<p>Builder for <a class="el" href="namespaceThunderEgg_1_1GMG.html" title="Geometric-Multigrid classes.">GMG</a> cycles.  
  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="CycleBuilder_8h_source.html">CycleBuilder.h</a>&gt;</code></p>
@@ -82,28 +98,35 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a0f6b87b434c233e6a2235ccfee451431"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#a0f6b87b434c233e6a2235ccfee451431">CycleBuilder</a> (const <a class="el" href="structThunderEgg_1_1GMG_1_1CycleOpts.html">CycleOpts</a> &amp;opts_in)</td></tr>
-<tr class="memdesc:a0f6b87b434c233e6a2235ccfee451431"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html" title="Builder for building GMG cycles.">CycleBuilder</a> object.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#a0f6b87b434c233e6a2235ccfee451431">More...</a><br /></td></tr>
+<tr class="memdesc:a0f6b87b434c233e6a2235ccfee451431"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html" title="Builder for GMG cycles.">CycleBuilder</a> object.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#a0f6b87b434c233e6a2235ccfee451431">More...</a><br /></td></tr>
 <tr class="separator:a0f6b87b434c233e6a2235ccfee451431"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8c724ea6e0d30b5784e921db4c97e06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#af8c724ea6e0d30b5784e921db4c97e06">addFinestLevel</a> (const <a class="el" href="classThunderEgg_1_1Operator.html">Operator</a>&lt; D &gt; &amp;op, const <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html">Smoother</a>&lt; D &gt; &amp;smoother, const <a class="el" href="classThunderEgg_1_1GMG_1_1Restrictor.html">Restrictor</a>&lt; D &gt; &amp;restrictor)</td></tr>
-<tr class="memdesc:af8c724ea6e0d30b5784e921db4c97e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the finest level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a>.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#af8c724ea6e0d30b5784e921db4c97e06">More...</a><br /></td></tr>
+<tr class="memdesc:af8c724ea6e0d30b5784e921db4c97e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the finest level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base abstract class for cycles.">Cycle</a>.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#af8c724ea6e0d30b5784e921db4c97e06">More...</a><br /></td></tr>
 <tr class="separator:af8c724ea6e0d30b5784e921db4c97e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07549d866229f20b2113c6278a0d83c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#a07549d866229f20b2113c6278a0d83c9">addIntermediateLevel</a> (const <a class="el" href="classThunderEgg_1_1Operator.html">Operator</a>&lt; D &gt; &amp;op, const <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html">Smoother</a>&lt; D &gt; &amp;smoother, const <a class="el" href="classThunderEgg_1_1GMG_1_1Restrictor.html">Restrictor</a>&lt; D &gt; &amp;restrictor, const <a class="el" href="classThunderEgg_1_1GMG_1_1Interpolator.html">Interpolator</a>&lt; D &gt; &amp;interpolator)</td></tr>
-<tr class="memdesc:a07549d866229f20b2113c6278a0d83c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the next intermediate level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a>.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#a07549d866229f20b2113c6278a0d83c9">More...</a><br /></td></tr>
+<tr class="memdesc:a07549d866229f20b2113c6278a0d83c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the next intermediate level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base abstract class for cycles.">Cycle</a>.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#a07549d866229f20b2113c6278a0d83c9">More...</a><br /></td></tr>
 <tr class="separator:a07549d866229f20b2113c6278a0d83c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6a5ebd59a6907b27827f2d9acd2670c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#ac6a5ebd59a6907b27827f2d9acd2670c">addCoarsestLevel</a> (const <a class="el" href="classThunderEgg_1_1Operator.html">Operator</a>&lt; D &gt; &amp;op, <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html">Smoother</a>&lt; D &gt; &amp;smoother, const <a class="el" href="classThunderEgg_1_1GMG_1_1Interpolator.html">Interpolator</a>&lt; D &gt; &amp;interpolator)</td></tr>
-<tr class="memdesc:ac6a5ebd59a6907b27827f2d9acd2670c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the next intermediate level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a>.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#ac6a5ebd59a6907b27827f2d9acd2670c">More...</a><br /></td></tr>
+<tr class="memdesc:ac6a5ebd59a6907b27827f2d9acd2670c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add the next intermediate level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base abstract class for cycles.">Cycle</a>.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#ac6a5ebd59a6907b27827f2d9acd2670c">More...</a><br /></td></tr>
 <tr class="separator:ac6a5ebd59a6907b27827f2d9acd2670c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c091a911522fc22618f1a0e8c8f706a"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html">Cycle</a>&lt; D &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#a0c091a911522fc22618f1a0e8c8f706a">getCycle</a> () const</td></tr>
-<tr class="memdesc:a0c091a911522fc22618f1a0e8c8f706a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the completed <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a> object.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#a0c091a911522fc22618f1a0e8c8f706a">More...</a><br /></td></tr>
+<tr class="memdesc:a0c091a911522fc22618f1a0e8c8f706a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the completed <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base abstract class for cycles.">Cycle</a> object.  <a href="classThunderEgg_1_1GMG_1_1CycleBuilder.html#a0c091a911522fc22618f1a0e8c8f706a">More...</a><br /></td></tr>
 <tr class="separator:a0c091a911522fc22618f1a0e8c8f706a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;int D&gt;<br />
 class ThunderEgg::GMG::CycleBuilder&lt; D &gt;</h3>
 
-<p>Builder for building GMG cycles. </p>
-<p>User will provide <a class="el" href="classThunderEgg_1_1Operator.html" title="Base class for operators.">Operator</a>,<a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Base class for multi-grid smoothing operators.">Smoother</a>,<a class="el" href="classThunderEgg_1_1GMG_1_1Restrictor.html" title="Base class for multi-grid restriction operators.">Restrictor</a>, and <a class="el" href="classThunderEgg_1_1GMG_1_1Interpolator.html" title="base class for interpolation operators from finer levels to coarser levels.">Interpolator</a> objects for each level.</p>
-<p>addFinestLevel has to be called first, then addIntermediateLevel (if there are any), and finally addCoarsestLevel. Then getCycle can be called to get the completed <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a>. If these are called in the wrong order, an exception will be thrown.</p>
+<p>Builder for <a class="el" href="namespaceThunderEgg_1_1GMG.html" title="Geometric-Multigrid classes.">GMG</a> cycles. </p>
+<p>The user provides an <a class="el" href="classThunderEgg_1_1Operator.html" title="Base class for operators.">Operator</a>, <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Abstract class for smoothing operators.">Smoother</a>, <a class="el" href="classThunderEgg_1_1GMG_1_1Restrictor.html" title="Abstract class for restriction operators.">Restrictor</a>, and <a class="el" href="classThunderEgg_1_1GMG_1_1Interpolator.html" title="Abstract class for interpolation operators.">Interpolator</a> object for each level.</p>
+<p>The user is expected to make these calls in the following order: </p><pre class="fragment">    builder.addFinestLevel()
+    for each intermediate level (if any)
+    {
+        builder.addIntermediateLevel()
+    }
+    builder.addCoarsestLevel()
+    M = builder.getCycle();
+</pre><p>If these are called in the wrong order, an exception will be thrown.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">D</td><td>the number of cartesian dimensions </td></tr>
@@ -137,10 +160,10 @@ template&lt;int D&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Construct a new <a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html" title="Builder for building GMG cycles.">CycleBuilder</a> object. </p>
+<p>Construct a new <a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html" title="Builder for GMG cycles.">CycleBuilder</a> object. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">opts_in</td><td>the options to use for the GMG cycle </td></tr>
+    <tr><td class="paramname">opts_in</td><td>the options to use for the <a class="el" href="namespaceThunderEgg_1_1GMG.html" title="Geometric-Multigrid classes.">GMG</a> cycle </td></tr>
   </table>
   </dd>
 </dl>
@@ -190,12 +213,12 @@ template&lt;int D&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Add the next intermediate level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a>. </p>
+<p>Add the next intermediate level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base abstract class for cycles.">Cycle</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">op</td><td>the <a class="el" href="classThunderEgg_1_1Operator.html" title="Base class for operators.">Operator</a> for the level </td></tr>
-    <tr><td class="paramname">smoother</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Base class for multi-grid smoothing operators.">Smoother</a> for the level </td></tr>
-    <tr><td class="paramname">interpolator</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Interpolator.html" title="base class for interpolation operators from finer levels to coarser levels.">Interpolator</a> that restricts from this level to the finer level </td></tr>
+    <tr><td class="paramname">smoother</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Abstract class for smoothing operators.">Smoother</a> for the level </td></tr>
+    <tr><td class="paramname">interpolator</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Interpolator.html" title="Abstract class for interpolation operators.">Interpolator</a> that restricts from this level to the finer level </td></tr>
   </table>
   </dd>
 </dl>
@@ -244,12 +267,12 @@ template&lt;int D&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Add the finest level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a>. </p>
+<p>Add the finest level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base abstract class for cycles.">Cycle</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">op</td><td>the <a class="el" href="classThunderEgg_1_1Operator.html" title="Base class for operators.">Operator</a> for the level </td></tr>
-    <tr><td class="paramname">smoother</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Base class for multi-grid smoothing operators.">Smoother</a> for the level </td></tr>
-    <tr><td class="paramname">restrictor</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Restrictor.html" title="Base class for multi-grid restriction operators.">Restrictor</a> that restricts from this level to the coarser level </td></tr>
+    <tr><td class="paramname">smoother</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Abstract class for smoothing operators.">Smoother</a> for the level </td></tr>
+    <tr><td class="paramname">restrictor</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Restrictor.html" title="Abstract class for restriction operators.">Restrictor</a> that restricts from this level to the coarser level </td></tr>
     <tr><td class="paramname">vg</td><td>the VectorGenerator for the level </td></tr>
   </table>
   </dd>
@@ -305,13 +328,13 @@ template&lt;int D&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Add the next intermediate level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a>. </p>
+<p>Add the next intermediate level to the <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base abstract class for cycles.">Cycle</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">op</td><td>the <a class="el" href="classThunderEgg_1_1Operator.html" title="Base class for operators.">Operator</a> for the level </td></tr>
-    <tr><td class="paramname">smoother</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Base class for multi-grid smoothing operators.">Smoother</a> for the level </td></tr>
-    <tr><td class="paramname">restrictor</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Restrictor.html" title="Base class for multi-grid restriction operators.">Restrictor</a> that restricts from this level to the coarser level </td></tr>
-    <tr><td class="paramname">interpolator</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Interpolator.html" title="base class for interpolation operators from finer levels to coarser levels.">Interpolator</a> that restricts from this level to the finer level </td></tr>
+    <tr><td class="paramname">smoother</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Abstract class for smoothing operators.">Smoother</a> for the level </td></tr>
+    <tr><td class="paramname">restrictor</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Restrictor.html" title="Abstract class for restriction operators.">Restrictor</a> that restricts from this level to the coarser level </td></tr>
+    <tr><td class="paramname">interpolator</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1Interpolator.html" title="Abstract class for interpolation operators.">Interpolator</a> that restricts from this level to the finer level </td></tr>
     <tr><td class="paramname">vg</td><td>the VectorGenerator for the level </td></tr>
   </table>
   </dd>
@@ -344,8 +367,8 @@ template&lt;int D&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Get the completed <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a> object. </p>
-<dl class="section return"><dt>Returns</dt><dd>std::shared_ptr&lt;Cycle&lt;D&gt;&gt; the completed <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base class for cycles. Includes functions for preparing vectors for finer and coarser levels,...">Cycle</a>, will throw an exception if it is incomplete </dd></dl>
+<p>Get the completed <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base abstract class for cycles.">Cycle</a> object. </p>
+<dl class="section return"><dt>Returns</dt><dd>std::shared_ptr&lt;Cycle&lt;D&gt;&gt; the completed <a class="el" href="classThunderEgg_1_1GMG_1_1Cycle.html" title="Base abstract class for cycles.">Cycle</a>, will throw an exception if it is incomplete </dd></dl>
 
 </div>
 </div>
@@ -353,11 +376,15 @@ template&lt;int D&gt; </div>
 <li>src/ThunderEgg/GMG/<a class="el" href="CycleBuilder_8h_source.html">CycleBuilder.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="namespaceThunderEgg_1_1GMG.html">GMG</a></li><li class="navelem"><a class="el" href="classThunderEgg_1_1GMG_1_1CycleBuilder.html">CycleBuilder</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
 </body>
 </html>
