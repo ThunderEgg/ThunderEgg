@@ -35,9 +35,9 @@ jobs:
       with:
         fetch-depth: 0
     - name: Cmake Configure
-      run: cmake --preset gcc-ci
+      run: cmake --preset ci-gcc
     - name: Build
-      run: build-wrapper-linux-x86-64 --out-dir bw-output cmake --build -parallel 2
+      run: build-wrapper-linux-x86-64 --out-dir bw-output cmake --build --preset ci-gcc -parallel 2
     - name: Run Tests
       run: ctest -j2
     - name: Generate Coverage Report
