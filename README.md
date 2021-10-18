@@ -12,12 +12,13 @@ ThunderEgg is an object-oriented C++ library designed for flexibility and to all
 # Required Software
 * MPI
 * CMake
-* BLAS and LAPACK
 
 ## Optional Software
-* FFTW - [FFTW PatchSolver](https://thunderegg.dev/docs/develop/doc/html/classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html)
-* PETSc - ThunderEgg provides [a set of interfaces](https://thunderegg.dev/docs/develop/doc/html/namespaceThunderEgg_1_1PETSc.html) to use PETSc Krylov Solvers and PETSc matrices.
+* FFTW - [FFTW PatchSolver](https://thunderegg.dev/ThunderEgg/docs/develop-wip/classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html)
+* BLAS and LAPACK - [DFT PatchSolver](https://thunderegg.dev/ThunderEgg/docs/develop-wip/classThunderEgg_1_1Poisson_1_1DFTPatchSolver.html)
+* PETSc - ThunderEgg provides [a set of interfaces](https://thunderegg.dev/ThunderEgg/docs/develop-wip/namespaceThunderEgg_1_1PETSc.html) to use PETSc Krylov Solvers and PETSc matrices.
 * p4est - for compatibility with the p4est quadtree library
+
 
 # Compiling
 Create a seperate source directory and run cmake in the build directory:
@@ -40,9 +41,3 @@ Then compile with make:
 ```
 make
 ```
-
-# Examples:
-
-Example applications are in the `apps` directory.
-
-TODO cleanup/simplify example applications
