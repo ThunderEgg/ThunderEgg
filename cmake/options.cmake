@@ -1,5 +1,4 @@
 option(examples "build example applicaitons" off)
-option(unit_tests "build unit tests" off)
 option(disable_petsc "disable the use the use of PETSc" off)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)

@@ -3,14 +3,16 @@ include(FetchContent)
 FetchContent_Declare(
   catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2
-  GIT_TAG        v3.0.0-preview3
+  #GIT_TAG        v3.0.0-preview3
+  GIT_TAG        4436a604566f18091489b55af215b8d32afe657a
 )
 
 FetchContent_MakeAvailable(catch2)
 
+list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 
-include(CTest)
-include(ParseAndAddCatchTests)
+
+include(Catch)
 
 set(TE_TEST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 configure_file(TestConfig.h.in TestConfig.h)
@@ -170,14 +172,9 @@ target_link_libraries(unit_tests_mpi3 test_shared)
 
 set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
 
-function(add_mpi_test ARG1 ARG2)
-  set(OptionalCatchTestLauncher ${MPIEXEC} "--oversubscribe" ${MPIEXEC_NUMPROC_FLAG}  ${ARG2})
-
-  parseandaddcatchtests(${ARG1})
-
-  unset(OptionalCatchTestLauncher)
-  set(AdditionalCatchParameters)
-
+function(add_mpi_test TARGET NUMPROC)
+  set_target_properties(${TARGET} PROPERTIES CROSSCOMPILING_EMULATOR "${MPIEXEC};${MPIEXEC_NUMPROC_FLAG};${NUMPROC};${THUNDEREGG_MPIEXEC_FLAGS}")
+  catch_discover_tests(${TARGET} TEST_PREFIX "${TARGET}___" PROPERTIES PROCESSORS ${NUMPROC})
 endfunction(add_mpi_test)
 
 add_mpi_test(unit_tests_mpi1 1)

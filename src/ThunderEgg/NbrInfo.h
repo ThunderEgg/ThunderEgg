@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2020-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,16 +20,20 @@
 #ifndef THUNDEREGG_NBRINFO_H
 #define THUNDEREGG_NBRINFO_H
 #include <ThunderEgg/NbrInfoBase.h>
+/**
+ * @file
+ *
+ * @brief NbrInfo class
+ */
 
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Represents information about a patch's neighbor.
  *
  * Includes information like neighbor id and and indexes.
  */
-template <int D> class NbrInfo : public NbrInfoBase
-{
-};
+template<int D>
+class NbrInfo : public NbrInfoBase
+{};
 } // namespace ThunderEgg
 #endif

@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2021      Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,25 +20,30 @@
 
 #ifndef THUNDEREGG_GHOSTFILLINGTYPE_H
 #define THUNDEREGG_GHOSTFILLINGTYPE_H
+/**
+ * @file
+ *
+ * @brief GhostFillingType enum
+ */
 
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief type of ghost filling.
  */
-enum class GhostFillingType {
-	/**
-	 * @brief Fill only faces
-	 */
-	Faces,
-	/**
-	 * @brief Fill faces and edges
-	 */
-	Edges,
-	/**
-	 * @brief Fill faces, edges, and corners. (or faces and corners in the 2d case)
-	 */
-	Corners
+enum class GhostFillingType
+{
+  /**
+   * @brief Fill only faces
+   */
+  Faces,
+  /**
+   * @brief Fill faces and edges
+   */
+  Edges,
+  /**
+   * @brief Fill faces, edges, and corners. (or faces and corners in the 2d case)
+   */
+  Corners
 };
 } // namespace ThunderEgg
 

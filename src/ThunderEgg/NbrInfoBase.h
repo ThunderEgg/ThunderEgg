@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2021      Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,14 +19,18 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_NBRINFOBASE_H
 #define THUNDEREGG_NBRINFOBASE_H
+/**
+ * @file
+ *
+ * @brief NbrInfoBase class
+ */
 #include <ThunderEgg/NbrType.h>
 #include <ThunderEgg/Serializable.h>
 #include <deque>
 #include <map>
 #include <memory>
 
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Represents information about a patch's neighbor.
  *
@@ -35,41 +38,41 @@ namespace ThunderEgg
  */
 class NbrInfoBase : public Serializable
 {
-	public:
-	/**
-	 * @brief Destroy the NbrInfo object
-	 */
-	virtual ~NbrInfoBase() = default;
-	/**
-	 * @brief Get the NbrType
-	 */
-	virtual NbrType getNbrType() const = 0;
-	/**
-	 * @brief Add to a deque of neighbor ids
-	 */
-	virtual void getNbrIds(std::deque<int> &nbr_ids) const = 0;
-	/**
-	 * @brief Add to a deque of neighbor ranks
-	 */
-	virtual void getNbrRanks(std::deque<int> &nbr_ranks) const = 0;
-	/**
-	 * @brief Set the local indexes in the NbrInfo objects
-	 *
-	 * @param rev_map map from id to local_index
-	 */
-	virtual void setGlobalIndexes(const std::map<int, int> &rev_map) = 0;
-	/**
-	 * @brief Set the global indexes in the NbrInfo objects
-	 *
-	 * @param rev_map map from local_index to global_index
-	 */
-	virtual void setLocalIndexes(const std::map<int, int> &rev_map) = 0;
-	/**
-	 * @brief get a clone of this object (equivalent to copy constructor)
-	 *
-	 * @return std::unique_ptr<NbrInfo> the cloned object
-	 */
-	virtual std::unique_ptr<NbrInfoBase> clone() const = 0;
+public:
+  /**
+   * @brief Destroy the NbrInfo object
+   */
+  virtual ~NbrInfoBase() = default;
+  /**
+   * @brief Get the NbrType
+   */
+  virtual NbrType getNbrType() const = 0;
+  /**
+   * @brief Add to a deque of neighbor ids
+   */
+  virtual void getNbrIds(std::deque<int>& nbr_ids) const = 0;
+  /**
+   * @brief Add to a deque of neighbor ranks
+   */
+  virtual void getNbrRanks(std::deque<int>& nbr_ranks) const = 0;
+  /**
+   * @brief Set the local indexes in the NbrInfo objects
+   *
+   * @param rev_map map from id to local_index
+   */
+  virtual void setGlobalIndexes(const std::map<int, int>& rev_map) = 0;
+  /**
+   * @brief Set the global indexes in the NbrInfo objects
+   *
+   * @param rev_map map from local_index to global_index
+   */
+  virtual void setLocalIndexes(const std::map<int, int>& rev_map) = 0;
+  /**
+   * @brief get a clone of this object (equivalent to copy constructor)
+   *
+   * @return std::unique_ptr<NbrInfo> the cloned object
+   */
+  virtual std::unique_ptr<NbrInfoBase> clone() const = 0;
 };
 } // namespace ThunderEgg
 #endif

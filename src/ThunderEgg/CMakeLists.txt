@@ -4,8 +4,6 @@ target_sources(ThunderEgg PRIVATE BiLinearGhostFiller.cpp)
 list(APPEND ThunderEgg_HDRS BiQuadraticGhostFiller.h)
 target_sources(ThunderEgg PRIVATE BiQuadraticGhostFiller.cpp)
 
-list(APPEND ThunderEgg_HDRS BreakdownError.h)
-
 list(APPEND ThunderEgg_HDRS BufferReader.h)
 
 list(APPEND ThunderEgg_HDRS BufferWriter.h)
@@ -20,8 +18,6 @@ target_sources(ThunderEgg PRIVATE ComponentArray.cpp)
 
 list(APPEND ThunderEgg_HDRS ComponentView.h)
 target_sources(ThunderEgg PRIVATE ComponentView.cpp)
-
-list(APPEND ThunderEgg_HDRS DivergenceError.h)
 
 list(APPEND ThunderEgg_HDRS DimensionalArray.h)
 
@@ -93,8 +89,6 @@ target_sources(ThunderEgg PRIVATE Timer.cpp)
 list(APPEND ThunderEgg_HDRS TriLinearGhostFiller.h)
 target_sources(ThunderEgg PRIVATE TriLinearGhostFiller.cpp)
 
-list(APPEND ThunderEgg_HDRS TypeDefs.h)
-
 list(APPEND ThunderEgg_HDRS Vector.h)
 target_sources(ThunderEgg PRIVATE Vector.cpp)
 
@@ -109,7 +103,6 @@ install(
 )
 
 # -- subdirectories
-add_subdirectory(Experimental)
 add_subdirectory(GMG)
 add_subdirectory(PETSc)
 add_subdirectory(Poisson)

@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
-project(ThunderEgg LANGUAGES CXX)
+project(ThunderEgg 
+        VERSION 1.0.0
+        LANGUAGES CXX)
 enable_testing()
 
 # set(CMAKE_CXX_EXTENSIONS OFF)
@@ -37,43 +39,15 @@ else()
   include(cmake/p4est.cmake)
 endif()
 
-add_subdirectory(tpl)
 add_subdirectory(src)
 
 
-if(examples)
-  add_subdirectory(apps)
-endif(examples)
-if(unit_tests)
+include(CTest)
+if(BUILD_TESTING)
   add_subdirectory(test)
-endif(unit_tests)
+endif(BUILD_TESTING)
 
-find_package(Doxygen)
-if(Doxygen_FOUND)
-  option(BUILD_DOCUMENTATION
-       "Create and install the HTML based API documentation (requires Doxygen)"
-       ${DOXYGEN_FOUND})
-endif(Doxygen_FOUND)
-
-if(BUILD_DOCUMENTATION)
-  if(NOT DOXYGEN_FOUND)
-    message(FATAL_ERROR "Doxygen is needed to build the documentation.")
-  endif()
-  if(NOT DEFINED THUNDEREGG_HTML_OUTPUT_DIR)
-    set(THUNDEREGG_HTML_OUTPUT_DIR "html")
-  endif()
-
-  set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
-  set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-
-  configure_file(${doxyfile_in} ${doxyfile} @ONLY)
-  add_custom_target(
-    doc
-    COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMENT "Generating API documentation with Doxygen"
-    VERBATIM)
-endif()
+include(cmake/documentation.cmake)
 
 include(CMakePackageConfigHelpers)
 
@@ -102,9 +76,9 @@ configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/Config.cmake.in
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindPackageMultipass.cmake
   DESTINATION lib/cmake/Modules)
 
-#write_basic_package_version_file(
-#  ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
-#  COMPATIBILITY SameMinorVersion)
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
+  COMPATIBILITY SameMinorVersion)
 
 install(TARGETS ThunderEgg EXPORT ThunderEggTargets)
 
@@ -114,7 +88,7 @@ install(EXPORT ${PROJECT_NAME}Targets
 
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake
-#  ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
   DESTINATION lib/cmake/${PROJECT_NAME})
 
 export(EXPORT ${PROJECT_NAME}Targets

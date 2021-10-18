@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2018-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,35 +20,37 @@
 
 #ifndef THUNDEREGG_GMG_SMOOTHER_H
 #define THUNDEREGG_GMG_SMOOTHER_H
-#include <ThunderEgg/Vector.h>
-namespace ThunderEgg
-{
-namespace GMG
-{
 /**
- * @brief Base class for multi-grid smoothing operators.
+ * @file
+ *
+ * @brief Smoother class
  */
-template <int D> class Smoother
+#include <ThunderEgg/Vector.h>
+namespace ThunderEgg::GMG {
+/**
+ * @brief Abstract class for smoothing operators.
+ */
+template<int D>
+class Smoother
 {
-	public:
-	/**
-	 * @brief Destroy the Smoother object
-	 */
-	virtual ~Smoother() {}
-	/**
-	 * @brief Clone this smoother
-	 *
-	 * @return Smoother<D>* a newly allocated copy of this smoother
-	 */
-	virtual Smoother<D> *clone() const = 0;
-	/**
-	 * @brief Virtual function that derived classes have to implement.
-	 *
-	 * @param f the RHS vector
-	 * @param u the solution vector, updated upon return.
-	 */
-	virtual void smooth(const Vector<D> &f, Vector<D> &u) const = 0;
+public:
+  /**
+   * @brief Destroy the Smoother object
+   */
+  virtual ~Smoother() {}
+  /**
+   * @brief Clone this smoother
+   *
+   * @return Smoother<D>* a newly allocated copy of this smoother
+   */
+  virtual Smoother<D>* clone() const = 0;
+  /**
+   * @brief Virtual function that derived classes have to implement.
+   *
+   * @param f the RHS vector
+   * @param u the solution vector, updated upon return.
+   */
+  virtual void smooth(const Vector<D>& f, Vector<D>& u) const = 0;
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

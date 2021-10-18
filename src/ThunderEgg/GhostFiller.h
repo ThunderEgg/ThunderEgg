@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2019-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,34 +18,39 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_GHOSTEFILLER_H
-#define THUNDEREGG_GHOSTEFILLER_H
+#ifndef THUNDEREGG_GHOSTFILLER_H
+#define THUNDEREGG_GHOSTFILLER_H
+/**
+ * @file
+ *
+ * @brief GhostFiller class
+ */
 #include <ThunderEgg/Vector.h>
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Fills ghost cells on patches
  *
  * @tparam D the number of Cartesian dimensions in the patches.
  */
-template <int D> class GhostFiller
+template<int D>
+class GhostFiller
 {
-	public:
-	virtual ~GhostFiller() {}
+public:
+  virtual ~GhostFiller() {}
 
-	/**
-	 * @brief Clone this GhostFiller
-	 *
-	 * @return GhostFiller<D>* a newly allocated copy of this GhostFiller
-	 */
-	virtual GhostFiller<D> *clone() const = 0;
+  /**
+   * @brief Clone this GhostFiller
+   *
+   * @return GhostFiller<D>* a newly allocated copy of this GhostFiller
+   */
+  virtual GhostFiller<D>* clone() const = 0;
 
-	/**
-	 * @brief Fill ghost cells on a vector
-	 *
-	 * @param u  the vector
-	 */
-	virtual void fillGhost(const Vector<D> &u) const = 0;
+  /**
+   * @brief Fill ghost cells on a vector
+   *
+   * @param u  the vector
+   */
+  virtual void fillGhost(const Vector<D>& u) const = 0;
 };
 } // namespace ThunderEgg
 #endif

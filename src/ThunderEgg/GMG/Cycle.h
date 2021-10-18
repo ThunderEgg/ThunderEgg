@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2018-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,84 +20,90 @@
 
 #ifndef THUNDEREGG_GMG_CYCLE_H
 #define THUNDEREGG_GMG_CYCLE_H
+/**
+ * @file
+ *
+ * @brief Cycle class
+ */
 
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/Vector.h>
 #include <list>
 
-namespace ThunderEgg
-{
-namespace GMG
-{
+namespace ThunderEgg::GMG {
 /**
- * @brief Base class for cycles. Includes functions for preparing vectors for finer and coarser
- * levels, and a function to run an iteration of smoothing on a level. Derived cycle classes
- * need to implement the visit function.
+ * @brief Base abstract class for cycles.
+ *
+ * There is an abstract visit() function for base classes to implement.
  */
-template <int D> class Cycle : public Operator<D>
+template<int D>
+class Cycle : public Operator<D>
 {
-	private:
-	/**
-	 * @brief pointer to the finest level
-	 */
-	std::shared_ptr<Level<D>> finest_level;
+private:
+  /**
+   * @brief pointer to the finest level
+   */
+  std::shared_ptr<const Level<D>> finest_level;
 
-	protected:
-	/**
-	 * @brief Prepare vectors for coarser level.
-	 *
-	 * @param level the current level
-	 */
-	Vector<D> restrict(const Level<D> &level, const Vector<D> &f, const Vector<D> &u) const
-	{
-		// calculate residual
-		Vector<D> r = u.getZeroClone();
-		level.getOperator().apply(u, r);
-		r.scaleThenAdd(-1, f);
-		// create vectors for coarser levels
-		return level.getRestrictor().restrict(r);
-	}
+protected:
+  /**
+   * @brief Prepare vectors for coarser level.
+   *
+   * @param level the current level
+   * @param f the rhs vector cooresponding to the level
+   * @param u the solution vector cooresponding to the level
+   * @return Vector<D> the restricted residual vector
+   */
+  Vector<D> restrict(const Level<D>& level, const Vector<D>& f, const Vector<D>& u) const
+  {
+    // calculate residual
+    Vector<D> r = u.getZeroClone();
+    level.getOperator().apply(u, r);
+    r.scaleThenAdd(-1, f);
+    // create vectors for coarser levels
+    return level.getRestrictor().restrict(r);
+  }
 
-	/**
-	 * @brief Virtual visit function that needs to be implemented in derived classes.
-	 *
-	 * @param level the level currently begin visited.
-	 */
-	virtual void visit(const Level<D> &level, const Vector<D> &f, Vector<D> &u) const = 0;
+  /**
+   * @brief Virtual visit function that needs to be implemented in derived classes.
+   *
+   * @param level the level currently begin visited.
+   * @param f the rhs vector cooresponding to the level
+   * @param u the solution vector cooresponding to the level
+   */
+  virtual void visit(const Level<D>& level, const Vector<D>& f, Vector<D>& u) const = 0;
 
-	public:
-	/**
-	 * @brief Create new cycle object.
-	 *
-	 * @param finest_level pointer to the finest level object.
-	 */
-	Cycle(std::shared_ptr<Level<D>> finest_level)
-	{
-		this->finest_level = finest_level;
-	}
-	/**
-	 * @brief Run one iteration of the cycle.
-	 *
-	 * @param f the RHS vector.
-	 * @param u the current solution vector. Output will be updated solution vector.
-	 */
-	void apply(const Vector<D> &f, Vector<D> &u) const
-	{
-		u.setWithGhost(0);
-		visit(*finest_level, f, u);
-	}
-	/**
-	 * @brief Get the finest Level object
-	 *
-	 * @return std::shared_ptr<const Level<D>> the Level
-	 */
-	std::shared_ptr<const Level<D>> getFinestLevel() const
-	{
-		return finest_level;
-	}
+public:
+  /**
+   * @brief Create new cycle object.
+   *
+   * @param finest_level the finest level object.
+   */
+  Cycle(const Level<D>& finest_level)
+    : finest_level(new Level<D>(finest_level))
+  {}
+  /**
+   * @brief Run one iteration of the cycle.
+   *
+   * Performs one cycle on on the system `Au=f` where `A` is the operator for the
+   * finest level.
+   *
+   * @param f the RHS vector.
+   * @param u the solution vector.
+   */
+  void apply(const Vector<D>& f, Vector<D>& u) const
+  {
+    u.setWithGhost(0);
+    visit(*finest_level, f, u);
+  }
+  /**
+   * @brief Get the finest Level
+   *
+   * @return const Level<D>& the Level
+   */
+  const Level<D>& getFinestLevel() const { return *finest_level; }
 };
 extern template class Cycle<2>;
 extern template class Cycle<3>;
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

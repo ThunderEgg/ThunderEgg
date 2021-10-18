@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019-2020 ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2020-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,85 +20,85 @@
 
 #ifndef THUNDEREGG_GMG_MPIRESTRICTOR_H
 #define THUNDEREGG_GMG_MPIRESTRICTOR_H
+/**
+ * @file
+ *
+ * @brief MPIRestrictor class
+ */
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/Restrictor.h>
-#include <memory>
-namespace ThunderEgg
-{
-namespace GMG
-{
+namespace ThunderEgg::GMG {
 /**
- * @brief Restrictor that implements the necessary mpi calls, derived classes only have to
- * implement restrictorPatches method
+ * @brief Base class that makes the necessary mpi calls, derived classes only have to
+ * implement restrictPatches() method
  */
-template <int D> class MPIRestrictor : public Restrictor<D>
+template<int D>
+class MPIRestrictor : public Restrictor<D>
 {
-	private:
-	/**
-	 * @brief The communication package for restricting between levels.
-	 */
-	mutable InterLevelComm<D> ilc;
+private:
+  /**
+   * @brief The communication package for restricting between levels.
+   */
+  mutable InterLevelComm<D> ilc;
 
-	public:
-	/**
-	 * @brief Create new LinearRestrictor object.
-	 *
-	 * @param ilc the communcation package for the two levels.
-	 */
-	MPIRestrictor(const Domain<D> &coarser_domain, const Domain<D> &finer_domain) : ilc(coarser_domain, finer_domain) {}
-	Vector<D> restrict(const Vector<D> &fine) const override
-	{
-		if constexpr (ENABLE_DEBUG) {
-			if (fine.getNumLocalPatches() != ilc->getFinerDomain()->getNumLocalPatches()) {
-				throw RuntimeError("fine vector is incorrect length. Expected Lenght of "
-				                   + std::to_string(ilc->getFinerDomain()->getNumLocalPatches()) + " but vector was length "
-				                   + std::to_string(fine.getNumLocalPatches()));
-			}
-		}
-		Vector<D> coarse       = getNewCoarserVector(fine.getNumComponents());
-		Vector<D> coarse_ghost = ilc.getNewGhostVector(fine.getNumComponents());
+public:
+  /**
+   * @brief Create new LinearRestrictor object.
+   *
+   * @param ilc the communcation package for the two levels.
+   */
+  MPIRestrictor(const Domain<D>& coarser_domain, const Domain<D>& finer_domain)
+    : ilc(coarser_domain, finer_domain)
+  {}
+  Vector<D> restrict(const Vector<D>& fine) const override
+  {
+    if constexpr (ENABLE_DEBUG) {
+      if (fine.getNumLocalPatches() != ilc.getFinerDomain().getNumLocalPatches()) {
+        throw RuntimeError("fine vector is incorrect length. Expected Length of " +
+                           std::to_string(ilc.getFinerDomain().getNumLocalPatches()) +
+                           " but vector was length " + std::to_string(fine.getNumLocalPatches()));
+      }
+    }
+    Vector<D> coarse(ilc.getCoarserDomain(), fine.getNumComponents());
+    Vector<D> coarse_ghost = ilc.getNewGhostVector(fine.getNumComponents());
 
-		// fill in ghost values
-		restrictPatches(ilc.getPatchesWithGhostParent(), fine, coarse_ghost);
+    // fill in ghost values
+    restrictPatches(ilc.getPatchesWithGhostParent(), fine, coarse_ghost);
 
-		// clear values in coarse vector
-		coarse.setWithGhost(0);
+    // clear values in coarse vector
+    coarse.setWithGhost(0);
 
-		// start scatter for ghost values
-		ilc.sendGhostPatchesStart(coarse, coarse_ghost);
+    // start scatter for ghost values
+    ilc.sendGhostPatchesStart(coarse, coarse_ghost);
 
-		// fill in local values
-		restrictPatches(ilc.getPatchesWithLocalParent(), fine, coarse);
+    // fill in local values
+    restrictPatches(ilc.getPatchesWithLocalParent(), fine, coarse);
 
-		// finish scatter for ghost values
-		ilc.sendGhostPatchesFinish(coarse, coarse_ghost);
+    // finish scatter for ghost values
+    ilc.sendGhostPatchesFinish(coarse, coarse_ghost);
 
-		return coarse;
-	}
-	Vector<D> getNewCoarserVector(int num_components) const override
-	{
-		return Vector<D>(ilc.getCoarserDomain(), num_components);
-	}
-	/**
-	 * @brief Restrict values into coarse vector
-	 *
-	 * The idea behind this is that this function will be called twice. Once to fill in the ghost
-	 * values, and once to fill in the local values. The ghost values will be filled first and the
-	 * local values will be fill while MPI communication is happening.
-	 *
-	 * @param patches pairs where the first value is the index in the coarse vector and the second
-	 * value is a reference to the PatchInfo object
-	 * @param finer_vector the finer vector
-	 * @param coarser_vector the coaser vector
-	 */
-	virtual void restrictPatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> &patches,
-	                             const Vector<D> &                                                              finer_vector,
-	                             Vector<D> &                                                                    coarser_vector) const = 0;
+    return coarse;
+  }
+  /**
+   * @brief Restrict values into coarse vector
+   *
+   * The idea behind this is that this function will be called twice. Once to fill in the ghost
+   * values, and once to fill in the local values. The ghost values will be filled first and the
+   * local values will be fill while MPI communication is happening.
+   *
+   * @param patches pairs where the first value is the index in the coarse vector and the second
+   * value is a reference to the PatchInfo object
+   * @param finer_vector the finer vector
+   * @param coarser_vector the coarser vector
+   */
+  virtual void restrictPatches(
+    const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches,
+    const Vector<D>& finer_vector,
+    Vector<D>& coarser_vector) const = 0;
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 // explicit instantiation
 extern template class ThunderEgg::GMG::MPIRestrictor<2>;
 extern template class ThunderEgg::GMG::MPIRestrictor<3>;

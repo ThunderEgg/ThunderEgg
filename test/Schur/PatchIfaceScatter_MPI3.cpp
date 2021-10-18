@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2020-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -43,84 +42,89 @@ using namespace ThunderEgg;
 TEST_CASE("Schur::PatchIfaceScatter<2> throws exception for non-square patches",
           "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto nx = GENERATE(5, 7);
-	INFO("NX: " << nx);
-	auto ny = GENERATE(6, 8);
-	INFO("NY: " << ny);
-	DomainReader<2>           domain_reader(mesh_file, {nx, ny}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto nx = GENERATE(5, 7);
+  INFO("NX: " << nx);
+  auto ny = GENERATE(6, 8);
+  INFO("NY: " << ny);
+  DomainReader<2> domain_reader(mesh_file, { nx, ny }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	CHECK_THROWS_AS(Schur::PatchIfaceScatter<2>(iface_domain), RuntimeError);
+  CHECK_THROWS_AS(Schur::PatchIfaceScatter<2>(iface_domain), RuntimeError);
 }
-TEST_CASE(
-"Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different global vectors",
-"[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different "
+          "global vectors",
+          "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto n = GENERATE(5, 10);
+  INFO("N" << n);
 
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
+  Schur::PatchIfaceScatter<2> scatter(iface_domain);
 
-	Vector<1> global_vector(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	Vector<1> global_vector_2(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	auto      local_vector = scatter.getNewLocalPatchIfaceVector();
+  Vector<1> global_vector(
+    domain.getCommunicator(), { n }, 1, iface_domain.getNumLocalInterfaces(), 0);
+  Vector<1> global_vector_2(
+    domain.getCommunicator(), { n }, 1, iface_domain.getNumLocalInterfaces(), 0);
+  auto local_vector = scatter.getNewLocalPatchIfaceVector();
 
-	auto state = scatter.scatterStart(global_vector, *local_vector);
-	CHECK_THROWS_AS(scatter.scatterFinish(state, global_vector_2, *local_vector), RuntimeError);
+  auto state = scatter.scatterStart(global_vector, *local_vector);
+  CHECK_THROWS_AS(scatter.scatterFinish(state, global_vector_2, *local_vector), RuntimeError);
 }
-TEST_CASE(
-"Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different local vectors",
-"[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different "
+          "local vectors",
+          "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto n = GENERATE(5, 10);
+  INFO("N" << n);
 
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
+  Schur::PatchIfaceScatter<2> scatter(iface_domain);
 
-	Vector<1> global_vector(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	auto      local_vector   = scatter.getNewLocalPatchIfaceVector();
-	auto      local_vector_2 = scatter.getNewLocalPatchIfaceVector();
+  Vector<1> global_vector(
+    domain.getCommunicator(), { n }, 1, iface_domain.getNumLocalInterfaces(), 0);
+  auto local_vector = scatter.getNewLocalPatchIfaceVector();
+  auto local_vector_2 = scatter.getNewLocalPatchIfaceVector();
 
-	auto state = scatter.scatterStart(global_vector, *local_vector);
-	CHECK_THROWS_AS(scatter.scatterFinish(state, global_vector, *local_vector_2), RuntimeError);
+  auto state = scatter.scatterStart(global_vector, *local_vector);
+  CHECK_THROWS_AS(scatter.scatterFinish(state, global_vector, *local_vector_2), RuntimeError);
 }
-TEST_CASE(
-"Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different local and global vectors",
-"[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> scatterFinish throws exception when called with different "
+          "local and global vectors",
+          "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto n = GENERATE(5, 10);
+  INFO("N" << n);
 
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
+  Schur::PatchIfaceScatter<2> scatter(iface_domain);
 
-	Vector<1> global_vector(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	Vector<1> global_vector_2(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	auto      local_vector   = scatter.getNewLocalPatchIfaceVector();
-	auto      local_vector_2 = scatter.getNewLocalPatchIfaceVector();
+  Vector<1> global_vector(
+    domain.getCommunicator(), { n }, 1, iface_domain.getNumLocalInterfaces(), 0);
+  Vector<1> global_vector_2(
+    domain.getCommunicator(), { n }, 1, iface_domain.getNumLocalInterfaces(), 0);
+  auto local_vector = scatter.getNewLocalPatchIfaceVector();
+  auto local_vector_2 = scatter.getNewLocalPatchIfaceVector();
 
-	auto state = scatter.scatterStart(global_vector, *local_vector);
-	CHECK_THROWS_AS(scatter.scatterFinish(state, global_vector_2, *local_vector_2), RuntimeError);
+  auto state = scatter.scatterStart(global_vector, *local_vector);
+  CHECK_THROWS_AS(scatter.scatterFinish(state, global_vector_2, *local_vector_2), RuntimeError);
 }
 /******
  *
@@ -129,56 +133,56 @@ TEST_CASE(
  *
  ********/
 TEST_CASE(
-"Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vector of expected length",
-"[Schur::PatchIfaceScatter]")
+  "Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vector of expected length",
+  "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto n = GENERATE(5, 10);
+  INFO("N" << n);
 
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
+  Schur::PatchIfaceScatter<2> scatter(iface_domain);
 
-	auto     local_vector = scatter.getNewLocalPatchIfaceVector();
-	set<int> patch_iface_interfaces;
+  auto local_vector = scatter.getNewLocalPatchIfaceVector();
+  set<int> patch_iface_interfaces;
 
-	for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
-		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo.hasNbr(s)) {
-				auto iface_info = piinfo->getIfaceInfo(s);
-				patch_iface_interfaces.insert(iface_info->id);
-			}
-		}
-	}
+  for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
+    for (Side<2> s : Side<2>::getValues()) {
+      if (piinfo->pinfo.hasNbr(s)) {
+        auto iface_info = piinfo->getIfaceInfo(s);
+        patch_iface_interfaces.insert(iface_info->id);
+      }
+    }
+  }
 
-	CHECK(local_vector->getNumLocalPatches() == (int) patch_iface_interfaces.size());
-	CHECK(local_vector->getNumLocalCells() == n * (int) patch_iface_interfaces.size());
+  CHECK(local_vector->getNumLocalPatches() == (int)patch_iface_interfaces.size());
+  CHECK(local_vector->getNumLocalCells() == n * (int)patch_iface_interfaces.size());
 }
 TEST_CASE(
-"Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vector with local MPI_Comm",
-"[Schur::PatchIfaceScatter]")
+  "Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vector with local MPI_Comm",
+  "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto n = GENERATE(5, 10);
+  INFO("N" << n);
 
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
+  Schur::PatchIfaceScatter<2> scatter(iface_domain);
 
-	auto local_vector = scatter.getNewLocalPatchIfaceVector();
+  auto local_vector = scatter.getNewLocalPatchIfaceVector();
 
-	int result;
-	int err = MPI_Comm_compare(local_vector->getCommunicator().getMPIComm(), MPI_COMM_SELF, &result);
-	REQUIRE(err == MPI_SUCCESS);
-	CHECK(result == MPI_CONGRUENT);
+  int result;
+  int err = MPI_Comm_compare(local_vector->getCommunicator().getMPIComm(), MPI_COMM_SELF, &result);
+  REQUIRE(err == MPI_SUCCESS);
+  CHECK(result == MPI_CONGRUENT);
 }
 /******
  *
@@ -189,162 +193,166 @@ TEST_CASE(
 TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied",
           "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto n = GENERATE(5, 10);
+  INFO("N" << n);
 
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
+  Schur::PatchIfaceScatter<2> scatter(iface_domain);
 
-	Vector<1> global_vector(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	auto      local_vector = scatter.getNewLocalPatchIfaceVector();
+  Vector<1> global_vector(
+    domain.getCommunicator(), { n }, 1, iface_domain.getNumLocalInterfaces(), 0);
+  auto local_vector = scatter.getNewLocalPatchIfaceVector();
 
-	for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
-		auto iface      = iface_domain.getInterfaces()[i];
-		auto local_data = global_vector.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               local_data[coord] = iface->global_index + 1 + coord[0];
-		               });
-	}
-	auto state = scatter.scatterStart(global_vector, *local_vector);
-	for (auto iface : iface_domain.getInterfaces()) {
-		INFO("IFACE_ID: " << iface->id);
-		auto local_data = local_vector->getComponentView(0, iface->local_index);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               CHECK(local_data[coord] == Catch::Approx(iface->global_index + 1 + coord[0]));
-		               });
-	}
+  for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
+    auto iface = iface_domain.getInterfaces()[i];
+    auto local_data = global_vector.getComponentView(0, i);
+    Loop::Nested<1>(
+      local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) {
+        local_data[coord] = iface->global_index + 1 + coord[0];
+      });
+  }
+  auto state = scatter.scatterStart(global_vector, *local_vector);
+  for (auto iface : iface_domain.getInterfaces()) {
+    INFO("IFACE_ID: " << iface->id);
+    auto local_data = local_vector->getComponentView(0, iface->local_index);
+    Loop::Nested<1>(
+      local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) {
+        CHECK(local_data[coord] == Catch::Approx(iface->global_index + 1 + coord[0]));
+      });
+  }
 }
 TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto n = GENERATE(5, 10);
+  INFO("N" << n);
 
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
+  Schur::PatchIfaceScatter<2> scatter(iface_domain);
 
-	Vector<1> global_vector(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	auto      local_vector = scatter.getNewLocalPatchIfaceVector();
+  Vector<1> global_vector(
+    domain.getCommunicator(), { n }, 1, iface_domain.getNumLocalInterfaces(), 0);
+  auto local_vector = scatter.getNewLocalPatchIfaceVector();
 
-	for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
-		auto iface      = iface_domain.getInterfaces()[i];
-		auto local_data = global_vector.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               local_data[coord] = iface->global_index + 1 + coord[0];
-		               });
-	}
-	auto state = scatter.scatterStart(global_vector, *local_vector);
-	scatter.scatterFinish(state, global_vector, *local_vector);
-	for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
-		INFO("PATCH_ID: " << piinfo->pinfo.id);
-		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo.hasNbr(s)) {
-				INFO("Side: " << s);
-				auto iface_info = piinfo->getIfaceInfo(s);
-				auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
-				nested_loop<1>(
-				local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1> &coord) {
-					CHECK(local_data[coord] == Catch::Approx(iface_info->global_index + 1 + coord[0]));
-				});
-			}
-		}
-	}
+  for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
+    auto iface = iface_domain.getInterfaces()[i];
+    auto local_data = global_vector.getComponentView(0, i);
+    Loop::Nested<1>(
+      local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) {
+        local_data[coord] = iface->global_index + 1 + coord[0];
+      });
+  }
+  auto state = scatter.scatterStart(global_vector, *local_vector);
+  scatter.scatterFinish(state, global_vector, *local_vector);
+  for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
+    INFO("PATCH_ID: " << piinfo->pinfo.id);
+    for (Side<2> s : Side<2>::getValues()) {
+      if (piinfo->pinfo.hasNbr(s)) {
+        INFO("Side: " << s);
+        auto iface_info = piinfo->getIfaceInfo(s);
+        auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
+        Loop::Nested<1>(
+          local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) {
+            CHECK(local_data[coord] == Catch::Approx(iface_info->global_index + 1 + coord[0]));
+          });
+      }
+    }
+  }
 }
 TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice", "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto n = GENERATE(5, 10);
+  INFO("N" << n);
 
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
+  Schur::PatchIfaceScatter<2> scatter(iface_domain);
 
-	Vector<1> global_vector(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	auto      local_vector = scatter.getNewLocalPatchIfaceVector();
+  Vector<1> global_vector(
+    domain.getCommunicator(), { n }, 1, iface_domain.getNumLocalInterfaces(), 0);
+  auto local_vector = scatter.getNewLocalPatchIfaceVector();
 
-	for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
-		auto iface      = iface_domain.getInterfaces()[i];
-		auto local_data = global_vector.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               local_data[coord] = iface->global_index + 1 + coord[0];
-		               });
-	}
-	auto state = scatter.scatterStart(global_vector, *local_vector);
-	scatter.scatterFinish(state, global_vector, *local_vector);
-	state = scatter.scatterStart(global_vector, *local_vector);
-	scatter.scatterFinish(state, global_vector, *local_vector);
-	for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
-		INFO("PATCH_ID: " << piinfo->pinfo.id);
-		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo.hasNbr(s)) {
-				INFO("Side: " << s);
-				auto iface_info = piinfo->getIfaceInfo(s);
-				auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
-				nested_loop<1>(
-				local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1> &coord) {
-					CHECK(local_data[coord] == Catch::Approx(iface_info->global_index + 1 + coord[0]));
-				});
-			}
-		}
-	}
+  for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
+    auto iface = iface_domain.getInterfaces()[i];
+    auto local_data = global_vector.getComponentView(0, i);
+    Loop::Nested<1>(
+      local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) {
+        local_data[coord] = iface->global_index + 1 + coord[0];
+      });
+  }
+  auto state = scatter.scatterStart(global_vector, *local_vector);
+  scatter.scatterFinish(state, global_vector, *local_vector);
+  state = scatter.scatterStart(global_vector, *local_vector);
+  scatter.scatterFinish(state, global_vector, *local_vector);
+  for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
+    INFO("PATCH_ID: " << piinfo->pinfo.id);
+    for (Side<2> s : Side<2>::getValues()) {
+      if (piinfo->pinfo.hasNbr(s)) {
+        INFO("Side: " << s);
+        auto iface_info = piinfo->getIfaceInfo(s);
+        auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
+        Loop::Nested<1>(
+          local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) {
+            CHECK(local_data[coord] == Catch::Approx(iface_info->global_index + 1 + coord[0]));
+          });
+      }
+    }
+  }
 }
 TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled",
           "[Schur::PatchIfaceScatter]")
 {
-	auto mesh_file = GENERATE(as<std::string>{}, MESHES);
-	INFO("MESH: " << mesh_file);
-	auto n = GENERATE(5, 10);
-	INFO("N" << n);
+  auto mesh_file = GENERATE(as<std::string>{}, MESHES);
+  INFO("MESH: " << mesh_file);
+  auto n = GENERATE(5, 10);
+  INFO("N" << n);
 
-	DomainReader<2>           domain_reader(mesh_file, {n, n}, 0);
-	Domain<2>                 domain = domain_reader.getFinerDomain();
-	Schur::InterfaceDomain<2> iface_domain(domain);
+  DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
+  Domain<2> domain = domain_reader.getFinerDomain();
+  Schur::InterfaceDomain<2> iface_domain(domain);
 
-	Schur::PatchIfaceScatter<2> scatter(iface_domain);
+  Schur::PatchIfaceScatter<2> scatter(iface_domain);
 
-	Vector<1> global_vector(domain.getCommunicator(), {n}, 1, iface_domain.getNumLocalInterfaces(), 0);
-	auto      local_vector = scatter.getNewLocalPatchIfaceVector();
-	local_vector->setWithGhost(99);
+  Vector<1> global_vector(
+    domain.getCommunicator(), { n }, 1, iface_domain.getNumLocalInterfaces(), 0);
+  auto local_vector = scatter.getNewLocalPatchIfaceVector();
+  local_vector->setWithGhost(99);
 
-	for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
-		auto iface      = iface_domain.getInterfaces()[i];
-		auto local_data = global_vector.getComponentView(0, i);
-		nested_loop<1>(local_data.getStart(), local_data.getEnd(),
-		               [&](const std::array<int, 1> &coord) {
-			               local_data[coord] = iface->global_index + 1 + coord[0];
-		               });
-	}
-	auto state = scatter.scatterStart(global_vector, *local_vector);
-	scatter.scatterFinish(state, global_vector, *local_vector);
-	for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
-		INFO("PATCH_ID: " << piinfo->pinfo.id);
-		for (Side<2> s : Side<2>::getValues()) {
-			if (piinfo->pinfo.hasNbr(s)) {
-				INFO("Side: " << s);
-				auto iface_info = piinfo->getIfaceInfo(s);
-				auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
-				nested_loop<1>(
-				local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1> &coord) {
-					CHECK(local_data[coord] == Catch::Approx(iface_info->global_index + 1 + coord[0]));
-				});
-			}
-		}
-	}
+  for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
+    auto iface = iface_domain.getInterfaces()[i];
+    auto local_data = global_vector.getComponentView(0, i);
+    Loop::Nested<1>(
+      local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) {
+        local_data[coord] = iface->global_index + 1 + coord[0];
+      });
+  }
+  auto state = scatter.scatterStart(global_vector, *local_vector);
+  scatter.scatterFinish(state, global_vector, *local_vector);
+  for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
+    INFO("PATCH_ID: " << piinfo->pinfo.id);
+    for (Side<2> s : Side<2>::getValues()) {
+      if (piinfo->pinfo.hasNbr(s)) {
+        INFO("Side: " << s);
+        auto iface_info = piinfo->getIfaceInfo(s);
+        auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
+        Loop::Nested<1>(
+          local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) {
+            CHECK(local_data[coord] == Catch::Approx(iface_info->global_index + 1 + coord[0]));
+          });
+      }
+    }
+  }
 }

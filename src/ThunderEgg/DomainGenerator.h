@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2019-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,9 +20,13 @@
 
 #ifndef THUNDEREGG_DOMAINGENERATOR_H
 #define THUNDEREGG_DOMAINGENERATOR_H
+/**
+ * @file
+ *
+ * @brief DomainGenerator class
+ */
 #include <ThunderEgg/Domain.h>
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Generates Domain objects.
  *
@@ -32,25 +35,26 @@ namespace ThunderEgg
  *
  * @tparam D the number of Cartesian dimensions
  */
-template <int D> class DomainGenerator
+template<int D>
+class DomainGenerator
 {
-	public:
-	/**
-	 * @brief Destroy the DomainGenerator object
-	 */
-	virtual ~DomainGenerator(){};
-	/**
-	 * @brief Return the finest domain
-	 */
-	virtual Domain<D> getFinestDomain() = 0;
-	/**
-	 * @brief return true if there is a coarser domain to be generated.
-	 */
-	virtual bool hasCoarserDomain() = 0;
-	/**
-	 * @brief Return a new coarser domain
-	 */
-	virtual Domain<D> getCoarserDomain() = 0;
+public:
+  /**
+   * @brief Destroy the DomainGenerator object
+   */
+  virtual ~DomainGenerator(){};
+  /**
+   * @brief Return the finest domain
+   */
+  virtual Domain<D> getFinestDomain() = 0;
+  /**
+   * @brief return true if there is a coarser domain to be generated.
+   */
+  virtual bool hasCoarserDomain() = 0;
+  /**
+   * @brief Return a new coarser domain
+   */
+  virtual Domain<D> getCoarserDomain() = 0;
 };
 } // namespace ThunderEgg
 #endif

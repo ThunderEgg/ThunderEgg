@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2018-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,43 +20,38 @@
 
 #ifndef THUNDEREGG_GMG_RESTRICTOR_H
 #define THUNDEREGG_GMG_RESTRICTOR_H
+/**
+ * @file
+ *
+ * @brief Restrictor class
+ */
 
 #include <ThunderEgg/Vector.h>
 
-namespace ThunderEgg
-{
-namespace GMG
-{
+namespace ThunderEgg::GMG {
 /**
- * @brief Base class for multi-grid restriction operators.
+ * @brief Abstract class for restriction operators.
  */
-template <int D> class Restrictor
+template<int D>
+class Restrictor
 {
-	public:
-	/**
-	 * @brief Destroy the Restrictor object
-	 */
-	virtual ~Restrictor() {}
-	/**
-	 * @brief Clone this interpolator
-	 *
-	 * @return Interpolator<D>* a newly allocated copy of this interpolator
-	 */
-	virtual Restrictor<D> *clone() const = 0;
-	/**
-	 * @brief
-	 *
-	 * @param fine
-	 */
-	virtual Vector<D> restrict(const Vector<D> &fine) const = 0;
-	/**
-	 * @brief Get get a new vector for the coarser domain
-	 *
-	 * @param num_components the number of components in the vector
-	 * @return Vector<D> the vector
-	 */
-	virtual Vector<D> getNewCoarserVector(int num_components) const = 0;
+public:
+  /**
+   * @brief Destroy the Restrictor object
+   */
+  virtual ~Restrictor() {}
+  /**
+   * @brief Clone this interpolator
+   *
+   * @return Interpolator<D>* a newly allocated copy of this interpolator
+   */
+  virtual Restrictor<D>* clone() const = 0;
+  /**
+   * @brief
+   *
+   * @param fine
+   */
+  virtual Vector<D> restrict(const Vector<D>& fine) const = 0;
 };
-} // namespace GMG
-} // namespace ThunderEgg
+} // namespace ThunderEgg::GMG
 #endif

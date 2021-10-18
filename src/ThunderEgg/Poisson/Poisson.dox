@@ -1,0 +1,4 @@
+/**
+ * @namespace ThunderEgg::Poisson
+ * @brief Classes specific to the Poisson equation.
+ */

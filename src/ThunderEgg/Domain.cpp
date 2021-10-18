@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2019-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,5 +22,7 @@
 
 template class ThunderEgg::Domain<2>;
 template class ThunderEgg::Domain<3>;
-template void ThunderEgg::to_json<2>(nlohmann::json &j, const Domain<2> &domain);
-template void ThunderEgg::to_json<3>(nlohmann::json &j, const Domain<3> &domain);
+template void
+ThunderEgg::to_json<2>(ThunderEgg::tpl::nlohmann::json& j, const Domain<2>& domain);
+template void
+ThunderEgg::to_json<3>(ThunderEgg::tpl::nlohmann::json& j, const Domain<3>& domain);

@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2017-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,14 +20,16 @@
 
 #ifndef THUNDEREGG_POISSON_MATRIXHELPER_H
 #define THUNDEREGG_POISSON_MATRIXHELPER_H
+/**
+ * @file
+ *
+ * @brief MatrixHelper class
+ */
 
 #include <ThunderEgg/Domain.h>
 #include <petscmat.h>
 
-namespace ThunderEgg
-{
-namespace Poisson
-{
+namespace ThunderEgg::Poisson {
 /**
  * @brief Create a matrix for the 3D second-order Laplacian operator
  *
@@ -36,32 +37,31 @@ namespace Poisson
  */
 class MatrixHelper
 {
-	private:
-	/**
-	 * @brief the domain
-	 */
-	Domain<3> domain;
-	/**
-	 * @brief boundary conditions
-	 */
-	std::bitset<6> neumann;
+private:
+  /**
+   * @brief the domain
+   */
+  Domain<3> domain;
+  /**
+   * @brief boundary conditions
+   */
+  std::bitset<6> neumann;
 
-	public:
-	/**
-	 * @brief Create a MatrixHelper for a given 3D domain.
-	 *
-	 * @param domain the Domain
-	 * @param neumann boundary conditions
-	 */
-	explicit MatrixHelper(const Domain<3> &domain, std::bitset<6> neumann);
+public:
+  /**
+   * @brief Create a MatrixHelper for a given 3D domain.
+   *
+   * @param domain the Domain
+   * @param neumann boundary conditions
+   */
+  explicit MatrixHelper(const Domain<3>& domain, std::bitset<6> neumann);
 
-	/**
-	 * @brief Form the matrix for the domain
-	 *
-	 * @return the formed matrix
-	 */
-	Mat formCRSMatrix();
+  /**
+   * @brief Form the matrix for the domain
+   *
+   * @return the formed matrix
+   */
+  Mat formCRSMatrix();
 };
-} // namespace Poisson
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Poisson
 #endif

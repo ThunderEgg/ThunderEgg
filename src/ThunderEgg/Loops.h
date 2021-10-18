@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2019-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,81 +18,143 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef THUNDEREGG_LOOPS_H
-#define THUNDEREGG_LOOPS_H
+#ifndef THUNDEREGG_LOOP_H
+#define THUNDEREGG_LOOP_H
+/**
+ * @file
+ *
+ * @brief Loop templates
+ */
 
 #include <array>
 
-namespace ThunderEgg
+namespace ThunderEgg {
+/**
+ * @brief Dimension templated loops
+ */
+class Loop
 {
-template <int start, int stop, typename T> class Loop
-{
-	public:
-	static void inline loop_loop(T lambda)
-	{
-		lambda(start);
-		Loop<start + 1, stop, T>::loop_loop(lambda);
-	}
-};
+private:
+  template<int start, int stop, typename T>
+  class ULoop
+  {
+  public:
+    static void inline loop_loop(T lambda)
+    {
+      lambda(start);
+      ULoop<start + 1, stop, T>::loop_loop(lambda);
+    }
+  };
 
-template <int start, typename T> class Loop<start, start, T>
-{
-	public:
-	static void inline loop_loop(T lambda)
-	{
-		lambda(start);
-	}
-};
-template <typename T> class Loop<0, -1, T>
-{
-	public:
-	static void inline loop_loop(T lambda) {}
-};
-template <int start, int stop, typename T> inline void loop(T lambda)
-{
-	Loop<start, stop, T>::loop_loop(lambda);
-}
-template <int D, int Dir, typename T, typename A> class NestedLoop
-{
-	public:
-	static void inline nested_loop_loop(A coord, A start, A end, T lambda)
-	{
-		for (coord[Dir] = start[Dir]; coord[Dir] <= end[Dir]; coord[Dir]++) {
-			NestedLoop<D, Dir - 1, T, A>::nested_loop_loop(coord, start, end, lambda);
-		}
-	}
-};
+  template<int start, typename T>
+  class ULoop<start, start, T>
+  {
+  public:
+    static void inline loop_loop(T lambda) { lambda(start); }
+  };
+  template<typename T>
+  class ULoop<0, -1, T>
+  {
+  public:
+    static void inline loop_loop(T lambda) {}
+  };
 
-template <int D, typename T, typename A> class NestedLoop<D, 0, T, A>
-{
-	public:
-	static void inline nested_loop_loop(A coord, A start, A end, T lambda)
-	{
-		for (coord[0] = start[0]; coord[0] <= end[0]; coord[0]++) {
-			lambda(coord);
-		}
-	}
+public:
+  /**
+   * @brief Unroll a fixed-length loop
+   *
+   * @tparam start the starting index
+   * @tparam stop the stopping index, inclusive
+   * @tparam T lambda type
+   * @param lambda
+   */
+  template<int start, int stop, typename T>
+  static inline void Unroll(T lambda)
+  {
+    ULoop<start, stop, T>::loop_loop(lambda);
+  }
+
+private:
+  /**
+   * @tparam Dir
+   * @tparam T
+   * @tparam A
+   */
+  template<int D, int Dir, typename T, typename A>
+  class NestedLoop
+  {
+  public:
+    static void inline nested_loop_loop(A coord, A start, A end, T lambda)
+    {
+      for (coord[Dir] = start[Dir]; coord[Dir] <= end[Dir]; coord[Dir]++) {
+        NestedLoop<D, Dir - 1, T, A>::nested_loop_loop(coord, start, end, lambda);
+      }
+    }
+  };
+
+  template<int D, typename T, typename A>
+  class NestedLoop<D, 0, T, A>
+  {
+  public:
+    static void inline nested_loop_loop(A coord, A start, A end, T lambda)
+    {
+      for (coord[0] = start[0]; coord[0] <= end[0]; coord[0]++) {
+        lambda(coord);
+      }
+    }
+  };
+  template<typename T, typename A>
+  class NestedLoop<0, -1, T, A>
+  {
+  public:
+    static void inline nested_loop_loop(A coord, A, A, T lambda) { lambda(coord); }
+  };
+
+public:
+  /**
+   * @brief Loop over a range of integer coordinates
+   *
+   * @tparam D the dimensions of the coordinates
+   * @tparam T lambda type
+   * @tparam A coordinate type
+   * @param start initial coordinate
+   * @param end final coordinate, inclusive
+   * @param lambda the lambda function to call each time
+   */
+  template<int D, typename T, typename A>
+  static inline void Nested(A start, A end, T lambda)
+  {
+    A coord = start;
+    NestedLoop<D, D - 1, T, A>::nested_loop_loop(coord, start, end, lambda);
+  }
+  /**
+   * @brief Loop over all the interior coordinates of a view
+   *
+   * @tparam D the dimension of the view
+   * @tparam V the view type
+   * @tparam T the lambda type
+   * @param view the view to loop over
+   * @param lambda the lambda function to call each time
+   */
+  template<int D, typename V, typename T>
+  static inline void OverInteriorIndexes(const V& view, T lambda)
+  {
+    Nested<D>(view.getStart(), view.getEnd(), lambda);
+  }
+  /**
+   * @brief Loop over all the coordinates of a view, including ghost cells
+   *
+   * @tparam D the dimension of the view
+   * @tparam V the view type
+   * @tparam T the lambda type
+   * @param view the view to loop over
+   * @param lambda the lambda function to call each time
+   */
+  template<int D, typename V, typename T>
+  static inline void OverAllIndexes(const V& view, T lambda)
+  {
+    Nested<D>(view.getGhostStart(), view.getGhostEnd(), lambda);
+  }
 };
-template <typename T, typename A> class NestedLoop<0, -1, T, A>
-{
-	public:
-	static void inline nested_loop_loop(A coord, A, A, T lambda)
-	{
-		lambda(coord);
-	}
-};
-template <int D, typename T, typename A> inline void nested_loop(A start, A end, T lambda)
-{
-	A coord = start;
-	NestedLoop<D, D - 1, T, A>::nested_loop_loop(coord, start, end, lambda);
-}
-template <int D, typename V, typename T> inline void loop_over_interior_indexes(const V &view, T lambda)
-{
-	nested_loop<D>(view.getStart(), view.getEnd(), lambda);
-}
-template <int D, typename V, typename T> inline void loop_over_all_indexes(const V &view, T lambda)
-{
-	nested_loop<D>(view.getGhostStart(), view.getGhostEnd(), lambda);
-}
 } // namespace ThunderEgg
 #endif

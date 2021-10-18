@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2020-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,22 +20,28 @@
 
 #ifndef THUNDEREGG_RUNTIMEERROR_H
 #define THUNDEREGG_RUNTIMEERROR_H
+/**
+ * @file
+ *
+ * @brief RuntimeError struct
+ */
 
 #include <stdexcept>
 #include <string>
 
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief ThunderEgg runtime exception
  */
-struct RuntimeError : std::runtime_error {
-	/**
-	 * @brief Construct a new RuntimeError object
-	 *
-	 * @param message the message to print
-	 */
-	RuntimeError(std::string message) : std::runtime_error(message){};
+struct RuntimeError : std::runtime_error
+{
+  /**
+   * @brief Construct a new RuntimeError object
+   *
+   * @param message the message to print
+   */
+  RuntimeError(std::string message)
+    : std::runtime_error(message){};
 };
 } // namespace ThunderEgg
 #endif

@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2018-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,35 +18,40 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#ifndef Serializable_H
-#define Serializable_H
+#ifndef SERIALIZABLE_H
+#define SERIALIZABLE_H
+/**
+ * @file
+ *
+ * @brief Serializable class
+ */
+
 #include <memory>
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Interface for serializing objects
  */
 class Serializable
 {
-	public:
-	/**
-	 * @brief Destroy the Serializable object
-	 */
-	virtual ~Serializable() = default;
-	/**
-	 * @brief Serialize object into buffer
-	 *
-	 * @param buffer the buffer. Can be set to nullptr if you just want the size
-	 * @return int the size of the serialized object
-	 */
-	virtual int serialize(char *buffer) const = 0;
-	/**
-	 * @brief Deserialize an object
-	 *
-	 * @param buffer the buffer
-	 * @return int the size of object that was deserialized
-	 */
-	virtual int deserialize(char *buffer) = 0;
+public:
+  /**
+   * @brief Destroy the Serializable object
+   */
+  virtual ~Serializable() = default;
+  /**
+   * @brief Serialize object into buffer
+   *
+   * @param buffer the buffer. Can be set to nullptr if you just want the size
+   * @return int the size of the serialized object
+   */
+  virtual int serialize(char* buffer) const = 0;
+  /**
+   * @brief Deserialize an object
+   *
+   * @param buffer the buffer
+   * @return int the size of object that was deserialized
+   */
+  virtual int deserialize(char* buffer) = 0;
 };
 } // namespace ThunderEgg
 #endif

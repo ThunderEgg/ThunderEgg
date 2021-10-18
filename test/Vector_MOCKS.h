@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2020      Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,8 +19,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Vector.h>
-namespace ThunderEgg
-{
+namespace ThunderEgg {
 /**
  * @brief Check if a coordinate is a ghost coordinate
  *
@@ -32,14 +30,15 @@ namespace ThunderEgg
  * @return true if it is a ghost coordinate
  * @return false if it is not a ghost coordinate
  */
-template <size_t D>
-bool isGhost(const std::array<int, D> &coord, const std::array<int, D> &ns, int num_ghost_cells)
+template<size_t D>
+bool
+isGhost(const std::array<int, D>& coord, const std::array<int, D>& ns, int num_ghost_cells)
 {
-	for (size_t i = 0; i < D; i++) {
-		if (coord[i] < 0 || coord[i] >= ns[i]) {
-			return true;
-		}
-	}
-	return false;
+  for (size_t i = 0; i < D; i++) {
+    if (coord[i] < 0 || coord[i] >= ns[i]) {
+      return true;
+    }
+  }
+  return false;
 }
 } // namespace ThunderEgg

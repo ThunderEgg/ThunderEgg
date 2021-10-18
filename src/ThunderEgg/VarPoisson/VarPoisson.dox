@@ -1,0 +1,4 @@
+/**
+ * @namespace ThunderEgg::VarPoisson
+ * @brief Classes specific to a variable coefficient Poisson equation.
+ */

@@ -1,0 +1,10 @@
+/**
+ * @namespace ThunderEgg::GMG
+ * @brief Geometric-Multigrid classes.
+ *
+ * This namespace contains three abstract needed classes for multigrid cycles. Cycle, for which there
+ * are implimentations for the V (VCycle), W (WCycle), and full multigrid (FMGCycle) cycles. Restrictor
+ * restricts from a finer level in the multigrid cycle to a coarser level.
+ * Interpolator interpolates from a finer level in the multigrid cycle
+ * to a coarse level.
+ */

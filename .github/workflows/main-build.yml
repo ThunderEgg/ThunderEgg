@@ -9,9 +9,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-20.04
-    env:
-      CXXFLAGS: -g -O0 -Wall -Wno-system-headers -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline
-      LDFLAGS: -lgcov
     steps:
     - name: Install dependencies
       run: |
@@ -34,12 +31,12 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Cmake Configure
-      run: cmake -Dunit_tests=ON -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ -GNinja .
+    - name: Configure
+      run: cmake --preset ci-gcc
     - name: Build
-      run: build-wrapper-linux-x86-64 --out-dir bw-output ninja -j2
+      run: build-wrapper-linux-x86-64 --out-dir bw-output cmake --build --preset ci-gcc -parallel 2
     - name: Run Tests
-      run: ctest -j2 --output-on-failure
+      run: ctest -j2 --preset ci-gcc
     - name: Generate Coverage Report
       run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
     - name: Upload to codecov.io

@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2020-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,13 +20,16 @@
 
 #ifndef THUNDEREGG_SCHUR_IFACEINFO_H
 #define THUNDEREGG_SCHUR_IFACEINFO_H
+/**
+ * @file
+ *
+ * @brief IfaceInfo class
+ */
 #include <ThunderEgg/Schur/IfaceType.h>
 #include <deque>
 #include <map>
-namespace ThunderEgg
-{
-namespace Schur
-{
+namespace ThunderEgg {
+namespace Schur {
 /**
  * @brief The IfaceInfo class represents the information for an interface on a given side of the
  * patch.
@@ -37,46 +39,50 @@ namespace Schur
  *
  * @tparam D the number of Cartesian dimensions in the patches.
  */
-template <int D> class IfaceInfo
+template<int D>
+class IfaceInfo
 {
-	public:
-	/**
-	 * @brief The rank that the interface resides on.
-	 */
-	int rank;
-	/**
-	 * @brief The globally unique ID of the interface.
-	 */
-	int id;
-	/**
-	 * @brief the local index in the interface for the local patch interface vector
-	 */
-	int patch_local_index = -1;
-	/**
-	 * @brief the local index in the interface for the local column interface vector
-	 */
-	int col_local_index = -1;
-	/**
-	 * @brief the local index in the interface for the local row interface vector
-	 */
-	int row_local_index = -1;
-	/**
-	 * @brief the global index in the interface vector.
-	 */
-	int global_index = -1;
-	/**
-	 * @brief Construct a new IfaceInfo object
-	 *
-	 * All indexes will be set to -1
-	 *
-	 * @param rank the rank of the interface
-	 * @param id the id of the interface
-	 */
-	IfaceInfo(int rank, int id) : rank(rank), id(id) {}
-	/**
-	 * @brief Destroy the IfaceInfo object
-	 */
-	virtual ~IfaceInfo() {}
+public:
+  /**
+   * @brief The rank that the interface resides on.
+   */
+  int rank;
+  /**
+   * @brief The globally unique ID of the interface.
+   */
+  int id;
+  /**
+   * @brief the local index in the interface for the local patch interface vector
+   */
+  int patch_local_index = -1;
+  /**
+   * @brief the local index in the interface for the local column interface vector
+   */
+  int col_local_index = -1;
+  /**
+   * @brief the local index in the interface for the local row interface vector
+   */
+  int row_local_index = -1;
+  /**
+   * @brief the global index in the interface vector.
+   */
+  int global_index = -1;
+  /**
+   * @brief Construct a new IfaceInfo object
+   *
+   * All indexes will be set to -1
+   *
+   * @param rank the rank of the interface
+   * @param id the id of the interface
+   */
+  IfaceInfo(int rank, int id)
+    : rank(rank)
+    , id(id)
+  {}
+  /**
+   * @brief Destroy the IfaceInfo object
+   */
+  virtual ~IfaceInfo() {}
 };
 } // namespace Schur
 } // namespace ThunderEgg

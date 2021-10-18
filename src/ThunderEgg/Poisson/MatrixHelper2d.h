@@ -1,9 +1,8 @@
 /***************************************************************************
- *  ThunderEgg, a library for solving Poisson's equation on adaptively
- *  refined block-structured Cartesian grids
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
+ *  Cartesian grids.
  *
- *  Copyright (C) 2019  ThunderEgg Developers. See AUTHORS.md file at the
- *  top-level directory.
+ *  Copyright (c) 2018-2021 Scott Aiton
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,39 +20,40 @@
 
 #ifndef THUNDEREGG_POISSON_MATRIXHELPER2D_H
 #define THUNDEREGG_POISSON_MATRIXHELPER2D_H
+/**
+ * @file
+ *
+ * @brief MatrixHelper2D class
+ */
 
 #include <ThunderEgg/Domain.h>
 #include <petscmat.h>
 
-namespace ThunderEgg
-{
-namespace Poisson
-{
+namespace ThunderEgg::Poisson {
 /**
  * @brief Create a matrix for the 2D second-order Laplacian operator
  */
 class MatrixHelper2d
 {
-	private:
-	Domain<2>      domain;
-	std::bitset<4> neumann;
+private:
+  Domain<2> domain;
+  std::bitset<4> neumann;
 
-	public:
-	/**
-	 * @brief Create a MatrixHelper for a given domain
-	 *
-	 * @param domain the domain
-	 * @param neumann the boundary conditions
-	 */
-	MatrixHelper2d(const Domain<2> &domain, std::bitset<4> neumann);
+public:
+  /**
+   * @brief Create a MatrixHelper for a given domain
+   *
+   * @param domain the domain
+   * @param neumann the boundary conditions
+   */
+  MatrixHelper2d(const Domain<2>& domain, std::bitset<4> neumann);
 
-	/**
-	 * @brief Form the matrix
-	 *
-	 * @return the formed matrix
-	 */
-	Mat formCRSMatrix(double lambda = 0);
+  /**
+   * @brief Form the matrix
+   *
+   * @return the formed matrix
+   */
+  Mat formCRSMatrix(double lambda = 0);
 };
-} // namespace Poisson
-} // namespace ThunderEgg
+} // namespace ThunderEgg::Poisson
 #endif
