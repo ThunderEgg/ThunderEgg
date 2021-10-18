@@ -8,7 +8,7 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-				"CMAKE_CXX_COMPILER": "/usr/bin/g++",
+				"CMAKE_CXX_COMPILER": "mpicxx",
 				"CMAKE_CXX_FLAGS": "-g -O0 -Wall -Wno-system-headers -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline",
 				"PETSC_DIR": "/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/",
 				"THUNDEREGG_MPIEXEC_FLAGS": "--oversubscribe",
