@@ -9,10 +9,15 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -22,6 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ThunderEgg
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
   </td>
  </tr>
@@ -45,6 +51,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('classThunderEgg_1_1PatchSolver.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -59,11 +82,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="classThunderEgg_1_1PatchSolver.html">PatchSolver</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
@@ -83,13 +101,13 @@ Inheritance diagram for ThunderEgg::PatchSolver&lt; D &gt;:</div>
 <div class="center"><img src="classThunderEgg_1_1PatchSolver__inherit__graph.png" border="0" usemap="#ThunderEgg_1_1PatchSolver_3_01D_01_4_inherit__map" alt="Inheritance graph"/></div>
 <map name="ThunderEgg_1_1PatchSolver_3_01D_01_4_inherit__map" id="ThunderEgg_1_1PatchSolver_3_01D_01_4_inherit__map">
 <area shape="rect" title="Solves the problem on the patches using a specified interface value." alt="" coords="304,78,527,105"/>
-<area shape="rect" href="classThunderEgg_1_1Iterative_1_1PatchSolver.html" title="Solves the patches u_viewing a Iterative iterative solver on each patch." alt="" coords="585,5,747,47"/>
-<area shape="rect" href="classThunderEgg_1_1Poisson_1_1DFTPatchSolver.html" title="This patch solver uses DFT transforms to solve for the Poisson equation." alt="" coords="581,71,751,112"/>
-<area shape="rect" href="classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html" title="This patch solver uses FFT transforms to solve for the Poisson equation." alt="" coords="575,136,757,177"/>
+<area shape="rect" href="classThunderEgg_1_1Iterative_1_1PatchSolver.html" title="Solves the patches using an iterative Solver on each patch." alt="" coords="585,5,747,47"/>
+<area shape="rect" href="classThunderEgg_1_1Poisson_1_1DFTPatchSolver.html" title="Use DFT transforms to solve for the Poisson equation." alt="" coords="581,71,751,112"/>
+<area shape="rect" href="classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html" title="Use FFT transforms to solve for the Poisson equation." alt="" coords="575,136,757,177"/>
 <area shape="rect" href="classThunderEgg_1_1Operator.html" title="Base class for operators." alt="" coords="29,53,233,79"/>
-<area shape="rect" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Base class for multi&#45;grid smoothing operators." alt="" coords="5,103,256,130"/>
+<area shape="rect" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Abstract class for smoothing operators." alt="" coords="5,103,256,130"/>
 </map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for ThunderEgg::PatchSolver&lt; D &gt;:</div>
 <div class="dyncontent">
@@ -97,9 +115,9 @@ Collaboration diagram for ThunderEgg::PatchSolver&lt; D &gt;:</div>
 <map name="ThunderEgg_1_1PatchSolver_3_01D_01_4_coll__map" id="ThunderEgg_1_1PatchSolver_3_01D_01_4_coll__map">
 <area shape="rect" title="Solves the problem on the patches using a specified interface value." alt="" coords="121,80,344,107"/>
 <area shape="rect" href="classThunderEgg_1_1Operator.html" title="Base class for operators." alt="" coords="5,5,209,32"/>
-<area shape="rect" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Base class for multi&#45;grid smoothing operators." alt="" coords="234,5,485,32"/>
+<area shape="rect" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Abstract class for smoothing operators." alt="" coords="234,5,485,32"/>
 </map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -136,7 +154,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="inherit_header pub_methods_classThunderEgg_1_1GMG_1_1Smoother"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classThunderEgg_1_1GMG_1_1Smoother')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html">ThunderEgg::GMG::Smoother&lt; D &gt;</a></td></tr>
 <tr class="memitem:a658ca92bced694154e23f7a8669941b0 inherit pub_methods_classThunderEgg_1_1GMG_1_1Smoother"><td class="memItemLeft" align="right" valign="top"><a id="a658ca92bced694154e23f7a8669941b0"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html#a658ca92bced694154e23f7a8669941b0">~Smoother</a> ()</td></tr>
-<tr class="memdesc:a658ca92bced694154e23f7a8669941b0 inherit pub_methods_classThunderEgg_1_1GMG_1_1Smoother"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Base class for multi-grid smoothing operators.">Smoother</a> object. <br /></td></tr>
+<tr class="memdesc:a658ca92bced694154e23f7a8669941b0 inherit pub_methods_classThunderEgg_1_1GMG_1_1Smoother"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html" title="Abstract class for smoothing operators.">Smoother</a> object. <br /></td></tr>
 <tr class="separator:a658ca92bced694154e23f7a8669941b0 inherit pub_methods_classThunderEgg_1_1GMG_1_1Smoother"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -452,11 +470,15 @@ template&lt;int D&gt; </div>
 <li>src/ThunderEgg/<a class="el" href="PatchSolver_8h_source.html">PatchSolver.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="classThunderEgg_1_1PatchSolver.html">PatchSolver</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
 </body>
 </html>

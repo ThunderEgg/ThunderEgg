@@ -9,10 +9,15 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -22,6 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ThunderEgg
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
   </td>
  </tr>
@@ -45,6 +51,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('classThunderEgg_1_1GMG_1_1Level.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -59,11 +82,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><b>GMG</b></li><li class="navelem"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
@@ -108,23 +126,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a07d84198c8adbd28d30a31e159aa1182"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classThunderEgg_1_1GMG_1_1Smoother.html">Smoother</a>&lt; D &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#a07d84198c8adbd28d30a31e159aa1182">getSmoother</a> () const</td></tr>
 <tr class="memdesc:a07d84198c8adbd28d30a31e159aa1182"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get smoother operator for this level.  <a href="classThunderEgg_1_1GMG_1_1Level.html#a07d84198c8adbd28d30a31e159aa1182">More...</a><br /></td></tr>
 <tr class="separator:a07d84198c8adbd28d30a31e159aa1182"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac28a469bcbcac25939657fd731aa7f88"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#ac28a469bcbcac25939657fd731aa7f88">setCoarser</a> (std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a> &gt; coarser)</td></tr>
-<tr class="memdesc:ac28a469bcbcac25939657fd731aa7f88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointer to the coarser level.  <a href="classThunderEgg_1_1GMG_1_1Level.html#ac28a469bcbcac25939657fd731aa7f88">More...</a><br /></td></tr>
-<tr class="separator:ac28a469bcbcac25939657fd731aa7f88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c4cbd42ec17326efdcbe8bbaabacf08"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#a5c4cbd42ec17326efdcbe8bbaabacf08">getCoarser</a> () const</td></tr>
-<tr class="memdesc:a5c4cbd42ec17326efdcbe8bbaabacf08"><td class="mdescLeft">&#160;</td><td class="mdescRight">get reference to the coarser level.  <a href="classThunderEgg_1_1GMG_1_1Level.html#a5c4cbd42ec17326efdcbe8bbaabacf08">More...</a><br /></td></tr>
-<tr class="separator:a5c4cbd42ec17326efdcbe8bbaabacf08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8011843cc44d9440ec68e8b1fc6e8804"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#a8011843cc44d9440ec68e8b1fc6e8804">setFiner</a> (std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a> &gt; finer)</td></tr>
-<tr class="memdesc:a8011843cc44d9440ec68e8b1fc6e8804"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the pointer to the finer level.  <a href="classThunderEgg_1_1GMG_1_1Level.html#a8011843cc44d9440ec68e8b1fc6e8804">More...</a><br /></td></tr>
-<tr class="separator:a8011843cc44d9440ec68e8b1fc6e8804"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd77f282c672db29720fe22301a213a9"><td class="memItemLeft" align="right" valign="top"><a id="abd77f282c672db29720fe22301a213a9"></a>
-std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#abd77f282c672db29720fe22301a213a9">getFiner</a> ()</td></tr>
-<tr class="memdesc:abd77f282c672db29720fe22301a213a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the finer level. <br /></td></tr>
-<tr class="separator:abd77f282c672db29720fe22301a213a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1352526921f62fa1b1e893013a19e592"><td class="memItemLeft" align="right" valign="top"><a id="a1352526921f62fa1b1e893013a19e592"></a>
-std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#a1352526921f62fa1b1e893013a19e592">getFiner</a> () const</td></tr>
-<tr class="memdesc:a1352526921f62fa1b1e893013a19e592"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the finer level. <br /></td></tr>
-<tr class="separator:a1352526921f62fa1b1e893013a19e592"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1553aa120840832bce58e3ec801df9ed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#a1553aa120840832bce58e3ec801df9ed">setCoarser</a> (std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a> &gt; coarser)</td></tr>
+<tr class="memdesc:a1553aa120840832bce58e3ec801df9ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointer to the coarser level.  <a href="classThunderEgg_1_1GMG_1_1Level.html#a1553aa120840832bce58e3ec801df9ed">More...</a><br /></td></tr>
+<tr class="separator:a1553aa120840832bce58e3ec801df9ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adde82d8f38f3862066ac0781ef809e1f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#adde82d8f38f3862066ac0781ef809e1f">getCoarser</a> () const</td></tr>
+<tr class="memdesc:adde82d8f38f3862066ac0781ef809e1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">get reference to the coarser level.  <a href="classThunderEgg_1_1GMG_1_1Level.html#adde82d8f38f3862066ac0781ef809e1f">More...</a><br /></td></tr>
+<tr class="separator:adde82d8f38f3862066ac0781ef809e1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcfea0c5b042af511342a24123424b4b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#adcfea0c5b042af511342a24123424b4b">finest</a> () const</td></tr>
 <tr class="memdesc:adcfea0c5b042af511342a24123424b4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if this level is the finest level.  <a href="classThunderEgg_1_1GMG_1_1Level.html#adcfea0c5b042af511342a24123424b4b">More...</a><br /></td></tr>
 <tr class="separator:adcfea0c5b042af511342a24123424b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -198,8 +205,8 @@ template&lt;int D&gt; </div>
 
 </div>
 </div>
-<a id="a5c4cbd42ec17326efdcbe8bbaabacf08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c4cbd42ec17326efdcbe8bbaabacf08">&#9670;&nbsp;</a></span>getCoarser()</h2>
+<a id="adde82d8f38f3862066ac0781ef809e1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adde82d8f38f3862066ac0781ef809e1f">&#9670;&nbsp;</a></span>getCoarser()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -210,7 +217,7 @@ template&lt;int D&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;const <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a>&gt; <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">ThunderEgg::GMG::Level</a>&lt; D &gt;::getCoarser </td>
+          <td class="memname">const <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a>&amp; <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">ThunderEgg::GMG::Level</a>&lt; D &gt;::getCoarser </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -348,8 +355,8 @@ template&lt;int D&gt; </div>
 
 </div>
 </div>
-<a id="ac28a469bcbcac25939657fd731aa7f88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac28a469bcbcac25939657fd731aa7f88">&#9670;&nbsp;</a></span>setCoarser()</h2>
+<a id="a1553aa120840832bce58e3ec801df9ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1553aa120840832bce58e3ec801df9ed">&#9670;&nbsp;</a></span>setCoarser()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -362,7 +369,7 @@ template&lt;int D&gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">ThunderEgg::GMG::Level</a>&lt; D &gt;::setCoarser </td>
           <td>(</td>
-          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a>&lt; D &gt; &gt;&#160;</td>
+          <td class="paramtype">std::shared_ptr&lt; const <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a>&lt; D &gt; &gt;&#160;</td>
           <td class="paramname"><em>coarser</em></td><td>)</td>
           <td></td>
         </tr>
@@ -378,42 +385,6 @@ template&lt;int D&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">coarser</td><td>the pointer to the coarser level. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a8011843cc44d9440ec68e8b1fc6e8804"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8011843cc44d9440ec68e8b1fc6e8804">&#9670;&nbsp;</a></span>setFiner()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;int D&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">ThunderEgg::GMG::Level</a>&lt; D &gt;::setFiner </td>
-          <td>(</td>
-          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a>&lt; D &gt; &gt;&#160;</td>
-          <td class="paramname"><em>finer</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set the pointer to the finer level. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">finer</td><td>pointer to the finer level. </td></tr>
   </table>
   </dd>
 </dl>
@@ -568,11 +539,15 @@ template&lt;int D&gt; </div>
 <li>src/ThunderEgg/GMG/<a class="el" href="Level_8h_source.html">Level.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="namespaceThunderEgg_1_1GMG.html">GMG</a></li><li class="navelem"><a class="el" href="classThunderEgg_1_1GMG_1_1Level.html">Level</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
 </body>
 </html>

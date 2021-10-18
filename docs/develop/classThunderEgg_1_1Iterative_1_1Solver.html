@@ -9,10 +9,15 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -22,6 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ThunderEgg
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
   </td>
  </tr>
@@ -45,6 +51,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('classThunderEgg_1_1Iterative_1_1Solver.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -59,11 +82,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><b>Iterative</b></li><li class="navelem"><a class="el" href="classThunderEgg_1_1Iterative_1_1Solver.html">Solver</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
@@ -73,7 +91,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Represents an iterative solver.  
+<p>Abstract interface for <a class="el" href="namespaceThunderEgg_1_1Iterative.html" title="Iterative Solvers.">Iterative</a> solvers.  
  <a href="classThunderEgg_1_1Iterative_1_1Solver.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="Solver_8h_source.html">Solver.h</a>&gt;</code></p>
@@ -82,12 +100,12 @@ Inheritance diagram for ThunderEgg::Iterative::Solver&lt; D &gt;:</div>
 <div class="dyncontent">
 <div class="center"><img src="classThunderEgg_1_1Iterative_1_1Solver__inherit__graph.png" border="0" usemap="#ThunderEgg_1_1Iterative_1_1Solver_3_01D_01_4_inherit__map" alt="Inheritance graph"/></div>
 <map name="ThunderEgg_1_1Iterative_1_1Solver_3_01D_01_4_inherit__map" id="ThunderEgg_1_1Iterative_1_1Solver_3_01D_01_4_inherit__map">
-<area shape="rect" title="Represents an iterative solver." alt="" coords="5,71,168,112"/>
-<area shape="rect" href="classThunderEgg_1_1Iterative_1_1BiCGStab.html" title="ThunderEgg implementation of BiCGStab iterative solver." alt="" coords="216,5,379,47"/>
-<area shape="rect" href="classThunderEgg_1_1Iterative_1_1CG.html" title="ThunderEgg implementation of CG iterative solver." alt="" coords="216,71,379,112"/>
-<area shape="rect" href="classThunderEgg_1_1PETSc_1_1KSPSolver.html" title="Wraps a PETSc Mat object for use as a ThunderEgg Operator." alt="" coords="220,136,375,177"/>
+<area shape="rect" title="Abstract interface for Iterative solvers." alt="" coords="5,71,168,112"/>
+<area shape="rect" href="classThunderEgg_1_1Iterative_1_1BiCGStab.html" title="BiCGStab iterative solver." alt="" coords="216,5,379,47"/>
+<area shape="rect" href="classThunderEgg_1_1Iterative_1_1CG.html" title="CG iterative solver." alt="" coords="216,71,379,112"/>
+<area shape="rect" href="classThunderEgg_1_1PETSc_1_1KSPSolver.html" title="Wraps a PETSc KSP solver for use use as a Solver." alt="" coords="220,136,375,177"/>
 </map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -96,7 +114,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad554f8ad9bc754d0a2cc612c7723aecd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e74bbaab4c31aec8ae27f871d233735"><td class="memItemLeft" align="right" valign="top"><a id="a1e74bbaab4c31aec8ae27f871d233735"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Iterative_1_1Solver.html#a1e74bbaab4c31aec8ae27f871d233735">~Solver</a> ()</td></tr>
-<tr class="memdesc:a1e74bbaab4c31aec8ae27f871d233735"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classThunderEgg_1_1Iterative_1_1Solver.html" title="Represents an iterative solver.">Solver</a> object. <br /></td></tr>
+<tr class="memdesc:a1e74bbaab4c31aec8ae27f871d233735"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classThunderEgg_1_1Iterative_1_1Solver.html" title="Abstract interface for Iterative solvers.">Solver</a> object. <br /></td></tr>
 <tr class="separator:a1e74bbaab4c31aec8ae27f871d233735"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad905f9dc2d91aa784d026a219e8e747e"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1Iterative_1_1Solver.html#ad905f9dc2d91aa784d026a219e8e747e">solve</a> (const <a class="el" href="classThunderEgg_1_1Operator.html">Operator</a>&lt; D &gt; &amp;A, <a class="el" href="classThunderEgg_1_1Vector.html">Vector</a>&lt; D &gt; &amp;x, const <a class="el" href="classThunderEgg_1_1Vector.html">Vector</a>&lt; D &gt; &amp;b, const <a class="el" href="classThunderEgg_1_1Operator.html">Operator</a>&lt; D &gt; *Mr=nullptr, bool output=false, std::ostream &amp;os=std::cout) const =0</td></tr>
 <tr class="memdesc:ad905f9dc2d91aa784d026a219e8e747e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform an iterative solve.  <a href="classThunderEgg_1_1Iterative_1_1Solver.html#ad905f9dc2d91aa784d026a219e8e747e">More...</a><br /></td></tr>
@@ -106,7 +124,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <div class="textblock"><h3>template&lt;int D&gt;<br />
 class ThunderEgg::Iterative::Solver&lt; D &gt;</h3>
 
-<p>Represents an iterative solver. </p>
+<p>Abstract interface for <a class="el" href="namespaceThunderEgg_1_1Iterative.html" title="Iterative Solvers.">Iterative</a> solvers. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">D</td><td>the number of cartesian dimensions </td></tr>
@@ -220,7 +238,7 @@ template&lt;int D&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the number of iterations </dd></dl>
 
-<p>Implemented in <a class="el" href="classThunderEgg_1_1Iterative_1_1BiCGStab.html#ae89789e39bce779f7a24a52127bf2507">ThunderEgg::Iterative::BiCGStab&lt; D &gt;</a>, <a class="el" href="classThunderEgg_1_1Iterative_1_1CG.html#aa7732422fae3b6702b5ce2a08a7d676f">ThunderEgg::Iterative::CG&lt; D &gt;</a>, and <a class="el" href="classThunderEgg_1_1PETSc_1_1KSPSolver.html#a1d2087f9144c38863a1c6b30e17ace79">ThunderEgg::PETSc::KSPSolver&lt; D &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classThunderEgg_1_1PETSc_1_1KSPSolver.html#a1d2087f9144c38863a1c6b30e17ace79">ThunderEgg::PETSc::KSPSolver&lt; D &gt;</a>, <a class="el" href="classThunderEgg_1_1Iterative_1_1BiCGStab.html#ae89789e39bce779f7a24a52127bf2507">ThunderEgg::Iterative::BiCGStab&lt; D &gt;</a>, and <a class="el" href="classThunderEgg_1_1Iterative_1_1CG.html#aa7732422fae3b6702b5ce2a08a7d676f">ThunderEgg::Iterative::CG&lt; D &gt;</a>.</p>
 
 </div>
 </div>
@@ -228,11 +246,15 @@ template&lt;int D&gt; </div>
 <li>src/ThunderEgg/Iterative/<a class="el" href="Solver_8h_source.html">Solver.h</a></li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespaceThunderEgg.html">ThunderEgg</a></li><li class="navelem"><a class="el" href="namespaceThunderEgg_1_1Iterative.html">Iterative</a></li><li class="navelem"><a class="el" href="classThunderEgg_1_1Iterative_1_1Solver.html">Solver</a></li>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
 </body>
 </html>

@@ -1,0 +1,22 @@
+<map id="src/ThunderEgg/CoarseNbrInfo.h" name="src/ThunderEgg/CoarseNbrInfo.h">
+<area shape="rect" id="node1" title="CoarseNbrInfo class." alt="" coords="327,5,522,47"/>
+<area shape="rect" id="node2" href="$BufferReader_8h.html" title="BufferReader class." alt="" coords="223,95,421,121"/>
+<area shape="rect" id="node8" href="$BufferWriter_8h.html" title="BufferWriter class." alt="" coords="5,95,199,121"/>
+<area shape="rect" id="node9" href="$NbrInfo_8h.html" title="NbrInfo class." alt="" coords="446,95,609,121"/>
+<area shape="rect" id="node16" href="$Orthant_8h.html" title="Orthant class." alt="" coords="665,95,829,121"/>
+<area shape="rect" id="node3" href="$Serializable_8h.html" title="Serializable class." alt="" coords="181,244,372,271"/>
+<area shape="rect" id="node5" title=" " alt="" coords="176,169,247,196"/>
+<area shape="rect" id="node6" title=" " alt="" coords="322,169,402,196"/>
+<area shape="rect" id="node7" title=" " alt="" coords="60,169,152,196"/>
+<area shape="rect" id="node4" title=" " alt="" coords="305,319,382,345"/>
+<area shape="rect" id="node10" href="$NbrInfoBase_8h.html" title="NbrInfoBase class." alt="" coords="426,169,621,196"/>
+<area shape="rect" id="node11" href="$NbrType_8h.html" title="NbrType class." alt="" coords="447,244,615,271"/>
+<area shape="rect" id="node14" title=" " alt="" coords="640,244,703,271"/>
+<area shape="rect" id="node15" title=" " alt="" coords="727,244,778,271"/>
+<area shape="rect" id="node12" title=" " alt="" coords="675,319,854,345"/>
+<area shape="rect" id="node13" title=" " alt="" coords="493,319,569,345"/>
+<area shape="rect" id="node17" href="$Face_8h.html" title="Face class." alt="" coords="831,169,975,196"/>
+<area shape="rect" id="node18" title=" " alt="" coords="915,244,971,271"/>
+<area shape="rect" id="node19" title=" " alt="" coords="645,169,719,196"/>
+<area shape="rect" id="node20" title=" " alt="" coords="744,169,807,196"/>
+</map>

@@ -9,10 +9,15 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -22,6 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ThunderEgg
+   &#160;<span id="projectnumber">1.0.0</span>
    </div>
   </td>
  </tr>
@@ -46,6 +52,22 @@ $(function() {
 /* @license-end */</script>
 <div id="main-nav"></div>
 </div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('functions_func_s.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -83,7 +105,8 @@ $(function() {
 : <a class="el" href="classThunderEgg_1_1Schur_1_1PatchIfaceScatter.html#aceebeab4782898ac255b87be7b3213a7">ThunderEgg::Schur::PatchIfaceScatter&lt; D &gt;</a>
 </li>
 <li>se()
-: <a class="el" href="classThunderEgg_1_1Orthant.html#a39b6429ab5ea1b015379bfd5895f7a05">ThunderEgg::Orthant&lt; D &gt;</a>
+: <a class="el" href="classThunderEgg_1_1Face.html#a9855b3ff3651da0f0784092e32dd0fdb">ThunderEgg::Face&lt; D, M &gt;</a>
+, <a class="el" href="classThunderEgg_1_1Orthant.html#a39b6429ab5ea1b015379bfd5895f7a05">ThunderEgg::Orthant&lt; D &gt;</a>
 </li>
 <li>sendGhostPatchesFinish()
 : <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html#ae8e6c6d7e7aad45ce3c167f63f7a479f">ThunderEgg::GMG::InterLevelComm&lt; D &gt;</a>
@@ -105,10 +128,7 @@ $(function() {
 , <a class="el" href="classThunderEgg_1_1View.html#a0a6dd2978c1291d8d9a3d1a4c053a55c">ThunderEgg::View&lt; T, D &gt;</a>
 </li>
 <li>setCoarser()
-: <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#ac28a469bcbcac25939657fd731aa7f88">ThunderEgg::GMG::Level&lt; D &gt;</a>
-</li>
-<li>setFiner()
-: <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#a8011843cc44d9440ec68e8b1fc6e8804">ThunderEgg::GMG::Level&lt; D &gt;</a>
+: <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html#a1553aa120840832bce58e3ec801df9ed">ThunderEgg::GMG::Level&lt; D &gt;</a>
 </li>
 <li>setGlobalIndexes()
 : <a class="el" href="classThunderEgg_1_1CoarseNbrInfo.html#ad471e9702f0d965cb59f4cc4e3b4b45e">ThunderEgg::CoarseNbrInfo&lt; D &gt;</a>
@@ -169,10 +189,10 @@ $(function() {
 , <a class="el" href="classThunderEgg_1_1Iterative_1_1CG.html#aa71d00e745bbacbd7168a4518756d1ad">ThunderEgg::Iterative::CG&lt; D &gt;</a>
 </li>
 <li>SetValues()
-: <a class="el" href="classThunderEgg_1_1DomainTools.html#a3702bc156f72772c20b15453fb6464e4">ThunderEgg::DomainTools</a>
+: <a class="el" href="classThunderEgg_1_1DomainTools.html#a1dcfa87e7f144d6dd05bf7532197f96d">ThunderEgg::DomainTools</a>
 </li>
 <li>SetValuesWithGhost()
-: <a class="el" href="classThunderEgg_1_1DomainTools.html#a8786c8714f41575c9718c82ff1d6ceb1">ThunderEgg::DomainTools</a>
+: <a class="el" href="classThunderEgg_1_1DomainTools.html#a94bdaadd2fa5cef657475290883ae474">ThunderEgg::DomainTools</a>
 </li>
 <li>setWithGhost()
 : <a class="el" href="classThunderEgg_1_1Vector.html#aee71873b5aa32bef366ca17ad6ccd52f">ThunderEgg::Vector&lt; D &gt;</a>
@@ -199,6 +219,9 @@ $(function() {
 , <a class="el" href="classThunderEgg_1_1Poisson_1_1DFTPatchSolver.html#a428ad145fe6c6b425a3a9b3686319f4b">ThunderEgg::Poisson::DFTPatchSolver&lt; D &gt;</a>
 , <a class="el" href="classThunderEgg_1_1Poisson_1_1FFTWPatchSolver.html#a11000d2147b72c17fc0db4d21aa5a512">ThunderEgg::Poisson::FFTWPatchSolver&lt; D &gt;</a>
 </li>
+<li>south()
+: <a class="el" href="classThunderEgg_1_1Face.html#ac59948ae7ecaf1d967217217804c6542">ThunderEgg::Face&lt; D, M &gt;</a>
+</li>
 <li>StarPatchOperator()
 : <a class="el" href="classThunderEgg_1_1Poisson_1_1StarPatchOperator.html#aeca01fffc449045bb062e46e476e3620">ThunderEgg::Poisson::StarPatchOperator&lt; D &gt;</a>
 , <a class="el" href="classThunderEgg_1_1VarPoisson_1_1StarPatchOperator.html#ace0fa3b49dcc3c3a819eed76fbdbdd1f">ThunderEgg::VarPoisson::StarPatchOperator&lt; D &gt;</a>
@@ -222,15 +245,19 @@ $(function() {
 : <a class="el" href="classThunderEgg_1_1Timer.html#ace4032c1b8e0998549885b97d5021b50">ThunderEgg::Timer</a>
 </li>
 <li>sw()
-: <a class="el" href="classThunderEgg_1_1Orthant.html#a3ed7f1e359b6f7cfd30bf5719c987ac3">ThunderEgg::Orthant&lt; D &gt;</a>
+: <a class="el" href="classThunderEgg_1_1Face.html#a84bdb5ca207a32072c431bdd63ab38db">ThunderEgg::Face&lt; D, M &gt;</a>
+, <a class="el" href="classThunderEgg_1_1Orthant.html#a3ed7f1e359b6f7cfd30bf5719c987ac3">ThunderEgg::Orthant&lt; D &gt;</a>
 </li>
 </ul>
 </div><!-- contents -->
+</div><!-- doc-content -->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">Generated by
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
 </body>
 </html>
