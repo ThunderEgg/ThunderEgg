@@ -9,9 +9,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-20.04
-    env:
-      CXXFLAGS: -g -O0 -Wall -Wno-system-headers -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline
-      LDFLAGS: -lgcov
     steps:
     - name: Install dependencies
       run: |
