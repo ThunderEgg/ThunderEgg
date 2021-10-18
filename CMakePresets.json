@@ -11,10 +11,8 @@
 				"CMAKE_CXX_COMPILER": "/usr/bin/g++",
 				"CMAKE_CXX_FLAGS": "-g -O0 -Wall -Wno-system-headers -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unknown-warning-option -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline",
 				"PETSC_DIR": "/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/",
-				"THUNDEREGG_MPIEXEC_FLAGS": "--oversubscribe"
-			},
-			"environment": {
-				"LDFLAGS": "-lgcov"
+				"THUNDEREGG_MPIEXEC_FLAGS": "--oversubscribe",
+				"CMAKE_EXE_LINKER_FLAGS": "-lgcov"
 			}
 		}
 	],
