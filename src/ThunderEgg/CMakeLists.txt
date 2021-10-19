@@ -123,18 +123,20 @@ set(ALL_ThunderEgg_HDRS ${ALL_ThunderEgg_HDRS} PARENT_SCOPE)
 
 # -- config header
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(TE_ENABLE_DEBUG "true")
-else()
-  set(TE_ENABLE_DEBUG "false")
+  set(THUNDEREGG_ENABLE_DEBUG ON)
 endif()
-
+if(TARGET FFTW::FFTW)
+  set(THUNDEREGG_FFTW_ENABLED TRUE)
+endif()
+if(TARGET P4EST::P4EST)
+  set(THUNDEREGG_P4EST_ENABLED TRUE)
+endif()
+if(TARGET BLAS::BLAS AND TARGET LAPACK::LAPACK)
+  set(THUNDEREGG_LAPACK_ENABLED TRUE)
+endif()
 if(TARGET PETSC::PETSC)
-  set(TE_PETSC_ENABLED "true")
-  set(THUNDEREGG_PETSC_ENABLED "ON")
-else()
-  set(TE_PETSC_ENABLED "false")
+  set(THUNDEREGG_PETSC_ENABLED TRUE)
 endif()
-
 
 configure_file(Config.h.in Config.h)
 

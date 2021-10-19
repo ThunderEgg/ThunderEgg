@@ -1,5 +1,5 @@
 /***************************************************************************
- *  ThunderEgg, a library for solvers on adaptively refined block-structured 
+ *  ThunderEgg, a library for solvers on adaptively refined block-structured
  *  Cartesian grids.
  *
  *  Copyright (c) 2021      Scott Aiton
@@ -19,10 +19,44 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_CONFIG_H
 #define THUNDEREGG_CONFIG_H
+
+#cmakedefine THUNDEREGG_FFTW_ENABLED
+#cmakedefine THUNDEREGG_P4EST_ENABLED
+#cmakedefine THUNDEREGG_LAPACK_ENABLED
 #cmakedefine THUNDEREGG_PETSC_ENABLED
-namespace ThunderEgg
-{
-constexpr bool ENABLE_DEBUG  = @TE_ENABLE_DEBUG@;
-constexpr bool PETSC_ENABLED = @TE_PETSC_ENABLED@;
+#cmakedefine THUNDEREGG_ENABLE_DEBUG
+
+namespace ThunderEgg {
+
+#ifdef THUNDEREGG_FFTW_ENABLED
+constexpr bool FFTW_ENABLED = true;
+#else
+constexpr bool FFTW_ENABLED = false;
+#endif
+
+#ifdef THUNDEREGG_P4EST_ENABLED
+constexpr bool P4EST_ENABLED = true;
+#else
+constexpr bool P4EST_ENABLED = false;
+#endif
+
+#ifdef THUNDEREGG_LAPACK_ENABLED
+constexpr bool LAPACK_ENABLED = true;
+#else
+constexpr bool LAPACK_ENABLED = false;
+#endif
+
+#ifdef THUNDEREGG_PETSC_ENABLED
+constexpr bool PETSC_ENABLED = true;
+#else
+constexpr bool PETSC_ENABLED = false;
+#endif
+
+#ifdef THUNDEREGG_ENABLE_DEBUG
+constexpr bool ENABLE_DEBUG = true;
+#else
+constexpr bool ENABLE_DEBUG = false;
+#endif
+
 } // namespace ThunderEgg
 #endif
