@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 project(ThunderEgg 
-        VERSION 1.0.0
+        VERSION 1.0.1
         LANGUAGES CXX)
 enable_testing()
 
