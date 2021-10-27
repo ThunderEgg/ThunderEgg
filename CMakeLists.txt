@@ -15,12 +15,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG true)
 
-find_program(CCACHE_FOUND ccache)
-if(CCACHE_FOUND)
-  message("-- Using ccache.")
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-endif(CCACHE_FOUND)
 find_package(MPI REQUIRED)
 
 if(NOT disable_petsc)
