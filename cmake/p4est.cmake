@@ -1,8 +1,6 @@
 # provides imported target P4EST::P4EST
 include(ExternalProject)
 
-set(p4est_external true CACHE BOOL "build p4est library" FORCE)
-
 # --- libsc externalProject
 # this keeps libsc scope totally separate from p4est, which avoids 
 # tricky to diagnose behaviors
