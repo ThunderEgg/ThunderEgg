@@ -44,19 +44,6 @@ endif(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
 
 target_link_libraries(ThunderEgg PUBLIC MPI::MPI_CXX)
 
-# -- install
-
-install(
-  TARGETS ThunderEgg
-  EXPORT ThunderEggConfig
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
-install(EXPORT ThunderEggConfig DESTINATION share/ThunderEgg/cmake)
-
-
 # -- imported target, for use from FetchContent
 
 add_library(ThunderEgg::ThunderEgg INTERFACE IMPORTED GLOBAL)

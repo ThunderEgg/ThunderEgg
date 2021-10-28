@@ -45,17 +45,22 @@ include(cmake/documentation.cmake)
 
 include(CMakePackageConfigHelpers)
 
+set(THUNDEREGG_ENABLED_COMPONENTS "")
 if(TARGET FFTW::FFTW)
   set(THUNDEREGG_FFTW_ENABLED TRUE)
+  list(APPEND THUNDEREGG_ENABLED_COMPONENTS "FFTW")
 endif()
 if(TARGET P4EST::P4EST)
   set(THUNDEREGG_P4EST_ENABLED TRUE)
+  list(APPEND THUNDEREGG_ENABLED_COMPONENTS "P4EST")
 endif()
 if(TARGET BLAS::BLAS AND TARGET LAPACK::LAPACK)
   set(THUNDEREGG_LAPACK_ENABLED TRUE)
+  list(APPEND THUNDEREGG_ENABLED_COMPONENTS "LAPACK")
 endif()
 if(TARGET PETSC::PETSC)
   set(THUNDEREGG_PETSC_ENABLED TRUE)
+  list(APPEND THUNDEREGG_ENABLED_COMPONENTS "PETSC")
 endif()
 
 configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/Config.cmake.in
@@ -65,6 +70,8 @@ configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/Config.cmake.in
   install(FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindFFTW.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindPETSc.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindP4EST.cmake
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindSC.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/CorrectWindowsPaths.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/ResolveCompilerPaths.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindPackageMultipass.cmake
@@ -78,12 +85,12 @@ install(TARGETS ThunderEgg EXPORT ThunderEggTargets)
 
 install(EXPORT ${PROJECT_NAME}Targets
   NAMESPACE ${PROJECT_NAME}::
-  DESTINATION lib/cmake/${PROJECT_NAME})
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
-  DESTINATION lib/cmake/${PROJECT_NAME})
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
 export(EXPORT ${PROJECT_NAME}Targets
   FILE ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Targets.cmake
