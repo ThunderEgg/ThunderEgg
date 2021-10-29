@@ -50,6 +50,7 @@ target_sources(ThunderEgg PRIVATE WCycle.cpp)
 install(
   FILES ${ThunderEgg_HDRS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg/GMG
+  COMPONENT   ThunderEgg_Development
 )
 
 # -- add list of headers to all

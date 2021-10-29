@@ -34,6 +34,7 @@ target_sources(ThunderEgg PRIVATE PatchSolverWrapper.cpp)
 install(
   FILES ${ThunderEgg_HDRS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg/Schur
+  COMPONENT   ThunderEgg_Development
 )
 
 # -- add list of headers to all

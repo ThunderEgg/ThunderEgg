@@ -43,6 +43,7 @@ endif(TARGET PETSC::PETSC)
 install(
   FILES ${ThunderEgg_HDRS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg/Poisson
+  COMPONENT   ThunderEgg_Development
 )
 
 # -- add list of headers to all

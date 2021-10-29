@@ -100,6 +100,7 @@ target_sources(ThunderEgg PRIVATE View.cpp)
 install(
   FILES ${ThunderEgg_HDRS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg
+  COMPONENT   ThunderEgg_Development
 )
 
 # -- subdirectories
@@ -140,7 +141,10 @@ endif()
 
 configure_file(Config.h.in Config.h)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Config.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Config.h 
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg
+        COMPONENT   ThunderEgg_Development
+        )
 
 target_include_directories(
   ThunderEgg
