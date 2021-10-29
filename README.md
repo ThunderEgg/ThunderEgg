@@ -30,29 +30,25 @@ Compilers can be specified in the following way
 ```
 $ cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER /path/to/source
 ```
-Some helpful CMake variables for configuration:
-```
-
-PETSC_DIR               The PETSc directory
-PETSC_ARCH              The PETSc arch
-petsc                   allow the use the use of PETSc
-petsc_required          fail if PETSc is not found
-
-FFTW_ROOT               The fftw directory
-fftw                    allow the use the use of FFTW
-fftw_required           fail if FFTW is not found
-
-P4EST_ROOT              The p4est directory
-p4est                   allow the use the use of p4est
-p4est_external          build p4est library if not found on system
-p4est_required          fail if p4est is not found
-
-lapack                  allow the use the use of lapack/blas
-lapack_required         fail if lapack/blas is not found
-
-```
 
 Then compile with make:
 ```
 make
 ```
+Some helpful CMake variables for configuration:
+Variable           | Default Value |   Description
+-------------------|:---------:|---------------------------------------
+PETSC_DIR          |         |    The PETSc directory
+PETSC_ARCH         |         |    The PETSc arch
+petsc              |   ON    |    allow the use the use of PETSc
+petsc_required     |   OFF   |    fail if PETSc is not found
+FFTW_ROOT          |         |    The fftw directory
+fftw               |   ON    |    allow the use the use of FFTW
+fftw_required      |   OFF   |    fail if FFTW is not found
+P4EST_ROOT         |         |    The p4est directory
+p4est              |   ON    |    allow the use the use of p4est
+p4est_external     |   ON    |    build p4est library if not found on system
+p4est_required     |   OFF   |    fail if p4est is not found
+lapack             |   ON    |    allow the use the use of lapack/blas
+lapack_required    |   OFF   |    fail if lapack/blas is not found
+
