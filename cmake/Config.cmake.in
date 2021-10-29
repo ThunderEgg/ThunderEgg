@@ -7,7 +7,8 @@ set(THUNDEREGG_ENABLED_COMPONENTS "@THUNDEREGG_ENABLED_COMPONENTS@")
 
 foreach(COMPONENT IN LISTS ThunderEgg_FIND_COMPONENTS)
   if(NOT ${COMPONENT} IN_LIST THUNDEREGG_ENABLED_COMPONENTS)
-    message(FATAL_ERROR "ThunderEgg was not build with ${COMPONENT} enabled.")
+    message(WARNING "ThunderEgg was not build with ${COMPONENT} enabled.")
+    set(ThunderEgg_FOUND FALSE)
   endif()
 endforeach()
 
@@ -28,5 +29,4 @@ if("PETSC" IN_LIST THUNDEREGG_ENABLED_COMPONENTS)
     find_dependency(PETSc)
 endif()
 find_dependency(MPI COMPONENTS C CXX)
-
-check_required_components(@PROJECT_NAME@)
+)

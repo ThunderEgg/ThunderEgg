@@ -104,7 +104,9 @@ include(CMakePackageConfigHelpers)
 
 configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/Config.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake
-  INSTALL_DESTINATION lib)
+  INSTALL_DESTINATION lib
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO  
+)
 
   install(FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindFFTW.cmake
