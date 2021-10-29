@@ -2,6 +2,11 @@
 
 add_library(ThunderEgg)
 
+set_target_properties(
+  ThunderEgg PROPERTIES
+    SOVERSION ${CMAKE_PROJECT_VERSION_MAJOR}
+    VERSION   ${CMAKE_PROJECT_VERSION}
+)
 add_subdirectory(ThunderEgg)
 
 # -- generate the single header ThunderEgg.h
@@ -12,7 +17,9 @@ foreach(HDR ${ALL_ThunderEgg_HDRS})
 endforeach(HDR)
 configure_file("ThunderEgg.h.in" "ThunderEgg.h")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.h"
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT   ThunderEgg_Development
+)
 
 
 # -- set include directories

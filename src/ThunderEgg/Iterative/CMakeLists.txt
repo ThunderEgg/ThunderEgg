@@ -22,6 +22,7 @@ list(APPEND ThunderEgg_HDRS Solver.h)
 install(
   FILES ${ThunderEgg_HDRS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg/Iterative
+  COMPONENT   ThunderEgg_Development
 )
 
 # -- add list of headers to all

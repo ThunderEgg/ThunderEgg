@@ -11,6 +11,7 @@ list(APPEND ThunderEgg_HDRS json.hpp)
 install(
   FILES ${ThunderEgg_HDRS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg/tpl
+  COMPONENT   ThunderEgg_Development
 )
 
 # -- add list of headers to all

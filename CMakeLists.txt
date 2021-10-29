@@ -120,20 +120,34 @@ write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
   COMPATIBILITY SameMinorVersion)
 
-install(TARGETS ThunderEgg EXPORT ThunderEggTargets)
+install(TARGETS ThunderEgg 
+  EXPORT                        ThunderEggTargets
+  RUNTIME DESTINATION           ${CMAKE_INSTALL_BINDIR}
+          COMPONENT             ThunderEgg_RunTime
+  LIBRARY DESTINATION           ${CMAKE_INSTALL_LIBDIR}
+          COMPONENT             ThunderEgg_RunTime
+          NAMELINK_COMPONENT    ThunderEgg_Development
+  ARCHIVE DESTINATION           ${CMAKE_INSTALL_LIBDIR}
+          COMPONENT             ThunderEgg_Development
+)
 
 install(EXPORT ${PROJECT_NAME}Targets
   NAMESPACE ${PROJECT_NAME}::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+  COMPONENT   ThunderEgg_Development
+)
 
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+  COMPONENT   ThunderEgg_Development
+)
 
 export(EXPORT ${PROJECT_NAME}Targets
   FILE ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Targets.cmake
-  NAMESPACE ${PROJECT_NAME}::)
+  NAMESPACE ${PROJECT_NAME}::
+)
 
 # -- generate a pkgconfig file
 include(cmake/pkgconfig.cmake)

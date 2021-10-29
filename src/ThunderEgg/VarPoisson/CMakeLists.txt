@@ -12,6 +12,7 @@ target_sources(ThunderEgg PRIVATE StarPatchOperator.cpp)
 install(
   FILES ${ThunderEgg_HDRS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ThunderEgg/VarPoisson
+  COMPONENT   ThunderEgg_Development
 )
 
 # -- add list of headers to all
