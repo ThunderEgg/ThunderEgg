@@ -1,11 +1,15 @@
 include(CMakeDependentOption)
 
+set(PETSC_DIR CACHE PATH "The PETSc directory")
+set(PETSC_ARCH CACHE STRING "The PETSc arch")
 option(petsc "allow the use the use of PETSc" on)
 cmake_dependent_option(petsc_required "fail if PETSc is not found" off "petsc" off)
 
+set(FFTW_ROOT CACHE PATH "The fftw directory")
 option(fftw "allow the use the use of FFTW" on)
 cmake_dependent_option(fftw_required "fail if FFTW is not found" off "fftw" off)
 
+set(P4EST_ROOT CACHE PATH "The p4est directory")
 option(p4est "allow the use the use of p4est" on)
 cmake_dependent_option(p4est_external "build p4est library if not found on system" on "p4est" off)
 cmake_dependent_option(p4est_required "fail if p4est is not found" off "p4est" off)
