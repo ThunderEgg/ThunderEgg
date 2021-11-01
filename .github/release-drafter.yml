@@ -1,4 +1,4 @@
-name-template: 'v$RESOLVED_VERSION'
+name-template: 'ThunderEgg v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 categories:
   - title: '🚀 Features'
@@ -28,6 +28,7 @@ version-resolver:
       - 'patch'
   default: patch
 template: |
+  View documentation at https://thunderegg.dev/ThunderEgg/docs/v$RESOLVED_VERSION/index.html
   ## Changes
 
   $CHANGES
