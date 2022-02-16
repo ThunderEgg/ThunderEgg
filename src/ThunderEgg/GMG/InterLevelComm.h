@@ -223,6 +223,65 @@ public:
     }
   }
   /**
+   * @brief Copy construct a new Inter Level Comm object
+   *
+   * @param other the InterLevelComm to copy
+   */
+  InterLevelComm(const InterLevelComm& other)
+    : comm(other.comm)
+    , coarser_domain(other.coarser_domain)
+    , finer_domain(other.finer_domain)
+    , ns(other.ns)
+    , num_ghost_cells(other.num_ghost_cells)
+    , num_ghost_patches(other.num_ghost_patches)
+    , patch_size(other.patch_size)
+    , rank_and_local_indexes_for_vector(other.rank_and_local_indexes_for_vector)
+    , rank_and_local_indexes_for_ghost_vector(other.rank_and_local_indexes_for_ghost_vector)
+  {
+    patches_with_local_parent.reserve(other.patches_with_local_parent.size());
+    for (auto pair : other.patches_with_local_parent) {
+      patches_with_local_parent.emplace_back(
+        pair.first, finer_domain.getPatchInfoVector()[pair.second.get().local_index]);
+    }
+    patches_with_ghost_parent.reserve(other.patches_with_ghost_parent.size());
+    for (auto pair : other.patches_with_ghost_parent) {
+      patches_with_ghost_parent.emplace_back(
+        pair.first, finer_domain.getPatchInfoVector()[pair.second.get().local_index]);
+    }
+  }
+  /**
+   * @brief Copy assign a new Inter Level Comm object
+   *
+   * @param other the InterLevelComm to copy
+   */
+  InterLevelComm& operator=(const InterLevelComm& other)
+  {
+    comm = other.comm;
+    coarser_domain = other.coarser_domain;
+    finer_domain = other.finer_domain;
+    ns = other.ns;
+    num_ghost_cells = other.num_ghost_cells;
+    num_ghost_patches = other.num_ghost_patches;
+    patch_size = other.patch_size;
+    rank_and_local_indexes_for_vector = other.rank_and_local_indexes_for_vector;
+    rank_and_local_indexes_for_ghost_vector = other.rank_and_local_indexes_for_ghost_vector;
+
+    patches_with_local_parent.clear();
+    patches_with_local_parent.reserve(other.patches_with_local_parent.size());
+    for (auto pair : other.patches_with_local_parent) {
+      patches_with_local_parent.emplace_back(
+        pair.first, finer_domain.getPatchInfoVector()[pair.second.get().local_index]);
+    }
+    patches_with_ghost_parent.clear();
+    patches_with_ghost_parent.reserve(other.patches_with_ghost_parent.size());
+    for (auto pair : other.patches_with_ghost_parent) {
+      patches_with_ghost_parent.emplace_back(
+        pair.first, finer_domain.getPatchInfoVector()[pair.second.get().local_index]);
+    }
+    return *this;
+  }
+
+  /**
    * @brief Destroy the InterLevelComm object
    */
   ~InterLevelComm()

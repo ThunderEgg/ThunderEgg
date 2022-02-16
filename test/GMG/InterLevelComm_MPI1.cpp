@@ -40,13 +40,28 @@ TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLe
   Domain<2> d_coarse = domain_reader.getCoarserDomain();
   INFO("d_fine: " << d_fine.getNumLocalPatches());
   INFO("d_coarse: " << d_coarse.getNumLocalPatches());
-  GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
+  GMG::InterLevelComm<2>* ilc = nullptr;
+  std::string construction_type = GENERATE("direct", "copy", "copy_assign");
+  INFO("construction_type: " << construction_type);
+  if (construction_type == "direct") {
+    // direct construction
+    ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
+  } else if (construction_type == "copy") {
+    // copy construction
+    GMG::InterLevelComm<2> ilc_other(d_coarse, d_fine);
+    ilc = new GMG::InterLevelComm<2>(ilc_other);
+  } else if (construction_type == "copy_assign") {
+    // copy assignment
+    GMG::InterLevelComm<2> ilc_other(d_coarse, d_fine);
+    ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
+    *ilc = ilc_other;
+  }
 
-  CHECK(ilc.getPatchesWithGhostParent().size() == 0);
-  CHECK(ilc.getPatchesWithLocalParent().size() == 16);
+  CHECK(ilc->getPatchesWithGhostParent().size() == 0);
+  CHECK(ilc->getPatchesWithLocalParent().size() == 16);
 
   map<int, set<int>> parents_to_children;
-  for (auto pair : ilc.getPatchesWithLocalParent()) {
+  for (auto pair : ilc->getPatchesWithLocalParent()) {
     parents_to_children[pair.first].insert(pair.second.get().id);
   }
   CHECK(parents_to_children.size() == 4);
@@ -74,8 +89,9 @@ TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLe
   CHECK(parents_to_children[3].count(10) == 1);
   CHECK(parents_to_children[3].count(11) == 1);
   CHECK(parents_to_children[3].count(12) == 1);
+  delete ilc;
 }
-TEST_CASE("1-processor getNewGhostVector on uniform 4x4", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 1-processor getNewGhostVector on uniform 4x4", "[GMG::InterLevelComm]")
 {
   auto num_components = GENERATE(1, 2, 3);
   auto nx = GENERATE(2, 10);
@@ -84,14 +100,30 @@ TEST_CASE("1-processor getNewGhostVector on uniform 4x4", "[GMG::InterLevelComm]
   DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
   Domain<2> d_fine = domain_reader.getFinerDomain();
   Domain<2> d_coarse = domain_reader.getCoarserDomain();
-  GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
+  GMG::InterLevelComm<2>* ilc = nullptr;
+  std::string construction_type = GENERATE("direct", "copy", "copy_assign");
+  INFO("construction_type: " << construction_type);
+  if (construction_type == "direct") {
+    // direct construction
+    ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
+  } else if (construction_type == "copy") {
+    // copy construction
+    GMG::InterLevelComm<2> ilc_other(d_coarse, d_fine);
+    ilc = new GMG::InterLevelComm<2>(ilc_other);
+  } else if (construction_type == "copy_assign") {
+    // copy assignment
+    GMG::InterLevelComm<2> ilc_other(d_coarse, d_fine);
+    ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
+    *ilc = ilc_other;
+  }
 
-  Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
+  Vector<2> ghost_vec = ilc->getNewGhostVector(num_components);
 
   CHECK(ghost_vec.getNumLocalPatches() == 0);
   CHECK(ghost_vec.getNumComponents() == num_components);
+  delete ilc;
 }
-TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]")
 {
   auto num_components = GENERATE(1, 2, 3);
   auto nx = GENERATE(2, 10);
@@ -100,12 +132,27 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
   DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
   Domain<2> d_fine = domain_reader.getFinerDomain();
   Domain<2> d_coarse = domain_reader.getCoarserDomain();
-  GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
+  GMG::InterLevelComm<2>* ilc = nullptr;
+  std::string construction_type = GENERATE("direct", "copy", "copy_assign");
+  INFO("construction_type: " << construction_type);
+  if (construction_type == "direct") {
+    // direct construction
+    ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
+  } else if (construction_type == "copy") {
+    // copy construction
+    GMG::InterLevelComm<2> ilc_other(d_coarse, d_fine);
+    ilc = new GMG::InterLevelComm<2>(ilc_other);
+  } else if (construction_type == "copy_assign") {
+    // copy assignment
+    GMG::InterLevelComm<2> ilc_other(d_coarse, d_fine);
+    ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
+    *ilc = ilc_other;
+  }
 
   Vector<2> coarse_vec(d_coarse, num_components);
   Vector<2> coarse_expected(d_coarse, num_components);
 
-  Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
+  Vector<2> ghost_vec = ilc->getNewGhostVector(num_components);
 
   // info
   INFO("nx: " << nx);
@@ -125,8 +172,8 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
   // since there are not ghost patches, the coarse vec should not be modified
   coarse_expected.copy(coarse_vec);
 
-  ilc.sendGhostPatchesStart(coarse_vec, ghost_vec);
-  ilc.sendGhostPatchesFinish(coarse_vec, ghost_vec);
+  ilc->sendGhostPatchesStart(coarse_vec, ghost_vec);
+  ilc->sendGhostPatchesFinish(coarse_vec, ghost_vec);
   for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
     PatchView<double, 2> vec_view = coarse_vec.getPatchView(i);
     PatchView<double, 2> expected_view = coarse_expected.getPatchView(i);
@@ -134,4 +181,5 @@ TEST_CASE("1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]"
       REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord]));
     });
   }
+  delete ilc;
 }
