@@ -27,7 +27,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">ThunderEgg
-   &#160;<span id="projectnumber">1.0.2</span>
+   &#160;<span id="projectnumber">1.0.3</span>
    </div>
   </td>
  </tr>
@@ -101,6 +101,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7aadba939045a8c0a1b5c8e677fcb0ff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html#a7aadba939045a8c0a1b5c8e677fcb0ff">InterLevelComm</a> (const <a class="el" href="classThunderEgg_1_1Domain.html">Domain</a>&lt; D &gt; &amp;coarser_domain, const <a class="el" href="classThunderEgg_1_1Domain.html">Domain</a>&lt; D &gt; &amp;finer_domain)</td></tr>
 <tr class="memdesc:a7aadba939045a8c0a1b5c8e677fcb0ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html" title="Facilitates communication between a finer domain and a coarser domain.">InterLevelComm</a> object.  <a href="classThunderEgg_1_1GMG_1_1InterLevelComm.html#a7aadba939045a8c0a1b5c8e677fcb0ff">More...</a><br /></td></tr>
 <tr class="separator:a7aadba939045a8c0a1b5c8e677fcb0ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0c461b87fe1b972d253b0eae8fa0175"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html#ad0c461b87fe1b972d253b0eae8fa0175">InterLevelComm</a> (const <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html">InterLevelComm</a> &amp;other)</td></tr>
+<tr class="memdesc:ad0c461b87fe1b972d253b0eae8fa0175"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy construct a new Inter <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html" title="Represents a level in geometric multi-grid.">Level</a> Comm object.  <a href="classThunderEgg_1_1GMG_1_1InterLevelComm.html#ad0c461b87fe1b972d253b0eae8fa0175">More...</a><br /></td></tr>
+<tr class="separator:ad0c461b87fe1b972d253b0eae8fa0175"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad52f15c4cc0b45c8e3a5b963be344320"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html">InterLevelComm</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html#ad52f15c4cc0b45c8e3a5b963be344320">operator=</a> (const <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html">InterLevelComm</a> &amp;other)</td></tr>
+<tr class="memdesc:ad52f15c4cc0b45c8e3a5b963be344320"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assign a new Inter <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html" title="Represents a level in geometric multi-grid.">Level</a> Comm object.  <a href="classThunderEgg_1_1GMG_1_1InterLevelComm.html#ad52f15c4cc0b45c8e3a5b963be344320">More...</a><br /></td></tr>
+<tr class="separator:ad52f15c4cc0b45c8e3a5b963be344320"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a975b14015ff76fd3677e0484cb9240f0"><td class="memItemLeft" align="right" valign="top"><a id="a975b14015ff76fd3677e0484cb9240f0"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html#a975b14015ff76fd3677e0484cb9240f0">~InterLevelComm</a> ()</td></tr>
 <tr class="memdesc:a975b14015ff76fd3677e0484cb9240f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html" title="Facilitates communication between a finer domain and a coarser domain.">InterLevelComm</a> object. <br /></td></tr>
@@ -149,7 +155,7 @@ class ThunderEgg::GMG::InterLevelComm&lt; D &gt;</h3>
 <p>Scatter functions are provided for scattering to and from the coarse vector to the coarse ghost vector. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a7aadba939045a8c0a1b5c8e677fcb0ff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7aadba939045a8c0a1b5c8e677fcb0ff">&#9670;&nbsp;</a></span>InterLevelComm()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7aadba939045a8c0a1b5c8e677fcb0ff">&#9670;&nbsp;</a></span>InterLevelComm() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -189,6 +195,42 @@ template&lt;int D&gt; </div>
   <table class="params">
     <tr><td class="paramname">coarse_domain</td><td>the coarser DomainCollection. </td></tr>
     <tr><td class="paramname">fine_domain</td><td>the finer DomainCollection. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad0c461b87fe1b972d253b0eae8fa0175"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0c461b87fe1b972d253b0eae8fa0175">&#9670;&nbsp;</a></span>InterLevelComm() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int D&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html">ThunderEgg::GMG::InterLevelComm</a>&lt; D &gt;::<a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html">InterLevelComm</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html">InterLevelComm</a>&lt; D &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy construct a new Inter <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html" title="Represents a level in geometric multi-grid.">Level</a> Comm object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html" title="Facilitates communication between a finer domain and a coarser domain.">InterLevelComm</a> to copy </td></tr>
   </table>
   </dd>
 </dl>
@@ -456,6 +498,42 @@ template&lt;int D&gt; </div>
 <li>Second value: a reference to the child patch</li>
 </ul>
 <dl class="section return"><dt>Returns</dt><dd>const std::vector&lt;std::pair&lt;int, std::reference_wrapper&lt;const PatchInfo&lt;D&gt;&gt;&gt;&gt;&amp; the vector </dd></dl>
+
+</div>
+</div>
+<a id="ad52f15c4cc0b45c8e3a5b963be344320"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad52f15c4cc0b45c8e3a5b963be344320">&#9670;&nbsp;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int D&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html">InterLevelComm</a>&amp; <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html">ThunderEgg::GMG::InterLevelComm</a>&lt; D &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html">InterLevelComm</a>&lt; D &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy assign a new Inter <a class="el" href="classThunderEgg_1_1GMG_1_1Level.html" title="Represents a level in geometric multi-grid.">Level</a> Comm object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>the <a class="el" href="classThunderEgg_1_1GMG_1_1InterLevelComm.html" title="Facilitates communication between a finer domain and a coarser domain.">InterLevelComm</a> to copy </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
