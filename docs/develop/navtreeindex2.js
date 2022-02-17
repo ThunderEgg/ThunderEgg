@@ -1,5 +1,7 @@
 var NAVTREEINDEX2 =
 {
+"classThunderEgg_1_1NormalNbrInfo.html#a2e39504edcbe12db5f2b63e61996a741":[2,0,0,26,0],
+"classThunderEgg_1_1NormalNbrInfo.html#a3d5a80f2e3a545c314ea827e7188c0da":[2,0,0,26,11],
 "classThunderEgg_1_1NormalNbrInfo.html#a50cb9f60b83458742614bd6d9989378d":[2,0,0,26,12],
 "classThunderEgg_1_1NormalNbrInfo.html#a53718791775b48227068bccbbe8658a8":[2,0,0,26,3],
 "classThunderEgg_1_1NormalNbrInfo.html#a5badefcb39c479e6778b61059aa48236":[2,0,0,26,7],
@@ -247,7 +249,5 @@ var NAVTREEINDEX2 =
 "classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a1ae55414db5e6a5ee6e4b4e6ddad04a4":[2,0,0,4,7,8],
 "classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a20bd50f926952b3016f7bce73e238265":[2,0,0,4,7,10],
 "classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a3f62a767fbf7ba40b6f3081719f08b6b":[2,0,0,4,7,9],
-"classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a45040733a1ee628196c898207c74b91e":[2,0,0,4,7,6],
-"classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a48dee1fa540e04de99d97466b12ca37c":[2,0,0,4,7,12],
-"classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a628f0684a5479b3c3eadb15314be440a":[2,0,0,4,7,11]
+"classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html#a45040733a1ee628196c898207c74b91e":[2,0,0,4,7,6]
 };
