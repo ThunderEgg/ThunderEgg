@@ -118,9 +118,13 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
 
   P4estDomainGenerator dg(p4est, { nx, ny }, num_ghost_cells, bmf);
 
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_2 = dg.getFinestDomain();
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_1 = dg.getCoarserDomain();
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_0 = dg.getCoarserDomain();
+  CHECK_FALSE(dg.hasCoarserDomain());
 
   // SECTION("correct number of patches")
   {
@@ -1105,9 +1109,13 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
 
   P4estDomainGenerator dg(p4est, { nx, ny }, num_ghost_cells, bmf);
 
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_2 = dg.getFinestDomain();
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_1 = dg.getCoarserDomain();
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_0 = dg.getCoarserDomain();
+  CHECK_FALSE(dg.hasCoarserDomain());
 
   // SECTION("patches have correct ns")
   {
@@ -1734,10 +1742,15 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
 
   P4estDomainGenerator dg(p4est, { nx, ny }, num_ghost_cells, bmf);
 
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_3 = dg.getFinestDomain();
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_2 = dg.getCoarserDomain();
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_1 = dg.getCoarserDomain();
+  CHECK(dg.hasCoarserDomain());
   Domain<2> domain_0 = dg.getCoarserDomain();
+  CHECK_FALSE(dg.hasCoarserDomain());
 
   // SECTION("correct number of patches")
   {
