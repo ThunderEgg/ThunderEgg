@@ -51,7 +51,7 @@ jobs:
     - name: Run Tests
       run: ctest -j2 --preset ci-gcc
     - name: Generate Coverage Report
-      run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
+      run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b -k
     - name: Upload to codecov.io
       run: bash <(curl -s https://codecov.io/bash)
     - name: Run sonar-scanner
