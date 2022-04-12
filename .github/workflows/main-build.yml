@@ -53,12 +53,12 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         sonar-scanner \
-        -Dsonar.cfamily.gcov.reportsPath=src/ \
+        -Dsonar.cfamily.gcov.reportsPath=out/build/ci-gcc \
         -Dsonar.projectKey=thunderegg \
         -Dsonar.organization=thunderegg \
         -Dsonar.sources=src \
         -Dsonar.exclusions=src/ThunderEgg/Experimental/**/*,src/ThunderEgg/tpl/**/* \
         -Dsonar.cpd.exclusions=src/ThunderEgg/VarPoisson/**/*,src/ThunderEgg/Poisson/**/* \
-        -Dsonar.cfamily.compile-commands=compile_commands.json \
+        -Dsonar.cfamily.compile-commands=out/build/ci-gcc/compile_commands.json \
         -Dsonar.host.url=https://sonarcloud.io \
-        -Dsonar.cfamily.threads=2 
+        -Dsonar.cfamily.threads=2
