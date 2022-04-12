@@ -40,7 +40,7 @@ jobs:
     - name: Configure
       run: cmake --preset ci-gcc
     - name: Build
-      run: build-wrapper-linux-x86-64 --out-dir bw-output cmake --build --preset ci-gcc -parallel 2
+      run: cmake --build --preset ci-gcc -parallel 2
     - name: Run Tests
       run: ctest -j2 --preset ci-gcc
     - name: Generate Coverage Report
