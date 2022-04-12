@@ -3,7 +3,6 @@ on:
   push:
     paths-ignore:
       - '.github/workflows/doxygen.yml'
-env:
 jobs:
   build:
     runs-on: ubuntu-20.04
