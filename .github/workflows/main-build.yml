@@ -4,8 +4,6 @@ on:
     paths-ignore:
       - '.github/workflows/doxygen.yml'
 env:
-  SONAR_WRAPPER_URL: https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
-  SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -16,13 +14,9 @@ jobs:
         sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build ccache
         echo $HOME/.local/bin >> $GITHUB_PATH
         pip install gcovr
-    - name: Install Sonar Build Wrapper
-      run: |
-        wget --quiet $SONAR_WRAPPER_URL
-        unzip build-wrapper-linux-x86.zip
-        mv build-wrapper-linux-x86 $HOME/build-wrapper-linux-x86
-        echo $HOME/build-wrapper-linux-x86 >> $GITHUB_PATH
     - name: Install Sonar Scanner
+      env:
+        SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
       run: |
         wget --quiet $SONAR_SCANNER_URL
         unzip sonar-scanner-*-linux.zip
@@ -58,4 +52,14 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: sonar-scanner
+      run: |
+        sonar-scanner \
+        -Dsonar.cfamily.gcov.reportsPath=src/ \
+        -Dsonar.projectKey=thunderegg \
+        -Dsonar.organization=thunderegg \
+        -Dsonar.sources=src \
+        -Dsonar.exclusions=src/ThunderEgg/Experimental/**/*, src/ThunderEgg/tpl/**/* \
+        -Dsonar.cpd.exclusions=src/ThunderEgg/VarPoisson/**/*, src/ThunderEgg/Poisson/**/* \
+        -Dsonar.cfamily.compile-commands=compile_commands.json \
+        -Dsonar.host.url=https://sonarcloud.io \
+        -Dsonar.cfamily.threads=2 
