@@ -950,5 +950,5 @@ P8estDomainGenerator::getFinestDomain()
 bool
 P8estDomainGenerator::hasCoarserDomain()
 {
-  return curr_level > 0;
+  return !domain_patches.empty();
 }

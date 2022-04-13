@@ -69,6 +69,20 @@ struct FourTreeBSW
   }
 };
 } // namespace
+TEST_CASE("P8estDomainGenerator 4x4x4 Uniform hasCoarserDomain", "[P8estDomainGenerator]")
+{
+  FourTreeBSW tree;
+
+  P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
+
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_2 = dg.getFinestDomain();
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_1 = dg.getCoarserDomain();
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_0 = dg.getCoarserDomain();
+  CHECK_FALSE(dg.hasCoarserDomain());
+}
 TEST_CASE("P8estDomainGenerator 4x4x4 Uniform Number of Patches", "[P8estDomainGenerator]")
 {
   FourTreeBSW tree;
@@ -314,6 +328,22 @@ struct FourTreeRefineBSW
   }
 };
 } // namespace
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw Uniform hasCoarserDomain", "[P8estDomainGenerator]")
+{
+  FourTreeRefineBSW tree;
+
+  P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
+
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_3 = dg.getFinestDomain();
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_2 = dg.getCoarserDomain();
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_1 = dg.getCoarserDomain();
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_0 = dg.getCoarserDomain();
+  CHECK_FALSE(dg.hasCoarserDomain());
+}
 TEST_CASE("P8estDomainGenerator 4x4x4rbsw Uniform Number of Patches", "[P8estDomainGenerator]")
 {
   FourTreeRefineBSW tree;
@@ -599,7 +629,20 @@ struct TwoTreeRefineBSW
 };
 
 } // namespace
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform hasCoarserDomain", "[P8estDomainGenerator]")
+{
+  TwoTreeRefineBSW tree;
 
+  P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
+
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_2 = dg.getFinestDomain();
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_1 = dg.getCoarserDomain();
+  CHECK(dg.hasCoarserDomain());
+  Domain<3> domain_0 = dg.getCoarserDomain();
+  CHECK_FALSE(dg.hasCoarserDomain());
+}
 TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform Number of Patches", "[P8estDomainGenerator]")
 {
   TwoTreeRefineBSW tree;
