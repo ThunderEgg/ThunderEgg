@@ -27,18 +27,56 @@
 				"CXX": "g++",
 				"CC": "gcc"
 			}
+		},
+		{
+			"name": "ci-clang",
+			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+				"CMAKE_C_COMPILER_LAUNCHER": "ccache",
+				"CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+				"CMAKE_CXX_FLAGS": "-O3",
+				"THUNDEREGG_ENABLE_DEBUG": true,
+				"PETSC_DIR": "/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/",
+				"THUNDEREGG_MPIEXEC_FLAGS": "--oversubscribe",
+				"petsc": true,
+				"petsc_required": true,
+				"fftw": true,
+				"fftw_required": true,
+				"p4est": true,
+				"p4est_required": true,
+				"lapack": true,
+				"lapack_required": true
+			},
+			"environment": {
+				"CXX": "clang++",
+				"CC": "clang"
+			}
 		}
 	],
 	"buildPresets": [
 		{
 			"name": "ci-gcc",
 			"configurePreset": "ci-gcc"
+		},
+		{
+			"name": "ci-clang",
+			"configurePreset": "ci-clang"
 		}
 	],
 	"testPresets": [
 		{
 			"name": "ci-gcc",
 			"configurePreset": "ci-gcc",
+			"output": {
+				"outputOnFailure": true
+			}
+		},
+		{
+			"name": "ci-clang",
+			"configurePreset": "ci-clang",
 			"output": {
 				"outputOnFailure": true
 			}
