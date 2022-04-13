@@ -21,8 +21,8 @@ jobs:
         unzip sonar-scanner-*-linux.zip
         mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
         echo $HOME/sonar-scanner-linux/bin >> $GITHUB_PATH
-    - name: Prepare ccache timestamp
-      id: ccache_cache_timestamp
+    - name: Prepare cache timestamp
+      id: cache_cache_timestamp
       shell: cmake -P {0}
       run: |
         string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
@@ -31,9 +31,16 @@ jobs:
       uses: actions/cache@v2
       with:
         path: .ccache
-        key: gcc-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+        key: gcc-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
         restore-keys: |
           gcc-ccache-
+    - name: sonar-scanner cache files
+      uses: actions/cache@v2
+      with:
+        path: ~/.sonar/cache
+        key: gcc-sonar-scanner-${{ steps.cache_timestamp.outputs.timestamp }}
+        restore-keys: |
+          gcc-sonar-scanner-
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
@@ -61,4 +68,6 @@ jobs:
         -Dsonar.cpd.exclusions=src/ThunderEgg/VarPoisson/**/*,src/ThunderEgg/Poisson/**/* \
         -Dsonar.cfamily.compile-commands=out/build/ci-gcc/compile_commands.json \
         -Dsonar.host.url=https://sonarcloud.io \
-        -Dsonar.cfamily.threads=2
+        -Dsonar.cfamily.threads=2 \
+        -Dsonar.cfamily.cache.enabled=true \
+        -Dsonar.cfamily.cache.path=$HOME/.sonar/cache
