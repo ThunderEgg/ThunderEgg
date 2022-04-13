@@ -18,7 +18,7 @@ jobs:
         - name: "clang"
           preset: "ci-clang"
           ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build"
-          analyze: false
+          analyze: true
 
     name: ${{ matrix.name }} Build on Linux
     steps:
@@ -27,9 +27,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install ${{ matrix.ubuntu_packages }} ninja-build ccache
-        echo $HOME/.local/bin >> $GITHUB_PATH
-        pip install gcovr
-
+        
     - name: Install Sonar Scanner
       if: ${{ matrix.analyze }}
       env:
@@ -68,7 +66,17 @@ jobs:
 
     - name: Generate Coverage Report
       if: ${{ matrix.analyze }}
-      run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b -k
+      run: |
+        llvm-profdata merge \
+          -sparse out/test/${{ matrix.preset }}/test.profraw.* \
+          -o test.profdata
+        llvm-cov show \
+          --instr-profile=test.profdata \
+          -object out/build/${{ matrix.preset }}/test/unit_tests_mpi1 \
+          -object out/build/${{ matrix.preset }}/test/unit_tests_mpi2 \
+          -object out/build/${{ matrix.preset }}/test/unit_tests_mpi3 \
+          --ignore-filename-regex="((test|out|tpl)/.*)" \
+          > coverage.txt
 
     - name: Upload to codecov.io
       if: ${{ matrix.analyze }}
@@ -81,7 +89,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         sonar-scanner \
-        -Dsonar.cfamily.gcov.reportsPath=out/build/ci-gcc \
+        -Dsonar.cfamily.llvm-cov.reportPath=coverage.txt \
         -Dsonar.projectKey=thunderegg \
         -Dsonar.organization=thunderegg \
         -Dsonar.sources=src \

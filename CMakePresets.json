@@ -81,6 +81,9 @@
 			"configurePreset": "ci-clang",
 			"output": {
 				"outputOnFailure": true
+			},
+			"environment": {
+				"LLVM_PROFILE_FILE": "${sourceDir}/out/test/${presetName}/test.profraw.%p"
 			}
 		}
 	]
