@@ -30,7 +30,7 @@ jobs:
     - name: ccache cache files
       uses: actions/cache@v2
       with:
-        path: .ccache
+        path: ~/.ccache
         key: gcc-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
         restore-keys: |
           gcc-ccache-
