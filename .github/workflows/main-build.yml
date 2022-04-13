@@ -6,13 +6,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - name: "gcc"
+          preset: "ci-gcc"
+          ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build"
+
+    name: ${{ matrix.name }} Build on Linux
     steps:
+
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build ccache
+        sudo apt-get install ${{ matrix.ubuntu_packages }} ninja-build ccache
         echo $HOME/.local/bin >> $GITHUB_PATH
         pip install gcovr
+
     - name: Install Sonar Scanner
       env:
         SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
@@ -21,12 +33,14 @@ jobs:
         unzip sonar-scanner-*-linux.zip
         mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
         echo $HOME/sonar-scanner-linux/bin >> $GITHUB_PATH
+
     - name: Prepare cache timestamp
       id: cache_timestamp
       shell: cmake -P {0}
       run: |
         string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
         message("::set-output name=timestamp::${current_date}")
+
     - name: ccache cache files
       uses: actions/cache@v2
       with:
@@ -34,6 +48,7 @@ jobs:
         key: gcc-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
         restore-keys: |
           gcc-ccache-
+
     - name: sonar-scanner cache files
       uses: actions/cache@v2
       with:
@@ -41,19 +56,26 @@ jobs:
         key: gcc-sonar-scanner-${{ steps.cache_timestamp.outputs.timestamp }}
         restore-keys: |
           gcc-sonar-scanner-
+
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+
     - name: Configure
-      run: cmake --preset ci-gcc
+      run: cmake --preset ${{ matrix.preset }}
+
     - name: Build
-      run: cmake --build --preset ci-gcc -parallel 2
+      run: cmake --build --preset ${{ matrix.preset }} -parallel 2
+
     - name: Run Tests
-      run: ctest -j2 --preset ci-gcc
+      run: ctest -j2 --preset ${{ matrix.preset }}
+
     - name: Generate Coverage Report
       run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b -k
+
     - name: Upload to codecov.io
       run: bash <(curl -s https://codecov.io/bash)
+
     - name: Run sonar-scanner
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
