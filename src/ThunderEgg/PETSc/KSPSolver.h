@@ -170,10 +170,6 @@ public:
     int iterations;
     KSPGetIterationNumber(ksp, &iterations);
 
-    const char* converged_reason;
-    KSPGetConvergedReasonString(ksp, &converged_reason);
-    os << converged_reason << std::endl;
-
     KSPDestroy(&ksp);
     VecDestroy(&x_PETSC);
     VecDestroy(&b_PETSC);
