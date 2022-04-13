@@ -22,7 +22,7 @@ jobs:
         mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
         echo $HOME/sonar-scanner-linux/bin >> $GITHUB_PATH
     - name: Prepare cache timestamp
-      id: cache_cache_timestamp
+      id: cache_timestamp
       shell: cmake -P {0}
       run: |
         string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
