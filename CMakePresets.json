@@ -21,8 +21,7 @@
 				"p4est": true,
 				"p4est_required": true,
 				"lapack": true,
-				"lapack_required": true,
-				"pch": true
+				"lapack_required": true
 			},
 			"environment": {
 				"CXX": "g++",
@@ -49,8 +48,7 @@
 				"p4est": true,
 				"p4est_required": true,
 				"lapack": true,
-				"lapack_required": true,
-				"pch": true
+				"lapack_required": true
 			},
 			"environment": {
 				"CXX": "clang++",
