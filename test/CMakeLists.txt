@@ -101,7 +101,8 @@ if(TARGET P4EST::P4EST)
   
 endif(TARGET P4EST::P4EST)
 
-target_sources(unit_tests_mpi1 PRIVATE PatchInfo_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE PatchInfo_2_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE PatchInfo_3_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE PatchOperator_MPI1.cpp)
 

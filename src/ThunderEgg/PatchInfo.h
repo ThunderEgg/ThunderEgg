@@ -129,74 +129,23 @@ public:
    * @brief Construct a new Patch Info object
    * starts, ns, and spacings are all set to 0
    */
-  PatchInfo()
-  {
-    starts.fill(0);
-    ns.fill(1);
-    spacings.fill(1);
-    child_ids.fill(-1);
-    child_ranks.fill(-1);
-  }
+  PatchInfo();
 
   /**
    * @brief Copy constructor
    *
    * @param other_pinfo  object to copy
    */
-  PatchInfo(const PatchInfo<D>& other_pinfo)
-    : id(other_pinfo.id)
-    , local_index(other_pinfo.local_index)
-    , global_index(other_pinfo.global_index)
-    , refine_level(other_pinfo.refine_level)
-    , parent_id(other_pinfo.parent_id)
-    , parent_rank(other_pinfo.parent_rank)
-    , child_ids(other_pinfo.child_ids)
-    , child_ranks(other_pinfo.child_ranks)
-    , num_ghost_cells(other_pinfo.num_ghost_cells)
-    , rank(other_pinfo.rank)
-    , orth_on_parent(other_pinfo.orth_on_parent)
-    , ns(other_pinfo.ns)
-    , starts(other_pinfo.starts)
-    , spacings(other_pinfo.spacings)
-  {
-    for (size_t i = 0; i < other_pinfo.nbr_infos.size(); i++) {
-      if (other_pinfo.nbr_infos[i] != nullptr) {
-        nbr_infos[i] = other_pinfo.nbr_infos[i]->clone();
-      }
-    }
-  }
+  PatchInfo(const PatchInfo<D>& other_pinfo);
+
   /**
    * @brief Copy asisgnment
    *
    * @param other_pinfo the object to copy
    * @return PatchInfo<D>& this object
    */
-  PatchInfo<D>& operator=(const PatchInfo<D>& other_pinfo)
-  {
-    id = other_pinfo.id;
-    local_index = other_pinfo.local_index;
-    global_index = other_pinfo.global_index;
-    refine_level = other_pinfo.refine_level;
-    parent_id = other_pinfo.parent_id;
-    parent_rank = other_pinfo.parent_rank;
-    child_ids = other_pinfo.child_ids;
-    child_ranks = other_pinfo.child_ranks;
-    num_ghost_cells = other_pinfo.num_ghost_cells;
-    rank = other_pinfo.rank;
-    orth_on_parent = other_pinfo.orth_on_parent;
-    ns = other_pinfo.ns;
-    starts = other_pinfo.starts;
-    spacings = other_pinfo.spacings;
+  PatchInfo<D>& operator=(const PatchInfo<D>& other_pinfo);
 
-    for (size_t i = 0; i < other_pinfo.nbr_infos.size(); i++) {
-      if (other_pinfo.nbr_infos[i] != nullptr) {
-        nbr_infos[i] = other_pinfo.nbr_infos[i]->clone();
-      } else {
-        nbr_infos[i] = nullptr;
-      }
-    }
-    return *this;
-  }
   /**
    * @brief Compare the ids of the patches
    *
@@ -205,12 +154,17 @@ public:
    * @return true if r's id is lower
    * @return false if r's id is not lower
    */
-  friend bool operator<(const PatchInfo& l, const PatchInfo& r) { return l.id < r.id; }
+  friend bool operator<(const PatchInfo& l, const PatchInfo& r);
+
+  /**
+   * @brief Set the Nbr Info object to null
+   *
+   * @tparam M the dimensionality of the face
+   * @param f the face
+   */
   template<int M>
-  void setNbrInfo(Face<D, M> f, std::nullptr_t)
-  {
-    nbr_infos[Face<D, M>::sum_of_faces + f.getIndex()] = nullptr;
-  }
+  void setNbrInfo(Face<D, M> f, std::nullptr_t);
+
   /**
    * @brief Set the Nbr Info object on a given face
    *
@@ -219,10 +173,8 @@ public:
    * @param nbr_info the neighbor info object, this patchinfo will take ownership of it
    */
   template<int M>
-  void setNbrInfo(Face<D, M> f, NbrInfo<M>* nbr_info)
-  {
-    nbr_infos[Face<D, M>::sum_of_faces + f.getIndex()].reset(nbr_info);
-  }
+  void setNbrInfo(Face<D, M> f, NbrInfo<M>* nbr_info);
+
   /**
    * @brief Get the NbrType for a side
    *
