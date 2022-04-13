@@ -3,9 +3,6 @@ on:
   push:
     paths-ignore:
       - '.github/workflows/doxygen.yml'
-env:
-  SONAR_WRAPPER_URL: https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
-  SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.0.2311-linux.zip
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -16,20 +13,16 @@ jobs:
         sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build ccache
         echo $HOME/.local/bin >> $GITHUB_PATH
         pip install gcovr
-    - name: Install Sonar Build Wrapper
-      run: |
-        wget --quiet $SONAR_WRAPPER_URL
-        unzip build-wrapper-linux-x86.zip
-        mv build-wrapper-linux-x86 $HOME/build-wrapper-linux-x86
-        echo $HOME/build-wrapper-linux-x86 >> $GITHUB_PATH
     - name: Install Sonar Scanner
+      env:
+        SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
       run: |
         wget --quiet $SONAR_SCANNER_URL
         unzip sonar-scanner-*-linux.zip
         mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
         echo $HOME/sonar-scanner-linux/bin >> $GITHUB_PATH
-    - name: Prepare ccache timestamp
-      id: ccache_cache_timestamp
+    - name: Prepare cache timestamp
+      id: cache_timestamp
       shell: cmake -P {0}
       run: |
         string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
@@ -37,25 +30,44 @@ jobs:
     - name: ccache cache files
       uses: actions/cache@v2
       with:
-        path: .ccache
-        key: gcc-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+        path: ~/.ccache
+        key: gcc-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
         restore-keys: |
           gcc-ccache-
+    - name: sonar-scanner cache files
+      uses: actions/cache@v2
+      with:
+        path: ~/.sonar/cache
+        key: gcc-sonar-scanner-${{ steps.cache_timestamp.outputs.timestamp }}
+        restore-keys: |
+          gcc-sonar-scanner-
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
     - name: Configure
       run: cmake --preset ci-gcc
     - name: Build
-      run: build-wrapper-linux-x86-64 --out-dir bw-output cmake --build --preset ci-gcc -parallel 2
+      run: cmake --build --preset ci-gcc -parallel 2
     - name: Run Tests
       run: ctest -j2 --preset ci-gcc
     - name: Generate Coverage Report
-      run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b --sonarqube coverage.xml
+      run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b -k
     - name: Upload to codecov.io
       run: bash <(curl -s https://codecov.io/bash)
     - name: Run sonar-scanner
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: sonar-scanner
+      run: |
+        sonar-scanner \
+        -Dsonar.cfamily.gcov.reportsPath=out/build/ci-gcc \
+        -Dsonar.projectKey=thunderegg \
+        -Dsonar.organization=thunderegg \
+        -Dsonar.sources=src \
+        -Dsonar.exclusions=src/ThunderEgg/Experimental/**/*,src/ThunderEgg/tpl/**/* \
+        -Dsonar.cpd.exclusions=src/ThunderEgg/VarPoisson/**/*,src/ThunderEgg/Poisson/**/* \
+        -Dsonar.cfamily.compile-commands=out/build/ci-gcc/compile_commands.json \
+        -Dsonar.host.url=https://sonarcloud.io \
+        -Dsonar.cfamily.threads=2 \
+        -Dsonar.cfamily.cache.enabled=true \
+        -Dsonar.cfamily.cache.path=$HOME/.sonar/cache
