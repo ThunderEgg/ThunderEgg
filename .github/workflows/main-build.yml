@@ -14,6 +14,7 @@ jobs:
         - name: "gcc"
           preset: "ci-gcc"
           ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build"
+          analyze: false
 
     name: ${{ matrix.name }} Build on Linux
     steps:
@@ -26,6 +27,7 @@ jobs:
         pip install gcovr
 
     - name: Install Sonar Scanner
+      if: ${{ matrix.analyze }}
       env:
         SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
       run: |
@@ -45,17 +47,18 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ~/.ccache
-        key: gcc-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
+        key: ${{ matrix.name }}-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
         restore-keys: |
-          gcc-ccache-
+          ${{ matrix.name }}-ccache-
 
     - name: sonar-scanner cache files
+      if: ${{ matrix.analyze }}
       uses: actions/cache@v2
       with:
         path: ~/.sonar/cache
-        key: gcc-sonar-scanner-${{ steps.cache_timestamp.outputs.timestamp }}
+        key: ${{ matrix.name }}-sonar-scanner-${{ steps.cache_timestamp.outputs.timestamp }}
         restore-keys: |
-          gcc-sonar-scanner-
+          ${{ matrix.name }}-sonar-scanner-
 
     - uses: actions/checkout@v2
       with:
@@ -71,12 +74,15 @@ jobs:
       run: ctest -j2 --preset ${{ matrix.preset }}
 
     - name: Generate Coverage Report
+      if: ${{ matrix.analyze }}
       run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b -k
 
     - name: Upload to codecov.io
+      if: ${{ matrix.analyze }}
       run: bash <(curl -s https://codecov.io/bash)
 
     - name: Run sonar-scanner
+      if: ${{ matrix.analyze }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
