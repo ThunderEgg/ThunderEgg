@@ -1,5 +1,7 @@
 include(CMakeDependentOption)
 
+option(pch "use precompiled headers" off)
+
 option(petsc "allow the use the use of PETSc" on)
 cmake_dependent_option(petsc_required "fail if PETSc is not found" off "petsc" off)
 

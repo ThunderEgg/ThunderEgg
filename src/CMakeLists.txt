@@ -21,7 +21,6 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ThunderEgg.h"
         COMPONENT   ThunderEgg_Development
 )
 
-
 # -- set include directories
 
 target_include_directories(
@@ -50,6 +49,10 @@ if(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
 endif(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
 
 target_link_libraries(ThunderEgg PUBLIC MPI::MPI_CXX)
+
+if(pch)
+  target_precompile_headers(ThunderEgg PUBLIC ${ALL_ThunderEgg_HDRS})
+endif(pch)
 
 # -- imported target, for use from FetchContent
 
