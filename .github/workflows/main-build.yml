@@ -67,10 +67,10 @@ jobs:
     - name: Generate Coverage Report
       if: ${{ matrix.analyze }}
       run: |
-        llvm-profdata merge \
+        llvm-profdata-11 merge \
           -sparse out/test/${{ matrix.preset }}/test.profraw.* \
           -o test.profdata
-        llvm-cov show \
+        llvm-cov-11 show \
           --instr-profile=test.profdata \
           -object out/build/${{ matrix.preset }}/test/unit_tests_mpi1 \
           -object out/build/${{ matrix.preset }}/test/unit_tests_mpi2 \
