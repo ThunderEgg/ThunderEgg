@@ -6,14 +6,30 @@ on:
 jobs:
   build:
     runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - name: "gcc"
+          preset: "ci-gcc"
+          ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev"
+          analyze: false
+        - name: "clang"
+          preset: "ci-clang"
+          ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev llvm-11"
+          analyze: true
+
+    name: ${{ matrix.name }} Build on Linux
     steps:
+
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build ccache
-        echo $HOME/.local/bin >> $GITHUB_PATH
-        pip install gcovr
+        sudo apt-get install ${{ matrix.ubuntu_packages }} ninja-build ccache
+        
     - name: Install Sonar Scanner
+      if: ${{ matrix.analyze }}
       env:
         SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
       run: |
@@ -21,52 +37,76 @@ jobs:
         unzip sonar-scanner-*-linux.zip
         mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
         echo $HOME/sonar-scanner-linux/bin >> $GITHUB_PATH
+
     - name: Prepare cache timestamp
       id: cache_timestamp
       shell: cmake -P {0}
       run: |
         string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
         message("::set-output name=timestamp::${current_date}")
+
     - name: ccache cache files
       uses: actions/cache@v2
       with:
         path: ~/.ccache
-        key: gcc-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
+        key: ${{ matrix.name }}-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
         restore-keys: |
-          gcc-ccache-
+          ${{ matrix.name }}-ccache-
+
     - name: sonar-scanner cache files
+      if: ${{ matrix.analyze }}
       uses: actions/cache@v2
       with:
         path: ~/.sonar/cache
-        key: gcc-sonar-scanner-${{ steps.cache_timestamp.outputs.timestamp }}
+        key: ${{ matrix.name }}-sonar-scanner-${{ steps.cache_timestamp.outputs.timestamp }}
         restore-keys: |
-          gcc-sonar-scanner-
+          ${{ matrix.name }}-sonar-scanner-
+
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+
     - name: Configure
-      run: cmake --preset ci-gcc
+      run: cmake --preset ${{ matrix.preset }}
+
     - name: Build
-      run: cmake --build --preset ci-gcc -parallel 2
+      run: cmake --build --preset ${{ matrix.preset }} -parallel 2
+
     - name: Run Tests
-      run: ctest -j2 --preset ci-gcc
+      run: ctest -j2 --preset ${{ matrix.preset }}
+
     - name: Generate Coverage Report
-      run: gcovr --exclude-unreachable-branches --exclude-throw-branches -f src/ -b -k
+      if: ${{ matrix.analyze }}
+      run: |
+        llvm-profdata-11 merge \
+          -sparse out/test/${{ matrix.preset }}/test.profraw.* \
+          -o test.profdata
+        llvm-cov-11 show \
+          --instr-profile=test.profdata \
+          -object out/build/${{ matrix.preset }}/test/unit_tests_mpi1 \
+          -object out/build/${{ matrix.preset }}/test/unit_tests_mpi2 \
+          -object out/build/${{ matrix.preset }}/test/unit_tests_mpi3 \
+          --ignore-filename-regex="((test|out|tpl)/.*)" \
+          > coverage.txt
+
     - name: Upload to codecov.io
+      if: ${{ matrix.analyze }}
       run: bash <(curl -s https://codecov.io/bash)
+
     - name: Run sonar-scanner
+      if: ${{ matrix.analyze }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         sonar-scanner \
-        -Dsonar.cfamily.gcov.reportsPath=out/build/ci-gcc \
+        -Dsonar.cfamily.llvm-cov.reportPath=coverage.txt \
         -Dsonar.projectKey=thunderegg \
         -Dsonar.organization=thunderegg \
         -Dsonar.sources=src \
         -Dsonar.exclusions=src/ThunderEgg/Experimental/**/*,src/ThunderEgg/tpl/**/* \
         -Dsonar.cpd.exclusions=src/ThunderEgg/VarPoisson/**/*,src/ThunderEgg/Poisson/**/* \
-        -Dsonar.cfamily.compile-commands=out/build/ci-gcc/compile_commands.json \
+        -Dsonar.cfamily.compile-commands=out/build/${{ matrix.preset }}/compile_commands.json \
         -Dsonar.host.url=https://sonarcloud.io \
         -Dsonar.cfamily.threads=2 \
         -Dsonar.cfamily.cache.enabled=true \
