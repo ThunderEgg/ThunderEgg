@@ -17,7 +17,7 @@ var classThunderEgg_1_1PatchInfo =
     [ "serialize", "classThunderEgg_1_1PatchInfo.html#a80411c805285f24a2c6fdb22ea742df2", null ],
     [ "serializeNeighbors", "classThunderEgg_1_1PatchInfo.html#a4564a510eaf9adb51f7e5734124ab33c", null ],
     [ "setNbrInfo", "classThunderEgg_1_1PatchInfo.html#a5166ffdc28625dda8e2a593ecdaa0e64", null ],
-    [ "setNbrInfo", "classThunderEgg_1_1PatchInfo.html#ab403169e0bc6c2a0587453d2e3295539", null ],
+    [ "setNbrInfo", "classThunderEgg_1_1PatchInfo.html#ad6dbc178f874c2ad793e6f8be361e677", null ],
     [ "setNeighborGlobalIndexes", "classThunderEgg_1_1PatchInfo.html#a70967db10f659812eeea777b9e4ff951", null ],
     [ "setNeighborLocalIndexes", "classThunderEgg_1_1PatchInfo.html#ab947af58e540c62ff281a9bd74e6f0b9", null ],
     [ "operator<", "classThunderEgg_1_1PatchInfo.html#adc6baa37bb24593fa730a398836561ba", null ],
