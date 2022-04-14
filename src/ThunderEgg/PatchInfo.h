@@ -206,7 +206,7 @@ public:
    */
   friend bool operator<(const PatchInfo& l, const PatchInfo& r) { return l.id < r.id; }
   template<int M>
-  void setNbrInfo(Face<D, M> f, nullptr_t)
+  void setNbrInfo(Face<D, M> f, std::nullptr_t)
   {
     nbr_infos[Face<D, M>::sum_of_faces + f.getIndex()] = nullptr;
   }
