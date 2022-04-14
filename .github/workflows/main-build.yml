@@ -17,7 +17,7 @@ jobs:
           analyze: false
         - name: "clang"
           preset: "ci-clang"
-          ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev llvm"
+          ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev llvm-11"
           analyze: true
 
     name: ${{ matrix.name }} Build on Linux
