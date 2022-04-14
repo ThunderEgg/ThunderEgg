@@ -38,18 +38,29 @@ jobs:
         mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
         echo $HOME/sonar-scanner-linux/bin >> $GITHUB_PATH
 
+    - name: Prepare cache timestamp
+      id: cache_timestamp
+      shell: cmake -P {0}
+      run: |
+        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+        message("::set-output name=timestamp::${current_date}")
+
     - name: ccache cache files
       uses: actions/cache@v2
       with:
         path: ~/.ccache
-        key: ${{ matrix.name }}-ccache
+        key: ${{ matrix.name }}-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
+        restore-keys: |
+          ${{ matrix.name }}-ccache-
 
     - name: sonar-scanner cache files
       if: ${{ matrix.analyze }}
       uses: actions/cache@v2
       with:
         path: ~/.sonar/cache
-        key: ${{ matrix.name }}-sonar-scanner
+        key: ${{ matrix.name }}-sonar-scanner-${{ steps.cache_timestamp.outputs.timestamp }}
+        restore-keys: |
+          ${{ matrix.name }}-sonar-scanner-
 
     - uses: actions/checkout@v2
       with:
