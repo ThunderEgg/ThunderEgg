@@ -1105,7 +1105,6 @@ public:
    */
   const Domain<D>& getDomain() const { return domain; }
 };
-extern template class MPIGhostFiller<1>;
 extern template class MPIGhostFiller<2>;
 extern template class MPIGhostFiller<3>;
 } // namespace ThunderEgg

@@ -58,5 +58,8 @@ constexpr bool ENABLE_DEBUG = true;
 constexpr bool ENABLE_DEBUG = false;
 #endif
 
+template<int D>
+constexpr bool is_supported_dimension = (D == 2 || D == 3);
+
 } // namespace ThunderEgg
 #endif

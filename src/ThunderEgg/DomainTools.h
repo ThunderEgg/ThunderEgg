@@ -300,32 +300,6 @@ public:
     }
   }
   /**
-   * @brief Set the values for a vector with the given function.
-   *
-   * @param domain the domain that we are setting values for
-   * @param vec the vector to set values in
-   * @param component_index the component to set
-   * @param func the function
-   */
-  static void SetValues(const Domain<1>& domain,
-                        Vector<1>& vec,
-                        int component_index,
-                        std::function<double(double)> func)
-  {
-    if (component_index >= vec.getNumComponents()) {
-      throw RuntimeError("Invalid component to set");
-    }
-    for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-      ComponentView<double, 1> ld = vec.getComponentView(component_index, i);
-      const PatchInfo<1>& pinfo = domain.getPatchInfoVector()[i];
-      double dx = pinfo.spacings[0];
-      for (int xi = 0; xi < pinfo.ns[0]; xi++) {
-        double x = pinfo.starts[0] + 0.5 * dx + xi * dx;
-        ld(xi) = func(x);
-      }
-    }
-  }
-  /**
    * @brief Set the values for a vector with the given functions
    *
    * @tparam D the number of cartesian dimensions
@@ -435,33 +409,6 @@ public:
           double x = pinfo.starts[0] + 0.5 * dx + xi * dx;
           ld(xi, yi) = func(x, y);
         }
-      }
-    }
-  }
-  /**
-   * @brief Set the values (including ghost values) for a vector with the given function.
-   *
-   * @param domain the domain that we are setting values for
-   * @param vec the vector to set values in
-   * @param component_index the component to set
-   * @param func the function
-   */
-  static void SetValuesWithGhost(const Domain<1>& domain,
-                                 Vector<1>& vec,
-                                 int component_index,
-                                 std::function<double(double)> func)
-  {
-    if (component_index >= vec.getNumComponents()) {
-      throw RuntimeError("Invalid component to set");
-    }
-    for (int i = 0; i < vec.getNumLocalPatches(); i++) {
-      ComponentView<double, 1> ld = vec.getComponentView(component_index, i);
-      const PatchInfo<1>& pinfo = domain.getPatchInfoVector()[i];
-      int num_ghost = pinfo.num_ghost_cells;
-      double dx = pinfo.spacings[0];
-      for (int xi = -num_ghost; xi < pinfo.ns[0] + num_ghost; xi++) {
-        double x = pinfo.starts[0] + 0.5 * dx + xi * dx;
-        ld(xi) = func(x);
       }
     }
   }

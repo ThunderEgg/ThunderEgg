@@ -25,37 +25,6 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace doctest;
 
-TEST_CASE("DomainTools::GetRealCoord 1D")
-{
-  for (auto nx : { 1, 2, 3, 10, 16, 17 }) {
-    for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
-      for (auto lengthx : { 1.0, 0.23, 3.0 }) {
-        PatchInfo<1> pinfo;
-
-        pinfo.ns = { nx };
-        pinfo.spacings = { lengthx / nx };
-        pinfo.starts = { startx };
-
-        for (int coordx = -1; coordx <= nx; coordx++) {
-          array<int, 1> coord = { coordx };
-          array<double, 1> expected;
-          if (coordx == -1) {
-            expected[0] = startx;
-          } else if (coordx == nx) {
-            expected[0] = startx + lengthx;
-          } else {
-            expected[0] = startx + (0.5 + coordx) * lengthx / nx;
-          }
-
-          array<double, 1> result;
-          DomainTools::GetRealCoord<1>(pinfo, coord, result);
-
-          CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
-        }
-      }
-    }
-  }
-}
 TEST_CASE("DomainTools::GetRealCoord 2D")
 {
   for (auto ny : { 1, 2, 3 }) {
@@ -159,31 +128,6 @@ TEST_CASE("DomainTools::GetRealCoord 3D")
     }
   }
 }
-TEST_CASE("DomainTools::getRealCoordGhost 1D")
-{
-  for (auto nx : { 1, 2, 3, 10, 16, 17 }) {
-    for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
-      for (auto lengthx : { 1.0, 0.23, 3.0 }) {
-        PatchInfo<1> pinfo;
-
-        pinfo.ns = { nx };
-        pinfo.spacings = { lengthx / nx };
-        pinfo.starts = { startx };
-
-        for (int coordx = -1; coordx <= nx; coordx++) {
-          array<int, 1> coord = { coordx };
-          array<double, 1> expected;
-          expected[0] = startx + (0.5 + coordx) * lengthx / nx;
-
-          array<double, 1> result;
-          DomainTools::GetRealCoordGhost<1>(pinfo, coord, result);
-
-          CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
-        }
-      }
-    }
-  }
-}
 TEST_CASE("DomainTools::getRealCoordGhost 2D")
 {
   for (auto ny : { 1, 2, 3 }) {
@@ -257,7 +201,7 @@ TEST_CASE("DomainTools::getRealCoordGhost 3D")
     }
   }
 }
-TEST_CASE("DomainTools::GetRealCoordBound 1D")
+TEST_CASE("DomainTools::GetRealCoordBound 2D")
 {
   for (auto nx : { 1, 2, 3, 10, 16, 17 }) {
     for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -335,80 +279,6 @@ TEST_CASE("DomainTools::GetRealCoordBound 2D")
 
           CHECK_EQ(result[0] + 100, Approx(startx + lengthx + 100));
           CHECK_EQ(result[1] + 100, Approx(expected[1] + 100));
-        }
-      }
-    }
-  }
-}
-TEST_CASE("DomainTools::setValues 1D g=x")
-{
-  for (auto nx : { 1, 2, 10, 13 }) {
-    for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
-      for (auto spacingx : { 0.01, 1.0, 3.14 }) {
-        for (auto num_ghost : { 0, 1, 2, 3, 4, 5 }) {
-          Communicator comm(MPI_COMM_WORLD);
-
-          auto f = [](const std::array<double, 1> coord) { return coord[0]; };
-
-          vector<PatchInfo<1>> pinfos(1);
-
-          pinfos[0].id = 0;
-          pinfos[0].ns = { nx };
-          pinfos[0].spacings = { spacingx };
-          pinfos[0].starts = { startx };
-          pinfos[0].num_ghost_cells = num_ghost;
-          Domain<1> d(comm, 0, { nx }, num_ghost, pinfos.begin(), pinfos.end());
-
-          Vector<1> vec(d, 1);
-
-          DomainTools::SetValues<1>(d, vec, f);
-          auto ld = vec.getComponentView(0, 0);
-          Loop::Nested<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
-            if (coord[0] < 0 || coord[0] >= nx) {
-              CHECK_EQ(ld[coord] + 100, Approx(0.0 + 100));
-            } else {
-              std::array<double, 1> real_coord;
-              DomainTools::GetRealCoord<1>(pinfos[0], coord, real_coord);
-              CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
-            }
-          });
-        }
-      }
-    }
-  }
-}
-TEST_CASE("DomainTools::setValues 1D f=x**2")
-{
-  for (auto nx : { 1, 2, 10, 13 }) {
-    for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
-      for (auto spacingx : { 0.01, 1.0, 3.14 }) {
-        for (auto num_ghost : { 0, 1, 2, 3, 4, 5 }) {
-          Communicator comm(MPI_COMM_WORLD);
-
-          auto f = [](const std::array<double, 1> coord) { return coord[0] * coord[0]; };
-
-          vector<PatchInfo<1>> pinfos(1);
-
-          pinfos[0].id = 0;
-          pinfos[0].ns = { nx };
-          pinfos[0].spacings = { spacingx };
-          pinfos[0].starts = { startx };
-          pinfos[0].num_ghost_cells = num_ghost;
-          Domain<1> d(comm, 0, { nx }, num_ghost, pinfos.begin(), pinfos.end());
-
-          Vector<1> vec(d, 1);
-
-          DomainTools::SetValues<1>(d, vec, f);
-          auto ld = vec.getComponentView(0, 0);
-          Loop::Nested<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
-            if (coord[0] < 0 || coord[0] >= nx) {
-              CHECK_EQ(ld[coord] + 100, Approx(0.0 + 100));
-            } else {
-              std::array<double, 1> real_coord;
-              DomainTools::GetRealCoord<1>(pinfos[0], coord, real_coord);
-              CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
-            }
-          });
         }
       }
     }
@@ -542,72 +412,6 @@ TEST_CASE("DomainTools::setValues 2D f=x*y")
               DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
               CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
             }
-          });
-        }
-      }
-    }
-  }
-}
-TEST_CASE("DomainTools::setValuesWithGhost 1D f=x")
-{
-  for (auto nx : { 1, 2, 10, 13 }) {
-    for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
-      for (auto spacingx : { 0.01, 1.0, 3.14 }) {
-        for (auto num_ghost : { 0, 1, 2, 3, 4, 5 }) {
-          Communicator comm(MPI_COMM_WORLD);
-
-          auto f = [](const std::array<double, 1> coord) { return coord[0]; };
-
-          vector<PatchInfo<1>> pinfos(1);
-
-          pinfos[0].id = 0;
-          pinfos[0].ns = { nx };
-          pinfos[0].spacings = { spacingx };
-          pinfos[0].starts = { startx };
-          pinfos[0].num_ghost_cells = num_ghost;
-          Domain<1> d(comm, 0, { nx }, num_ghost, pinfos.begin(), pinfos.end());
-
-          Vector<1> vec(d, 1);
-
-          DomainTools::SetValuesWithGhost<1>(d, vec, f);
-          auto ld = vec.getComponentView(0, 0);
-          Loop::Nested<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
-            std::array<double, 1> real_coord;
-            DomainTools::GetRealCoordGhost<1>(pinfos[0], coord, real_coord);
-            CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
-          });
-        }
-      }
-    }
-  }
-}
-TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2")
-{
-  for (auto nx : { 1, 2, 10, 13 }) {
-    for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
-      for (auto spacingx : { 0.01, 1.0, 3.14 }) {
-        for (auto num_ghost : { 0, 1, 2, 3, 4, 5 }) {
-          Communicator comm(MPI_COMM_WORLD);
-
-          auto f = [](const std::array<double, 1> coord) { return coord[0] * coord[0]; };
-
-          vector<PatchInfo<1>> pinfos(1);
-
-          pinfos[0].id = 0;
-          pinfos[0].ns = { nx };
-          pinfos[0].spacings = { spacingx };
-          pinfos[0].starts = { startx };
-          pinfos[0].num_ghost_cells = num_ghost;
-          Domain<1> d(comm, 0, { nx }, num_ghost, pinfos.begin(), pinfos.end());
-
-          Vector<1> vec(d, 1);
-
-          DomainTools::SetValuesWithGhost<1>(d, vec, f);
-          auto ld = vec.getComponentView(0, 0);
-          Loop::Nested<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
-            std::array<double, 1> real_coord;
-            DomainTools::GetRealCoordGhost<1>(pinfos[0], coord, real_coord);
-            CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
           });
         }
       }

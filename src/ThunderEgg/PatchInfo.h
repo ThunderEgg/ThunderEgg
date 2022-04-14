@@ -25,6 +25,7 @@
  * @brief PatchInfo class
  */
 #include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Config.h>
 #include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NormalNbrInfo.h>
 #include <ThunderEgg/Orthant.h>
@@ -49,6 +50,7 @@ namespace ThunderEgg {
  * @tparam D the number of cartesian dimensions in the patch
  */
 template<int D>
+requires is_supported_dimension<D>
 class PatchInfo : public Serializable
 {
 private:

@@ -158,35 +158,10 @@ public:
    * @param domain the domain
    * @param num_components  the number of components for each patch
    */
-  Vector(const Domain<D>& domain, int num_components)
-    : comm(domain.getCommunicator())
-    , num_ghost_cells(domain.getNumGhostCells())
-    , num_local_cells(domain.getNumLocalCells())
-  {
-    const std::array<int, D>& ns = domain.getNs();
-    int num_local_patches = domain.getNumLocalPatches();
-    for (int i = 0; i < D; i++) {
-      lengths[i] = ns[i];
-    }
-    lengths[D] = num_components;
-    int size = 1;
-    num_local_cells = 1;
-    for (int i = 0; i < D; i++) {
-      strides[i] = size;
-      size *= lengths[i] + 2 * num_ghost_cells;
-      num_local_cells *= lengths[i];
-    }
-    strides[D] = size;
-    size *= lengths[D];
-    int patch_stride = size;
-    size *= num_local_patches;
-    num_local_cells *= num_local_patches;
-    data.resize(size);
-    patch_starts.resize(num_local_patches);
-    for (int i = 0; i < num_local_patches; i++) {
-      patch_starts[i] = data.data() + i * patch_stride;
-    }
-  }
+  template<int DomainD>
+  Vector(const Domain<DomainD>& domain, int num_components) requires is_supported_dimension<D> &&
+    (D == DomainD);
+
   /**
    * @brief Construct a new Vector object with unmanaged memory
    *

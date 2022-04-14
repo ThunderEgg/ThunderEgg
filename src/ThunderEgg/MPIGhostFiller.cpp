@@ -20,6 +20,5 @@
 
 #include <ThunderEgg/MPIGhostFiller.h>
 
-template class ThunderEgg::MPIGhostFiller<1>;
 template class ThunderEgg::MPIGhostFiller<2>;
 template class ThunderEgg::MPIGhostFiller<3>;

@@ -47,6 +47,7 @@ namespace ThunderEgg {
  * @tparam D the number of Cartesian dimensions
  */
 template<int D>
+requires is_supported_dimension<D>
 class Domain
 {
 private:

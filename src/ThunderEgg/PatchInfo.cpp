@@ -23,6 +23,7 @@
 namespace ThunderEgg {
 
 template<int D>
+requires is_supported_dimension<D>
 PatchInfo<D>::PatchInfo()
 {
   starts.fill(0);
@@ -33,6 +34,7 @@ PatchInfo<D>::PatchInfo()
 }
 
 template<int D>
+requires is_supported_dimension<D>
 PatchInfo<D>::PatchInfo(const PatchInfo<D>& other_pinfo)
   : id(other_pinfo.id)
   , local_index(other_pinfo.local_index)
@@ -57,8 +59,8 @@ PatchInfo<D>::PatchInfo(const PatchInfo<D>& other_pinfo)
 }
 
 template<int D>
-PatchInfo<D>&
-PatchInfo<D>::operator=(const PatchInfo<D>& other_pinfo)
+requires is_supported_dimension<D> PatchInfo<D>
+&PatchInfo<D>::operator=(const PatchInfo<D>& other_pinfo)
 {
   id = other_pinfo.id;
   local_index = other_pinfo.local_index;
@@ -86,6 +88,7 @@ PatchInfo<D>::operator=(const PatchInfo<D>& other_pinfo)
 }
 
 template<int D>
+requires is_supported_dimension<D>
 bool
 operator<(const PatchInfo<D>& l, const PatchInfo<D>& r)
 {
@@ -93,6 +96,7 @@ operator<(const PatchInfo<D>& l, const PatchInfo<D>& r)
 }
 
 template<int D>
+requires is_supported_dimension<D>
 template<int M>
 void
 PatchInfo<D>::setNbrInfo(Face<D, M> f, std::nullptr_t)
@@ -101,6 +105,7 @@ PatchInfo<D>::setNbrInfo(Face<D, M> f, std::nullptr_t)
 }
 
 template<int D>
+requires is_supported_dimension<D>
 template<int M>
 void
 PatchInfo<D>::setNbrInfo(Face<D, M> f, NbrInfo<M>* nbr_info)
@@ -108,25 +113,23 @@ PatchInfo<D>::setNbrInfo(Face<D, M> f, NbrInfo<M>* nbr_info)
   nbr_infos[Face<D, M>::sum_of_faces + f.getIndex()].reset(nbr_info);
 }
 
-template class PatchInfo<1>;
-
 template class PatchInfo<2>;
 
-// template void
-// PatchInfo<2>::setNbrInfo(Face<2, 1> f, std::nullptr_t);
-// template void
-// PatchInfo<2>::setNbrInfo(Face<2, 0> f, std::nullptr_t);
+template void
+PatchInfo<2>::setNbrInfo(Face<2, 1> f, std::nullptr_t);
+template void
+PatchInfo<2>::setNbrInfo(Face<2, 0> f, std::nullptr_t);
 
 template void
 PatchInfo<2>::setNbrInfo(Face<2, 1> f, NbrInfo<1>* nbr_info);
 
 template class PatchInfo<3>;
 
-// template void
-// PatchInfo<3>::setNbrInfo(Face<3, 2> f, std::nullptr_t);
-// template void
-// PatchInfo<3>::setNbrInfo(Face<3, 1> f, std::nullptr_t);
-// template void
-// PatchInfo<3>::setNbrInfo(Face<3, 0> f, std::nullptr_t);
+template void
+PatchInfo<3>::setNbrInfo(Face<3, 2> f, std::nullptr_t);
+template void
+PatchInfo<3>::setNbrInfo(Face<3, 1> f, std::nullptr_t);
+template void
+PatchInfo<3>::setNbrInfo(Face<3, 0> f, std::nullptr_t);
 
 }
