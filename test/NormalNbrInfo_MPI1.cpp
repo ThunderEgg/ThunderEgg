@@ -27,20 +27,20 @@ using namespace ThunderEgg::tpl;
 
 TEST_CASE("NormalNbrInfo getNbrType works")
 {
-  NbrInfo<3>* info = new NormalNbrInfo<3>();
+  NbrInfo<2>* info = new NormalNbrInfo<2>();
   REQUIRE_EQ(info->getNbrType(), NbrType::Normal);
   delete info;
 }
 
 TEST_CASE("NormalNbrInfo Serialization/Deserialization")
 {
-  NormalNbrInfo<3> info;
+  NormalNbrInfo<2> info;
   info.id = 5;
   info.rank = 1;
   // serialize and then deserialize
   char* buff = new char[info.serialize(nullptr)];
   info.serialize(buff);
-  NormalNbrInfo<3> out;
+  NormalNbrInfo<2> out;
   out.deserialize(buff);
   delete[] buff;
   REQUIRE_EQ(out.id, 5);

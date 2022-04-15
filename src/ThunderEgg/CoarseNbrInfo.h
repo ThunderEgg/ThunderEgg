@@ -36,6 +36,7 @@ namespace ThunderEgg {
  * @tparam D the number of Cartesian dimensions.
  */
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 class CoarseNbrInfo : public NbrInfo<D>
 {
 public:
@@ -62,8 +63,9 @@ public:
   /**
    * @brief Construct a new empty CoarseNbrInfo object
    */
-  CoarseNbrInfo() = default;
-  ~CoarseNbrInfo() = default;
+  CoarseNbrInfo();
+
+  ~CoarseNbrInfo();
   /**
    * @brief Construct a new CoarseNbrInfo object
    *
@@ -71,68 +73,62 @@ public:
    * @param orth_on_coarse The orthant of the neighboring patch's interface that the this patch
    * lies along.
    */
-  CoarseNbrInfo(int id, Orthant<D> orth_on_coarse)
-  {
-    this->id = id;
-    this->orth_on_coarse = orth_on_coarse;
-  }
-  NbrType getNbrType() const override { return NbrType::Coarse; }
-  void getNbrIds(std::deque<int>& nbr_ids) const override { nbr_ids.push_back(id); };
-  void getNbrRanks(std::deque<int>& nbr_ranks) const override { nbr_ranks.push_back(rank); }
-  void setGlobalIndexes(const std::map<int, int>& id_to_global_index_map) override
-  {
-    global_index = id_to_global_index_map.at(id);
-  }
-  void setLocalIndexes(const std::map<int, int>& id_to_local_index_map) override
-  {
-    auto iter = id_to_local_index_map.find(id);
-    if (iter != id_to_local_index_map.end()) {
-      local_index = iter->second;
-    }
-  }
-  int serialize(char* buffer) const override
-  {
-    BufferWriter writer(buffer);
-    writer << rank;
-    writer << id;
-    writer << orth_on_coarse;
-    return writer.getPos();
-  }
-  int deserialize(char* buffer) override
-  {
-    BufferReader reader(buffer);
-    reader >> rank;
-    reader >> id;
-    reader >> orth_on_coarse;
-    return reader.getPos();
-  }
-  std::unique_ptr<NbrInfoBase> clone() const override
-  {
-    return std::make_unique<CoarseNbrInfo<D>>(*this);
-  }
+  CoarseNbrInfo(int id, Orthant<D> orth_on_coarse);
+
+  NbrType
+  getNbrType() const override;
+
+  void
+  getNbrIds(std::deque<int>& nbr_ids) const override;
+
+  void
+  getNbrRanks(std::deque<int>& nbr_ranks) const override;
+
+  void
+  setGlobalIndexes(const std::map<int, int>& id_to_global_index_map) override;
+
+  void
+  setLocalIndexes(const std::map<int, int>& id_to_local_index_map) override;
+
+  int
+  serialize(char* buffer) const override;
+
+  int
+  deserialize(char* buffer) override;
+
+  std::unique_ptr<NbrInfoBase>
+  clone() const override;
 };
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<D>& n);
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<D>& n);
 
-extern template void
-to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<0>& n);
-extern template void
-to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<1>& n);
-extern template void
-to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<2>& n);
+// EXPLICIT INSTANTIATIONS
+
+extern template class CoarseNbrInfo<0>;
+extern template class CoarseNbrInfo<1>;
+extern template class CoarseNbrInfo<2>;
 
 extern template void
-from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<0>& n);
+to_json<0>(tpl::nlohmann::json& j, const CoarseNbrInfo<0>& n);
 extern template void
-from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<1>& n);
+to_json<1>(tpl::nlohmann::json& j, const CoarseNbrInfo<1>& n);
 extern template void
-from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<2>& n);
+to_json<2>(tpl::nlohmann::json& j, const CoarseNbrInfo<2>& n);
+
+extern template void
+from_json<0>(const tpl::nlohmann::json& j, CoarseNbrInfo<0>& n);
+extern template void
+from_json<1>(const tpl::nlohmann::json& j, CoarseNbrInfo<1>& n);
+extern template void
+from_json<2>(const tpl::nlohmann::json& j, CoarseNbrInfo<2>& n);
 
 } // namespace ThunderEgg
 #endif

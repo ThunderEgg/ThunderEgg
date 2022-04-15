@@ -6,3 +6,4 @@ IndentRequiresClause: true
 AlwaysBreakAfterReturnType: All
 AlwaysBreakTemplateDeclarations: Yes
 AllowShortFunctionsOnASingleLine: None
+SeparateDefinitionBlocks: Always

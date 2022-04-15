@@ -17,105 +17,119 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-
-#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/FineNbrInfo.h>
 
 namespace ThunderEgg {
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
-CoarseNbrInfo<D>::CoarseNbrInfo() = default;
-template<int D>
-  requires is_supported_neighbor_dimension<D>
-CoarseNbrInfo<D>::~CoarseNbrInfo() = default;
+FineNbrInfo<D>::FineNbrInfo()
+{
+  ranks.fill(0);
+  ids.fill(0);
+  local_indexes.fill(-1);
+  global_indexes.fill(-1);
+}
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
-CoarseNbrInfo<D>::CoarseNbrInfo(int id, Orthant<D> orth_on_coarse)
+FineNbrInfo<D>::~FineNbrInfo() = default;
+
+template<int D>
+  requires is_supported_neighbor_dimension<D>
+FineNbrInfo<D>::FineNbrInfo(std::array<int, Orthant<D>::num_orthants> ids)
+  : ids(ids)
 {
-  this->id = id;
-  this->orth_on_coarse = orth_on_coarse;
+  ranks.fill(0);
+  local_indexes.fill(-1);
+  global_indexes.fill(-1);
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 NbrType
-CoarseNbrInfo<D>::getNbrType() const
+FineNbrInfo<D>::getNbrType() const
 {
-  return NbrType::Coarse;
+  return NbrType::Fine;
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 void
-CoarseNbrInfo<D>::getNbrIds(std::deque<int>& nbr_ids) const
+FineNbrInfo<D>::getNbrIds(std::deque<int>& nbr_ids) const
 {
-  nbr_ids.push_back(id);
+  for (size_t i = 0; i < ids.size(); i++) {
+    nbr_ids.push_back(ids[i]);
+  }
 };
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 void
-CoarseNbrInfo<D>::getNbrRanks(std::deque<int>& nbr_ranks) const
+FineNbrInfo<D>::getNbrRanks(std::deque<int>& nbr_ranks) const
 {
-  nbr_ranks.push_back(rank);
+  for (size_t i = 0; i < ranks.size(); i++) {
+    nbr_ranks.push_back(ranks[i]);
+  }
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 void
-CoarseNbrInfo<D>::setGlobalIndexes(const std::map<int, int>& id_to_global_index_map)
+FineNbrInfo<D>::setGlobalIndexes(const std::map<int, int>& id_to_global_index_map)
 {
-  global_index = id_to_global_index_map.at(id);
+  for (size_t i = 0; i < global_indexes.size(); i++) {
+    global_indexes[i] = id_to_global_index_map.at(ids[i]);
+  }
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 void
-CoarseNbrInfo<D>::setLocalIndexes(const std::map<int, int>& id_to_local_index_map)
+FineNbrInfo<D>::setLocalIndexes(const std::map<int, int>& id_to_local_index_map)
 {
-  auto iter = id_to_local_index_map.find(id);
-  if (iter != id_to_local_index_map.end()) {
-    local_index = iter->second;
+  for (size_t i = 0; i < local_indexes.size(); i++) {
+    auto iter = id_to_local_index_map.find(ids[i]);
+    if (iter != id_to_local_index_map.end()) {
+      local_indexes[i] = iter->second;
+    }
   }
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 int
-CoarseNbrInfo<D>::serialize(char* buffer) const
+FineNbrInfo<D>::serialize(char* buffer) const
 {
   BufferWriter writer(buffer);
-  writer << rank;
-  writer << id;
-  writer << orth_on_coarse;
+  writer << ranks;
+  writer << ids;
   return writer.getPos();
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 int
-CoarseNbrInfo<D>::deserialize(char* buffer)
+FineNbrInfo<D>::deserialize(char* buffer)
 {
   BufferReader reader(buffer);
-  reader >> rank;
-  reader >> id;
-  reader >> orth_on_coarse;
+  reader >> ranks;
+  reader >> ids;
   return reader.getPos();
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 std::unique_ptr<NbrInfoBase>
-CoarseNbrInfo<D>::clone() const
+FineNbrInfo<D>::clone() const
 {
-  return std::make_unique<CoarseNbrInfo<D>>(*this);
+  return std::make_unique<FineNbrInfo<D>>(*this);
 }
 
 // EXPLICIT INSTANTIATIONS
 
-template class CoarseNbrInfo<0>;
-template class CoarseNbrInfo<1>;
-template class CoarseNbrInfo<2>;
+template class FineNbrInfo<0>;
+template class FineNbrInfo<1>;
+template class FineNbrInfo<2>;
 
 } // namespace ThunderEgg

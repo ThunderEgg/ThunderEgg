@@ -19,43 +19,46 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("PatchInfo<3> getFineNbrInfo side", "[PatchInfo]")
+TEST_CASE("PatchInfo<3> getFineNbrInfo side")
 {
   for (Side<3> e : Side<3>::getValues()) {
     PatchInfo<3> pinfo;
 
     FineNbrInfo<2>* nbr_info = new FineNbrInfo<2>({ 1, 2, 3, 4 });
     pinfo.setNbrInfo(e, nbr_info);
-    CHECK(&pinfo.getFineNbrInfo(e) == nbr_info);
+    CHECK_EQ(&pinfo.getFineNbrInfo(e), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<3> getFineNbrInfo edge", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getFineNbrInfo edge")
 {
   for (Edge e : Edge::getValues()) {
     PatchInfo<3> pinfo;
 
     FineNbrInfo<1>* nbr_info = new FineNbrInfo<1>({ 1, 2 });
     pinfo.setNbrInfo(e, nbr_info);
-    CHECK(&pinfo.getFineNbrInfo(e) == nbr_info);
+    CHECK_EQ(&pinfo.getFineNbrInfo(e), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<3> getFineNbrInfo corner", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getFineNbrInfo corner")
 {
   for (Corner<3> c : Corner<3>::getValues()) {
     PatchInfo<3> pinfo;
 
     FineNbrInfo<0>* nbr_info = new FineNbrInfo<0>({ 1 });
     pinfo.setNbrInfo(c, nbr_info);
-    CHECK(&pinfo.getFineNbrInfo(c) == nbr_info);
+    CHECK_EQ(&pinfo.getFineNbrInfo(c), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<3> getFineNbrInfo side throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getFineNbrInfo side throws on null")
 {
   for (Side<3> s : Side<3>::getValues()) {
     PatchInfo<3> pinfo;
@@ -63,7 +66,8 @@ TEST_CASE("PatchInfo<3> getFineNbrInfo side throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getFineNbrInfo(s));
   }
 }
-TEST_CASE("PatchInfo<3> getFineNbrInfo edge throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getFineNbrInfo edge throws on null")
 {
   for (Edge e : Edge::getValues()) {
     PatchInfo<3> pinfo;
@@ -71,7 +75,8 @@ TEST_CASE("PatchInfo<3> getFineNbrInfo edge throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getFineNbrInfo(e));
   }
 }
-TEST_CASE("PatchInfo<3> getFineNbrInfo corner throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getFineNbrInfo corner throws on null")
 {
   for (Corner<3> c : Corner<3>::getValues()) {
     PatchInfo<3> pinfo;
@@ -79,7 +84,8 @@ TEST_CASE("PatchInfo<3> getFineNbrInfo corner throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getFineNbrInfo(c));
   }
 }
-TEST_CASE("PatchInfo<3> getFineNbrInfo side throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getFineNbrInfo side throws on wrong type")
 {
   for (Side<3> s : Side<3>::getValues()) {
     PatchInfo<3> pinfo;
@@ -89,7 +95,8 @@ TEST_CASE("PatchInfo<3> getFineNbrInfo side throws on wrong type", "[PatchInfo]"
     CHECK_THROWS(pinfo.getFineNbrInfo(s));
   }
 }
-TEST_CASE("PatchInfo<3> getFineNbrInfo edge throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getFineNbrInfo edge throws on wrong type")
 {
   for (Edge e : Edge::getValues()) {
     PatchInfo<3> pinfo;
@@ -99,7 +106,8 @@ TEST_CASE("PatchInfo<3> getFineNbrInfo edge throws on wrong type", "[PatchInfo]"
     CHECK_THROWS(pinfo.getFineNbrInfo(e));
   }
 }
-TEST_CASE("PatchInfo<3> getFineNbrInfo corner throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getFineNbrInfo corner throws on wrong type")
 {
   for (Corner<3> c : Corner<3>::getValues()) {
     PatchInfo<3> pinfo;

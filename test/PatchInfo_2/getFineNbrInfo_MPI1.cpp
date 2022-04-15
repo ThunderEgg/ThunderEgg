@@ -19,33 +19,35 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("PatchInfo<2> getFineNbrInfo side", "[PatchInfo]")
+TEST_CASE("PatchInfo<2> getFineNbrInfo side")
 {
   for (Side<2> s : Side<2>::getValues()) {
     PatchInfo<2> pinfo;
 
     FineNbrInfo<1>* nbr_info = new FineNbrInfo<1>({ 1, 2 });
     pinfo.setNbrInfo(s, nbr_info);
-    CHECK(&pinfo.getFineNbrInfo(s) == nbr_info);
+    CHECK_EQ(&pinfo.getFineNbrInfo(s), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<2> getFineNbrInfo corner", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getFineNbrInfo corner")
 {
   for (Corner<2> c : Corner<2>::getValues()) {
     PatchInfo<2> pinfo;
 
     FineNbrInfo<0>* nbr_info = new FineNbrInfo<0>({ 1 });
     pinfo.setNbrInfo(c, nbr_info);
-    CHECK(&pinfo.getFineNbrInfo(c) == nbr_info);
+    CHECK_EQ(&pinfo.getFineNbrInfo(c), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<2> getFineNbrInfo side throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getFineNbrInfo side throws on null")
 {
   for (Side<2> s : Side<2>::getValues()) {
     PatchInfo<2> pinfo;
@@ -53,7 +55,8 @@ TEST_CASE("PatchInfo<2> getFineNbrInfo side throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getFineNbrInfo(s));
   }
 }
-TEST_CASE("PatchInfo<2> getFineNbrInfo corner throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getFineNbrInfo corner throws on null")
 {
   for (Corner<2> c : Corner<2>::getValues()) {
     PatchInfo<2> pinfo;
@@ -61,7 +64,8 @@ TEST_CASE("PatchInfo<2> getFineNbrInfo corner throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getFineNbrInfo(c));
   }
 }
-TEST_CASE("PatchInfo<2> getFineNbrInfo side throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getFineNbrInfo side throws on wrong type")
 {
   for (Side<2> s : Side<2>::getValues()) {
     PatchInfo<2> pinfo;
@@ -71,7 +75,8 @@ TEST_CASE("PatchInfo<2> getFineNbrInfo side throws on wrong type", "[PatchInfo]"
     CHECK_THROWS(pinfo.getFineNbrInfo(s));
   }
 }
-TEST_CASE("PatchInfo<2> getFineNbrInfo corner throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getFineNbrInfo corner throws on wrong type")
 {
   for (Corner<2> c : Corner<2>::getValues()) {
     PatchInfo<2> pinfo;

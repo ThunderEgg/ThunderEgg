@@ -17,46 +17,47 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-
-#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/NormalNbrInfo.h>
 
 namespace ThunderEgg {
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
-CoarseNbrInfo<D>::CoarseNbrInfo() = default;
-template<int D>
-  requires is_supported_neighbor_dimension<D>
-CoarseNbrInfo<D>::~CoarseNbrInfo() = default;
+NormalNbrInfo<D>::NormalNbrInfo()
+{
+}
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
-CoarseNbrInfo<D>::CoarseNbrInfo(int id, Orthant<D> orth_on_coarse)
+NormalNbrInfo<D>::~NormalNbrInfo() = default;
+
+template<int D>
+  requires is_supported_neighbor_dimension<D>
+NormalNbrInfo<D>::NormalNbrInfo(int id)
 {
   this->id = id;
-  this->orth_on_coarse = orth_on_coarse;
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 NbrType
-CoarseNbrInfo<D>::getNbrType() const
+NormalNbrInfo<D>::getNbrType() const
 {
-  return NbrType::Coarse;
+  return NbrType::Normal;
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 void
-CoarseNbrInfo<D>::getNbrIds(std::deque<int>& nbr_ids) const
+NormalNbrInfo<D>::getNbrIds(std::deque<int>& nbr_ids) const
 {
   nbr_ids.push_back(id);
-};
+}
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 void
-CoarseNbrInfo<D>::getNbrRanks(std::deque<int>& nbr_ranks) const
+NormalNbrInfo<D>::getNbrRanks(std::deque<int>& nbr_ranks) const
 {
   nbr_ranks.push_back(rank);
 }
@@ -64,7 +65,7 @@ CoarseNbrInfo<D>::getNbrRanks(std::deque<int>& nbr_ranks) const
 template<int D>
   requires is_supported_neighbor_dimension<D>
 void
-CoarseNbrInfo<D>::setGlobalIndexes(const std::map<int, int>& id_to_global_index_map)
+NormalNbrInfo<D>::setGlobalIndexes(const std::map<int, int>& id_to_global_index_map)
 {
   global_index = id_to_global_index_map.at(id);
 }
@@ -72,7 +73,7 @@ CoarseNbrInfo<D>::setGlobalIndexes(const std::map<int, int>& id_to_global_index_
 template<int D>
   requires is_supported_neighbor_dimension<D>
 void
-CoarseNbrInfo<D>::setLocalIndexes(const std::map<int, int>& id_to_local_index_map)
+NormalNbrInfo<D>::setLocalIndexes(const std::map<int, int>& id_to_local_index_map)
 {
   auto iter = id_to_local_index_map.find(id);
   if (iter != id_to_local_index_map.end()) {
@@ -83,39 +84,37 @@ CoarseNbrInfo<D>::setLocalIndexes(const std::map<int, int>& id_to_local_index_ma
 template<int D>
   requires is_supported_neighbor_dimension<D>
 int
-CoarseNbrInfo<D>::serialize(char* buffer) const
+NormalNbrInfo<D>::serialize(char* buffer) const
 {
   BufferWriter writer(buffer);
   writer << rank;
   writer << id;
-  writer << orth_on_coarse;
   return writer.getPos();
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 int
-CoarseNbrInfo<D>::deserialize(char* buffer)
+NormalNbrInfo<D>::deserialize(char* buffer)
 {
   BufferReader reader(buffer);
   reader >> rank;
   reader >> id;
-  reader >> orth_on_coarse;
   return reader.getPos();
 }
 
 template<int D>
   requires is_supported_neighbor_dimension<D>
 std::unique_ptr<NbrInfoBase>
-CoarseNbrInfo<D>::clone() const
+NormalNbrInfo<D>::clone() const
 {
-  return std::make_unique<CoarseNbrInfo<D>>(*this);
+  return std::make_unique<NormalNbrInfo<D>>(*this);
 }
 
 // EXPLICIT INSTANTIATIONS
 
-template class CoarseNbrInfo<0>;
-template class CoarseNbrInfo<1>;
-template class CoarseNbrInfo<2>;
+template class NormalNbrInfo<0>;
+template class NormalNbrInfo<1>;
+template class NormalNbrInfo<2>;
 
 } // namespace ThunderEgg

@@ -55,6 +55,7 @@ TEST_CASE("Test from_json for Edge")
   CHECK_EQ(j["ne"].get<Edge>(), Edge::ne());
   CHECK_EQ(j["nw"].get<Edge>(), Edge::nw());
 }
+
 TEST_CASE("Test to_json for Edge")
 {
   nlohmann::json j;
@@ -85,6 +86,7 @@ TEST_CASE("Test to_json for Edge")
   CHECK_EQ(j["se"], "SE");
   CHECK_EQ(j["nw"], "NW");
 }
+
 TEST_CASE("Test to_json for Side<1>")
 {
   nlohmann::json j;
@@ -95,6 +97,7 @@ TEST_CASE("Test to_json for Side<1>")
   CHECK_EQ(j["west"], "WEST");
   CHECK_EQ(j["east"], "EAST");
 }
+
 TEST_CASE("Test to_json for Side<2>")
 {
   nlohmann::json j;
@@ -109,6 +112,7 @@ TEST_CASE("Test to_json for Side<2>")
   CHECK_EQ(j["south"], "SOUTH");
   CHECK_EQ(j["north"], "NORTH");
 }
+
 TEST_CASE("Test to_json for Side<3>")
 {
   nlohmann::json j;
@@ -127,6 +131,7 @@ TEST_CASE("Test to_json for Side<3>")
   CHECK_EQ(j["bottom"], "BOTTOM");
   CHECK_EQ(j["top"], "TOP");
 }
+
 TEST_CASE("Test from_json for Side<1>")
 {
   nlohmann::json j;
@@ -137,6 +142,7 @@ TEST_CASE("Test from_json for Side<1>")
   CHECK_EQ(j["west"].get<Side<1>>(), Side<1>::west());
   CHECK_EQ(j["east"].get<Side<1>>(), Side<1>::east());
 }
+
 TEST_CASE("Test from_json for Side<2>")
 {
   nlohmann::json j;
@@ -151,6 +157,7 @@ TEST_CASE("Test from_json for Side<2>")
   CHECK_EQ(j["south"].get<Side<2>>(), Side<2>::south());
   CHECK_EQ(j["north"].get<Side<2>>(), Side<2>::north());
 }
+
 TEST_CASE("Test from_json for Side<3>")
 {
   nlohmann::json j;
@@ -169,12 +176,14 @@ TEST_CASE("Test from_json for Side<3>")
   CHECK_EQ(j["bottom"].get<Side<3>>(), Side<3>::bottom());
   CHECK_EQ(j["top"].get<Side<3>>(), Side<3>::top());
 }
+
 TEST_CASE("Test from_json for Orthant<0>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
   CHECK_EQ(j["null"].get<Orthant<0>>(), Orthant<0>::null());
 }
+
 TEST_CASE("Test from_json for Orthant<1>")
 {
   nlohmann::json j;
@@ -185,6 +194,7 @@ TEST_CASE("Test from_json for Orthant<1>")
   CHECK_EQ(j["lower"].get<Orthant<1>>(), Orthant<1>::lower());
   CHECK_EQ(j["upper"].get<Orthant<1>>(), Orthant<1>::upper());
 }
+
 TEST_CASE("Test from_json for Orthant<2>")
 {
   nlohmann::json j;
@@ -199,6 +209,7 @@ TEST_CASE("Test from_json for Orthant<2>")
   CHECK_EQ(j["nw"].get<Orthant<2>>(), Orthant<2>::nw());
   CHECK_EQ(j["ne"].get<Orthant<2>>(), Orthant<2>::ne());
 }
+
 TEST_CASE("Test from_json for Orthant<3>")
 {
   nlohmann::json j;
@@ -221,12 +232,14 @@ TEST_CASE("Test from_json for Orthant<3>")
   CHECK_EQ(j["tnw"].get<Orthant<3>>(), Orthant<3>::tnw());
   CHECK_EQ(j["tne"].get<Orthant<3>>(), Orthant<3>::tne());
 }
+
 TEST_CASE("Test to_json for Orthant<0>")
 {
   nlohmann::json j;
   j["null"] = Orthant<0>::null();
   CHECK_EQ(j["null"], nullptr);
 }
+
 TEST_CASE("Test to_json for Orthant<1>")
 {
   nlohmann::json j;
@@ -237,6 +250,7 @@ TEST_CASE("Test to_json for Orthant<1>")
   CHECK_EQ(j["lower"], "LOWER");
   CHECK_EQ(j["upper"], "UPPER");
 }
+
 TEST_CASE("Test to_json for Orthant<2>")
 {
   nlohmann::json j;
@@ -251,6 +265,7 @@ TEST_CASE("Test to_json for Orthant<2>")
   CHECK_EQ(j["nw"], "NW");
   CHECK_EQ(j["ne"], "NE");
 }
+
 TEST_CASE("Test to_json for Orthant<3>")
 {
   nlohmann::json j;
@@ -273,6 +288,7 @@ TEST_CASE("Test to_json for Orthant<3>")
   CHECK_EQ(j["tnw"], "TNW");
   CHECK_EQ(j["tne"], "TNE");
 }
+
 TEST_CASE("Test from_json for Corner<2>")
 {
   nlohmann::json j;
@@ -287,6 +303,7 @@ TEST_CASE("Test from_json for Corner<2>")
   CHECK_EQ(j["nw"].get<Corner<2>>(), Corner<2>::nw());
   CHECK_EQ(j["ne"].get<Corner<2>>(), Corner<2>::ne());
 }
+
 TEST_CASE("Test from_json for Corner<3>")
 {
   nlohmann::json j;
@@ -309,6 +326,7 @@ TEST_CASE("Test from_json for Corner<3>")
   CHECK_EQ(j["tnw"].get<Corner<3>>(), Corner<3>::tnw());
   CHECK_EQ(j["tne"].get<Corner<3>>(), Corner<3>::tne());
 }
+
 TEST_CASE("Test to_json for Corner<2>")
 {
   nlohmann::json j;
@@ -323,6 +341,7 @@ TEST_CASE("Test to_json for Corner<2>")
   CHECK_EQ(j["nw"], "NW");
   CHECK_EQ(j["ne"], "NE");
 }
+
 TEST_CASE("Test to_json for Corner<3>")
 {
   nlohmann::json j;
@@ -345,6 +364,7 @@ TEST_CASE("Test to_json for Corner<3>")
   CHECK_EQ(j["tnw"], "TNW");
   CHECK_EQ(j["tne"], "TNE");
 }
+
 TEST_CASE("PatchInfo from_json with children")
 {
   nlohmann::json j;
@@ -358,7 +378,9 @@ TEST_CASE("PatchInfo from_json with children")
   j["lengths"] = { 10, 20, 30 };
   j["child_ids"] = { 1, 2, 3, 4, 5, 6, 7, 8 };
   j["child_ranks"] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-  j["nbrs"] = { NormalNbrInfo<2>(1), CoarseNbrInfo<2>(2, Orthant<2>::nw()), FineNbrInfo<2>({ 3, 4, 5, 6 }) };
+  j["nbrs"] = { NormalNbrInfo<2>(1),
+                CoarseNbrInfo<2>(2, Orthant<2>::nw()),
+                FineNbrInfo<2>({ 3, 4, 5, 6 }) };
   j["nbrs"][0]["side"] = "NORTH";
   j["nbrs"][1]["side"] = "EAST";
   j["nbrs"][2]["side"] = "SOUTH";
@@ -405,6 +427,7 @@ TEST_CASE("PatchInfo from_json with children")
   CHECK_UNARY_FALSE(d.hasNbr(Side<3>::bottom()));
   CHECK_UNARY_FALSE(d.hasNbr(Side<3>::top()));
 }
+
 TEST_CASE("PatchInfo to_json no children")
 {
   PatchInfo<3> d;
@@ -484,6 +507,7 @@ TEST_CASE("PatchInfo to_json no children")
   CHECK_EQ(j["edge_nbrs"][2]["type"], "NORMAL");
   CHECK_EQ(j["edge_nbrs"][2]["edge"], "SW");
 }
+
 TEST_CASE("PatchInfo to_json no children no neighbors")
 {
   PatchInfo<3> d;
@@ -522,6 +546,7 @@ TEST_CASE("PatchInfo to_json no children no neighbors")
   REQUIRE_UNARY(j["nbrs"].is_array());
   REQUIRE_EQ(j["nbrs"].size(), 0);
 }
+
 TEST_CASE("PatchInfo to_json with children")
 {
   PatchInfo<3> d;
@@ -593,6 +618,7 @@ TEST_CASE("PatchInfo to_json with children")
   CHECK_EQ(j["nbrs"][2]["type"], "NORMAL");
   CHECK_EQ(j["nbrs"][2]["side"], "NORTH");
 }
+
 TEST_CASE("PatchInfo from_json no children")
 {
   nlohmann::json j;
@@ -603,15 +629,21 @@ TEST_CASE("PatchInfo from_json no children")
   j["parent_rank"] = 3;
   j["starts"] = { 1, 2, 3 };
   j["lengths"] = { 10, 20, 30 };
-  j["nbrs"] = { NormalNbrInfo<2>(1), CoarseNbrInfo<2>(2, Orthant<2>::nw()), FineNbrInfo<2>({ 3, 4, 5, 6 }) };
+  j["nbrs"] = { NormalNbrInfo<2>(1),
+                CoarseNbrInfo<2>(2, Orthant<2>::nw()),
+                FineNbrInfo<2>({ 3, 4, 5, 6 }) };
   j["nbrs"][0]["side"] = "NORTH";
   j["nbrs"][1]["side"] = "EAST";
   j["nbrs"][2]["side"] = "SOUTH";
-  j["corner_nbrs"] = { NormalNbrInfo<0>(1), CoarseNbrInfo<0>(2, Orthant<0>(0)), FineNbrInfo<0>({ 1 }) };
+  j["corner_nbrs"] = { NormalNbrInfo<0>(1),
+                       CoarseNbrInfo<0>(2, Orthant<0>(0)),
+                       FineNbrInfo<0>({ 1 }) };
   j["corner_nbrs"][0]["corner"] = "BSW";
   j["corner_nbrs"][1]["corner"] = "TSE";
   j["corner_nbrs"][2]["corner"] = "BNW";
-  j["edge_nbrs"] = { NormalNbrInfo<1>(1), CoarseNbrInfo<1>(2, Orthant<1>::lower()), FineNbrInfo<1>({ 1, 2 }) };
+  j["edge_nbrs"] = { NormalNbrInfo<1>(1),
+                     CoarseNbrInfo<1>(2, Orthant<1>::lower()),
+                     FineNbrInfo<1>({ 1, 2 }) };
   j["edge_nbrs"][0]["edge"] = "SW";
   j["edge_nbrs"][1]["edge"] = "BN";
   j["edge_nbrs"][2]["edge"] = "TW";
@@ -670,6 +702,7 @@ TEST_CASE("PatchInfo from_json no children")
   CHECK_UNARY_FALSE(d.hasNbr(Edge::se()));
   CHECK_UNARY_FALSE(d.hasNbr(Edge::nw()));
 }
+
 TEST_CASE("FineNbrInfo to_json")
 {
   for (int ids_0 : { 1, 2 }) {
@@ -714,6 +747,7 @@ TEST_CASE("FineNbrInfo to_json")
     }
   }
 }
+
 TEST_CASE("FineNbrInfo from_json")
 {
   for (int id1 : { 1, 2 }) {
@@ -748,6 +782,7 @@ TEST_CASE("FineNbrInfo from_json")
     }
   }
 }
+
 TEST_CASE("NbrType to_json")
 {
   nlohmann::json j;
@@ -758,6 +793,7 @@ TEST_CASE("NbrType to_json")
   CHECK_EQ(j["coarse"], "COARSE");
   CHECK_EQ(j["fine"], "FINE");
 }
+
 TEST_CASE("NbrType from_json")
 {
   nlohmann::json j;
@@ -768,6 +804,7 @@ TEST_CASE("NbrType from_json")
   CHECK_EQ(j["coarse"].get<NbrType>(), NbrType::Coarse);
   CHECK_EQ(j["fine"].get<NbrType>(), NbrType::Fine);
 }
+
 TEST_CASE("NormalNbrInfo to_json")
 {
   for (int id : { 1, 2, 3 }) {
@@ -788,6 +825,7 @@ TEST_CASE("NormalNbrInfo to_json")
     }
   }
 }
+
 TEST_CASE("NormalNbrInfo from_json")
 {
   for (int id : { 1, 2, 3 }) {
@@ -804,6 +842,7 @@ TEST_CASE("NormalNbrInfo from_json")
     }
   }
 }
+
 TEST_CASE("CoarseNbrInfo to_json")
 {
   for (int id : { 1, 2, 3 }) {
@@ -828,6 +867,7 @@ TEST_CASE("CoarseNbrInfo to_json")
     }
   }
 }
+
 TEST_CASE("CoarseNbrInfo from_json")
 {
   for (int id : { 1, 2, 3 }) {
@@ -844,6 +884,390 @@ TEST_CASE("CoarseNbrInfo from_json")
         CHECK_EQ(info.id, id);
         CHECK_EQ(info.rank, rank);
         CHECK_EQ(info.orth_on_coarse, orth_on_coarse);
+      }
+    }
+  }
+}
+
+TEST_CASE("NormalNbrInfo to_json")
+{
+  for (int id : { 1, 2, 3 }) {
+    for (int rank : { 0, 1, 2 }) {
+      NormalNbrInfo<2> info;
+      info.id = id;
+      info.rank = rank;
+
+      nlohmann::json j = info;
+
+      CHECK_EQ(j["type"], "NORMAL");
+      REQUIRE_UNARY(j["ids"].is_array());
+      CHECK_EQ(j["ids"].size(), 1);
+      CHECK_EQ(j["ids"][0], info.id);
+      REQUIRE_UNARY(j["ranks"].is_array());
+      CHECK_EQ(j["ranks"].size(), 1);
+      CHECK_EQ(j["ranks"][0], info.rank);
+    }
+  }
+}
+
+TEST_CASE("NormalNbrInfo from_json")
+{
+  for (int id : { 1, 2, 3 }) {
+    for (int rank : { 0, 1, 2 }) {
+
+      nlohmann::json j;
+      j["type"] = "NORMAL";
+      j["ids"] = { id };
+      j["ranks"] = { rank };
+
+      NormalNbrInfo<2> info = j.get<NormalNbrInfo<2>>();
+      CHECK_EQ(info.id, id);
+      CHECK_EQ(info.rank, rank);
+    }
+  }
+}
+
+TEST_CASE("PatchInfo<2> to_json no children")
+{
+  PatchInfo<2> d;
+  d.id = 9;
+  d.rank = 0;
+  d.parent_id = 2;
+  d.parent_rank = 3;
+  d.orth_on_parent = Orthant<2>::nw();
+  d.starts = { 1, 2 };
+  d.spacings = { 0.1, 0.2 };
+  d.ns = { 10, 20 };
+  d.setNbrInfo(Side<2>::north(), new NormalNbrInfo<1>(1));
+  d.setNbrInfo(Side<2>::east(), new CoarseNbrInfo<1>(2, Orthant<1>::lower()));
+  d.setNbrInfo(Side<2>::south(), new FineNbrInfo<1>({ 3, 4 }));
+  d.setNbrInfo(Corner<2>::sw(), new NormalNbrInfo<0>(1));
+  d.setNbrInfo(Corner<2>::se(), new CoarseNbrInfo<0>(2, Orthant<0>(0)));
+  d.setNbrInfo(Corner<2>::nw(), new FineNbrInfo<0>({ 1 }));
+
+  nlohmann::json j = d;
+
+  CHECK_EQ(j["id"], d.id);
+  CHECK_EQ(j["parent_id"], d.parent_id);
+  CHECK_EQ(j["parent_rank"], d.parent_rank);
+  CHECK_EQ(j["orth_on_parent"], "TNW");
+  CHECK_EQ(j["rank"], d.rank);
+  CHECK_EQ(j["child_ids"], nullptr);
+  CHECK_EQ(j["child_ranks"], nullptr);
+
+  REQUIRE(j["starts"].is_array());
+  REQUIRE(j["starts"].size() == 2);
+  CHECK(j["starts"][0] == d.starts[0]);
+  CHECK(j["starts"][1] == d.starts[1]);
+
+  REQUIRE(j["lengths"].is_array());
+  REQUIRE(j["lengths"].size() == 2);
+  CHECK(j["lengths"][0] == d.spacings[0] * d.ns[0]);
+  CHECK(j["lengths"][1] == d.spacings[1] * d.ns[1]);
+
+  REQUIRE_UNARY(j["nbrs"].is_array());
+  REQUIRE_EQ(j["nbrs"].size(), 3);
+
+  CHECK_EQ(j["nbrs"][0]["type"], "COARSE");
+  CHECK_EQ(j["nbrs"][0]["side"], "EAST");
+
+  CHECK_EQ(j["nbrs"][1]["type"], "FINE");
+  CHECK_EQ(j["nbrs"][1]["side"], "SOUTH");
+
+  CHECK_EQ(j["nbrs"][2]["type"], "NORMAL");
+  CHECK_EQ(j["nbrs"][2]["side"], "NORTH");
+
+  REQUIRE_UNARY(j["corner_nbrs"].is_array());
+  REQUIRE_EQ(j["corner_nbrs"].size(), 3);
+
+  CHECK(j["corner_nbrs"][0]["type"] == "NORMAL");
+  CHECK(j["corner_nbrs"][0]["corner"] == "SW");
+
+  CHECK(j["corner_nbrs"][1]["type"] == "COARSE");
+  CHECK(j["corner_nbrs"][1]["corner"] == "SE");
+
+  CHECK(j["corner_nbrs"][2]["type"] == "FINE");
+  CHECK(j["corner_nbrs"][2]["corner"] == "NW");
+}
+
+TEST_CASE("PatchInfo<2> to_json no children no neighbors")
+{
+  PatchInfo<2> d;
+  d.id = 9;
+  d.rank = 0;
+  d.parent_id = 2;
+  d.parent_rank = 3;
+  d.refine_level = 329;
+  d.starts = { 1, 2 };
+  d.spacings = { 0.1, 0.2 };
+  d.ns = { 10, 20 };
+
+  nlohmann::json j = d;
+
+  CHECK(j["id"] == d.id);
+  CHECK(j["parent_id"] == d.parent_id);
+  CHECK(j["parent_rank"] == d.parent_rank);
+  CHECK(j["rank"] == d.rank);
+  CHECK(j["refine_level"] == 329);
+  CHECK(j["child_ids"] == nullptr);
+  CHECK(j["child_ranks"] == nullptr);
+  CHECK(j["orth_on_parent"] == nullptr);
+
+  REQUIRE(j["starts"].is_array());
+  REQUIRE(j["starts"].size() == 2);
+  CHECK(j["starts"][0] == d.starts[0]);
+  CHECK(j["starts"][1] == d.starts[1]);
+
+  REQUIRE(j["lengths"].is_array());
+  REQUIRE(j["lengths"].size() == 2);
+  CHECK(j["lengths"][0] == d.spacings[0] * d.ns[0]);
+  CHECK(j["lengths"][1] == d.spacings[1] * d.ns[1]);
+
+  REQUIRE(j["nbrs"].is_array());
+  REQUIRE(j["nbrs"].size() == 0);
+}
+
+TEST_CASE("PatchInfo<2> to_json with children")
+{
+  PatchInfo<2> d;
+  d.id = 9;
+  d.rank = 0;
+  d.parent_id = 2;
+  d.parent_rank = 3;
+  d.refine_level = 329;
+  d.starts = { 1, 2 };
+  d.spacings = { 0.1, 0.2 };
+  d.ns = { 10, 20 };
+  d.child_ids = { 3, 4, 5, 6 };
+  d.child_ranks = { 1, 2, 3, 4 };
+  d.setNbrInfo(Side<2>::north(), new NormalNbrInfo<1>(1));
+  d.setNbrInfo(Side<2>::east(), new CoarseNbrInfo<1>(2, Orthant<1>::lower()));
+  d.setNbrInfo(Side<2>::south(), new FineNbrInfo<1>({ 3, 4 }));
+
+  nlohmann::json j = d;
+
+  CHECK(j["id"] == d.id);
+  CHECK(j["parent_id"] == d.parent_id);
+  CHECK(j["parent_rank"] == d.parent_rank);
+  CHECK(j["rank"] == d.rank);
+  CHECK(j["refine_level"] == 329);
+
+  REQUIRE(j["child_ids"].is_array());
+  REQUIRE(j["child_ids"].size() == 4);
+  CHECK(j["child_ids"][0] == d.child_ids[0]);
+  CHECK(j["child_ids"][1] == d.child_ids[1]);
+  CHECK(j["child_ids"][2] == d.child_ids[2]);
+  CHECK(j["child_ids"][3] == d.child_ids[3]);
+
+  REQUIRE(j["child_ranks"].is_array());
+  REQUIRE(j["child_ranks"].size() == 4);
+  CHECK(j["child_ranks"][0] == d.child_ranks[0]);
+  CHECK(j["child_ranks"][1] == d.child_ranks[1]);
+  CHECK(j["child_ranks"][2] == d.child_ranks[2]);
+  CHECK(j["child_ranks"][3] == d.child_ranks[3]);
+
+  REQUIRE(j["starts"].is_array());
+  REQUIRE(j["starts"].size() == 2);
+  CHECK(j["starts"][0] == d.starts[0]);
+  CHECK(j["starts"][1] == d.starts[1]);
+
+  REQUIRE(j["lengths"].is_array());
+  REQUIRE(j["lengths"].size() == 2);
+  CHECK(j["lengths"][0] == d.spacings[0] * d.ns[0]);
+  CHECK(j["lengths"][1] == d.spacings[1] * d.ns[1]);
+
+  REQUIRE(j["nbrs"].is_array());
+  REQUIRE(j["nbrs"].size() == 3);
+
+  CHECK(j["nbrs"][0]["type"] == "COARSE");
+  CHECK(j["nbrs"][0]["side"] == "EAST");
+
+  CHECK(j["nbrs"][1]["type"] == "FINE");
+  CHECK(j["nbrs"][1]["side"] == "SOUTH");
+
+  CHECK(j["nbrs"][2]["type"] == "NORMAL");
+  CHECK(j["nbrs"][2]["side"] == "NORTH");
+}
+
+TEST_CASE("PatchInfo<2> from_json no children")
+{
+  nlohmann::json j;
+  j["id"] = 9;
+  j["rank"] = 3;
+  j["refine_level"] = 329;
+  j["parent_id"] = 2;
+  j["parent_rank"] = 3;
+  j["starts"] = { 1, 2 };
+  j["lengths"] = { 10, 20 };
+  j["nbrs"] = { NormalNbrInfo<1>(1),
+                CoarseNbrInfo<1>(2, Orthant<1>::lower()),
+                FineNbrInfo<1>({ 3, 4 }) };
+  j["nbrs"][0]["side"] = "NORTH";
+  j["nbrs"][1]["side"] = "EAST";
+  j["nbrs"][2]["side"] = "SOUTH";
+  j["corner_nbrs"] = { NormalNbrInfo<0>(1),
+                       CoarseNbrInfo<0>(2, Orthant<0>(0)),
+                       FineNbrInfo<0>({ 1 }) };
+  j["corner_nbrs"][0]["corner"] = "SW";
+  j["corner_nbrs"][1]["corner"] = "SE";
+  j["corner_nbrs"][2]["corner"] = "NW";
+
+  PatchInfo<2> d = j.get<PatchInfo<2>>();
+  CHECK(d.id == 9);
+  CHECK(d.rank == 3);
+  CHECK(d.refine_level == 329);
+  CHECK(d.parent_id == 2);
+  CHECK(d.parent_rank == 3);
+  CHECK(d.orth_on_parent == Orthant<2>::null());
+  CHECK(d.starts[0] == 1);
+  CHECK(d.starts[1] == 2);
+  CHECK(d.starts[2] == 3);
+  CHECK(d.spacings[0] == 10);
+  CHECK(d.spacings[1] == 20);
+  CHECK(d.spacings[2] == 30);
+  CHECK(d.ns[0] == 1);
+  CHECK(d.ns[1] == 1);
+  CHECK(d.ns[2] == 1);
+  CHECK_FALSE(d.hasNbr(Side<2>::west()));
+  CHECK(d.hasNbr(Side<2>::east()));
+  CHECK(d.getNbrType(Side<2>::east()) == NbrType::Coarse);
+  CHECK(d.hasNbr(Side<2>::south()));
+  CHECK(d.getNbrType(Side<2>::south()) == NbrType::Fine);
+  CHECK(d.hasNbr(Side<2>::north()));
+  CHECK(d.getNbrType(Side<2>::north()) == NbrType::Normal);
+
+  CHECK(d.hasNbr(Corner<2>::sw()));
+  CHECK(d.getNbrType(Corner<2>::sw()) == NbrType::Normal);
+  CHECK(d.hasNbr(Corner<2>::se()));
+  CHECK(d.getNbrType(Corner<2>::se()) == NbrType::Coarse);
+  CHECK(d.hasNbr(Corner<2>::nw()));
+  CHECK(d.getNbrType(Corner<2>::nw()) == NbrType::Fine);
+  CHECK_FALSE(d.hasNbr(Corner<2>::ne()));
+}
+
+TEST_CASE("PatchInfo<2> from_json with children")
+{
+  nlohmann::json j;
+  j["id"] = 9;
+  j["rank"] = 3;
+  j["refine_level"] = 329;
+  j["parent_id"] = 2;
+  j["parent_rank"] = 3;
+  j["orth_on_parent"] = "NW";
+  j["starts"] = { 1, 2 };
+  j["lengths"] = { 10, 20 };
+  j["child_ids"] = { 1, 2, 3, 4 };
+  j["child_ranks"] = { 0, 1, 2, 3 };
+  j["nbrs"] = { NormalNbrInfo<1>(1),
+                CoarseNbrInfo<1>(2, Orthant<1>::lower()),
+                FineNbrInfo<1>({ 3, 4 }) };
+  j["nbrs"][0]["side"] = "NORTH";
+  j["nbrs"][1]["side"] = "EAST";
+  j["nbrs"][2]["side"] = "SOUTH";
+
+  PatchInfo<2> d = j.get<PatchInfo<2>>();
+  CHECK(d.id == 9);
+  CHECK(d.rank == 3);
+  CHECK(d.refine_level == 329);
+  CHECK(d.parent_id == 2);
+  CHECK(d.parent_rank == 3);
+  CHECK(d.orth_on_parent == Orthant<2>::nw());
+  CHECK(d.starts[0] == 1);
+  CHECK(d.starts[1] == 2);
+  CHECK(d.spacings[0] == 10);
+  CHECK(d.spacings[1] == 20);
+  CHECK(d.ns[0] == 1);
+  CHECK(d.ns[1] == 1);
+  CHECK(d.child_ids[0] == 1);
+  CHECK(d.child_ids[1] == 2);
+  CHECK(d.child_ids[2] == 3);
+  CHECK(d.child_ids[3] == 4);
+  CHECK(d.child_ranks[0] == 0);
+  CHECK(d.child_ranks[1] == 1);
+  CHECK(d.child_ranks[2] == 2);
+  CHECK(d.child_ranks[3] == 3);
+  CHECK_FALSE(d.hasNbr(Side<2>::west()));
+  CHECK(d.hasNbr(Side<2>::east()));
+  CHECK(d.getNbrType(Side<2>::east()) == NbrType::Coarse);
+  CHECK(d.hasNbr(Side<2>::south()));
+  CHECK(d.getNbrType(Side<2>::south()) == NbrType::Fine);
+  CHECK(d.hasNbr(Side<2>::north()));
+  CHECK(d.getNbrType(Side<2>::north()) == NbrType::Normal);
+}
+
+TEST_CASE("PatchInfo<2> copy constructor")
+{
+  PatchInfo<2> d;
+  d.id = 9;
+  d.local_index = 10;
+  d.global_index = 10;
+  d.rank = 0;
+  d.parent_id = 2;
+  d.parent_rank = 3;
+  d.num_ghost_cells = 239;
+  d.refine_level = 329;
+  d.starts = { 1, 2 };
+  d.spacings = { 0.1, 0.2 };
+  d.ns = { 10, 20 };
+  d.child_ids = { 3, 4, 5, 6 };
+  d.child_ranks = { 1, 2, 3, 4 };
+  d.setNbrInfo(Side<2>::north(), new NormalNbrInfo<1>(1));
+  d.setNbrInfo(Side<2>::east(), new CoarseNbrInfo<1>(2, Orthant<1>::lower()));
+  d.setNbrInfo(Side<2>::south(), new FineNbrInfo<1>({ 3, 4 }));
+  d.setNbrInfo(Corner<2>::sw(), new NormalNbrInfo<0>(1));
+  d.setNbrInfo(Corner<2>::se(), new CoarseNbrInfo<0>(2, Orthant<0>(0)));
+  d.setNbrInfo(Corner<2>::nw(), new FineNbrInfo<0>({ 1 }));
+
+  PatchInfo<2> d2(d);
+
+  CHECK_EQ(d.id, d2.id);
+  CHECK_EQ(d.local_index, d2.global_index);
+  CHECK_EQ(d.rank, d2.rank);
+  CHECK_EQ(d.parent_id, d2.parent_id);
+  CHECK_EQ(d.parent_rank, d2.parent_rank);
+  CHECK_EQ(d.num_ghost_cells, d2.num_ghost_cells);
+  CHECK_EQ(d.refine_level, d2.refine_level);
+  CHECK_EQ(d.starts, d2.starts);
+  CHECK_EQ(d.spacings, d2.spacings);
+  CHECK_EQ(d.ns, d2.ns);
+  CHECK_EQ(d.child_ids, d2.child_ids);
+  CHECK_EQ(d.child_ranks, d2.child_ranks);
+
+  for (Side<2> s : Side<2>::getValues()) {
+    REQUIRE_EQ(d.hasNbr(s), d2.hasNbr(s));
+    if (d.hasNbr(s)) {
+      switch (d.getNbrType(s)) {
+        case NbrType::Normal:
+          CHECK_EQ(d.getNormalNbrInfo(s).id, d2.getNormalNbrInfo(s).id);
+          CHECK_NE(&d.getNormalNbrInfo(s), &d2.getNormalNbrInfo(s));
+          break;
+        case NbrType::Fine:
+          CHECK_EQ(d.getFineNbrInfo(s).ids[0], d2.getFineNbrInfo(s).ids[0]);
+          CHECK_NE(&d.getFineNbrInfo(s), &d2.getFineNbrInfo(s));
+          break;
+        case NbrType::Coarse:
+          CHECK_EQ(d.getCoarseNbrInfo(s).id, d2.getCoarseNbrInfo(s).id);
+          CHECK_NE(&d.getCoarseNbrInfo(s), &d2.getCoarseNbrInfo(s));
+          break;
+      }
+    }
+  }
+  for (Corner<2> c : Corner<2>::getValues()) {
+    REQUIRE_EQ(d.hasNbr(c), d2.hasNbr(c));
+    if (d.hasNbr(c)) {
+      switch (d.getNbrType(c)) {
+        case NbrType::Normal:
+          CHECK_EQ(d.getNormalNbrInfo(c).id, d2.getNormalNbrInfo(c).id);
+          CHECK_NE(&d.getNormalNbrInfo(c), &d2.getNormalNbrInfo(c));
+          break;
+        case NbrType::Fine:
+          CHECK_EQ(d.getFineNbrInfo(c).ids[0], d2.getFineNbrInfo(c).ids[0]);
+          CHECK_NE(&d.getFineNbrInfo(c), &d2.getFineNbrInfo(c));
+          break;
+        case NbrType::Coarse:
+          CHECK_EQ(d.getCoarseNbrInfo(c).id, d2.getCoarseNbrInfo(c).id);
+          CHECK_NE(&d.getCoarseNbrInfo(c), &d2.getCoarseNbrInfo(c));
+          break;
       }
     }
   }

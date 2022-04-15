@@ -19,33 +19,35 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("PatchInfo<2> getNormalNbrInfo side", "[PatchInfo]")
+TEST_CASE("PatchInfo<2> getNormalNbrInfo side")
 {
   for (Side<2> s : Side<2>::getValues()) {
     PatchInfo<2> pinfo;
 
     NormalNbrInfo<1>* nbr_info = new NormalNbrInfo<1>(2);
     pinfo.setNbrInfo(s, nbr_info);
-    CHECK(&pinfo.getNormalNbrInfo(s) == nbr_info);
+    CHECK_EQ(&pinfo.getNormalNbrInfo(s), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<2> getNormalNbrInfo corner", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNormalNbrInfo corner")
 {
   for (Corner<2> c : Corner<2>::getValues()) {
     PatchInfo<2> pinfo;
 
     NormalNbrInfo<0>* nbr_info = new NormalNbrInfo<0>(2);
     pinfo.setNbrInfo(c, nbr_info);
-    CHECK(&pinfo.getNormalNbrInfo(c) == nbr_info);
+    CHECK_EQ(&pinfo.getNormalNbrInfo(c), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<2> getNormalNbrInfo side throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNormalNbrInfo side throws on null")
 {
   for (Side<2> s : Side<2>::getValues()) {
     PatchInfo<2> pinfo;
@@ -53,7 +55,8 @@ TEST_CASE("PatchInfo<2> getNormalNbrInfo side throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getNormalNbrInfo(s));
   }
 }
-TEST_CASE("PatchInfo<2> getNormalNbrInfo corner throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNormalNbrInfo corner throws on null")
 {
   for (Corner<2> c : Corner<2>::getValues()) {
     PatchInfo<2> pinfo;
@@ -61,7 +64,8 @@ TEST_CASE("PatchInfo<2> getNormalNbrInfo corner throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getNormalNbrInfo(c));
   }
 }
-TEST_CASE("PatchInfo<2> getNormalNbrInfo side throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNormalNbrInfo side throws on wrong type")
 {
   for (Side<2> s : Side<2>::getValues()) {
     for (NbrType nbr_type : { NbrType::Normal, NbrType::Coarse, NbrType::Fine }) {
@@ -73,7 +77,8 @@ TEST_CASE("PatchInfo<2> getNormalNbrInfo side throws on wrong type", "[PatchInfo
     }
   }
 }
-TEST_CASE("PatchInfo<2> getNormalNbrInfo corner throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNormalNbrInfo corner throws on wrong type")
 {
   for (Corner<2> c : Corner<2>::getValues()) {
     PatchInfo<2> pinfo;

@@ -11,6 +11,7 @@ list(APPEND ThunderEgg_HDRS BufferReader.h)
 list(APPEND ThunderEgg_HDRS BufferWriter.h)
 
 list(APPEND ThunderEgg_HDRS CoarseNbrInfo.h)
+target_sources(ThunderEgg PRIVATE CoarseNbrInfo.cpp)
 
 list(APPEND ThunderEgg_HDRS Communicator.h)
 target_sources(ThunderEgg PRIVATE Communicator.cpp)
@@ -34,6 +35,7 @@ list(APPEND ThunderEgg_HDRS Face.h)
 target_sources(ThunderEgg PRIVATE Face.cpp)
 
 list(APPEND ThunderEgg_HDRS FineNbrInfo.h)
+target_sources(ThunderEgg PRIVATE FineNbrInfo.cpp)
 
 list(APPEND ThunderEgg_HDRS GhostFiller.h)
 
@@ -52,6 +54,7 @@ list(APPEND ThunderEgg_HDRS NbrType.h)
 target_sources(ThunderEgg PRIVATE NbrType.cpp)
 
 list(APPEND ThunderEgg_HDRS NormalNbrInfo.h)
+target_sources(ThunderEgg PRIVATE NormalNbrInfo.cpp)
 
 list(APPEND ThunderEgg_HDRS Operator.h)
 

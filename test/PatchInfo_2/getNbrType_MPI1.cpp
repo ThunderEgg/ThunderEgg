@@ -19,13 +19,13 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("PatchInfo<2> getNbrType side", "[PatchInfo]")
+TEST_CASE("PatchInfo<2> getNbrType side")
 {
   for (Side<2> s : Side<2>::getValues()) {
     for (NbrType nbr_type : { NbrType::Normal, NbrType::Coarse, NbrType::Fine }) {
@@ -44,11 +44,12 @@ TEST_CASE("PatchInfo<2> getNbrType side", "[PatchInfo]")
           break;
       }
       pinfo.setNbrInfo(s, nbr_info);
-      CHECK(pinfo.getNbrType(s) == nbr_type);
+      CHECK_EQ(pinfo.getNbrType(s), nbr_type);
     }
   }
 }
-TEST_CASE("PatchInfo<2> getNbrType corner", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNbrType corner")
 {
   for (Corner<2> c : Corner<2>::getValues()) {
     for (NbrType nbr_type : { NbrType::Normal, NbrType::Coarse, NbrType::Fine }) {
@@ -67,11 +68,12 @@ TEST_CASE("PatchInfo<2> getNbrType corner", "[PatchInfo]")
           break;
       }
       pinfo.setNbrInfo(c, nbr_info);
-      CHECK(pinfo.getNbrType(c) == nbr_type);
+      CHECK_EQ(pinfo.getNbrType(c), nbr_type);
     }
   }
 }
-TEST_CASE("PatchInfo<2> getNbrType side throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNbrType side throws on null")
 {
   for (Side<2> s : Side<2>::getValues()) {
     for (NbrType nbr_type : { NbrType::Normal, NbrType::Coarse, NbrType::Fine }) {
@@ -81,7 +83,8 @@ TEST_CASE("PatchInfo<2> getNbrType side throws on null", "[PatchInfo]")
     }
   }
 }
-TEST_CASE("PatchInfo<2> getNbrType corner throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNbrType corner throws on null")
 {
   for (Corner<2> c : Corner<2>::getValues()) {
     for (NbrType nbr_type : { NbrType::Normal, NbrType::Coarse, NbrType::Fine }) {
@@ -91,7 +94,8 @@ TEST_CASE("PatchInfo<2> getNbrType corner throws on null", "[PatchInfo]")
     }
   }
 }
-TEST_CASE("PatchInfo<2> getNbrType side throws on null after set", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNbrType side throws on null after set")
 {
   for (Side<2> s : Side<2>::getValues()) {
     for (NbrType nbr_type : { NbrType::Normal, NbrType::Coarse, NbrType::Fine }) {
@@ -115,7 +119,8 @@ TEST_CASE("PatchInfo<2> getNbrType side throws on null after set", "[PatchInfo]"
     }
   }
 }
-TEST_CASE("PatchInfo<2> getNbrType corner throws on null after set", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<2> getNbrType corner throws on null after set")
 {
   for (Corner<2> c : Corner<2>::getValues()) {
     for (NbrType nbr_type : { NbrType::Normal, NbrType::Coarse, NbrType::Fine }) {

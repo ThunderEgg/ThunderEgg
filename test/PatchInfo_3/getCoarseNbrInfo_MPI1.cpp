@@ -19,43 +19,46 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("PatchInfo<3> getCoarseNbrInfo side", "[PatchInfo]")
+TEST_CASE("PatchInfo<3> getCoarseNbrInfo side")
 {
   for (Side<3> e : Side<3>::getValues()) {
     PatchInfo<3> pinfo;
 
     CoarseNbrInfo<2>* nbr_info = new CoarseNbrInfo<2>(2, Orthant<2>::sw());
     pinfo.setNbrInfo(e, nbr_info);
-    CHECK(&pinfo.getCoarseNbrInfo(e) == nbr_info);
+    CHECK_EQ(&pinfo.getCoarseNbrInfo(e), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<3> getCoarseNbrInfo edge", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getCoarseNbrInfo edge")
 {
   for (Edge e : Edge::getValues()) {
     PatchInfo<3> pinfo;
 
     CoarseNbrInfo<1>* nbr_info = new CoarseNbrInfo<1>(2, Orthant<1>::lower());
     pinfo.setNbrInfo(e, nbr_info);
-    CHECK(&pinfo.getCoarseNbrInfo(e) == nbr_info);
+    CHECK_EQ(&pinfo.getCoarseNbrInfo(e), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<3> getCoarseNbrInfo corner", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getCoarseNbrInfo corner")
 {
   for (Corner<3> c : Corner<3>::getValues()) {
     PatchInfo<3> pinfo;
 
     CoarseNbrInfo<0>* nbr_info = new CoarseNbrInfo<0>(2, Orthant<0>::null());
     pinfo.setNbrInfo(c, nbr_info);
-    CHECK(&pinfo.getCoarseNbrInfo(c) == nbr_info);
+    CHECK_EQ(&pinfo.getCoarseNbrInfo(c), nbr_info);
   }
 }
-TEST_CASE("PatchInfo<3> getCoarseNbrInfo side throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getCoarseNbrInfo side throws on null")
 {
   for (Side<3> s : Side<3>::getValues()) {
     PatchInfo<3> pinfo;
@@ -63,7 +66,8 @@ TEST_CASE("PatchInfo<3> getCoarseNbrInfo side throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getCoarseNbrInfo(s));
   }
 }
-TEST_CASE("PatchInfo<3> getCoarseNbrInfo edge throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getCoarseNbrInfo edge throws on null")
 {
   for (Edge e : Edge::getValues()) {
     PatchInfo<3> pinfo;
@@ -71,7 +75,8 @@ TEST_CASE("PatchInfo<3> getCoarseNbrInfo edge throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getCoarseNbrInfo(e));
   }
 }
-TEST_CASE("PatchInfo<3> getCoarseNbrInfo corner throws on null", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getCoarseNbrInfo corner throws on null")
 {
   for (Corner<3> c : Corner<3>::getValues()) {
     PatchInfo<3> pinfo;
@@ -79,7 +84,8 @@ TEST_CASE("PatchInfo<3> getCoarseNbrInfo corner throws on null", "[PatchInfo]")
     CHECK_THROWS(pinfo.getCoarseNbrInfo(c));
   }
 }
-TEST_CASE("PatchInfo<3> getCoarseNbrInfo side throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getCoarseNbrInfo side throws on wrong type")
 {
   for (Side<3> s : Side<3>::getValues()) {
     PatchInfo<3> pinfo;
@@ -89,7 +95,8 @@ TEST_CASE("PatchInfo<3> getCoarseNbrInfo side throws on wrong type", "[PatchInfo
     CHECK_THROWS(pinfo.getCoarseNbrInfo(s));
   }
 }
-TEST_CASE("PatchInfo<3> getCoarseNbrInfo edge throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getCoarseNbrInfo edge throws on wrong type")
 {
   for (Edge e : Edge::getValues()) {
     PatchInfo<3> pinfo;
@@ -99,7 +106,8 @@ TEST_CASE("PatchInfo<3> getCoarseNbrInfo edge throws on wrong type", "[PatchInfo
     CHECK_THROWS(pinfo.getCoarseNbrInfo(e));
   }
 }
-TEST_CASE("PatchInfo<3> getCoarseNbrInfo corner throws on wrong type", "[PatchInfo]")
+
+TEST_CASE("PatchInfo<3> getCoarseNbrInfo corner throws on wrong type")
 {
   for (Corner<3> c : Corner<3>::getValues()) {
     PatchInfo<3> pinfo;

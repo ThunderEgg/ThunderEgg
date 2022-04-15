@@ -36,6 +36,7 @@ namespace ThunderEgg {
  * @tparam D the number of Cartesian dimensions.
  */
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 class FineNbrInfo : public NbrInfo<D>
 {
 public:
@@ -55,98 +56,75 @@ public:
    * @brief The local indexes of the neighbors
    */
   std::array<int, Orthant<D>::num_orthants> local_indexes;
+
   /**
    * @brief Construct a new empty FineNbrInfo object
    */
-  FineNbrInfo()
-  {
-    ranks.fill(0);
-    ids.fill(0);
-    local_indexes.fill(-1);
-    global_indexes.fill(-1);
-  }
-  ~FineNbrInfo() = default;
+  FineNbrInfo();
+
+  ~FineNbrInfo();
+
   /**
    * @brief Construct a new FineNbrInfo object
    *
    * @param ids the ids of the neighbors
    */
-  FineNbrInfo(std::array<int, Orthant<D>::num_orthants> ids)
-    : ids(ids)
-  {
-    ranks.fill(0);
-    local_indexes.fill(-1);
-    global_indexes.fill(-1);
-  }
-  NbrType getNbrType() const override { return NbrType::Fine; }
-  void getNbrIds(std::deque<int>& nbr_ids) const override
-  {
-    for (size_t i = 0; i < ids.size(); i++) {
-      nbr_ids.push_back(ids[i]);
-    }
-  };
-  void getNbrRanks(std::deque<int>& nbr_ranks) const override
-  {
-    for (size_t i = 0; i < ranks.size(); i++) {
-      nbr_ranks.push_back(ranks[i]);
-    }
-  }
-  void setGlobalIndexes(const std::map<int, int>& id_to_global_index_map) override
-  {
-    for (size_t i = 0; i < global_indexes.size(); i++) {
-      global_indexes[i] = id_to_global_index_map.at(ids[i]);
-    }
-  }
-  void setLocalIndexes(const std::map<int, int>& id_to_local_index_map) override
-  {
-    for (size_t i = 0; i < local_indexes.size(); i++) {
-      auto iter = id_to_local_index_map.find(ids[i]);
-      if (iter != id_to_local_index_map.end()) {
-        local_indexes[i] = iter->second;
-      }
-    }
-  }
-  int serialize(char* buffer) const override
-  {
-    BufferWriter writer(buffer);
-    writer << ranks;
-    writer << ids;
-    return writer.getPos();
-  }
-  int deserialize(char* buffer) override
-  {
-    BufferReader reader(buffer);
-    reader >> ranks;
-    reader >> ids;
-    return reader.getPos();
-  }
-  std::unique_ptr<NbrInfoBase> clone() const override
-  {
-    return std::make_unique<FineNbrInfo<D>>(*this);
-  }
+  FineNbrInfo(std::array<int, Orthant<D>::num_orthants> ids);
+
+  NbrType
+  getNbrType() const override;
+
+  void
+  getNbrIds(std::deque<int>& nbr_ids) const override;
+
+  void
+  getNbrRanks(std::deque<int>& nbr_ranks) const override;
+
+  void
+  setGlobalIndexes(const std::map<int, int>& id_to_global_index_map) override;
+
+  void
+  setLocalIndexes(const std::map<int, int>& id_to_local_index_map) override;
+
+  int
+  serialize(char* buffer) const override;
+
+  int
+  deserialize(char* buffer) override;
+
+  std::unique_ptr<NbrInfoBase>
+  clone() const override;
 };
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 to_json(tpl::nlohmann::json& j, const FineNbrInfo<D>& n);
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 from_json(const tpl::nlohmann::json& j, FineNbrInfo<D>& n);
 
-extern template void
-to_json(tpl::nlohmann::json& j, const FineNbrInfo<0>& n);
-extern template void
-to_json(tpl::nlohmann::json& j, const FineNbrInfo<1>& n);
-extern template void
-to_json(tpl::nlohmann::json& j, const FineNbrInfo<2>& n);
+// EXPLICIT INSTANTIATIONS
+
+extern template class FineNbrInfo<0>;
+extern template class FineNbrInfo<1>;
+extern template class FineNbrInfo<2>;
 
 extern template void
-from_json(const tpl::nlohmann::json& j, FineNbrInfo<0>& n);
+to_json<0>(tpl::nlohmann::json& j, const FineNbrInfo<0>& n);
 extern template void
-from_json(const tpl::nlohmann::json& j, FineNbrInfo<1>& n);
+to_json<1>(tpl::nlohmann::json& j, const FineNbrInfo<1>& n);
 extern template void
-from_json(const tpl::nlohmann::json& j, FineNbrInfo<2>& n);
+to_json<2>(tpl::nlohmann::json& j, const FineNbrInfo<2>& n);
+
+extern template void
+from_json<0>(const tpl::nlohmann::json& j, FineNbrInfo<0>& n);
+extern template void
+from_json<1>(const tpl::nlohmann::json& j, FineNbrInfo<1>& n);
+extern template void
+from_json<2>(const tpl::nlohmann::json& j, FineNbrInfo<2>& n);
 
 } // namespace ThunderEgg
 #endif

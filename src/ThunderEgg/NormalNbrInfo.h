@@ -35,6 +35,7 @@ namespace ThunderEgg {
  * @tparam D the number of Cartesian dimensions on a patch.
  */
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 class NormalNbrInfo : public NbrInfo<D>
 {
 public:
@@ -57,69 +58,71 @@ public:
   /**
    * @brief Construct a new empty NormalNbrInfo object
    */
-  NormalNbrInfo() {}
-  ~NormalNbrInfo() = default;
+  NormalNbrInfo();
+
+  ~NormalNbrInfo();
+
   /**
    * @brief Construct a new NormalNbrInfo object
    *
    * @param id the id of the neighbor.
    */
-  NormalNbrInfo(int id) { this->id = id; }
-  NbrType getNbrType() const override { return NbrType::Normal; }
-  void getNbrIds(std::deque<int>& nbr_ids) const override { nbr_ids.push_back(id); }
-  void getNbrRanks(std::deque<int>& nbr_ranks) const override { nbr_ranks.push_back(rank); }
-  void setGlobalIndexes(const std::map<int, int>& id_to_global_index_map) override
-  {
-    global_index = id_to_global_index_map.at(id);
-  }
-  void setLocalIndexes(const std::map<int, int>& id_to_local_index_map) override
-  {
-    auto iter = id_to_local_index_map.find(id);
-    if (iter != id_to_local_index_map.end()) {
-      local_index = iter->second;
-    }
-  }
-  int serialize(char* buffer) const override
-  {
-    BufferWriter writer(buffer);
-    writer << rank;
-    writer << id;
-    return writer.getPos();
-  }
-  int deserialize(char* buffer) override
-  {
-    BufferReader reader(buffer);
-    reader >> rank;
-    reader >> id;
-    return reader.getPos();
-  }
-  std::unique_ptr<NbrInfoBase> clone() const override
-  {
-    return std::make_unique<NormalNbrInfo<D>>(*this);
-  }
+  NormalNbrInfo(int id);
+
+  NbrType
+  getNbrType() const override;
+
+  void
+  getNbrIds(std::deque<int>& nbr_ids) const override;
+
+  void
+  getNbrRanks(std::deque<int>& nbr_ranks) const override;
+
+  void
+  setGlobalIndexes(const std::map<int, int>& id_to_global_index_map) override;
+
+  void
+  setLocalIndexes(const std::map<int, int>& id_to_local_index_map) override;
+
+  int
+  serialize(char* buffer) const override;
+
+  int
+  deserialize(char* buffer) override;
+
+  std::unique_ptr<NbrInfoBase>
+  clone() const override;
 };
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 to_json(tpl::nlohmann::json& j, const NormalNbrInfo<D>& n);
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 from_json(const tpl::nlohmann::json& j, NormalNbrInfo<D>& n);
 
-extern template void
-to_json(tpl::nlohmann::json& j, const NormalNbrInfo<0>& n);
-extern template void
-to_json(tpl::nlohmann::json& j, const NormalNbrInfo<1>& n);
-extern template void
-to_json(tpl::nlohmann::json& j, const NormalNbrInfo<2>& n);
+// EXPLICIT INSTANTIATIONS
+
+extern template class NormalNbrInfo<0>;
+extern template class NormalNbrInfo<1>;
+extern template class NormalNbrInfo<2>;
 
 extern template void
-from_json(const tpl::nlohmann::json& j, NormalNbrInfo<0>& n);
+to_json<0>(tpl::nlohmann::json& j, const NormalNbrInfo<0>& n);
 extern template void
-from_json(const tpl::nlohmann::json& j, NormalNbrInfo<1>& n);
+to_json<1>(tpl::nlohmann::json& j, const NormalNbrInfo<1>& n);
 extern template void
-from_json(const tpl::nlohmann::json& j, NormalNbrInfo<2>& n);
+to_json<2>(tpl::nlohmann::json& j, const NormalNbrInfo<2>& n);
+
+extern template void
+from_json<0>(const tpl::nlohmann::json& j, NormalNbrInfo<0>& n);
+extern template void
+from_json<1>(const tpl::nlohmann::json& j, NormalNbrInfo<1>& n);
+extern template void
+from_json<2>(const tpl::nlohmann::json& j, NormalNbrInfo<2>& n);
 
 } // namespace ThunderEgg
 #endif

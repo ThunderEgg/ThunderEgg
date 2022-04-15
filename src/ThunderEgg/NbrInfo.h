@@ -19,6 +19,7 @@
  ***************************************************************************/
 #ifndef THUNDEREGG_NBRINFO_H
 #define THUNDEREGG_NBRINFO_H
+#include <ThunderEgg/Config.h>
 #include <ThunderEgg/NbrInfoBase.h>
 /**
  * @file
@@ -33,6 +34,7 @@ namespace ThunderEgg {
  * Includes information like neighbor id and and indexes.
  */
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 class NbrInfo : public NbrInfoBase
 {};
 } // namespace ThunderEgg

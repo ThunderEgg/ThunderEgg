@@ -41,6 +41,7 @@ to_json(tpl::nlohmann::json& j, const NbrType& o)
       break;
   }
 }
+
 void
 from_json(const tpl::nlohmann::json& j, NbrType& o)
 {
@@ -60,6 +61,7 @@ from_json(const tpl::nlohmann::json& j, NbrType& o)
 }
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 to_json(tpl::nlohmann::json& j, const NormalNbrInfo<D>& n)
 {
@@ -69,6 +71,7 @@ to_json(tpl::nlohmann::json& j, const NormalNbrInfo<D>& n)
 }
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 from_json(const tpl::nlohmann::json& j, NormalNbrInfo<D>& n)
 {
@@ -91,6 +94,7 @@ template void
 from_json(const tpl::nlohmann::json& j, NormalNbrInfo<2>& n);
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<D>& n)
 {
@@ -101,6 +105,7 @@ to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<D>& n)
 }
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<D>& n)
 {
@@ -128,6 +133,7 @@ template void
 from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<2>& n);
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 to_json(tpl::nlohmann::json& j, const FineNbrInfo<D>& n)
 {
@@ -137,6 +143,7 @@ to_json(tpl::nlohmann::json& j, const FineNbrInfo<D>& n)
 }
 
 template<int D>
+  requires is_supported_neighbor_dimension<D>
 void
 from_json(const tpl::nlohmann::json& j, FineNbrInfo<D>& n)
 {
@@ -159,6 +166,7 @@ template void
 from_json(const tpl::nlohmann::json& j, FineNbrInfo<2>& n);
 
 template<int D>
+  requires is_supported_dimension<D>
 void
 to_json(tpl::nlohmann::json& j, const PatchInfo<D>& pinfo)
 {
@@ -242,7 +250,9 @@ to_json(tpl::nlohmann::json& j, const PatchInfo<D>& pinfo)
     j["child_ranks"] = pinfo.child_ranks;
   }
 }
+
 template<int D>
+  requires is_supported_dimension<D>
 void
 from_json(const tpl::nlohmann::json& j, PatchInfo<D>& pinfo)
 {
@@ -263,16 +273,13 @@ from_json(const tpl::nlohmann::json& j, PatchInfo<D>& pinfo)
     Side<D> s = nbr_j["side"].get<Side<D>>();
     switch (nbr_j["type"].get<NbrType>()) {
       case NbrType::Normal:
-        pinfo.setNbrInfo(s, new NormalNbrInfo<D - 1>());
-        pinfo.getNormalNbrInfo(s) = nbr_j.get<NormalNbrInfo<D - 1>>();
+        pinfo.setNbrInfo(s, new NormalNbrInfo<D - 1>(nbr_j.get<NormalNbrInfo<D - 1>>()));
         break;
       case NbrType::Coarse:
-        pinfo.setNbrInfo(s, new CoarseNbrInfo<D - 1>());
-        pinfo.getCoarseNbrInfo(s) = nbr_j.get<CoarseNbrInfo<D - 1>>();
+        pinfo.setNbrInfo(s, new CoarseNbrInfo<D - 1>(nbr_j.get<CoarseNbrInfo<D - 1>>()));
         break;
       case NbrType::Fine:
-        pinfo.setNbrInfo(s, new FineNbrInfo<D - 1>());
-        pinfo.getFineNbrInfo(s) = nbr_j.get<FineNbrInfo<D - 1>>();
+        pinfo.setNbrInfo(s, new FineNbrInfo<D - 1>(nbr_j.get<FineNbrInfo<D - 1>>()));
         break;
       default:
         throw RuntimeError("Unsupported NbrType");
@@ -284,16 +291,13 @@ from_json(const tpl::nlohmann::json& j, PatchInfo<D>& pinfo)
         Edge e = nbr_j["edge"].get<Edge>();
         switch (nbr_j["type"].get<NbrType>()) {
           case NbrType::Normal:
-            pinfo.setNbrInfo(e, new NormalNbrInfo<1>());
-            pinfo.getNormalNbrInfo(e) = nbr_j.get<NormalNbrInfo<1>>();
+            pinfo.setNbrInfo(e, new NormalNbrInfo<1>(nbr_j.get<NormalNbrInfo<1>>()));
             break;
           case NbrType::Coarse:
-            pinfo.setNbrInfo(e, new CoarseNbrInfo<1>());
-            pinfo.getCoarseNbrInfo(e) = nbr_j.get<CoarseNbrInfo<1>>();
+            pinfo.setNbrInfo(e, new CoarseNbrInfo<1>(nbr_j.get<CoarseNbrInfo<1>>()));
             break;
           case NbrType::Fine:
-            pinfo.setNbrInfo(e, new FineNbrInfo<1>());
-            pinfo.getFineNbrInfo(e) = nbr_j.get<FineNbrInfo<1>>();
+            pinfo.setNbrInfo(e, new FineNbrInfo<1>(nbr_j.get<FineNbrInfo<1>>()));
             break;
           default:
             throw RuntimeError("Unsupported NbrType");
@@ -307,16 +311,13 @@ from_json(const tpl::nlohmann::json& j, PatchInfo<D>& pinfo)
         Corner<D> c = nbr_j["corner"].get<Corner<D>>();
         switch (nbr_j["type"].get<NbrType>()) {
           case NbrType::Normal:
-            pinfo.setNbrInfo(c, new NormalNbrInfo<0>());
-            pinfo.getNormalNbrInfo(c) = nbr_j.get<NormalNbrInfo<0>>();
+            pinfo.setNbrInfo(c, new NormalNbrInfo<0>(nbr_j.get<NormalNbrInfo<0>>()));
             break;
           case NbrType::Coarse:
-            pinfo.setNbrInfo(c, new CoarseNbrInfo<0>());
-            pinfo.getCoarseNbrInfo(c) = nbr_j.get<CoarseNbrInfo<0>>();
+            pinfo.setNbrInfo(c, new CoarseNbrInfo<0>(nbr_j.get<CoarseNbrInfo<0>>()));
             break;
           case NbrType::Fine:
-            pinfo.setNbrInfo(c, new FineNbrInfo<0>());
-            pinfo.getFineNbrInfo(c) = nbr_j.get<FineNbrInfo<0>>();
+            pinfo.setNbrInfo(c, new FineNbrInfo<0>(nbr_j.get<FineNbrInfo<0>>()));
             break;
           default:
             throw RuntimeError("Unsupported NbrType");
@@ -355,6 +356,7 @@ template void
 ThunderEgg::to_json<3>(ThunderEgg::tpl::nlohmann::json& j, const Domain<3>& domain);
 
 template<int D>
+  requires is_supported_dimension<D>
 void
 Domain<D>::setTimer(std::shared_ptr<Timer> timer) const
 {
