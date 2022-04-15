@@ -50,7 +50,7 @@ namespace ThunderEgg {
  * @tparam D the number of cartesian dimensions in the patch
  */
 template<int D>
-requires is_supported_dimension<D>
+  requires is_supported_dimension<D>
 class PatchInfo : public Serializable
 {
 private:
@@ -146,7 +146,8 @@ public:
    * @param other_pinfo the object to copy
    * @return PatchInfo<D>& this object
    */
-  PatchInfo<D>& operator=(const PatchInfo<D>& other_pinfo);
+  PatchInfo<D>&
+  operator=(const PatchInfo<D>& other_pinfo);
 
   /**
    * @brief Compare the ids of the patches
@@ -156,7 +157,8 @@ public:
    * @return true if r's id is lower
    * @return false if r's id is not lower
    */
-  friend bool operator<(const PatchInfo& l, const PatchInfo& r);
+  friend bool
+  operator<(const PatchInfo& l, const PatchInfo& r);
 
   /**
    * @brief Set the Nbr Info object to null
@@ -165,7 +167,9 @@ public:
    * @param f the face
    */
   template<int M>
-  void setNbrInfo(Face<D, M> f, std::nullptr_t);
+    requires is_valid_face<D, M>
+  void
+  setNbrInfo(Face<D, M> f, std::nullptr_t);
 
   /**
    * @brief Set the Nbr Info object on a given face
@@ -175,7 +179,9 @@ public:
    * @param nbr_info the neighbor info object, this patchinfo will take ownership of it
    */
   template<int M>
-  void setNbrInfo(Face<D, M> f, NbrInfo<M>* nbr_info);
+    requires is_valid_face<D, M>
+  void
+  setNbrInfo(Face<D, M> f, NbrInfo<M>* nbr_info);
 
   /**
    * @brief Get the NbrType for a side
@@ -184,10 +190,10 @@ public:
    * @return The NbrType
    */
   template<int M>
-  NbrType getNbrType(Face<D, M> s) const
-  {
-    return nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()]->getNbrType();
-  }
+    requires is_valid_face<D, M>
+  NbrType
+  getNbrType(Face<D, M> s) const;
+
   /**
    * @brief Get the NormalNbrInfo object for a side
    *
@@ -197,7 +203,9 @@ public:
    * @return NormalNbrInfo<D>& the object
    */
   template<int M>
-  NormalNbrInfo<M>& getNormalNbrInfo(Face<D, M> s) const
+    requires is_valid_face<D, M>
+  NormalNbrInfo<M>&
+  getNormalNbrInfo(Face<D, M> s) const
   {
     return *dynamic_cast<NormalNbrInfo<M>*>(
       nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
@@ -210,7 +218,8 @@ public:
    * @return CoarseNbrInfo<D>& the object
   */
   template<int M>
-  CoarseNbrInfo<M>& getCoarseNbrInfo(Face<D, M> s) const
+  CoarseNbrInfo<M>&
+  getCoarseNbrInfo(Face<D, M> s) const
   {
     return *dynamic_cast<CoarseNbrInfo<M>*>(
       nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
@@ -224,7 +233,8 @@ public:
    * @return FineNbrInfo<D>& the object
    */
   template<int M>
-  FineNbrInfo<M>& getFineNbrInfo(Face<D, M> s) const
+  FineNbrInfo<M>&
+  getFineNbrInfo(Face<D, M> s) const
   {
     return *dynamic_cast<FineNbrInfo<M>*>(nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
   }
@@ -236,14 +246,16 @@ public:
    * @return false if at domain boundary
    */
   template<int M>
-  inline bool hasNbr(Face<D, M> s) const
+  inline bool
+  hasNbr(Face<D, M> s) const
   {
     return nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()] != nullptr;
   }
   /**
    * @brief Return if this patch has a neighbor
    */
-  inline bool hasNbr() const
+  inline bool
+  hasNbr() const
   {
     return std::any_of(
       nbr_infos.begin(), nbr_infos.end(), [](const std::unique_ptr<NbrInfoBase>& nbr_info) {
@@ -255,13 +267,18 @@ public:
    *
    * @return true if there is a parent
    */
-  inline bool hasCoarseParent() const { return orth_on_parent != Orthant<D>::null(); }
+  inline bool
+  hasCoarseParent() const
+  {
+    return orth_on_parent != Orthant<D>::null();
+  }
   /**
    * @brief Set the local indexes in the NbrInfo objects
    *
    * @param id_to_local_index_map map from id to local_index
    */
-  void setNeighborLocalIndexes(const std::map<int, int>& id_to_local_index_map)
+  void
+  setNeighborLocalIndexes(const std::map<int, int>& id_to_local_index_map)
   {
     for (size_t i = 0; i < nbr_infos.size(); i++) {
       if (nbr_infos[i] != nullptr) {
@@ -274,7 +291,8 @@ public:
    *
    * @param id_to_global_index_map map form id to global_index
    */
-  void setNeighborGlobalIndexes(const std::map<int, int>& id_to_global_index_map)
+  void
+  setNeighborGlobalIndexes(const std::map<int, int>& id_to_global_index_map)
   {
     for (size_t i = 0; i < nbr_infos.size(); i++) {
       if (nbr_infos[i] != nullptr) {
@@ -285,7 +303,8 @@ public:
   /**
    * @brief return a vector of neighbor ids
    */
-  std::deque<int> getNbrIds() const
+  std::deque<int>
+  getNbrIds() const
   {
     std::deque<int> retval;
     for (size_t i = 0; i < nbr_infos.size(); i++) {
@@ -298,7 +317,8 @@ public:
   /**
    * @brief return a vector of neighbor ranks
    */
-  std::deque<int> getNbrRanks() const
+  std::deque<int>
+  getNbrRanks() const
   {
     std::deque<int> retval;
     for (size_t i = 0; i < nbr_infos.size(); i++) {
@@ -309,7 +329,8 @@ public:
     return retval;
   }
   template<int M>
-  void serializeNeighbors(BufferWriter& writer) const
+  void
+  serializeNeighbors(BufferWriter& writer) const
   {
     std::bitset<Face<D, M>::number_of> has_nbr;
     for (Face<D, M> f : Face<D, M>::getValues()) {
@@ -343,7 +364,8 @@ public:
     }
   }
   template<int M>
-  void deserializeNeighbors(BufferReader& reader)
+  void
+  deserializeNeighbors(BufferReader& reader)
   {
     std::bitset<Face<D, M>::number_of> has_nbr;
     reader >> has_nbr;
@@ -376,7 +398,8 @@ public:
       deserializeNeighbors<M - 1>(reader);
     }
   }
-  int serialize(char* buffer) const
+  int
+  serialize(char* buffer) const
   {
     BufferWriter writer(buffer);
     writer << id;
@@ -395,7 +418,8 @@ public:
 
     return writer.getPos();
   }
-  int deserialize(char* buffer)
+  int
+  deserialize(char* buffer)
   {
     BufferReader reader(buffer);
     reader >> id;

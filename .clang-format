@@ -1,2 +1,8 @@
 BasedOnStyle : Mozilla
-ColumnLimit: 1000
+ColumnLimit: 100
+AlwaysBreakTemplateDeclarations: true
+RequiresClausePosition: OwnLine
+IndentRequiresClause: true
+AlwaysBreakAfterReturnType: All
+AlwaysBreakTemplateDeclarations: Yes
+AllowShortFunctionsOnASingleLine: None

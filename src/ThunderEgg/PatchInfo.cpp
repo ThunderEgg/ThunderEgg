@@ -23,7 +23,7 @@
 namespace ThunderEgg {
 
 template<int D>
-requires is_supported_dimension<D>
+  requires is_supported_dimension<D>
 PatchInfo<D>::PatchInfo()
 {
   starts.fill(0);
@@ -34,7 +34,7 @@ PatchInfo<D>::PatchInfo()
 }
 
 template<int D>
-requires is_supported_dimension<D>
+  requires is_supported_dimension<D>
 PatchInfo<D>::PatchInfo(const PatchInfo<D>& other_pinfo)
   : id(other_pinfo.id)
   , local_index(other_pinfo.local_index)
@@ -59,8 +59,9 @@ PatchInfo<D>::PatchInfo(const PatchInfo<D>& other_pinfo)
 }
 
 template<int D>
-requires is_supported_dimension<D> PatchInfo<D>
-&PatchInfo<D>::operator=(const PatchInfo<D>& other_pinfo)
+  requires is_supported_dimension<D>
+PatchInfo<D>&
+PatchInfo<D>::operator=(const PatchInfo<D>& other_pinfo)
 {
   id = other_pinfo.id;
   local_index = other_pinfo.local_index;
@@ -88,16 +89,16 @@ requires is_supported_dimension<D> PatchInfo<D>
 }
 
 template<int D>
-requires is_supported_dimension<D>
-bool
+  requires is_supported_dimension<D> bool
 operator<(const PatchInfo<D>& l, const PatchInfo<D>& r)
 {
   return l.id < r.id;
 }
 
 template<int D>
-requires is_supported_dimension<D>
+  requires is_supported_dimension<D>
 template<int M>
+  requires is_valid_face<D, M>
 void
 PatchInfo<D>::setNbrInfo(Face<D, M> f, std::nullptr_t)
 {
@@ -105,12 +106,27 @@ PatchInfo<D>::setNbrInfo(Face<D, M> f, std::nullptr_t)
 }
 
 template<int D>
-requires is_supported_dimension<D>
+  requires is_supported_dimension<D>
 template<int M>
+  requires is_valid_face<D, M>
 void
 PatchInfo<D>::setNbrInfo(Face<D, M> f, NbrInfo<M>* nbr_info)
 {
   nbr_infos[Face<D, M>::sum_of_faces + f.getIndex()].reset(nbr_info);
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+template<int M>
+  requires is_valid_face<D, M>
+NbrType
+PatchInfo<D>::getNbrType(Face<D, M> s) const
+{
+  const NbrInfoBase* info = nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get();
+  if (info == nullptr) {
+    throw RuntimeError("PatchInfo::getNbrType: nbr_info is nullptr");
+  }
+  return info->getNbrType();
 }
 
 template class PatchInfo<2>;
@@ -122,6 +138,8 @@ PatchInfo<2>::setNbrInfo(Face<2, 0> f, std::nullptr_t);
 
 template void
 PatchInfo<2>::setNbrInfo(Face<2, 1> f, NbrInfo<1>* nbr_info);
+template void
+PatchInfo<2>::setNbrInfo(Face<2, 0> f, NbrInfo<0>* nbr_info);
 
 template class PatchInfo<3>;
 
@@ -132,4 +150,4 @@ PatchInfo<3>::setNbrInfo(Face<3, 1> f, std::nullptr_t);
 template void
 PatchInfo<3>::setNbrInfo(Face<3, 0> f, std::nullptr_t);
 
-}
+} // namespace ThunderEgg

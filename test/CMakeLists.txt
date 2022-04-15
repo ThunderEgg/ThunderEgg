@@ -17,6 +17,8 @@ target_include_directories(test_shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(GMG)
 add_subdirectory(Iterative)
+add_subdirectory(PatchInfo_2)
+add_subdirectory(PatchInfo_3)
 add_subdirectory(PETSc)
 add_subdirectory(Poisson)
 add_subdirectory(Schur)

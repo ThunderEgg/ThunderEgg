@@ -61,5 +61,8 @@ constexpr bool ENABLE_DEBUG = false;
 template<int D>
 constexpr bool is_supported_dimension = (D == 2 || D == 3);
 
+template<int D, int M>
+constexpr bool is_valid_face = is_supported_dimension<D> && (M >= 0) && (M < D);
+
 } // namespace ThunderEgg
 #endif
