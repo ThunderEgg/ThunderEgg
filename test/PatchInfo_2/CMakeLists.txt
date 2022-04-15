@@ -1,1 +1,4 @@
 target_sources(unit_tests_mpi1 PRIVATE getNbrType_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE getNormalNbrInfo_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE getCoarseNbrInfo_MPI1.cpp)
+target_sources(unit_tests_mpi1 PRIVATE getFineNbrInfo_MPI1.cpp)

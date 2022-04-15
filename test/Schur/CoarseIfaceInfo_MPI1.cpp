@@ -41,9 +41,10 @@ TEST_CASE("Schur::CoarseIfaceInfo constructor")
     PatchInfo<2> pinfo;
     pinfo.rank = 0;
     pinfo.id = id;
-    pinfo.setNbrInfo(s, new CoarseNbrInfo<1>(nbr_id, Orthant<1>::upper()));
-    pinfo.getCoarseNbrInfo(s).rank = 1;
-    pinfo.getCoarseNbrInfo(s).orth_on_coarse = Orthant<1>::upper();
+    CoarseNbrInfo<1>* info = new CoarseNbrInfo<1>(nbr_id, Orthant<1>::upper());
+    info->rank = 1;
+    info->orth_on_coarse = Orthant<1>::upper();
+    pinfo.setNbrInfo(s, info);
     Schur::CoarseIfaceInfo<2> iface_info(pinfo, s);
     CHECK_EQ(iface_info.rank, 0);
     CHECK_EQ(iface_info.coarse_rank, 1);

@@ -41,8 +41,9 @@ TEST_CASE("Schur::NormalIfaceInfo constructor")
     PatchInfo<2> pinfo;
     pinfo.rank = 0;
     pinfo.id = id;
-    pinfo.setNbrInfo(s, new NormalNbrInfo<1>(nbr_id));
-    pinfo.getNormalNbrInfo(s).rank = 1;
+    NormalNbrInfo<1>* info = new NormalNbrInfo<1>(nbr_id);
+    info->rank = 1;
+    pinfo.setNbrInfo(s, info);
     Schur::NormalIfaceInfo<2> iface_info(pinfo, s);
     if (s.isHigherOnAxis()) {
       // check that iface belongs to this

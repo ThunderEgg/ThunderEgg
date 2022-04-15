@@ -47,8 +47,9 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with NormalIfaceInfo")
     PatchInfo<2> pinfo;
     pinfo.rank = 0;
     pinfo.id = id;
-    pinfo.setNbrInfo(side_to_set, new NormalNbrInfo<1>(nbr_id));
-    pinfo.getNormalNbrInfo(side_to_set).rank = 1;
+    NormalNbrInfo<1>* info = new NormalNbrInfo<1>(nbr_id);
+    info->rank = 1;
+    pinfo.setNbrInfo(side_to_set, info);
     auto iface_info = make_shared<Schur::NormalIfaceInfo<2>>(pinfo, side_to_set);
 
     Schur::PatchIfaceInfo<2> piinfo;
@@ -81,9 +82,10 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with FineIfaceInfo")
     array<int, 2> nbr_ids = { 2, 3 };
     PatchInfo<2> pinfo;
     pinfo.id = id;
-    pinfo.setNbrInfo(side_to_set, new FineNbrInfo<1>(nbr_ids));
-    pinfo.getFineNbrInfo(side_to_set).ranks[0] = 1;
-    pinfo.getFineNbrInfo(side_to_set).ranks[1] = 2;
+    FineNbrInfo<1>* info = new FineNbrInfo<1>(nbr_ids);
+    info->ranks[0] = 1;
+    info->ranks[1] = 2;
+    pinfo.setNbrInfo(side_to_set, info);
     auto iface_info = make_shared<Schur::FineIfaceInfo<2>>(pinfo, side_to_set);
 
     Schur::PatchIfaceInfo<2> piinfo;
@@ -116,8 +118,9 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with CoarseIfaceInfo")
     int nbr_id = 2;
     PatchInfo<2> pinfo;
     pinfo.id = id;
-    pinfo.setNbrInfo(side_to_set, new CoarseNbrInfo<1>(nbr_id, Orthant<1>::upper()));
-    pinfo.getCoarseNbrInfo(side_to_set).rank = 1;
+    CoarseNbrInfo<1>* info = new CoarseNbrInfo<1>(nbr_id, Orthant<1>::upper());
+    info->rank = 1;
+    pinfo.setNbrInfo(side_to_set, info);
     auto iface_info = make_shared<Schur::CoarseIfaceInfo<2>>(pinfo, side_to_set);
 
     Schur::PatchIfaceInfo<2> piinfo;

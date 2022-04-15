@@ -40,9 +40,10 @@ TEST_CASE("Schur::FineIfaceInfo constructor")
     PatchInfo<2> pinfo;
     pinfo.rank = 0;
     pinfo.id = id;
-    pinfo.setNbrInfo(s, new FineNbrInfo<1>(nbr_ids));
-    pinfo.getFineNbrInfo(s).ranks[0] = 1;
-    pinfo.getFineNbrInfo(s).ranks[1] = 2;
+    FineNbrInfo<1>* info = new FineNbrInfo<1>(nbr_ids);
+    info->ranks[0] = 1;
+    info->ranks[1] = 2;
+    pinfo.setNbrInfo(s, info);
     Schur::FineIfaceInfo<2> iface_info(pinfo, s);
     CHECK_EQ(iface_info.rank, 0);
     CHECK_EQ(iface_info.fine_ranks[0], 1);

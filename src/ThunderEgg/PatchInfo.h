@@ -60,6 +60,26 @@ private:
    */
   std::array<std::unique_ptr<NbrInfoBase>, Face<D, D>::sum_of_faces> nbr_infos;
 
+  /**
+   * @brief Serialize neighbors into buffer
+   *
+   * @tparam M dimensionality of neighbor, this is recursive stops at 0
+   * @param writer the buffer
+   */
+  template<int M>
+  void
+  serializeNeighbors(BufferWriter& writer) const;
+
+  /**
+   * @brief Deserialize neighbors from buffer
+   *
+   * @tparam M dimensionality of neighbor, this is recursive stops at 0
+   * @param reader the buffer
+   */
+  template<int M>
+  void
+  deserializeNeighbors(BufferReader& reader);
+
 public:
   /**
    * @brief The globally unique ID of the patch
@@ -200,44 +220,37 @@ public:
    * Neighbor must be of Normal type, otherwise behavior is undefined.
    *
    * @param s the side
-   * @return NormalNbrInfo<D>& the object
+   * @return const NormalNbrInfo<D>& the object
    */
   template<int M>
     requires is_valid_face<D, M>
-  NormalNbrInfo<M>&
-  getNormalNbrInfo(Face<D, M> s) const
-  {
-    return *dynamic_cast<NormalNbrInfo<M>*>(
-      nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
-  }
+  const NormalNbrInfo<M>&
+  getNormalNbrInfo(Face<D, M> s) const;
+
   /**
    * @brief Get the CoarseNbrInfo object
    *
-
    * @param s the side
-   * @return CoarseNbrInfo<D>& the object
-  */
+   * @return const CoarseNbrInfo<D>& the object
+   */
   template<int M>
-  CoarseNbrInfo<M>&
-  getCoarseNbrInfo(Face<D, M> s) const
-  {
-    return *dynamic_cast<CoarseNbrInfo<M>*>(
-      nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
-  }
+    requires is_valid_face<D, M>
+  const CoarseNbrInfo<M>&
+  getCoarseNbrInfo(Face<D, M> s) const;
+
   /**
    * @brief Get the FineNbrInfo object
    *
    * Neighbor must be of Fine type, otherwise behavior is undefined.
    *
    * @param s the side
-   * @return FineNbrInfo<D>& the object
+   * @return const FineNbrInfo<D>& the object
    */
   template<int M>
-  FineNbrInfo<M>&
-  getFineNbrInfo(Face<D, M> s) const
-  {
-    return *dynamic_cast<FineNbrInfo<M>*>(nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
-  }
+    requires is_valid_face<D, M>
+  const FineNbrInfo<M>&
+  getFineNbrInfo(Face<D, M> s) const;
+
   /**
    * @brief Return whether the patch has a neighbor
    *
@@ -246,205 +259,77 @@ public:
    * @return false if at domain boundary
    */
   template<int M>
-  inline bool
-  hasNbr(Face<D, M> s) const
-  {
-    return nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()] != nullptr;
-  }
+    requires is_valid_face<D, M> bool
+  hasNbr(Face<D, M> s) const;
+
   /**
    * @brief Return if this patch has a neighbor
    */
-  inline bool
-  hasNbr() const
-  {
-    return std::any_of(
-      nbr_infos.begin(), nbr_infos.end(), [](const std::unique_ptr<NbrInfoBase>& nbr_info) {
-        return nbr_info != nullptr;
-      });
-  }
+  bool
+  hasNbr() const;
+
   /**
    * @brief Return whether the patch has a coarser parent
    *
    * @return true if there is a parent
    */
-  inline bool
-  hasCoarseParent() const
-  {
-    return orth_on_parent != Orthant<D>::null();
-  }
+  bool
+  hasCoarseParent() const;
+
   /**
    * @brief Set the local indexes in the NbrInfo objects
    *
    * @param id_to_local_index_map map from id to local_index
    */
   void
-  setNeighborLocalIndexes(const std::map<int, int>& id_to_local_index_map)
-  {
-    for (size_t i = 0; i < nbr_infos.size(); i++) {
-      if (nbr_infos[i] != nullptr) {
-        nbr_infos[i]->setLocalIndexes(id_to_local_index_map);
-      }
-    }
-  }
+  setNeighborLocalIndexes(const std::map<int, int>& id_to_local_index_map);
+
   /**
    * @brief Set the global indexes in the NbrInfo objects
    *
    * @param id_to_global_index_map map form id to global_index
    */
   void
-  setNeighborGlobalIndexes(const std::map<int, int>& id_to_global_index_map)
-  {
-    for (size_t i = 0; i < nbr_infos.size(); i++) {
-      if (nbr_infos[i] != nullptr) {
-        nbr_infos[i]->setGlobalIndexes(id_to_global_index_map);
-      }
-    }
-  }
+  setNeighborGlobalIndexes(const std::map<int, int>& id_to_global_index_map);
+
   /**
    * @brief return a vector of neighbor ids
    */
   std::deque<int>
-  getNbrIds() const
-  {
-    std::deque<int> retval;
-    for (size_t i = 0; i < nbr_infos.size(); i++) {
-      if (nbr_infos[i] != nullptr) {
-        nbr_infos[i]->getNbrIds(retval);
-      }
-    }
-    return retval;
-  }
+  getNbrIds() const;
+
   /**
    * @brief return a vector of neighbor ranks
    */
   std::deque<int>
-  getNbrRanks() const
-  {
-    std::deque<int> retval;
-    for (size_t i = 0; i < nbr_infos.size(); i++) {
-      if (nbr_infos[i] != nullptr) {
-        nbr_infos[i]->getNbrRanks(retval);
-      }
-    }
-    return retval;
-  }
-  template<int M>
-  void
-  serializeNeighbors(BufferWriter& writer) const
-  {
-    std::bitset<Face<D, M>::number_of> has_nbr;
-    for (Face<D, M> f : Face<D, M>::getValues()) {
-      has_nbr[f.getIndex()] = hasNbr(f);
-    }
-    writer << has_nbr;
-    for (Face<D, M> f : Face<D, M>::getValues()) {
-      if (hasNbr(f)) {
-        NbrType type = getNbrType(f);
-        writer << type;
-        switch (type) {
-          case NbrType::Normal: {
-            NormalNbrInfo<M> tmp = getNormalNbrInfo(f);
-            writer << tmp;
-          } break;
-          case NbrType::Fine: {
-            FineNbrInfo<M> tmp = getFineNbrInfo(f);
-            writer << tmp;
-          } break;
-          case NbrType::Coarse: {
-            CoarseNbrInfo<M> tmp = getCoarseNbrInfo(f);
-            writer << tmp;
-          } break;
-          default:
-            throw RuntimeError("Unsupported NbrType");
-        }
-      }
-    }
-    if constexpr (M > 0) {
-      serializeNeighbors<M - 1>(writer);
-    }
-  }
-  template<int M>
-  void
-  deserializeNeighbors(BufferReader& reader)
-  {
-    std::bitset<Face<D, M>::number_of> has_nbr;
-    reader >> has_nbr;
-    for (Face<D, M> f : Face<D, M>::getValues()) {
-      if (has_nbr[f.getIndex()]) {
-        NbrType type;
-        reader >> type;
-        NbrInfo<M>* info;
-        switch (type) {
-          case NbrType::Normal:
-            info = new NormalNbrInfo<M>();
-            reader >> *static_cast<NormalNbrInfo<M>*>(info);
-            break;
-          case NbrType::Fine:
-            info = new FineNbrInfo<M>();
-            reader >> *static_cast<FineNbrInfo<M>*>(info);
-            break;
-          case NbrType::Coarse:
-            info = new CoarseNbrInfo<M>();
-            reader >> *static_cast<CoarseNbrInfo<M>*>(info);
-            break;
-          default:
-            throw RuntimeError("Unsupported NbrType");
-        }
+  getNbrRanks() const;
 
-        setNbrInfo(f, info);
-      }
-    }
-    if constexpr (M > 0) {
-      deserializeNeighbors<M - 1>(reader);
-    }
-  }
+  /**
+   * @brief Serialize the object from a buffer
+   *
+   * @param buffer the buffer (can be nullptr for dry run to get the size)
+   * @return int the number of bytes written
+   */
   int
-  serialize(char* buffer) const
-  {
-    BufferWriter writer(buffer);
-    writer << id;
-    writer << ns;
-    writer << refine_level;
-    writer << parent_id;
-    writer << parent_rank;
-    writer << child_ids;
-    writer << child_ranks;
-    writer << rank;
-    writer << orth_on_parent;
-    writer << starts;
-    writer << spacings;
+  serialize(char* buffer) const;
 
-    serializeNeighbors<D - 1>(writer);
-
-    return writer.getPos();
-  }
+  /**
+   * @brief Deserialize the object from a buffer
+   *
+   * @param buffer the buffer
+   * @return int the number of bytes read
+   */
   int
-  deserialize(char* buffer)
-  {
-    BufferReader reader(buffer);
-    reader >> id;
-    reader >> ns;
-    reader >> refine_level;
-    reader >> parent_id;
-    reader >> parent_rank;
-    reader >> child_ids;
-    reader >> child_ranks;
-    reader >> rank;
-    reader >> orth_on_parent;
-    reader >> starts;
-    reader >> spacings;
-
-    deserializeNeighbors<D - 1>(reader);
-
-    return reader.getPos();
-  }
+  deserialize(char* buffer);
 };
 
 template<int D>
+  requires is_supported_dimension<D>
 void
 to_json(tpl::nlohmann::json& j, const PatchInfo<D>& pinfo);
 
 template<int D>
+  requires is_supported_dimension<D>
 void
 from_json(const tpl::nlohmann::json& j, PatchInfo<D>& pinfo);
 
