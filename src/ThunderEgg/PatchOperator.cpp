@@ -19,5 +19,63 @@
  ***************************************************************************/
 
 #include <ThunderEgg/PatchOperator.h>
-template class ThunderEgg::PatchOperator<2>;
-template class ThunderEgg::PatchOperator<3>;
+
+namespace ThunderEgg {
+template<int D>
+  requires is_supported_dimension<D>
+PatchOperator<D>::PatchOperator(const Domain<D>& domain, const GhostFiller<D>& ghost_filler)
+  : domain(domain)
+  , ghost_filler(ghost_filler.clone())
+{
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+PatchOperator<D>::~PatchOperator()
+{
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+void
+PatchOperator<D>::apply(const Vector<D>& u, Vector<D>& f) const
+{
+  if constexpr (ENABLE_DEBUG) {
+    if (u.getNumLocalPatches() != domain.getNumLocalPatches()) {
+      throw RuntimeError("u vector is incorrect length");
+    }
+    if (f.getNumLocalPatches() != domain.getNumLocalPatches()) {
+      throw RuntimeError("f vector is incorrect length");
+    }
+  }
+  f.setWithGhost(0);
+  ghost_filler->fillGhost(u);
+  for (const PatchInfo<D>& pinfo : domain.getPatchInfoVector()) {
+    PatchView<const double, D> u_view = u.getPatchView(pinfo.local_index);
+    PatchView<double, D> f_view = f.getPatchView(pinfo.local_index);
+    applySinglePatch(pinfo, u_view, f_view);
+  }
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+const Domain<D>&
+PatchOperator<D>::getDomain() const
+{
+  return domain;
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+const GhostFiller<D>&
+PatchOperator<D>::getGhostFiller() const
+{
+  return *ghost_filler;
+}
+
+// EXPLICIT INSTANTIATIONS
+
+template class PatchOperator<2>;
+template class PatchOperator<3>;
+
+}

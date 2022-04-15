@@ -29,6 +29,7 @@
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Vector.h>
+
 namespace ThunderEgg {
 /**
  * @brief This is an Operator where derived classes only have to implement the two virtual functions
@@ -37,6 +38,7 @@ namespace ThunderEgg {
  * @tparam D the number of Cartesian dimensions.
  */
 template<int D>
+  requires is_supported_dimension<D>
 class PatchOperator : public Operator<D>
 {
 private:
@@ -58,20 +60,20 @@ public:
    * @param domain  the Domain
    * @param ghost_filler the GhostFiller
    */
-  PatchOperator(const Domain<D>& domain, const GhostFiller<D>& ghost_filler)
-    : domain(domain)
-    , ghost_filler(ghost_filler.clone())
-  {}
+  PatchOperator(const Domain<D>& domain, const GhostFiller<D>& ghost_filler);
+
   /**
    * @brief Clone this patch operator
    *
    * @return PatchOperator<D>* a newly allocated copy of this patch operator
    */
-  virtual PatchOperator<D>* clone() const override = 0;
+  virtual PatchOperator<D>*
+  clone() const override = 0;
+
   /**
    * @brief Destroy the PatchOperator object
    */
-  virtual ~PatchOperator() {}
+  virtual ~PatchOperator();
 
   /**
    * @brief Apply the operator to a single patch
@@ -82,9 +84,10 @@ public:
    * @param u_view the solution
    * @param f_view the left hand side
    */
-  virtual void applySinglePatch(const PatchInfo<D>& pinfo,
-                                const PatchView<const double, D>& u_view,
-                                const PatchView<double, D>& f_view) const = 0;
+  virtual void
+  applySinglePatch(const PatchInfo<D>& pinfo,
+                   const PatchView<const double, D>& u_view,
+                   const PatchView<double, D>& f_view) const = 0;
 
   /**
    * @brief Treat the internal patch boundaries as domain boundaires and modify
@@ -97,9 +100,10 @@ public:
    * @param u_view the left hand side
    * @param f_view the right hand side
    */
-  virtual void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                                      const PatchView<const double, D>& u_view,
-                                                      const PatchView<double, D>& f_view) const = 0;
+  virtual void
+  modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo,
+                                         const PatchView<const double, D>& u_view,
+                                         const PatchView<double, D>& f_view) const = 0;
 
   /**
    * @brief Apply the operator to a single patch
@@ -110,10 +114,10 @@ public:
    * @param u_view the solution
    * @param f_view the left hand side
    */
-  virtual void applySinglePatchWithInternalBoundaryConditions(
-    const PatchInfo<D>& pinfo,
-    const PatchView<const double, D>& u_view,
-    const PatchView<double, D>& f_view) const = 0;
+  virtual void
+  applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo,
+                                                 const PatchView<const double, D>& u_view,
+                                                 const PatchView<double, D>& f_view) const = 0;
 
   /**
    * @brief Apply the operator
@@ -123,34 +127,25 @@ public:
    * @param u the left hand side
    * @param f the right hand side
    */
-  void apply(const Vector<D>& u, Vector<D>& f) const override
-  {
-    if constexpr (ENABLE_DEBUG) {
-      if (u.getNumLocalPatches() != domain.getNumLocalPatches()) {
-        throw RuntimeError("u vector is incorrect length");
-      }
-      if (f.getNumLocalPatches() != domain.getNumLocalPatches()) {
-        throw RuntimeError("f vector is incorrect length");
-      }
-    }
-    f.setWithGhost(0);
-    ghost_filler->fillGhost(u);
-    for (const PatchInfo<D>& pinfo : domain.getPatchInfoVector()) {
-      PatchView<const double, D> u_view = u.getPatchView(pinfo.local_index);
-      PatchView<double, D> f_view = f.getPatchView(pinfo.local_index);
-      applySinglePatch(pinfo, u_view, f_view);
-    }
-  }
+  void
+  apply(const Vector<D>& u, Vector<D>& f) const override;
+
   /**
    * @brief Get the Domain object associated with this PatchOperator
    */
-  const Domain<D>& getDomain() const { return domain; }
+  const Domain<D>&
+  getDomain() const;
+
   /**
    * @brief Get the GhostFiller object associated with this PatchOperator
    */
-  const GhostFiller<D>& getGhostFiller() const { return *ghost_filler; }
+  const GhostFiller<D>&
+  getGhostFiller() const;
 };
 } // namespace ThunderEgg
+
+// EXPLICIT INSTANTIATIONS
+
 extern template class ThunderEgg::PatchOperator<2>;
 extern template class ThunderEgg::PatchOperator<3>;
 #endif
