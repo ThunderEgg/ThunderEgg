@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Face.h>
+#include <ThunderEgg/tpl/json.hpp>
 namespace ThunderEgg {
 void
 to_json(tpl::nlohmann::json& j, const Side<1>& s)

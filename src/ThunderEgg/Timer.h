@@ -28,7 +28,7 @@
 
 #include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/RuntimeError.h>
-#include <ThunderEgg/tpl/json.hpp>
+#include <ThunderEgg/tpl/json_fwd.hpp>
 #include <list>
 #include <map>
 #include <ostream>

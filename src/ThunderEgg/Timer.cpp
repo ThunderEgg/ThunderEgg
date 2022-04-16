@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Timer.h>
+#include <ThunderEgg/tpl/json.hpp>
 #include <chrono>
 #include <fstream>
 #include <iomanip>
