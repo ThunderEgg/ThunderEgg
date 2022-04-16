@@ -174,8 +174,7 @@ PatchInfo<D>::getFineNbrInfo(Face<D, M> s) const
 template<int D>
   requires is_supported_dimension<D>
 template<int M>
-  requires is_valid_face<D, M>
-inline bool
+  requires is_valid_face<D, M> bool
 PatchInfo<D>::hasNbr(Face<D, M> s) const
 {
   return nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()] != nullptr;
@@ -407,6 +406,11 @@ PatchInfo<2>::getFineNbrInfo(Face<2, 1> f) const;
 template const FineNbrInfo<0>&
 PatchInfo<2>::getFineNbrInfo(Face<2, 0> f) const;
 
+template bool
+PatchInfo<2>::hasNbr(Face<2, 1> s) const;
+template bool
+PatchInfo<2>::hasNbr(Face<2, 0> s) const;
+
 template class PatchInfo<3>;
 
 template void
@@ -415,6 +419,13 @@ template void
 PatchInfo<3>::setNbrInfo(Face<3, 1> f, std::nullptr_t);
 template void
 PatchInfo<3>::setNbrInfo(Face<3, 0> f, std::nullptr_t);
+
+template void
+PatchInfo<3>::setNbrInfo(Face<3, 2> f, NbrInfo<2>* nbr_info);
+template void
+PatchInfo<3>::setNbrInfo(Face<3, 1> f, NbrInfo<1>* nbr_info);
+template void
+PatchInfo<3>::setNbrInfo(Face<3, 0> f, NbrInfo<0>* nbr_info);
 
 template NbrType
 PatchInfo<3>::getNbrType(Face<3, 2> f) const;
@@ -443,5 +454,12 @@ template const FineNbrInfo<1>&
 PatchInfo<3>::getFineNbrInfo(Face<3, 1> f) const;
 template const FineNbrInfo<0>&
 PatchInfo<3>::getFineNbrInfo(Face<3, 0> f) const;
+
+template bool
+PatchInfo<3>::hasNbr(Face<3, 2> s) const;
+template bool
+PatchInfo<3>::hasNbr(Face<3, 1> s) const;
+template bool
+PatchInfo<3>::hasNbr(Face<3, 0> s) const;
 
 } // namespace ThunderEgg
