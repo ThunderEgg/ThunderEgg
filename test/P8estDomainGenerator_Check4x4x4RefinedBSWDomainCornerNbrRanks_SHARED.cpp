@@ -28,29 +28,21 @@ using namespace ThunderEgg;
 void
 Check4x4x4RefinedBSWDomainCornerNeighborRanks(const PatchVector& domain)
 {
-  CHECK(domain["bsw_bsw_bsw"]->getNormalNbrInfo(Corner<3>::tne()).rank ==
-        domain["bsw_bsw_tne"]->rank);
+  CHECK(domain["bsw_bsw_bsw"]->getNormalNbrInfo(Corner<3>::tne()).rank == domain["bsw_bsw_tne"]->rank);
 
-  CHECK(domain["bsw_bsw_bse"]->getNormalNbrInfo(Corner<3>::tnw()).rank ==
-        domain["bsw_bsw_tnw"]->rank);
+  CHECK(domain["bsw_bsw_bse"]->getNormalNbrInfo(Corner<3>::tnw()).rank == domain["bsw_bsw_tnw"]->rank);
 
-  CHECK(domain["bsw_bsw_bnw"]->getNormalNbrInfo(Corner<3>::tse()).rank ==
-        domain["bsw_bsw_tse"]->rank);
+  CHECK(domain["bsw_bsw_bnw"]->getNormalNbrInfo(Corner<3>::tse()).rank == domain["bsw_bsw_tse"]->rank);
 
-  CHECK(domain["bsw_bsw_bne"]->getNormalNbrInfo(Corner<3>::tsw()).rank ==
-        domain["bsw_bsw_tsw"]->rank);
+  CHECK(domain["bsw_bsw_bne"]->getNormalNbrInfo(Corner<3>::tsw()).rank == domain["bsw_bsw_tsw"]->rank);
 
-  CHECK(domain["bsw_bsw_tsw"]->getNormalNbrInfo(Corner<3>::bne()).rank ==
-        domain["bsw_bsw_bne"]->rank);
+  CHECK(domain["bsw_bsw_tsw"]->getNormalNbrInfo(Corner<3>::bne()).rank == domain["bsw_bsw_bne"]->rank);
 
-  CHECK(domain["bsw_bsw_tse"]->getNormalNbrInfo(Corner<3>::bnw()).rank ==
-        domain["bsw_bsw_bnw"]->rank);
+  CHECK(domain["bsw_bsw_tse"]->getNormalNbrInfo(Corner<3>::bnw()).rank == domain["bsw_bsw_bnw"]->rank);
 
-  CHECK(domain["bsw_bsw_tnw"]->getNormalNbrInfo(Corner<3>::bse()).rank ==
-        domain["bsw_bsw_bse"]->rank);
+  CHECK(domain["bsw_bsw_tnw"]->getNormalNbrInfo(Corner<3>::bse()).rank == domain["bsw_bsw_bse"]->rank);
 
-  CHECK(domain["bsw_bsw_tne"]->getNormalNbrInfo(Corner<3>::bsw()).rank ==
-        domain["bsw_bsw_bsw"]->rank);
+  CHECK(domain["bsw_bsw_tne"]->getNormalNbrInfo(Corner<3>::bsw()).rank == domain["bsw_bsw_bsw"]->rank);
   CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Corner<3>::tne()).rank == domain["bsw_tne"]->rank);
 
   CHECK(domain["bsw_bse"]->getNormalNbrInfo(Corner<3>::tnw()).rank == domain["bsw_tnw"]->rank);
@@ -77,8 +69,7 @@ Check4x4x4RefinedBSWDomainCornerNeighborRanks(const PatchVector& domain)
   CHECK(domain["bsw_tnw"]->getNormalNbrInfo(Corner<3>::tse()).rank == domain["tsw_bse"]->rank);
   CHECK(domain["bsw_tnw"]->getNormalNbrInfo(Corner<3>::tne()).rank == domain["tnw_bse"]->rank);
 
-  CHECK(domain["bsw_tne"]->getFineNbrInfo(Corner<3>::bsw()).ranks[0] ==
-        domain["bsw_bsw_tne"]->rank);
+  CHECK(domain["bsw_tne"]->getFineNbrInfo(Corner<3>::bsw()).ranks[0] == domain["bsw_bsw_tne"]->rank);
   CHECK(domain["bsw_tne"]->getNormalNbrInfo(Corner<3>::bse()).rank == domain["bse_bsw"]->rank);
   CHECK(domain["bsw_tne"]->getNormalNbrInfo(Corner<3>::bnw()).rank == domain["bnw_bsw"]->rank);
   CHECK(domain["bsw_tne"]->getNormalNbrInfo(Corner<3>::bne()).rank == domain["bne_bsw"]->rank);

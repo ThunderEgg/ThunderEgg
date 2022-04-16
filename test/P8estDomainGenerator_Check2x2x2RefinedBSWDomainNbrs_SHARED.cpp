@@ -223,72 +223,48 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
     CHECK(domain_2_tne_patch->hasNbr(Side<3>::bottom()) == true);
     CHECK(domain_2_tne_patch->hasNbr(Side<3>::top()) == false);
 
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::east()).id ==
-          domain_2_bsw_bse_patch->id);
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::north()).id ==
-          domain_2_bsw_bnw_patch->id);
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::top()).id ==
-          domain_2_bsw_tsw_patch->id);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bsw_bse_patch->id);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bsw_bnw_patch->id);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bsw_tsw_patch->id);
 
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::west()).id ==
-          domain_2_bsw_bsw_patch->id);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_bsw_patch->id);
     CHECK(domain_2_bsw_bse_patch->getCoarseNbrInfo(Side<3>::east()).id == domain_2_bse_patch->id);
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::north()).id ==
-          domain_2_bsw_bne_patch->id);
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::top()).id ==
-          domain_2_bsw_tse_patch->id);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bsw_bne_patch->id);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bsw_tse_patch->id);
 
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).id ==
-          domain_2_bsw_bne_patch->id);
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id ==
-          domain_2_bsw_bsw_patch->id);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bsw_bne_patch->id);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bsw_bsw_patch->id);
     CHECK(domain_2_bsw_bnw_patch->getCoarseNbrInfo(Side<3>::north()).id == domain_2_bnw_patch->id);
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::top()).id ==
-          domain_2_bsw_tnw_patch->id);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bsw_tnw_patch->id);
 
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::west()).id ==
-          domain_2_bsw_bnw_patch->id);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_bnw_patch->id);
     CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::east()).id == domain_2_bse_patch->id);
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::south()).id ==
-          domain_2_bsw_bse_patch->id);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bsw_bse_patch->id);
     CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::north()).id == domain_2_bnw_patch->id);
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::top()).id ==
-          domain_2_bsw_tne_patch->id);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_bsw_tne_patch->id);
 
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::east()).id ==
-          domain_2_bsw_tse_patch->id);
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::north()).id ==
-          domain_2_bsw_tnw_patch->id);
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).id ==
-          domain_2_bsw_bsw_patch->id);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bsw_tse_patch->id);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bsw_tnw_patch->id);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bsw_patch->id);
     CHECK(domain_2_bsw_tsw_patch->getCoarseNbrInfo(Side<3>::top()).id == domain_2_tsw_patch->id);
 
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id ==
-          domain_2_bsw_tsw_patch->id);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tsw_patch->id);
     CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::east()).id == domain_2_bse_patch->id);
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id ==
-          domain_2_bsw_tne_patch->id);
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id ==
-          domain_2_bsw_bse_patch->id);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_bsw_tne_patch->id);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bse_patch->id);
     CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::top()).id == domain_2_tsw_patch->id);
 
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id ==
-          domain_2_bsw_tne_patch->id);
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).id ==
-          domain_2_bsw_tsw_patch->id);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bsw_tne_patch->id);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bsw_tsw_patch->id);
     CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::north()).id == domain_2_bnw_patch->id);
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id ==
-          domain_2_bsw_bnw_patch->id);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bnw_patch->id);
     CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::top()).id == domain_2_tsw_patch->id);
 
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::west()).id ==
-          domain_2_bsw_tnw_patch->id);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bsw_tnw_patch->id);
     CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::east()).id == domain_2_bse_patch->id);
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::south()).id ==
-          domain_2_bsw_tse_patch->id);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_bsw_tse_patch->id);
     CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::north()).id == domain_2_bnw_patch->id);
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id ==
-          domain_2_bsw_bne_patch->id);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bsw_bne_patch->id);
     CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::top()).id == domain_2_tsw_patch->id);
 
     CHECK(domain_2_bse_patch->getFineNbrInfo(Side<3>::west()).ids[0] == domain_2_bsw_bse_patch->id);
@@ -299,14 +275,10 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
     CHECK(domain_2_bse_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tse_patch->id);
 
     CHECK(domain_2_bnw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_bne_patch->id);
-    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ids[0] ==
-          domain_2_bsw_bnw_patch->id);
-    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ids[1] ==
-          domain_2_bsw_bne_patch->id);
-    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ids[2] ==
-          domain_2_bsw_tnw_patch->id);
-    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ids[3] ==
-          domain_2_bsw_tne_patch->id);
+    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ids[0] == domain_2_bsw_bnw_patch->id);
+    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ids[1] == domain_2_bsw_bne_patch->id);
+    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ids[2] == domain_2_bsw_tnw_patch->id);
+    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ids[3] == domain_2_bsw_tne_patch->id);
     CHECK(domain_2_bnw_patch->getNormalNbrInfo(Side<3>::top()).id == domain_2_tnw_patch->id);
 
     CHECK(domain_2_bne_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_bnw_patch->id);
@@ -315,14 +287,10 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
 
     CHECK(domain_2_tsw_patch->getNormalNbrInfo(Side<3>::east()).id == domain_2_tse_patch->id);
     CHECK(domain_2_tsw_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tnw_patch->id);
-    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ids[0] ==
-          domain_2_bsw_tsw_patch->id);
-    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ids[1] ==
-          domain_2_bsw_tse_patch->id);
-    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ids[2] ==
-          domain_2_bsw_tnw_patch->id);
-    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ids[3] ==
-          domain_2_bsw_tne_patch->id);
+    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ids[0] == domain_2_bsw_tsw_patch->id);
+    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ids[1] == domain_2_bsw_tse_patch->id);
+    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ids[2] == domain_2_bsw_tnw_patch->id);
+    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ids[3] == domain_2_bsw_tne_patch->id);
 
     CHECK(domain_2_tse_patch->getNormalNbrInfo(Side<3>::west()).id == domain_2_tsw_patch->id);
     CHECK(domain_2_tse_patch->getNormalNbrInfo(Side<3>::north()).id == domain_2_tne_patch->id);
@@ -336,106 +304,62 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
     CHECK(domain_2_tne_patch->getNormalNbrInfo(Side<3>::south()).id == domain_2_tse_patch->id);
     CHECK(domain_2_tne_patch->getNormalNbrInfo(Side<3>::bottom()).id == domain_2_bne_patch->id);
 
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank ==
-          domain_2_bsw_bse_patch->rank);
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank ==
-          domain_2_bsw_bnw_patch->rank);
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank ==
-          domain_2_bsw_tsw_patch->rank);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bsw_bse_patch->rank);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bsw_bnw_patch->rank);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bsw_tsw_patch->rank);
 
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::west()).rank ==
-          domain_2_bsw_bsw_patch->rank);
-    CHECK(domain_2_bsw_bse_patch->getCoarseNbrInfo(Side<3>::east()).rank ==
-          domain_2_bse_patch->rank);
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::north()).rank ==
-          domain_2_bsw_bne_patch->rank);
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank ==
-          domain_2_bsw_tse_patch->rank);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_bsw_patch->rank);
+    CHECK(domain_2_bsw_bse_patch->getCoarseNbrInfo(Side<3>::east()).rank == domain_2_bse_patch->rank);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bsw_bne_patch->rank);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bsw_tse_patch->rank);
 
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank ==
-          domain_2_bsw_bne_patch->rank);
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank ==
-          domain_2_bsw_bsw_patch->rank);
-    CHECK(domain_2_bsw_bnw_patch->getCoarseNbrInfo(Side<3>::north()).rank ==
-          domain_2_bnw_patch->rank);
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank ==
-          domain_2_bsw_tnw_patch->rank);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bsw_bne_patch->rank);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bsw_bsw_patch->rank);
+    CHECK(domain_2_bsw_bnw_patch->getCoarseNbrInfo(Side<3>::north()).rank == domain_2_bnw_patch->rank);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bsw_tnw_patch->rank);
 
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::west()).rank ==
-          domain_2_bsw_bnw_patch->rank);
-    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::east()).rank ==
-          domain_2_bse_patch->rank);
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::south()).rank ==
-          domain_2_bsw_bse_patch->rank);
-    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::north()).rank ==
-          domain_2_bnw_patch->rank);
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::top()).rank ==
-          domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_bnw_patch->rank);
+    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::east()).rank == domain_2_bse_patch->rank);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bsw_bse_patch->rank);
+    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::north()).rank == domain_2_bnw_patch->rank);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_bsw_tne_patch->rank);
 
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::east()).rank ==
-          domain_2_bsw_tse_patch->rank);
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::north()).rank ==
-          domain_2_bsw_tnw_patch->rank);
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank ==
-          domain_2_bsw_bsw_patch->rank);
-    CHECK(domain_2_bsw_tsw_patch->getCoarseNbrInfo(Side<3>::top()).rank ==
-          domain_2_tsw_patch->rank);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bsw_tse_patch->rank);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bsw_tnw_patch->rank);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bsw_patch->rank);
+    CHECK(domain_2_bsw_tsw_patch->getCoarseNbrInfo(Side<3>::top()).rank == domain_2_tsw_patch->rank);
 
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank ==
-          domain_2_bsw_tsw_patch->rank);
-    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::east()).rank ==
-          domain_2_bse_patch->rank);
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank ==
-          domain_2_bsw_tne_patch->rank);
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank ==
-          domain_2_bsw_bse_patch->rank);
-    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::top()).rank ==
-          domain_2_tsw_patch->rank);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tsw_patch->rank);
+    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::east()).rank == domain_2_bse_patch->rank);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bse_patch->rank);
+    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::top()).rank == domain_2_tsw_patch->rank);
 
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank ==
-          domain_2_bsw_tne_patch->rank);
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank ==
-          domain_2_bsw_tsw_patch->rank);
-    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::north()).rank ==
-          domain_2_bnw_patch->rank);
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank ==
-          domain_2_bsw_bnw_patch->rank);
-    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::top()).rank ==
-          domain_2_tsw_patch->rank);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bsw_tsw_patch->rank);
+    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::north()).rank == domain_2_bnw_patch->rank);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bnw_patch->rank);
+    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::top()).rank == domain_2_tsw_patch->rank);
 
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::west()).rank ==
-          domain_2_bsw_tnw_patch->rank);
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::east()).rank ==
-          domain_2_bse_patch->rank);
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::south()).rank ==
-          domain_2_bsw_tse_patch->rank);
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::north()).rank ==
-          domain_2_bnw_patch->rank);
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank ==
-          domain_2_bsw_bne_patch->rank);
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::top()).rank ==
-          domain_2_tsw_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bsw_tnw_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::east()).rank == domain_2_bse_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_bsw_tse_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::north()).rank == domain_2_bnw_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bsw_bne_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::top()).rank == domain_2_tsw_patch->rank);
 
-    CHECK(domain_2_bse_patch->getFineNbrInfo(Side<3>::west()).ranks[0] ==
-          domain_2_bsw_bse_patch->rank);
-    CHECK(domain_2_bse_patch->getFineNbrInfo(Side<3>::west()).ranks[1] ==
-          domain_2_bsw_bne_patch->rank);
-    CHECK(domain_2_bse_patch->getFineNbrInfo(Side<3>::west()).ranks[2] ==
-          domain_2_bsw_tse_patch->rank);
-    CHECK(domain_2_bse_patch->getFineNbrInfo(Side<3>::west()).ranks[3] ==
-          domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_bse_patch->getFineNbrInfo(Side<3>::west()).ranks[0] == domain_2_bsw_bse_patch->rank);
+    CHECK(domain_2_bse_patch->getFineNbrInfo(Side<3>::west()).ranks[1] == domain_2_bsw_bne_patch->rank);
+    CHECK(domain_2_bse_patch->getFineNbrInfo(Side<3>::west()).ranks[2] == domain_2_bsw_tse_patch->rank);
+    CHECK(domain_2_bse_patch->getFineNbrInfo(Side<3>::west()).ranks[3] == domain_2_bsw_tne_patch->rank);
     CHECK(domain_2_bse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_bne_patch->rank);
     CHECK(domain_2_bse_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tse_patch->rank);
 
     CHECK(domain_2_bnw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_bne_patch->rank);
-    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ranks[0] ==
-          domain_2_bsw_bnw_patch->rank);
-    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ranks[1] ==
-          domain_2_bsw_bne_patch->rank);
-    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ranks[2] ==
-          domain_2_bsw_tnw_patch->rank);
-    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ranks[3] ==
-          domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ranks[0] == domain_2_bsw_bnw_patch->rank);
+    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ranks[1] == domain_2_bsw_bne_patch->rank);
+    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ranks[2] == domain_2_bsw_tnw_patch->rank);
+    CHECK(domain_2_bnw_patch->getFineNbrInfo(Side<3>::south()).ranks[3] == domain_2_bsw_tne_patch->rank);
     CHECK(domain_2_bnw_patch->getNormalNbrInfo(Side<3>::top()).rank == domain_2_tnw_patch->rank);
 
     CHECK(domain_2_bne_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_bnw_patch->rank);
@@ -444,14 +368,10 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
 
     CHECK(domain_2_tsw_patch->getNormalNbrInfo(Side<3>::east()).rank == domain_2_tse_patch->rank);
     CHECK(domain_2_tsw_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tnw_patch->rank);
-    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ranks[0] ==
-          domain_2_bsw_tsw_patch->rank);
-    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ranks[1] ==
-          domain_2_bsw_tse_patch->rank);
-    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ranks[2] ==
-          domain_2_bsw_tnw_patch->rank);
-    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ranks[3] ==
-          domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ranks[0] == domain_2_bsw_tsw_patch->rank);
+    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ranks[1] == domain_2_bsw_tse_patch->rank);
+    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ranks[2] == domain_2_bsw_tnw_patch->rank);
+    CHECK(domain_2_tsw_patch->getFineNbrInfo(Side<3>::bottom()).ranks[3] == domain_2_bsw_tne_patch->rank);
 
     CHECK(domain_2_tse_patch->getNormalNbrInfo(Side<3>::west()).rank == domain_2_tsw_patch->rank);
     CHECK(domain_2_tse_patch->getNormalNbrInfo(Side<3>::north()).rank == domain_2_tne_patch->rank);
@@ -465,32 +385,20 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
     CHECK(domain_2_tne_patch->getNormalNbrInfo(Side<3>::south()).rank == domain_2_tse_patch->rank);
     CHECK(domain_2_tne_patch->getNormalNbrInfo(Side<3>::bottom()).rank == domain_2_bne_patch->rank);
 
-    CHECK(domain_2_bsw_bse_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse ==
-          Orthant<2>::sw());
-    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse ==
-          Orthant<2>::se());
-    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse ==
-          Orthant<2>::nw());
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse ==
-          Orthant<2>::ne());
+    CHECK(domain_2_bsw_bse_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::sw());
+    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::se());
+    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::nw());
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::ne());
 
-    CHECK(domain_2_bsw_bnw_patch->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse ==
-          Orthant<2>::sw());
-    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse ==
-          Orthant<2>::se());
-    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse ==
-          Orthant<2>::nw());
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse ==
-          Orthant<2>::ne());
+    CHECK(domain_2_bsw_bnw_patch->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse == Orthant<2>::sw());
+    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse == Orthant<2>::se());
+    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse == Orthant<2>::nw());
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse == Orthant<2>::ne());
 
-    CHECK(domain_2_bsw_tsw_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse ==
-          Orthant<2>::sw());
-    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse ==
-          Orthant<2>::se());
-    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse ==
-          Orthant<2>::nw());
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse ==
-          Orthant<2>::ne());
+    CHECK(domain_2_bsw_tsw_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::sw());
+    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::se());
+    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::nw());
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::ne());
 
     CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Edge::bs()));
     CHECK(domain_2_bsw_bsw_patch->hasNbr(Edge::tn()));
@@ -756,66 +664,42 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
     CHECK(domain_2_tne_patch->getNormalNbrInfo(Edge::bw()).id == domain_2_bnw_patch->id);
     CHECK(domain_2_tne_patch->getNormalNbrInfo(Edge::sw()).id == domain_2_tsw_patch->id);
 
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Edge::tn()).rank ==
-          domain_2_bsw_tnw_patch->rank);
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Edge::te()).rank ==
-          domain_2_bsw_tse_patch->rank);
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Edge::ne()).rank ==
-          domain_2_bsw_bne_patch->rank);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Edge::tn()).rank == domain_2_bsw_tnw_patch->rank);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Edge::te()).rank == domain_2_bsw_tse_patch->rank);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Edge::ne()).rank == domain_2_bsw_bne_patch->rank);
 
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Edge::tn()).rank ==
-          domain_2_bsw_tne_patch->rank);
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Edge::tw()).rank ==
-          domain_2_bsw_tsw_patch->rank);
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Edge::nw()).rank ==
-          domain_2_bsw_bnw_patch->rank);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Edge::tn()).rank == domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Edge::tw()).rank == domain_2_bsw_tsw_patch->rank);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Edge::nw()).rank == domain_2_bsw_bnw_patch->rank);
 
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Edge::ts()).rank ==
-          domain_2_bsw_tsw_patch->rank);
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Edge::te()).rank ==
-          domain_2_bsw_tne_patch->rank);
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Edge::se()).rank ==
-          domain_2_bsw_bse_patch->rank);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Edge::ts()).rank == domain_2_bsw_tsw_patch->rank);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Edge::te()).rank == domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Edge::se()).rank == domain_2_bsw_bse_patch->rank);
 
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Edge::ts()).rank ==
-          domain_2_bsw_tse_patch->rank);
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Edge::tw()).rank ==
-          domain_2_bsw_tnw_patch->rank);
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Edge::sw()).rank ==
-          domain_2_bsw_bsw_patch->rank);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Edge::ts()).rank == domain_2_bsw_tse_patch->rank);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Edge::tw()).rank == domain_2_bsw_tnw_patch->rank);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Edge::sw()).rank == domain_2_bsw_bsw_patch->rank);
     CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Edge::ne()).rank == domain_2_bne_patch->rank);
 
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Edge::bn()).rank ==
-          domain_2_bsw_bnw_patch->rank);
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Edge::be()).rank ==
-          domain_2_bsw_bse_patch->rank);
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Edge::ne()).rank ==
-          domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Edge::bn()).rank == domain_2_bsw_bnw_patch->rank);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Edge::be()).rank == domain_2_bsw_bse_patch->rank);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Edge::ne()).rank == domain_2_bsw_tne_patch->rank);
 
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Edge::bn()).rank ==
-          domain_2_bsw_bne_patch->rank);
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Edge::bw()).rank ==
-          domain_2_bsw_bsw_patch->rank);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Edge::bn()).rank == domain_2_bsw_bne_patch->rank);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Edge::bw()).rank == domain_2_bsw_bsw_patch->rank);
     CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Edge::te()).rank == domain_2_tse_patch->rank);
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Edge::nw()).rank ==
-          domain_2_bsw_tnw_patch->rank);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Edge::nw()).rank == domain_2_bsw_tnw_patch->rank);
 
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Edge::bs()).rank ==
-          domain_2_bsw_bsw_patch->rank);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Edge::bs()).rank == domain_2_bsw_bsw_patch->rank);
     CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Edge::tn()).rank == domain_2_tnw_patch->rank);
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Edge::be()).rank ==
-          domain_2_bsw_bne_patch->rank);
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Edge::se()).rank ==
-          domain_2_bsw_tse_patch->rank);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Edge::be()).rank == domain_2_bsw_bne_patch->rank);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Edge::se()).rank == domain_2_bsw_tse_patch->rank);
 
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Edge::bs()).rank ==
-          domain_2_bsw_bse_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Edge::bs()).rank == domain_2_bsw_bse_patch->rank);
     CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::tn()).rank == domain_2_tnw_patch->rank);
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Edge::bw()).rank ==
-          domain_2_bsw_bnw_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Edge::bw()).rank == domain_2_bsw_bnw_patch->rank);
     CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::te()).rank == domain_2_tse_patch->rank);
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Edge::sw()).rank ==
-          domain_2_bsw_tsw_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Edge::sw()).rank == domain_2_bsw_tsw_patch->rank);
     CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::ne()).rank == domain_2_bne_patch->rank);
 
     CHECK(domain_2_bse_patch->getNormalNbrInfo(Edge::tn()).rank == domain_2_tne_patch->rank);
@@ -849,20 +733,14 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
     CHECK(domain_2_tne_patch->getNormalNbrInfo(Edge::bw()).rank == domain_2_bnw_patch->rank);
     CHECK(domain_2_tne_patch->getNormalNbrInfo(Edge::sw()).rank == domain_2_tsw_patch->rank);
 
-    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Edge::tn()).orth_on_coarse ==
-          Orthant<1>::lower());
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::tn()).orth_on_coarse ==
-          Orthant<1>::upper());
+    CHECK(domain_2_bsw_tnw_patch->getCoarseNbrInfo(Edge::tn()).orth_on_coarse == Orthant<1>::lower());
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::tn()).orth_on_coarse == Orthant<1>::upper());
 
-    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Edge::te()).orth_on_coarse ==
-          Orthant<1>::lower());
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::te()).orth_on_coarse ==
-          Orthant<1>::upper());
+    CHECK(domain_2_bsw_tse_patch->getCoarseNbrInfo(Edge::te()).orth_on_coarse == Orthant<1>::lower());
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::te()).orth_on_coarse == Orthant<1>::upper());
 
-    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Edge::ne()).orth_on_coarse ==
-          Orthant<1>::lower());
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::ne()).orth_on_coarse ==
-          Orthant<1>::upper());
+    CHECK(domain_2_bsw_bne_patch->getCoarseNbrInfo(Edge::ne()).orth_on_coarse == Orthant<1>::lower());
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Edge::ne()).orth_on_coarse == Orthant<1>::upper());
 
     CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Corner<3>::bse()));
     CHECK_FALSE(domain_2_bsw_bsw_patch->hasNbr(Corner<3>::bnw()));
@@ -998,29 +876,21 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
     CHECK_FALSE(domain_2_tne_patch->hasNbr(Corner<3>::tnw()));
     CHECK_FALSE(domain_2_tne_patch->hasNbr(Corner<3>::tne()));
 
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Corner<3>::tne()).id ==
-          domain_2_bsw_tne_patch->id);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Corner<3>::tne()).id == domain_2_bsw_tne_patch->id);
 
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Corner<3>::tnw()).id ==
-          domain_2_bsw_tnw_patch->id);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Corner<3>::tnw()).id == domain_2_bsw_tnw_patch->id);
 
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Corner<3>::tse()).id ==
-          domain_2_bsw_tse_patch->id);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Corner<3>::tse()).id == domain_2_bsw_tse_patch->id);
 
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Corner<3>::tsw()).id ==
-          domain_2_bsw_tsw_patch->id);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Corner<3>::tsw()).id == domain_2_bsw_tsw_patch->id);
 
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Corner<3>::bne()).id ==
-          domain_2_bsw_bne_patch->id);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Corner<3>::bne()).id == domain_2_bsw_bne_patch->id);
 
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Corner<3>::bnw()).id ==
-          domain_2_bsw_bnw_patch->id);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Corner<3>::bnw()).id == domain_2_bsw_bnw_patch->id);
 
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Corner<3>::bse()).id ==
-          domain_2_bsw_bse_patch->id);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Corner<3>::bse()).id == domain_2_bsw_bse_patch->id);
 
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Corner<3>::bsw()).id ==
-          domain_2_bsw_bsw_patch->id);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Corner<3>::bsw()).id == domain_2_bsw_bsw_patch->id);
     CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Corner<3>::tne()).id == domain_2_tne_patch->id);
 
     CHECK(domain_2_bse_patch->getNormalNbrInfo(Corner<3>::tnw()).id == domain_2_tnw_patch->id);
@@ -1035,34 +905,24 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
 
     CHECK(domain_2_tnw_patch->getNormalNbrInfo(Corner<3>::bse()).id == domain_2_bse_patch->id);
 
-    CHECK(domain_2_tne_patch->getFineNbrInfo(Corner<3>::bsw()).ids[0] ==
-          domain_2_bsw_tne_patch->id);
+    CHECK(domain_2_tne_patch->getFineNbrInfo(Corner<3>::bsw()).ids[0] == domain_2_bsw_tne_patch->id);
 
-    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Corner<3>::tne()).rank ==
-          domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_bsw_bsw_patch->getNormalNbrInfo(Corner<3>::tne()).rank == domain_2_bsw_tne_patch->rank);
 
-    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Corner<3>::tnw()).rank ==
-          domain_2_bsw_tnw_patch->rank);
+    CHECK(domain_2_bsw_bse_patch->getNormalNbrInfo(Corner<3>::tnw()).rank == domain_2_bsw_tnw_patch->rank);
 
-    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Corner<3>::tse()).rank ==
-          domain_2_bsw_tse_patch->rank);
+    CHECK(domain_2_bsw_bnw_patch->getNormalNbrInfo(Corner<3>::tse()).rank == domain_2_bsw_tse_patch->rank);
 
-    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Corner<3>::tsw()).rank ==
-          domain_2_bsw_tsw_patch->rank);
+    CHECK(domain_2_bsw_bne_patch->getNormalNbrInfo(Corner<3>::tsw()).rank == domain_2_bsw_tsw_patch->rank);
 
-    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Corner<3>::bne()).rank ==
-          domain_2_bsw_bne_patch->rank);
+    CHECK(domain_2_bsw_tsw_patch->getNormalNbrInfo(Corner<3>::bne()).rank == domain_2_bsw_bne_patch->rank);
 
-    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Corner<3>::bnw()).rank ==
-          domain_2_bsw_bnw_patch->rank);
+    CHECK(domain_2_bsw_tse_patch->getNormalNbrInfo(Corner<3>::bnw()).rank == domain_2_bsw_bnw_patch->rank);
 
-    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Corner<3>::bse()).rank ==
-          domain_2_bsw_bse_patch->rank);
+    CHECK(domain_2_bsw_tnw_patch->getNormalNbrInfo(Corner<3>::bse()).rank == domain_2_bsw_bse_patch->rank);
 
-    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Corner<3>::bsw()).rank ==
-          domain_2_bsw_bsw_patch->rank);
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Corner<3>::tne()).rank ==
-          domain_2_tne_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getNormalNbrInfo(Corner<3>::bsw()).rank == domain_2_bsw_bsw_patch->rank);
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Corner<3>::tne()).rank == domain_2_tne_patch->rank);
 
     CHECK(domain_2_bse_patch->getNormalNbrInfo(Corner<3>::tnw()).rank == domain_2_tnw_patch->rank);
 
@@ -1076,10 +936,8 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
 
     CHECK(domain_2_tnw_patch->getNormalNbrInfo(Corner<3>::bse()).rank == domain_2_bse_patch->rank);
 
-    CHECK(domain_2_tne_patch->getFineNbrInfo(Corner<3>::bsw()).ranks[0] ==
-          domain_2_bsw_tne_patch->rank);
+    CHECK(domain_2_tne_patch->getFineNbrInfo(Corner<3>::bsw()).ranks[0] == domain_2_bsw_tne_patch->rank);
 
-    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Corner<3>::tne()).orth_on_coarse ==
-          Orthant<0>(0));
+    CHECK(domain_2_bsw_tne_patch->getCoarseNbrInfo(Corner<3>::tne()).orth_on_coarse == Orthant<0>(0));
   }
 }

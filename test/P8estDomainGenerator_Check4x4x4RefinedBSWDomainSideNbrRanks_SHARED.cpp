@@ -28,72 +28,48 @@ using namespace ThunderEgg;
 void
 Check4x4x4RefinedBSWDomainSideNeighborRanks(const PatchVector& domain)
 {
-  CHECK(domain["bsw_bsw_bsw"]->getNormalNbrInfo(Side<3>::east()).rank ==
-        domain["bsw_bsw_bse"]->rank);
-  CHECK(domain["bsw_bsw_bsw"]->getNormalNbrInfo(Side<3>::north()).rank ==
-        domain["bsw_bsw_bnw"]->rank);
-  CHECK(domain["bsw_bsw_bsw"]->getNormalNbrInfo(Side<3>::top()).rank ==
-        domain["bsw_bsw_tsw"]->rank);
+  CHECK(domain["bsw_bsw_bsw"]->getNormalNbrInfo(Side<3>::east()).rank == domain["bsw_bsw_bse"]->rank);
+  CHECK(domain["bsw_bsw_bsw"]->getNormalNbrInfo(Side<3>::north()).rank == domain["bsw_bsw_bnw"]->rank);
+  CHECK(domain["bsw_bsw_bsw"]->getNormalNbrInfo(Side<3>::top()).rank == domain["bsw_bsw_tsw"]->rank);
 
-  CHECK(domain["bsw_bsw_bse"]->getNormalNbrInfo(Side<3>::west()).rank ==
-        domain["bsw_bsw_bsw"]->rank);
+  CHECK(domain["bsw_bsw_bse"]->getNormalNbrInfo(Side<3>::west()).rank == domain["bsw_bsw_bsw"]->rank);
   CHECK(domain["bsw_bsw_bse"]->getCoarseNbrInfo(Side<3>::east()).rank == domain["bsw_bse"]->rank);
-  CHECK(domain["bsw_bsw_bse"]->getNormalNbrInfo(Side<3>::north()).rank ==
-        domain["bsw_bsw_bne"]->rank);
-  CHECK(domain["bsw_bsw_bse"]->getNormalNbrInfo(Side<3>::top()).rank ==
-        domain["bsw_bsw_tse"]->rank);
+  CHECK(domain["bsw_bsw_bse"]->getNormalNbrInfo(Side<3>::north()).rank == domain["bsw_bsw_bne"]->rank);
+  CHECK(domain["bsw_bsw_bse"]->getNormalNbrInfo(Side<3>::top()).rank == domain["bsw_bsw_tse"]->rank);
 
-  CHECK(domain["bsw_bsw_bnw"]->getNormalNbrInfo(Side<3>::east()).rank ==
-        domain["bsw_bsw_bne"]->rank);
-  CHECK(domain["bsw_bsw_bnw"]->getNormalNbrInfo(Side<3>::south()).rank ==
-        domain["bsw_bsw_bsw"]->rank);
+  CHECK(domain["bsw_bsw_bnw"]->getNormalNbrInfo(Side<3>::east()).rank == domain["bsw_bsw_bne"]->rank);
+  CHECK(domain["bsw_bsw_bnw"]->getNormalNbrInfo(Side<3>::south()).rank == domain["bsw_bsw_bsw"]->rank);
   CHECK(domain["bsw_bsw_bnw"]->getCoarseNbrInfo(Side<3>::north()).rank == domain["bsw_bnw"]->rank);
-  CHECK(domain["bsw_bsw_bnw"]->getNormalNbrInfo(Side<3>::top()).rank ==
-        domain["bsw_bsw_tnw"]->rank);
+  CHECK(domain["bsw_bsw_bnw"]->getNormalNbrInfo(Side<3>::top()).rank == domain["bsw_bsw_tnw"]->rank);
 
-  CHECK(domain["bsw_bsw_bne"]->getNormalNbrInfo(Side<3>::west()).rank ==
-        domain["bsw_bsw_bnw"]->rank);
+  CHECK(domain["bsw_bsw_bne"]->getNormalNbrInfo(Side<3>::west()).rank == domain["bsw_bsw_bnw"]->rank);
   CHECK(domain["bsw_bsw_bne"]->getCoarseNbrInfo(Side<3>::east()).rank == domain["bsw_bse"]->rank);
-  CHECK(domain["bsw_bsw_bne"]->getNormalNbrInfo(Side<3>::south()).rank ==
-        domain["bsw_bsw_bse"]->rank);
+  CHECK(domain["bsw_bsw_bne"]->getNormalNbrInfo(Side<3>::south()).rank == domain["bsw_bsw_bse"]->rank);
   CHECK(domain["bsw_bsw_bne"]->getCoarseNbrInfo(Side<3>::north()).rank == domain["bsw_bnw"]->rank);
-  CHECK(domain["bsw_bsw_bne"]->getNormalNbrInfo(Side<3>::top()).rank ==
-        domain["bsw_bsw_tne"]->rank);
+  CHECK(domain["bsw_bsw_bne"]->getNormalNbrInfo(Side<3>::top()).rank == domain["bsw_bsw_tne"]->rank);
 
-  CHECK(domain["bsw_bsw_tsw"]->getNormalNbrInfo(Side<3>::east()).rank ==
-        domain["bsw_bsw_tse"]->rank);
-  CHECK(domain["bsw_bsw_tsw"]->getNormalNbrInfo(Side<3>::north()).rank ==
-        domain["bsw_bsw_tnw"]->rank);
-  CHECK(domain["bsw_bsw_tsw"]->getNormalNbrInfo(Side<3>::bottom()).rank ==
-        domain["bsw_bsw_bsw"]->rank);
+  CHECK(domain["bsw_bsw_tsw"]->getNormalNbrInfo(Side<3>::east()).rank == domain["bsw_bsw_tse"]->rank);
+  CHECK(domain["bsw_bsw_tsw"]->getNormalNbrInfo(Side<3>::north()).rank == domain["bsw_bsw_tnw"]->rank);
+  CHECK(domain["bsw_bsw_tsw"]->getNormalNbrInfo(Side<3>::bottom()).rank == domain["bsw_bsw_bsw"]->rank);
   CHECK(domain["bsw_bsw_tsw"]->getCoarseNbrInfo(Side<3>::top()).rank == domain["bsw_tsw"]->rank);
 
-  CHECK(domain["bsw_bsw_tse"]->getNormalNbrInfo(Side<3>::west()).rank ==
-        domain["bsw_bsw_tsw"]->rank);
+  CHECK(domain["bsw_bsw_tse"]->getNormalNbrInfo(Side<3>::west()).rank == domain["bsw_bsw_tsw"]->rank);
   CHECK(domain["bsw_bsw_tse"]->getCoarseNbrInfo(Side<3>::east()).rank == domain["bsw_bse"]->rank);
-  CHECK(domain["bsw_bsw_tse"]->getNormalNbrInfo(Side<3>::north()).rank ==
-        domain["bsw_bsw_tne"]->rank);
-  CHECK(domain["bsw_bsw_tse"]->getNormalNbrInfo(Side<3>::bottom()).rank ==
-        domain["bsw_bsw_bse"]->rank);
+  CHECK(domain["bsw_bsw_tse"]->getNormalNbrInfo(Side<3>::north()).rank == domain["bsw_bsw_tne"]->rank);
+  CHECK(domain["bsw_bsw_tse"]->getNormalNbrInfo(Side<3>::bottom()).rank == domain["bsw_bsw_bse"]->rank);
   CHECK(domain["bsw_bsw_tse"]->getCoarseNbrInfo(Side<3>::top()).rank == domain["bsw_tsw"]->rank);
 
-  CHECK(domain["bsw_bsw_tnw"]->getNormalNbrInfo(Side<3>::east()).rank ==
-        domain["bsw_bsw_tne"]->rank);
-  CHECK(domain["bsw_bsw_tnw"]->getNormalNbrInfo(Side<3>::south()).rank ==
-        domain["bsw_bsw_tsw"]->rank);
+  CHECK(domain["bsw_bsw_tnw"]->getNormalNbrInfo(Side<3>::east()).rank == domain["bsw_bsw_tne"]->rank);
+  CHECK(domain["bsw_bsw_tnw"]->getNormalNbrInfo(Side<3>::south()).rank == domain["bsw_bsw_tsw"]->rank);
   CHECK(domain["bsw_bsw_tnw"]->getCoarseNbrInfo(Side<3>::north()).rank == domain["bsw_bnw"]->rank);
-  CHECK(domain["bsw_bsw_tnw"]->getNormalNbrInfo(Side<3>::bottom()).rank ==
-        domain["bsw_bsw_bnw"]->rank);
+  CHECK(domain["bsw_bsw_tnw"]->getNormalNbrInfo(Side<3>::bottom()).rank == domain["bsw_bsw_bnw"]->rank);
   CHECK(domain["bsw_bsw_tnw"]->getCoarseNbrInfo(Side<3>::top()).rank == domain["bsw_tsw"]->rank);
 
-  CHECK(domain["bsw_bsw_tne"]->getNormalNbrInfo(Side<3>::west()).rank ==
-        domain["bsw_bsw_tnw"]->rank);
+  CHECK(domain["bsw_bsw_tne"]->getNormalNbrInfo(Side<3>::west()).rank == domain["bsw_bsw_tnw"]->rank);
   CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Side<3>::east()).rank == domain["bsw_bse"]->rank);
-  CHECK(domain["bsw_bsw_tne"]->getNormalNbrInfo(Side<3>::south()).rank ==
-        domain["bsw_bsw_tse"]->rank);
+  CHECK(domain["bsw_bsw_tne"]->getNormalNbrInfo(Side<3>::south()).rank == domain["bsw_bsw_tse"]->rank);
   CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Side<3>::north()).rank == domain["bsw_bnw"]->rank);
-  CHECK(domain["bsw_bsw_tne"]->getNormalNbrInfo(Side<3>::bottom()).rank ==
-        domain["bsw_bsw_bne"]->rank);
+  CHECK(domain["bsw_bsw_tne"]->getNormalNbrInfo(Side<3>::bottom()).rank == domain["bsw_bsw_bne"]->rank);
   CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Side<3>::top()).rank == domain["bsw_tsw"]->rank);
 
   CHECK(domain["bsw_bse"]->getFineNbrInfo(Side<3>::west()).ranks[0] == domain["bsw_bsw_bse"]->rank);
@@ -105,14 +81,10 @@ Check4x4x4RefinedBSWDomainSideNeighborRanks(const PatchVector& domain)
   CHECK(domain["bsw_bse"]->getNormalNbrInfo(Side<3>::top()).rank == domain["bsw_tse"]->rank);
 
   CHECK(domain["bsw_bnw"]->getNormalNbrInfo(Side<3>::east()).rank == domain["bsw_bne"]->rank);
-  CHECK(domain["bsw_bnw"]->getFineNbrInfo(Side<3>::south()).ranks[0] ==
-        domain["bsw_bsw_bnw"]->rank);
-  CHECK(domain["bsw_bnw"]->getFineNbrInfo(Side<3>::south()).ranks[1] ==
-        domain["bsw_bsw_bne"]->rank);
-  CHECK(domain["bsw_bnw"]->getFineNbrInfo(Side<3>::south()).ranks[2] ==
-        domain["bsw_bsw_tnw"]->rank);
-  CHECK(domain["bsw_bnw"]->getFineNbrInfo(Side<3>::south()).ranks[3] ==
-        domain["bsw_bsw_tne"]->rank);
+  CHECK(domain["bsw_bnw"]->getFineNbrInfo(Side<3>::south()).ranks[0] == domain["bsw_bsw_bnw"]->rank);
+  CHECK(domain["bsw_bnw"]->getFineNbrInfo(Side<3>::south()).ranks[1] == domain["bsw_bsw_bne"]->rank);
+  CHECK(domain["bsw_bnw"]->getFineNbrInfo(Side<3>::south()).ranks[2] == domain["bsw_bsw_tnw"]->rank);
+  CHECK(domain["bsw_bnw"]->getFineNbrInfo(Side<3>::south()).ranks[3] == domain["bsw_bsw_tne"]->rank);
   CHECK(domain["bsw_bnw"]->getNormalNbrInfo(Side<3>::north()).rank == domain["bnw_bsw"]->rank);
   CHECK(domain["bsw_bnw"]->getNormalNbrInfo(Side<3>::top()).rank == domain["bsw_tnw"]->rank);
 
@@ -124,14 +96,10 @@ Check4x4x4RefinedBSWDomainSideNeighborRanks(const PatchVector& domain)
 
   CHECK(domain["bsw_tsw"]->getNormalNbrInfo(Side<3>::east()).rank == domain["bsw_tse"]->rank);
   CHECK(domain["bsw_tsw"]->getNormalNbrInfo(Side<3>::north()).rank == domain["bsw_tnw"]->rank);
-  CHECK(domain["bsw_tsw"]->getFineNbrInfo(Side<3>::bottom()).ranks[0] ==
-        domain["bsw_bsw_tsw"]->rank);
-  CHECK(domain["bsw_tsw"]->getFineNbrInfo(Side<3>::bottom()).ranks[1] ==
-        domain["bsw_bsw_tse"]->rank);
-  CHECK(domain["bsw_tsw"]->getFineNbrInfo(Side<3>::bottom()).ranks[2] ==
-        domain["bsw_bsw_tnw"]->rank);
-  CHECK(domain["bsw_tsw"]->getFineNbrInfo(Side<3>::bottom()).ranks[3] ==
-        domain["bsw_bsw_tne"]->rank);
+  CHECK(domain["bsw_tsw"]->getFineNbrInfo(Side<3>::bottom()).ranks[0] == domain["bsw_bsw_tsw"]->rank);
+  CHECK(domain["bsw_tsw"]->getFineNbrInfo(Side<3>::bottom()).ranks[1] == domain["bsw_bsw_tse"]->rank);
+  CHECK(domain["bsw_tsw"]->getFineNbrInfo(Side<3>::bottom()).ranks[2] == domain["bsw_bsw_tnw"]->rank);
+  CHECK(domain["bsw_tsw"]->getFineNbrInfo(Side<3>::bottom()).ranks[3] == domain["bsw_bsw_tne"]->rank);
   CHECK(domain["bsw_tsw"]->getNormalNbrInfo(Side<3>::top()).rank == domain["tsw_bsw"]->rank);
 
   CHECK(domain["bsw_tse"]->getNormalNbrInfo(Side<3>::west()).rank == domain["bsw_tsw"]->rank);

@@ -128,8 +128,7 @@ GetAllPatchesOnRank0(const Domain<3>& domain)
       char patches_string[buffer_size];
       MPI_Recv(patches_string, buffer_size, MPI_CHAR, 1, 0, MPI_COMM_WORLD, &status);
 
-      ThunderEgg::tpl::nlohmann::json patches =
-        ThunderEgg::tpl::nlohmann::json::parse((char*)patches_string);
+      ThunderEgg::tpl::nlohmann::json patches = ThunderEgg::tpl::nlohmann::json::parse((char*)patches_string);
       if (patches != nullptr) {
         patches.get_to(all_patches);
         for (auto& patch : all_patches) {
@@ -220,10 +219,7 @@ getChildOrthant(const string& str)
 }
 } // namespace
 void
-CheckParentAndChildIdsAndRanks(const ThunderEgg::Domain<3>& coarser_domain,
-                               int coarser_max_level,
-                               const ThunderEgg::Domain<3>& finer_domain,
-                               int finer_max_level)
+CheckParentAndChildIdsAndRanks(const ThunderEgg::Domain<3>& coarser_domain, int coarser_max_level, const ThunderEgg::Domain<3>& finer_domain, int finer_max_level)
 {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -256,10 +252,7 @@ CheckParentAndChildIdsAndRanks(const ThunderEgg::Domain<3>& coarser_domain,
   }
 }
 void
-CheckParentAndChildIdsAndRanksRefined(const ThunderEgg::Domain<3>& coarser_domain,
-                                      int coarser_max_level,
-                                      const ThunderEgg::Domain<3>& finer_domain,
-                                      int finer_max_level)
+CheckParentAndChildIdsAndRanksRefined(const ThunderEgg::Domain<3>& coarser_domain, int coarser_max_level, const ThunderEgg::Domain<3>& finer_domain, int finer_max_level)
 {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
