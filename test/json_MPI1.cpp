@@ -1273,3 +1273,25 @@ TEST_CASE("PatchInfo<2> copy constructor")
     }
   }
 }
+
+TEST_CASE("Domain to_json")
+{
+  Communicator comm(MPI_COMM_WORLD);
+
+  vector<PatchInfo<2>> pinfos(1);
+
+  int n = 10;
+  double spacing = 0.01;
+  int num_ghost = 1;
+
+  pinfos[0].id = 0;
+  pinfos[0].ns.fill(n);
+  pinfos[0].spacings.fill(spacing);
+  pinfos[0].num_ghost_cells = num_ghost;
+  Domain<2> d(comm, 0, { n, n }, num_ghost, pinfos.begin(), pinfos.end());
+
+  nlohmann::json j = d;
+  REQUIRE_UNARY(j.is_array());
+  REQUIRE_EQ(j.size(), 1);
+  REQUIRE_EQ(j[0]["id"], 0);
+}
