@@ -359,9 +359,7 @@ TEST_CASE("PatchInfo from_json with children", "[PatchInfo]")
   j["lengths"] = { 10, 20, 30 };
   j["child_ids"] = { 1, 2, 3, 4, 5, 6, 7, 8 };
   j["child_ranks"] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-  j["nbrs"] = { NormalNbrInfo<2>(1),
-                CoarseNbrInfo<2>(2, Orthant<2>::nw()),
-                FineNbrInfo<2>({ 3, 4, 5, 6 }) };
+  j["nbrs"] = { NormalNbrInfo<2>(1), CoarseNbrInfo<2>(2, Orthant<2>::nw()), FineNbrInfo<2>({ 3, 4, 5, 6 }) };
   j["nbrs"][0]["side"] = "NORTH";
   j["nbrs"][1]["side"] = "EAST";
   j["nbrs"][2]["side"] = "SOUTH";
@@ -606,21 +604,15 @@ TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
   j["parent_rank"] = 3;
   j["starts"] = { 1, 2, 3 };
   j["lengths"] = { 10, 20, 30 };
-  j["nbrs"] = { NormalNbrInfo<2>(1),
-                CoarseNbrInfo<2>(2, Orthant<2>::nw()),
-                FineNbrInfo<2>({ 3, 4, 5, 6 }) };
+  j["nbrs"] = { NormalNbrInfo<2>(1), CoarseNbrInfo<2>(2, Orthant<2>::nw()), FineNbrInfo<2>({ 3, 4, 5, 6 }) };
   j["nbrs"][0]["side"] = "NORTH";
   j["nbrs"][1]["side"] = "EAST";
   j["nbrs"][2]["side"] = "SOUTH";
-  j["corner_nbrs"] = { NormalNbrInfo<0>(1),
-                       CoarseNbrInfo<0>(2, Orthant<0>(0)),
-                       FineNbrInfo<0>({ 1 }) };
+  j["corner_nbrs"] = { NormalNbrInfo<0>(1), CoarseNbrInfo<0>(2, Orthant<0>(0)), FineNbrInfo<0>({ 1 }) };
   j["corner_nbrs"][0]["corner"] = "BSW";
   j["corner_nbrs"][1]["corner"] = "TSE";
   j["corner_nbrs"][2]["corner"] = "BNW";
-  j["edge_nbrs"] = { NormalNbrInfo<1>(1),
-                     CoarseNbrInfo<1>(2, Orthant<1>::lower()),
-                     FineNbrInfo<1>({ 1, 2 }) };
+  j["edge_nbrs"] = { NormalNbrInfo<1>(1), CoarseNbrInfo<1>(2, Orthant<1>::lower()), FineNbrInfo<1>({ 1, 2 }) };
   j["edge_nbrs"][0]["edge"] = "SW";
   j["edge_nbrs"][1]["edge"] = "BN";
   j["edge_nbrs"][2]["edge"] = "TW";
@@ -681,57 +673,81 @@ TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
 }
 TEST_CASE("FineNbrInfo to_json", "[FineNbrInfo]")
 {
-  FineNbrInfo<2> info;
-  info.ids[0] = GENERATE(1, 2);
-  info.ids[1] = GENERATE(1, 2);
-  info.ids[2] = GENERATE(1, 2);
-  info.ids[3] = GENERATE(1, 2);
-  info.ranks[0] = GENERATE(0, 1);
-  info.ranks[1] = GENERATE(0, 1);
-  info.ranks[2] = GENERATE(0, 1);
-  info.ranks[3] = GENERATE(0, 1);
+  for (int ids_0 : { 1, 2 }) {
+    for (int ids_1 : { 1, 2 }) {
+      for (int ids_2 : { 1, 2 }) {
+        for (int ids_3 : { 1, 2 }) {
+          for (int ranks_0 : { 0, 1 }) {
+            for (int ranks_1 : { 0, 1 }) {
+              for (int ranks_2 : { 0, 1 }) {
+                for (int ranks_3 : { 0, 1 }) {
+                  FineNbrInfo<2> info;
+                  info.ids[0] = ids_0;
+                  info.ids[1] = ids_1;
+                  info.ids[2] = ids_2;
+                  info.ids[3] = ids_3;
+                  info.ranks[0] = ranks_0;
+                  info.ranks[1] = ranks_1;
+                  info.ranks[2] = ranks_2;
+                  info.ranks[3] = ranks_3;
 
-  nlohmann::json j = info;
+                  nlohmann::json j = info;
 
-  CHECK(j["type"] == "FINE");
-  REQUIRE(j["ids"].is_array());
-  REQUIRE(j["ids"].size() == 4);
-  CHECK(j["ids"][0] == info.ids[0]);
-  CHECK(j["ids"][1] == info.ids[1]);
-  CHECK(j["ids"][2] == info.ids[2]);
-  CHECK(j["ids"][3] == info.ids[3]);
-  REQUIRE(j["ranks"].is_array());
-  REQUIRE(j["ranks"].size() == 4);
-  CHECK(j["ranks"][0] == info.ranks[0]);
-  CHECK(j["ranks"][1] == info.ranks[1]);
-  CHECK(j["ranks"][2] == info.ranks[2]);
-  CHECK(j["ranks"][3] == info.ranks[3]);
+                  CHECK(j["type"] == "FINE");
+                  REQUIRE(j["ids"].is_array());
+                  REQUIRE(j["ids"].size() == 4);
+                  CHECK(j["ids"][0] == info.ids[0]);
+                  CHECK(j["ids"][1] == info.ids[1]);
+                  CHECK(j["ids"][2] == info.ids[2]);
+                  CHECK(j["ids"][3] == info.ids[3]);
+                  REQUIRE(j["ranks"].is_array());
+                  REQUIRE(j["ranks"].size() == 4);
+                  CHECK(j["ranks"][0] == info.ranks[0]);
+                  CHECK(j["ranks"][1] == info.ranks[1]);
+                  CHECK(j["ranks"][2] == info.ranks[2]);
+                  CHECK(j["ranks"][3] == info.ranks[3]);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 TEST_CASE("FineNbrInfo from_json", "[FineNbrInfo]")
 {
-  int id1 = GENERATE(1, 2);
-  int id2 = GENERATE(1, 2);
-  int id3 = GENERATE(1, 2);
-  int id4 = GENERATE(1, 2);
-  int rank1 = GENERATE(0, 1);
-  int rank2 = GENERATE(0, 1);
-  int rank3 = GENERATE(0, 1);
-  int rank4 = GENERATE(0, 1);
+  for (int id1 : { 1, 2 }) {
+    for (int id2 : { 1, 2 }) {
+      for (int id3 : { 1, 2 }) {
+        for (int id4 : { 1, 2 }) {
+          for (int rank1 : { 0, 1 }) {
+            for (int rank2 : { 0, 1 }) {
+              for (int rank3 : { 0, 1 }) {
+                for (int rank4 : { 0, 1 }) {
 
-  nlohmann::json j;
-  j["type"] = "NORMAL";
-  j["ids"] = { id1, id2, id3, id4 };
-  j["ranks"] = { rank1, rank2, rank3, rank4 };
+                  nlohmann::json j;
+                  j["type"] = "NORMAL";
+                  j["ids"] = { id1, id2, id3, id4 };
+                  j["ranks"] = { rank1, rank2, rank3, rank4 };
 
-  FineNbrInfo<2> info = j.get<FineNbrInfo<2>>();
-  CHECK(info.ids[0] == id1);
-  CHECK(info.ids[1] == id2);
-  CHECK(info.ids[2] == id3);
-  CHECK(info.ids[3] == id4);
-  CHECK(info.ranks[0] == rank1);
-  CHECK(info.ranks[1] == rank2);
-  CHECK(info.ranks[2] == rank3);
-  CHECK(info.ranks[3] == rank4);
+                  FineNbrInfo<2> info = j.get<FineNbrInfo<2>>();
+                  CHECK(info.ids[0] == id1);
+                  CHECK(info.ids[1] == id2);
+                  CHECK(info.ids[2] == id3);
+                  CHECK(info.ids[3] == id4);
+                  CHECK(info.ranks[0] == rank1);
+                  CHECK(info.ranks[1] == rank2);
+                  CHECK(info.ranks[2] == rank3);
+                  CHECK(info.ranks[3] == rank4);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 TEST_CASE("NbrType to_json", "[NbrType]")
 {
@@ -755,66 +771,81 @@ TEST_CASE("NbrType from_json", "[NbrType]")
 }
 TEST_CASE("NormalNbrInfo to_json", "[NormalNbrInfo]")
 {
-  NormalNbrInfo<2> info;
-  info.id = GENERATE(1, 2, 3);
-  info.rank = GENERATE(0, 1, 2);
+  for (int id : { 1, 2, 3 }) {
+    for (int rank : { 0, 1, 2 }) {
+      NormalNbrInfo<2> info;
+      info.id = id;
+      info.rank = rank;
 
-  nlohmann::json j = info;
+      nlohmann::json j = info;
 
-  CHECK(j["type"] == "NORMAL");
-  REQUIRE(j["ids"].is_array());
-  CHECK(j["ids"].size() == 1);
-  CHECK(j["ids"][0] == info.id);
-  REQUIRE(j["ranks"].is_array());
-  CHECK(j["ranks"].size() == 1);
-  CHECK(j["ranks"][0] == info.rank);
+      CHECK(j["type"] == "NORMAL");
+      REQUIRE(j["ids"].is_array());
+      CHECK(j["ids"].size() == 1);
+      CHECK(j["ids"][0] == info.id);
+      REQUIRE(j["ranks"].is_array());
+      CHECK(j["ranks"].size() == 1);
+      CHECK(j["ranks"][0] == info.rank);
+    }
+  }
 }
 TEST_CASE("NormalNbrInfo from_json", "[NormalNbrInfo]")
 {
-  int id = GENERATE(1, 2, 3);
-  int rank = GENERATE(0, 1, 2);
+  for (int id : { 1, 2, 3 }) {
+    for (int rank : { 0, 1, 2 }) {
 
-  nlohmann::json j;
-  j["type"] = "NORMAL";
-  j["ids"] = { id };
-  j["ranks"] = { rank };
+      nlohmann::json j;
+      j["type"] = "NORMAL";
+      j["ids"] = { id };
+      j["ranks"] = { rank };
 
-  NormalNbrInfo<2> info = j.get<NormalNbrInfo<2>>();
-  CHECK(info.id == id);
-  CHECK(info.rank == rank);
+      NormalNbrInfo<2> info = j.get<NormalNbrInfo<2>>();
+      CHECK(info.id == id);
+      CHECK(info.rank == rank);
+    }
+  }
 }
 TEST_CASE("CoarseNbrInfo to_json", "[CoarseNbrInfo]")
 {
-  CoarseNbrInfo<2> info;
-  info.id = GENERATE(1, 2, 3);
-  info.rank = GENERATE(0, 1, 2);
-  info.orth_on_coarse = GENERATE(Orthant<2>::sw(), Orthant<3>::se(), Orthant<2>::nw());
+  for (int id : { 1, 2, 3 }) {
+    for (int rank : { 0, 1, 2 }) {
+      for (Orthant<2> orth_on_coarse : { Orthant<2>::sw(), Orthant<3>::se(), Orthant<2>::nw() }) {
+        CoarseNbrInfo<2> info;
+        info.id = id;
+        info.rank = rank;
+        info.orth_on_coarse = orth_on_coarse;
 
-  ThunderEgg::tpl::nlohmann::json j = info;
+        ThunderEgg::tpl::nlohmann::json j = info;
 
-  CHECK(j["type"] == "COARSE");
-  REQUIRE(j["ids"].is_array());
-  CHECK(j["ids"].size() == 1);
-  CHECK(j["ids"][0] == info.id);
-  REQUIRE(j["ranks"].is_array());
-  CHECK(j["ranks"].size() == 1);
-  CHECK(j["ranks"][0] == info.rank);
-  CHECK(j["orth_on_coarse"].get<Orthant<2>>() == info.orth_on_coarse);
+        CHECK(j["type"] == "COARSE");
+        REQUIRE(j["ids"].is_array());
+        CHECK(j["ids"].size() == 1);
+        CHECK(j["ids"][0] == info.id);
+        REQUIRE(j["ranks"].is_array());
+        CHECK(j["ranks"].size() == 1);
+        CHECK(j["ranks"][0] == info.rank);
+        CHECK(j["orth_on_coarse"].get<Orthant<2>>() == info.orth_on_coarse);
+      }
+    }
+  }
 }
 TEST_CASE("CoarseNbrInfo from_json", "[CoarseNbrInfo]")
 {
-  int id = GENERATE(1, 2, 3);
-  int rank = GENERATE(0, 1, 2);
-  Orthant<2> orth_on_coarse = GENERATE(Orthant<2>::sw(), Orthant<3>::se(), Orthant<2>::nw());
+  for (int id : { 1, 2, 3 }) {
+    for (int rank : { 0, 1, 2 }) {
+      for (Orthant<2> orth_on_coarse : { Orthant<2>::sw(), Orthant<3>::se(), Orthant<2>::nw() }) {
 
-  ThunderEgg::tpl::nlohmann::json j;
-  j["type"] = "COARSE";
-  j["ids"] = { id };
-  j["ranks"] = { rank };
-  j["orth_on_coarse"] = orth_on_coarse;
+        ThunderEgg::tpl::nlohmann::json j;
+        j["type"] = "COARSE";
+        j["ids"] = { id };
+        j["ranks"] = { rank };
+        j["orth_on_coarse"] = orth_on_coarse;
 
-  CoarseNbrInfo<2> info = j.get<CoarseNbrInfo<2>>();
-  CHECK(info.id == id);
-  CHECK(info.rank == rank);
-  CHECK(info.orth_on_coarse == orth_on_coarse);
+        CoarseNbrInfo<2> info = j.get<CoarseNbrInfo<2>>();
+        CHECK(info.id == id);
+        CHECK(info.rank == rank);
+        CHECK(info.orth_on_coarse == orth_on_coarse);
+      }
+    }
+  }
 }

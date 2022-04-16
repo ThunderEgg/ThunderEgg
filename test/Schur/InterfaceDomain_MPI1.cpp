@@ -76,8 +76,7 @@ TEST_CASE("Schur::InterfaceDomain<2> getDomain", "[Schur::InterfaceDomain]")
 
   CHECK(interface_domain.getDomain().getNumLocalPatches() == domain.getNumLocalPatches());
 }
-TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -95,8 +94,7 @@ TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0"
 
   CHECK(min_local_index == 0);
 }
-TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguous",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguous", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -118,9 +116,7 @@ TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguou
     prev_local_index = local_index;
   }
 }
-TEST_CASE(
-  "Schur::InterfaceDomain<2> each id has only one patch interface local index associated with it",
-  "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> each id has only one patch interface local index associated with it", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -131,8 +127,7 @@ TEST_CASE(
   for (auto piinfo : interface_domain.getPatchIfaceInfos()) {
     for (Side<2> s : Side<2>::getValues()) {
       if (piinfo->pinfo.hasNbr(s)) {
-        id_to_local_indexes[piinfo->getIfaceInfo(s)->id].insert(
-          piinfo->getIfaceInfo(s)->patch_local_index);
+        id_to_local_indexes[piinfo->getIfaceInfo(s)->id].insert(piinfo->getIfaceInfo(s)->patch_local_index);
       }
     }
   }
@@ -143,9 +138,7 @@ TEST_CASE(
     CHECK(pair.second.size() == 1);
   }
 }
-TEST_CASE(
-  "Schur::InterfaceDomain<2> each patch interface local index has only one id associated with it",
-  "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> each patch interface local index has only one id associated with it", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -156,8 +149,7 @@ TEST_CASE(
   for (auto piinfo : interface_domain.getPatchIfaceInfos()) {
     for (Side<2> s : Side<2>::getValues()) {
       if (piinfo->pinfo.hasNbr(s)) {
-        local_index_to_ids[piinfo->getIfaceInfo(s)->patch_local_index].insert(
-          piinfo->getIfaceInfo(s)->id);
+        local_index_to_ids[piinfo->getIfaceInfo(s)->patch_local_index].insert(piinfo->getIfaceInfo(s)->id);
       }
     }
   }
@@ -216,8 +208,7 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous", "[Schur:
     prev_local_index = local_index;
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> each id has only one row local index associated with it",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> each id has only one row local index associated with it", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -244,8 +235,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one row local index associ
     CHECK(pair.second.size() == 1);
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associated with it",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associated with it", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -362,8 +352,7 @@ TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous", "[Schur:
     prev_local_index = local_index;
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> each id has only one col local index associated with it",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> each id has only one col local index associated with it", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -388,11 +377,9 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one col local index associ
 
               id_to_local_indexes[iface_info->id].insert(iface_info->col_local_index);
 
-              id_to_local_indexes[iface_info->fine_ids[0]].insert(
-                iface_info->fine_col_local_indexes[0]);
+              id_to_local_indexes[iface_info->fine_ids[0]].insert(iface_info->fine_col_local_indexes[0]);
 
-              id_to_local_indexes[iface_info->fine_ids[1]].insert(
-                iface_info->fine_col_local_indexes[1]);
+              id_to_local_indexes[iface_info->fine_ids[1]].insert(iface_info->fine_col_local_indexes[1]);
 
             } else if (patch.piinfo->pinfo.getNbrType(s) == NbrType::Coarse) {
               auto iface_info = patch.piinfo->getCoarseIfaceInfo(s);
@@ -413,8 +400,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one col local index associ
     CHECK(pair.second.size() == 1);
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associated with it",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associated with it", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -435,10 +421,8 @@ TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associ
             } else if (patch.piinfo->pinfo.getNbrType(s) == NbrType::Fine) {
               auto iface_info = patch.piinfo->getFineIfaceInfo(s);
               local_index_to_ids[iface_info->col_local_index].insert(iface_info->id);
-              local_index_to_ids[iface_info->fine_col_local_indexes[0]].insert(
-                iface_info->fine_ids[0]);
-              local_index_to_ids[iface_info->fine_col_local_indexes[1]].insert(
-                iface_info->fine_ids[1]);
+              local_index_to_ids[iface_info->fine_col_local_indexes[0]].insert(iface_info->fine_ids[0]);
+              local_index_to_ids[iface_info->fine_col_local_indexes[1]].insert(iface_info->fine_ids[1]);
             } else if (patch.piinfo->pinfo.getNbrType(s) == NbrType::Coarse) {
               auto iface_info = patch.piinfo->getCoarseIfaceInfo(s);
               local_index_to_ids[iface_info->col_local_index].insert(iface_info->id);
@@ -474,14 +458,11 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0", "[Schur::Inte
 
           switch (patch.piinfo->pinfo.getNbrType(s)) {
             case NbrType::Coarse:
-              min_global_index =
-                min(min_global_index, patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
+              min_global_index = min(min_global_index, patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
               break;
             case NbrType::Fine:
-              min_global_index =
-                min(min_global_index, patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
-              min_global_index =
-                min(min_global_index, patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
+              min_global_index = min(min_global_index, patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
+              min_global_index = min(min_global_index, patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
               break;
             default:
               break;
@@ -498,14 +479,11 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0", "[Schur::Inte
 
         switch (patch->pinfo.getNbrType(s)) {
           case NbrType::Coarse:
-            min_global_index =
-              min(min_global_index, patch->getCoarseIfaceInfo(s)->coarse_global_index);
+            min_global_index = min(min_global_index, patch->getCoarseIfaceInfo(s)->coarse_global_index);
             break;
           case NbrType::Fine:
-            min_global_index =
-              min(min_global_index, patch->getFineIfaceInfo(s)->fine_global_indexes[0]);
-            min_global_index =
-              min(min_global_index, patch->getFineIfaceInfo(s)->fine_global_indexes[1]);
+            min_global_index = min(min_global_index, patch->getFineIfaceInfo(s)->fine_global_indexes[0]);
+            min_global_index = min(min_global_index, patch->getFineIfaceInfo(s)->fine_global_indexes[1]);
             break;
           default:
             break;
@@ -575,8 +553,7 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous", "[Schur::In
     prev_global_index = global_index;
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associated with it",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associated with it", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -590,19 +567,15 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associate
     for (auto patch : iface->patches) {
       for (Side<2> s : Side<2>::getValues()) {
         if (patch.piinfo->pinfo.hasNbr(s)) {
-          id_to_global_indexes[patch.piinfo->getIfaceInfo(s)->id].insert(
-            patch.piinfo->getIfaceInfo(s)->global_index);
+          id_to_global_indexes[patch.piinfo->getIfaceInfo(s)->id].insert(patch.piinfo->getIfaceInfo(s)->global_index);
 
           switch (patch.piinfo->pinfo.getNbrType(s)) {
             case NbrType::Coarse:
-              id_to_global_indexes[patch.piinfo->getCoarseIfaceInfo(s)->coarse_id].insert(
-                patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
+              id_to_global_indexes[patch.piinfo->getCoarseIfaceInfo(s)->coarse_id].insert(patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
               break;
             case NbrType::Fine:
-              id_to_global_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]].insert(
-                patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
-              id_to_global_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]].insert(
-                patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
+              id_to_global_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]].insert(patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
+              id_to_global_indexes[patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]].insert(patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
               break;
             default:
               break;
@@ -615,19 +588,15 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associate
   for (auto piinfo : interface_domain.getPatchIfaceInfos()) {
     for (Side<2> s : Side<2>::getValues()) {
       if (piinfo->pinfo.hasNbr(s)) {
-        id_to_global_indexes[piinfo->getIfaceInfo(s)->id].insert(
-          piinfo->getIfaceInfo(s)->global_index);
+        id_to_global_indexes[piinfo->getIfaceInfo(s)->id].insert(piinfo->getIfaceInfo(s)->global_index);
 
         switch (piinfo->pinfo.getNbrType(s)) {
           case NbrType::Coarse:
-            id_to_global_indexes[piinfo->getCoarseIfaceInfo(s)->coarse_id].insert(
-              piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
+            id_to_global_indexes[piinfo->getCoarseIfaceInfo(s)->coarse_id].insert(piinfo->getCoarseIfaceInfo(s)->coarse_global_index);
             break;
           case NbrType::Fine:
-            id_to_global_indexes[piinfo->getFineIfaceInfo(s)->fine_ids[0]].insert(
-              piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
-            id_to_global_indexes[piinfo->getFineIfaceInfo(s)->fine_ids[1]].insert(
-              piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
+            id_to_global_indexes[piinfo->getFineIfaceInfo(s)->fine_ids[0]].insert(piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]);
+            id_to_global_indexes[piinfo->getFineIfaceInfo(s)->fine_ids[1]].insert(piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]);
             break;
           default:
             break;
@@ -642,8 +611,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associate
     CHECK(pair.second.size() == 1);
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associated with it",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associated with it", "[Schur::InterfaceDomain]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -657,19 +625,15 @@ TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associate
     for (auto patch : iface->patches) {
       for (Side<2> s : Side<2>::getValues()) {
         if (patch.piinfo->pinfo.hasNbr(s)) {
-          global_index_to_ids[patch.piinfo->getIfaceInfo(s)->global_index].insert(
-            patch.piinfo->getIfaceInfo(s)->id);
+          global_index_to_ids[patch.piinfo->getIfaceInfo(s)->global_index].insert(patch.piinfo->getIfaceInfo(s)->id);
 
           switch (patch.piinfo->pinfo.getNbrType(s)) {
             case NbrType::Coarse:
-              global_index_to_ids[patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index].insert(
-                patch.piinfo->getCoarseIfaceInfo(s)->coarse_id);
+              global_index_to_ids[patch.piinfo->getCoarseIfaceInfo(s)->coarse_global_index].insert(patch.piinfo->getCoarseIfaceInfo(s)->coarse_id);
               break;
             case NbrType::Fine:
-              global_index_to_ids[patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]].insert(
-                patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]);
-              global_index_to_ids[patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]].insert(
-                patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]);
+              global_index_to_ids[patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]].insert(patch.piinfo->getFineIfaceInfo(s)->fine_ids[0]);
+              global_index_to_ids[patch.piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]].insert(patch.piinfo->getFineIfaceInfo(s)->fine_ids[1]);
               break;
             default:
               break;
@@ -682,19 +646,15 @@ TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associate
   for (auto piinfo : interface_domain.getPatchIfaceInfos()) {
     for (Side<2> s : Side<2>::getValues()) {
       if (piinfo->pinfo.hasNbr(s)) {
-        global_index_to_ids[piinfo->getIfaceInfo(s)->global_index].insert(
-          piinfo->getIfaceInfo(s)->id);
+        global_index_to_ids[piinfo->getIfaceInfo(s)->global_index].insert(piinfo->getIfaceInfo(s)->id);
 
         switch (piinfo->pinfo.getNbrType(s)) {
           case NbrType::Coarse:
-            global_index_to_ids[piinfo->getCoarseIfaceInfo(s)->coarse_global_index].insert(
-              piinfo->getCoarseIfaceInfo(s)->coarse_id);
+            global_index_to_ids[piinfo->getCoarseIfaceInfo(s)->coarse_global_index].insert(piinfo->getCoarseIfaceInfo(s)->coarse_id);
             break;
           case NbrType::Fine:
-            global_index_to_ids[piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]].insert(
-              piinfo->getFineIfaceInfo(s)->fine_ids[0]);
-            global_index_to_ids[piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]].insert(
-              piinfo->getFineIfaceInfo(s)->fine_ids[1]);
+            global_index_to_ids[piinfo->getFineIfaceInfo(s)->fine_global_indexes[0]].insert(piinfo->getFineIfaceInfo(s)->fine_ids[0]);
+            global_index_to_ids[piinfo->getFineIfaceInfo(s)->fine_global_indexes[1]].insert(piinfo->getFineIfaceInfo(s)->fine_ids[1]);
             break;
           default:
             break;

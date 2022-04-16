@@ -77,27 +77,22 @@ TEST_CASE("Schur::Interface insert Coarse interface", "[Schur::Interface]")
   CHECK(iface.patches[0].type.isCoarseToCoarse());
   CHECK(iface.patches[0].piinfo == piinfos[0]);
 
-  iface.insert(Side<2>::west(),
-               piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+  iface.insert(Side<2>::west(), piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
   REQUIRE(iface.patches.size() == 2);
   CHECK(iface.patches[1].side == Side<2>::west());
   CHECK(iface.patches[1].type.isFineToCoarse());
   CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
   CHECK(iface.patches[0].piinfo == piinfos[0]);
-  CHECK(iface.patches[1].piinfo ==
-        piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+  CHECK(iface.patches[1].piinfo == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 
-  iface.insert(Side<2>::west(),
-               piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
+  iface.insert(Side<2>::west(), piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
   REQUIRE(iface.patches.size() == 3);
   CHECK(iface.patches[2].side == Side<2>::west());
   CHECK(iface.patches[2].type.isFineToCoarse());
   CHECK(iface.patches[2].type.getOrthant() == Orthant<1>::upper());
   CHECK(iface.patches[0].piinfo == piinfos[0]);
-  CHECK(iface.patches[1].piinfo ==
-        piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
-  CHECK(iface.patches[2].piinfo ==
-        piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
+  CHECK(iface.patches[1].piinfo == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+  CHECK(iface.patches[2].piinfo == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
 }
 TEST_CASE("Schur::Interface insert Fine interface", "[Schur::Interface]")
 {
@@ -117,15 +112,13 @@ TEST_CASE("Schur::Interface insert Fine interface", "[Schur::Interface]")
   CHECK(iface.patches[0].type.getOrthant() == Orthant<1>::lower());
   CHECK(iface.patches[0].piinfo == piinfos[0]);
 
-  iface.insert(Side<2>::west(),
-               piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+  iface.insert(Side<2>::west(), piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
   REQUIRE(iface.patches.size() == 2);
   CHECK(iface.patches[1].side == Side<2>::west());
   CHECK(iface.patches[1].type.isFineToFine());
   CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
   CHECK(iface.patches[0].piinfo == piinfos[0]);
-  CHECK(iface.patches[1].piinfo ==
-        piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+  CHECK(iface.patches[1].piinfo == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 }
 TEST_CASE("Schur::Interface merge Fine interface", "[Schur::Interface]")
 {
@@ -141,8 +134,7 @@ TEST_CASE("Schur::Interface merge Fine interface", "[Schur::Interface]")
   iface.insert(Side<2>::east(), piinfos[0]);
 
   Schur::Interface<2> iface2(id);
-  iface2.insert(Side<2>::west(),
-                piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+  iface2.insert(Side<2>::west(), piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 
   iface.merge(iface2);
   REQUIRE(iface.patches.size() == 2);
@@ -153,8 +145,7 @@ TEST_CASE("Schur::Interface merge Fine interface", "[Schur::Interface]")
   CHECK(iface.patches[1].side == Side<2>::west());
   CHECK(iface.patches[1].type.isFineToFine());
   CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
-  CHECK(iface.patches[1].piinfo ==
-        piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+  CHECK(iface.patches[1].piinfo == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 }
 TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface]")
 {
@@ -173,11 +164,9 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
   CHECK(off_proc_piinfos.size() == 0);
 
   auto coarse_piinfo = piinfos[0];
-  auto ref_sw_piinfo =
-    piinfos[coarse_piinfo->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]];
+  auto ref_sw_piinfo = piinfos[coarse_piinfo->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]];
   auto ref_se_piinfo = piinfos[ref_sw_piinfo->pinfo.getNormalNbrInfo(Side<2>::east()).local_index];
-  auto ref_nw_piinfo =
-    piinfos[coarse_piinfo->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]];
+  auto ref_nw_piinfo = piinfos[coarse_piinfo->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]];
   auto ref_ne_piinfo = piinfos[ref_nw_piinfo->pinfo.getNormalNbrInfo(Side<2>::east()).local_index];
 
   // check coarse interface
@@ -358,10 +347,8 @@ TEST_CASE("Schur::Interface serialize Coarse interface", "[Schur::Interface]")
   Schur::Interface<2> iface_in(id);
 
   iface_in.insert(Side<2>::east(), piinfos[0]);
-  iface_in.insert(Side<2>::west(),
-                  piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
-  iface_in.insert(Side<2>::west(),
-                  piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
+  iface_in.insert(Side<2>::west(), piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+  iface_in.insert(Side<2>::west(), piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
 
   char* buff = new char[iface_in.serialize(nullptr)];
   iface_in.serialize(buff);
@@ -377,14 +364,12 @@ TEST_CASE("Schur::Interface serialize Coarse interface", "[Schur::Interface]")
   CHECK(iface.patches[1].side == Side<2>::west());
   CHECK(iface.patches[1].type.isFineToCoarse());
   CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
-  CHECK(iface.patches[1].piinfo->pinfo.id ==
-        piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[0]);
+  CHECK(iface.patches[1].piinfo->pinfo.id == piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[0]);
 
   CHECK(iface.patches[2].side == Side<2>::west());
   CHECK(iface.patches[2].type.isFineToCoarse());
   CHECK(iface.patches[2].type.getOrthant() == Orthant<1>::upper());
-  CHECK(iface.patches[2].piinfo->pinfo.id ==
-        piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[1]);
+  CHECK(iface.patches[2].piinfo->pinfo.id == piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[1]);
 }
 TEST_CASE("Schur::Interface serialize Fine interface", "[Schur::Interface]")
 {
@@ -398,8 +383,7 @@ TEST_CASE("Schur::Interface serialize Fine interface", "[Schur::Interface]")
   Schur::Interface<2> iface_in(id);
 
   iface_in.insert(Side<2>::east(), piinfos[0]);
-  iface_in.insert(Side<2>::west(),
-                  piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
+  iface_in.insert(Side<2>::west(), piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 
   char* buff = new char[iface_in.serialize(nullptr)];
   iface_in.serialize(buff);
@@ -417,6 +401,5 @@ TEST_CASE("Schur::Interface serialize Fine interface", "[Schur::Interface]")
   CHECK(iface.patches[1].side == Side<2>::west());
   CHECK(iface.patches[1].type.isFineToFine());
   CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
-  CHECK(iface.patches[1].piinfo->pinfo.id ==
-        piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[0]);
+  CHECK(iface.patches[1].piinfo->pinfo.id == piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[0]);
 }

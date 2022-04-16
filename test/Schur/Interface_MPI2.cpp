@@ -29,12 +29,9 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE(
-  "Schur::Interface enumerateIfacesFromPiinfoVector refined interface on processor boundary",
-  "[Schur::Interface]")
+TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector refined interface on processor boundary", "[Schur::Interface]")
 {
-  DomainReader<2> domain_reader(
-    "mesh_inputs/2d_refined_east_1x2_east_on_1_mpi2.json", { 10, 10 }, 0);
+  DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_east_on_1_mpi2.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
   vector<shared_ptr<const Schur::PatchIfaceInfo<2>>> piinfos;
   for (auto& patch : domain.getPatchInfoVector()) {
@@ -98,8 +95,7 @@ TEST_CASE(
     REQUIRE(off_proc_piinfos.size() == 2);
 
     for (auto piinfo : off_proc_piinfos) {
-      CHECK((piinfo->pinfo.id == ref_ne_patch->piinfo->pinfo.id ||
-             piinfo->pinfo.id == ref_se_patch->piinfo->pinfo.id));
+      CHECK((piinfo->pinfo.id == ref_ne_patch->piinfo->pinfo.id || piinfo->pinfo.id == ref_se_patch->piinfo->pinfo.id));
     }
 
     // CHECK off proc ifaces
@@ -297,8 +293,7 @@ TEST_CASE(
     CHECK(upper_patch->side == Side<2>::west());
   }
 }
-TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on processor boundary",
-          "[Schur::Interface]")
+TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on processor boundary", "[Schur::Interface]")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_uniform_1x2_east_on_1_mpi2.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();

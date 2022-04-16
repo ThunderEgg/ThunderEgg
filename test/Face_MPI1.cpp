@@ -110,7 +110,8 @@ TEST_CASE("Test sum_of_faces for Face<3,3>", "[Face]")
 
 TEST_CASE("getIndex returns value passed to constructor Face<3,2>", "[Face]")
 {
-  unsigned char val = GENERATE(1, 2, 3);
-  Face<3, 2> face(val);
-  CHECK(face.getIndex() == val);
+  for (unsigned char val : { 1, 2, 3 }) {
+    Face<3, 2> face(val);
+    CHECK(face.getIndex() == val);
+  }
 }

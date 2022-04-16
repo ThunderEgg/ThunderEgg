@@ -39,10 +39,11 @@ TEST_CASE("CG default max iterations", "[CG]")
 }
 TEST_CASE("CG set max iterations", "[CG]")
 {
-  CG<2> bcgs;
-  int iterations = GENERATE(1, 2, 3);
-  bcgs.setMaxIterations(iterations);
-  CHECK(bcgs.getMaxIterations() == iterations);
+  for (int iterations : { 1, 2, 3 }) {
+    CG<2> bcgs;
+    bcgs.setMaxIterations(iterations);
+    CHECK(bcgs.getMaxIterations() == iterations);
+  }
 }
 TEST_CASE("CG default tolerance", "[CG]")
 {
@@ -51,10 +52,11 @@ TEST_CASE("CG default tolerance", "[CG]")
 }
 TEST_CASE("CG set tolerance", "[CG]")
 {
-  CG<2> bcgs;
-  double tolerance = GENERATE(1.2, 2.3, 3.4);
-  bcgs.setTolerance(tolerance);
-  CHECK(bcgs.getTolerance() == tolerance);
+  for (double tolerance : { 1.2, 2.3, 3.4 }) {
+    CG<2> bcgs;
+    bcgs.setTolerance(tolerance);
+    CHECK(bcgs.getTolerance() == tolerance);
+  }
 }
 TEST_CASE("CG default timer", "[CG]")
 {
@@ -71,85 +73,87 @@ TEST_CASE("CG set timer", "[CG]")
 }
 TEST_CASE("CG clone", "[CG]")
 {
-  CG<2> bcgs;
-  int iterations = GENERATE(1, 2, 3);
-  bcgs.setMaxIterations(iterations);
+  for (int iterations : { 1, 2, 3 }) {
+    for (double tolerance : { 1.2, 2.3, 3.4 }) {
+      CG<2> bcgs;
+      bcgs.setMaxIterations(iterations);
 
-  double tolerance = GENERATE(1.2, 2.3, 3.4);
-  bcgs.setTolerance(tolerance);
+      bcgs.setTolerance(tolerance);
 
-  Communicator comm(MPI_COMM_WORLD);
-  auto timer = make_shared<Timer>(comm);
-  bcgs.setTimer(timer);
+      Communicator comm(MPI_COMM_WORLD);
+      auto timer = make_shared<Timer>(comm);
+      bcgs.setTimer(timer);
 
-  unique_ptr<CG<2>> clone(bcgs.clone());
-  CHECK(bcgs.getTimer() == clone->getTimer());
-  CHECK(bcgs.getMaxIterations() == clone->getMaxIterations());
-  CHECK(bcgs.getTolerance() == clone->getTolerance());
+      unique_ptr<CG<2>> clone(bcgs.clone());
+      CHECK(bcgs.getTimer() == clone->getTimer());
+      CHECK(bcgs.getMaxIterations() == clone->getMaxIterations());
+      CHECK(bcgs.getTolerance() == clone->getTolerance());
+    }
+  }
 }
 TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
 {
-  string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
-  INFO("MESH FILE " << mesh_file);
-  DomainReader<2> domain_reader(mesh_file, { 32, 32 }, 1);
-  Domain<2> domain = domain_reader.getCoarserDomain();
+  for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
+    string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
+    INFO("MESH FILE " << mesh_file);
+    DomainReader<2> domain_reader(mesh_file, { 32, 32 }, 1);
+    Domain<2> domain = domain_reader.getCoarserDomain();
 
-  auto ffun = [](const std::array<double, 2>& coord) {
-    double x = coord[0];
-    double y = coord[1];
-    return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
-  };
-  auto gfun = [](const std::array<double, 2>& coord) {
-    double x = coord[0];
-    double y = coord[1];
-    return sin(M_PI * y) * cos(2 * M_PI * x);
-  };
+    auto ffun = [](const std::array<double, 2>& coord) {
+      double x = coord[0];
+      double y = coord[1];
+      return -5 * M_PI * M_PI * sin(M_PI * y) * cos(2 * M_PI * x);
+    };
+    auto gfun = [](const std::array<double, 2>& coord) {
+      double x = coord[0];
+      double y = coord[1];
+      return sin(M_PI * y) * cos(2 * M_PI * x);
+    };
 
-  Vector<2> f_vec(domain, 1);
-  DomainTools::SetValues<2>(domain, f_vec, ffun);
-  Vector<2> residual(domain, 1);
+    Vector<2> f_vec(domain, 1);
+    DomainTools::SetValues<2>(domain, f_vec, ffun);
+    Vector<2> residual(domain, 1);
 
-  Vector<2> g_vec(domain, 1);
+    Vector<2> g_vec(domain, 1);
 
-  BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
+    BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
-  Poisson::StarPatchOperator<2> p_operator(domain, gf);
-  p_operator.addDrichletBCToRHS(f_vec, gfun);
+    Poisson::StarPatchOperator<2> p_operator(domain, gf);
+    p_operator.addDrichletBCToRHS(f_vec, gfun);
 
-  double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
+    CG<2> solver;
+    solver.setMaxIterations(1000);
+    solver.setTolerance(tolerance);
+    solver.solve(p_operator, g_vec, f_vec);
 
-  CG<2> solver;
-  solver.setMaxIterations(1000);
-  solver.setTolerance(tolerance);
-  solver.solve(p_operator, g_vec, f_vec);
-
-  p_operator.apply(g_vec, residual);
-  residual.addScaled(-1, f_vec);
-  CHECK(residual.dot(residual) / f_vec.dot(f_vec) <= tolerance);
+    p_operator.apply(g_vec, residual);
+    residual.addScaled(-1, f_vec);
+    CHECK(residual.dot(residual) / f_vec.dot(f_vec) <= tolerance);
+  }
 }
 TEST_CASE("CG handles zero rhs vector", "[CG]")
 {
-  string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
-  INFO("MESH FILE " << mesh_file);
-  DomainReader<2> domain_reader(mesh_file, { 32, 32 }, 1);
-  Domain<2> domain = domain_reader.getCoarserDomain();
+  for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
+    string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
+    INFO("MESH FILE " << mesh_file);
+    DomainReader<2> domain_reader(mesh_file, { 32, 32 }, 1);
+    Domain<2> domain = domain_reader.getCoarserDomain();
 
-  Vector<2> f_vec(domain, 1);
+    Vector<2> f_vec(domain, 1);
 
-  Vector<2> g_vec(domain, 1);
+    Vector<2> g_vec(domain, 1);
 
-  BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
+    BiLinearGhostFiller gf(domain, GhostFillingType::Faces);
 
-  Poisson::StarPatchOperator<2> p_operator(domain, gf);
+    Poisson::StarPatchOperator<2> p_operator(domain, gf);
 
-  double tolerance = GENERATE(1e-9, 1e-7, 1e-5);
+    CG<2> solver;
+    solver.setMaxIterations(1000);
+    solver.setTolerance(tolerance);
+    solver.solve(p_operator, g_vec, f_vec);
 
-  CG<2> solver;
-  solver.setMaxIterations(1000);
-  solver.setTolerance(tolerance);
-  solver.solve(p_operator, g_vec, f_vec);
-
-  CHECK(g_vec.infNorm() == 0);
+    CHECK(g_vec.infNorm() == 0);
+  }
 }
 TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
 {

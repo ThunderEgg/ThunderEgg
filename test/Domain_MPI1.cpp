@@ -31,37 +31,39 @@ using namespace ThunderEgg::tpl;
 
 TEST_CASE("Domain constructors work", "[Domain]")
 {
-  Communicator comm(MPI_COMM_WORLD);
+  for (auto n : { 1, 2, 10, 13 }) {
+    for (auto spacing : { 0.01, 1.0, 3.14 }) {
+      for (auto num_ghost : { 0, 1, 2, 3, 4, 5 }) {
+        Communicator comm(MPI_COMM_WORLD);
 
-  vector<PatchInfo<2>> pinfos(1);
+        vector<PatchInfo<2>> pinfos(1);
 
-  auto n = GENERATE(1, 2, 10, 13);
-  auto spacing = GENERATE(0.01, 1.0, 3.14);
-  auto num_ghost = GENERATE(0, 1, 2, 3, 4, 5);
+        pinfos[0].id = 0;
+        pinfos[0].ns.fill(n);
+        pinfos[0].spacings.fill(spacing);
+        pinfos[0].num_ghost_cells = num_ghost;
+        Domain<2> d(comm, 0, { n, n }, num_ghost, pinfos.begin(), pinfos.end());
 
-  pinfos[0].id = 0;
-  pinfos[0].ns.fill(n);
-  pinfos[0].spacings.fill(spacing);
-  pinfos[0].num_ghost_cells = num_ghost;
-  Domain<2> d(comm, 0, { n, n }, num_ghost, pinfos.begin(), pinfos.end());
+        // check getters
+        for (int ni : d.getNs()) {
+          CHECK(ni == n);
+        }
+        CHECK(d.getNumGlobalPatches() == 1);
+        CHECK(d.getNumLocalPatches() == 1);
+        CHECK(d.getNumGlobalCells() == n * n);
+        CHECK(d.getNumLocalCells() == n * n);
+        CHECK(d.getNumLocalCellsWithGhost() == (n + 2 * num_ghost) * (n + 2 * num_ghost));
+        CHECK(d.getNumCellsInPatch() == n * n);
+        CHECK(d.getNumGhostCells() == num_ghost);
+        CHECK(d.volume() == Catch::Approx(spacing * spacing * n * n));
 
-  // check getters
-  for (int ni : d.getNs()) {
-    CHECK(ni == n);
+        int result;
+        int err = MPI_Comm_compare(comm.getMPIComm(), d.getCommunicator().getMPIComm(), &result);
+        REQUIRE(err == MPI_SUCCESS);
+        CHECK(result == MPI_CONGRUENT);
+      }
+    }
   }
-  CHECK(d.getNumGlobalPatches() == 1);
-  CHECK(d.getNumLocalPatches() == 1);
-  CHECK(d.getNumGlobalCells() == n * n);
-  CHECK(d.getNumLocalCells() == n * n);
-  CHECK(d.getNumLocalCellsWithGhost() == (n + 2 * num_ghost) * (n + 2 * num_ghost));
-  CHECK(d.getNumCellsInPatch() == n * n);
-  CHECK(d.getNumGhostCells() == num_ghost);
-  CHECK(d.volume() == Catch::Approx(spacing * spacing * n * n));
-
-  int result;
-  int err = MPI_Comm_compare(comm.getMPIComm(), d.getCommunicator().getMPIComm(), &result);
-  REQUIRE(err == MPI_SUCCESS);
-  CHECK(result == MPI_CONGRUENT);
 }
 TEST_CASE("Domain setTimer", "[Domain]")
 {
@@ -127,22 +129,23 @@ TEST_CASE("Domain getTimer default is no timer", "[Domain]")
 }
 TEST_CASE("Domain id in constructor", "[Domain]")
 {
-  Communicator comm(MPI_COMM_WORLD);
+  for (auto id : { 1, 2, 9 }) {
+    Communicator comm(MPI_COMM_WORLD);
 
-  vector<PatchInfo<2>> pinfos(1);
+    vector<PatchInfo<2>> pinfos(1);
 
-  int n = 10;
-  double spacing = 0.01;
-  int num_ghost = 1;
+    int n = 10;
+    double spacing = 0.01;
+    int num_ghost = 1;
 
-  pinfos[0].id = 0;
-  pinfos[0].ns.fill(n);
-  pinfos[0].spacings.fill(spacing);
-  pinfos[0].num_ghost_cells = num_ghost;
-  auto id = GENERATE(1, 2, 9);
-  Domain<2> d(comm, id, { n, n }, num_ghost, pinfos.begin(), pinfos.end());
+    pinfos[0].id = 0;
+    pinfos[0].ns.fill(n);
+    pinfos[0].spacings.fill(spacing);
+    pinfos[0].num_ghost_cells = num_ghost;
+    Domain<2> d(comm, id, { n, n }, num_ghost, pinfos.begin(), pinfos.end());
 
-  CHECK(d.getId() == id);
+    CHECK(d.getId() == id);
+  }
 }
 TEST_CASE("Domain to_json", "[Domain]")
 {
@@ -230,8 +233,7 @@ TEST_CASE("Domain<3> local indexes match position in pinfo vector", "[Domain]")
     CHECK(pinfo_vector[i].local_index == (int)i);
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consistent",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consistent", "[Schur::InterfaceDomain]")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", { 10, 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -325,9 +327,7 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent", "[Domain]"
     id_to_global_index_map[pinfo.id] = pinfo.local_index;
   }
 
-  auto checkIdAndLocalIndex = [&](int id, int global_index) {
-    CHECK(global_index == id_to_global_index_map.at(id));
-  };
+  auto checkIdAndLocalIndex = [&](int id, int global_index) { CHECK(global_index == id_to_global_index_map.at(id)); };
   for (auto pinfo : domain.getPatchInfoVector()) {
     for (Side<3> s : Side<3>::getValues()) {
       if (pinfo.hasNbr(s)) {

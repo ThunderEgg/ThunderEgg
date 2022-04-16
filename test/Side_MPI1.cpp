@@ -79,15 +79,13 @@ TEST_CASE("Test that named constructors for Side<3> give expected index values",
   CHECK(Side<3>::top().getIndex() == 5);
   CHECK(Side<3>::null().getIndex() == 6);
 }
-TEST_CASE("Test that named constructors for Side<1> give expected axis index values",
-          "[Side][Face]")
+TEST_CASE("Test that named constructors for Side<1> give expected axis index values", "[Side][Face]")
 {
   CHECK(Side<1>::west().getAxisIndex() == 0);
   CHECK(Side<1>::east().getAxisIndex() == 0);
   CHECK(Side<1>::null().getAxisIndex() == 1);
 }
-TEST_CASE("Test that named constructors for Side<2> give expected axis index values",
-          "[Side][Face]")
+TEST_CASE("Test that named constructors for Side<2> give expected axis index values", "[Side][Face]")
 {
   CHECK(Side<2>::west().getAxisIndex() == 0);
   CHECK(Side<2>::east().getAxisIndex() == 0);
@@ -95,8 +93,7 @@ TEST_CASE("Test that named constructors for Side<2> give expected axis index val
   CHECK(Side<2>::north().getAxisIndex() == 1);
   CHECK(Side<2>::null().getAxisIndex() == 2);
 }
-TEST_CASE("Test that named constructors for Side<3> give expected axis index values",
-          "[Side][Face]")
+TEST_CASE("Test that named constructors for Side<3> give expected axis index values", "[Side][Face]")
 {
   CHECK(Side<3>::west().getAxisIndex() == 0);
   CHECK(Side<3>::east().getAxisIndex() == 0);

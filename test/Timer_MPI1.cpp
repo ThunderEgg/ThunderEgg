@@ -93,14 +93,16 @@ TEST_CASE("Timer ostream operator throws with unfinished timing", "[Timer]")
 }
 TEST_CASE("Timer Two DomainTimings Sequential Stop second before started", "[Timer]")
 {
-  Communicator comm(MPI_COMM_WORLD);
-  Timer timer(comm);
-  timer.addDomain(0, GetDomain(comm));
-  timer.startDomainTiming(0, "A");
-  timer.stopDomainTiming(0, "A");
-  int id = GENERATE(0, 1);
-  const string name = GENERATE("A", "B", "");
-  REQUIRE_THROWS_AS(timer.stopDomainTiming(id, name), RuntimeError);
+  for (int id : { 0, 1 }) {
+    for (const string name : { "A", "B", "" }) {
+      Communicator comm(MPI_COMM_WORLD);
+      Timer timer(comm);
+      timer.addDomain(0, GetDomain(comm));
+      timer.startDomainTiming(0, "A");
+      timer.stopDomainTiming(0, "A");
+      REQUIRE_THROWS_AS(timer.stopDomainTiming(id, name), RuntimeError);
+    }
+  }
 }
 TEST_CASE("Timer DomainTimings Nested Wrong id on stop", "[Timer]")
 {
@@ -387,8 +389,7 @@ TEST_CASE("Timer to_json unassociated timing with two different int info calls",
   CHECK(j["timings"][0]["infos"][1]["num_calls"] == 1);
   CHECK(j["timings"][0]["infos"][1]["sum"] == 1);
 }
-TEST_CASE("Timer to_json unassociated timing with two different int and double info calls",
-          "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with two different int and double info calls", "[Timer]")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -695,8 +696,7 @@ TEST_CASE("Timer ostream domain timing two different domains sequential", "[Time
   CHECK(occurrences(s, "max (sec)") == 1);
   CHECK(occurrences(s, "average calls per rank") == 1);
 }
-TEST_CASE("Timer ostream domain timing two different domains with information sequential",
-          "[Timer]")
+TEST_CASE("Timer ostream domain timing two different domains with information sequential", "[Timer]")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -889,6 +889,5 @@ TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
   timer.stopDomainTiming(1, "B");
   timer.stopDomainTiming(1, "A");
 
-  CHECK_THROWS_AS(timer.saveToFile("surely/this/directory/does/not/exist/timer.json"),
-                  RuntimeError);
+  CHECK_THROWS_AS(timer.saveToFile("surely/this/directory/does/not/exist/timer.json"), RuntimeError);
 }

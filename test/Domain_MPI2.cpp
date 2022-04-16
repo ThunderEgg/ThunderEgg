@@ -119,8 +119,7 @@ TEST_CASE("Domain<3> local indexes match position in pinfo vector", "[Domain]")
     CHECK(pinfo_vector[i].local_index == (int)i);
   }
 }
-TEST_CASE("Schur::InterfaceDomain<3> local indexes in neighbor info are consistent",
-          "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<3> local indexes in neighbor info are consistent", "[Schur::InterfaceDomain]")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi2.json", { 10, 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -223,21 +222,14 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent", "[Domain]"
     global_index_to_id_in[pinfo.global_index] = pinfo.id;
   }
 
-  MPI_Allreduce(global_index_to_id_in.data(),
-                global_index_to_id_out.data(),
-                global_index_to_id_in.size(),
-                MPI_INT,
-                MPI_SUM,
-                MPI_COMM_WORLD);
+  MPI_Allreduce(global_index_to_id_in.data(), global_index_to_id_out.data(), global_index_to_id_in.size(), MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
   map<int, int> id_to_global_index_map;
   for (size_t i = 0; i < global_index_to_id_out.size(); i++) {
     id_to_global_index_map[global_index_to_id_out[i]] = i;
   }
 
-  auto checkIdAndLocalIndex = [&](int id, int global_index) {
-    CHECK(global_index == id_to_global_index_map.at(id));
-  };
+  auto checkIdAndLocalIndex = [&](int id, int global_index) { CHECK(global_index == id_to_global_index_map.at(id)); };
   for (auto pinfo : domain.getPatchInfoVector()) {
     for (Side<3> s : Side<3>::getValues()) {
       if (pinfo.hasNbr(s)) {

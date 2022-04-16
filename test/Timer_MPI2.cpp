@@ -561,9 +561,7 @@ TEST_CASE("Timer ostream domain timing two different domains sequential", "[Time
     CHECK(s.size() == 0);
   }
 }
-TEST_CASE(
-  "Timer ostream domain timing two different domains sequential rank 0 has unrelated timing",
-  "[Timer]")
+TEST_CASE("Timer ostream domain timing two different domains sequential rank 0 has unrelated timing", "[Timer]")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -780,8 +778,7 @@ TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
   timer.stopDomainTiming(1, "A");
 
   if (comm.getRank() == 0) {
-    CHECK_THROWS_AS(timer.saveToFile("surely/this/directory/does/not/exist/timer.json"),
-                    RuntimeError);
+    CHECK_THROWS_AS(timer.saveToFile("surely/this/directory/does/not/exist/timer.json"), RuntimeError);
   } else {
     timer.saveToFile("surely/this/directory/does/not/exist/timer.json");
   }
