@@ -1,11 +1,11 @@
 <map id="src/ThunderEgg/Schur/IfaceType.h" name="src/ThunderEgg/Schur/IfaceType.h">
-<area shape="rect" id="node1" title="IfaceType class." alt="" coords="299,5,461,47"/>
-<area shape="rect" id="node2" href="$Orthant_8h.html" title="Orthant class." alt="" coords="231,95,395,121"/>
-<area shape="rect" id="node9" title=" " alt="" coords="419,95,474,121"/>
-<area shape="rect" id="node3" href="$Face_8h.html" title="Face class." alt="" coords="55,169,199,196"/>
-<area shape="rect" id="node5" title=" " alt="" coords="208,244,264,271"/>
-<area shape="rect" id="node6" title=" " alt="" coords="273,169,353,196"/>
-<area shape="rect" id="node7" title=" " alt="" coords="377,169,452,196"/>
-<area shape="rect" id="node8" title=" " alt="" coords="477,169,539,196"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,244,184,271"/>
+<area shape="rect" id="node1" title="IfaceType class." alt="" coords="271,5,434,47"/>
+<area shape="rect" id="node2" href="$Orthant_8h.html" title="Orthant class." alt="" coords="204,95,368,121"/>
+<area shape="rect" id="node9" title=" " alt="" coords="392,95,447,121"/>
+<area shape="rect" id="node3" href="$Face_8h.html" title="Face class." alt="" coords="27,169,171,196"/>
+<area shape="rect" id="node5" title=" " alt="" coords="181,251,237,278"/>
+<area shape="rect" id="node6" title=" " alt="" coords="246,169,326,196"/>
+<area shape="rect" id="node7" title=" " alt="" coords="350,169,425,196"/>
+<area shape="rect" id="node8" title=" " alt="" coords="449,169,512,196"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,244,156,285"/>
 </map>

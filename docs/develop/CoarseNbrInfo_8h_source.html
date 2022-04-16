@@ -166,35 +166,36 @@ $(document).ready(function(){initNavTree('CoarseNbrInfo_8h_source.html',''); ini
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordflow">return</span> std::make_unique&lt;CoarseNbrInfo&lt;D&gt;&gt;(*this);</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  }</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;};</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">template</span>&lt;<span class="keywordtype">int</span> D&gt;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;to_json(tpl::nlohmann::json&amp; j, <span class="keyword">const</span> CoarseNbrInfo&lt;D&gt;&amp; n)</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;{</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  j[<span class="stringliteral">&quot;type&quot;</span>] = <a class="code" href="namespaceThunderEgg.html#a49f4aa7867b8d56b98e80a1d04635464a1fb282a269a2bc94abc136c0511daa59">NbrType::Coarse</a>;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  j[<span class="stringliteral">&quot;ids&quot;</span>] = { n.id };</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;  j[<span class="stringliteral">&quot;ranks&quot;</span>] = { n.rank };</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;  j[<span class="stringliteral">&quot;orth_on_coarse&quot;</span>] = n.orth_on_coarse;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keyword">template</span>&lt;<span class="keywordtype">int</span> D&gt;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="keywordtype">void</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;from_json(<span class="keyword">const</span> tpl::nlohmann::json&amp; j, CoarseNbrInfo&lt;D&gt;&amp; n)</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;{</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  n.id = j[<span class="stringliteral">&quot;ids&quot;</span>][0];</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  n.rank = j[<span class="stringliteral">&quot;ranks&quot;</span>][0];</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  <span class="keywordflow">if</span> (j.contains(<span class="stringliteral">&quot;orth_on_coarse&quot;</span>)) {</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    n.orth_on_coarse = j[<span class="stringliteral">&quot;orth_on_coarse&quot;</span>].get&lt;Orthant&lt;D&gt;&gt;();</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    n.orth_on_coarse = <a class="code" href="classThunderEgg_1_1Orthant.html#ac27ef0346a1fa7f592a46a8bd629d700">Orthant&lt;D&gt;::null</a>();</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;  }</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;}</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;} <span class="comment">// namespace ThunderEgg</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="keyword">template</span>&lt;<span class="keywordtype">int</span> D&gt;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;to_json(tpl::nlohmann::json&amp; j, <span class="keyword">const</span> CoarseNbrInfo&lt;D&gt;&amp; n);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="keyword">template</span>&lt;<span class="keywordtype">int</span> D&gt;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="keywordtype">void</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;from_json(<span class="keyword">const</span> tpl::nlohmann::json&amp; j, CoarseNbrInfo&lt;D&gt;&amp; n);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keyword">extern</span> <span class="keyword">template</span> <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;to_json(tpl::nlohmann::json&amp; j, <span class="keyword">const</span> CoarseNbrInfo&lt;0&gt;&amp; n);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keyword">extern</span> <span class="keyword">template</span> <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;to_json(tpl::nlohmann::json&amp; j, <span class="keyword">const</span> CoarseNbrInfo&lt;1&gt;&amp; n);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="keyword">extern</span> <span class="keyword">template</span> <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;to_json(tpl::nlohmann::json&amp; j, <span class="keyword">const</span> CoarseNbrInfo&lt;2&gt;&amp; n);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="keyword">extern</span> <span class="keyword">template</span> <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;from_json(<span class="keyword">const</span> tpl::nlohmann::json&amp; j, CoarseNbrInfo&lt;0&gt;&amp; n);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="keyword">extern</span> <span class="keyword">template</span> <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;from_json(<span class="keyword">const</span> tpl::nlohmann::json&amp; j, CoarseNbrInfo&lt;1&gt;&amp; n);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="keyword">extern</span> <span class="keyword">template</span> <span class="keywordtype">void</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;from_json(<span class="keyword">const</span> tpl::nlohmann::json&amp; j, CoarseNbrInfo&lt;2&gt;&amp; n);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160; </div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;} <span class="comment">// namespace ThunderEgg</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassThunderEgg_1_1CoarseNbrInfo_html_a99a18a1afa435fbba10be61a67956dd2"><div class="ttname"><a href="classThunderEgg_1_1CoarseNbrInfo.html#a99a18a1afa435fbba10be61a67956dd2">ThunderEgg::CoarseNbrInfo::getNbrIds</a></div><div class="ttdeci">void getNbrIds(std::deque&lt; int &gt; &amp;nbr_ids) const override</div><div class="ttdoc">Add to a deque of neighbor ids.</div><div class="ttdef"><b>Definition:</b> CoarseNbrInfo.h:80</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1CoarseNbrInfo_html_a1c3f47479bbcd0be8a2658a3fd2b252f"><div class="ttname"><a href="classThunderEgg_1_1CoarseNbrInfo.html#a1c3f47479bbcd0be8a2658a3fd2b252f">ThunderEgg::CoarseNbrInfo::id</a></div><div class="ttdeci">int id</div><div class="ttdoc">The id of the neighbor.</div><div class="ttdef"><b>Definition:</b> CoarseNbrInfo.h:49</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1CoarseNbrInfo_html_afb34836b096ddea5c8cc20c3bd318398"><div class="ttname"><a href="classThunderEgg_1_1CoarseNbrInfo.html#afb34836b096ddea5c8cc20c3bd318398">ThunderEgg::CoarseNbrInfo::clone</a></div><div class="ttdeci">std::unique_ptr&lt; NbrInfoBase &gt; clone() const override</div><div class="ttdoc">get a clone of this object (equivalent to copy constructor)</div><div class="ttdef"><b>Definition:</b> CoarseNbrInfo.h:109</div></div>
-<div class="ttc" id="aclassThunderEgg_1_1Orthant_html_ac27ef0346a1fa7f592a46a8bd629d700"><div class="ttname"><a href="classThunderEgg_1_1Orthant.html#ac27ef0346a1fa7f592a46a8bd629d700">ThunderEgg::Orthant::null</a></div><div class="ttdeci">static Orthant&lt; D &gt; null()</div><div class="ttdoc">null value</div><div class="ttdef"><b>Definition:</b> Orthant.h:68</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1Orthant_html"><div class="ttname"><a href="classThunderEgg_1_1Orthant.html">ThunderEgg::Orthant</a></div><div class="ttdoc">An enum-style class that represents the octants of a cube.</div><div class="ttdef"><b>Definition:</b> Orthant.h:43</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1CoarseNbrInfo_html_a6b0220a28e11ff6c84e4092baa800c4a"><div class="ttname"><a href="classThunderEgg_1_1CoarseNbrInfo.html#a6b0220a28e11ff6c84e4092baa800c4a">ThunderEgg::CoarseNbrInfo::global_index</a></div><div class="ttdeci">int global_index</div><div class="ttdoc">The global index of the neighbor.</div><div class="ttdef"><b>Definition:</b> CoarseNbrInfo.h:57</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1BufferWriter_html"><div class="ttname"><a href="classThunderEgg_1_1BufferWriter.html">ThunderEgg::BufferWriter</a></div><div class="ttdoc">Class that is used to help serialize objects into a buffer.</div><div class="ttdef"><b>Definition:</b> BufferWriter.h:38</div></div>
