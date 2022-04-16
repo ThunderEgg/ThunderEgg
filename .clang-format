@@ -1,2 +1,2 @@
 BasedOnStyle : Mozilla
-ColumnLimit: 100
+ColumnLimit: 1000
