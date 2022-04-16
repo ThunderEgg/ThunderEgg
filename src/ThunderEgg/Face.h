@@ -28,6 +28,7 @@
 
 #include <ThunderEgg/tpl/json_fwd.hpp>
 #include <array>
+
 namespace ThunderEgg {
 /**
  * @brief Enum-style class for the faces of an n-dimensional cube
@@ -38,6 +39,7 @@ namespace ThunderEgg {
  * For 3D, this class represents corners (`M = 0`), edges (`M = 1`), and faces (`M = 2`).
  */
 template<int D, int M>
+  requires(D <= 3 && D >= 0) && (M >= 0 && M <= D)
 class Face
 {
 private:
@@ -49,22 +51,32 @@ private:
   /**
    * @brief 2^N
    */
-  static constexpr size_t twopow(size_t N) { return 0b1 << N; }
+  static constexpr size_t
+  twopow(size_t N)
+  {
+    return 0b1 << N;
+  }
 
   /**
    * @brief N!
    */
-  static constexpr size_t factorial(size_t N) { return N == 0 ? 1 : N * factorial(N - 1); }
+  static constexpr size_t
+  factorial(size_t N)
+  {
+    return N == 0 ? 1 : N * factorial(N - 1);
+  }
 
   /**
    * @brief N choose K
    */
-  static constexpr size_t choose(size_t N, size_t K)
+  static constexpr size_t
+  choose(size_t N, size_t K)
   {
     return factorial(N) / (factorial(K) * factorial(N - K));
   }
 
-  static constexpr size_t sum(int N)
+  static constexpr size_t
+  sum(int N)
   {
     return N == -1 ? 0 : (twopow(D - N) * choose(D, N) + sum(N - 1));
   }
@@ -77,6 +89,7 @@ public:
   static constexpr size_t number_of = twopow(D - M) * choose(D, M);
 
   static constexpr size_t sum_of_faces = M <= 0 ? 0 : sum(M - 1);
+
   /**
    * @brief Construct a new Face object
    *
@@ -85,8 +98,6 @@ public:
   explicit Face(unsigned char value)
     : value(value)
   {
-    static_assert(D <= 3 && D >= 0, "Only up to 3 dimensions supported");
-    static_assert(M >= 0 && M < D, "Invalid M value");
   }
 
   /**
@@ -103,7 +114,11 @@ public:
    *
    * @return Face<D, M>  the null value
    */
-  static Face<D, M> null() { return Face<D, M>(number_of); }
+  static Face<D, M>
+  null()
+  {
+    return Face<D, M>(number_of);
+  }
 
   /*
    * these can be cleaned up when version is bumped to c++20
@@ -113,51 +128,58 @@ public:
    * @brief west side
    */
   template<int N = 0>
-  static auto west() -> typename std::enable_if<D <= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto
+  west() -> typename std::enable_if<D <= 3 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b000);
   }
+
   /**
    * @brief east side
    */
   template<int N = 0>
-  static auto east() -> typename std::enable_if<D <= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto
+  east() -> typename std::enable_if<D <= 3 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b001);
   }
+
   /**
    * @brief south side
    */
   template<int N = 0>
-  static auto south() ->
-    typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto
+  south() -> typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b010);
   }
+
   /**
    * @brief north side
    */
   template<int N = 0>
-  static auto north() ->
-    typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto
+  north() -> typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b011);
   }
+
   /**
    * @brief bottom side
    */
   template<int N = 0>
-  static auto bottom() ->
-    typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto
+  bottom() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b100);
   }
+
   /**
    * @brief top side
    */
   template<int N = 0>
-  static auto top() ->
-    typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto
+  top() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b101);
   }
@@ -166,31 +188,38 @@ public:
    * @brief southwest corner
    */
   template<int N = 0>
-  static auto sw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  sw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b00);
   }
+
   /**
    * @brief southeast corner
    */
   template<int N = 0>
-  static auto se() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  se() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b01);
   }
+
   /**
    * @brief northwest corner
    */
   template<int N = 0>
-  static auto nw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  nw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b10);
   }
+
   /**
    * @brief northeast corner
    */
   template<int N = 0>
-  static auto ne() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  ne() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b11);
   }
@@ -199,63 +228,78 @@ public:
    * @brief bottom-south-west corner
    */
   template<int N = 0>
-  static auto bsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  bsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b000);
   }
+
   /**
    * @brief bottom-south-east corner
    */
   template<int N = 0>
-  static auto bse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  bse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b001);
   }
+
   /**
    * @brief bottom-north-west corner
    */
   template<int N = 0>
-  static auto bnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  bnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b010);
   }
+
   /**
    * @brief bottom-north-east corner
    */
   template<int N = 0>
-  static auto bne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  bne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b011);
   }
+
   /**
    * @brief top-south-west corner
    */
   template<int N = 0>
-  static auto tsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  tsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b100);
   }
+
   /**
    * @brief top-south-east corner
    */
   template<int N = 0>
-  static auto tse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  tse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b101);
   }
+
   /**
    * @brief top-north-west corner
    */
   template<int N = 0>
-  static auto tnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  tnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b110);
   }
+
   /**
    * @brief top-north-east corner
    */
   template<int N = 0>
-  static auto tne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static auto
+  tne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b111);
   }
@@ -264,95 +308,118 @@ public:
    * @brief bottom-south edge
    */
   template<int N = 0>
-  static auto bs() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  bs() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b0000);
   }
+
   /**
    * @brief bottom-north edge
    */
   template<int N = 0>
-  static auto bn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  bn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b0001);
   }
+
   /**
    * @brief top-south edge
    */
   template<int N = 0>
-  static auto ts() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  ts() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b0010);
   }
+
   /**
    * @brief top-north edge
    */
   template<int N = 0>
-  static auto tn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  tn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b0011);
   }
+
   /**
    * @brief bottom-west edge
    */
   template<int N = 0>
-  static auto bw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  bw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b0100);
   }
+
   /**
    * @brief bottom-east edge
    */
   template<int N = 0>
-  static auto be() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  be() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b0101);
   }
+
   /**
    * @brief top-west edge
    */
   template<int N = 0>
-  static auto tw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  tw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b0110);
   }
+
   /**
    * @brief top-east edge
    */
   template<int N = 0>
-  static auto te() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  te() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b0111);
   }
+
   /**
    * @brief south-west edge
    */
   template<int N = 0>
-  static auto sw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  sw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b1000);
   }
+
   /**
    * @brief south-east edge
    */
   template<int N = 0>
-  static auto se() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  se() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b1001);
   }
+
   /**
    * @brief north-west edge
    */
   template<int N = 0>
-  static auto nw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  nw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b1010);
   }
+
   /**
    * @brief north-east edge
    */
   template<int N = 0>
-  static auto ne() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static auto
+  ne() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b1011);
   }
@@ -386,28 +453,41 @@ public:
         : s(s)
       {
       }
+
       /**
        * @brief Increment the side value
        *
        * @return const Face<D,M>& the resulting value
        */
-      const Face<D, M>& operator++()
+      const Face<D, M>&
+      operator++()
       {
         ++s.value;
         return s;
       }
+
       /**
        * @brief Get a reference to the side object
        *
        * @return const Face<D,M>&  the reference
        */
-      const Face<D, M>& operator*() const { return s; }
+      const Face<D, M>&
+      operator*() const
+      {
+        return s;
+      }
+
       /**
        * @brief Get a pointer to the side object
        *
        * @return const Face<D,M>* the pointer
        */
-      const Face<D, M>* operator->() const { return &s; }
+      const Face<D, M>*
+      operator->() const
+      {
+        return &s;
+      }
+
       /**
        * @brief Check the iterators reference the same value
        *
@@ -415,7 +495,12 @@ public:
        * @return true if the same
        * @return false if different
        */
-      bool operator==(const Iterator& b) const { return s.value == b.s.value; }
+      bool
+      operator==(const Iterator& b) const
+      {
+        return s.value == b.s.value;
+      }
+
       /**
        * @brief Check the iterators don't reference the same value
        *
@@ -423,41 +508,65 @@ public:
        * @return true if different
        * @return false if the same
        */
-      bool operator!=(const Iterator& b) const { return s.value != b.s.value; }
+      bool
+      operator!=(const Iterator& b) const
+      {
+        return s.value != b.s.value;
+      }
     };
+
     /**
      * @brief Returns an iterator with the lowest Side value
      *
      * @return Iterator the iterator
      */
-    Iterator begin() { return Iterator(Face<D, M>(0)); }
+    Iterator
+    begin()
+    {
+      return Iterator(Face<D, M>(0));
+    }
+
     /**
      * @brief Returns an iterator with Edge<D,M>::null()
      *
      * @return Iterator the iterator
      */
-    Iterator end() { return Iterator(null()); }
+    Iterator
+    end()
+    {
+      return Iterator(null());
+    }
   };
+
   /**
    * @brief Get a range of values that can be iterated over
    *
    * @return Range the range of values
    */
-  static Range getValues() { return Range(); }
+  static Range
+  getValues()
+  {
+    return Range();
+  }
 
   /**
    * @brief Get the index for this Face
    *
    * @return size_t the index
    */
-  size_t getIndex() const { return value; }
+  size_t
+  getIndex() const
+  {
+    return value;
+  }
 
   /**
    * @brief Get the axis index of this side
    */
   template<int N = 0>
-  auto getAxisIndex() const ->
-    typename std::enable_if<D <= 3 && D >= 1 && M == D - 1 && N == N, size_t>::type
+  auto
+  getAxisIndex() const ->
+    typename std::enable_if<D <= 3 && D >= 0 && M == (D == 0 ? 0 : D - 1) && N == N, size_t>::type
   {
     return value >> 1;
   }
@@ -466,8 +575,9 @@ public:
    * @brief Return if this side is lower on it's axis
    */
   template<int N = 0>
-  auto isLowerOnAxis() const ->
-    typename std::enable_if<D <= 3 && D >= 1 && M == D - 1 && N == N, bool>::type
+  auto
+  isLowerOnAxis() const ->
+    typename std::enable_if<D <= 3 && D >= 0 && M == (D == 0 ? 0 : D - 1) && N == N, bool>::type
   {
     return !(value & 0b1);
   }
@@ -476,8 +586,9 @@ public:
    * @brief Return if this side is higher on it's axis
    */
   template<int N = 0>
-  auto isHigherOnAxis() const ->
-    typename std::enable_if<D <= 3 && D >= 1 && M == D - 1 && N == N, bool>::type
+  auto
+  isHigherOnAxis() const ->
+    typename std::enable_if<D <= 3 && D >= 0 && M == D - 1 && N == N, bool>::type
   {
     return value & 0b1;
   }
@@ -487,14 +598,19 @@ public:
    *
    * @return Face<D, M> the face on the opposite side
    */
-  Face<D, M> opposite() const { return Face<D, M>(value ^ ~((~0u) << (D - M))); }
+  Face<D, M>
+  opposite() const
+  {
+    return Face<D, M>(value ^ ~((~0u) << (D - M)));
+  }
 
   /**
    * @brief Get the Sides that this Face lies on
    *
    * @return std::array<Face<D, D - 1>, D - M> the sides
    */
-  std::array<Face<D, D - 1>, D - M> getSides() const
+  std::array<Face<D, D == 0 ? 0 : D - 1>, D - M>
+  getSides() const
   {
     std::array<Face<D, D - 1>, D - M> sides;
     if constexpr (D > 1 && M == 0) {
@@ -528,7 +644,11 @@ public:
    *
    * @return Whether or not the index of this face is lower than the other face.
    */
-  bool operator<(const Face<D, M>& other) const { return value < other.value; }
+  bool
+  operator<(const Face<D, M>& other) const
+  {
+    return value < other.value;
+  }
 
   /**
    * @brief Equals operator.
@@ -537,7 +657,11 @@ public:
    *
    * @return Whether or not the value of this face equals the value other face.
    */
-  bool operator==(const Face<D, M>& other) const { return value == other.value; }
+  bool
+  operator==(const Face<D, M>& other) const
+  {
+    return value == other.value;
+  }
 
   /**
    * @brief Not Equals operator.
@@ -546,7 +670,11 @@ public:
    *
    * @return Whether or not the value of this face equals the value other face.
    */
-  bool operator!=(const Face<D, M>& other) const { return value != other.value; }
+  bool
+  operator!=(const Face<D, M>& other) const
+  {
+    return value != other.value;
+  }
 };
 
 /**
@@ -555,7 +683,8 @@ public:
  * @tparam D the number of Cartesian dimensions
  */
 template<int D>
-using Side = Face<D, D - 1>;
+using Side = Face<D, D == 0 ? 0 : D - 1>;
+
 /**
  * @brief Get the higher side on a given axis
  *
@@ -569,6 +698,7 @@ HigherSideOnAxis(size_t axis)
 {
   return Side<D>((axis << 1) + 1);
 }
+
 /**
  * @brief Get the lower side on a given axis
  *
@@ -582,6 +712,7 @@ LowerSideOnAxis(size_t axis)
 {
   return Side<D>(axis << 1);
 }
+
 void
 to_json(tpl::nlohmann::json& j, const Side<1>& s);
 void

@@ -30,7 +30,15 @@
 #include <iostream>
 #include <numeric>
 #include <vector>
+
 namespace ThunderEgg {
+
+template<int D>
+constexpr bool is_supported_side_dimension = D >= 1 && D <= 3;
+
+template<int D>
+constexpr bool is_supported_orthant_dimension = D >= 0 && D <= 3;
+
 /**
  * @brief An enum-style class that represents the octants of a cube.
  *
@@ -40,6 +48,7 @@ namespace ThunderEgg {
  * meet.
  */
 template<int D>
+  requires is_supported_orthant_dimension<D>
 class Orthant
 {
 private:
@@ -50,78 +59,109 @@ private:
 
 public:
   static constexpr size_t num_orthants = 1 << D;
+
   /**
    * @brief Create new Orthant<D> with given value.
    *
    * @param val_in the value
    */
-  explicit Orthant(const unsigned char val_in)
-    : val(val_in)
-  {}
+  explicit Orthant(const unsigned char val_in);
+
   /**
    * @brief Default constructor that initializes the value to null().
    */
-  Orthant() {}
+  Orthant();
+
   /**
    * @brief null value
    */
-  static Orthant<D> null() { return Orthant<D>(num_orthants); }
+  static Orthant<D>
+  null();
+
   /**
    * @brief Lower half of line.
    */
-  static Orthant<1> lower() { return Orthant<1>(0b0); }
+  static Orthant<1>
+  lower();
+
   /**
    * @brief Upper half of line.
    */
-  static Orthant<1> upper() { return Orthant<1>(0b1); }
+  static Orthant<1>
+  upper();
+
   /**
    * @brief South-West quadrant of square.
    */
-  static Orthant<2> sw() { return Orthant<2>(0b00); }
+  static Orthant<2>
+  sw();
+
   /**
    * @brief South-East quadrant of square.
    */
-  static Orthant<2> se() { return Orthant<2>(0b01); }
+  static Orthant<2>
+  se();
+
   /**
    * @brief North-West quadrant of square.
    */
-  static Orthant<2> nw() { return Orthant<2>(0b10); }
+  static Orthant<2>
+  nw();
+
   /**
    * @brief North-East quadrant of square.
    */
-  static Orthant<2> ne() { return Orthant<2>(0b11); }
+  static Orthant<2>
+  ne();
+
   /**
    * @brief Bottom-South-West octant of cube.
    */
-  static Orthant<3> bsw() { return Orthant<3>(0b000); }
+  static Orthant<3>
+  bsw();
+
   /**
    * @brief Bottom-South-East octant of cube.
    */
-  static Orthant<3> bse() { return Orthant<3>(0b001); }
+  static Orthant<3>
+  bse();
+
   /**
    * @brief Bottom-North-West octant of cube.
    */
-  static Orthant<3> bnw() { return Orthant<3>(0b010); }
+  static Orthant<3>
+  bnw();
+
   /**
    * @brief Bottom-North-East octant of cube.
    */
-  static Orthant<3> bne() { return Orthant<3>(0b011); }
+  static Orthant<3>
+  bne();
+
   /**
    * @brief Top-South-West octant of cube.
    */
-  static Orthant<3> tsw() { return Orthant<3>(0b100); }
+  static Orthant<3>
+  tsw();
+
   /**
    * @brief Top-South-East octant of cube.
    */
-  static Orthant<3> tse() { return Orthant<3>(0b101); }
+  static Orthant<3>
+  tse();
+
   /**
    * @brief Top-North-West octant of cube.
    */
-  static Orthant<3> tnw() { return Orthant<3>(0b110); }
+  static Orthant<3>
+  tnw();
+
   /**
    * @brief Top-North-East octant of cube.
    */
-  static Orthant<3> tne() { return Orthant<3>(0b111); }
+  static Orthant<3>
+  tne();
+
   /**
    * @brief Range class for Orthant
    *
@@ -147,31 +187,32 @@ public:
        *
        * @param o_in the orthant
        */
-      explicit Iterator(Orthant<D> o_in)
-        : o(o_in)
-      {}
+      explicit Iterator(Orthant<D> o_in);
+
       /**
        * @brief Increment the Orthant value
        *
        * @return const Orthant<D>& the resulting value
        */
-      const Orthant<D>& operator++()
-      {
-        ++o.val;
-        return o;
-      }
+      const Orthant<D>&
+      operator++();
+
       /**
        * @brief Get a reference to the Orthant object
        *
        * @return const Orthant<D>&  the reference
        */
-      const Orthant<D>& operator*() const { return o; }
+      const Orthant<D>&
+      operator*() const;
+
       /**
        * @brief Get a pointer to the Orthant object
        *
        * @return const Orthant<D>* the pointer
        */
-      const Orthant<D>* operator->() const { return &o; }
+      const Orthant<D>*
+      operator->() const;
+
       /**
        * @brief Check the iterators reference the same value
        *
@@ -179,7 +220,9 @@ public:
        * @return true if the same
        * @return false if different
        */
-      bool operator==(const Iterator& b) const { return o.val == b.o.val; }
+      bool
+      operator==(const Iterator& b) const;
+
       /**
        * @brief Check the iterators don't reference the same value
        *
@@ -187,33 +230,43 @@ public:
        * @return true if different
        * @return false if the same
        */
-      bool operator!=(const Iterator& b) const { return o.val != b.o.val; }
+      bool
+      operator!=(const Iterator& b) const;
     };
+
     /**
      * @brief Returns an iterator with the lowest Orthant value
      *
      * @return Iterator the iterator
      */
-    Iterator begin() { return Iterator(Orthant<D>(0)); }
+    Iterator
+    begin();
+
     /**
      * @brief Returns an iterator with Orthant<D>::null()
      *
      * @return Iterator the iterator
      */
-    Iterator end() { return Iterator(null()); }
+    Iterator
+    end();
   };
+
   /**
    * @brief Get a range of values that can be iterated over
    *
    * @return Range the range of values
    */
-  static Range getValues() { return Range(); }
+  static Range
+  getValues();
+
   /**
    * @brief Get the integer value of the octant.
    *
    * @return The integer value.
    */
-  size_t getIndex() const { return val; }
+  size_t
+  getIndex() const;
+
   /**
    * @brief Return the octant that neighbors this octant on a particular side.
    *
@@ -221,47 +274,25 @@ public:
    *
    * @return  The octant that neighbors on that side.
    */
-  Orthant<D> getNbrOnSide(Side<D> s) const
-  {
-    Orthant<D> retval = *this;
-    // flip the bit for that side
-    retval.val ^= (0x1 << s.getAxisIndex());
-    return retval;
-  }
+  Orthant<D>
+  getNbrOnSide(Side<D> s) const;
+
   /**
    * @brief Get the sides of the octant that are on the interior of the cube.
    *
    * @return The sides of the octant that are on the interior of the cube.
    */
-  std::array<Side<D>, D> getInteriorSides() const
-  {
-    std::array<Side<D>, D> retval;
-    for (size_t i = 0; i < D; i++) {
-      size_t side = 2 * i;
-      if (!((1 << i) & val)) {
-        side |= 1;
-      }
-      retval[i] = Side<D>(side);
-    }
-    return retval;
-  }
+  std::array<Side<D>, D>
+  getInteriorSides() const;
+
   /**
    * @brief Get the sides of the octant that are on the exterior of the cube.
    *
    * @return The sides of the octant that are on the exterior of the cube.
    */
-  std::array<Side<D>, D> getExteriorSides() const
-  {
-    std::array<Side<D>, D> retval;
-    for (size_t i = 0; i < D; i++) {
-      size_t side = 2 * i;
-      if ((1 << i) & val) {
-        side |= 1;
-      }
-      retval[i] = Side<D>(side);
-    }
-    return retval;
-  }
+  std::array<Side<D>, D>
+  getExteriorSides() const;
+
   /**
    * @brief Return whether or not the octant lies on a particular side of a cube.
    *
@@ -269,15 +300,15 @@ public:
    *
    * @return Whether or not it lies on that side.
    */
-  bool isOnSide(Side<D> s) const
-  {
-    int idx = s.getIndex() / 2;
-    int remainder = s.getIndex() % 2;
-    bool is_bit_set = val & (0x1 << idx);
-    return is_bit_set == remainder;
-  }
-  bool isHigherOnAxis(size_t axis) const { return val & (0b1 << axis); }
-  bool isLowerOnAxis(size_t axis) const { return !(val & (0b1 << axis)); }
+  bool
+  isOnSide(Side<D> s) const;
+
+  bool
+  isHigherOnAxis(size_t axis) const;
+
+  bool
+  isLowerOnAxis(size_t axis) const;
+
   /**
    * @brief From the point of view of an axis, get orthant that this orthant lies on in the D-1
    * dimension
@@ -285,11 +316,10 @@ public:
    * @param axis the axis
    * @return Orthant<D - 1> the resulting orthant
    */
-  Orthant<D - 1> collapseOnAxis(size_t axis) const
-  {
-    size_t upper_mask = (~0x0U) << axis;
-    return Orthant<D - 1>(((val >> 1) & upper_mask) | (val & ~upper_mask));
-  }
+  template<int Dm1 = D - 1>
+    requires(Dm1 == D - 1) && (D - 1 >= 0)
+  Orthant<Dm1> collapseOnAxis(size_t axis) const;
+
   /**
    * @brief Get an array of all Orthant<D> values that lie on a particular side of the cube.
    *
@@ -305,22 +335,10 @@ public:
    *
    * @return The array.
    */
-  static std::array<Orthant, num_orthants / 2> getValuesOnSide(Side<D> s)
-  {
-    unsigned int bit_to_insert = s.getAxisIndex();
-    unsigned int set_bit = s.isLowerOnAxis() ? 0 : 1;
-    unsigned int lower_mask = ~((~0x0U) << bit_to_insert);
-    unsigned int upper_mask = (~0x0U) << (bit_to_insert + 1);
 
-    std::array<Orthant<D>, Orthant<D>::num_orthants / 2> retval;
-    for (size_t i = 0; i < Orthant<D>::num_orthants / 2; i++) {
-      size_t value = (i << 1) & upper_mask;
-      value |= i & lower_mask;
-      value |= set_bit << bit_to_insert;
-      retval[i] = Orthant<D>(value);
-    }
-    return retval;
-  }
+  static std::array<Orthant, num_orthants / 2>
+  getValuesOnSide(Side<D> s);
+
   /**
    * @brief Equals operator.
    *
@@ -328,7 +346,9 @@ public:
    *
    * @return Whether or not the value of this octant equals the value other octant.
    */
-  bool operator==(const Orthant<D>& other) const { return val == other.val; }
+  bool
+  operator==(const Orthant<D>& other) const;
+
   /**
    * @brief Not Equals operator.
    *
@@ -336,7 +356,9 @@ public:
    *
    * @return Whether or not the value of this octant is not equal the value other octant.
    */
-  bool operator!=(const Orthant<D>& other) const { return val != other.val; }
+  bool
+  operator!=(const Orthant<D>& other) const;
+
   /**
    * @brief Less Tan operator.
    *
@@ -344,7 +366,8 @@ public:
    *
    * @return Whether or not the value of this octant is less than the value other octant.
    */
-  bool operator<(const Orthant<D>& other) const { return val < other.val; }
+  bool
+  operator<(const Orthant<D>& other) const;
 };
 
 /**
@@ -357,16 +380,9 @@ public:
  *
  * @return  the ostream
  */
-inline std::ostream&
-operator<<(std::ostream& os, const Orthant<0>& o)
-{
-  if (o == Orthant<0>::null()) {
-    os << "Orthant<0>::null()";
-  } else {
-    os << "Orthant<0> invalid value: " << o.getIndex();
-  }
-  return os;
-}
+std::ostream&
+operator<<(std::ostream& os, const Orthant<0>& o);
+
 /**
  * @brief ostream operator that prints a string representation of Orthant<1> enum.
  *
@@ -377,20 +393,9 @@ operator<<(std::ostream& os, const Orthant<0>& o)
  *
  * @return  the ostream
  */
-inline std::ostream&
-operator<<(std::ostream& os, const Orthant<1>& o)
-{
-  if (o == Orthant<1>::lower()) {
-    os << "Orthant<1>::lower()";
-  } else if (o == Orthant<1>::upper()) {
-    os << "Orthant<1>::upper()";
-  } else if (o == Orthant<1>::null()) {
-    os << "Orthant<1>::null()";
-  } else {
-    os << "Orthant<1> invalid value: " << o.getIndex();
-  }
-  return os;
-}
+std::ostream&
+operator<<(std::ostream& os, const Orthant<1>& o);
+
 /**
  * @brief ostream operator that prints a string representation of quadrant enum.
  *
@@ -401,24 +406,9 @@ operator<<(std::ostream& os, const Orthant<1>& o)
  *
  * @return  the ostream
  */
-inline std::ostream&
-operator<<(std::ostream& os, const Orthant<2>& o)
-{
-  if (o == Orthant<2>::sw()) {
-    os << "Orthant<2>::sw()";
-  } else if (o == Orthant<2>::se()) {
-    os << "Orthant<2>::se()";
-  } else if (o == Orthant<2>::nw()) {
-    os << "Orthant<2>::nw()";
-  } else if (o == Orthant<2>::ne()) {
-    os << "Orthant<2>::ne()";
-  } else if (o == Orthant<2>::null()) {
-    os << "Orthant<2>::null()";
-  } else {
-    os << "Orthant<2> invalid value: " << o.getIndex();
-  }
-  return os;
-}
+std::ostream&
+operator<<(std::ostream& os, const Orthant<2>& o);
+
 /**
  * @brief ostream operator that prints a string representation of orthant enum.
  *
@@ -429,32 +419,9 @@ operator<<(std::ostream& os, const Orthant<2>& o)
  *
  * @return  the ostream
  */
-inline std::ostream&
-operator<<(std::ostream& os, const Orthant<3>& o)
-{
-  if (o == Orthant<3>::bsw()) {
-    os << "Orthant<3>::bsw()";
-  } else if (o == Orthant<3>::bse()) {
-    os << "Orthant<3>::bse()";
-  } else if (o == Orthant<3>::bnw()) {
-    os << "Orthant<3>::bnw()";
-  } else if (o == Orthant<3>::bne()) {
-    os << "Orthant<3>::bne()";
-  } else if (o == Orthant<3>::tsw()) {
-    os << "Orthant<3>::tsw()";
-  } else if (o == Orthant<3>::tse()) {
-    os << "Orthant<3>::tse()";
-  } else if (o == Orthant<3>::tnw()) {
-    os << "Orthant<3>::tnw()";
-  } else if (o == Orthant<3>::tne()) {
-    os << "Orthant<3>::tne()";
-  } else if (o == Orthant<3>::null()) {
-    os << "Orthant<3>::null()";
-  } else {
-    os << "Orthant<3> invalid value: " << o.getIndex();
-  }
-  return os;
-}
+std::ostream&
+operator<<(std::ostream& os, const Orthant<3>& o);
+
 void
 to_json(tpl::nlohmann::json& j, const Orthant<0>& o);
 void
@@ -471,5 +438,16 @@ void
 from_json(const tpl::nlohmann::json& j, Orthant<2>& o);
 void
 from_json(const tpl::nlohmann::json& j, Orthant<3>& o);
+
+// EXPLICIT INSTANTIATIONS
+
+extern template class Orthant<0>;
+
+extern template class Orthant<1>;
+
+extern template class Orthant<2>;
+
+extern template class Orthant<3>;
+
 } // namespace ThunderEgg
 #endif

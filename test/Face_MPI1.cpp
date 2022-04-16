@@ -96,11 +96,13 @@ TEST_CASE("Test sum_of_faces for Face<3,1>")
   size_t sum = Face<3, 1>::sum_of_faces;
   CHECK_EQ(sum, 8);
 }
+
 TEST_CASE("Test sum_of_faces for Face<3,2>")
 {
   size_t sum = Face<3, 2>::sum_of_faces;
   CHECK_EQ(sum, 20);
 }
+
 TEST_CASE("Test sum_of_faces for Face<3,3>")
 {
   size_t sum = Face<3, 3>::sum_of_faces;
