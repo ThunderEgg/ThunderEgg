@@ -28,7 +28,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Vector<3> twoNorm", "[Vector]")
+TEST_CASE("Vector<3> twoNorm")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -76,7 +76,7 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> infNorm", "[Vector]")
+TEST_CASE("Vector<3> infNorm")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -123,7 +123,7 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> dot", "[Vector]")
+TEST_CASE("Vector<3> dot")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {

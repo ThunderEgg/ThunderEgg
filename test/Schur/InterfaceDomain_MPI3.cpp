@@ -27,7 +27,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0 2d_refined_complicated", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0 2d_refined_complicated")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -45,7 +45,7 @@ TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0 
 
   CHECK(min_local_index == 0);
 }
-TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguous 2d_refined_complicated", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguous 2d_refined_complicated")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -115,7 +115,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each patch interface local index has only o
     CHECK(pair.second.size() == 1);
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_refined_complicated", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_refined_complicated")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -137,7 +137,7 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_refined_c
 
   CHECK(min_local_index == 0);
 }
-TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_refined_complicated", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_refined_complicated")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -221,7 +221,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associ
     CHECK(pair.second.size() == 1);
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0 2d_refined_complicated", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0 2d_refined_complicated")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -264,7 +264,7 @@ TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0 2d_refined_c
   }
   CHECK(min_local_index == 0);
 }
-TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous 2d_refined_complicated", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous 2d_refined_complicated")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -403,7 +403,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associ
     CHECK(pair.second.size() == 1);
   }
 }
-TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0 2d_refined_complicated", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0 2d_refined_complicated")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();
@@ -450,7 +450,7 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0 2d_refined_comp
 
   CHECK(global_min_global_index == 0);
 }
-TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous 2d_refined_complicated", "[Schur::InterfaceDomain]")
+TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous 2d_refined_complicated")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi3.json", { 10, 10 }, 0);
   Domain<2> domain = domain_reader.getFinerDomain();

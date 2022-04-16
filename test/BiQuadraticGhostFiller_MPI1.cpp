@@ -32,7 +32,7 @@ using namespace Catch;
 constexpr auto single_mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
 constexpr auto cross_mesh_file = "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json";
-TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostFiller]")
+TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller")
 {
   for (auto nx : { 10, 13 }) {
     for (auto ny : { 10, 13 }) {
@@ -253,7 +253,7 @@ TEST_CASE("exchange uniform 2D quad BiQuadraticGhostFiller", "[BiQuadraticGhostF
     }
   }
 }
-TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller", "[BiQuadraticGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 10, 13 }) {
@@ -309,7 +309,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller", "[BiQuadraticGhos
     }
   }
 }
-TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set", "[BiQuadraticGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 10, 13 }) {
@@ -365,7 +365,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set",
     }
   }
 }
-TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components", "[BiQuadraticGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 10, 13 }) {
@@ -441,7 +441,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components", "[
     }
   }
 }
-TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set two components", "[BiQuadraticGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set two components")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 10, 13 }) {
@@ -517,7 +517,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set t
     }
   }
 }
-TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller corners", "[BiQuadraticGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller corners")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 10, 13 }) {
@@ -582,7 +582,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller corners", "[BiQuadr
     }
   }
 }
-TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set corners", "[BiQuadraticGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set corners")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 10, 13 }) {
@@ -647,7 +647,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set c
     }
   }
 }
-TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corners", "[BiQuadraticGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corners")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 10, 13 }) {
@@ -741,7 +741,7 @@ TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller two components corn
     }
   }
 }
-TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set two components corners", "[BiQuadraticGhostFiller]")
+TEST_CASE("exchange various meshes 2D BiQuadraticGhostFiller ghost already set two components corners")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 10, 13 }) {

@@ -43,7 +43,7 @@ public:
     b.scale(0.5);
   }
 };
-TEST_CASE("PETSc::MatShellCreator works with 0.5I", "[PETSc::MatShellCreator]")
+TEST_CASE("PETSc::MatShellCreator works with 0.5I")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -84,7 +84,7 @@ TEST_CASE("PETSc::MatShellCreator works with 0.5I", "[PETSc::MatShellCreator]")
     VecDestroy(&b);
   }
 }
-TEST_CASE("PETSc::MatShellCreator works with 0.5I two components", "[PETSc::MatShellCreator]")
+TEST_CASE("PETSc::MatShellCreator works with 0.5I two components")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);

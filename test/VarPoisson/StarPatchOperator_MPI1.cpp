@@ -34,7 +34,7 @@ using namespace ThunderEgg;
 #define MESHES "mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_4x4_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
-TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOperator]")
+TEST_CASE("Test StarPatchOperator add ghost to RHS")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -109,7 +109,7 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS", "[VarPoisson::StarPatchOper
     }
   }
 }
-TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff", "[VarPoisson::StarPatchOperator]")
+TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -151,7 +151,7 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff", "[VarPois
     }
   }
 }
-TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff", "[VarPoisson::StarPatchOperator]")
+TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -199,7 +199,7 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff", "[Var
     CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
   }
 }
-TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff", "[VarPoisson::StarPatchOperator]")
+TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -251,7 +251,7 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff", "[
     CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
   }
 }
-TEST_CASE("Test VarPoisson::StarPatchOperator constructor throws exception with no ghost cells", "[VarPoisson::StarPatchOperator]")
+TEST_CASE("Test VarPoisson::StarPatchOperator constructor throws exception with no ghost cells")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);

@@ -34,7 +34,7 @@ constexpr auto single_mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
 constexpr auto cross_mesh_file = "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json";
 
-TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
+TEST_CASE("PatchSolver apply for various domains")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
@@ -69,7 +69,7 @@ TEST_CASE("PatchSolver apply for various domains", "[PatchSolver]")
     }
   }
 }
-TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
+TEST_CASE("PatchSolver apply for various domains with timer")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
@@ -110,7 +110,7 @@ TEST_CASE("PatchSolver apply for various domains with timer", "[PatchSolver]")
     }
   }
 }
-TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
+TEST_CASE("PatchSolver smooth for various domains")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
@@ -151,7 +151,7 @@ TEST_CASE("PatchSolver smooth for various domains", "[PatchSolver]")
     }
   }
 }
-TEST_CASE("PatchSolver smooth for various domains with timer", "[PatchSolver]")
+TEST_CASE("PatchSolver smooth for various domains with timer")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
@@ -186,7 +186,7 @@ TEST_CASE("PatchSolver smooth for various domains with timer", "[PatchSolver]")
     }
   }
 }
-TEST_CASE("PatchSolver getDomain", "[PatchSolver]")
+TEST_CASE("PatchSolver getDomain")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
@@ -207,7 +207,7 @@ TEST_CASE("PatchSolver getDomain", "[PatchSolver]")
     }
   }
 }
-TEST_CASE("PatchSolver getGhostFiller", "[PatchSolver]")
+TEST_CASE("PatchSolver getGhostFiller")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {

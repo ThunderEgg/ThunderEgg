@@ -27,7 +27,7 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace Catch;
 
-TEST_CASE("DomainTools::GetRealCoord 1D", "[getRealCoord][DomainTools]")
+TEST_CASE("DomainTools::GetRealCoord 1D")
 {
   for (auto nx : { 1, 2, 3, 10, 16, 17 }) {
     for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -58,7 +58,7 @@ TEST_CASE("DomainTools::GetRealCoord 1D", "[getRealCoord][DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::GetRealCoord 2D", "[getRealCoord][DomainTools]")
+TEST_CASE("DomainTools::GetRealCoord 2D")
 {
   for (auto ny : { 1, 2, 3 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -103,7 +103,7 @@ TEST_CASE("DomainTools::GetRealCoord 2D", "[getRealCoord][DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::GetRealCoord 3D", "[getRealCoord][DomainTools]")
+TEST_CASE("DomainTools::GetRealCoord 3D")
 {
   for (auto nz : { 1, 2, 3 }) {
     for (auto startz : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -161,7 +161,7 @@ TEST_CASE("DomainTools::GetRealCoord 3D", "[getRealCoord][DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::getRealCoordGhost 1D", "[getRealCoordGhost][DomainTools]")
+TEST_CASE("DomainTools::getRealCoordGhost 1D")
 {
   for (auto nx : { 1, 2, 3, 10, 16, 17 }) {
     for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -186,7 +186,7 @@ TEST_CASE("DomainTools::getRealCoordGhost 1D", "[getRealCoordGhost][DomainTools]
     }
   }
 }
-TEST_CASE("DomainTools::getRealCoordGhost 2D", "[getRealCoordGhost][DomainTools]")
+TEST_CASE("DomainTools::getRealCoordGhost 2D")
 {
   for (auto ny : { 1, 2, 3 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -219,7 +219,7 @@ TEST_CASE("DomainTools::getRealCoordGhost 2D", "[getRealCoordGhost][DomainTools]
     }
   }
 }
-TEST_CASE("DomainTools::getRealCoordGhost 3D", "[getRealCoordGhost][DomainTools]")
+TEST_CASE("DomainTools::getRealCoordGhost 3D")
 {
   for (auto nz : { 1, 2, 3 }) {
     for (auto startz : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -259,7 +259,7 @@ TEST_CASE("DomainTools::getRealCoordGhost 3D", "[getRealCoordGhost][DomainTools]
     }
   }
 }
-TEST_CASE("DomainTools::GetRealCoordBound 1D", "[DomainTools]")
+TEST_CASE("DomainTools::GetRealCoordBound 1D")
 {
   for (auto nx : { 1, 2, 3, 10, 16, 17 }) {
     for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -280,7 +280,7 @@ TEST_CASE("DomainTools::GetRealCoordBound 1D", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::GetRealCoordBound 2D", "[getRealCoord][DomainTools]")
+TEST_CASE("DomainTools::GetRealCoordBound 2D")
 {
   for (auto ny : { 1, 2, 3 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -342,7 +342,7 @@ TEST_CASE("DomainTools::GetRealCoordBound 2D", "[getRealCoord][DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 1D g=x")
 {
   for (auto nx : { 1, 2, 10, 13 }) {
     for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -379,7 +379,7 @@ TEST_CASE("DomainTools::setValues 1D g=x", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 1D f=x**2")
 {
   for (auto nx : { 1, 2, 10, 13 }) {
     for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -416,7 +416,7 @@ TEST_CASE("DomainTools::setValues 1D f=x**2", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 2D f=x+y")
 {
   for (auto ny : { 1, 2, 10, 13 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -457,7 +457,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y")
 {
   for (auto ny : { 1, 2, 10, 13 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -509,7 +509,7 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 2D f=x*y")
 {
   for (auto ny : { 1, 2, 10, 13 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -550,7 +550,7 @@ TEST_CASE("DomainTools::setValues 2D f=x*y", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValuesWithGhost 1D f=x", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 1D f=x")
 {
   for (auto nx : { 1, 2, 10, 13 }) {
     for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -583,7 +583,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2")
 {
   for (auto nx : { 1, 2, 10, 13 }) {
     for (auto startx : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -616,7 +616,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y")
 {
   for (auto ny : { 1, 2, 10, 13 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -653,7 +653,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y")
 {
   for (auto ny : { 1, 2, 10, 13 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -697,7 +697,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y", "[DomainTools]")
     }
   }
 }
-TEST_CASE("DomainTools::setValuesWithGhost 2D throws when too many functions are given", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 2D throws when too many functions are given")
 {
   for (auto ny : { 1, 2, 10, 13 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -729,7 +729,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D throws when too many functions are
     }
   }
 }
-TEST_CASE("DomainTools::setValues 2D throws when too many functions are given", "[DomainTools]")
+TEST_CASE("DomainTools::setValues 2D throws when too many functions are given")
 {
   for (auto ny : { 1, 2, 10, 13 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {
@@ -761,7 +761,7 @@ TEST_CASE("DomainTools::setValues 2D throws when too many functions are given", 
     }
   }
 }
-TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y", "[DomainTools]")
+TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y")
 {
   for (auto ny : { 1, 2, 10, 13 }) {
     for (auto starty : { 0.0, -1.0, 1.0, 0.23, -0.23, 3.0, -3.0 }) {

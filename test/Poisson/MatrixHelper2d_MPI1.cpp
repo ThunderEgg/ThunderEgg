@@ -36,7 +36,7 @@ using namespace ThunderEgg;
 #define MESHES "mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
-TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPatchOperator", "[Poisson::MatrixHelper2d]")
+TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPatchOperator")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -89,7 +89,7 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
     MatDestroy(&A);
   }
 }
-TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPatchOperator with Neumann BC", "[Poisson::MatrixHelper2d]")
+TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPatchOperator with Neumann BC")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);

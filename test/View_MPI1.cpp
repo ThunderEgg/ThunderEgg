@@ -22,7 +22,7 @@
 #include <catch2/generators/catch_generators.hpp>
 using namespace std;
 using namespace ThunderEgg;
-TEST_CASE("View default constructor", "[View]")
+TEST_CASE("View default constructor")
 {
   View<double, 2> v;
 
@@ -38,7 +38,7 @@ TEST_CASE("View default constructor", "[View]")
     CHECK_THROWS_AS(v(0, 0), RuntimeError);
   }
 }
-TEST_CASE("View constructor", "[View]")
+TEST_CASE("View constructor")
 {
   for (auto x_stride : { 1, 2 }) {
     for (auto y_stride : { 1, 2 }) {
@@ -77,7 +77,7 @@ TEST_CASE("View constructor", "[View]")
     }
   }
 }
-TEST_CASE("View squarebracket operator", "[View]")
+TEST_CASE("View squarebracket operator")
 {
   for (auto x_stride : { 1, 2 }) {
     for (auto y_stride : { 4, 5 }) {
@@ -121,7 +121,7 @@ TEST_CASE("View squarebracket operator", "[View]")
     }
   }
 }
-TEST_CASE("View parens operator", "[View]")
+TEST_CASE("View parens operator")
 {
   for (auto x_stride : { 1, 2 }) {
     for (auto y_stride : { 4, 5 }) {
@@ -165,7 +165,7 @@ TEST_CASE("View parens operator", "[View]")
     }
   }
 }
-TEST_CASE("View set", "[View]")
+TEST_CASE("View set")
 {
   for (auto x_stride : { 1, 2 }) {
     for (auto y_stride : { 4, 5 }) {
@@ -211,7 +211,7 @@ TEST_CASE("View set", "[View]")
     }
   }
 }
-TEST_CASE("View set const", "[View]")
+TEST_CASE("View set const")
 {
   for (auto x_stride : { 1, 2 }) {
     for (auto y_stride : { 4, 5 }) {
@@ -262,7 +262,7 @@ TEST_CASE("View set const", "[View]")
     }
   }
 }
-TEST_CASE("View implicit conversion to const type", "[View]")
+TEST_CASE("View implicit conversion to const type")
 {
   for (auto x_stride : { 1, 2 }) {
     for (auto y_stride : { 4, 5 }) {

@@ -22,7 +22,7 @@
 #include <catch2/generators/catch_generators.hpp>
 using namespace std;
 using namespace ThunderEgg;
-TEST_CASE("PatchArray default constructor getStart", "[PatchArray]")
+TEST_CASE("PatchArray default constructor getStart")
 {
   PatchArray<2> pa;
 
@@ -30,7 +30,7 @@ TEST_CASE("PatchArray default constructor getStart", "[PatchArray]")
   CHECK(pa.getStart()[1] == 0);
   CHECK(pa.getStart()[2] == 0);
 }
-TEST_CASE("PatchArray default constructor getEnd", "[PatchArray]")
+TEST_CASE("PatchArray default constructor getEnd")
 {
   PatchArray<2> pa;
 
@@ -38,7 +38,7 @@ TEST_CASE("PatchArray default constructor getEnd", "[PatchArray]")
   CHECK(pa.getEnd()[1] == -1);
   CHECK(pa.getEnd()[2] == -1);
 }
-TEST_CASE("PatchArray default constructor getGhostStart", "[PatchArray]")
+TEST_CASE("PatchArray default constructor getGhostStart")
 {
   PatchArray<2> pa;
 
@@ -46,7 +46,7 @@ TEST_CASE("PatchArray default constructor getGhostStart", "[PatchArray]")
   CHECK(pa.getGhostStart()[1] == 0);
   CHECK(pa.getGhostStart()[2] == 0);
 }
-TEST_CASE("PatchArray default constructor getGhostEnd", "[PatchArray]")
+TEST_CASE("PatchArray default constructor getGhostEnd")
 {
   PatchArray<2> pa;
 
@@ -54,7 +54,7 @@ TEST_CASE("PatchArray default constructor getGhostEnd", "[PatchArray]")
   CHECK(pa.getGhostEnd()[1] == -1);
   CHECK(pa.getGhostEnd()[2] == -1);
 }
-TEST_CASE("PatchArray getStart", "[PatchArray]")
+TEST_CASE("PatchArray getStart")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -71,7 +71,7 @@ TEST_CASE("PatchArray getStart", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray getEnd", "[PatchArray]")
+TEST_CASE("PatchArray getEnd")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -88,7 +88,7 @@ TEST_CASE("PatchArray getEnd", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray getGhostStart", "[PatchArray]")
+TEST_CASE("PatchArray getGhostStart")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -105,7 +105,7 @@ TEST_CASE("PatchArray getGhostStart", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray getGhostEnd", "[PatchArray]")
+TEST_CASE("PatchArray getGhostEnd")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -122,7 +122,7 @@ TEST_CASE("PatchArray getGhostEnd", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray getStrides", "[PatchArray]")
+TEST_CASE("PatchArray getStrides")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -139,7 +139,7 @@ TEST_CASE("PatchArray getStrides", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray squarebracket operator", "[PatchArray]")
+TEST_CASE("PatchArray squarebracket operator")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -162,7 +162,7 @@ TEST_CASE("PatchArray squarebracket operator", "[PatchArray]")
   }
 }
 
-TEST_CASE("PatchArray squarebracket operator const", "[PatchArray]")
+TEST_CASE("PatchArray squarebracket operator const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -184,7 +184,7 @@ TEST_CASE("PatchArray squarebracket operator const", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray parens operator", "[PatchArray]")
+TEST_CASE("PatchArray parens operator")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -206,7 +206,7 @@ TEST_CASE("PatchArray parens operator", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray parens operator const", "[PatchArray]")
+TEST_CASE("PatchArray parens operator const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -228,7 +228,7 @@ TEST_CASE("PatchArray parens operator const", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray default is zero", "[PatchArray]")
+TEST_CASE("PatchArray default is zero")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -251,7 +251,7 @@ TEST_CASE("PatchArray default is zero", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<2> getSliceOn<1>", "[PatchArray]")
+TEST_CASE("PatchArray<2> getSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -312,7 +312,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<2> getSliceOn<1> const", "[PatchArray]")
+TEST_CASE("PatchArray<2> getSliceOn<1> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -373,7 +373,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1> const", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<3> getSliceOn<2>", "[PatchArray]")
+TEST_CASE("PatchArray<3> getSliceOn<2>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -478,7 +478,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<3> getSliceOn<2> const", "[PatchArray]")
+TEST_CASE("PatchArray<3> getSliceOn<2> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -583,7 +583,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
+TEST_CASE("PatchArray<3> getSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -778,7 +778,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
+TEST_CASE("PatchArray<3> getSliceOn<1> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -973,7 +973,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<3> getSliceOn<0>", "[PatchArray]")
+TEST_CASE("PatchArray<3> getSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1009,7 +1009,7 @@ TEST_CASE("PatchArray<3> getSliceOn<0>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<3> getSliceOn<0> const", "[PatchArray]")
+TEST_CASE("PatchArray<3> getSliceOn<0> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1045,7 +1045,7 @@ TEST_CASE("PatchArray<3> getSliceOn<0> const", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<2> getSliceOn<0>", "[PatchArray]")
+TEST_CASE("PatchArray<2> getSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1072,7 +1072,7 @@ TEST_CASE("PatchArray<2> getSliceOn<0>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<2> getSliceOn<0> const", "[PatchArray]")
+TEST_CASE("PatchArray<2> getSliceOn<0> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1100,7 +1100,7 @@ TEST_CASE("PatchArray<2> getSliceOn<0> const", "[PatchArray]")
   }
 }
 
-TEST_CASE("PatchArray<2> getGhostSliceOn<1>", "[PatchArray]")
+TEST_CASE("PatchArray<2> getGhostSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1141,7 +1141,7 @@ TEST_CASE("PatchArray<2> getGhostSliceOn<1>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<3> getGhostSliceOn<2>", "[PatchArray]")
+TEST_CASE("PatchArray<3> getGhostSliceOn<2>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1207,7 +1207,7 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<2>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<3> getGhostSliceOn<1>", "[PatchArray]")
+TEST_CASE("PatchArray<3> getGhostSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1285,7 +1285,7 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<1>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<3> getGhostSliceOn<0>", "[PatchArray]")
+TEST_CASE("PatchArray<3> getGhostSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1321,7 +1321,7 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<0>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray<2> getGhostSliceOn<0>", "[PatchArray]")
+TEST_CASE("PatchArray<2> getGhostSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1348,7 +1348,7 @@ TEST_CASE("PatchArray<2> getGhostSliceOn<0>", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray copy constructor", "[PatchArray]")
+TEST_CASE("PatchArray copy constructor")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1386,7 +1386,7 @@ TEST_CASE("PatchArray copy constructor", "[PatchArray]")
     }
   }
 }
-TEST_CASE("PatchArray copy assignment", "[PatchArray]")
+TEST_CASE("PatchArray copy assignment")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {

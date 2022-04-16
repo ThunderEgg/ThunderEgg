@@ -32,12 +32,12 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Iterative;
 
-TEST_CASE("CG default max iterations", "[CG]")
+TEST_CASE("CG default max iterations")
 {
   CG<2> bcgs;
   CHECK(bcgs.getMaxIterations() == 1000);
 }
-TEST_CASE("CG set max iterations", "[CG]")
+TEST_CASE("CG set max iterations")
 {
   for (int iterations : { 1, 2, 3 }) {
     CG<2> bcgs;
@@ -45,12 +45,12 @@ TEST_CASE("CG set max iterations", "[CG]")
     CHECK(bcgs.getMaxIterations() == iterations);
   }
 }
-TEST_CASE("CG default tolerance", "[CG]")
+TEST_CASE("CG default tolerance")
 {
   CG<2> bcgs;
   CHECK(bcgs.getTolerance() == 1e-12);
 }
-TEST_CASE("CG set tolerance", "[CG]")
+TEST_CASE("CG set tolerance")
 {
   for (double tolerance : { 1.2, 2.3, 3.4 }) {
     CG<2> bcgs;
@@ -58,12 +58,12 @@ TEST_CASE("CG set tolerance", "[CG]")
     CHECK(bcgs.getTolerance() == tolerance);
   }
 }
-TEST_CASE("CG default timer", "[CG]")
+TEST_CASE("CG default timer")
 {
   CG<2> bcgs;
   CHECK(bcgs.getTimer() == nullptr);
 }
-TEST_CASE("CG set timer", "[CG]")
+TEST_CASE("CG set timer")
 {
   Communicator comm(MPI_COMM_WORLD);
   CG<2> bcgs;
@@ -71,7 +71,7 @@ TEST_CASE("CG set timer", "[CG]")
   bcgs.setTimer(timer);
   CHECK(bcgs.getTimer() == timer);
 }
-TEST_CASE("CG clone", "[CG]")
+TEST_CASE("CG clone")
 {
   for (int iterations : { 1, 2, 3 }) {
     for (double tolerance : { 1.2, 2.3, 3.4 }) {
@@ -91,7 +91,7 @@ TEST_CASE("CG clone", "[CG]")
     }
   }
 }
-TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
+TEST_CASE("CG solves poisson problem within given tolerance")
 {
   for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
     string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
@@ -131,7 +131,7 @@ TEST_CASE("CG solves poisson problem within given tolerance", "[CG]")
     CHECK(residual.dot(residual) / f_vec.dot(f_vec) <= tolerance);
   }
 }
-TEST_CASE("CG handles zero rhs vector", "[CG]")
+TEST_CASE("CG handles zero rhs vector")
 {
   for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
     string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
@@ -155,7 +155,7 @@ TEST_CASE("CG handles zero rhs vector", "[CG]")
     CHECK(g_vec.infNorm() == 0);
   }
 }
-TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
+TEST_CASE("CG outputs iteration count and residual to output")
 {
   string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
   INFO("MESH FILE " << mesh_file);
@@ -204,7 +204,7 @@ TEST_CASE("CG outputs iteration count and residual to output", "[CG]")
     prev_iteration = iteration;
   }
 }
-TEST_CASE("CG giving a good initial guess reduces the iterations", "[CG]")
+TEST_CASE("CG giving a good initial guess reduces the iterations")
 {
   string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
   INFO("MESH FILE " << mesh_file);

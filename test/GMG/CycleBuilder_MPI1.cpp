@@ -53,7 +53,7 @@ public:
   MockRestrictor* clone() const override { return new MockRestrictor(*this); }
   Vector<2> restrict(const Vector<2>& x) const override { return x.getZeroClone(); }
 };
-TEST_CASE("CycleBuilder with two levels", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder with two levels")
 {
   GMG::CycleOpts opts;
   GMG::CycleBuilder<2> builder(opts);
@@ -88,7 +88,7 @@ TEST_CASE("CycleBuilder with two levels", "[GMG::CycleBuilder]")
   CHECK(coarsest_level.coarsest());
   CHECK_THROWS_AS(coarsest_level.getCoarser(), RuntimeError);
 }
-TEST_CASE("CycleBuilder with three levels", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder with three levels")
 {
   std::array<MockOperator, 3> ops;
   std::array<MockSmoother, 3> smoothers;
@@ -136,7 +136,7 @@ TEST_CASE("CycleBuilder with three levels", "[GMG::CycleBuilder]")
   CHECK(coarsest_level.coarsest());
   CHECK_THROWS_AS(coarsest_level.getCoarser(), RuntimeError);
 }
-TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder with four levels")
 {
   std::array<MockOperator, 4> ops;
   std::array<MockSmoother, 4> smoothers;
@@ -193,7 +193,7 @@ TEST_CASE("CycleBuilder with four levels", "[GMG::CycleBuilder]")
   CHECK(coarsest_level.coarsest());
   CHECK_THROWS_AS(coarsest_level.getCoarser(), RuntimeError);
 }
-TEST_CASE("CycleBuilder addFinestLevel throws exception if called twice", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder addFinestLevel throws exception if called twice")
 {
   std::array<MockOperator, 4> ops;
   std::array<MockSmoother, 4> smoothers;
@@ -205,7 +205,7 @@ TEST_CASE("CycleBuilder addFinestLevel throws exception if called twice", "[GMG:
   builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]);
   CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]), RuntimeError);
 }
-TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addIntermediateLevel", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addIntermediateLevel")
 {
   std::array<MockOperator, 4> ops;
   std::array<MockSmoother, 4> smoothers;
@@ -218,7 +218,7 @@ TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addInter
   builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]);
   CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]), RuntimeError);
 }
-TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addCoarsestLevel", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addCoarsestLevel")
 {
   std::array<MockOperator, 4> ops;
   std::array<MockSmoother, 4> smoothers;
@@ -233,7 +233,7 @@ TEST_CASE("CycleBuilder addFinestLevel throws exception if called after addCoars
   builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]);
   CHECK_THROWS_AS(builder.addFinestLevel(ops[0], smoothers[0], restrictors[0]), RuntimeError);
 }
-TEST_CASE("CycleBuilder addIntermediateLevel throws exception if addFinestLevel isn't called", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder addIntermediateLevel throws exception if addFinestLevel isn't called")
 {
   std::array<MockOperator, 4> ops;
   std::array<MockSmoother, 4> smoothers;
@@ -244,7 +244,7 @@ TEST_CASE("CycleBuilder addIntermediateLevel throws exception if addFinestLevel 
   GMG::CycleBuilder<2> builder(opts);
   CHECK_THROWS_AS(builder.addIntermediateLevel(ops[1], smoothers[1], restrictors[1], interpolators[0]), RuntimeError);
 }
-TEST_CASE("CycleBuilder addIntermediateLevel throws exception if called after addCoarsestLevel", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder addIntermediateLevel throws exception if called after addCoarsestLevel")
 {
   std::array<MockOperator, 4> ops;
   std::array<MockSmoother, 4> smoothers;
@@ -259,7 +259,7 @@ TEST_CASE("CycleBuilder addIntermediateLevel throws exception if called after ad
   builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]);
   CHECK_THROWS_AS(builder.addIntermediateLevel(ops[2], smoothers[2], restrictors[2], interpolators[1]), RuntimeError);
 }
-TEST_CASE("CycleBuilder addCoarsestLevel throws exception if addFinestLevel isn't called", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder addCoarsestLevel throws exception if addFinestLevel isn't called")
 {
   std::array<MockOperator, 4> ops;
   std::array<MockSmoother, 4> smoothers;
@@ -270,7 +270,7 @@ TEST_CASE("CycleBuilder addCoarsestLevel throws exception if addFinestLevel isn'
   GMG::CycleBuilder<2> builder(opts);
   CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]), RuntimeError);
 }
-TEST_CASE("CycleBuilder addCoarsestLevel throws exception if called twice", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder addCoarsestLevel throws exception if called twice")
 {
   std::array<MockOperator, 4> ops;
   std::array<MockSmoother, 4> smoothers;
@@ -285,7 +285,7 @@ TEST_CASE("CycleBuilder addCoarsestLevel throws exception if called twice", "[GM
   builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]);
   CHECK_THROWS_AS(builder.addCoarsestLevel(ops[3], smoothers[3], interpolators[2]), RuntimeError);
 }
-TEST_CASE("CycleBuilder getCycle throws exception if addCoarsestLevel isn't called", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder getCycle throws exception if addCoarsestLevel isn't called")
 {
   std::array<MockOperator, 4> ops;
   std::array<MockSmoother, 4> smoothers;
@@ -300,7 +300,7 @@ TEST_CASE("CycleBuilder getCycle throws exception if addCoarsestLevel isn't call
 
   CHECK_THROWS_AS(builder.getCycle(), RuntimeError);
 }
-TEST_CASE("CycleBuilder getCycle throws exception if no calls are made", "[GMG::CycleBuilder]")
+TEST_CASE("CycleBuilder getCycle throws exception if no calls are made")
 {
   GMG::CycleOpts opts;
   GMG::CycleBuilder<2> builder(opts);

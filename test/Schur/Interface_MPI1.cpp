@@ -28,7 +28,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Schur::Interface id constructor", "[Schur::Interface]")
+TEST_CASE("Schur::Interface id constructor")
 {
   Schur::Interface<2> iface(2);
   CHECK(iface.id == 2);
@@ -36,7 +36,7 @@ TEST_CASE("Schur::Interface id constructor", "[Schur::Interface]")
   CHECK(iface.local_index == -1);
   CHECK(iface.patches.empty());
 }
-TEST_CASE("Schur::Interface insert Normal interface", "[Schur::Interface]")
+TEST_CASE("Schur::Interface insert Normal interface")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_uniform_1x2_mpi1.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -60,7 +60,7 @@ TEST_CASE("Schur::Interface insert Normal interface", "[Schur::Interface]")
   CHECK(iface.patches[0].piinfo == piinfos[0]);
   CHECK(iface.patches[1].piinfo == piinfos[1]);
 }
-TEST_CASE("Schur::Interface insert Coarse interface", "[Schur::Interface]")
+TEST_CASE("Schur::Interface insert Coarse interface")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -94,7 +94,7 @@ TEST_CASE("Schur::Interface insert Coarse interface", "[Schur::Interface]")
   CHECK(iface.patches[1].piinfo == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
   CHECK(iface.patches[2].piinfo == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[1]]);
 }
-TEST_CASE("Schur::Interface insert Fine interface", "[Schur::Interface]")
+TEST_CASE("Schur::Interface insert Fine interface")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -120,7 +120,7 @@ TEST_CASE("Schur::Interface insert Fine interface", "[Schur::Interface]")
   CHECK(iface.patches[0].piinfo == piinfos[0]);
   CHECK(iface.patches[1].piinfo == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 }
-TEST_CASE("Schur::Interface merge Fine interface", "[Schur::Interface]")
+TEST_CASE("Schur::Interface merge Fine interface")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -147,7 +147,7 @@ TEST_CASE("Schur::Interface merge Fine interface", "[Schur::Interface]")
   CHECK(iface.patches[1].type.getOrthant() == Orthant<1>::lower());
   CHECK(iface.patches[1].piinfo == piinfos[piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).local_indexes[0]]);
 }
-TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface]")
+TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -306,7 +306,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector", "[Schur::Interface
     CHECK(ref_ne_patch->side == Side<2>::south());
   }
 }
-TEST_CASE("Schur::Interface serialize Normal interface", "[Schur::Interface]")
+TEST_CASE("Schur::Interface serialize Normal interface")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_uniform_1x2_mpi1.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -335,7 +335,7 @@ TEST_CASE("Schur::Interface serialize Normal interface", "[Schur::Interface]")
   CHECK(iface.patches[1].type.isNormal());
   CHECK(iface.patches[1].piinfo->pinfo.id == piinfos[1]->pinfo.id);
 }
-TEST_CASE("Schur::Interface serialize Coarse interface", "[Schur::Interface]")
+TEST_CASE("Schur::Interface serialize Coarse interface")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -371,7 +371,7 @@ TEST_CASE("Schur::Interface serialize Coarse interface", "[Schur::Interface]")
   CHECK(iface.patches[2].type.getOrthant() == Orthant<1>::upper());
   CHECK(iface.patches[2].piinfo->pinfo.id == piinfos[0]->pinfo.getFineNbrInfo(Side<2>::east()).ids[1]);
 }
-TEST_CASE("Schur::Interface serialize Fine interface", "[Schur::Interface]")
+TEST_CASE("Schur::Interface serialize Fine interface")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_mpi1.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();

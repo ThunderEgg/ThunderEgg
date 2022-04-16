@@ -32,7 +32,7 @@ using namespace ThunderEgg;
 
 const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi2.json";
 
-TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
+TEST_CASE("Linear Test LinearRestrictor")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {

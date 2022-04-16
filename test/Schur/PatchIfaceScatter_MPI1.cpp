@@ -38,7 +38,7 @@ using namespace ThunderEgg;
  *
  *
  *****************/
-TEST_CASE("Schur::PatchIfaceScatter<2> throws exception for non-square patches", "[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> throws exception for non-square patches")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 5, 7 }) {
@@ -134,7 +134,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatterFinish throws exception when calle
  *
  *
  ********/
-TEST_CASE("Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vector of expected length", "[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vector of expected length")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
@@ -154,7 +154,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vecto
     }
   }
 }
-TEST_CASE("Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vector with local MPI_Comm", "[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vector with local MPI_Comm")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
@@ -182,7 +182,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vecto
  *
  *
  ********/
-TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied", "[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
@@ -212,7 +212,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied", "[S
     }
   }
 }
-TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> scatter")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
@@ -249,7 +249,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter", "[Schur::PatchIfaceScatter]")
     }
   }
 }
-TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice", "[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
@@ -288,7 +288,7 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice", "[Schur::PatchIfaceScatte
     }
   }
 }
-TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled", "[Schur::PatchIfaceScatter]")
+TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {

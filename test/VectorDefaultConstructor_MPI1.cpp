@@ -26,7 +26,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Vector<1> getNumGhostCells default constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumGhostCells default constructor")
 {
   Communicator comm(MPI_COMM_WORLD);
 
@@ -34,7 +34,7 @@ TEST_CASE("Vector<1> getNumGhostCells default constructor", "[Vector]")
 
   CHECK(vec.getNumGhostCells() == 0);
 }
-TEST_CASE("Vector<1> getMPIComm default constructor", "[Vector]")
+TEST_CASE("Vector<1> getMPIComm default constructor")
 {
   Communicator comm(MPI_COMM_WORLD);
 
@@ -42,7 +42,7 @@ TEST_CASE("Vector<1> getMPIComm default constructor", "[Vector]")
 
   CHECK_THROWS_AS(vec.getCommunicator().getMPIComm(), RuntimeError);
 }
-TEST_CASE("Vector<1> getNumLocalPatches default constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumLocalPatches default constructor")
 {
   Communicator comm(MPI_COMM_WORLD);
 
@@ -50,7 +50,7 @@ TEST_CASE("Vector<1> getNumLocalPatches default constructor", "[Vector]")
 
   CHECK(vec.getNumLocalPatches() == 0);
 }
-TEST_CASE("Vector<1> getNumComponents default constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumComponents default constructor")
 {
   Communicator comm(MPI_COMM_WORLD);
 
@@ -58,7 +58,7 @@ TEST_CASE("Vector<1> getNumComponents default constructor", "[Vector]")
 
   CHECK(vec.getNumComponents() == 0);
 }
-TEST_CASE("Vector<1> getNumLocalCells default constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumLocalCells default constructor")
 {
   Communicator comm(MPI_COMM_WORLD);
 
@@ -66,7 +66,7 @@ TEST_CASE("Vector<1> getNumLocalCells default constructor", "[Vector]")
 
   CHECK(vec.getNumLocalCells() == 0);
 }
-TEST_CASE("Vector<2> getNumGhostCells default constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumGhostCells default constructor")
 {
   Communicator comm(MPI_COMM_WORLD);
 
@@ -74,62 +74,62 @@ TEST_CASE("Vector<2> getNumGhostCells default constructor", "[Vector]")
 
   CHECK(vec.getNumGhostCells() == 0);
 }
-TEST_CASE("Vector<2> getMPIComm default constructor", "[Vector]")
+TEST_CASE("Vector<2> getMPIComm default constructor")
 {
   Vector<2> vec;
 
   CHECK_THROWS_AS(vec.getCommunicator().getMPIComm(), RuntimeError);
 }
-TEST_CASE("Vector<2> getNumLocalPatches default constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumLocalPatches default constructor")
 {
   Vector<2> vec;
 
   CHECK(vec.getNumLocalPatches() == 0);
 }
-TEST_CASE("Vector<2> getNumComponents default constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumComponents default constructor")
 {
   Vector<2> vec;
 
   CHECK(vec.getNumComponents() == 0);
 }
-TEST_CASE("Vector<2> getNumLocalCells default constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumLocalCells default constructor")
 {
   Vector<2> vec;
 
   CHECK(vec.getNumLocalCells() == 0);
 }
-TEST_CASE("Vector<3> getNumGhostCells default constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumGhostCells default constructor")
 {
   Vector<3> vec;
 
   CHECK(vec.getNumGhostCells() == 0);
 }
-TEST_CASE("Vector<3> getMPIComm default constructor", "[Vector]")
+TEST_CASE("Vector<3> getMPIComm default constructor")
 {
   Vector<3> vec;
 
   CHECK_THROWS_AS(vec.getCommunicator().getMPIComm(), RuntimeError);
 }
-TEST_CASE("Vector<3> getNumLocalPatches default constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumLocalPatches default constructor")
 {
   Vector<3> vec;
 
   CHECK(vec.getNumLocalPatches() == 0);
 }
-TEST_CASE("Vector<3> getNumComponents default constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumComponents default constructor")
 {
   Vector<3> vec;
 
   CHECK(vec.getNumComponents() == 0);
 }
-TEST_CASE("Vector<3> getNumLocalCells default constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumLocalCells default constructor")
 {
   Vector<3> vec;
 
   CHECK(vec.getNumLocalCells() == 0);
 }
 
-TEST_CASE("Vector<1> getComponentView.h default constructor", "[Vector]")
+TEST_CASE("Vector<1> getComponentView.h default constructor")
 {
   Vector<1> vec;
 
@@ -140,7 +140,7 @@ TEST_CASE("Vector<1> getComponentView.h default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
   }
 }
-TEST_CASE("Vector<1> getComponentView const default constructor", "[Vector]")
+TEST_CASE("Vector<1> getComponentView const default constructor")
 {
   Vector<1> vec_non_const;
   const Vector<1>& vec = vec_non_const;
@@ -152,7 +152,7 @@ TEST_CASE("Vector<1> getComponentView const default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
   }
 }
-TEST_CASE("Vector<2> getComponentView default constructor", "[Vector]")
+TEST_CASE("Vector<2> getComponentView default constructor")
 {
   Vector<2> vec;
 
@@ -163,7 +163,7 @@ TEST_CASE("Vector<2> getComponentView default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
   }
 }
-TEST_CASE("Vector<2> getComponentView const default constructor", "[Vector]")
+TEST_CASE("Vector<2> getComponentView const default constructor")
 {
   Vector<2> vec_non_const;
   const Vector<2>& vec = vec_non_const;
@@ -175,7 +175,7 @@ TEST_CASE("Vector<2> getComponentView const default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
   }
 }
-TEST_CASE("Vector<3> getComponentView default constructor", "[Vector]")
+TEST_CASE("Vector<3> getComponentView default constructor")
 {
   Vector<3> vec;
 
@@ -186,7 +186,7 @@ TEST_CASE("Vector<3> getComponentView default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
   }
 }
-TEST_CASE("Vector<3> getComponentView const default constructor", "[Vector]")
+TEST_CASE("Vector<3> getComponentView const default constructor")
 {
   Vector<3> vec_non_const;
   const Vector<3>& vec = vec_non_const;
@@ -198,7 +198,7 @@ TEST_CASE("Vector<3> getComponentView const default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getComponentView(0, 0), RuntimeError);
   }
 }
-TEST_CASE("Vector<1> getPatchView default constructor", "[Vector]")
+TEST_CASE("Vector<1> getPatchView default constructor")
 {
   Vector<1> vec;
 
@@ -207,7 +207,7 @@ TEST_CASE("Vector<1> getPatchView default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
   }
 }
-TEST_CASE("Vector<1> getPatchView const default constructor", "[Vector]")
+TEST_CASE("Vector<1> getPatchView const default constructor")
 {
   Vector<1> vec_non_const;
   const Vector<1>& vec = vec_non_const;
@@ -217,7 +217,7 @@ TEST_CASE("Vector<1> getPatchView const default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
   }
 }
-TEST_CASE("Vector<2> getPatchView default constructor", "[Vector]")
+TEST_CASE("Vector<2> getPatchView default constructor")
 {
   Vector<2> vec;
 
@@ -226,7 +226,7 @@ TEST_CASE("Vector<2> getPatchView default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
   }
 }
-TEST_CASE("Vector<2> getPatchView const default constructor", "[Vector]")
+TEST_CASE("Vector<2> getPatchView const default constructor")
 {
   Vector<2> vec_non_const;
   const Vector<2>& vec = vec_non_const;
@@ -236,7 +236,7 @@ TEST_CASE("Vector<2> getPatchView const default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
   }
 }
-TEST_CASE("Vector<3> getPatchView default constructor", "[Vector]")
+TEST_CASE("Vector<3> getPatchView default constructor")
 {
   Vector<3> vec;
 
@@ -245,7 +245,7 @@ TEST_CASE("Vector<3> getPatchView default constructor", "[Vector]")
     CHECK_THROWS_AS(vec.getPatchView(0), RuntimeError);
   }
 }
-TEST_CASE("Vector<3> getPatchView const default constructor", "[Vector]")
+TEST_CASE("Vector<3> getPatchView const default constructor")
 {
   Vector<3> vec_non_const;
   const Vector<3>& vec = vec_non_const;

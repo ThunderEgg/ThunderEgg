@@ -59,7 +59,7 @@ struct FourTreeBSW
   }
 };
 } // namespace
-TEST_CASE("P8estDomainGenerator 4x4x4 hasCoarserDomain", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4 hasCoarserDomain")
 {
   FourTreeBSW tree;
 
@@ -73,7 +73,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 hasCoarserDomain", "[P8estDomainGenerator]
   Domain<3> domain_0 = dg.getCoarserDomain();
   CHECK_FALSE(dg.hasCoarserDomain());
 }
-TEST_CASE("P8estDomainGenerator 4x4x4 Uniform Number of Patches", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4 Uniform Number of Patches")
 {
   FourTreeBSW tree;
 
@@ -87,7 +87,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform Number of Patches", "[P8estDomainG
   CHECK(domain_1.getNumGlobalPatches() == 8);
   CHECK(domain_0.getNumGlobalPatches() == 1);
 }
-TEST_CASE("P8estDomainGenerator 4x4x4 RefineLevel", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4 RefineLevel")
 {
   FourTreeBSW tree;
 
@@ -109,7 +109,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 RefineLevel", "[P8estDomainGenerator]")
     CHECK(patch.refine_level == 0);
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4 rank", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4 rank")
 {
   FourTreeBSW tree;
 
@@ -131,7 +131,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 rank", "[P8estDomainGenerator]")
     CHECK(patch.rank == tree.rank);
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4 spacings", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4 spacings")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -177,7 +177,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 spacings", "[P8estDomainGenerator]")
     }
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4 ns", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4 ns")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -211,7 +211,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 ns", "[P8estDomainGenerator]")
     }
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4 num_ghost_cells", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4 num_ghost_cells")
 {
   for (int num_ghost_cells : { 0, 1, 2 }) {
     FourTreeBSW tree;
@@ -235,7 +235,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 num_ghost_cells", "[P8estDomainGenerator]"
     }
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4 Uniform neighbor nfos", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4 Uniform neighbor nfos")
 {
   FourTreeBSW tree;
 
@@ -257,7 +257,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform neighbor nfos", "[P8estDomainGener
 
   Check4x4x4DomainNeighbors(domain_2);
 }
-TEST_CASE("P8estDomainGenerator 4x4x4 Uniform child/parent ids and ranks", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4 Uniform child/parent ids and ranks")
 {
   FourTreeBSW tree;
 
@@ -308,7 +308,7 @@ struct FourTreeRefineBSW
   }
 };
 } // namespace
-TEST_CASE("P8estDomainGenerator 4x4x4rbsw hasCoarserDomain", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw hasCoarserDomain")
 {
   FourTreeRefineBSW tree;
 
@@ -324,7 +324,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw hasCoarserDomain", "[P8estDomainGenera
   Domain<3> domain_0 = dg.getCoarserDomain();
   CHECK_FALSE(dg.hasCoarserDomain());
 }
-TEST_CASE("P8estDomainGenerator 4x4x4rbsw Uniform Number of Patches", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw Uniform Number of Patches")
 {
   FourTreeRefineBSW tree;
 
@@ -340,7 +340,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw Uniform Number of Patches", "[P8estDom
   CHECK(domain_1.getNumGlobalPatches() == 8);
   CHECK(domain_0.getNumGlobalPatches() == 1);
 }
-TEST_CASE("P8estDomainGenerator 4x4x4rbsw RefineLevel", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw RefineLevel")
 {
   FourTreeRefineBSW tree;
 
@@ -371,7 +371,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw RefineLevel", "[P8estDomainGenerator]"
     CHECK(patch.refine_level == 0);
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4rbsw rank", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw rank")
 {
   FourTreeRefineBSW tree;
 
@@ -398,7 +398,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw rank", "[P8estDomainGenerator]")
     CHECK(patch.rank == tree.rank);
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4rbsw spacings", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw spacings")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -457,7 +457,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw spacings", "[P8estDomainGenerator]")
     }
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4rbsw ns", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw ns")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -498,7 +498,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw ns", "[P8estDomainGenerator]")
     }
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4rbsw num_ghost_cells", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw num_ghost_cells")
 {
   for (int num_ghost_cells : { 0, 1, 2 }) {
     FourTreeRefineBSW tree;
@@ -527,7 +527,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw num_ghost_cells", "[P8estDomainGenerat
     }
   }
 }
-TEST_CASE("P8estDomainGenerator 4x4x4rbsw neighbor nfos", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw neighbor nfos")
 {
   FourTreeRefineBSW tree;
 
@@ -554,7 +554,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw neighbor nfos", "[P8estDomainGenerator
 
   Check4x4x4RefinedBSWDomainNeighbors(domain_3);
 }
-TEST_CASE("P8estDomainGenerator 4x4x4rbsw child/parent ids and ranks", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw child/parent ids and ranks")
 {
   FourTreeRefineBSW tree;
 
@@ -604,7 +604,7 @@ struct TwoTreeRefineBSW
 
 } // namespace
 
-TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform hasCoarserDomain", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform hasCoarserDomain")
 {
   TwoTreeRefineBSW tree;
 
@@ -618,7 +618,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform hasCoarserDomain", "[P8estDoma
   Domain<3> domain_0 = dg.getCoarserDomain();
   CHECK_FALSE(dg.hasCoarserDomain());
 }
-TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform Number of Patches", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform Number of Patches")
 {
   TwoTreeRefineBSW tree;
 
@@ -632,7 +632,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform Number of Patches", "[P8estDom
   CHECK(domain_1.getNumGlobalPatches() == 8);
   CHECK(domain_0.getNumGlobalPatches() == 1);
 }
-TEST_CASE("P8estDomainGenerator 2x2x2rbsw RefineLevel", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw RefineLevel")
 {
   TwoTreeRefineBSW tree;
 
@@ -658,7 +658,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw RefineLevel", "[P8estDomainGenerator]"
     CHECK(patch.refine_level == 0);
   }
 }
-TEST_CASE("P8estDomainGenerator 2x2x2rbsw rank", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw rank")
 {
   TwoTreeRefineBSW tree;
 
@@ -680,7 +680,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw rank", "[P8estDomainGenerator]")
     CHECK(patch.rank == tree.rank);
   }
 }
-TEST_CASE("P8estDomainGenerator 2x2x2rbsw spacings", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw spacings")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -732,7 +732,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw spacings", "[P8estDomainGenerator]")
     }
   }
 }
-TEST_CASE("P8estDomainGenerator 2x2x2rbsw ns", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw ns")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -766,7 +766,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw ns", "[P8estDomainGenerator]")
     }
   }
 }
-TEST_CASE("P8estDomainGenerator 2x2x2rbsw num_ghost_cells", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw num_ghost_cells")
 {
   for (int num_ghost_cells : { 0, 1, 2 }) {
     TwoTreeRefineBSW tree;
@@ -790,7 +790,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw num_ghost_cells", "[P8estDomainGenerat
     }
   }
 }
-TEST_CASE("P8estDomainGenerator 2x2x2rbsw neighbor nfos", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw neighbor nfos")
 {
   TwoTreeRefineBSW tree;
 
@@ -812,7 +812,7 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw neighbor nfos", "[P8estDomainGenerator
 
   Check2x2x2RefinedBSWDomainNeighbors(domain_2);
 }
-TEST_CASE("P8estDomainGenerator 2x2x2rbsw child/parent ids and ranks", "[P8estDomainGenerator]")
+TEST_CASE("P8estDomainGenerator 2x2x2rbsw child/parent ids and ranks")
 {
   TwoTreeRefineBSW tree;
 

@@ -29,7 +29,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector refined interface on processor boundary", "[Schur::Interface]")
+TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector refined interface on processor boundary")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_east_1x2_east_on_1_mpi2.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -293,7 +293,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector refined interface on
     CHECK(upper_patch->side == Side<2>::west());
   }
 }
-TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on processor boundary", "[Schur::Interface]")
+TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on processor boundary")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_uniform_1x2_east_on_1_mpi2.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
@@ -357,7 +357,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector normal interface on 
     CHECK(ifaces[0].at(1)->patches[0].side == Side<2>::west());
   }
 }
-TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh", "[Schur::Interface]")
+TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector complicated mesh")
 {
   DomainReader<2> domain_reader("mesh_inputs/2d_refined_complicated_mpi2.json", { 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();

@@ -25,7 +25,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("CoarseNbrInfo Serialization/Deserialization", "[CoarseNbrInfo]")
+TEST_CASE("CoarseNbrInfo Serialization/Deserialization")
 {
   CoarseNbrInfo<2> info;
   info.id = 5;

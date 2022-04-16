@@ -29,7 +29,7 @@
 using namespace std;
 using namespace ThunderEgg;
 #define MESHES "mesh_inputs/2d_refined_east_1x2_mpi1.json", "mesh_inputs/2d_uniform_1x2_mpi1.json"
-TEST_CASE("Schur::PatchSolverWrapper<2> throws exception for non-square patches", "[Schur::PatchSolverWrapper]")
+TEST_CASE("Schur::PatchSolverWrapper<2> throws exception for non-square patches")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 5, 7 }) {
@@ -48,7 +48,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> throws exception for non-square patches"
     }
   }
 }
-TEST_CASE("Schur::PatchSolverWrapper<2> apply fills ghost in rhs as expected", "[Schur::PatchSolverWrapper]")
+TEST_CASE("Schur::PatchSolverWrapper<2> apply fills ghost in rhs as expected")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {
@@ -74,7 +74,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply fills ghost in rhs as expected", "
     }
   }
 }
-TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur matrix", "[Schur::PatchSolverWrapper]")
+TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur matrix")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {
@@ -141,7 +141,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
     }
   }
 }
-TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in rhs as expected", "[Schur::PatchSolverWrapper]")
+TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in rhs as expected")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {
@@ -167,7 +167,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in 
     }
   }
 }
-TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS gives expected rhs value for Schur matrix", "[Schur::PatchSolverWrapper]")
+TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS gives expected rhs value for Schur matrix")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {

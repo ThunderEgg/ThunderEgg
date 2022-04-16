@@ -27,45 +27,45 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("Corner<2> num_corners", "[Corner][Face]")
+TEST_CASE("Corner<2> num_corners")
 {
   CHECK(Corner<2>::number_of == 4);
 }
-TEST_CASE("Corner<3> num_corners", "[Corner][Face]")
+TEST_CASE("Corner<3> num_corners")
 {
   CHECK(Corner<3>::number_of == 8);
 }
 
-TEST_CASE("Corner<2> dimensionality", "[Corner][Face]")
+TEST_CASE("Corner<2> dimensionality")
 {
   CHECK(Corner<2>::dimensionality == 0);
 }
-TEST_CASE("Corner<3> dimensionality", "[Corner][Face]")
+TEST_CASE("Corner<3> dimensionality")
 {
   CHECK(Corner<3>::dimensionality == 0);
 }
 
-TEST_CASE("Corner<2> unsigned char constructor works", "[Corner][Face]")
+TEST_CASE("Corner<2> unsigned char constructor works")
 {
   Corner<2> o(13);
   CHECK(o.getIndex() == 13);
 }
-TEST_CASE("Corner<3> unsigned char constructor works", "[Corner][Face]")
+TEST_CASE("Corner<3> unsigned char constructor works")
 {
   Corner<3> o(13);
   CHECK(o.getIndex() == 13);
 }
-TEST_CASE("Corner<2> Default constructor works", "[Corner][Face]")
+TEST_CASE("Corner<2> Default constructor works")
 {
   Corner<2> o;
   CHECK(o == Corner<2>::null());
 }
-TEST_CASE("Corner<3> Default constructor works", "[Corner][Face]")
+TEST_CASE("Corner<3> Default constructor works")
 {
   Corner<3> o;
   CHECK(o == Corner<3>::null());
 }
-TEST_CASE("Corner<2> named constructors give expected index values", "[Corner][Face]")
+TEST_CASE("Corner<2> named constructors give expected index values")
 {
   CHECK(Corner<2>::sw().getIndex() == 0);
   CHECK(Corner<2>::se().getIndex() == 1);
@@ -73,7 +73,7 @@ TEST_CASE("Corner<2> named constructors give expected index values", "[Corner][F
   CHECK(Corner<2>::ne().getIndex() == 3);
   CHECK(Corner<2>::null().getIndex() == 4);
 }
-TEST_CASE("Corner<3> named constructors give expected index values", "[Corner][Face]")
+TEST_CASE("Corner<3> named constructors give expected index values")
 {
   CHECK(Corner<3>::bsw().getIndex() == 0);
   CHECK(Corner<3>::bse().getIndex() == 1);
@@ -85,14 +85,14 @@ TEST_CASE("Corner<3> named constructors give expected index values", "[Corner][F
   CHECK(Corner<3>::tne().getIndex() == 7);
   CHECK(Corner<3>::null().getIndex() == 8);
 }
-TEST_CASE("Corner<2> opposite", "[Corner][Face]")
+TEST_CASE("Corner<2> opposite")
 {
   CHECK(Corner<2>::sw().opposite() == Corner<2>::ne());
   CHECK(Corner<2>::se().opposite() == Corner<2>::nw());
   CHECK(Corner<2>::nw().opposite() == Corner<2>::se());
   CHECK(Corner<2>::ne().opposite() == Corner<2>::sw());
 }
-TEST_CASE("Corner<3> opposite", "[Corner][Face]")
+TEST_CASE("Corner<3> opposite")
 {
   CHECK(Corner<3>::bsw().opposite() == Corner<3>::tne());
   CHECK(Corner<3>::bse().opposite() == Corner<3>::tnw());
@@ -103,7 +103,7 @@ TEST_CASE("Corner<3> opposite", "[Corner][Face]")
   CHECK(Corner<3>::tnw().opposite() == Corner<3>::bse());
   CHECK(Corner<3>::tne().opposite() == Corner<3>::bsw());
 }
-TEST_CASE("Corner<2> getSides is as expected", "[Corner][Face]")
+TEST_CASE("Corner<2> getSides is as expected")
 {
   {
     auto array = Corner<2>::sw().getSides();
@@ -126,7 +126,7 @@ TEST_CASE("Corner<2> getSides is as expected", "[Corner][Face]")
     CHECK(array[1] == Side<2>::north());
   }
 }
-TEST_CASE("Corner<3> getSides is as expected", "[Corner][Face]")
+TEST_CASE("Corner<3> getSides is as expected")
 {
   {
     auto array = Corner<3>::bsw().getSides();
@@ -177,7 +177,7 @@ TEST_CASE("Corner<3> getSides is as expected", "[Corner][Face]")
     CHECK(array[2] == Side<3>::top());
   }
 }
-TEST_CASE("Corner<2> ==", "[Corner][Face]")
+TEST_CASE("Corner<2> ==")
 {
   CHECK(Corner<2>::sw() == Corner<2>::sw());
   CHECK_FALSE(Corner<2>::sw() == Corner<2>::se());
@@ -209,7 +209,7 @@ TEST_CASE("Corner<2> ==", "[Corner][Face]")
   CHECK_FALSE(Corner<2>::null() == Corner<2>::ne());
   CHECK(Corner<2>::null() == Corner<2>::null());
 }
-TEST_CASE("Corner<3> ==", "[Corner][Face]")
+TEST_CASE("Corner<3> ==")
 {
   CHECK(Corner<3>::bsw() == Corner<3>::bsw());
   CHECK_FALSE(Corner<3>::bsw() == Corner<3>::bse());
@@ -301,7 +301,7 @@ TEST_CASE("Corner<3> ==", "[Corner][Face]")
   CHECK_FALSE(Corner<3>::null() == Corner<3>::tne());
   CHECK(Corner<3>::null() == Corner<3>::null());
 }
-TEST_CASE("Corner<2> !=", "[Corner][Face]")
+TEST_CASE("Corner<2> !=")
 {
   CHECK_FALSE(Corner<2>::sw() != Corner<2>::sw());
   CHECK(Corner<2>::sw() != Corner<2>::se());
@@ -333,7 +333,7 @@ TEST_CASE("Corner<2> !=", "[Corner][Face]")
   CHECK(Corner<2>::null() != Corner<2>::ne());
   CHECK_FALSE(Corner<2>::null() != Corner<2>::null());
 }
-TEST_CASE("Corner<3> !=", "[Corner][Face]")
+TEST_CASE("Corner<3> !=")
 {
   CHECK_FALSE(Corner<3>::bsw() != Corner<3>::bsw());
   CHECK(Corner<3>::bsw() != Corner<3>::bse());
@@ -425,7 +425,7 @@ TEST_CASE("Corner<3> !=", "[Corner][Face]")
   CHECK(Corner<3>::null() != Corner<3>::tne());
   CHECK_FALSE(Corner<3>::null() != Corner<3>::null());
 }
-TEST_CASE("Corner<2> <", "[Corner][Face]")
+TEST_CASE("Corner<2> <")
 {
   CHECK_FALSE(Corner<2>::sw() < Corner<2>::sw());
   CHECK(Corner<2>::sw() < Corner<2>::se());
@@ -457,7 +457,7 @@ TEST_CASE("Corner<2> <", "[Corner][Face]")
   CHECK_FALSE(Corner<2>::null() < Corner<2>::ne());
   CHECK_FALSE(Corner<2>::null() < Corner<2>::null());
 }
-TEST_CASE("Corner<3> <", "[Corner][Face]")
+TEST_CASE("Corner<3> <")
 {
   CHECK_FALSE(Corner<3>::bsw() < Corner<3>::bsw());
   CHECK(Corner<3>::bsw() < Corner<3>::bse());
@@ -549,7 +549,7 @@ TEST_CASE("Corner<3> <", "[Corner][Face]")
   CHECK_FALSE(Corner<3>::null() < Corner<3>::tne());
   CHECK_FALSE(Corner<3>::null() < Corner<3>::null());
 }
-TEST_CASE("Test ostream for Corner<2>", "[Corner][Face]")
+TEST_CASE("Test ostream for Corner<2>")
 {
   stringstream ss;
   ss << Corner<2>::sw();
@@ -570,7 +570,7 @@ TEST_CASE("Test ostream for Corner<2>", "[Corner][Face]")
   ss << Corner<2>(13);
   CHECK(ss.str() == "Corner<2> invalid value: 13");
 }
-TEST_CASE("Test ostream for Corner<3>", "[Corner][Face]")
+TEST_CASE("Test ostream for Corner<3>")
 {
   stringstream ss;
   ss << Corner<3>::bsw();
@@ -603,7 +603,7 @@ TEST_CASE("Test ostream for Corner<3>", "[Corner][Face]")
   ss << Corner<3>(13);
   CHECK(ss.str() == "Corner<3> invalid value: 13");
 }
-TEST_CASE("Test iterator for Corner<2>", "[Corner][Face]")
+TEST_CASE("Test iterator for Corner<2>")
 {
   auto iter = Corner<2>::getValues().begin();
   CHECK(iter == Corner<2>::getValues().begin());
@@ -620,7 +620,7 @@ TEST_CASE("Test iterator for Corner<2>", "[Corner][Face]")
   CHECK(*iter == Corner<2>::null());
   CHECK(iter == Corner<2>::getValues().end());
 }
-TEST_CASE("Test iterator for Corner<3>", "[Corner][Face]")
+TEST_CASE("Test iterator for Corner<3>")
 {
   auto iter = Corner<3>::getValues().begin();
   CHECK(iter == Corner<3>::getValues().begin());

@@ -27,7 +27,7 @@
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("Test from_json for Edge", "[Edge][Face]")
+TEST_CASE("Test from_json for Edge")
 {
   nlohmann::json j;
   j["null"] = nullptr;
@@ -56,7 +56,7 @@ TEST_CASE("Test from_json for Edge", "[Edge][Face]")
   CHECK(j["ne"].get<Edge>() == Edge::ne());
   CHECK(j["nw"].get<Edge>() == Edge::nw());
 }
-TEST_CASE("Test to_json for Edge", "[Edge][Face]")
+TEST_CASE("Test to_json for Edge")
 {
   nlohmann::json j;
   j["null"] = Edge::null();
@@ -86,7 +86,7 @@ TEST_CASE("Test to_json for Edge", "[Edge][Face]")
   CHECK(j["se"] == "SE");
   CHECK(j["nw"] == "NW");
 }
-TEST_CASE("Test to_json for Side<1>", "[Side][Face]")
+TEST_CASE("Test to_json for Side<1>")
 {
   nlohmann::json j;
   j["null"] = Side<1>::null();
@@ -96,7 +96,7 @@ TEST_CASE("Test to_json for Side<1>", "[Side][Face]")
   CHECK(j["west"] == "WEST");
   CHECK(j["east"] == "EAST");
 }
-TEST_CASE("Test to_json for Side<2>", "[Side][Face]")
+TEST_CASE("Test to_json for Side<2>")
 {
   nlohmann::json j;
   j["null"] = Side<2>::null();
@@ -110,7 +110,7 @@ TEST_CASE("Test to_json for Side<2>", "[Side][Face]")
   CHECK(j["south"] == "SOUTH");
   CHECK(j["north"] == "NORTH");
 }
-TEST_CASE("Test to_json for Side<3>", "[Side][Face]")
+TEST_CASE("Test to_json for Side<3>")
 {
   nlohmann::json j;
   j["null"] = Side<3>::null();
@@ -128,7 +128,7 @@ TEST_CASE("Test to_json for Side<3>", "[Side][Face]")
   CHECK(j["bottom"] == "BOTTOM");
   CHECK(j["top"] == "TOP");
 }
-TEST_CASE("Test from_json for Side<1>", "[Side][Face]")
+TEST_CASE("Test from_json for Side<1>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
@@ -138,7 +138,7 @@ TEST_CASE("Test from_json for Side<1>", "[Side][Face]")
   CHECK(j["west"].get<Side<1>>() == Side<1>::west());
   CHECK(j["east"].get<Side<1>>() == Side<1>::east());
 }
-TEST_CASE("Test from_json for Side<2>", "[Side][Face]")
+TEST_CASE("Test from_json for Side<2>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
@@ -152,7 +152,7 @@ TEST_CASE("Test from_json for Side<2>", "[Side][Face]")
   CHECK(j["south"].get<Side<2>>() == Side<2>::south());
   CHECK(j["north"].get<Side<2>>() == Side<2>::north());
 }
-TEST_CASE("Test from_json for Side<3>", "[Side][Face]")
+TEST_CASE("Test from_json for Side<3>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
@@ -170,13 +170,13 @@ TEST_CASE("Test from_json for Side<3>", "[Side][Face]")
   CHECK(j["bottom"].get<Side<3>>() == Side<3>::bottom());
   CHECK(j["top"].get<Side<3>>() == Side<3>::top());
 }
-TEST_CASE("Test from_json for Orthant<0>", "[Orthant]")
+TEST_CASE("Test from_json for Orthant<0>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
   CHECK(j["null"].get<Orthant<0>>() == Orthant<0>::null());
 }
-TEST_CASE("Test from_json for Orthant<1>", "[Orthant]")
+TEST_CASE("Test from_json for Orthant<1>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
@@ -186,7 +186,7 @@ TEST_CASE("Test from_json for Orthant<1>", "[Orthant]")
   CHECK(j["lower"].get<Orthant<1>>() == Orthant<1>::lower());
   CHECK(j["upper"].get<Orthant<1>>() == Orthant<1>::upper());
 }
-TEST_CASE("Test from_json for Orthant<2>", "[Orthant]")
+TEST_CASE("Test from_json for Orthant<2>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
@@ -200,7 +200,7 @@ TEST_CASE("Test from_json for Orthant<2>", "[Orthant]")
   CHECK(j["nw"].get<Orthant<2>>() == Orthant<2>::nw());
   CHECK(j["ne"].get<Orthant<2>>() == Orthant<2>::ne());
 }
-TEST_CASE("Test from_json for Orthant<3>", "[Orthant]")
+TEST_CASE("Test from_json for Orthant<3>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
@@ -222,13 +222,13 @@ TEST_CASE("Test from_json for Orthant<3>", "[Orthant]")
   CHECK(j["tnw"].get<Orthant<3>>() == Orthant<3>::tnw());
   CHECK(j["tne"].get<Orthant<3>>() == Orthant<3>::tne());
 }
-TEST_CASE("Test to_json for Orthant<0>", "[Orthant]")
+TEST_CASE("Test to_json for Orthant<0>")
 {
   nlohmann::json j;
   j["null"] = Orthant<0>::null();
   CHECK(j["null"] == nullptr);
 }
-TEST_CASE("Test to_json for Orthant<1>", "[Orthant]")
+TEST_CASE("Test to_json for Orthant<1>")
 {
   nlohmann::json j;
   j["null"] = Orthant<1>::null();
@@ -238,7 +238,7 @@ TEST_CASE("Test to_json for Orthant<1>", "[Orthant]")
   CHECK(j["lower"] == "LOWER");
   CHECK(j["upper"] == "UPPER");
 }
-TEST_CASE("Test to_json for Orthant<2>", "[Orthant]")
+TEST_CASE("Test to_json for Orthant<2>")
 {
   nlohmann::json j;
   j["null"] = Orthant<2>::null();
@@ -252,7 +252,7 @@ TEST_CASE("Test to_json for Orthant<2>", "[Orthant]")
   CHECK(j["nw"] == "NW");
   CHECK(j["ne"] == "NE");
 }
-TEST_CASE("Test to_json for Orthant<3>", "[Orthant]")
+TEST_CASE("Test to_json for Orthant<3>")
 {
   nlohmann::json j;
   j["null"] = Orthant<3>::null();
@@ -274,7 +274,7 @@ TEST_CASE("Test to_json for Orthant<3>", "[Orthant]")
   CHECK(j["tnw"] == "TNW");
   CHECK(j["tne"] == "TNE");
 }
-TEST_CASE("Test from_json for Corner<2>", "[Corner][Face]")
+TEST_CASE("Test from_json for Corner<2>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
@@ -288,7 +288,7 @@ TEST_CASE("Test from_json for Corner<2>", "[Corner][Face]")
   CHECK(j["nw"].get<Corner<2>>() == Corner<2>::nw());
   CHECK(j["ne"].get<Corner<2>>() == Corner<2>::ne());
 }
-TEST_CASE("Test from_json for Corner<3>", "[Corner][Face]")
+TEST_CASE("Test from_json for Corner<3>")
 {
   nlohmann::json j;
   j["null"] = nullptr;
@@ -310,7 +310,7 @@ TEST_CASE("Test from_json for Corner<3>", "[Corner][Face]")
   CHECK(j["tnw"].get<Corner<3>>() == Corner<3>::tnw());
   CHECK(j["tne"].get<Corner<3>>() == Corner<3>::tne());
 }
-TEST_CASE("Test to_json for Corner<2>", "[Corner][Face]")
+TEST_CASE("Test to_json for Corner<2>")
 {
   nlohmann::json j;
   j["null"] = Corner<2>::null();
@@ -324,7 +324,7 @@ TEST_CASE("Test to_json for Corner<2>", "[Corner][Face]")
   CHECK(j["nw"] == "NW");
   CHECK(j["ne"] == "NE");
 }
-TEST_CASE("Test to_json for Corner<3>", "[Corner][Face]")
+TEST_CASE("Test to_json for Corner<3>")
 {
   nlohmann::json j;
   j["null"] = Corner<3>::null();
@@ -346,7 +346,7 @@ TEST_CASE("Test to_json for Corner<3>", "[Corner][Face]")
   CHECK(j["tnw"] == "TNW");
   CHECK(j["tne"] == "TNE");
 }
-TEST_CASE("PatchInfo from_json with children", "[PatchInfo]")
+TEST_CASE("PatchInfo from_json with children")
 {
   nlohmann::json j;
   j["id"] = 9;
@@ -406,7 +406,7 @@ TEST_CASE("PatchInfo from_json with children", "[PatchInfo]")
   CHECK_FALSE(d.hasNbr(Side<3>::bottom()));
   CHECK_FALSE(d.hasNbr(Side<3>::top()));
 }
-TEST_CASE("PatchInfo to_json no children", "[PatchInfo]")
+TEST_CASE("PatchInfo to_json no children")
 {
   PatchInfo<3> d;
   d.id = 9;
@@ -485,7 +485,7 @@ TEST_CASE("PatchInfo to_json no children", "[PatchInfo]")
   CHECK(j["edge_nbrs"][2]["type"] == "NORMAL");
   CHECK(j["edge_nbrs"][2]["edge"] == "SW");
 }
-TEST_CASE("PatchInfo to_json no children no neighbors", "[PatchInfo]")
+TEST_CASE("PatchInfo to_json no children no neighbors")
 {
   PatchInfo<3> d;
   d.id = 9;
@@ -523,7 +523,7 @@ TEST_CASE("PatchInfo to_json no children no neighbors", "[PatchInfo]")
   REQUIRE(j["nbrs"].is_array());
   REQUIRE(j["nbrs"].size() == 0);
 }
-TEST_CASE("PatchInfo to_json with children", "[PatchInfo]")
+TEST_CASE("PatchInfo to_json with children")
 {
   PatchInfo<3> d;
   d.id = 9;
@@ -594,7 +594,7 @@ TEST_CASE("PatchInfo to_json with children", "[PatchInfo]")
   CHECK(j["nbrs"][2]["type"] == "NORMAL");
   CHECK(j["nbrs"][2]["side"] == "NORTH");
 }
-TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
+TEST_CASE("PatchInfo from_json no children")
 {
   nlohmann::json j;
   j["id"] = 9;
@@ -671,7 +671,7 @@ TEST_CASE("PatchInfo from_json no children", "[PatchInfo]")
   CHECK_FALSE(d.hasNbr(Edge::se()));
   CHECK_FALSE(d.hasNbr(Edge::nw()));
 }
-TEST_CASE("FineNbrInfo to_json", "[FineNbrInfo]")
+TEST_CASE("FineNbrInfo to_json")
 {
   for (int ids_0 : { 1, 2 }) {
     for (int ids_1 : { 1, 2 }) {
@@ -715,7 +715,7 @@ TEST_CASE("FineNbrInfo to_json", "[FineNbrInfo]")
     }
   }
 }
-TEST_CASE("FineNbrInfo from_json", "[FineNbrInfo]")
+TEST_CASE("FineNbrInfo from_json")
 {
   for (int id1 : { 1, 2 }) {
     for (int id2 : { 1, 2 }) {
@@ -749,7 +749,7 @@ TEST_CASE("FineNbrInfo from_json", "[FineNbrInfo]")
     }
   }
 }
-TEST_CASE("NbrType to_json", "[NbrType]")
+TEST_CASE("NbrType to_json")
 {
   nlohmann::json j;
   j["normal"] = NbrType::Normal;
@@ -759,7 +759,7 @@ TEST_CASE("NbrType to_json", "[NbrType]")
   CHECK(j["coarse"] == "COARSE");
   CHECK(j["fine"] == "FINE");
 }
-TEST_CASE("NbrType from_json", "[NbrType]")
+TEST_CASE("NbrType from_json")
 {
   nlohmann::json j;
   j["normal"] = "NORMAL";
@@ -769,7 +769,7 @@ TEST_CASE("NbrType from_json", "[NbrType]")
   CHECK(j["coarse"].get<NbrType>() == NbrType::Coarse);
   CHECK(j["fine"].get<NbrType>() == NbrType::Fine);
 }
-TEST_CASE("NormalNbrInfo to_json", "[NormalNbrInfo]")
+TEST_CASE("NormalNbrInfo to_json")
 {
   for (int id : { 1, 2, 3 }) {
     for (int rank : { 0, 1, 2 }) {
@@ -789,7 +789,7 @@ TEST_CASE("NormalNbrInfo to_json", "[NormalNbrInfo]")
     }
   }
 }
-TEST_CASE("NormalNbrInfo from_json", "[NormalNbrInfo]")
+TEST_CASE("NormalNbrInfo from_json")
 {
   for (int id : { 1, 2, 3 }) {
     for (int rank : { 0, 1, 2 }) {
@@ -805,7 +805,7 @@ TEST_CASE("NormalNbrInfo from_json", "[NormalNbrInfo]")
     }
   }
 }
-TEST_CASE("CoarseNbrInfo to_json", "[CoarseNbrInfo]")
+TEST_CASE("CoarseNbrInfo to_json")
 {
   for (int id : { 1, 2, 3 }) {
     for (int rank : { 0, 1, 2 }) {
@@ -829,7 +829,7 @@ TEST_CASE("CoarseNbrInfo to_json", "[CoarseNbrInfo]")
     }
   }
 }
-TEST_CASE("CoarseNbrInfo from_json", "[CoarseNbrInfo]")
+TEST_CASE("CoarseNbrInfo from_json")
 {
   for (int id : { 1, 2, 3 }) {
     for (int rank : { 0, 1, 2 }) {

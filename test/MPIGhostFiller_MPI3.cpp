@@ -32,7 +32,7 @@ using namespace ThunderEgg;
 constexpr auto uniform = "mesh_inputs/2d_uniform_2x2_mpi3.json";
 constexpr auto refined = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi3.json";
 
-TEST_CASE("Calls for various domains 2d face cases MPI3", "[MPIGhostFiller]")
+TEST_CASE("Calls for various domains 2d face cases MPI3")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto mesh_file : { uniform, refined }) {
@@ -57,7 +57,7 @@ TEST_CASE("Calls for various domains 2d face cases MPI3", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Calls for various domains 2d corner cases MPI3", "[MPIGhostFiller]")
+TEST_CASE("Calls for various domains 2d corner cases MPI3")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto mesh_file : { uniform, refined }) {
@@ -82,7 +82,7 @@ TEST_CASE("Calls for various domains 2d corner cases MPI3", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Exchange for various domains 2d face cases MPI3", "[MPIGhostFiller]")
+TEST_CASE("Exchange for various domains 2d face cases MPI3")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto mesh_file : { uniform, refined }) {
@@ -112,7 +112,7 @@ TEST_CASE("Exchange for various domains 2d face cases MPI3", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Exchange for various domains 2d corner cases MPI3", "[MPIGhostFiller]")
+TEST_CASE("Exchange for various domains 2d corner cases MPI3")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto mesh_file : { uniform, refined }) {
@@ -142,7 +142,7 @@ TEST_CASE("Exchange for various domains 2d corner cases MPI3", "[MPIGhostFiller]
     }
   }
 }
-TEST_CASE("Two Exchanges for various domains 2d face cases MPI3", "[MPIGhostFiller]")
+TEST_CASE("Two Exchanges for various domains 2d face cases MPI3")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto mesh_file : { uniform, refined }) {
@@ -173,7 +173,7 @@ TEST_CASE("Two Exchanges for various domains 2d face cases MPI3", "[MPIGhostFill
     }
   }
 }
-TEST_CASE("Two Exchanges for various domains 2d corner cases MPI3", "[MPIGhostFiller]")
+TEST_CASE("Two Exchanges for various domains 2d corner cases MPI3")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto mesh_file : { uniform, refined }) {

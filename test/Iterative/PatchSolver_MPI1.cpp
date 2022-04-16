@@ -34,7 +34,7 @@ constexpr auto single_mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
 constexpr auto cross_mesh_file = "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json";
 
-TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length", "[Iterative::PatchSolver]")
+TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
@@ -65,7 +65,7 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length", "[It
     }
   }
 }
-TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchSolver]")
+TEST_CASE("Iterative::PatchSolver passes modified operator")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
@@ -104,7 +104,7 @@ TEST_CASE("Iterative::PatchSolver passes modified operator", "[Iterative::PatchS
     }
   }
 }
-TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::PatchSolver]")
+TEST_CASE("Iterative::PatchSolver propagates BreakdownError")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
@@ -136,7 +136,7 @@ TEST_CASE("Iterative::PatchSolver propagates BreakdownError", "[Iterative::Patch
     }
   }
 }
-TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError", "[Iterative::PatchSolver]")
+TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {

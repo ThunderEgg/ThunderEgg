@@ -28,7 +28,7 @@ using namespace ThunderEgg;
 using namespace std;
 
 const string mesh_file = "mesh_inputs/2d_uniform_quad_mpi3.json";
-TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad")
 {
   for (auto nx : { 2 }) {
     for (auto ny : { 2 }) {
@@ -77,7 +77,7 @@ TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad", "[GMG::InterL
     }
   }
 }
-TEST_CASE("3-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("3-processor getNewGhostVector on uniform quad")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto nx : { 2, 10 }) {
@@ -102,7 +102,7 @@ TEST_CASE("3-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm
     }
   }
 }
-TEST_CASE("3-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("3-processor sendGhostPatches on uniform quad")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto nx : { 2, 10 }) {
@@ -244,7 +244,7 @@ TEST_CASE("3-processor sendGhostPatches throws exception when start and finish a
     }
   }
 }
-TEST_CASE("3-processor sendGhostPatches throws exception when start is called twice on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("3-processor sendGhostPatches throws exception when start is called twice on uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -263,7 +263,7 @@ TEST_CASE("3-processor sendGhostPatches throws exception when start is called tw
     }
   }
 }
-TEST_CASE("3-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("3-processor getGhostPatches on uniform quad")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto nx : { 2, 10 }) {
@@ -390,7 +390,7 @@ TEST_CASE("3-processor getGhostPatches throws exception when start and finish ar
     }
   }
 }
-TEST_CASE("3-processor getGhostPatches throws exception when start is called twice on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("3-processor getGhostPatches throws exception when start is called twice on uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {

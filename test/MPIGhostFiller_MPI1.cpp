@@ -37,7 +37,7 @@ constexpr auto td_uniform = "mesh_inputs/3d_uniform_2x2x2_mpi1.json";
 constexpr auto td_refined = "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json";
 constexpr auto td_mid_refine = "mesh_inputs/3d_mid_refine_4x4x4_mpi1.json";
 
-TEST_CASE("No calls for 1 patch domain", "[MPIGhostFiller]")
+TEST_CASE("No calls for 1 patch domain")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto nx : { 2, 3 }) {
@@ -60,7 +60,7 @@ TEST_CASE("No calls for 1 patch domain", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Calls for various domains 2d face cases", "[MPIGhostFiller]")
+TEST_CASE("Calls for various domains 2d face cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
@@ -85,7 +85,7 @@ TEST_CASE("Calls for various domains 2d face cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Calls for various domains 2d corner cases", "[MPIGhostFiller]")
+TEST_CASE("Calls for various domains 2d corner cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
@@ -110,7 +110,7 @@ TEST_CASE("Calls for various domains 2d corner cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Calls for various domains 3d face cases", "[MPIGhostFiller]")
+TEST_CASE("Calls for various domains 3d face cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { td_uniform, td_refined, td_mid_refine }) {
@@ -137,7 +137,7 @@ TEST_CASE("Calls for various domains 3d face cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Calls for various domains 3d edge cases", "[MPIGhostFiller]")
+TEST_CASE("Calls for various domains 3d edge cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { td_uniform, td_refined, td_mid_refine }) {
@@ -164,7 +164,7 @@ TEST_CASE("Calls for various domains 3d edge cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Calls for various domains 3d corner cases", "[MPIGhostFiller]")
+TEST_CASE("Calls for various domains 3d corner cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { td_uniform, td_refined, td_mid_refine }) {
@@ -191,7 +191,7 @@ TEST_CASE("Calls for various domains 3d corner cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Exchange for various domains 2d face cases", "[MPIGhostFiller]")
+TEST_CASE("Exchange for various domains 2d face cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
@@ -222,7 +222,7 @@ TEST_CASE("Exchange for various domains 2d face cases", "[MPIGhostFiller]")
   }
 }
 
-TEST_CASE("Exchange for various domains 2d corner cases", "[MPIGhostFiller]")
+TEST_CASE("Exchange for various domains 2d corner cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
@@ -253,7 +253,7 @@ TEST_CASE("Exchange for various domains 2d corner cases", "[MPIGhostFiller]")
   }
 }
 
-TEST_CASE("Exchange for various domains 3d face cases", "[MPIGhostFiller]")
+TEST_CASE("Exchange for various domains 3d face cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { td_uniform, td_refined, td_mid_refine }) {
@@ -285,7 +285,7 @@ TEST_CASE("Exchange for various domains 3d face cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
+TEST_CASE("Exchange for various domains 3d edge cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { td_uniform, td_refined, td_mid_refine }) {
@@ -317,7 +317,7 @@ TEST_CASE("Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Exchange for various domains 3d corner cases", "[MPIGhostFiller]")
+TEST_CASE("Exchange for various domains 3d corner cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { td_uniform, td_refined, td_mid_refine }) {
@@ -350,7 +350,7 @@ TEST_CASE("Exchange for various domains 3d corner cases", "[MPIGhostFiller]")
   }
 }
 
-TEST_CASE("Two Exchanges for various domains 2d face cases", "[MPIGhostFiller]")
+TEST_CASE("Two Exchanges for various domains 2d face cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
@@ -381,7 +381,7 @@ TEST_CASE("Two Exchanges for various domains 2d face cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Two Exchanges for various domains 2d corner cases", "[MPIGhostFiller]")
+TEST_CASE("Two Exchanges for various domains 2d corner cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
@@ -412,7 +412,7 @@ TEST_CASE("Two Exchanges for various domains 2d corner cases", "[MPIGhostFiller]
     }
   }
 }
-TEST_CASE("Two Exchange for various domains 3d face cases", "[MPIGhostFiller]")
+TEST_CASE("Two Exchange for various domains 3d face cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { td_uniform, td_refined, td_mid_refine }) {
@@ -445,7 +445,7 @@ TEST_CASE("Two Exchange for various domains 3d face cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Two Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
+TEST_CASE("Two Exchange for various domains 3d edge cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { td_uniform, td_refined, td_mid_refine }) {
@@ -478,7 +478,7 @@ TEST_CASE("Two Exchange for various domains 3d edge cases", "[MPIGhostFiller]")
     }
   }
 }
-TEST_CASE("Two Exchange for various domains 3d corner cases", "[MPIGhostFiller]")
+TEST_CASE("Two Exchange for various domains 3d corner cases")
 {
   for (auto num_components : { 1, 2 }) {
     for (auto mesh_file : { td_uniform, td_refined, td_mid_refine }) {

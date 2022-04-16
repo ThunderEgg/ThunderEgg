@@ -36,7 +36,7 @@ using namespace ThunderEgg;
 #define MESHES "mesh_inputs/3d_uniform_2x2x2_mpi1.json", "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", "mesh_inputs/3d_mid_refine_4x4x4_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
-TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatchOperator", "[Poisson::MatrixHelper]")
+TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatchOperator")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 8, 10 }) {
@@ -98,7 +98,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
     }
   }
 }
-TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatchOperator with Neumann BC", "[Poisson::MatrixHelper]")
+TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatchOperator with Neumann BC")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 8, 10 }) {
@@ -161,7 +161,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
     }
   }
 }
-TEST_CASE("Poisson::MatrixHelper constructor throws error with odd number of cells", "[Poisson::MatrixHelper]")
+TEST_CASE("Poisson::MatrixHelper constructor throws error with odd number of cells")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto axis : { 0, 1, 2 }) {

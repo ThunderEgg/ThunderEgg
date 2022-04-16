@@ -26,7 +26,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Vector<1> getNumGhostCells managed constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumGhostCells managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -47,7 +47,7 @@ TEST_CASE("Vector<1> getNumGhostCells managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getMPIComm managed constructor", "[Vector]")
+TEST_CASE("Vector<1> getMPIComm managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -72,7 +72,7 @@ TEST_CASE("Vector<1> getMPIComm managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getNumLocalPatches managed constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumLocalPatches managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -94,7 +94,7 @@ TEST_CASE("Vector<1> getNumLocalPatches managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getNumComponents managed constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumComponents managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -116,7 +116,7 @@ TEST_CASE("Vector<1> getNumComponents managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getNumLocalCells managed constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumLocalCells managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -138,7 +138,7 @@ TEST_CASE("Vector<1> getNumLocalCells managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getNumGhostCells managed constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumGhostCells managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -163,7 +163,7 @@ TEST_CASE("Vector<2> getNumGhostCells managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getMPIComm managed constructor", "[Vector]")
+TEST_CASE("Vector<2> getMPIComm managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -191,7 +191,7 @@ TEST_CASE("Vector<2> getMPIComm managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getNumLocalPatches managed constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumLocalPatches managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -216,7 +216,7 @@ TEST_CASE("Vector<2> getNumLocalPatches managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getNumComponents managed constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumComponents managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -241,7 +241,7 @@ TEST_CASE("Vector<2> getNumComponents managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getNumLocalCells managed constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumLocalCells managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -266,7 +266,7 @@ TEST_CASE("Vector<2> getNumLocalCells managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumGhostCells managed constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumGhostCells managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -294,7 +294,7 @@ TEST_CASE("Vector<3> getNumGhostCells managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getMPIComm managed constructor", "[Vector]")
+TEST_CASE("Vector<3> getMPIComm managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -325,7 +325,7 @@ TEST_CASE("Vector<3> getMPIComm managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumLocalPatches managed constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumLocalPatches managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -353,7 +353,7 @@ TEST_CASE("Vector<3> getNumLocalPatches managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumComponents managed constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumComponents managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -381,7 +381,7 @@ TEST_CASE("Vector<3> getNumComponents managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumLocalCells managed constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumLocalCells managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -410,7 +410,7 @@ TEST_CASE("Vector<3> getNumLocalCells managed constructor", "[Vector]")
   }
 }
 
-TEST_CASE("Vector<1> getComponentView.h managed constructor", "[Vector]")
+TEST_CASE("Vector<1> getComponentView.h managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -449,7 +449,7 @@ TEST_CASE("Vector<1> getComponentView.h managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getComponentView const managed constructor", "[Vector]")
+TEST_CASE("Vector<1> getComponentView const managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -488,7 +488,7 @@ TEST_CASE("Vector<1> getComponentView const managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getComponentView managed constructor", "[Vector]")
+TEST_CASE("Vector<2> getComponentView managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -530,7 +530,7 @@ TEST_CASE("Vector<2> getComponentView managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getComponentView const managed constructor", "[Vector]")
+TEST_CASE("Vector<2> getComponentView const managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -572,7 +572,7 @@ TEST_CASE("Vector<2> getComponentView const managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getComponentView managed constructor", "[Vector]")
+TEST_CASE("Vector<3> getComponentView managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -616,7 +616,7 @@ TEST_CASE("Vector<3> getComponentView managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getComponentView const managed constructor", "[Vector]")
+TEST_CASE("Vector<3> getComponentView const managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -661,7 +661,7 @@ TEST_CASE("Vector<3> getComponentView const managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getPatchView managed constructor", "[Vector]")
+TEST_CASE("Vector<1> getPatchView managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -695,7 +695,7 @@ TEST_CASE("Vector<1> getPatchView managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getPatchView const managed constructor", "[Vector]")
+TEST_CASE("Vector<1> getPatchView const managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -729,7 +729,7 @@ TEST_CASE("Vector<1> getPatchView const managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getPatchView managed constructor", "[Vector]")
+TEST_CASE("Vector<2> getPatchView managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -766,7 +766,7 @@ TEST_CASE("Vector<2> getPatchView managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getPatchView const managed constructor", "[Vector]")
+TEST_CASE("Vector<2> getPatchView const managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -804,7 +804,7 @@ TEST_CASE("Vector<2> getPatchView const managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getPatchView managed constructor", "[Vector]")
+TEST_CASE("Vector<3> getPatchView managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -844,7 +844,7 @@ TEST_CASE("Vector<3> getPatchView managed constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getPatchView const managed constructor", "[Vector]")
+TEST_CASE("Vector<3> getPatchView const managed constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {

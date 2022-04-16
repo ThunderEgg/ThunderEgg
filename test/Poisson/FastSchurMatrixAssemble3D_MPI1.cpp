@@ -38,7 +38,7 @@ using namespace ThunderEgg;
 #define MESHES "mesh_inputs/3d_uniform_2x2x2_mpi1.json", "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", "mesh_inputs/3d_mid_refine_4x4x4_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
-TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws exception for non-square patches", "[Poisson::FastSchurMatrixAssemble3D]")
+TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws exception for non-square patches")
 {
   for (auto mesh_file : { MESHES }) {
     for (int nx : { 2, 8 }) {
@@ -72,7 +72,7 @@ public:
 };
 } // namespace
 } // namespace ThunderEgg
-TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws with unsupported ghost filler", "[Poisson::FastSchurMatrixAssemble3D]")
+TEST_CASE("Poisson::FastSchurMatrixAssemble3D throws with unsupported ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);

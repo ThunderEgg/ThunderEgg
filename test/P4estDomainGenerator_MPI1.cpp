@@ -30,7 +30,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("SinglePatch", "[p4estDomGen]")
+TEST_CASE("SinglePatch")
 {
   p4est_connectivity_t* conn = p4est_connectivity_new_unitsquare();
   p4est_t* p4est = p4est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
@@ -59,7 +59,7 @@ TEST_CASE("SinglePatch", "[p4estDomGen]")
 
   CHECK_FALSE(dg.hasCoarserDomain());
 }
-TEST_CASE("P4estDomainGenerator 2x2 Uniform", "[p4estDomGen]")
+TEST_CASE("P4estDomainGenerator 2x2 Uniform")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -363,7 +363,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Uniform", "[p4estDomGen]")
     }
   }
 }
-TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
+TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -919,7 +919,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
     }
   }
 }
-TEST_CASE("2x1 brick", "[p4estDomGen]")
+TEST_CASE("2x1 brick")
 {
   p4est_connectivity_t* conn = p4est_connectivity_new_brick(2, 1, false, false);
   p4est_t* p4est = p4est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);

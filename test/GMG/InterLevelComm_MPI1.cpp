@@ -30,7 +30,7 @@ using namespace std;
 
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
-TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLevelComm]")
+TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4")
 {
   for (auto nx : { 2 }) {
     for (auto ny : { 2 }) {
@@ -94,7 +94,7 @@ TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4", "[GMG::InterLe
     }
   }
 }
-TEST_CASE("InterLevelComm 1-processor getNewGhostVector on uniform 4x4", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 1-processor getNewGhostVector on uniform 4x4")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto nx : { 2, 10 }) {
@@ -130,7 +130,7 @@ TEST_CASE("InterLevelComm 1-processor getNewGhostVector on uniform 4x4", "[GMG::
     }
   }
 }
-TEST_CASE("InterLevelComm 1-processor sendGhostPatches on uniform 4x4", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 1-processor sendGhostPatches on uniform 4x4")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto nx : { 2, 10 }) {

@@ -35,7 +35,7 @@ using namespace ThunderEgg;
 #define MESHES "mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_4x4_mpi1.json", "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
-TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -106,7 +106,7 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS", "[Poisson::StarPat
     }
   }
 }
-TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff", "[Poisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -154,7 +154,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff", 
     }
   }
 }
-TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff with Neumann BC", "[Poisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff with Neumann BC")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -204,7 +204,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
     }
   }
 }
-TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence", "[Poisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -251,7 +251,7 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence", "[Poisso
     CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
   }
 }
-TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence with neumann BC", "[Poisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence with neumann BC")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -304,7 +304,7 @@ TEST_CASE("Test Poisson::StarPatchOperator gets 2nd order convergence with neuma
     CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
   }
 }
-TEST_CASE("Test Poisson::StarPatchOperator constructor throws exception with no ghost cells", "[Poisson::StarPatchOperator]")
+TEST_CASE("Test Poisson::StarPatchOperator constructor throws exception with no ghost cells")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);

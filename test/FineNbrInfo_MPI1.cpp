@@ -26,7 +26,7 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("FineNbrInfo Serialization/Deserialization", "[FineNbrInfo]")
+TEST_CASE("FineNbrInfo Serialization/Deserialization")
 {
   FineNbrInfo<2> info;
   info.ids[0] = 1;

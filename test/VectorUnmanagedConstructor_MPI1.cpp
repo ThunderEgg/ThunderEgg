@@ -26,7 +26,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Vector<1> getNumGhostCells unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumGhostCells unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -54,7 +54,7 @@ TEST_CASE("Vector<1> getNumGhostCells unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getMPIComm unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getMPIComm unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -85,7 +85,7 @@ TEST_CASE("Vector<1> getMPIComm unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getNumLocalPatches unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumLocalPatches unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -113,7 +113,7 @@ TEST_CASE("Vector<1> getNumLocalPatches unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getNumComponents unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumComponents unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -141,7 +141,7 @@ TEST_CASE("Vector<1> getNumComponents unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getNumLocalCells unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getNumLocalCells unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -169,7 +169,7 @@ TEST_CASE("Vector<1> getNumLocalCells unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getNumGhostCells unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumGhostCells unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -200,7 +200,7 @@ TEST_CASE("Vector<2> getNumGhostCells unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getMPIComm unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> getMPIComm unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -234,7 +234,7 @@ TEST_CASE("Vector<2> getMPIComm unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getNumLocalPatches unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumLocalPatches unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -265,7 +265,7 @@ TEST_CASE("Vector<2> getNumLocalPatches unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getNumComponents unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumComponents unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -296,7 +296,7 @@ TEST_CASE("Vector<2> getNumComponents unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getNumLocalCells unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> getNumLocalCells unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -327,7 +327,7 @@ TEST_CASE("Vector<2> getNumLocalCells unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumGhostCells unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumGhostCells unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -361,7 +361,7 @@ TEST_CASE("Vector<3> getNumGhostCells unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getMPIComm unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<3> getMPIComm unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -398,7 +398,7 @@ TEST_CASE("Vector<3> getMPIComm unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumLocalPatches unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumLocalPatches unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -432,7 +432,7 @@ TEST_CASE("Vector<3> getNumLocalPatches unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumComponents unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumComponents unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -466,7 +466,7 @@ TEST_CASE("Vector<3> getNumComponents unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumLocalCells unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<3> getNumLocalCells unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -501,7 +501,7 @@ TEST_CASE("Vector<3> getNumLocalCells unmanaged constructor", "[Vector]")
   }
 }
 
-TEST_CASE("Vector<1> getComponentView unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getComponentView unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -546,7 +546,7 @@ TEST_CASE("Vector<1> getComponentView unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getComponentView const unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getComponentView const unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -591,7 +591,7 @@ TEST_CASE("Vector<1> getComponentView const unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getComponentView unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> getComponentView unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -639,7 +639,7 @@ TEST_CASE("Vector<2> getComponentView unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getComponentView const unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> getComponentView const unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -688,7 +688,7 @@ TEST_CASE("Vector<2> getComponentView const unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getComponentView unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<3> getComponentView unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -738,7 +738,7 @@ TEST_CASE("Vector<3> getComponentView unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getComponentView const unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<3> getComponentView const unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -790,7 +790,7 @@ TEST_CASE("Vector<3> getComponentView const unmanaged constructor", "[Vector]")
   }
 }
 
-TEST_CASE("Vector<1> getPatchView unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getPatchView unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -830,7 +830,7 @@ TEST_CASE("Vector<1> getPatchView unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<1> getPatchView const unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<1> getPatchView const unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -870,7 +870,7 @@ TEST_CASE("Vector<1> getPatchView const unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getPatchView unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> getPatchView unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -913,7 +913,7 @@ TEST_CASE("Vector<2> getPatchView unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<2> getPatchView const unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<2> getPatchView const unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -957,7 +957,7 @@ TEST_CASE("Vector<2> getPatchView const unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getPatchView unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<3> getPatchView unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -1003,7 +1003,7 @@ TEST_CASE("Vector<3> getPatchView unmanaged constructor", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getPatchView const unmanaged constructor", "[Vector]")
+TEST_CASE("Vector<3> getPatchView const unmanaged constructor")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {

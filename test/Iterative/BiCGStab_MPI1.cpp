@@ -32,12 +32,12 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Iterative;
 
-TEST_CASE("BiCGStab default max iterations", "[BiCGStab]")
+TEST_CASE("BiCGStab default max iterations")
 {
   BiCGStab<2> bcgs;
   CHECK(bcgs.getMaxIterations() == 1000);
 }
-TEST_CASE("BiCGStab set max iterations", "[BiCGStab]")
+TEST_CASE("BiCGStab set max iterations")
 {
   for (int iterations : { 1, 2, 3 }) {
     BiCGStab<2> bcgs;
@@ -45,12 +45,12 @@ TEST_CASE("BiCGStab set max iterations", "[BiCGStab]")
     CHECK(bcgs.getMaxIterations() == iterations);
   }
 }
-TEST_CASE("BiCGStab default tolerance", "[BiCGStab]")
+TEST_CASE("BiCGStab default tolerance")
 {
   BiCGStab<2> bcgs;
   CHECK(bcgs.getTolerance() == 1e-12);
 }
-TEST_CASE("BiCGStab set tolerance", "[BiCGStab]")
+TEST_CASE("BiCGStab set tolerance")
 {
   for (double tolerance : { 1.2, 2.3, 3.4 }) {
     BiCGStab<2> bcgs;
@@ -58,12 +58,12 @@ TEST_CASE("BiCGStab set tolerance", "[BiCGStab]")
     CHECK(bcgs.getTolerance() == tolerance);
   }
 }
-TEST_CASE("BiCGStab default timer", "[BiCGStab]")
+TEST_CASE("BiCGStab default timer")
 {
   BiCGStab<2> bcgs;
   CHECK(bcgs.getTimer() == nullptr);
 }
-TEST_CASE("BiCGStab set timer", "[BiCGStab]")
+TEST_CASE("BiCGStab set timer")
 {
   Communicator comm(MPI_COMM_WORLD);
   BiCGStab<2> bcgs;
@@ -71,7 +71,7 @@ TEST_CASE("BiCGStab set timer", "[BiCGStab]")
   bcgs.setTimer(timer);
   CHECK(bcgs.getTimer() == timer);
 }
-TEST_CASE("BiCGStab clone", "[BiCGStab]")
+TEST_CASE("BiCGStab clone")
 {
   for (int iterations : { 1, 2, 3 }) {
     for (double tolerance : { 1.2, 2.3, 3.4 }) {
@@ -91,7 +91,7 @@ TEST_CASE("BiCGStab clone", "[BiCGStab]")
     }
   }
 }
-TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]")
+TEST_CASE("BiCGStab solves poisson problem withing given tolerance")
 {
   for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
     string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
@@ -131,7 +131,7 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance", "[BiCGStab]
     CHECK(residual.dot(residual) / f_vec.dot(f_vec) <= tolerance);
   }
 }
-TEST_CASE("BiCGStab handles zero rhs vector", "[BiCGStab]")
+TEST_CASE("BiCGStab handles zero rhs vector")
 {
   for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
     string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
@@ -155,7 +155,7 @@ TEST_CASE("BiCGStab handles zero rhs vector", "[BiCGStab]")
     CHECK(g_vec.infNorm() == 0);
   }
 }
-TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
+TEST_CASE("outputs iteration count and residual to output")
 {
   string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
   INFO("MESH FILE " << mesh_file);
@@ -204,7 +204,7 @@ TEST_CASE("outputs iteration count and residual to output", "[BiCGStab]")
     prev_iteration = iteration;
   }
 }
-TEST_CASE("giving a good initial guess reduces the iterations", "[BiCGStab]")
+TEST_CASE("giving a good initial guess reduces the iterations")
 {
   string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
   INFO("MESH FILE " << mesh_file);
@@ -261,7 +261,7 @@ public:
   I2Operator* clone() const override { return new I2Operator(*this); }
 };
 } // namespace
-TEST_CASE("BiCGStab solves poisson 2I problem", "[BiCGStab]")
+TEST_CASE("BiCGStab solves poisson 2I problem")
 {
   for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
     string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";

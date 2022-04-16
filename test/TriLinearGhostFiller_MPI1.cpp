@@ -32,7 +32,7 @@ using namespace ThunderEgg;
 constexpr auto single_mesh_file = "mesh_inputs/3d_uniform_2x2x2_mpi1.json";
 constexpr auto refined_mesh_file = "mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json";
 
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -89,7 +89,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller", "[TriLinearGhostFil
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -167,7 +167,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components", "[Tr
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two components", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two components")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -245,7 +245,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -302,7 +302,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set", "
     }
   }
 }
-TEST_CASE("TriLinearGhostFiller constructor throws error with odd number of cells", "[TriLinearGhostFiller]")
+TEST_CASE("TriLinearGhostFiller constructor throws error with odd number of cells")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (GhostFillingType fill_type : { GhostFillingType::Faces, GhostFillingType::Edges, GhostFillingType::Corners }) {
@@ -324,7 +324,7 @@ TEST_CASE("TriLinearGhostFiller constructor throws error with odd number of cell
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -393,7 +393,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges", "[TriLinearGh
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -495,7 +495,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two components edges", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two components edges")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -597,7 +597,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edges", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edges")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -666,7 +666,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -744,7 +744,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners", "[TriLinear
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corners", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corners")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -864,7 +864,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two components corners", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two components corners")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {
@@ -984,7 +984,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
     }
   }
 }
-TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set corners", "[TriLinearGhostFiller]")
+TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set corners")
 {
   for (auto mesh_file : { single_mesh_file, refined_mesh_file }) {
     for (auto nx : { 4, 6 }) {

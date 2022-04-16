@@ -32,7 +32,7 @@ using namespace ThunderEgg;
 
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 const string refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
-TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
+TEST_CASE("Test DirectInterpolator on uniform 4x4")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto nx : { 2, 10 }) {
@@ -83,7 +83,7 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4", "[GMG::DirectInterpolator]")
     }
   }
 }
-TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4", "[GMG::DirectInterpolator]")
+TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto nx : { 2, 10 }) {
@@ -136,7 +136,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
     }
   }
 }
-TEST_CASE("Test DirectInterpolator on refined 2x2", "[GMG::DirectInterpolator]")
+TEST_CASE("Test DirectInterpolator on refined 2x2")
 {
   for (auto num_components : { 1, 2, 3 }) {
     for (auto nx : { 2, 10 }) {

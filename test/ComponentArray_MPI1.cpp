@@ -22,7 +22,7 @@
 #include <catch2/generators/catch_generators.hpp>
 using namespace std;
 using namespace ThunderEgg;
-TEST_CASE("ComponentArray getStart", "[ComponentArray]")
+TEST_CASE("ComponentArray getStart")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -36,7 +36,7 @@ TEST_CASE("ComponentArray getStart", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray getEnd", "[ComponentArray]")
+TEST_CASE("ComponentArray getEnd")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -50,7 +50,7 @@ TEST_CASE("ComponentArray getEnd", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray getGhostStart", "[ComponentArray]")
+TEST_CASE("ComponentArray getGhostStart")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -64,7 +64,7 @@ TEST_CASE("ComponentArray getGhostStart", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray getGhostEnd", "[ComponentArray]")
+TEST_CASE("ComponentArray getGhostEnd")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -78,7 +78,7 @@ TEST_CASE("ComponentArray getGhostEnd", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray getStrides", "[ComponentArray]")
+TEST_CASE("ComponentArray getStrides")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -92,7 +92,7 @@ TEST_CASE("ComponentArray getStrides", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray squarebracket operator", "[ComponentArray]")
+TEST_CASE("ComponentArray squarebracket operator")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -112,7 +112,7 @@ TEST_CASE("ComponentArray squarebracket operator", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray squarebracket operator const", "[ComponentArray]")
+TEST_CASE("ComponentArray squarebracket operator const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -132,7 +132,7 @@ TEST_CASE("ComponentArray squarebracket operator const", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray default is zero", "[ComponentArray]")
+TEST_CASE("ComponentArray default is zero")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -151,7 +151,7 @@ TEST_CASE("ComponentArray default is zero", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<2> getSliceOn<1>", "[ComponentArray]")
+TEST_CASE("ComponentArray<2> getSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -198,7 +198,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<2> getSliceOn<1> const", "[ComponentArray]")
+TEST_CASE("ComponentArray<2> getSliceOn<1> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -245,7 +245,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<1> const", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<3> getSliceOn<2>", "[ComponentArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<2>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -330,7 +330,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<3> getSliceOn<2> const", "[ComponentArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<2> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -415,7 +415,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<2> const", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -572,7 +572,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<1> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -729,7 +729,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<1> const", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<3> getSliceOn<0>", "[ComponentArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -760,7 +760,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<0>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<3> getSliceOn<0> const", "[ComponentArray]")
+TEST_CASE("ComponentArray<3> getSliceOn<0> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -791,7 +791,7 @@ TEST_CASE("ComponentArray<3> getSliceOn<0> const", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<2> getSliceOn<0>", "[ComponentArray]")
+TEST_CASE("ComponentArray<2> getSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -813,7 +813,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<0>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<2> getSliceOn<0> const", "[ComponentArray]")
+TEST_CASE("ComponentArray<2> getSliceOn<0> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -836,7 +836,7 @@ TEST_CASE("ComponentArray<2> getSliceOn<0> const", "[ComponentArray]")
   }
 }
 
-TEST_CASE("ComponentArray<2> getGhostSliceOn<1>", "[ComponentArray]")
+TEST_CASE("ComponentArray<2> getGhostSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -869,7 +869,7 @@ TEST_CASE("ComponentArray<2> getGhostSliceOn<1>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<3> getGhostSliceOn<2>", "[ComponentArray]")
+TEST_CASE("ComponentArray<3> getGhostSliceOn<2>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -924,7 +924,7 @@ TEST_CASE("ComponentArray<3> getGhostSliceOn<2>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<3> getGhostSliceOn<1>", "[ComponentArray]")
+TEST_CASE("ComponentArray<3> getGhostSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -991,7 +991,7 @@ TEST_CASE("ComponentArray<3> getGhostSliceOn<1>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<3> getGhostSliceOn<0>", "[ComponentArray]")
+TEST_CASE("ComponentArray<3> getGhostSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1022,7 +1022,7 @@ TEST_CASE("ComponentArray<3> getGhostSliceOn<0>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray<2> getGhostSliceOn<0>", "[ComponentArray]")
+TEST_CASE("ComponentArray<2> getGhostSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1044,7 +1044,7 @@ TEST_CASE("ComponentArray<2> getGhostSliceOn<0>", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray copy constructor", "[ComponentArray]")
+TEST_CASE("ComponentArray copy constructor")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1076,7 +1076,7 @@ TEST_CASE("ComponentArray copy constructor", "[ComponentArray]")
     }
   }
 }
-TEST_CASE("ComponentArray copy assignment", "[ComponentArray]")
+TEST_CASE("ComponentArray copy assignment")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {

@@ -77,7 +77,7 @@ GetAllPatchesOnRank0(const Domain<2>& domain)
   return all_patches;
 }
 } // namespace
-TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
+TEST_CASE("P4estDomainGenerator 4x4 Uniform")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -949,7 +949,7 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform", "[p4estDomGen]")
     }
   }
 }
-TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
+TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {
@@ -1543,7 +1543,7 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW", "[p4estDomGen]")
     }
   }
 }
-TEST_CASE("P4estDomainGenerator 4x4 Refined SW", "[p4estDomGen]")
+TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
 {
   for (int nx : { 5, 10 }) {
     for (int ny : { 5, 10 }) {

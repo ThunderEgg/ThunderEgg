@@ -32,7 +32,7 @@ contains(Container& deque, Value a)
 {
   return find(deque.begin(), deque.end(), a) != deque.end();
 }
-TEST_CASE("Schur::FineIfaceInfo constructor", "[Schur::FineIfaceInfo]")
+TEST_CASE("Schur::FineIfaceInfo constructor")
 {
   for (Side<2> s : Side<2>::getValues()) {
     int id = 1;

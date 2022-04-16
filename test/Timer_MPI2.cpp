@@ -61,7 +61,7 @@ occurrences(const std::string& s, const std::string& target)
   }
   return occurrences;
 }
-TEST_CASE("Timer to_json empty timer", "[Timer]")
+TEST_CASE("Timer to_json empty timer")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -69,7 +69,7 @@ TEST_CASE("Timer to_json empty timer", "[Timer]")
   INFO(j.dump(4));
   REQUIRE(j == nullptr);
 }
-TEST_CASE("Timer to_json unassociated timing", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -103,7 +103,7 @@ TEST_CASE("Timer to_json unassociated timing", "[Timer]")
     CHECK(j == nullptr);
   }
 }
-TEST_CASE("Timer to_json unassociated timing with int info", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with int info")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -159,7 +159,7 @@ TEST_CASE("Timer to_json unassociated timing with int info", "[Timer]")
     CHECK(j == nullptr);
   }
 }
-TEST_CASE("Timer to_json unassociated timing with double info", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with double info")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -215,7 +215,7 @@ TEST_CASE("Timer to_json unassociated timing with double info", "[Timer]")
     CHECK(j == nullptr);
   }
 }
-TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
+TEST_CASE("Timer to_json two unassociated timings sequential")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -265,7 +265,7 @@ TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
     CHECK(j == nullptr);
   }
 }
-TEST_CASE("Timer to_json nested timing", "[Timer]")
+TEST_CASE("Timer to_json nested timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -304,7 +304,7 @@ TEST_CASE("Timer to_json nested timing", "[Timer]")
     CHECK(j == nullptr);
   }
 }
-TEST_CASE("Timer to_json domain timing", "[Timer]")
+TEST_CASE("Timer to_json domain timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -350,7 +350,7 @@ TEST_CASE("Timer to_json domain timing", "[Timer]")
     REQUIRE(j == nullptr);
   }
 }
-TEST_CASE("Timer to_json domain timing only on rank 0", "[Timer]")
+TEST_CASE("Timer to_json domain timing only on rank 0")
 {
   Communicator comm(MPI_COMM_WORLD);
 
@@ -391,7 +391,7 @@ TEST_CASE("Timer to_json domain timing only on rank 0", "[Timer]")
     REQUIRE(j == nullptr);
   }
 }
-TEST_CASE("Timer to_json domain timing only on rank 1", "[Timer]")
+TEST_CASE("Timer to_json domain timing only on rank 1")
 {
   Communicator comm(MPI_COMM_WORLD);
 
@@ -432,7 +432,7 @@ TEST_CASE("Timer to_json domain timing only on rank 1", "[Timer]")
     REQUIRE(j == nullptr);
   }
 }
-TEST_CASE("Timer ostream empty timing", "[Timer]")
+TEST_CASE("Timer ostream empty timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -446,7 +446,7 @@ TEST_CASE("Timer ostream empty timing", "[Timer]")
     CHECK(s.size() == 0);
   }
 }
-TEST_CASE("Timer ostream unassociated timing", "[Timer]")
+TEST_CASE("Timer ostream unassociated timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -467,7 +467,7 @@ TEST_CASE("Timer ostream unassociated timing", "[Timer]")
     CHECK(s.size() == 0);
   }
 }
-TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
+TEST_CASE("Timer ostream nested unassociated timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -491,7 +491,7 @@ TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
     CHECK(s.size() == 0);
   }
 }
-TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
+TEST_CASE("Timer ostream sequential unassociated timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -514,7 +514,7 @@ TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
     CHECK(s.size() == 0);
   }
 }
-TEST_CASE("Timer ostream domain timing", "[Timer]")
+TEST_CASE("Timer ostream domain timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -536,7 +536,7 @@ TEST_CASE("Timer ostream domain timing", "[Timer]")
     CHECK(s.size() == 0);
   }
 }
-TEST_CASE("Timer ostream domain timing two different domains sequential", "[Timer]")
+TEST_CASE("Timer ostream domain timing two different domains sequential")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -561,7 +561,7 @@ TEST_CASE("Timer ostream domain timing two different domains sequential", "[Time
     CHECK(s.size() == 0);
   }
 }
-TEST_CASE("Timer ostream domain timing two different domains sequential rank 0 has unrelated timing", "[Timer]")
+TEST_CASE("Timer ostream domain timing two different domains sequential rank 0 has unrelated timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -591,7 +591,7 @@ TEST_CASE("Timer ostream domain timing two different domains sequential rank 0 h
     CHECK(s.size() == 0);
   }
 }
-TEST_CASE("Timer ostream domain timing two different domains sequential nested", "[Timer]")
+TEST_CASE("Timer ostream domain timing two different domains sequential nested")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -691,7 +691,7 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested s
     CHECK(s.size() == 0);
   }
 }
-TEST_CASE("Timer saveToFile new empty file", "[Timer]")
+TEST_CASE("Timer saveToFile new empty file")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -725,7 +725,7 @@ TEST_CASE("Timer saveToFile new empty file", "[Timer]")
     std::remove("timerne2.json");
   }
 }
-TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
+TEST_CASE("Timer saveToFile overwrites file")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -760,7 +760,7 @@ TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
     std::remove("timerow2.json");
   }
 }
-TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
+TEST_CASE("Timer saveToFile throws with nonexistant directory")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);

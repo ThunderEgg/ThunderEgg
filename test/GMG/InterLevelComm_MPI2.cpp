@@ -32,7 +32,7 @@ const string mid_uniform = "mesh_inputs/2d_4x4_mid_on_1_mpi2.json";
 #define MESHES uniform
 #define MESHE_FILES uniform, mid_uniform
 
-TEST_CASE("InterLevelComm Check number of local and ghost parents", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm Check number of local and ghost parents")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2 }) {
@@ -82,7 +82,7 @@ TEST_CASE("InterLevelComm Check number of local and ghost parents", "[GMG::Inter
     }
   }
 }
-TEST_CASE("InterLevelComm Check that parents have unique local indexes", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm Check that parents have unique local indexes")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2 }) {
@@ -135,7 +135,7 @@ TEST_CASE("InterLevelComm Check that parents have unique local indexes", "[GMG::
     }
   }
 }
-TEST_CASE("InterLevelComm Check that getPatches points to correct patches", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm Check that getPatches points to correct patches")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2 }) {
@@ -180,7 +180,7 @@ TEST_CASE("InterLevelComm Check that getPatches points to correct patches", "[GM
     }
   }
 }
-TEST_CASE("InterLevelComm 2-processor getNewGhostVector on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 2-processor getNewGhostVector on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto num_components : { 1, 2, 3 }) {
@@ -224,7 +224,7 @@ TEST_CASE("InterLevelComm 2-processor getNewGhostVector on uniform quad", "[GMG:
     }
   }
 }
-TEST_CASE("InterLevelComm 2-processor sendGhostPatches on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 2-processor sendGhostPatches on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto num_components : { 1, 2, 3 }) {
@@ -455,7 +455,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sta
     }
   }
 }
-TEST_CASE("2-processor sendGhostPatches throws exception when start is called twice on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("2-processor sendGhostPatches throws exception when start is called twice on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -575,7 +575,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sne
     }
   }
 }
-TEST_CASE("InterLevelComm 2-processor getGhostPatches on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 2-processor getGhostPatches on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto num_components : { 1, 2, 3 }) {
@@ -1082,7 +1082,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when get 
     }
   }
 }
-TEST_CASE("InterLevelComm 2-processor getGhostPatches called twice on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 2-processor getGhostPatches called twice on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto num_components : { 1, 2, 3 }) {
@@ -1144,7 +1144,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches called twice on uniform qu
     }
   }
 }
-TEST_CASE("InterLevelComm 2-processor sendGhostPatches called twice on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 2-processor sendGhostPatches called twice on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto num_components : { 1, 2, 3 }) {
@@ -1205,7 +1205,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches called twice on uniform q
     }
   }
 }
-TEST_CASE("InterLevelComm 2-processor sendGhostPatches then getGhostPaches called on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 2-processor sendGhostPatches then getGhostPaches called on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto num_components : { 1, 2, 3 }) {
@@ -1282,7 +1282,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches then getGhostPaches calle
     }
   }
 }
-TEST_CASE("InterLevelComm 2-processor getGhostPatches then sendGhostPaches called on uniform quad", "[GMG::InterLevelComm]")
+TEST_CASE("InterLevelComm 2-processor getGhostPatches then sendGhostPaches called on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto num_components : { 1, 2, 3 }) {

@@ -29,7 +29,7 @@ using namespace std;
 using namespace ThunderEgg;
 #define MESHES "mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
-TEST_CASE("Vector<3> getMPIComm", "[Vector]")
+TEST_CASE("Vector<3> getMPIComm")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (int num_ghost_cells : { 0, 1, 5 }) {
@@ -57,7 +57,7 @@ TEST_CASE("Vector<3> getMPIComm", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumComponents", "[Vector]")
+TEST_CASE("Vector<3> getNumComponents")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -85,7 +85,7 @@ TEST_CASE("Vector<3> getNumComponents", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumLocalPatches", "[Vector]")
+TEST_CASE("Vector<3> getNumLocalPatches")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -113,7 +113,7 @@ TEST_CASE("Vector<3> getNumLocalPatches", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getNumLocalCells", "[Vector]")
+TEST_CASE("Vector<3> getNumLocalCells")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -141,7 +141,7 @@ TEST_CASE("Vector<3> getNumLocalCells", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getComponentViews", "[Vector]")
+TEST_CASE("Vector<3> getComponentViews")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -175,7 +175,7 @@ TEST_CASE("Vector<3> getComponentViews", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> getComponentViews const", "[Vector]")
+TEST_CASE("Vector<3> getComponentViews const")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -209,7 +209,7 @@ TEST_CASE("Vector<3> getComponentViews const", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> set", "[Vector]")
+TEST_CASE("Vector<3> set")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -250,7 +250,7 @@ TEST_CASE("Vector<3> set", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> setWithGhost", "[Vector]")
+TEST_CASE("Vector<3> setWithGhost")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -285,7 +285,7 @@ TEST_CASE("Vector<3> setWithGhost", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> scale", "[Vector]")
+TEST_CASE("Vector<3> scale")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -327,7 +327,7 @@ TEST_CASE("Vector<3> scale", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> shift", "[Vector]")
+TEST_CASE("Vector<3> shift")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -369,7 +369,7 @@ TEST_CASE("Vector<3> shift", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> copy", "[Vector]")
+TEST_CASE("Vector<3> copy")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -419,7 +419,7 @@ TEST_CASE("Vector<3> copy", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> copyWithGhost", "[Vector]")
+TEST_CASE("Vector<3> copyWithGhost")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -463,7 +463,7 @@ TEST_CASE("Vector<3> copyWithGhost", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> add", "[Vector]")
+TEST_CASE("Vector<3> add")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -529,7 +529,7 @@ TEST_CASE("Vector<3> add", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> addScaled", "[Vector]")
+TEST_CASE("Vector<3> addScaled")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -595,7 +595,7 @@ TEST_CASE("Vector<3> addScaled", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> scaleThenAdd", "[Vector]")
+TEST_CASE("Vector<3> scaleThenAdd")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -661,7 +661,7 @@ TEST_CASE("Vector<3> scaleThenAdd", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> scaleThenAddScaled", "[Vector]")
+TEST_CASE("Vector<3> scaleThenAddScaled")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -727,7 +727,7 @@ TEST_CASE("Vector<3> scaleThenAddScaled", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> scaleThenAddScaled two vectors", "[Vector]")
+TEST_CASE("Vector<3> scaleThenAddScaled two vectors")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -800,7 +800,7 @@ TEST_CASE("Vector<3> scaleThenAddScaled two vectors", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> twoNorm", "[Vector]")
+TEST_CASE("Vector<3> twoNorm")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -846,7 +846,7 @@ TEST_CASE("Vector<3> twoNorm", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> infNorm", "[Vector]")
+TEST_CASE("Vector<3> infNorm")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {
@@ -891,7 +891,7 @@ TEST_CASE("Vector<3> infNorm", "[Vector]")
     }
   }
 }
-TEST_CASE("Vector<3> dot", "[Vector]")
+TEST_CASE("Vector<3> dot")
 {
   for (int num_components : { 1, 2, 3 }) {
     for (auto num_ghost_cells : { 0, 1, 5 }) {

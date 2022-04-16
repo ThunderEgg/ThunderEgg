@@ -22,7 +22,7 @@
 #include <catch2/generators/catch_generators.hpp>
 using namespace std;
 using namespace ThunderEgg;
-TEST_CASE("ComponentView constructor", "[ComponentView]")
+TEST_CASE("ComponentView constructor")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -50,7 +50,7 @@ TEST_CASE("ComponentView constructor", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,2> getSliceOn<1>", "[ComponentView]")
+TEST_CASE("ComponentView<double,2> getSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -105,7 +105,7 @@ TEST_CASE("ComponentView<double,2> getSliceOn<1>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,3> getSliceOn<2>", "[ComponentView]")
+TEST_CASE("ComponentView<double,3> getSliceOn<2>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -198,7 +198,7 @@ TEST_CASE("ComponentView<double,3> getSliceOn<2>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,3> getSliceOn<1>", "[ComponentView]")
+TEST_CASE("ComponentView<double,3> getSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -363,7 +363,7 @@ TEST_CASE("ComponentView<double,3> getSliceOn<1>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,3> getSliceOn<0>", "[ComponentView]")
+TEST_CASE("ComponentView<double,3> getSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -402,7 +402,7 @@ TEST_CASE("ComponentView<double,3> getSliceOn<0>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,3> getSliceOn<0> const", "[ComponentView]")
+TEST_CASE("ComponentView<double,3> getSliceOn<0> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -441,7 +441,7 @@ TEST_CASE("ComponentView<double,3> getSliceOn<0> const", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,2> getSliceOn<0>", "[ComponentView]")
+TEST_CASE("ComponentView<double,2> getSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -471,7 +471,7 @@ TEST_CASE("ComponentView<double,2> getSliceOn<0>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,2> getSliceOn<0> const", "[ComponentView]")
+TEST_CASE("ComponentView<double,2> getSliceOn<0> const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -502,7 +502,7 @@ TEST_CASE("ComponentView<double,2> getSliceOn<0> const", "[ComponentView]")
   }
 }
 
-TEST_CASE("ComponentView<double,2> getGhostSliceOn<1>", "[ComponentView]")
+TEST_CASE("ComponentView<double,2> getGhostSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -563,7 +563,7 @@ TEST_CASE("ComponentView<double,2> getGhostSliceOn<1>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,3> getGhostSliceOn<2>", "[ComponentView]")
+TEST_CASE("ComponentView<double,3> getGhostSliceOn<2>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -656,7 +656,7 @@ TEST_CASE("ComponentView<double,3> getGhostSliceOn<2>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,3> getGhostSliceOn<1>", "[ComponentView]")
+TEST_CASE("ComponentView<double,3> getGhostSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -791,7 +791,7 @@ TEST_CASE("ComponentView<double,3> getGhostSliceOn<1>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,3> getGhostSliceOn<0>", "[ComponentView]")
+TEST_CASE("ComponentView<double,3> getGhostSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -830,7 +830,7 @@ TEST_CASE("ComponentView<double,3> getGhostSliceOn<0>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView<double,2> getGhostSliceOn<0>", "[ComponentView]")
+TEST_CASE("ComponentView<double,2> getGhostSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -860,7 +860,7 @@ TEST_CASE("ComponentView<double,2> getGhostSliceOn<0>", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView squarebracket operator", "[ComponentView]")
+TEST_CASE("ComponentView squarebracket operator")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -894,7 +894,7 @@ TEST_CASE("ComponentView squarebracket operator", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView squarebracket operator const", "[ComponentView]")
+TEST_CASE("ComponentView squarebracket operator const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -927,7 +927,7 @@ TEST_CASE("ComponentView squarebracket operator const", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView set", "[ComponentView]")
+TEST_CASE("ComponentView set")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -962,7 +962,7 @@ TEST_CASE("ComponentView set", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView set const", "[ComponentView]")
+TEST_CASE("ComponentView set const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1002,7 +1002,7 @@ TEST_CASE("ComponentView set const", "[ComponentView]")
     }
   }
 }
-TEST_CASE("ComponentView implicit conversion to const type", "[View]")
+TEST_CASE("ComponentView implicit conversion to const type")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {

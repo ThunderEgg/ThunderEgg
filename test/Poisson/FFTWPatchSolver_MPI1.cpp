@@ -34,7 +34,7 @@ using namespace ThunderEgg;
 #define MESHES "mesh_inputs/2d_uniform_2x2_mpi1.json", "mesh_inputs/2d_uniform_8x8_refined_cross_mpi1.json"
 const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 
-TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence", "[Poisson::FFTWPatchSolver]")
+TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 10, 13 }) {
@@ -86,7 +86,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence", "[Poisson:
     }
   }
 }
-TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann boundary", "[Poisson::FFTWPatchSolver]")
+TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann boundary")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 10, 13 }) {
@@ -150,7 +150,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
     }
   }
 }
-TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann boundary single patch", "[Poisson::FFTWPatchSolver]")
+TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann boundary single patch")
 {
   for (auto nx : { 10, 13 }) {
     for (auto ny : { 10, 13 }) {

@@ -27,7 +27,7 @@
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("Schur::PatchIfaceInfo default constructor", "[Schur::PatchIfaceInfo]")
+TEST_CASE("Schur::PatchIfaceInfo default constructor")
 {
   Schur::PatchIfaceInfo<2> piinfo;
   for (Side<2> s : Side<2>::getValues()) {
@@ -38,7 +38,7 @@ TEST_CASE("Schur::PatchIfaceInfo default constructor", "[Schur::PatchIfaceInfo]"
     CHECK(piinfo.getFineIfaceInfo(s) == nullptr);
   }
 }
-TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with NormalIfaceInfo", "[Schur::PatchIfaceInfo]")
+TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with NormalIfaceInfo")
 {
   for (Side<2> side_to_set : Side<2>::getValues()) {
     // setup
@@ -73,7 +73,7 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with NormalIfaceInfo", "[Schur::Pa
     }
   }
 }
-TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with FineIfaceInfo", "[Schur::PatchIfaceInfo]")
+TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with FineIfaceInfo")
 {
   for (Side<2> side_to_set : Side<2>::getValues()) {
     // setup
@@ -108,7 +108,7 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with FineIfaceInfo", "[Schur::Patc
     }
   }
 }
-TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with CoarseIfaceInfo", "[Schur::PatchIfaceInfo]")
+TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with CoarseIfaceInfo")
 {
   for (Side<2> side_to_set : Side<2>::getValues()) {
     // setup
@@ -142,7 +142,7 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with CoarseIfaceInfo", "[Schur::Pa
     }
   }
 }
-TEST_CASE("Schur::PatchIfaceInfo PatchInfo constructor", "[Schur::PatchIfaceInfo]")
+TEST_CASE("Schur::PatchIfaceInfo PatchInfo constructor")
 {
   // setup
   int id = 1;
@@ -183,7 +183,7 @@ TEST_CASE("Schur::PatchIfaceInfo PatchInfo constructor", "[Schur::PatchIfaceInfo
   CHECK(piinfo.getCoarseIfaceInfo(Side<2>::north()) == nullptr);
   CHECK(piinfo.getFineIfaceInfo(Side<2>::north()) == nullptr);
 }
-TEST_CASE("Schur::PatchIfaceInfo serialization", "[Schur::PatchIfaceInfo]")
+TEST_CASE("Schur::PatchIfaceInfo serialization")
 {
   // setup
   int id = 1;

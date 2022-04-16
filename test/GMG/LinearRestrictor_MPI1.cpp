@@ -33,7 +33,7 @@ using namespace ThunderEgg;
 const string uniform_mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 const string refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";
 
-TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
+TEST_CASE("Linear Test LinearRestrictor")
 {
   for (auto mesh_file : { uniform_mesh_file, refined_mesh_file }) {
     for (auto nx : { 2, 10 }) {
@@ -86,7 +86,7 @@ TEST_CASE("Linear Test LinearRestrictor", "[GMG::LinearRestrictor]")
     }
   }
 }
-TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor]")
+TEST_CASE("Linear Test LinearRestrictor two components")
 {
   for (auto mesh_file : { uniform_mesh_file, refined_mesh_file }) {
     for (auto nx : { 2, 10 }) {
@@ -152,7 +152,7 @@ TEST_CASE("Linear Test LinearRestrictor two components", "[GMG::LinearRestrictor
     }
   }
 }
-TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::LinearRestrictor]")
+TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts")
 {
   for (auto mesh_file : { uniform_mesh_file, refined_mesh_file }) {
     for (auto nx : { 2, 10 }) {
@@ -202,7 +202,7 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts", "[GMG::L
     }
   }
 }
-TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary ghosts", "[GMG::LinearRestrictor]")
+TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary ghosts")
 {
   for (auto mesh_file : { uniform_mesh_file, refined_mesh_file }) {
     for (auto nx : { 2, 10 }) {

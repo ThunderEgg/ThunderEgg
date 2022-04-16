@@ -23,7 +23,7 @@
 #include <numeric>
 using namespace std;
 using namespace ThunderEgg;
-TEST_CASE("PatchView constructor", "[PatchView]")
+TEST_CASE("PatchView constructor")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -59,7 +59,7 @@ TEST_CASE("PatchView constructor", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,2> getSliceOn<1>", "[PatchView]")
+TEST_CASE("PatchView<double,2> getSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -145,7 +145,7 @@ TEST_CASE("PatchView<double,2> getSliceOn<1>", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,3> getSliceOn<2>", "[PatchView]")
+TEST_CASE("PatchView<double,3> getSliceOn<2>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -289,7 +289,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,3> getSliceOn<1>", "[PatchView]")
+TEST_CASE("PatchView<double,3> getSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -553,7 +553,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,3> getSliceOn<0>", "[PatchView]")
+TEST_CASE("PatchView<double,3> getSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -646,7 +646,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<0>", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,2> getSliceOn<0>", "[PatchView]")
+TEST_CASE("PatchView<double,2> getSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -707,7 +707,7 @@ TEST_CASE("PatchView<double,2> getSliceOn<0>", "[PatchView]")
   }
 }
 
-TEST_CASE("PatchView<double,2> getGhostSliceOn<1>", "[PatchView]")
+TEST_CASE("PatchView<double,2> getGhostSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -777,7 +777,7 @@ TEST_CASE("PatchView<double,2> getGhostSliceOn<1>", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,3> getGhostSliceOn<2>", "[PatchView]")
+TEST_CASE("PatchView<double,3> getGhostSliceOn<2>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -882,7 +882,7 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<2>", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,3> getGhostSliceOn<1>", "[PatchView]")
+TEST_CASE("PatchView<double,3> getGhostSliceOn<1>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1020,7 +1020,7 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<1>", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,3> getGhostSliceOn<0>", "[PatchView]")
+TEST_CASE("PatchView<double,3> getGhostSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1113,7 +1113,7 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<0>", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,2> getGhostSliceOn<0>", "[PatchView]")
+TEST_CASE("PatchView<double,2> getGhostSliceOn<0>")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1173,7 +1173,7 @@ TEST_CASE("PatchView<double,2> getGhostSliceOn<0>", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView squarebracket operator", "[PatchView]")
+TEST_CASE("PatchView squarebracket operator")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1212,7 +1212,7 @@ TEST_CASE("PatchView squarebracket operator", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView squarebracket operator const", "[PatchView]")
+TEST_CASE("PatchView squarebracket operator const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1250,7 +1250,7 @@ TEST_CASE("PatchView squarebracket operator const", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView set", "[PatchView]")
+TEST_CASE("PatchView set")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1290,7 +1290,7 @@ TEST_CASE("PatchView set", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView set const", "[PatchView]")
+TEST_CASE("PatchView set const")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1335,7 +1335,7 @@ TEST_CASE("PatchView set const", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView implicit conversion to const type", "[View]")
+TEST_CASE("PatchView implicit conversion to const type")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1365,7 +1365,7 @@ TEST_CASE("PatchView implicit conversion to const type", "[View]")
     }
   }
 }
-TEST_CASE("PatchView<double,2> getComponentView", "[PatchView]")
+TEST_CASE("PatchView<double,2> getComponentView")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {
@@ -1403,7 +1403,7 @@ TEST_CASE("PatchView<double,2> getComponentView", "[PatchView]")
     }
   }
 }
-TEST_CASE("PatchView<double,3> getComponentView", "[PatchView]")
+TEST_CASE("PatchView<double,3> getComponentView")
 {
   for (auto nx : { 2, 3 }) {
     for (auto ny : { 2, 3 }) {

@@ -26,14 +26,14 @@ using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("NormalNbrInfo getNbrType works", "[NormalNbrInfo]")
+TEST_CASE("NormalNbrInfo getNbrType works")
 {
   NbrInfo<3>* info = new NormalNbrInfo<3>();
   REQUIRE(info->getNbrType() == NbrType::Normal);
   delete info;
 }
 
-TEST_CASE("NormalNbrInfo Serialization/Deserialization", "[NormalNbrInfo]")
+TEST_CASE("NormalNbrInfo Serialization/Deserialization")
 {
   NormalNbrInfo<3> info;
   info.id = 5;
