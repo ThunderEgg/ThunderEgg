@@ -384,7 +384,8 @@ public:
        */
       explicit Iterator(Face<D, M> s)
         : s(s)
-      {}
+      {
+      }
       /**
        * @brief Increment the side value
        *
