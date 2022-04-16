@@ -30,6 +30,7 @@
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Serializable.h>
+#include <algorithm>
 #include <bitset>
 
 namespace ThunderEgg {
