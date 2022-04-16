@@ -20,13 +20,15 @@
 
 #include "MatrixHelper2d.h"
 #include <iostream>
+#include <valarray>
 using namespace std;
 using namespace ThunderEgg::Poisson;
 using namespace ThunderEgg;
 MatrixHelper2d::MatrixHelper2d(const Domain<2>& domain, std::bitset<4> neumann)
   : domain(domain)
   , neumann(neumann)
-{}
+{
+}
 namespace {
 class StencilHelper2d
 {

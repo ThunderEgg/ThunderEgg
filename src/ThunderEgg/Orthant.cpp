@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/tpl/json.hpp>
 namespace ThunderEgg {
 void
 to_json(tpl::nlohmann::json& j, const Orthant<0>&)

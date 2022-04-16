@@ -17,33 +17,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-#include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <ThunderEgg/CoarseNbrInfo.h>
 
-using namespace std;
-using namespace ThunderEgg;
-using namespace ThunderEgg::tpl;
+namespace ThunderEgg {
 
-TEST_CASE("NormalNbrInfo getNbrType works", "[NormalNbrInfo]")
-{
-  NbrInfo<3>* info = new NormalNbrInfo<3>();
-  REQUIRE(info->getNbrType() == NbrType::Normal);
-  delete info;
-}
-
-TEST_CASE("NormalNbrInfo Serialization/Deserialization", "[NormalNbrInfo]")
-{
-  NormalNbrInfo<3> info;
-  info.id = 5;
-  info.rank = 1;
-  // serialize and then deserialize
-  char* buff = new char[info.serialize(nullptr)];
-  info.serialize(buff);
-  NormalNbrInfo<3> out;
-  out.deserialize(buff);
-  delete[] buff;
-  REQUIRE(out.id == 5);
-  REQUIRE(out.rank == 1);
-}
+} // namespace ThunderEgg

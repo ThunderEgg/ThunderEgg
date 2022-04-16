@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Timer.h>
+#include <ThunderEgg/tpl/json.hpp>
 #include <chrono>
 #include <fstream>
 #include <iomanip>
@@ -77,7 +78,8 @@ public:
    */
   explicit IntInfo(const std::string& name)
     : name(name)
-  {}
+  {
+  }
   /**
    * @brief Add information
    *
@@ -134,7 +136,8 @@ public:
    */
   explicit DoubleInfo(const std::string& name)
     : name(name)
-  {}
+  {
+  }
   /**
    * @brief add information
    *
@@ -239,7 +242,8 @@ public:
     , name(name)
     , domain_id(domain_id)
     , patch_id(patch_id)
-  {}
+  {
+  }
   /**
    * @brief get a Timing that is nested in this timing
    *
@@ -748,7 +752,7 @@ to_json(nlohmann::json& output_j, const Timer& timer)
                timer.comm.getMPIComm(),
                &status);
 
-      nlohmann::json incoming_j = nlohmann::json::parse(incoming_j_string);
+      nlohmann::json incoming_j = nlohmann::json::parse((char*)incoming_j_string);
       MergeIncomingJson(j, incoming_j);
     }
     if (j != nullptr) {

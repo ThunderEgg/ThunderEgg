@@ -26,7 +26,7 @@
  * @brief Face class
  */
 
-#include <ThunderEgg/tpl/json.hpp>
+#include <ThunderEgg/tpl/json_fwd.hpp>
 #include <array>
 namespace ThunderEgg {
 /**
@@ -384,7 +384,8 @@ public:
        */
       explicit Iterator(Face<D, M> s)
         : s(s)
-      {}
+      {
+      }
       /**
        * @brief Increment the side value
        *

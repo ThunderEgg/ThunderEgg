@@ -20,6 +20,7 @@
 
 #include "P8estDomainGenerator_SHARED.h"
 #include "mpi.h"
+#include <ThunderEgg/tpl/json.hpp>
 #include <algorithm>
 #include <catch2/catch_approx.hpp>
 using namespace std;
@@ -128,7 +129,7 @@ GetAllPatchesOnRank0(const Domain<3>& domain)
       MPI_Recv(patches_string, buffer_size, MPI_CHAR, 1, 0, MPI_COMM_WORLD, &status);
 
       ThunderEgg::tpl::nlohmann::json patches =
-        ThunderEgg::tpl::nlohmann::json::parse(patches_string);
+        ThunderEgg::tpl::nlohmann::json::parse((char*)patches_string);
       if (patches != nullptr) {
         patches.get_to(all_patches);
         for (auto& patch : all_patches) {

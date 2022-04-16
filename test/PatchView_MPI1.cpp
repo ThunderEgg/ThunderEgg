@@ -20,6 +20,7 @@
 #include <ThunderEgg/PatchView.h>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <numeric>
 using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("PatchView constructor", "[PatchView]")

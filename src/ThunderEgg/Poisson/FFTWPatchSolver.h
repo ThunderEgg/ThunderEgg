@@ -32,6 +32,7 @@
 #include <bitset>
 #include <fftw3.h>
 #include <map>
+#include <valarray>
 
 namespace ThunderEgg::Poisson {
 /**

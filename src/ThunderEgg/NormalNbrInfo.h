@@ -98,20 +98,28 @@ public:
     return std::make_unique<NormalNbrInfo<D>>(*this);
   }
 };
+
 template<int D>
 void
-to_json(tpl::nlohmann::json& j, const NormalNbrInfo<D>& n)
-{
-  j["type"] = NbrType::Normal;
-  j["ids"] = { n.id };
-  j["ranks"] = { n.rank };
-}
+to_json(tpl::nlohmann::json& j, const NormalNbrInfo<D>& n);
+
 template<int D>
 void
-from_json(const tpl::nlohmann::json& j, NormalNbrInfo<D>& n)
-{
-  n.id = j["ids"][0];
-  n.rank = j["ranks"][0];
-}
+from_json(const tpl::nlohmann::json& j, NormalNbrInfo<D>& n);
+
+extern template void
+to_json(tpl::nlohmann::json& j, const NormalNbrInfo<0>& n);
+extern template void
+to_json(tpl::nlohmann::json& j, const NormalNbrInfo<1>& n);
+extern template void
+to_json(tpl::nlohmann::json& j, const NormalNbrInfo<2>& n);
+
+extern template void
+from_json(const tpl::nlohmann::json& j, NormalNbrInfo<0>& n);
+extern template void
+from_json(const tpl::nlohmann::json& j, NormalNbrInfo<1>& n);
+extern template void
+from_json(const tpl::nlohmann::json& j, NormalNbrInfo<2>& n);
+
 } // namespace ThunderEgg
 #endif

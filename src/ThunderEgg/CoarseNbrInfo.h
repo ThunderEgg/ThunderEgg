@@ -111,26 +111,28 @@ public:
     return std::make_unique<CoarseNbrInfo<D>>(*this);
   }
 };
+
 template<int D>
 void
-to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<D>& n)
-{
-  j["type"] = NbrType::Coarse;
-  j["ids"] = { n.id };
-  j["ranks"] = { n.rank };
-  j["orth_on_coarse"] = n.orth_on_coarse;
-}
+to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<D>& n);
+
 template<int D>
 void
-from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<D>& n)
-{
-  n.id = j["ids"][0];
-  n.rank = j["ranks"][0];
-  if (j.contains("orth_on_coarse")) {
-    n.orth_on_coarse = j["orth_on_coarse"].get<Orthant<D>>();
-  } else {
-    n.orth_on_coarse = Orthant<D>::null();
-  }
-}
+from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<D>& n);
+
+extern template void
+to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<0>& n);
+extern template void
+to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<1>& n);
+extern template void
+to_json(tpl::nlohmann::json& j, const CoarseNbrInfo<2>& n);
+
+extern template void
+from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<0>& n);
+extern template void
+from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<1>& n);
+extern template void
+from_json(const tpl::nlohmann::json& j, CoarseNbrInfo<2>& n);
+
 } // namespace ThunderEgg
 #endif
