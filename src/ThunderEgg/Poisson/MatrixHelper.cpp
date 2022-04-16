@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Poisson/MatrixHelper.h>
+#include <valarray>
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Poisson;

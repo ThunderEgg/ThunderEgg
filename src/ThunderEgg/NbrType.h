@@ -24,7 +24,7 @@
  *
  * @brief NbrType class
  */
-#include <ThunderEgg/tpl/json.hpp>
+#include <ThunderEgg/tpl/json_fwd.hpp>
 #include <ostream>
 
 namespace ThunderEgg {
@@ -65,9 +65,11 @@ operator<<(std::ostream& os, const NbrType& type)
   }
   return os;
 }
-NLOHMANN_JSON_SERIALIZE_ENUM(NbrType,
-                             { { NbrType::Normal, "NORMAL" },
-                               { NbrType::Coarse, "COARSE" },
-                               { NbrType::Fine, "FINE" } });
+
+void
+to_json(tpl::nlohmann::json& j, const NbrType& o);
+void
+from_json(const tpl::nlohmann::json& j, NbrType& o);
+
 } // namespace ThunderEgg
 #endif

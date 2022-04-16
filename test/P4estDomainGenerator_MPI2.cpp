@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <ThunderEgg/P4estDomainGenerator.h>
+#include <ThunderEgg/tpl/json.hpp>
 
 #include <p4est.h>
 #include <p4est_mesh.h>

@@ -35,7 +35,7 @@ add_subdirectory(VarPoisson)
 
 # -- add sources
 
-target_sources(unit_tests_mpi1 PRIVATE json.cpp)
+target_sources(unit_tests_mpi1 PRIVATE json_MPI1.cpp)
 
 target_sources(unit_tests_mpi1 PRIVATE BiLinearGhostFiller_MPI1.cpp)
 

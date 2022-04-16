@@ -20,6 +20,7 @@
 
 #include "P8estDomainGenerator_SHARED.h"
 #include "mpi.h"
+#include <ThunderEgg/tpl/json.hpp>
 #include <algorithm>
 #include <catch2/catch_approx.hpp>
 using namespace std;

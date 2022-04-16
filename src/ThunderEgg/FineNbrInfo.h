@@ -125,20 +125,28 @@ public:
     return std::make_unique<FineNbrInfo<D>>(*this);
   }
 };
+
 template<int D>
 void
-to_json(tpl::nlohmann::json& j, const FineNbrInfo<D>& n)
-{
-  j["type"] = NbrType::Fine;
-  j["ids"] = n.ids;
-  j["ranks"] = n.ranks;
-}
+to_json(tpl::nlohmann::json& j, const FineNbrInfo<D>& n);
+
 template<int D>
 void
-from_json(const tpl::nlohmann::json& j, FineNbrInfo<D>& n)
-{
-  n.ids = j["ids"].get<std::array<int, Orthant<D>::num_orthants>>();
-  n.ranks = j["ranks"].get<std::array<int, Orthant<D>::num_orthants>>();
-}
+from_json(const tpl::nlohmann::json& j, FineNbrInfo<D>& n);
+
+extern template void
+to_json(tpl::nlohmann::json& j, const FineNbrInfo<0>& n);
+extern template void
+to_json(tpl::nlohmann::json& j, const FineNbrInfo<1>& n);
+extern template void
+to_json(tpl::nlohmann::json& j, const FineNbrInfo<2>& n);
+
+extern template void
+from_json(const tpl::nlohmann::json& j, FineNbrInfo<0>& n);
+extern template void
+from_json(const tpl::nlohmann::json& j, FineNbrInfo<1>& n);
+extern template void
+from_json(const tpl::nlohmann::json& j, FineNbrInfo<2>& n);
+
 } // namespace ThunderEgg
 #endif

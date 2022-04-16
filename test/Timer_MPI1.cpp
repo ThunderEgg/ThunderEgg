@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Timer.h>
+#include <ThunderEgg/tpl/json.hpp>
 
 #include <fstream>
 #include <sstream>

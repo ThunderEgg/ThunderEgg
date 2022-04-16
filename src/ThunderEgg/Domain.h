@@ -317,11 +317,8 @@ public:
    *
    * @param timer the timer
    */
-  void setTimer(std::shared_ptr<Timer> timer) const
-  {
-    this->timer = timer;
-    timer->addDomain(id, *this);
-  }
+  void setTimer(std::shared_ptr<Timer> timer) const;
+
   /**
    * @brief Get the Timer object
    *
@@ -343,18 +340,15 @@ public:
 
 template<int D>
 void
-to_json(tpl::nlohmann::json& j, const Domain<D>& domain)
-{
-  for (auto pinfo : domain.getPatchInfoVector()) {
-    j.push_back(pinfo);
-  }
-}
+to_json(tpl::nlohmann::json& j, const Domain<D>& domain);
 
 extern template class Domain<2>;
 extern template class Domain<3>;
+
 extern template void
 to_json<2>(tpl::nlohmann::json& j, const Domain<2>& domain);
 extern template void
 to_json<3>(tpl::nlohmann::json& j, const Domain<3>& domain);
+
 } // namespace ThunderEgg
 #endif
