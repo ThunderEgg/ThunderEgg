@@ -23,6 +23,7 @@
 
 #include <doctest.h>
 
+using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
