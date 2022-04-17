@@ -26,33 +26,33 @@ TEST_CASE("PatchArray default constructor getStart")
 {
   PatchArray<2> pa;
 
-  CHECK(pa.getStart()[0] == 0);
-  CHECK(pa.getStart()[1] == 0);
-  CHECK(pa.getStart()[2] == 0);
+  CHECK_EQ(pa.getStart()[0], 0);
+  CHECK_EQ(pa.getStart()[1], 0);
+  CHECK_EQ(pa.getStart()[2], 0);
 }
 TEST_CASE("PatchArray default constructor getEnd")
 {
   PatchArray<2> pa;
 
-  CHECK(pa.getEnd()[0] == -1);
-  CHECK(pa.getEnd()[1] == -1);
-  CHECK(pa.getEnd()[2] == -1);
+  CHECK_EQ(pa.getEnd()[0], -1);
+  CHECK_EQ(pa.getEnd()[1], -1);
+  CHECK_EQ(pa.getEnd()[2], -1);
 }
 TEST_CASE("PatchArray default constructor getGhostStart")
 {
   PatchArray<2> pa;
 
-  CHECK(pa.getGhostStart()[0] == 0);
-  CHECK(pa.getGhostStart()[1] == 0);
-  CHECK(pa.getGhostStart()[2] == 0);
+  CHECK_EQ(pa.getGhostStart()[0], 0);
+  CHECK_EQ(pa.getGhostStart()[1], 0);
+  CHECK_EQ(pa.getGhostStart()[2], 0);
 }
 TEST_CASE("PatchArray default constructor getGhostEnd")
 {
   PatchArray<2> pa;
 
-  CHECK(pa.getGhostEnd()[0] == -1);
-  CHECK(pa.getGhostEnd()[1] == -1);
-  CHECK(pa.getGhostEnd()[2] == -1);
+  CHECK_EQ(pa.getGhostEnd()[0], -1);
+  CHECK_EQ(pa.getGhostEnd()[1], -1);
+  CHECK_EQ(pa.getGhostEnd()[2], -1);
 }
 TEST_CASE("PatchArray getStart")
 {
@@ -63,9 +63,9 @@ TEST_CASE("PatchArray getStart")
 
           PatchArray<2> pa({ nx, ny }, num_components, num_ghost);
 
-          CHECK(pa.getStart()[0] == 0);
-          CHECK(pa.getStart()[1] == 0);
-          CHECK(pa.getStart()[2] == 0);
+          CHECK_EQ(pa.getStart()[0], 0);
+          CHECK_EQ(pa.getStart()[1], 0);
+          CHECK_EQ(pa.getStart()[2], 0);
         }
       }
     }
@@ -80,9 +80,9 @@ TEST_CASE("PatchArray getEnd")
 
           PatchArray<2> pa({ nx, ny }, num_components, num_ghost);
 
-          CHECK(pa.getEnd()[0] == nx - 1);
-          CHECK(pa.getEnd()[1] == ny - 1);
-          CHECK(pa.getEnd()[2] == num_components - 1);
+          CHECK_EQ(pa.getEnd()[0], nx - 1);
+          CHECK_EQ(pa.getEnd()[1], ny - 1);
+          CHECK_EQ(pa.getEnd()[2], num_components - 1);
         }
       }
     }
@@ -97,9 +97,9 @@ TEST_CASE("PatchArray getGhostStart")
 
           PatchArray<2> pa({ nx, ny }, num_components, num_ghost);
 
-          CHECK(pa.getGhostStart()[0] == -num_ghost);
-          CHECK(pa.getGhostStart()[1] == -num_ghost);
-          CHECK(pa.getGhostStart()[2] == 0);
+          CHECK_EQ(pa.getGhostStart()[0], -num_ghost);
+          CHECK_EQ(pa.getGhostStart()[1], -num_ghost);
+          CHECK_EQ(pa.getGhostStart()[2], 0);
         }
       }
     }
@@ -114,9 +114,9 @@ TEST_CASE("PatchArray getGhostEnd")
 
           PatchArray<2> pa({ nx, ny }, num_components, num_ghost);
 
-          CHECK(pa.getGhostEnd()[0] == nx - 1 + num_ghost);
-          CHECK(pa.getGhostEnd()[1] == ny - 1 + num_ghost);
-          CHECK(pa.getGhostEnd()[2] == num_components - 1);
+          CHECK_EQ(pa.getGhostEnd()[0], nx - 1 + num_ghost);
+          CHECK_EQ(pa.getGhostEnd()[1], ny - 1 + num_ghost);
+          CHECK_EQ(pa.getGhostEnd()[2], num_components - 1);
         }
       }
     }
@@ -131,9 +131,9 @@ TEST_CASE("PatchArray getStrides")
 
           PatchArray<2> pa({ nx, ny }, num_components, num_ghost);
 
-          CHECK(pa.getStrides()[0] == 1);
-          CHECK(pa.getStrides()[1] == nx + 2 * num_ghost);
-          CHECK(pa.getStrides()[2] == (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
+          CHECK_EQ(pa.getStrides()[0], 1);
+          CHECK_EQ(pa.getStrides()[1], nx + 2 * num_ghost);
+          CHECK_EQ(pa.getStrides()[2], (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
         }
       }
     }
@@ -152,7 +152,7 @@ TEST_CASE("PatchArray squarebracket operator")
           for (unsigned char ci = 0; ci < num_components; ci++) {
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                CHECK(&pa[{ xi, yi, ci }] == start + xi + yi * (nx + 2 * num_ghost) + ci * (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
+                CHECK_EQ(&pa[{ xi, yi, ci }], start + xi + yi * (nx + 2 * num_ghost) + ci * (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
               }
             }
           }
@@ -175,7 +175,7 @@ TEST_CASE("PatchArray squarebracket operator const")
           for (unsigned char ci = 0; ci < num_components; ci++) {
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                CHECK(&pa[{ xi, yi, ci }] == start + xi + yi * (nx + 2 * num_ghost) + ci * (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
+                CHECK_EQ(&pa[{ xi, yi, ci }], start + xi + yi * (nx + 2 * num_ghost) + ci * (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
               }
             }
           }
@@ -197,7 +197,7 @@ TEST_CASE("PatchArray parens operator")
           for (unsigned char ci = 0; ci < num_components; ci++) {
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                CHECK(&pa(xi, yi, ci) == start + xi + yi * (nx + 2 * num_ghost) + ci * (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
+                CHECK_EQ(&pa(xi, yi, ci), start + xi + yi * (nx + 2 * num_ghost) + ci * (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
               }
             }
           }
@@ -219,7 +219,7 @@ TEST_CASE("PatchArray parens operator const")
           for (unsigned char ci = 0; ci < num_components; ci++) {
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                CHECK(&pa(xi, yi, ci) == start + xi + yi * (nx + 2 * num_ghost) + ci * (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
+                CHECK_EQ(&pa(xi, yi, ci), start + xi + yi * (nx + 2 * num_ghost) + ci * (nx + 2 * num_ghost) * (ny + 2 * num_ghost));
               }
             }
           }
@@ -240,12 +240,12 @@ TEST_CASE("PatchArray default is zero")
           for (unsigned char ci = 0; ci < num_components; ci++) {
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                CHECK(pa(xi, yi, ci) == 0.0);
+                CHECK_EQ(pa(xi, yi, ci), 0.0);
               }
             }
           }
-          CHECK(pa.getStrides()[0] == 1);
-          CHECK(pa.getStrides()[1] == nx + 2 * num_ghost);
+          CHECK_EQ(pa.getStrides()[0], 1);
+          CHECK_EQ(pa.getStrides()[1], nx + 2 * num_ghost);
         }
       }
     }
@@ -267,7 +267,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1>")
               INFO("ci: " << ci);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                 INFO("yi: " << yi);
-                CHECK(&pa(xi, yi, ci) == &slice(yi, ci));
+                CHECK_EQ(&pa(xi, yi, ci), &slice(yi, ci));
               }
             }
           }
@@ -279,7 +279,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1>")
               INFO("ci: " << ci);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                 INFO("yi: " << yi);
-                CHECK(&pa(nx - 1 - xi, yi, ci) == &slice(yi, ci));
+                CHECK_EQ(&pa(nx - 1 - xi, yi, ci), &slice(yi, ci));
               }
             }
           }
@@ -291,7 +291,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1>")
               INFO("ci: " << ci);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                 INFO("xi: " << xi);
-                CHECK(&pa(xi, yi, ci) == &slice(xi, ci));
+                CHECK_EQ(&pa(xi, yi, ci), &slice(xi, ci));
               }
             }
           }
@@ -303,7 +303,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1>")
               INFO("ci: " << ci);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                 INFO("xi: " << xi);
-                CHECK(&pa(xi, ny - 1 - yi, ci) == &slice(xi, ci));
+                CHECK_EQ(&pa(xi, ny - 1 - yi, ci), &slice(xi, ci));
               }
             }
           }
@@ -328,7 +328,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1> const")
               INFO("ci: " << ci);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                 INFO("yi: " << yi);
-                CHECK(&pa(xi, yi, ci) == &slice(yi, ci));
+                CHECK_EQ(&pa(xi, yi, ci), &slice(yi, ci));
               }
             }
           }
@@ -340,7 +340,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1> const")
               INFO("ci: " << ci);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                 INFO("yi: " << yi);
-                CHECK(&pa(nx - 1 - xi, yi, ci) == &slice(yi, ci));
+                CHECK_EQ(&pa(nx - 1 - xi, yi, ci), &slice(yi, ci));
               }
             }
           }
@@ -352,7 +352,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1> const")
               INFO("ci: " << ci);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                 INFO("xi: " << xi);
-                CHECK(&pa(xi, yi, ci) == &slice(xi, ci));
+                CHECK_EQ(&pa(xi, yi, ci), &slice(xi, ci));
               }
             }
           }
@@ -364,7 +364,7 @@ TEST_CASE("PatchArray<2> getSliceOn<1> const")
               INFO("ci: " << ci);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                 INFO("xi: " << xi);
-                CHECK(&pa(xi, ny - 1 - yi, ci) == &slice(xi, ci));
+                CHECK_EQ(&pa(xi, ny - 1 - yi, ci), &slice(xi, ci));
               }
             }
           }
@@ -392,7 +392,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>")
                   INFO("zi: " << zi);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(yi, zi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(yi, zi, ci));
                   }
                 }
               }
@@ -407,7 +407,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>")
                   INFO("zi: " << zi);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(nx - 1 - xi, yi, zi, ci) == &slice(yi, zi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, zi, ci), &slice(yi, zi, ci));
                   }
                 }
               }
@@ -422,7 +422,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>")
                   INFO("zi: " << zi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(xi, zi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(xi, zi, ci));
                   }
                 }
               }
@@ -437,7 +437,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>")
                   INFO("zi: " << zi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, ny - 1 - yi, zi, ci) == &slice(xi, zi, ci));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, zi, ci), &slice(xi, zi, ci));
                   }
                 }
               }
@@ -452,7 +452,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>")
                   INFO("yi: " << yi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(xi, yi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(xi, yi, ci));
                   }
                 }
               }
@@ -467,7 +467,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2>")
                   INFO("yi: " << yi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, nz - 1 - zi, ci) == &slice(xi, yi, ci));
+                    CHECK_EQ(&pa(xi, yi, nz - 1 - zi, ci), &slice(xi, yi, ci));
                   }
                 }
               }
@@ -497,7 +497,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const")
                   INFO("zi: " << zi);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(yi, zi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(yi, zi, ci));
                   }
                 }
               }
@@ -512,7 +512,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const")
                   INFO("zi: " << zi);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(nx - 1 - xi, yi, zi, ci) == &slice(yi, zi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, zi, ci), &slice(yi, zi, ci));
                   }
                 }
               }
@@ -527,7 +527,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const")
                   INFO("zi: " << zi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(xi, zi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(xi, zi, ci));
                   }
                 }
               }
@@ -542,7 +542,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const")
                   INFO("zi: " << zi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, ny - 1 - yi, zi, ci) == &slice(xi, zi, ci));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, zi, ci), &slice(xi, zi, ci));
                   }
                 }
               }
@@ -557,7 +557,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const")
                   INFO("yi: " << yi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(xi, yi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(xi, yi, ci));
                   }
                 }
               }
@@ -572,7 +572,7 @@ TEST_CASE("PatchArray<3> getSliceOn<2> const")
                   INFO("yi: " << yi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, nz - 1 - zi, ci) == &slice(xi, yi, ci));
+                    CHECK_EQ(&pa(xi, yi, nz - 1 - zi, ci), &slice(xi, yi, ci));
                   }
                 }
               }
@@ -602,7 +602,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(xi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(xi, ci));
                   }
                 }
               }
@@ -617,7 +617,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, ny - 1 - yi, nz - 1 - zi, ci) == &slice(xi, ci));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, nz - 1 - zi, ci), &slice(xi, ci));
                   }
                 }
               }
@@ -632,7 +632,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, ny - 1 - yi, zi, ci) == &slice(xi, ci));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, zi, ci), &slice(xi, ci));
                   }
                 }
               }
@@ -647,7 +647,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, nz - 1 - zi, ci) == &slice(xi, ci));
+                    CHECK_EQ(&pa(xi, yi, nz - 1 - zi, ci), &slice(xi, ci));
                   }
                 }
               }
@@ -662,7 +662,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(yi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(yi, ci));
                   }
                 }
               }
@@ -677,7 +677,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(nx - 1 - xi, yi, nz - 1 - zi, ci) == &slice(yi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, nz - 1 - zi, ci), &slice(yi, ci));
                   }
                 }
               }
@@ -692,7 +692,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(nx - 1 - xi, yi, zi, ci) == &slice(yi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, zi, ci), &slice(yi, ci));
                   }
                 }
               }
@@ -707,7 +707,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(xi, yi, nz - 1 - zi, ci) == &slice(yi, ci));
+                    CHECK_EQ(&pa(xi, yi, nz - 1 - zi, ci), &slice(yi, ci));
                   }
                 }
               }
@@ -722,7 +722,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
                     INFO("zi: " << zi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(zi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(zi, ci));
                   }
                 }
               }
@@ -737,7 +737,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
                     INFO("zi: " << zi);
-                    CHECK(&pa(nx - 1 - xi, ny - 1 - yi, zi, ci) == &slice(zi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, ny - 1 - yi, zi, ci), &slice(zi, ci));
                   }
                 }
               }
@@ -752,7 +752,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
                     INFO("zi: " << zi);
-                    CHECK(&pa(nx - 1 - xi, yi, zi, ci) == &slice(zi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, zi, ci), &slice(zi, ci));
                   }
                 }
               }
@@ -767,7 +767,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
                     INFO("zi: " << zi);
-                    CHECK(&pa(xi, ny - 1 - yi, zi, ci) == &slice(zi, ci));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, zi, ci), &slice(zi, ci));
                   }
                 }
               }
@@ -797,7 +797,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(xi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(xi, ci));
                   }
                 }
               }
@@ -812,7 +812,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, ny - 1 - yi, nz - 1 - zi, ci) == &slice(xi, ci));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, nz - 1 - zi, ci), &slice(xi, ci));
                   }
                 }
               }
@@ -827,7 +827,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, ny - 1 - yi, zi, ci) == &slice(xi, ci));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, zi, ci), &slice(xi, ci));
                   }
                 }
               }
@@ -842,7 +842,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, nz - 1 - zi, ci) == &slice(xi, ci));
+                    CHECK_EQ(&pa(xi, yi, nz - 1 - zi, ci), &slice(xi, ci));
                   }
                 }
               }
@@ -857,7 +857,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(yi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(yi, ci));
                   }
                 }
               }
@@ -872,7 +872,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(nx - 1 - xi, yi, nz - 1 - zi, ci) == &slice(yi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, nz - 1 - zi, ci), &slice(yi, ci));
                   }
                 }
               }
@@ -887,7 +887,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(nx - 1 - xi, yi, zi, ci) == &slice(yi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, zi, ci), &slice(yi, ci));
                   }
                 }
               }
@@ -902,7 +902,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(xi, yi, nz - 1 - zi, ci) == &slice(yi, ci));
+                    CHECK_EQ(&pa(xi, yi, nz - 1 - zi, ci), &slice(yi, ci));
                   }
                 }
               }
@@ -917,7 +917,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
                     INFO("zi: " << zi);
-                    CHECK(&pa(xi, yi, zi, ci) == &slice(zi, ci));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &slice(zi, ci));
                   }
                 }
               }
@@ -932,7 +932,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
                     INFO("zi: " << zi);
-                    CHECK(&pa(nx - 1 - xi, ny - 1 - yi, zi, ci) == &slice(zi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, ny - 1 - yi, zi, ci), &slice(zi, ci));
                   }
                 }
               }
@@ -947,7 +947,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
                     INFO("zi: " << zi);
-                    CHECK(&pa(nx - 1 - xi, yi, zi, ci) == &slice(zi, ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, zi, ci), &slice(zi, ci));
                   }
                 }
               }
@@ -962,7 +962,7 @@ TEST_CASE("PatchArray<3> getSliceOn<1> const")
                   INFO("ci: " << ci);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
                     INFO("zi: " << zi);
-                    CHECK(&pa(xi, ny - 1 - yi, zi, ci) == &slice(zi, ci));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, zi, ci), &slice(zi, ci));
                   }
                 }
               }
@@ -991,14 +991,14 @@ TEST_CASE("PatchArray<3> getSliceOn<0>")
                   INFO("xi: " << xi);
                   for (unsigned char ci = 0; ci < num_components; ci++) {
                     INFO("ci: " << ci);
-                    CHECK(&pa(xi, yi, zi, ci) == &(pa.getSliceOn(Corner<3>::bsw(), { xi, yi, zi }))(ci));
-                    CHECK(&pa(nx - 1 - xi, yi, zi, ci) == &(pa.getSliceOn(Corner<3>::bse(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(xi, ny - 1 - yi, zi, ci) == &(pa.getSliceOn(Corner<3>::bnw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx - 1 - xi, ny - 1 - yi, zi, ci) == &(pa.getSliceOn(Corner<3>::bne(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(xi, yi, nz - 1 - zi, ci) == &(pa.getSliceOn(Corner<3>::tsw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx - 1 - xi, yi, nz - 1 - zi, ci) == &(pa.getSliceOn(Corner<3>::tse(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(xi, ny - 1 - yi, nz - 1 - zi, ci) == &(pa.getSliceOn(Corner<3>::tnw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx - 1 - xi, ny - 1 - yi, nz - 1 - zi, ci) == &(pa.getSliceOn(Corner<3>::tne(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &(pa.getSliceOn(Corner<3>::bsw(), { xi, yi, zi }))(ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, zi, ci), &(pa.getSliceOn(Corner<3>::bse(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, zi, ci), &(pa.getSliceOn(Corner<3>::bnw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx - 1 - xi, ny - 1 - yi, zi, ci), &(pa.getSliceOn(Corner<3>::bne(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(xi, yi, nz - 1 - zi, ci), &(pa.getSliceOn(Corner<3>::tsw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, nz - 1 - zi, ci), &(pa.getSliceOn(Corner<3>::tse(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, nz - 1 - zi, ci), &(pa.getSliceOn(Corner<3>::tnw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx - 1 - xi, ny - 1 - yi, nz - 1 - zi, ci), &(pa.getSliceOn(Corner<3>::tne(), { xi, yi, zi })(ci)));
                   }
                 }
               }
@@ -1027,14 +1027,14 @@ TEST_CASE("PatchArray<3> getSliceOn<0> const")
                   INFO("xi: " << xi);
                   for (unsigned char ci = 0; ci < num_components; ci++) {
                     INFO("ci: " << ci);
-                    CHECK(&pa(xi, yi, zi, ci) == &(pa.getSliceOn(Corner<3>::bsw(), { xi, yi, zi }))(ci));
-                    CHECK(&pa(nx - 1 - xi, yi, zi, ci) == &(pa.getSliceOn(Corner<3>::bse(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(xi, ny - 1 - yi, zi, ci) == &(pa.getSliceOn(Corner<3>::bnw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx - 1 - xi, ny - 1 - yi, zi, ci) == &(pa.getSliceOn(Corner<3>::bne(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(xi, yi, nz - 1 - zi, ci) == &(pa.getSliceOn(Corner<3>::tsw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx - 1 - xi, yi, nz - 1 - zi, ci) == &(pa.getSliceOn(Corner<3>::tse(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(xi, ny - 1 - yi, nz - 1 - zi, ci) == &(pa.getSliceOn(Corner<3>::tnw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx - 1 - xi, ny - 1 - yi, nz - 1 - zi, ci) == &(pa.getSliceOn(Corner<3>::tne(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(xi, yi, zi, ci), &(pa.getSliceOn(Corner<3>::bsw(), { xi, yi, zi }))(ci));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, zi, ci), &(pa.getSliceOn(Corner<3>::bse(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, zi, ci), &(pa.getSliceOn(Corner<3>::bnw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx - 1 - xi, ny - 1 - yi, zi, ci), &(pa.getSliceOn(Corner<3>::bne(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(xi, yi, nz - 1 - zi, ci), &(pa.getSliceOn(Corner<3>::tsw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx - 1 - xi, yi, nz - 1 - zi, ci), &(pa.getSliceOn(Corner<3>::tse(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(xi, ny - 1 - yi, nz - 1 - zi, ci), &(pa.getSliceOn(Corner<3>::tnw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx - 1 - xi, ny - 1 - yi, nz - 1 - zi, ci), &(pa.getSliceOn(Corner<3>::tne(), { xi, yi, zi })(ci)));
                   }
                 }
               }
@@ -1060,10 +1060,10 @@ TEST_CASE("PatchArray<2> getSliceOn<0>")
               INFO("xi: " << xi);
               for (unsigned char ci = 0; ci < num_components; ci++) {
                 INFO("ci: " << ci);
-                CHECK(&pa(xi, yi, ci) == &(pa.getSliceOn(Corner<2>::sw(), { xi, yi })(ci)));
-                CHECK(&pa(nx - 1 - xi, yi, ci) == &(pa.getSliceOn(Corner<2>::se(), { xi, yi })(ci)));
-                CHECK(&pa(xi, ny - 1 - yi, ci) == &(pa.getSliceOn(Corner<2>::nw(), { xi, yi })(ci)));
-                CHECK(&pa(nx - 1 - xi, ny - 1 - yi, ci) == &(pa.getSliceOn(Corner<2>::ne(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(xi, yi, ci), &(pa.getSliceOn(Corner<2>::sw(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(nx - 1 - xi, yi, ci), &(pa.getSliceOn(Corner<2>::se(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(xi, ny - 1 - yi, ci), &(pa.getSliceOn(Corner<2>::nw(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(nx - 1 - xi, ny - 1 - yi, ci), &(pa.getSliceOn(Corner<2>::ne(), { xi, yi })(ci)));
               }
             }
           }
@@ -1087,10 +1087,10 @@ TEST_CASE("PatchArray<2> getSliceOn<0> const")
               INFO("xi: " << xi);
               for (unsigned char ci = 0; ci < num_components; ci++) {
                 INFO("ci: " << ci);
-                CHECK(&pa(xi, yi, ci) == &(pa.getSliceOn(Corner<2>::sw(), { xi, yi })(ci)));
-                CHECK(&pa(nx - 1 - xi, yi, ci) == &(pa.getSliceOn(Corner<2>::se(), { xi, yi })(ci)));
-                CHECK(&pa(xi, ny - 1 - yi, ci) == &(pa.getSliceOn(Corner<2>::nw(), { xi, yi })(ci)));
-                CHECK(&pa(nx - 1 - xi, ny - 1 - yi, ci) == &(pa.getSliceOn(Corner<2>::ne(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(xi, yi, ci), &(pa.getSliceOn(Corner<2>::sw(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(nx - 1 - xi, yi, ci), &(pa.getSliceOn(Corner<2>::se(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(xi, ny - 1 - yi, ci), &(pa.getSliceOn(Corner<2>::nw(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(nx - 1 - xi, ny - 1 - yi, ci), &(pa.getSliceOn(Corner<2>::ne(), { xi, yi })(ci)));
               }
             }
           }
@@ -1117,8 +1117,8 @@ TEST_CASE("PatchArray<2> getGhostSliceOn<1>")
               INFO("ci: " << ci);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                 INFO("yi: " << yi);
-                CHECK(&pa(-1 - xi, yi, ci) == &slice_w(yi, ci));
-                CHECK(&pa(nx + xi, yi, ci) == &slice_e(yi, ci));
+                CHECK_EQ(&pa(-1 - xi, yi, ci), &slice_w(yi, ci));
+                CHECK_EQ(&pa(nx + xi, yi, ci), &slice_e(yi, ci));
               }
             }
           }
@@ -1131,8 +1131,8 @@ TEST_CASE("PatchArray<2> getGhostSliceOn<1>")
               INFO("ci: " << ci);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                 INFO("xi: " << xi);
-                CHECK(&pa(xi, -1 - yi, ci) == &slice_s(xi, ci));
-                CHECK(&pa(xi, ny + yi, ci) == &slice_n(xi, ci));
+                CHECK_EQ(&pa(xi, -1 - yi, ci), &slice_s(xi, ci));
+                CHECK_EQ(&pa(xi, ny + yi, ci), &slice_n(xi, ci));
               }
             }
           }
@@ -1161,8 +1161,8 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<2>")
                   INFO("zi: " << zi);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(-1 - xi, yi, zi, ci) == &slice_w(yi, zi, ci));
-                    CHECK(&pa(nx + xi, yi, zi, ci) == &slice_e(yi, zi, ci));
+                    CHECK_EQ(&pa(-1 - xi, yi, zi, ci), &slice_w(yi, zi, ci));
+                    CHECK_EQ(&pa(nx + xi, yi, zi, ci), &slice_e(yi, zi, ci));
                   }
                 }
               }
@@ -1178,8 +1178,8 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<2>")
                   INFO("zi: " << zi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, -1 - yi, zi, ci) == &slice_s(xi, zi, ci));
-                    CHECK(&pa(xi, ny + yi, zi, ci) == &slice_n(xi, zi, ci));
+                    CHECK_EQ(&pa(xi, -1 - yi, zi, ci), &slice_s(xi, zi, ci));
+                    CHECK_EQ(&pa(xi, ny + yi, zi, ci), &slice_n(xi, zi, ci));
                   }
                 }
               }
@@ -1195,8 +1195,8 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<2>")
                   INFO("yi: " << yi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, yi, -1 - zi, ci) == &slice_b(xi, yi, ci));
-                    CHECK(&pa(xi, yi, nz + zi, ci) == &slice_t(xi, yi, ci));
+                    CHECK_EQ(&pa(xi, yi, -1 - zi, ci), &slice_b(xi, yi, ci));
+                    CHECK_EQ(&pa(xi, yi, nz + zi, ci), &slice_t(xi, yi, ci));
                   }
                 }
               }
@@ -1229,10 +1229,10 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
                     INFO("xi: " << xi);
-                    CHECK(&pa(xi, -1 - yi, -1 - zi, ci) == &slice_bs(xi, ci));
-                    CHECK(&pa(xi, ny + yi, nz + zi, ci) == &slice_tn(xi, ci));
-                    CHECK(&pa(xi, ny + yi, -1 - zi, ci) == &slice_bn(xi, ci));
-                    CHECK(&pa(xi, -1 - yi, nz + zi, ci) == &slice_ts(xi, ci));
+                    CHECK_EQ(&pa(xi, -1 - yi, -1 - zi, ci), &slice_bs(xi, ci));
+                    CHECK_EQ(&pa(xi, ny + yi, nz + zi, ci), &slice_tn(xi, ci));
+                    CHECK_EQ(&pa(xi, ny + yi, -1 - zi, ci), &slice_bn(xi, ci));
+                    CHECK_EQ(&pa(xi, -1 - yi, nz + zi, ci), &slice_ts(xi, ci));
                   }
                 }
               }
@@ -1250,10 +1250,10 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
                     INFO("yi: " << yi);
-                    CHECK(&pa(-1 - xi, yi, -1 - zi, ci) == &slice_bw(yi, ci));
-                    CHECK(&pa(nx + xi, yi, nz + zi, ci) == &slice_te(yi, ci));
-                    CHECK(&pa(nx + xi, yi, -1 - zi, ci) == &slice_be(yi, ci));
-                    CHECK(&pa(-1 - xi, yi, nz + zi, ci) == &slice_tw(yi, ci));
+                    CHECK_EQ(&pa(-1 - xi, yi, -1 - zi, ci), &slice_bw(yi, ci));
+                    CHECK_EQ(&pa(nx + xi, yi, nz + zi, ci), &slice_te(yi, ci));
+                    CHECK_EQ(&pa(nx + xi, yi, -1 - zi, ci), &slice_be(yi, ci));
+                    CHECK_EQ(&pa(-1 - xi, yi, nz + zi, ci), &slice_tw(yi, ci));
                   }
                 }
               }
@@ -1271,10 +1271,10 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<1>")
                   INFO("ci: " << ci);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
                     INFO("zi: " << zi);
-                    CHECK(&pa(-1 - xi, -1 - yi, zi, ci) == &slice_sw(zi, ci));
-                    CHECK(&pa(nx + xi, ny + yi, zi, ci) == &slice_ne(zi, ci));
-                    CHECK(&pa(nx + xi, -1 - yi, zi, ci) == &slice_se(zi, ci));
-                    CHECK(&pa(-1 - xi, ny + yi, zi, ci) == &slice_nw(zi, ci));
+                    CHECK_EQ(&pa(-1 - xi, -1 - yi, zi, ci), &slice_sw(zi, ci));
+                    CHECK_EQ(&pa(nx + xi, ny + yi, zi, ci), &slice_ne(zi, ci));
+                    CHECK_EQ(&pa(nx + xi, -1 - yi, zi, ci), &slice_se(zi, ci));
+                    CHECK_EQ(&pa(-1 - xi, ny + yi, zi, ci), &slice_nw(zi, ci));
                   }
                 }
               }
@@ -1303,14 +1303,14 @@ TEST_CASE("PatchArray<3> getGhostSliceOn<0>")
                   INFO("xi: " << xi);
                   for (unsigned char ci = 0; ci < num_components; ci++) {
                     INFO("ci: " << ci);
-                    CHECK(&pa(-1 - xi, -1 - yi, -1 - zi, ci) == &(pa.getGhostSliceOn(Corner<3>::bsw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx + xi, -1 - yi, -1 - zi, ci) == &(pa.getGhostSliceOn(Corner<3>::bse(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(-1 - xi, ny + yi, -1 - zi, ci) == &(pa.getGhostSliceOn(Corner<3>::bnw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx + xi, ny + yi, -1 - zi, ci) == &(pa.getGhostSliceOn(Corner<3>::bne(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(-1 - xi, -1 - yi, nz + zi, ci) == &(pa.getGhostSliceOn(Corner<3>::tsw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx + xi, -1 - yi, nz + zi, ci) == &(pa.getGhostSliceOn(Corner<3>::tse(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(-1 - xi, ny + yi, nz + zi, ci) == &(pa.getGhostSliceOn(Corner<3>::tnw(), { xi, yi, zi })(ci)));
-                    CHECK(&pa(nx + xi, ny + yi, nz + zi, ci) == &(pa.getGhostSliceOn(Corner<3>::tne(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(-1 - xi, -1 - yi, -1 - zi, ci), &(pa.getGhostSliceOn(Corner<3>::bsw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx + xi, -1 - yi, -1 - zi, ci), &(pa.getGhostSliceOn(Corner<3>::bse(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(-1 - xi, ny + yi, -1 - zi, ci), &(pa.getGhostSliceOn(Corner<3>::bnw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx + xi, ny + yi, -1 - zi, ci), &(pa.getGhostSliceOn(Corner<3>::bne(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(-1 - xi, -1 - yi, nz + zi, ci), &(pa.getGhostSliceOn(Corner<3>::tsw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx + xi, -1 - yi, nz + zi, ci), &(pa.getGhostSliceOn(Corner<3>::tse(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(-1 - xi, ny + yi, nz + zi, ci), &(pa.getGhostSliceOn(Corner<3>::tnw(), { xi, yi, zi })(ci)));
+                    CHECK_EQ(&pa(nx + xi, ny + yi, nz + zi, ci), &(pa.getGhostSliceOn(Corner<3>::tne(), { xi, yi, zi })(ci)));
                   }
                 }
               }
@@ -1336,10 +1336,10 @@ TEST_CASE("PatchArray<2> getGhostSliceOn<0>")
               INFO("xi: " << xi);
               for (unsigned char ci = 0; ci < num_components; ci++) {
                 INFO("ci: " << ci);
-                CHECK(&pa(-xi - 1, -yi - 1, ci) == &(pa.getGhostSliceOn(Corner<2>::sw(), { xi, yi })(ci)));
-                CHECK(&pa(nx + xi, -yi - 1, ci) == &(pa.getGhostSliceOn(Corner<2>::se(), { xi, yi })(ci)));
-                CHECK(&pa(-xi - 1, ny + yi, ci) == &(pa.getGhostSliceOn(Corner<2>::nw(), { xi, yi })(ci)));
-                CHECK(&pa(nx + xi, ny + yi, ci) == &(pa.getGhostSliceOn(Corner<2>::ne(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(-xi - 1, -yi - 1, ci), &(pa.getGhostSliceOn(Corner<2>::sw(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(nx + xi, -yi - 1, ci), &(pa.getGhostSliceOn(Corner<2>::se(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(-xi - 1, ny + yi, ci), &(pa.getGhostSliceOn(Corner<2>::nw(), { xi, yi })(ci)));
+                CHECK_EQ(&pa(nx + xi, ny + yi, ci), &(pa.getGhostSliceOn(Corner<2>::ne(), { xi, yi })(ci)));
               }
             }
           }
@@ -1370,17 +1370,17 @@ TEST_CASE("PatchArray copy constructor")
           for (int c = 0; c < num_components; c++) {
             for (int iy = -num_ghost; iy < ny + num_ghost; iy++) {
               for (int ix = -num_ghost; ix < nx + num_ghost; ix++) {
-                CHECK(pa(ix, iy, c) == pa_copy(ix, iy, c));
+                CHECK_EQ(pa(ix, iy, c), pa_copy(ix, iy, c));
               }
             }
           }
 
-          CHECK(pa.getStrides() == pa_copy.getStrides());
-          CHECK(pa.getGhostStart() == pa_copy.getGhostStart());
-          CHECK(pa.getStart() == pa_copy.getStart());
-          CHECK(pa.getEnd() == pa_copy.getEnd());
-          CHECK(pa.getGhostEnd() == pa_copy.getGhostEnd());
-          CHECK(&pa(0, 0, 0) != &pa_copy(0, 0, 0));
+          CHECK_EQ(pa.getStrides(), pa_copy.getStrides());
+          CHECK_EQ(pa.getGhostStart(), pa_copy.getGhostStart());
+          CHECK_EQ(pa.getStart(), pa_copy.getStart());
+          CHECK_EQ(pa.getEnd(), pa_copy.getEnd());
+          CHECK_EQ(pa.getGhostEnd(), pa_copy.getGhostEnd());
+          CHECK_NE(&pa(0, 0, 0), &pa_copy(0, 0, 0));
         }
       }
     }
@@ -1409,17 +1409,17 @@ TEST_CASE("PatchArray copy assignment")
           for (int c = 0; c < num_components; c++) {
             for (int iy = -num_ghost; iy < ny + num_ghost; iy++) {
               for (int ix = -num_ghost; ix < nx + num_ghost; ix++) {
-                CHECK(pa(ix, iy, c) == pa_copy(ix, iy, c));
+                CHECK_EQ(pa(ix, iy, c), pa_copy(ix, iy, c));
               }
             }
           }
 
-          CHECK(pa.getStrides() == pa_copy.getStrides());
-          CHECK(pa.getGhostStart() == pa_copy.getGhostStart());
-          CHECK(pa.getStart() == pa_copy.getStart());
-          CHECK(pa.getEnd() == pa_copy.getEnd());
-          CHECK(pa.getGhostEnd() == pa_copy.getGhostEnd());
-          CHECK(&pa(0, 0, 0) != &pa_copy(0, 0, 0));
+          CHECK_EQ(pa.getStrides(), pa_copy.getStrides());
+          CHECK_EQ(pa.getGhostStart(), pa_copy.getGhostStart());
+          CHECK_EQ(pa.getStart(), pa_copy.getStart());
+          CHECK_EQ(pa.getEnd(), pa_copy.getEnd());
+          CHECK_EQ(pa.getGhostEnd(), pa_copy.getGhostEnd());
+          CHECK_NE(&pa(0, 0, 0), &pa_copy(0, 0, 0));
         }
       }
     }

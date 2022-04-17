@@ -67,7 +67,7 @@ TEST_CASE("Linear Test LinearRestrictor")
           INFO("parent_orth:    " << pinfo.orth_on_parent);
           ComponentView<double, 2> vec_ld = coarse_vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
-          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -75,7 +75,7 @@ TEST_CASE("Linear Test LinearRestrictor")
             if (!pinfo.hasNbr(s)) {
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
               });
             }
           }
@@ -128,8 +128,8 @@ TEST_CASE("Linear Test LinearRestrictor two components")
           ComponentView<double, 2> vec_ld2 = coarse_vec.getComponentView(1, pinfo.local_index);
           ComponentView<double, 2> expected_ld2 = coarse_expected.getComponentView(1, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
-            REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord]));
-            REQUIRE(vec_ld2[coord] == doctest::Approx(expected_ld2[coord]));
+            REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord]));
+            REQUIRE_EQ(vec_ld2[coord], doctest::Approx(expected_ld2[coord]));
           });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
@@ -140,8 +140,8 @@ TEST_CASE("Linear Test LinearRestrictor two components")
             if (!pinfo.hasNbr(s)) {
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
-                CHECK(vec_ghost2[coord] == doctest::Approx(expected_ghost2[coord]));
+                CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost2[coord], doctest::Approx(expected_ghost2[coord]));
               });
             }
           }
@@ -186,13 +186,13 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts")
           INFO("parent_orth:    " << pinfo.orth_on_parent);
           ComponentView<double, 2> vec_ld = coarse_vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
-          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             INFO("side:      " << s);
             Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
               INFO("coord:  " << coord[0]);
-              CHECK(vec_ghost[coord] == 0);
+              CHECK_EQ(vec_ghost[coord], 0);
             });
           }
         }
@@ -244,8 +244,8 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
           ComponentView<double, 2> vec_ld2 = coarse_vec.getComponentView(1, pinfo.local_index);
           ComponentView<double, 2> expected_ld2 = coarse_expected.getComponentView(1, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
-            REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord]));
-            REQUIRE(vec_ld2[coord] == doctest::Approx(expected_ld2[coord]));
+            REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord]));
+            REQUIRE_EQ(vec_ld2[coord], doctest::Approx(expected_ld2[coord]));
           });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
@@ -253,8 +253,8 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
             INFO("side:      " << s);
             Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
               INFO("coord:  " << coord[0]);
-              CHECK(vec_ghost[coord] == 0);
-              CHECK(vec_ghost2[coord] == 0);
+              CHECK_EQ(vec_ghost[coord], 0);
+              CHECK_EQ(vec_ghost2[coord], 0);
             });
           }
         }

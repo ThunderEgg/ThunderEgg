@@ -60,34 +60,34 @@ TEST_CASE("Vector<2> move from domain constructor")
 
             // vec_to_move
 
-            CHECK(vec_to_move.getNumGhostCells() == 0);
+            CHECK_EQ(vec_to_move.getNumGhostCells(), 0);
             CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
-            CHECK(vec_to_move.getNumLocalPatches() == 0);
-            CHECK(vec_to_move.getNumComponents() == 0);
-            CHECK(vec_to_move.getNumLocalCells() == 0);
+            CHECK_EQ(vec_to_move.getNumLocalPatches(), 0);
+            CHECK_EQ(vec_to_move.getNumComponents(), 0);
+            CHECK_EQ(vec_to_move.getNumLocalCells(), 0);
 
             // vec
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_move_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_move_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_move_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view == view_to_move);
+            CHECK_EQ(view, view_to_move);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -98,14 +98,14 @@ TEST_CASE("Vector<2> move from domain constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_move[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_move[coord]); });
             }
           }
         }
@@ -143,34 +143,34 @@ TEST_CASE("Vector<2> move from managed constructor")
 
             // vec_to_move
 
-            CHECK(vec_to_move.getNumGhostCells() == 0);
+            CHECK_EQ(vec_to_move.getNumGhostCells(), 0);
             CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
-            CHECK(vec_to_move.getNumLocalPatches() == 0);
-            CHECK(vec_to_move.getNumComponents() == 0);
-            CHECK(vec_to_move.getNumLocalCells() == 0);
+            CHECK_EQ(vec_to_move.getNumLocalPatches(), 0);
+            CHECK_EQ(vec_to_move.getNumComponents(), 0);
+            CHECK_EQ(vec_to_move.getNumLocalCells(), 0);
 
             // vec
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_move_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_move_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_move_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view == view_to_move);
+            CHECK_EQ(view, view_to_move);
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -181,14 +181,14 @@ TEST_CASE("Vector<2> move from managed constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < num_local_patches; i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_move[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_move[coord]); });
             }
           }
         }
@@ -233,34 +233,34 @@ TEST_CASE("Vector<2> move from unmanaged constructor")
 
             // vec_to_move
 
-            CHECK(vec_to_move.getNumGhostCells() == 0);
+            CHECK_EQ(vec_to_move.getNumGhostCells(), 0);
             CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
-            CHECK(vec_to_move.getNumLocalPatches() == 0);
-            CHECK(vec_to_move.getNumComponents() == 0);
-            CHECK(vec_to_move.getNumLocalCells() == 0);
+            CHECK_EQ(vec_to_move.getNumLocalPatches(), 0);
+            CHECK_EQ(vec_to_move.getNumComponents(), 0);
+            CHECK_EQ(vec_to_move.getNumLocalCells(), 0);
 
             // vec
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_move_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_move_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_move_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view == view_to_move);
+            CHECK_EQ(view, view_to_move);
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -271,14 +271,14 @@ TEST_CASE("Vector<2> move from unmanaged constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < num_local_patches; i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_move[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_move[coord]); });
             }
           }
         }
@@ -319,34 +319,34 @@ TEST_CASE("Vector<2> move assign from domain constructor")
 
             // vec_to_move
 
-            CHECK(vec_to_move.getNumGhostCells() == 0);
+            CHECK_EQ(vec_to_move.getNumGhostCells(), 0);
             CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
-            CHECK(vec_to_move.getNumLocalPatches() == 0);
-            CHECK(vec_to_move.getNumComponents() == 0);
-            CHECK(vec_to_move.getNumLocalCells() == 0);
+            CHECK_EQ(vec_to_move.getNumLocalPatches(), 0);
+            CHECK_EQ(vec_to_move.getNumComponents(), 0);
+            CHECK_EQ(vec_to_move.getNumLocalCells(), 0);
 
             // vec
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_move_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_move_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_move_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view == view_to_move);
+            CHECK_EQ(view, view_to_move);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -357,14 +357,14 @@ TEST_CASE("Vector<2> move assign from domain constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_move[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_move[coord]); });
             }
           }
         }
@@ -403,34 +403,34 @@ TEST_CASE("Vector<2> move assign from managed constructor")
 
             // vec_to_move
 
-            CHECK(vec_to_move.getNumGhostCells() == 0);
+            CHECK_EQ(vec_to_move.getNumGhostCells(), 0);
             CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
-            CHECK(vec_to_move.getNumLocalPatches() == 0);
-            CHECK(vec_to_move.getNumComponents() == 0);
-            CHECK(vec_to_move.getNumLocalCells() == 0);
+            CHECK_EQ(vec_to_move.getNumLocalPatches(), 0);
+            CHECK_EQ(vec_to_move.getNumComponents(), 0);
+            CHECK_EQ(vec_to_move.getNumLocalCells(), 0);
 
             // vec
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_move_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_move_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_move_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view == view_to_move);
+            CHECK_EQ(view, view_to_move);
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -441,14 +441,14 @@ TEST_CASE("Vector<2> move assign from managed constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < num_local_patches; i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_move[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_move[coord]); });
             }
           }
         }
@@ -493,34 +493,34 @@ TEST_CASE("Vector<2> move assign from unmanaged constructor")
             vec = std::move(vec_to_move);
             // vec_to_move
 
-            CHECK(vec_to_move.getNumGhostCells() == 0);
+            CHECK_EQ(vec_to_move.getNumGhostCells(), 0);
             CHECK_THROWS_AS(vec_to_move.getCommunicator().getMPIComm(), RuntimeError);
-            CHECK(vec_to_move.getNumLocalPatches() == 0);
-            CHECK(vec_to_move.getNumComponents() == 0);
-            CHECK(vec_to_move.getNumLocalCells() == 0);
+            CHECK_EQ(vec_to_move.getNumLocalPatches(), 0);
+            CHECK_EQ(vec_to_move.getNumComponents(), 0);
+            CHECK_EQ(vec_to_move.getNumLocalCells(), 0);
 
             // vec
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_move_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_move_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_move_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_move_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_move_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_move_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view == view_to_move);
+            CHECK_EQ(view, view_to_move);
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -531,14 +531,14 @@ TEST_CASE("Vector<2> move assign from unmanaged constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < num_local_patches; i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_move = vec_to_move_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_move[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_move[coord]); });
             }
           }
         }

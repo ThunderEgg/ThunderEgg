@@ -80,7 +80,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence")
           errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
         }
         INFO("Errors: " << errors[0] << ", " << errors[1]);
-        CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
+        CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
       }
     }
   }
@@ -144,7 +144,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
           errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
         }
         INFO("Errors: " << errors[0] << ", " << errors[1]);
-        CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
+        CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
       }
     }
   }
@@ -208,7 +208,7 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
         errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
       }
       INFO("Errors: " << errors[0] << ", " << errors[1]);
-      CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
+      CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
     }
   }
 }

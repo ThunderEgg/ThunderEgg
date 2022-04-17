@@ -47,7 +47,7 @@ TEST_CASE("Calls for various domains 2d face cases MPI3")
 
           mgf.fillGhost(vec);
 
-          CHECK(mgf.called == true);
+          CHECK_EQ(mgf.called, true);
 
           mgf.checkCalls();
         }
@@ -72,7 +72,7 @@ TEST_CASE("Calls for various domains 2d corner cases MPI3")
 
           mgf.fillGhost(vec);
 
-          CHECK(mgf.called == true);
+          CHECK_EQ(mgf.called, true);
 
           mgf.checkCalls();
         }

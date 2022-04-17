@@ -42,36 +42,36 @@ TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad")
       int rank;
       MPI_Comm_rank(MPI_COMM_WORLD, &rank);
       if (rank == 0) {
-        CHECK(ilc.getPatchesWithGhostParent().size() == 0);
-        CHECK(ilc.getPatchesWithLocalParent().size() == 2);
+        CHECK_EQ(ilc.getPatchesWithGhostParent().size(), 0);
+        CHECK_EQ(ilc.getPatchesWithLocalParent().size(), 2);
 
         map<int, set<int>> parents_to_children;
         for (auto pair : ilc.getPatchesWithLocalParent()) {
           parents_to_children[pair.first].insert(pair.second.get().id);
         }
-        CHECK(parents_to_children.count(0));
-        CHECK(parents_to_children[0].count(1));
-        CHECK(parents_to_children[0].count(2));
+        CHECK_UNARY(parents_to_children.count(0));
+        CHECK_UNARY(parents_to_children[0].count(1));
+        CHECK_UNARY(parents_to_children[0].count(2));
       } else if (rank == 1) {
-        CHECK(ilc.getPatchesWithGhostParent().size() == 1);
-        CHECK(ilc.getPatchesWithLocalParent().size() == 0);
+        CHECK_EQ(ilc.getPatchesWithGhostParent().size(), 1);
+        CHECK_EQ(ilc.getPatchesWithLocalParent().size(), 0);
 
         map<int, set<int>> parents_to_children;
         for (auto pair : ilc.getPatchesWithGhostParent()) {
           parents_to_children[pair.first].insert(pair.second.get().id);
         }
-        CHECK(parents_to_children.count(0) == 1);
-        CHECK(parents_to_children[0].count(3) == 1);
+        CHECK_EQ(parents_to_children.count(0), 1);
+        CHECK_EQ(parents_to_children[0].count(3), 1);
       } else {
-        CHECK(ilc.getPatchesWithGhostParent().size() == 1);
-        CHECK(ilc.getPatchesWithLocalParent().size() == 0);
+        CHECK_EQ(ilc.getPatchesWithGhostParent().size(), 1);
+        CHECK_EQ(ilc.getPatchesWithLocalParent().size(), 0);
 
         map<int, set<int>> parents_to_children;
         for (auto pair : ilc.getPatchesWithGhostParent()) {
           parents_to_children[pair.first].insert(pair.second.get().id);
         }
-        CHECK(parents_to_children.count(0) == 1);
-        CHECK(parents_to_children[0].count(4) == 1);
+        CHECK_EQ(parents_to_children.count(0), 1);
+        CHECK_EQ(parents_to_children[0].count(4), 1);
       }
     }
   }
@@ -89,13 +89,13 @@ TEST_CASE("3-processor getNewGhostVector on uniform quad")
 
         Vector<2> ghost_vec = ilc.getNewGhostVector(num_components);
 
-        CHECK(ghost_vec.getNumComponents() == num_components);
+        CHECK_EQ(ghost_vec.getNumComponents(), num_components);
         int rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         if (rank == 0) {
-          CHECK(ghost_vec.getNumLocalPatches() == 0);
+          CHECK_EQ(ghost_vec.getNumLocalPatches(), 0);
         } else {
-          CHECK(ghost_vec.getNumLocalPatches() == 1);
+          CHECK_EQ(ghost_vec.getNumLocalPatches(), 1);
         }
       }
     }
@@ -147,7 +147,7 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad")
               INFO("xi: " << coord[0]);
               INFO("yi: " << coord[1]);
               INFO("c " << coord[2]);
-              CHECK(local_view[coord] == 1 + 2 + 3 + 3 * coord[2]);
+              CHECK_EQ(local_view[coord], 1 + 2 + 3 + 3 * coord[2]);
             }
           });
         } else {
@@ -292,7 +292,7 @@ TEST_CASE("3-processor getGhostPatches on uniform quad")
         } else {
           // the coarse vec should be filled with 1+c
           PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
-          Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK(local_view[coord] == 1 + coord[2]); });
+          Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK_EQ(local_view[coord], 1 + coord[2]); });
         }
       }
     }

@@ -28,18 +28,18 @@ using namespace ThunderEgg;
 void
 Check4x4x4RefinedBSWDomainSideNeighborOrths(const PatchVector& domain)
 {
-  CHECK(domain["bsw_bsw_bse"]->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::sw());
-  CHECK(domain["bsw_bsw_bne"]->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::se());
-  CHECK(domain["bsw_bsw_tse"]->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::nw());
-  CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse == Orthant<2>::ne());
+  CHECK_EQ(domain["bsw_bsw_bse"]->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse, Orthant<2>::sw());
+  CHECK_EQ(domain["bsw_bsw_bne"]->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse, Orthant<2>::se());
+  CHECK_EQ(domain["bsw_bsw_tse"]->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse, Orthant<2>::nw());
+  CHECK_EQ(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Side<3>::east()).orth_on_coarse, Orthant<2>::ne());
 
-  CHECK(domain["bsw_bsw_bnw"]->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse == Orthant<2>::sw());
-  CHECK(domain["bsw_bsw_bne"]->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse == Orthant<2>::se());
-  CHECK(domain["bsw_bsw_tnw"]->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse == Orthant<2>::nw());
-  CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse == Orthant<2>::ne());
+  CHECK_EQ(domain["bsw_bsw_bnw"]->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse, Orthant<2>::sw());
+  CHECK_EQ(domain["bsw_bsw_bne"]->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse, Orthant<2>::se());
+  CHECK_EQ(domain["bsw_bsw_tnw"]->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse, Orthant<2>::nw());
+  CHECK_EQ(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Side<3>::north()).orth_on_coarse, Orthant<2>::ne());
 
-  CHECK(domain["bsw_bsw_tsw"]->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::sw());
-  CHECK(domain["bsw_bsw_tse"]->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::se());
-  CHECK(domain["bsw_bsw_tnw"]->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::nw());
-  CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse == Orthant<2>::ne());
+  CHECK_EQ(domain["bsw_bsw_tsw"]->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse, Orthant<2>::sw());
+  CHECK_EQ(domain["bsw_bsw_tse"]->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse, Orthant<2>::se());
+  CHECK_EQ(domain["bsw_bsw_tnw"]->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse, Orthant<2>::nw());
+  CHECK_EQ(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Side<3>::top()).orth_on_coarse, Orthant<2>::ne());
 }

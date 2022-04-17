@@ -50,7 +50,7 @@ TEST_CASE("DomainTools::GetRealCoord 1D")
           array<double, 1> result;
           DomainTools::GetRealCoord<1>(pinfo, coord, result);
 
-          CHECK(result[0] + 100 == Approx(expected[0] + 100));
+          CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
         }
       }
     }
@@ -93,8 +93,8 @@ TEST_CASE("DomainTools::GetRealCoord 2D")
             array<int, 2> coord = { coordx, coordy };
             DomainTools::GetRealCoord<2>(pinfo, coord, result);
 
-            CHECK(result[0] + 100 == Approx(expected[0] + 100));
-            CHECK(result[1] + 100 == Approx(expected[1] + 100));
+            CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
+            CHECK_EQ(result[1] + 100, Approx(expected[1] + 100));
           }
         }
       }
@@ -149,9 +149,9 @@ TEST_CASE("DomainTools::GetRealCoord 3D")
               array<int, 3> coord = { coordx, coordy, coordz };
               DomainTools::GetRealCoord<3>(pinfo, coord, result);
 
-              CHECK(result[0] + 100 == Approx(expected[0] + 100));
-              CHECK(result[1] + 100 == Approx(expected[1] + 100));
-              CHECK(result[2] + 100 == Approx(expected[2] + 100));
+              CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
+              CHECK_EQ(result[1] + 100, Approx(expected[1] + 100));
+              CHECK_EQ(result[2] + 100, Approx(expected[2] + 100));
             }
           }
         }
@@ -178,7 +178,7 @@ TEST_CASE("DomainTools::getRealCoordGhost 1D")
           array<double, 1> result;
           DomainTools::GetRealCoordGhost<1>(pinfo, coord, result);
 
-          CHECK(result[0] + 100 == Approx(expected[0] + 100));
+          CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
         }
       }
     }
@@ -209,8 +209,8 @@ TEST_CASE("DomainTools::getRealCoordGhost 2D")
             array<int, 2> coord = { coordx, coordy };
             DomainTools::GetRealCoordGhost<2>(pinfo, coord, result);
 
-            CHECK(result[0] + 100 == Approx(expected[0] + 100));
-            CHECK(result[1] + 100 == Approx(expected[1] + 100));
+            CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
+            CHECK_EQ(result[1] + 100, Approx(expected[1] + 100));
           }
         }
       }
@@ -247,9 +247,9 @@ TEST_CASE("DomainTools::getRealCoordGhost 3D")
               array<int, 3> coord = { coordx, coordy, coordz };
               DomainTools::GetRealCoordGhost<3>(pinfo, coord, result);
 
-              CHECK(result[0] + 100 == Approx(expected[0] + 100));
-              CHECK(result[1] + 100 == Approx(expected[1] + 100));
-              CHECK(result[2] + 100 == Approx(expected[2] + 100));
+              CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
+              CHECK_EQ(result[1] + 100, Approx(expected[1] + 100));
+              CHECK_EQ(result[2] + 100, Approx(expected[2] + 100));
             }
           }
         }
@@ -271,9 +271,9 @@ TEST_CASE("DomainTools::GetRealCoordBound 1D")
         std::array<int, 0> coord;
         std::array<double, 1> result;
         DomainTools::GetRealCoordBound<1>(pinfo, coord, Side<1>::west(), result);
-        CHECK(result[0] + 100 == Approx(startx + 100));
+        CHECK_EQ(result[0] + 100, Approx(startx + 100));
         DomainTools::GetRealCoordBound<1>(pinfo, coord, Side<1>::east(), result);
-        CHECK(result[0] + 100 == Approx(startx + lengthx + 100));
+        CHECK_EQ(result[0] + 100, Approx(startx + lengthx + 100));
       }
     }
   }
@@ -307,12 +307,12 @@ TEST_CASE("DomainTools::GetRealCoordBound 2D")
           array<int, 1> coord = { coordx };
           DomainTools::GetRealCoordBound<2>(pinfo, coord, Side<2>::south(), result);
 
-          CHECK(result[0] + 100 == Approx(expected[0] + 100));
-          CHECK(result[1] + 100 == Approx(starty + 100));
+          CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
+          CHECK_EQ(result[1] + 100, Approx(starty + 100));
 
           DomainTools::GetRealCoordBound<2>(pinfo, coord, Side<2>::north(), result);
-          CHECK(result[0] + 100 == Approx(expected[0] + 100));
-          CHECK(result[1] + 100 == Approx(starty + lengthy + 100));
+          CHECK_EQ(result[0] + 100, Approx(expected[0] + 100));
+          CHECK_EQ(result[1] + 100, Approx(starty + lengthy + 100));
         }
         for (int coordy = -1; coordy <= ny; coordy++) {
           array<double, 2> expected;
@@ -328,13 +328,13 @@ TEST_CASE("DomainTools::GetRealCoordBound 2D")
           array<int, 1> coord = { coordy };
           DomainTools::GetRealCoordBound<2>(pinfo, coord, Side<2>::west(), result);
 
-          CHECK(result[0] + 100 == Approx(startx + 100));
-          CHECK(result[1] + 100 == Approx(expected[1] + 100));
+          CHECK_EQ(result[0] + 100, Approx(startx + 100));
+          CHECK_EQ(result[1] + 100, Approx(expected[1] + 100));
 
           DomainTools::GetRealCoordBound<2>(pinfo, coord, Side<2>::east(), result);
 
-          CHECK(result[0] + 100 == Approx(startx + lengthx + 100));
-          CHECK(result[1] + 100 == Approx(expected[1] + 100));
+          CHECK_EQ(result[0] + 100, Approx(startx + lengthx + 100));
+          CHECK_EQ(result[1] + 100, Approx(expected[1] + 100));
         }
       }
     }
@@ -365,11 +365,11 @@ TEST_CASE("DomainTools::setValues 1D g=x")
           auto ld = vec.getComponentView(0, 0);
           Loop::Nested<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
             if (coord[0] < 0 || coord[0] >= nx) {
-              CHECK(ld[coord] + 100 == Approx(0.0 + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(0.0 + 100));
             } else {
               std::array<double, 1> real_coord;
               DomainTools::GetRealCoord<1>(pinfos[0], coord, real_coord);
-              CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
             }
           });
         }
@@ -402,11 +402,11 @@ TEST_CASE("DomainTools::setValues 1D f=x**2")
           auto ld = vec.getComponentView(0, 0);
           Loop::Nested<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
             if (coord[0] < 0 || coord[0] >= nx) {
-              CHECK(ld[coord] + 100 == Approx(0.0 + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(0.0 + 100));
             } else {
               std::array<double, 1> real_coord;
               DomainTools::GetRealCoord<1>(pinfos[0], coord, real_coord);
-              CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
             }
           });
         }
@@ -443,11 +443,11 @@ TEST_CASE("DomainTools::setValues 2D f=x+y")
           auto ld = vec.getComponentView(0, 0);
           Loop::Nested<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
             if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
-              CHECK(ld[coord] + 100 == Approx(0.0 + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(0.0 + 100));
             } else {
               std::array<double, 2> real_coord;
               DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
-              CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
             }
           });
         }
@@ -485,21 +485,21 @@ TEST_CASE("DomainTools::setValues 2D f=x+y,g=x*y")
           auto ld = vec.getComponentView(0, 0);
           Loop::Nested<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
             if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
-              CHECK(ld[coord] + 100 == Approx(0.0 + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(0.0 + 100));
             } else {
               std::array<double, 2> real_coord;
               DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
-              CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
             }
           });
           auto ld2 = vec.getComponentView(1, 0);
           Loop::Nested<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
             if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
-              CHECK(ld2[coord] + 100 == Approx(0.0 + 100));
+              CHECK_EQ(ld2[coord] + 100, Approx(0.0 + 100));
             } else {
               std::array<double, 2> real_coord;
               DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
-              CHECK(ld2[coord] + 100 == Approx(g(real_coord) + 100));
+              CHECK_EQ(ld2[coord] + 100, Approx(g(real_coord) + 100));
             }
           });
         }
@@ -536,11 +536,11 @@ TEST_CASE("DomainTools::setValues 2D f=x*y")
           auto ld = vec.getComponentView(0, 0);
           Loop::Nested<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
             if (coord[0] < 0 || coord[0] >= nx || coord[1] < 0 || coord[1] >= ny) {
-              CHECK(ld[coord] + 100 == Approx(0.0 + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(0.0 + 100));
             } else {
               std::array<double, 2> real_coord;
               DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
-              CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+              CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
             }
           });
         }
@@ -574,7 +574,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x")
           Loop::Nested<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 1> real_coord;
             DomainTools::GetRealCoordGhost<1>(pinfos[0], coord, real_coord);
-            CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+            CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
           });
         }
       }
@@ -607,7 +607,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 1D f=x**2")
           Loop::Nested<1>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 1> real_coord;
             DomainTools::GetRealCoordGhost<1>(pinfos[0], coord, real_coord);
-            CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+            CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
           });
         }
       }
@@ -644,7 +644,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y")
           Loop::Nested<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[0], coord, real_coord);
-            CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+            CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
           });
         }
       }
@@ -682,13 +682,13 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x+y,g=x*y")
           Loop::Nested<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[0], coord, real_coord);
-            CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+            CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
           });
           auto ld2 = vec.getComponentView(1, 0);
           Loop::Nested<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[0], coord, real_coord);
-            CHECK(ld2[coord] + 100 == Approx(g(real_coord) + 100));
+            CHECK_EQ(ld2[coord] + 100, Approx(g(real_coord) + 100));
           });
         }
       }
@@ -789,7 +789,7 @@ TEST_CASE("DomainTools::setValuesWithGhost 2D f=x*y")
           Loop::Nested<2>(ld.getGhostStart(), ld.getGhostEnd(), [&](const std::array<int, 2> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[0], coord, real_coord);
-            CHECK(ld[coord] + 100 == Approx(f(real_coord) + 100));
+            CHECK_EQ(ld[coord] + 100, Approx(f(real_coord) + 100));
           });
         }
       }

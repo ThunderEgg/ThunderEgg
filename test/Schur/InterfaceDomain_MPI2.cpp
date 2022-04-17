@@ -38,9 +38,9 @@ TEST_CASE("Schur::InterfaceDomain<2> getNumLocalInterfaces 2d_refined_east")
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
-    CHECK(interface_domain.getNumLocalInterfaces() == 1);
+    CHECK_EQ(interface_domain.getNumLocalInterfaces(), 1);
   } else {
-    CHECK(interface_domain.getNumLocalInterfaces() == 6);
+    CHECK_EQ(interface_domain.getNumLocalInterfaces(), 6);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> getNumGlobalInterfaces 2d_refined_east")
@@ -49,7 +49,7 @@ TEST_CASE("Schur::InterfaceDomain<2> getNumGlobalInterfaces 2d_refined_east")
   Domain<2> domain = domain_reader.getFinerDomain();
   Schur::InterfaceDomain<2> interface_domain(domain);
 
-  CHECK(interface_domain.getNumGlobalInterfaces() == 7);
+  CHECK_EQ(interface_domain.getNumGlobalInterfaces(), 7);
 }
 TEST_CASE("Schur::InterfaceDomain<2> getInterfaces 2d_refined_east")
 {
@@ -62,12 +62,12 @@ TEST_CASE("Schur::InterfaceDomain<2> getInterfaces 2d_refined_east")
 
   auto interfaces = interface_domain.getInterfaces();
   if (rank == 0) {
-    CHECK(interfaces.size() == 1);
+    CHECK_EQ(interfaces.size(), 1);
   } else {
-    CHECK(interfaces.size() == 6);
+    CHECK_EQ(interfaces.size(), 6);
   }
   for (size_t i = 0; i < interfaces.size(); i++) {
-    CHECK(interfaces[i]->local_index == (int)i);
+    CHECK_EQ(interfaces[i]->local_index, (int)i);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> getPatchIfaceInfos 2d_refined_east")
@@ -81,12 +81,12 @@ TEST_CASE("Schur::InterfaceDomain<2> getPatchIfaceInfos 2d_refined_east")
 
   auto piinfos = interface_domain.getPatchIfaceInfos();
   if (rank == 0) {
-    CHECK(piinfos.size() == 1);
+    CHECK_EQ(piinfos.size(), 1);
   } else {
-    CHECK(piinfos.size() == 4);
+    CHECK_EQ(piinfos.size(), 4);
   }
   for (size_t i = 0; i < piinfos.size(); i++) {
-    CHECK(piinfos[i]->pinfo.local_index == (int)i);
+    CHECK_EQ(piinfos[i]->pinfo.local_index, (int)i);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> getDomain 2d_refined_east")
@@ -95,7 +95,7 @@ TEST_CASE("Schur::InterfaceDomain<2> getDomain 2d_refined_east")
   Domain<2> domain = domain_reader.getFinerDomain();
   Schur::InterfaceDomain<2> interface_domain(domain);
 
-  CHECK(interface_domain.getDomain().getNumLocalPatches() == domain.getNumLocalPatches());
+  CHECK_EQ(interface_domain.getDomain().getNumLocalPatches(), domain.getNumLocalPatches());
 }
 TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0 2d_refined_east")
 {
@@ -113,7 +113,7 @@ TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0 
     }
   }
 
-  CHECK(min_local_index == 0);
+  CHECK_EQ(min_local_index, 0);
 }
 TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguous 2d_refined_east")
 {
@@ -133,7 +133,7 @@ TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguou
 
   int prev_local_index = -1;
   for (int local_index : local_indexes) {
-    REQUIRE(local_index == prev_local_index + 1);
+    REQUIRE_EQ(local_index, prev_local_index + 1);
     prev_local_index = local_index;
   }
 }
@@ -154,10 +154,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one patch interface local 
     }
   }
 
-  REQUIRE(id_to_local_indexes.size() > 0);
+  REQUIRE_GT(id_to_local_indexes.size(), 0);
   for (auto pair : id_to_local_indexes) {
     INFO("ID " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> each patch interface local index has only one id associated "
@@ -177,10 +177,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each patch interface local index has only o
     }
   }
 
-  REQUIRE(local_index_to_ids.size() > 0);
+  REQUIRE_GT(local_index_to_ids.size(), 0);
   for (auto pair : local_index_to_ids) {
     INFO("Local Index " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_refined_east")
@@ -203,7 +203,7 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_refined_e
     }
   }
 
-  CHECK(min_local_index == 0);
+  CHECK_EQ(min_local_index, 0);
 }
 TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_refined_east")
 {
@@ -227,7 +227,7 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_refined
 
   int prev_local_index = -1;
   for (int local_index : local_indexes) {
-    REQUIRE(local_index == prev_local_index + 1);
+    REQUIRE_EQ(local_index, prev_local_index + 1);
     prev_local_index = local_index;
   }
 }
@@ -253,10 +253,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one row local index associ
     }
   }
 
-  REQUIRE(id_to_local_indexes.size() > 0);
+  REQUIRE_GT(id_to_local_indexes.size(), 0);
   for (auto pair : id_to_local_indexes) {
     INFO("ID " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associated with it "
@@ -281,10 +281,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associ
     }
   }
 
-  REQUIRE(local_index_to_ids.size() > 0);
+  REQUIRE_GT(local_index_to_ids.size(), 0);
   for (auto pair : local_index_to_ids) {
     INFO("Local Index " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0 2d_refined_east")
@@ -328,7 +328,7 @@ TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0 2d_refined_e
       }
     }
   }
-  CHECK(min_local_index == 0);
+  CHECK_EQ(min_local_index, 0);
 }
 TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous 2d_refined_east")
 {
@@ -373,7 +373,7 @@ TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous 2d_refined
   }
   int prev_local_index = -1;
   for (int local_index : local_indexes) {
-    REQUIRE(local_index == prev_local_index + 1);
+    REQUIRE_EQ(local_index, prev_local_index + 1);
     prev_local_index = local_index;
   }
 }
@@ -420,10 +420,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one col local index associ
     }
   }
 
-  REQUIRE(id_to_local_indexes.size() > 0);
+  REQUIRE_GT(id_to_local_indexes.size(), 0);
   for (auto pair : id_to_local_indexes) {
     INFO("ID " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associated with it "
@@ -461,10 +461,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associ
     }
   }
 
-  REQUIRE(local_index_to_ids.size() > 0);
+  REQUIRE_GT(local_index_to_ids.size(), 0);
   for (auto pair : local_index_to_ids) {
     INFO("Local Index " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0 2d_refined_east")
@@ -510,7 +510,7 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0 2d_refined_east
   int global_min_global_index;
   MPI_Allreduce(&min_global_index, &global_min_global_index, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
 
-  CHECK(global_min_global_index == 0);
+  CHECK_EQ(global_min_global_index, 0);
 }
 TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous 2d_refined_east")
 {
@@ -534,7 +534,7 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous 2d_refined_ea
     prev_global_index = 0;
   }
   for (int global_index : global_indexes) {
-    REQUIRE(global_index == prev_global_index + 1);
+    REQUIRE_EQ(global_index, prev_global_index + 1);
     prev_global_index = global_index;
   }
 }
@@ -592,7 +592,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associate
     }
   }
 
-  REQUIRE(id_to_global_indexes.size() > 0);
+  REQUIRE_GT(id_to_global_indexes.size(), 0);
   for (auto pair : id_to_global_indexes) {
     INFO("ID " << pair.first);
     string global_indexes;
@@ -600,7 +600,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associate
       global_indexes += to_string(global_index) + ", ";
     }
     INFO("GLOBAL_INDEXES: " << global_indexes);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associated with it 2d_refined_east")
@@ -656,7 +656,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associate
     }
   }
 
-  REQUIRE(global_index_to_ids.size() > 0);
+  REQUIRE_GT(global_index_to_ids.size(), 0);
   for (auto pair : global_index_to_ids) {
     INFO("Global Index " << pair.first);
     string ids;
@@ -664,7 +664,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associate
       ids += to_string(id) + ", ";
     }
     INFO("IDS " << ids);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> getNumLocalInterfaces 2d_uniform")
@@ -677,9 +677,9 @@ TEST_CASE("Schur::InterfaceDomain<2> getNumLocalInterfaces 2d_uniform")
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
-    CHECK(interface_domain.getNumLocalInterfaces() == 1);
+    CHECK_EQ(interface_domain.getNumLocalInterfaces(), 1);
   } else {
-    CHECK(interface_domain.getNumLocalInterfaces() == 0);
+    CHECK_EQ(interface_domain.getNumLocalInterfaces(), 0);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> getNumGlobalInterfaces 2d_uniform")
@@ -688,7 +688,7 @@ TEST_CASE("Schur::InterfaceDomain<2> getNumGlobalInterfaces 2d_uniform")
   Domain<2> domain = domain_reader.getFinerDomain();
   Schur::InterfaceDomain<2> interface_domain(domain);
 
-  CHECK(interface_domain.getNumGlobalInterfaces() == 1);
+  CHECK_EQ(interface_domain.getNumGlobalInterfaces(), 1);
 }
 TEST_CASE("Schur::InterfaceDomain<2> getInterfaces 2d_uniform")
 {
@@ -701,12 +701,12 @@ TEST_CASE("Schur::InterfaceDomain<2> getInterfaces 2d_uniform")
 
   auto interfaces = interface_domain.getInterfaces();
   if (rank == 0) {
-    CHECK(interfaces.size() == 1);
+    CHECK_EQ(interfaces.size(), 1);
   } else {
-    CHECK(interfaces.size() == 0);
+    CHECK_EQ(interfaces.size(), 0);
   }
   for (size_t i = 0; i < interfaces.size(); i++) {
-    CHECK(interfaces[i]->local_index == (int)i);
+    CHECK_EQ(interfaces[i]->local_index, (int)i);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> getPatchIfaceInfos 2d_uniform")
@@ -720,12 +720,12 @@ TEST_CASE("Schur::InterfaceDomain<2> getPatchIfaceInfos 2d_uniform")
 
   auto piinfos = interface_domain.getPatchIfaceInfos();
   if (rank == 0) {
-    CHECK(piinfos.size() == 1);
+    CHECK_EQ(piinfos.size(), 1);
   } else {
-    CHECK(piinfos.size() == 1);
+    CHECK_EQ(piinfos.size(), 1);
   }
   for (size_t i = 0; i < piinfos.size(); i++) {
-    CHECK(piinfos[i]->pinfo.local_index == (int)i);
+    CHECK_EQ(piinfos[i]->pinfo.local_index, (int)i);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> getDomain 2d_uniform")
@@ -734,7 +734,7 @@ TEST_CASE("Schur::InterfaceDomain<2> getDomain 2d_uniform")
   Domain<2> domain = domain_reader.getFinerDomain();
   Schur::InterfaceDomain<2> interface_domain(domain);
 
-  CHECK(interface_domain.getDomain().getNumLocalPatches() == domain.getNumLocalPatches());
+  CHECK_EQ(interface_domain.getDomain().getNumLocalPatches(), domain.getNumLocalPatches());
 }
 TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0 2d_uniform")
 {
@@ -752,7 +752,7 @@ TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes start from 0 
     }
   }
 
-  CHECK(min_local_index == 0);
+  CHECK_EQ(min_local_index, 0);
 }
 TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguous 2d_uniform")
 {
@@ -772,7 +772,7 @@ TEST_CASE("Schur::InterfaceDomain<2> patch interface local indexes are contiguou
 
   int prev_local_index = -1;
   for (int local_index : local_indexes) {
-    REQUIRE(local_index == prev_local_index + 1);
+    REQUIRE_EQ(local_index, prev_local_index + 1);
     prev_local_index = local_index;
   }
 }
@@ -793,10 +793,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one patch interface local 
     }
   }
 
-  REQUIRE(id_to_local_indexes.size() > 0);
+  REQUIRE_GT(id_to_local_indexes.size(), 0);
   for (auto pair : id_to_local_indexes) {
     INFO("ID " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> each patch interface local index has only one id associated "
@@ -816,10 +816,10 @@ TEST_CASE("Schur::InterfaceDomain<2> each patch interface local index has only o
     }
   }
 
-  REQUIRE(local_index_to_ids.size() > 0);
+  REQUIRE_GT(local_index_to_ids.size(), 0);
   for (auto pair : local_index_to_ids) {
     INFO("Local Index " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_uniform")
@@ -843,7 +843,7 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes start from 0 2d_uniform")
   }
 
   if (interface_domain.getNumLocalInterfaces() > 0) {
-    CHECK(min_local_index == 0);
+    CHECK_EQ(min_local_index, 0);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_uniform")
@@ -868,7 +868,7 @@ TEST_CASE("Schur::InterfaceDomain<2> row local indexes are contiguous 2d_uniform
 
   int prev_local_index = -1;
   for (int local_index : local_indexes) {
-    REQUIRE(local_index == prev_local_index + 1);
+    REQUIRE_EQ(local_index, prev_local_index + 1);
     prev_local_index = local_index;
   }
 }
@@ -894,11 +894,11 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one row local index associ
   }
 
   if (interface_domain.getNumLocalInterfaces() > 0) {
-    REQUIRE(id_to_local_indexes.size() > 0);
+    REQUIRE_GT(id_to_local_indexes.size(), 0);
   }
   for (auto pair : id_to_local_indexes) {
     INFO("ID " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associated with it 2d_uniform")
@@ -923,11 +923,11 @@ TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associ
   }
 
   if (interface_domain.getNumLocalInterfaces() > 0) {
-    REQUIRE(local_index_to_ids.size() > 0);
+    REQUIRE_GT(local_index_to_ids.size(), 0);
   }
   for (auto pair : local_index_to_ids) {
     INFO("Local Index " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0 2d_uniform")
@@ -973,7 +973,7 @@ TEST_CASE("Schur::InterfaceDomain<2> col local indexes start from 0 2d_uniform")
   }
 
   if (interface_domain.getNumLocalInterfaces() > 0) {
-    CHECK(min_local_index == 0);
+    CHECK_EQ(min_local_index, 0);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous 2d_uniform")
@@ -1019,7 +1019,7 @@ TEST_CASE("Schur::InterfaceDomain<2> col local indexes are contiguous 2d_uniform
   }
   int prev_local_index = -1;
   for (int local_index : local_indexes) {
-    REQUIRE(local_index == prev_local_index + 1);
+    REQUIRE_EQ(local_index, prev_local_index + 1);
     prev_local_index = local_index;
   }
 }
@@ -1066,11 +1066,11 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one col local index associ
   }
 
   if (interface_domain.getNumLocalInterfaces() > 0) {
-    REQUIRE(id_to_local_indexes.size() > 0);
+    REQUIRE_GT(id_to_local_indexes.size(), 0);
   }
   for (auto pair : id_to_local_indexes) {
     INFO("ID " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associated with it 2d_uniform")
@@ -1108,11 +1108,11 @@ TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associ
   }
 
   if (interface_domain.getNumLocalInterfaces() > 0) {
-    REQUIRE(local_index_to_ids.size() > 0);
+    REQUIRE_GT(local_index_to_ids.size(), 0);
   }
   for (auto pair : local_index_to_ids) {
     INFO("Local Index " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0 2d_uniform")
@@ -1158,7 +1158,7 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes start from 0 2d_uniform")
   int global_min_global_index;
   MPI_Allreduce(&min_global_index, &global_min_global_index, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
 
-  CHECK(global_min_global_index == 0);
+  CHECK_EQ(global_min_global_index, 0);
 }
 TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous 2d_uniform")
 {
@@ -1174,7 +1174,7 @@ TEST_CASE("Schur::InterfaceDomain<2> global indexes are contiguous 2d_uniform")
 
   int prev_global_index = -1;
   for (int global_index : global_indexes) {
-    REQUIRE(global_index == prev_global_index + 1);
+    REQUIRE_EQ(global_index, prev_global_index + 1);
     prev_global_index = global_index;
   }
 }
@@ -1232,7 +1232,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associate
     }
   }
 
-  REQUIRE(id_to_global_indexes.size() > 0);
+  REQUIRE_GT(id_to_global_indexes.size(), 0);
   for (auto pair : id_to_global_indexes) {
     INFO("ID " << pair.first);
     string global_indexes;
@@ -1240,7 +1240,7 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associate
       global_indexes += to_string(global_index) + ", ";
     }
     INFO("GLOBAL_INDEXES: " << global_indexes);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associated with it 2d_uniform")
@@ -1296,9 +1296,9 @@ TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associate
     }
   }
 
-  REQUIRE(global_index_to_ids.size() > 0);
+  REQUIRE_GT(global_index_to_ids.size(), 0);
   for (auto pair : global_index_to_ids) {
     INFO("Global Index " << pair.first);
-    CHECK(pair.second.size() == 1);
+    CHECK_EQ(pair.second.size(), 1);
   }
 }

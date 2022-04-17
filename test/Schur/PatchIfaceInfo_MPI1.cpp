@@ -31,11 +31,11 @@ TEST_CASE("Schur::PatchIfaceInfo default constructor")
 {
   Schur::PatchIfaceInfo<2> piinfo;
   for (Side<2> s : Side<2>::getValues()) {
-    CHECK(piinfo.iface_info[s.getIndex()] == nullptr);
-    CHECK(piinfo.getIfaceInfo(s) == nullptr);
-    CHECK(piinfo.getNormalIfaceInfo(s) == nullptr);
-    CHECK(piinfo.getCoarseIfaceInfo(s) == nullptr);
-    CHECK(piinfo.getFineIfaceInfo(s) == nullptr);
+    CHECK_EQ(piinfo.iface_info[s.getIndex()], nullptr);
+    CHECK_EQ(piinfo.getIfaceInfo(s), nullptr);
+    CHECK_EQ(piinfo.getNormalIfaceInfo(s), nullptr);
+    CHECK_EQ(piinfo.getCoarseIfaceInfo(s), nullptr);
+    CHECK_EQ(piinfo.getFineIfaceInfo(s), nullptr);
   }
 }
 TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with NormalIfaceInfo")
@@ -58,18 +58,18 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with NormalIfaceInfo")
 
     for (Side<2> s : Side<2>::getValues()) {
       if (s == side_to_set) {
-        CHECK(piinfo.iface_info[s.getIndex()] == iface_info);
-        CHECK(piinfo.getIfaceInfo(s) == iface_info);
-        CHECK(const_piinfo.getIfaceInfo(s) == iface_info);
-        CHECK(piinfo.getNormalIfaceInfo(s) == iface_info);
+        CHECK_EQ(piinfo.iface_info[s.getIndex()], iface_info);
+        CHECK_EQ(piinfo.getIfaceInfo(s), iface_info);
+        CHECK_EQ(const_piinfo.getIfaceInfo(s), iface_info);
+        CHECK_EQ(piinfo.getNormalIfaceInfo(s), iface_info);
       } else {
-        CHECK(piinfo.iface_info[s.getIndex()] == nullptr);
-        CHECK(piinfo.getIfaceInfo(s) == nullptr);
-        CHECK(const_piinfo.getIfaceInfo(s) == nullptr);
-        CHECK(piinfo.getNormalIfaceInfo(s) == nullptr);
+        CHECK_EQ(piinfo.iface_info[s.getIndex()], nullptr);
+        CHECK_EQ(piinfo.getIfaceInfo(s), nullptr);
+        CHECK_EQ(const_piinfo.getIfaceInfo(s), nullptr);
+        CHECK_EQ(piinfo.getNormalIfaceInfo(s), nullptr);
       }
-      CHECK(piinfo.getCoarseIfaceInfo(s) == nullptr);
-      CHECK(piinfo.getFineIfaceInfo(s) == nullptr);
+      CHECK_EQ(piinfo.getCoarseIfaceInfo(s), nullptr);
+      CHECK_EQ(piinfo.getFineIfaceInfo(s), nullptr);
     }
   }
 }
@@ -93,18 +93,18 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with FineIfaceInfo")
 
     for (Side<2> s : Side<2>::getValues()) {
       if (s == side_to_set) {
-        CHECK(piinfo.iface_info[s.getIndex()] == iface_info);
-        CHECK(piinfo.getIfaceInfo(s) == iface_info);
-        CHECK(const_piinfo.getIfaceInfo(s) == iface_info);
-        CHECK(piinfo.getFineIfaceInfo(s) == iface_info);
+        CHECK_EQ(piinfo.iface_info[s.getIndex()], iface_info);
+        CHECK_EQ(piinfo.getIfaceInfo(s), iface_info);
+        CHECK_EQ(const_piinfo.getIfaceInfo(s), iface_info);
+        CHECK_EQ(piinfo.getFineIfaceInfo(s), iface_info);
       } else {
-        CHECK(piinfo.iface_info[s.getIndex()] == nullptr);
-        CHECK(piinfo.getIfaceInfo(s) == nullptr);
-        CHECK(const_piinfo.getIfaceInfo(s) == nullptr);
-        CHECK(piinfo.getFineIfaceInfo(s) == nullptr);
+        CHECK_EQ(piinfo.iface_info[s.getIndex()], nullptr);
+        CHECK_EQ(piinfo.getIfaceInfo(s), nullptr);
+        CHECK_EQ(const_piinfo.getIfaceInfo(s), nullptr);
+        CHECK_EQ(piinfo.getFineIfaceInfo(s), nullptr);
       }
-      CHECK(piinfo.getNormalIfaceInfo(s) == nullptr);
-      CHECK(piinfo.getCoarseIfaceInfo(s) == nullptr);
+      CHECK_EQ(piinfo.getNormalIfaceInfo(s), nullptr);
+      CHECK_EQ(piinfo.getCoarseIfaceInfo(s), nullptr);
     }
   }
 }
@@ -127,18 +127,18 @@ TEST_CASE("Schur::PatchIfaceInfo setIfaceInfo with CoarseIfaceInfo")
 
     for (Side<2> s : Side<2>::getValues()) {
       if (s == side_to_set) {
-        CHECK(piinfo.iface_info[s.getIndex()] == iface_info);
-        CHECK(piinfo.getIfaceInfo(s) == iface_info);
-        CHECK(const_piinfo.getIfaceInfo(s) == iface_info);
-        CHECK(piinfo.getCoarseIfaceInfo(s) == iface_info);
+        CHECK_EQ(piinfo.iface_info[s.getIndex()], iface_info);
+        CHECK_EQ(piinfo.getIfaceInfo(s), iface_info);
+        CHECK_EQ(const_piinfo.getIfaceInfo(s), iface_info);
+        CHECK_EQ(piinfo.getCoarseIfaceInfo(s), iface_info);
       } else {
-        CHECK(piinfo.iface_info[s.getIndex()] == nullptr);
-        CHECK(piinfo.getIfaceInfo(s) == nullptr);
-        CHECK(const_piinfo.getIfaceInfo(s) == nullptr);
-        CHECK(piinfo.getCoarseIfaceInfo(s) == nullptr);
+        CHECK_EQ(piinfo.iface_info[s.getIndex()], nullptr);
+        CHECK_EQ(piinfo.getIfaceInfo(s), nullptr);
+        CHECK_EQ(const_piinfo.getIfaceInfo(s), nullptr);
+        CHECK_EQ(piinfo.getCoarseIfaceInfo(s), nullptr);
       }
-      CHECK(piinfo.getNormalIfaceInfo(s) == nullptr);
-      CHECK(piinfo.getFineIfaceInfo(s) == nullptr);
+      CHECK_EQ(piinfo.getNormalIfaceInfo(s), nullptr);
+      CHECK_EQ(piinfo.getFineIfaceInfo(s), nullptr);
     }
   }
 }
@@ -157,31 +157,31 @@ TEST_CASE("Schur::PatchIfaceInfo PatchInfo constructor")
 
   Schur::PatchIfaceInfo<2> piinfo(pinfo);
 
-  CHECK(piinfo.pinfo.id == pinfo.id);
+  CHECK_EQ(piinfo.pinfo.id, pinfo.id);
 
-  CHECK(piinfo.iface_info[Side<2>::west().getIndex()] != nullptr);
-  CHECK(piinfo.getIfaceInfo(Side<2>::west()) != nullptr);
-  CHECK(piinfo.getNormalIfaceInfo(Side<2>::west()) == nullptr);
-  CHECK(piinfo.getCoarseIfaceInfo(Side<2>::west()) != nullptr);
-  CHECK(piinfo.getFineIfaceInfo(Side<2>::west()) == nullptr);
+  CHECK_NE(piinfo.iface_info[Side<2>::west().getIndex()], nullptr);
+  CHECK_NE(piinfo.getIfaceInfo(Side<2>::west()), nullptr);
+  CHECK_EQ(piinfo.getNormalIfaceInfo(Side<2>::west()), nullptr);
+  CHECK_NE(piinfo.getCoarseIfaceInfo(Side<2>::west()), nullptr);
+  CHECK_EQ(piinfo.getFineIfaceInfo(Side<2>::west()), nullptr);
 
-  CHECK(piinfo.iface_info[Side<2>::east().getIndex()] == nullptr);
-  CHECK(piinfo.getIfaceInfo(Side<2>::east()) == nullptr);
-  CHECK(piinfo.getNormalIfaceInfo(Side<2>::east()) == nullptr);
-  CHECK(piinfo.getCoarseIfaceInfo(Side<2>::east()) == nullptr);
-  CHECK(piinfo.getFineIfaceInfo(Side<2>::east()) == nullptr);
+  CHECK_EQ(piinfo.iface_info[Side<2>::east().getIndex()], nullptr);
+  CHECK_EQ(piinfo.getIfaceInfo(Side<2>::east()), nullptr);
+  CHECK_EQ(piinfo.getNormalIfaceInfo(Side<2>::east()), nullptr);
+  CHECK_EQ(piinfo.getCoarseIfaceInfo(Side<2>::east()), nullptr);
+  CHECK_EQ(piinfo.getFineIfaceInfo(Side<2>::east()), nullptr);
 
-  CHECK(piinfo.iface_info[Side<2>::south().getIndex()] != nullptr);
-  CHECK(piinfo.getIfaceInfo(Side<2>::south()) != nullptr);
-  CHECK(piinfo.getNormalIfaceInfo(Side<2>::south()) == nullptr);
-  CHECK(piinfo.getCoarseIfaceInfo(Side<2>::south()) == nullptr);
-  CHECK(piinfo.getFineIfaceInfo(Side<2>::south()) != nullptr);
+  CHECK_NE(piinfo.iface_info[Side<2>::south().getIndex()], nullptr);
+  CHECK_NE(piinfo.getIfaceInfo(Side<2>::south()), nullptr);
+  CHECK_EQ(piinfo.getNormalIfaceInfo(Side<2>::south()), nullptr);
+  CHECK_EQ(piinfo.getCoarseIfaceInfo(Side<2>::south()), nullptr);
+  CHECK_NE(piinfo.getFineIfaceInfo(Side<2>::south()), nullptr);
 
-  CHECK(piinfo.iface_info[Side<2>::north().getIndex()] != nullptr);
-  CHECK(piinfo.getIfaceInfo(Side<2>::north()) != nullptr);
-  CHECK(piinfo.getNormalIfaceInfo(Side<2>::north()) != nullptr);
-  CHECK(piinfo.getCoarseIfaceInfo(Side<2>::north()) == nullptr);
-  CHECK(piinfo.getFineIfaceInfo(Side<2>::north()) == nullptr);
+  CHECK_NE(piinfo.iface_info[Side<2>::north().getIndex()], nullptr);
+  CHECK_NE(piinfo.getIfaceInfo(Side<2>::north()), nullptr);
+  CHECK_NE(piinfo.getNormalIfaceInfo(Side<2>::north()), nullptr);
+  CHECK_EQ(piinfo.getCoarseIfaceInfo(Side<2>::north()), nullptr);
+  CHECK_EQ(piinfo.getFineIfaceInfo(Side<2>::north()), nullptr);
 }
 TEST_CASE("Schur::PatchIfaceInfo serialization")
 {
@@ -203,29 +203,29 @@ TEST_CASE("Schur::PatchIfaceInfo serialization")
   Schur::PatchIfaceInfo<2> out;
   out.deserialize(buff);
 
-  CHECK(out.pinfo.id == pinfo.id);
+  CHECK_EQ(out.pinfo.id, pinfo.id);
 
-  CHECK(out.iface_info[Side<2>::west().getIndex()] != nullptr);
-  CHECK(out.getIfaceInfo(Side<2>::west()) != nullptr);
-  CHECK(out.getNormalIfaceInfo(Side<2>::west()) == nullptr);
-  CHECK(out.getCoarseIfaceInfo(Side<2>::west()) != nullptr);
-  CHECK(out.getFineIfaceInfo(Side<2>::west()) == nullptr);
+  CHECK_NE(out.iface_info[Side<2>::west().getIndex()], nullptr);
+  CHECK_NE(out.getIfaceInfo(Side<2>::west()), nullptr);
+  CHECK_EQ(out.getNormalIfaceInfo(Side<2>::west()), nullptr);
+  CHECK_NE(out.getCoarseIfaceInfo(Side<2>::west()), nullptr);
+  CHECK_EQ(out.getFineIfaceInfo(Side<2>::west()), nullptr);
 
-  CHECK(out.iface_info[Side<2>::east().getIndex()] == nullptr);
-  CHECK(out.getIfaceInfo(Side<2>::east()) == nullptr);
-  CHECK(out.getNormalIfaceInfo(Side<2>::east()) == nullptr);
-  CHECK(out.getCoarseIfaceInfo(Side<2>::east()) == nullptr);
-  CHECK(out.getFineIfaceInfo(Side<2>::east()) == nullptr);
+  CHECK_EQ(out.iface_info[Side<2>::east().getIndex()], nullptr);
+  CHECK_EQ(out.getIfaceInfo(Side<2>::east()), nullptr);
+  CHECK_EQ(out.getNormalIfaceInfo(Side<2>::east()), nullptr);
+  CHECK_EQ(out.getCoarseIfaceInfo(Side<2>::east()), nullptr);
+  CHECK_EQ(out.getFineIfaceInfo(Side<2>::east()), nullptr);
 
-  CHECK(out.iface_info[Side<2>::south().getIndex()] != nullptr);
-  CHECK(out.getIfaceInfo(Side<2>::south()) != nullptr);
-  CHECK(out.getNormalIfaceInfo(Side<2>::south()) == nullptr);
-  CHECK(out.getCoarseIfaceInfo(Side<2>::south()) == nullptr);
-  CHECK(out.getFineIfaceInfo(Side<2>::south()) != nullptr);
+  CHECK_NE(out.iface_info[Side<2>::south().getIndex()], nullptr);
+  CHECK_NE(out.getIfaceInfo(Side<2>::south()), nullptr);
+  CHECK_EQ(out.getNormalIfaceInfo(Side<2>::south()), nullptr);
+  CHECK_EQ(out.getCoarseIfaceInfo(Side<2>::south()), nullptr);
+  CHECK_NE(out.getFineIfaceInfo(Side<2>::south()), nullptr);
 
-  CHECK(out.iface_info[Side<2>::north().getIndex()] != nullptr);
-  CHECK(out.getIfaceInfo(Side<2>::north()) != nullptr);
-  CHECK(out.getNormalIfaceInfo(Side<2>::north()) != nullptr);
-  CHECK(out.getCoarseIfaceInfo(Side<2>::north()) == nullptr);
-  CHECK(out.getFineIfaceInfo(Side<2>::north()) == nullptr);
+  CHECK_NE(out.iface_info[Side<2>::north().getIndex()], nullptr);
+  CHECK_NE(out.getIfaceInfo(Side<2>::north()), nullptr);
+  CHECK_NE(out.getNormalIfaceInfo(Side<2>::north()), nullptr);
+  CHECK_EQ(out.getCoarseIfaceInfo(Side<2>::north()), nullptr);
+  CHECK_EQ(out.getFineIfaceInfo(Side<2>::north()), nullptr);
 }

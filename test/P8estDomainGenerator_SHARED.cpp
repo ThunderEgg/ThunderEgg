@@ -99,7 +99,7 @@ PatchVector::operator[](const std::string& str) const
     curr_level++;
   }
   const PatchInfo<3>* pinfo = array[i][j][k];
-  REQUIRE(pinfo != nullptr);
+  REQUIRE_NE(pinfo, nullptr);
   return pinfo;
 }
 std::vector<PatchInfo<3>>
@@ -163,13 +163,13 @@ CheckRootDomainNeighbors(const ThunderEgg::Domain<3>& domain)
   if (rank == 0) {
     const PatchInfo<3>& root_patch = patches[0];
     for (Side<3> s : Side<3>::getValues()) {
-      CHECK_FALSE(root_patch.hasNbr(s));
+      CHECK_UNARY_FALSE(root_patch.hasNbr(s));
     }
     for (Edge e : Edge::getValues()) {
-      CHECK_FALSE(root_patch.hasNbr(e));
+      CHECK_UNARY_FALSE(root_patch.hasNbr(e));
     }
     for (Corner<3> c : Corner<3>::getValues()) {
-      CHECK_FALSE(root_patch.hasNbr(c));
+      CHECK_UNARY_FALSE(root_patch.hasNbr(c));
     }
   }
 }
@@ -239,13 +239,13 @@ CheckParentAndChildIdsAndRanks(const ThunderEgg::Domain<3>& coarser_domain, int 
           const PatchInfo<3>* parent_patch = coarser_pvector[parent_str];
 
           Orthant<3> orth = getChildOrthant(child_str);
-          CHECK(child_patch->parent_id == parent_patch->id);
-          CHECK(parent_patch->child_ids[orth.getIndex()] == child_patch->id);
+          CHECK_EQ(child_patch->parent_id, parent_patch->id);
+          CHECK_EQ(parent_patch->child_ids[orth.getIndex()], child_patch->id);
 
-          CHECK(child_patch->parent_rank == parent_patch->rank);
-          CHECK(parent_patch->child_ranks[orth.getIndex()] == child_patch->rank);
+          CHECK_EQ(child_patch->parent_rank, parent_patch->rank);
+          CHECK_EQ(parent_patch->child_ranks[orth.getIndex()], child_patch->rank);
 
-          CHECK(child_patch->orth_on_parent == orth);
+          CHECK_EQ(child_patch->orth_on_parent, orth);
         }
       }
     }
@@ -276,13 +276,13 @@ CheckParentAndChildIdsAndRanksRefined(const ThunderEgg::Domain<3>& coarser_domai
             const PatchInfo<3>* parent_patch = coarser_pvector[parent_str];
 
             Orthant<3> orth = getChildOrthant(child_str);
-            CHECK(child_patch->parent_id == parent_patch->id);
-            CHECK(parent_patch->child_ids[orth.getIndex()] == child_patch->id);
+            CHECK_EQ(child_patch->parent_id, parent_patch->id);
+            CHECK_EQ(parent_patch->child_ids[orth.getIndex()], child_patch->id);
 
-            CHECK(child_patch->parent_rank == parent_patch->rank);
-            CHECK(parent_patch->child_ranks[orth.getIndex()] == child_patch->rank);
+            CHECK_EQ(child_patch->parent_rank, parent_patch->rank);
+            CHECK_EQ(parent_patch->child_ranks[orth.getIndex()], child_patch->rank);
 
-            CHECK(child_patch->orth_on_parent == orth);
+            CHECK_EQ(child_patch->orth_on_parent, orth);
           } else if (i % 2 == 0 && j % 2 == 0 && k % 2 == 0) {
             string child_str = getString(finer_max_level, i, j, k);
             string parent_str = child_str.substr(0, std::max<int>((int)child_str.size() - 4, 0));
@@ -291,19 +291,19 @@ CheckParentAndChildIdsAndRanksRefined(const ThunderEgg::Domain<3>& coarser_domai
             const PatchInfo<3>* child_patch = finer_pvector[parent_str];
             const PatchInfo<3>* parent_patch = coarser_pvector[parent_str];
 
-            CHECK(child_patch->parent_id == parent_patch->id);
-            CHECK(parent_patch->child_ids[0] == child_patch->id);
+            CHECK_EQ(child_patch->parent_id, parent_patch->id);
+            CHECK_EQ(parent_patch->child_ids[0], child_patch->id);
             for (int i = 1; i < 8; i++) {
-              CHECK(parent_patch->child_ids[i] == -1);
+              CHECK_EQ(parent_patch->child_ids[i], -1);
             }
 
-            CHECK(child_patch->parent_rank == parent_patch->rank);
-            CHECK(parent_patch->child_ranks[0] == child_patch->rank);
+            CHECK_EQ(child_patch->parent_rank, parent_patch->rank);
+            CHECK_EQ(parent_patch->child_ranks[0], child_patch->rank);
             for (int i = 1; i < 8; i++) {
-              CHECK(parent_patch->child_ranks[i] == -1);
+              CHECK_EQ(parent_patch->child_ranks[i], -1);
             }
 
-            CHECK(child_patch->orth_on_parent == Orthant<3>::null());
+            CHECK_EQ(child_patch->orth_on_parent, Orthant<3>::null());
           }
         }
       }
@@ -314,9 +314,9 @@ void
 CheckParentIdsAndRanksNull(const ThunderEgg::Domain<3>& domain)
 {
   for (const PatchInfo<3>& pinfo : domain.getPatchInfoVector()) {
-    CHECK(pinfo.parent_id == -1);
-    CHECK(pinfo.parent_rank == -1);
-    CHECK(pinfo.orth_on_parent == Orthant<3>::null());
+    CHECK_EQ(pinfo.parent_id, -1);
+    CHECK_EQ(pinfo.parent_rank, -1);
+    CHECK_EQ(pinfo.orth_on_parent, Orthant<3>::null());
   }
 }
 void
@@ -324,8 +324,8 @@ CheckChildIdsAndRanksNull(const ThunderEgg::Domain<3>& domain)
 {
   for (const PatchInfo<3>& pinfo : domain.getPatchInfoVector()) {
     for (int i = 0; i < 8; i++) {
-      CHECK(pinfo.child_ids[i] == -1);
-      CHECK(pinfo.child_ranks[i] == -1);
+      CHECK_EQ(pinfo.child_ids[i], -1);
+      CHECK_EQ(pinfo.child_ranks[i], -1);
     }
   }
 }

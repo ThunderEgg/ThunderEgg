@@ -34,33 +34,33 @@ using namespace ThunderEgg::Iterative;
 TEST_CASE("BiCGStab default max iterations")
 {
   BiCGStab<2> bcgs;
-  CHECK(bcgs.getMaxIterations() == 1000);
+  CHECK_EQ(bcgs.getMaxIterations(), 1000);
 }
 TEST_CASE("BiCGStab set max iterations")
 {
   for (int iterations : { 1, 2, 3 }) {
     BiCGStab<2> bcgs;
     bcgs.setMaxIterations(iterations);
-    CHECK(bcgs.getMaxIterations() == iterations);
+    CHECK_EQ(bcgs.getMaxIterations(), iterations);
   }
 }
 TEST_CASE("BiCGStab default tolerance")
 {
   BiCGStab<2> bcgs;
-  CHECK(bcgs.getTolerance() == 1e-12);
+  CHECK_EQ(bcgs.getTolerance(), 1e-12);
 }
 TEST_CASE("BiCGStab set tolerance")
 {
   for (double tolerance : { 1.2, 2.3, 3.4 }) {
     BiCGStab<2> bcgs;
     bcgs.setTolerance(tolerance);
-    CHECK(bcgs.getTolerance() == tolerance);
+    CHECK_EQ(bcgs.getTolerance(), tolerance);
   }
 }
 TEST_CASE("BiCGStab default timer")
 {
   BiCGStab<2> bcgs;
-  CHECK(bcgs.getTimer() == nullptr);
+  CHECK_EQ(bcgs.getTimer(), nullptr);
 }
 TEST_CASE("BiCGStab set timer")
 {
@@ -68,7 +68,7 @@ TEST_CASE("BiCGStab set timer")
   BiCGStab<2> bcgs;
   auto timer = make_shared<Timer>(comm);
   bcgs.setTimer(timer);
-  CHECK(bcgs.getTimer() == timer);
+  CHECK_EQ(bcgs.getTimer(), timer);
 }
 TEST_CASE("BiCGStab clone")
 {
@@ -84,9 +84,9 @@ TEST_CASE("BiCGStab clone")
       bcgs.setTimer(timer);
 
       unique_ptr<BiCGStab<2>> clone(bcgs.clone());
-      CHECK(bcgs.getTimer() == clone->getTimer());
-      CHECK(bcgs.getMaxIterations() == clone->getMaxIterations());
-      CHECK(bcgs.getTolerance() == clone->getTolerance());
+      CHECK_EQ(bcgs.getTimer(), clone->getTimer());
+      CHECK_EQ(bcgs.getMaxIterations(), clone->getMaxIterations());
+      CHECK_EQ(bcgs.getTolerance(), clone->getTolerance());
     }
   }
 }
@@ -127,7 +127,7 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance")
 
     p_operator.apply(g_vec, residual);
     residual.addScaled(-1, f_vec);
-    CHECK(residual.dot(residual) / f_vec.dot(f_vec) <= tolerance);
+    CHECK_LE(residual.dot(residual) / f_vec.dot(f_vec), tolerance);
   }
 }
 TEST_CASE("BiCGStab handles zero rhs vector")
@@ -151,7 +151,7 @@ TEST_CASE("BiCGStab handles zero rhs vector")
     solver.setTolerance(tolerance);
     solver.solve(p_operator, g_vec, f_vec);
 
-    CHECK(g_vec.infNorm() == 0);
+    CHECK_EQ(g_vec.infNorm(), 0);
   }
 }
 TEST_CASE("outputs iteration count and residual to output")
@@ -199,7 +199,7 @@ TEST_CASE("outputs iteration count and residual to output")
   while (prev_iteration < 5) {
     int iteration;
     ss >> iteration >> resid;
-    CHECK(iteration == prev_iteration + 1);
+    CHECK_EQ(iteration, prev_iteration + 1);
     prev_iteration = iteration;
   }
 }
@@ -241,7 +241,7 @@ TEST_CASE("giving a good initial guess reduces the iterations")
 
   int iterations_with_solved_guess = solver.solve(p_operator, g_vec, f_vec);
 
-  CHECK(iterations_with_solved_guess == 0);
+  CHECK_EQ(iterations_with_solved_guess, 0);
 }
 namespace {
 class MockOperator : public Operator<2>
@@ -291,6 +291,6 @@ TEST_CASE("BiCGStab solves poisson 2I problem")
 
     op.apply(g_vec, residual);
     residual.addScaled(-1, f_vec);
-    CHECK(residual.dot(residual) / f_vec.dot(f_vec) <= tolerance);
+    CHECK_LE(residual.dot(residual) / f_vec.dot(f_vec), tolerance);
   }
 }

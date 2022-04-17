@@ -63,13 +63,13 @@ TEST_CASE("P8estDomainGenerator 4x4x4 hasCoarserDomain")
 
   P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
 
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_2 = dg.getFinestDomain();
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_1 = dg.getCoarserDomain();
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_0 = dg.getCoarserDomain();
-  CHECK_FALSE(dg.hasCoarserDomain());
+  CHECK_UNARY_FALSE(dg.hasCoarserDomain());
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 Uniform Number of Patches")
 {
@@ -81,9 +81,9 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform Number of Patches")
   Domain<3> domain_1 = dg.getCoarserDomain();
   Domain<3> domain_0 = dg.getCoarserDomain();
 
-  CHECK(domain_2.getNumGlobalPatches() == 64);
-  CHECK(domain_1.getNumGlobalPatches() == 8);
-  CHECK(domain_0.getNumGlobalPatches() == 1);
+  CHECK_EQ(domain_2.getNumGlobalPatches(), 64);
+  CHECK_EQ(domain_1.getNumGlobalPatches(), 8);
+  CHECK_EQ(domain_0.getNumGlobalPatches(), 1);
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 RefineLevel")
 {
@@ -96,15 +96,15 @@ TEST_CASE("P8estDomainGenerator 4x4x4 RefineLevel")
   Domain<3> domain_0 = dg.getCoarserDomain();
 
   for (auto patch : domain_2.getPatchInfoVector()) {
-    CHECK(patch.refine_level == 2);
+    CHECK_EQ(patch.refine_level, 2);
   }
 
   for (auto patch : domain_1.getPatchInfoVector()) {
-    CHECK(patch.refine_level == 1);
+    CHECK_EQ(patch.refine_level, 1);
   }
 
   for (auto patch : domain_0.getPatchInfoVector()) {
-    CHECK(patch.refine_level == 0);
+    CHECK_EQ(patch.refine_level, 0);
   }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 rank")
@@ -118,15 +118,15 @@ TEST_CASE("P8estDomainGenerator 4x4x4 rank")
   Domain<3> domain_0 = dg.getCoarserDomain();
 
   for (auto patch : domain_2.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 
   for (auto patch : domain_1.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 
   for (auto patch : domain_0.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 spacings")
@@ -152,21 +152,21 @@ TEST_CASE("P8estDomainGenerator 4x4x4 spacings")
               Domain<3> domain_0 = dg.getCoarserDomain();
 
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.25 / nz));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.25 / nz));
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
-                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.5 / nz));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.5 / nz));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
-                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 1.0 / nz));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 1.0 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 1.0 / ny));
+                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 1.0 / nz));
               }
             }
           }
@@ -189,21 +189,21 @@ TEST_CASE("P8estDomainGenerator 4x4x4 ns")
         Domain<3> domain_0 = dg.getCoarserDomain();
 
         for (auto patch : domain_2.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
 
         for (auto patch : domain_1.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
 
         for (auto patch : domain_0.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
       }
     }
@@ -221,15 +221,15 @@ TEST_CASE("P8estDomainGenerator 4x4x4 num_ghost_cells")
     Domain<3> domain_0 = dg.getCoarserDomain();
 
     for (auto patch : domain_2.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
 
     for (auto patch : domain_1.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
 
     for (auto patch : domain_0.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
   }
 }
@@ -312,15 +312,15 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw hasCoarserDomain")
 
   P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
 
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_3 = dg.getFinestDomain();
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_2 = dg.getCoarserDomain();
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_1 = dg.getCoarserDomain();
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_0 = dg.getCoarserDomain();
-  CHECK_FALSE(dg.hasCoarserDomain());
+  CHECK_UNARY_FALSE(dg.hasCoarserDomain());
 }
 TEST_CASE("P8estDomainGenerator 4x4x4rbsw Uniform Number of Patches")
 {
@@ -333,10 +333,10 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw Uniform Number of Patches")
   Domain<3> domain_1 = dg.getCoarserDomain();
   Domain<3> domain_0 = dg.getCoarserDomain();
 
-  CHECK(domain_3.getNumGlobalPatches() == 71);
-  CHECK(domain_2.getNumGlobalPatches() == 64);
-  CHECK(domain_1.getNumGlobalPatches() == 8);
-  CHECK(domain_0.getNumGlobalPatches() == 1);
+  CHECK_EQ(domain_3.getNumGlobalPatches(), 71);
+  CHECK_EQ(domain_2.getNumGlobalPatches(), 64);
+  CHECK_EQ(domain_1.getNumGlobalPatches(), 8);
+  CHECK_EQ(domain_0.getNumGlobalPatches(), 1);
 }
 TEST_CASE("P8estDomainGenerator 4x4x4rbsw RefineLevel")
 {
@@ -351,22 +351,22 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw RefineLevel")
 
   for (auto patch : domain_3.getPatchInfoVector()) {
     if (patch.starts[0] < 0.24 && patch.starts[1] < 0.24 && patch.starts[2] < 0.24) {
-      CHECK(patch.refine_level == 3);
+      CHECK_EQ(patch.refine_level, 3);
     } else {
-      CHECK(patch.refine_level == 2);
+      CHECK_EQ(patch.refine_level, 2);
     }
   }
 
   for (auto patch : domain_2.getPatchInfoVector()) {
-    CHECK(patch.refine_level == 2);
+    CHECK_EQ(patch.refine_level, 2);
   }
 
   for (auto patch : domain_1.getPatchInfoVector()) {
-    CHECK(patch.refine_level == 1);
+    CHECK_EQ(patch.refine_level, 1);
   }
 
   for (auto patch : domain_0.getPatchInfoVector()) {
-    CHECK(patch.refine_level == 0);
+    CHECK_EQ(patch.refine_level, 0);
   }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4rbsw rank")
@@ -381,19 +381,19 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw rank")
   Domain<3> domain_0 = dg.getCoarserDomain();
 
   for (auto patch : domain_3.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 
   for (auto patch : domain_2.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 
   for (auto patch : domain_1.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 
   for (auto patch : domain_0.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4rbsw spacings")
@@ -421,32 +421,32 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw spacings")
 
               for (auto patch : domain_3.getPatchInfoVector()) {
                 if (patch.starts[0] < 0.24 * scale_x && patch.starts[1] < 0.24 * scale_y && patch.starts[2] < 0.24 * scale_z) {
-                  CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
-                  CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
-                  CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.125 / nz));
+                  CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.125 / nx));
+                  CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.125 / ny));
+                  CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.125 / nz));
                 } else {
-                  CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                  CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                  CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.25 / nz));
+                  CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                  CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                  CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.25 / nz));
                 }
               }
 
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.25 / nz));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.25 / nz));
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
-                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.5 / nz));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.5 / nz));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
-                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 1.0 / nz));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 1.0 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 1.0 / ny));
+                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 1.0 / nz));
               }
             }
           }
@@ -470,27 +470,27 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw ns")
         Domain<3> domain_0 = dg.getCoarserDomain();
 
         for (auto patch : domain_3.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
 
         for (auto patch : domain_2.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
 
         for (auto patch : domain_1.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
 
         for (auto patch : domain_0.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
       }
     }
@@ -509,19 +509,19 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw num_ghost_cells")
     Domain<3> domain_0 = dg.getCoarserDomain();
 
     for (auto patch : domain_3.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
 
     for (auto patch : domain_2.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
 
     for (auto patch : domain_1.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
 
     for (auto patch : domain_0.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
   }
 }
@@ -608,13 +608,13 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform hasCoarserDomain")
 
   P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
 
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_2 = dg.getFinestDomain();
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_1 = dg.getCoarserDomain();
-  CHECK(dg.hasCoarserDomain());
+  CHECK_UNARY(dg.hasCoarserDomain());
   Domain<3> domain_0 = dg.getCoarserDomain();
-  CHECK_FALSE(dg.hasCoarserDomain());
+  CHECK_UNARY_FALSE(dg.hasCoarserDomain());
 }
 TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform Number of Patches")
 {
@@ -626,9 +626,9 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw Uniform Number of Patches")
   Domain<3> domain_1 = dg.getCoarserDomain();
   Domain<3> domain_0 = dg.getCoarserDomain();
 
-  CHECK(domain_2.getNumGlobalPatches() == 15);
-  CHECK(domain_1.getNumGlobalPatches() == 8);
-  CHECK(domain_0.getNumGlobalPatches() == 1);
+  CHECK_EQ(domain_2.getNumGlobalPatches(), 15);
+  CHECK_EQ(domain_1.getNumGlobalPatches(), 8);
+  CHECK_EQ(domain_0.getNumGlobalPatches(), 1);
 }
 TEST_CASE("P8estDomainGenerator 2x2x2rbsw RefineLevel")
 {
@@ -642,18 +642,18 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw RefineLevel")
 
   for (auto patch : domain_2.getPatchInfoVector()) {
     if (patch.starts[0] < 0.5 && patch.starts[1] < 0.5 && patch.starts[2] < 0.5) {
-      CHECK(patch.refine_level == 2);
+      CHECK_EQ(patch.refine_level, 2);
     } else {
-      CHECK(patch.refine_level == 1);
+      CHECK_EQ(patch.refine_level, 1);
     }
   }
 
   for (auto patch : domain_1.getPatchInfoVector()) {
-    CHECK(patch.refine_level == 1);
+    CHECK_EQ(patch.refine_level, 1);
   }
 
   for (auto patch : domain_0.getPatchInfoVector()) {
-    CHECK(patch.refine_level == 0);
+    CHECK_EQ(patch.refine_level, 0);
   }
 }
 TEST_CASE("P8estDomainGenerator 2x2x2rbsw rank")
@@ -667,15 +667,15 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw rank")
   Domain<3> domain_0 = dg.getCoarserDomain();
 
   for (auto patch : domain_2.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 
   for (auto patch : domain_1.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 
   for (auto patch : domain_0.getPatchInfoVector()) {
-    CHECK(patch.rank == tree.rank);
+    CHECK_EQ(patch.rank, tree.rank);
   }
 }
 TEST_CASE("P8estDomainGenerator 2x2x2rbsw spacings")
@@ -702,26 +702,26 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw spacings")
 
               for (auto patch : domain_2.getPatchInfoVector()) {
                 if (patch.starts[0] < 0.5 * scale_x && patch.starts[1] < 0.5 * scale_y && patch.starts[2] < 0.5 * scale_z) {
-                  CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                  CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                  CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.25 / nz));
+                  CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                  CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                  CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.25 / nz));
                 } else {
-                  CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                  CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
-                  CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.5 / nz));
+                  CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                  CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.5 / ny));
+                  CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.5 / nz));
                 }
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
-                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.5 / nz));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.5 / nz));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
-                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 1.0 / nz));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 1.0 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 1.0 / ny));
+                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 1.0 / nz));
               }
             }
           }
@@ -744,21 +744,21 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw ns")
         Domain<3> domain_0 = dg.getCoarserDomain();
 
         for (auto patch : domain_2.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
 
         for (auto patch : domain_1.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
 
         for (auto patch : domain_0.getPatchInfoVector()) {
-          CHECK(patch.ns[0] == nx);
-          CHECK(patch.ns[1] == ny);
-          CHECK(patch.ns[2] == nz);
+          CHECK_EQ(patch.ns[0], nx);
+          CHECK_EQ(patch.ns[1], ny);
+          CHECK_EQ(patch.ns[2], nz);
         }
       }
     }
@@ -776,15 +776,15 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw num_ghost_cells")
     Domain<3> domain_0 = dg.getCoarserDomain();
 
     for (auto patch : domain_2.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
 
     for (auto patch : domain_1.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
 
     for (auto patch : domain_0.getPatchInfoVector()) {
-      CHECK(patch.num_ghost_cells == num_ghost_cells);
+      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
     }
   }
 }

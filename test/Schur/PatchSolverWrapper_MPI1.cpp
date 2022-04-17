@@ -67,7 +67,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply fills ghost in rhs as expected")
         // checking will be done in the solver
         Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
         psw.apply(x, b);
-        CHECK(solver.wasCalled());
+        CHECK_UNARY(solver.wasCalled());
       }
     }
   }
@@ -93,11 +93,11 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 
           Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
           psw.apply(x, b);
-          CHECK(solver.allPatchesCalled());
-          CHECK(ghost_filler.wasCalled());
+          CHECK_UNARY(solver.allPatchesCalled());
+          CHECK_UNARY(ghost_filler.wasCalled());
           for (int i = 0; i < b.getNumLocalPatches(); i++) {
             auto local_data = b.getComponentView(0, i);
-            Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == doctest::Approx(schur_fill_value - domain_fill_value)); });
+            Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK_EQ(local_data[coord], doctest::Approx(schur_fill_value - domain_fill_value)); });
           }
         }
       }
@@ -127,11 +127,11 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
 
           Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
           psw.apply(x, b);
-          CHECK(solver.allPatchesCalled());
-          CHECK(ghost_filler.wasCalled());
+          CHECK_UNARY(solver.allPatchesCalled());
+          CHECK_UNARY(ghost_filler.wasCalled());
           for (int i = 0; i < b.getNumLocalPatches(); i++) {
             auto local_data = b.getComponentView(0, i);
-            Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == doctest::Approx(schur_fill_value - domain_fill_value)); });
+            Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK_EQ(local_data[coord], doctest::Approx(schur_fill_value - domain_fill_value)); });
           }
         }
       }
@@ -159,7 +159,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in 
         // checking will be done in the solver
         Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
         psw.getSchurRHSFromDomainRHS(domain_b, schur_b);
-        CHECK(solver.wasCalled());
+        CHECK_UNARY(solver.wasCalled());
       }
     }
   }
@@ -182,11 +182,11 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS gives expected 
 
         Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
         psw.getSchurRHSFromDomainRHS(domain_b, schur_b);
-        CHECK(solver.allPatchesCalled());
-        CHECK(ghost_filler.wasCalled());
+        CHECK_UNARY(solver.allPatchesCalled());
+        CHECK_UNARY(ghost_filler.wasCalled());
         for (int i = 0; i < schur_b.getNumLocalPatches(); i++) {
           auto local_data = schur_b.getComponentView(0, i);
-          Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == doctest::Approx(domain_fill_value)); });
+          Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK_EQ(local_data[coord], doctest::Approx(domain_fill_value)); });
         }
       }
     }
@@ -213,11 +213,11 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS gives expected 
 
         Schur::PatchSolverWrapper<2> psw(iface_domain, solver);
         psw.getSchurRHSFromDomainRHS(domain_b, schur_b);
-        CHECK(solver.allPatchesCalled());
-        CHECK(ghost_filler.wasCalled());
+        CHECK_UNARY(solver.allPatchesCalled());
+        CHECK_UNARY(ghost_filler.wasCalled());
         for (int i = 0; i < schur_b.getNumLocalPatches(); i++) {
           auto local_data = schur_b.getComponentView(0, i);
-          Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == doctest::Approx(domain_fill_value)); });
+          Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK_EQ(local_data[coord], doctest::Approx(domain_fill_value)); });
         }
       }
     }

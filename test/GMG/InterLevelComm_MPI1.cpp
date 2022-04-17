@@ -55,38 +55,38 @@ TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4")
           *ilc = ilc_other;
         }
 
-        CHECK(ilc->getPatchesWithGhostParent().size() == 0);
-        CHECK(ilc->getPatchesWithLocalParent().size() == 16);
+        CHECK_EQ(ilc->getPatchesWithGhostParent().size(), 0);
+        CHECK_EQ(ilc->getPatchesWithLocalParent().size(), 16);
 
         map<int, set<int>> parents_to_children;
         for (auto pair : ilc->getPatchesWithLocalParent()) {
           parents_to_children[pair.first].insert(pair.second.get().id);
         }
-        CHECK(parents_to_children.size() == 4);
-        CHECK(parents_to_children.count(0) == 1);
-        CHECK(parents_to_children.count(1) == 1);
-        CHECK(parents_to_children.count(2) == 1);
-        CHECK(parents_to_children.count(3) == 1);
+        CHECK_EQ(parents_to_children.size(), 4);
+        CHECK_EQ(parents_to_children.count(0), 1);
+        CHECK_EQ(parents_to_children.count(1), 1);
+        CHECK_EQ(parents_to_children.count(2), 1);
+        CHECK_EQ(parents_to_children.count(3), 1);
 
-        CHECK(parents_to_children[0].count(13) == 1);
-        CHECK(parents_to_children[0].count(14) == 1);
-        CHECK(parents_to_children[0].count(15) == 1);
-        CHECK(parents_to_children[0].count(16) == 1);
+        CHECK_EQ(parents_to_children[0].count(13), 1);
+        CHECK_EQ(parents_to_children[0].count(14), 1);
+        CHECK_EQ(parents_to_children[0].count(15), 1);
+        CHECK_EQ(parents_to_children[0].count(16), 1);
 
-        CHECK(parents_to_children[1].count(17) == 1);
-        CHECK(parents_to_children[1].count(18) == 1);
-        CHECK(parents_to_children[1].count(19) == 1);
-        CHECK(parents_to_children[1].count(20) == 1);
+        CHECK_EQ(parents_to_children[1].count(17), 1);
+        CHECK_EQ(parents_to_children[1].count(18), 1);
+        CHECK_EQ(parents_to_children[1].count(19), 1);
+        CHECK_EQ(parents_to_children[1].count(20), 1);
 
-        CHECK(parents_to_children[2].count(5) == 1);
-        CHECK(parents_to_children[2].count(6) == 1);
-        CHECK(parents_to_children[2].count(7) == 1);
-        CHECK(parents_to_children[2].count(8) == 1);
+        CHECK_EQ(parents_to_children[2].count(5), 1);
+        CHECK_EQ(parents_to_children[2].count(6), 1);
+        CHECK_EQ(parents_to_children[2].count(7), 1);
+        CHECK_EQ(parents_to_children[2].count(8), 1);
 
-        CHECK(parents_to_children[3].count(9) == 1);
-        CHECK(parents_to_children[3].count(10) == 1);
-        CHECK(parents_to_children[3].count(11) == 1);
-        CHECK(parents_to_children[3].count(12) == 1);
+        CHECK_EQ(parents_to_children[3].count(9), 1);
+        CHECK_EQ(parents_to_children[3].count(10), 1);
+        CHECK_EQ(parents_to_children[3].count(11), 1);
+        CHECK_EQ(parents_to_children[3].count(12), 1);
         delete ilc;
       }
     }
@@ -120,8 +120,8 @@ TEST_CASE("InterLevelComm 1-processor getNewGhostVector on uniform 4x4")
 
           Vector<2> ghost_vec = ilc->getNewGhostVector(num_components);
 
-          CHECK(ghost_vec.getNumLocalPatches() == 0);
-          CHECK(ghost_vec.getNumComponents() == num_components);
+          CHECK_EQ(ghost_vec.getNumLocalPatches(), 0);
+          CHECK_EQ(ghost_vec.getNumComponents(), num_components);
           delete ilc;
         }
       }
@@ -182,7 +182,7 @@ TEST_CASE("InterLevelComm 1-processor sendGhostPatches on uniform 4x4")
           for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
             PatchView<double, 2> vec_view = coarse_vec.getPatchView(i);
             PatchView<double, 2> expected_view = coarse_expected.getPatchView(i);
-            Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE(vec_view[coord] == doctest::Approx(expected_view[coord])); });
+            Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_view[coord], doctest::Approx(expected_view[coord])); });
           }
           delete ilc;
         }

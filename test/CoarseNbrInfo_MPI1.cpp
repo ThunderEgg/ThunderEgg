@@ -36,7 +36,7 @@ TEST_CASE("CoarseNbrInfo Serialization/Deserialization")
   CoarseNbrInfo<2> out;
   out.deserialize(buff);
   delete[] buff;
-  REQUIRE(out.id == 5);
-  REQUIRE(out.rank == 1);
-  REQUIRE(out.orth_on_coarse == Orthant<2>::nw());
+  REQUIRE_EQ(out.id, 5);
+  REQUIRE_EQ(out.rank, 1);
+  REQUIRE_EQ(out.orth_on_coarse, Orthant<2>::nw());
 }

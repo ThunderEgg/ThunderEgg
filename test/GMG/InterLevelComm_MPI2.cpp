@@ -73,8 +73,8 @@ TEST_CASE("InterLevelComm Check number of local and ghost parents")
               num_ghost_parents++;
             }
           }
-          CHECK(ilc->getPatchesWithGhostParent().size() == num_ghost_parents);
-          CHECK(ilc->getPatchesWithLocalParent().size() == num_local_parents);
+          CHECK_EQ(ilc->getPatchesWithGhostParent().size(), num_ghost_parents);
+          CHECK_EQ(ilc->getPatchesWithLocalParent().size(), num_local_parents);
           delete ilc;
         }
       }
@@ -119,14 +119,14 @@ TEST_CASE("InterLevelComm Check that parents have unique local indexes")
             local_index_id_map[pair.first].insert(pair.second.get().parent_id);
           }
           for (auto pair : local_index_id_map) {
-            CHECK(pair.second.size() == 1);
+            CHECK_EQ(pair.second.size(), 1);
           }
           map<int, set<int>> ghost_local_index_id_map;
           for (auto pair : ilc->getPatchesWithGhostParent()) {
             ghost_local_index_id_map[pair.first].insert(pair.second.get().parent_id);
           }
           for (auto pair : ghost_local_index_id_map) {
-            CHECK(pair.second.size() == 1);
+            CHECK_EQ(pair.second.size(), 1);
           }
           delete ilc;
         }
@@ -168,10 +168,10 @@ TEST_CASE("InterLevelComm Check that getPatches points to correct patches")
           INFO("RANK " << rank);
 
           for (auto pair : ilc->getPatchesWithLocalParent()) {
-            CHECK(&pair.second.get() == &ilc->getFinerDomain().getPatchInfoVector().at(pair.second.get().local_index));
+            CHECK_EQ(&pair.second.get(), &ilc->getFinerDomain().getPatchInfoVector().at(pair.second.get().local_index));
           }
           for (auto pair : ilc->getPatchesWithGhostParent()) {
-            CHECK(&pair.second.get() == &ilc->getFinerDomain().getPatchInfoVector().at(pair.second.get().local_index));
+            CHECK_EQ(&pair.second.get(), &ilc->getFinerDomain().getPatchInfoVector().at(pair.second.get().local_index));
           }
           delete ilc;
         }
@@ -208,13 +208,13 @@ TEST_CASE("InterLevelComm 2-processor getNewGhostVector on uniform quad")
 
             Vector<2> ghost_vec = ilc->getNewGhostVector(num_components);
 
-            CHECK(ghost_vec.getNumComponents() == num_components);
+            CHECK_EQ(ghost_vec.getNumComponents(), num_components);
             int rank;
             MPI_Comm_rank(MPI_COMM_WORLD, &rank);
             if (rank == 0) {
-              CHECK(ghost_vec.getNumLocalPatches() == 0);
+              CHECK_EQ(ghost_vec.getNumLocalPatches(), 0);
             } else {
-              CHECK(ghost_vec.getNumLocalPatches() == 1);
+              CHECK_EQ(ghost_vec.getNumLocalPatches(), 1);
             }
             delete ilc;
           }
@@ -277,7 +277,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches on uniform quad")
             if (rank == 0) {
               // the coarse vec should be filled with 3+2*c
               PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
-              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK(local_view[coord] == 3 + 2 * coord[2]); });
+              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK_EQ(local_view[coord], 3 + 2 * coord[2]); });
             } else {
             }
             delete ilc;
@@ -618,7 +618,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches on uniform quad")
             } else {
               // the coarse vec should be filled with 1+c
               PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
-              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK(local_view[coord] == 1 + coord[2]); });
+              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK_EQ(local_view[coord], 1 + coord[2]); });
             }
             delete ilc;
           }
@@ -1116,7 +1116,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches called twice on uniform qu
               } else {
                 // the coarse vec should be filled with 1+c
                 PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
-                Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK(local_view[coord] == 1 + coord[2]); });
+                Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK_EQ(local_view[coord], 1 + coord[2]); });
               }
             }
             delete ilc;
@@ -1176,7 +1176,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches called twice on uniform q
               if (rank == 0) {
                 // the coarse vec should be filled with 3+2*c
                 PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
-                Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK(local_view[coord] == 3 + 2 * coord[2]); });
+                Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK_EQ(local_view[coord], 3 + 2 * coord[2]); });
               } else {
               }
             }
@@ -1235,7 +1235,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches then getGhostPaches calle
             if (rank == 0) {
               // the coarse vec should be filled with 3+2*c
               PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
-              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK(local_view[coord] == 3 + 2 * coord[2]); });
+              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK_EQ(local_view[coord], 3 + 2 * coord[2]); });
             } else {
             }
 
@@ -1255,7 +1255,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches then getGhostPaches calle
             } else {
               // the coarse vec should be filled with 1+c
               PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
-              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK(local_view[coord] == 1 + coord[2]); });
+              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK_EQ(local_view[coord], 1 + coord[2]); });
             }
             delete ilc;
           }
@@ -1313,7 +1313,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches then sendGhostPaches calle
             } else {
               // the coarse vec should be filled with 1+c
               PatchView<double, 2> local_view = ghost_vec.getPatchView(0);
-              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK(local_view[coord] == 1 + coord[2]); });
+              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK_EQ(local_view[coord], 1 + coord[2]); });
             }
 
             // fill vectors with rank+c+1
@@ -1331,7 +1331,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches then sendGhostPaches calle
             if (rank == 0) {
               // the coarse vec should be filled with 3+2*c
               PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
-              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK(local_view[coord] == 3 + 2 * coord[2]); });
+              Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) { CHECK_EQ(local_view[coord], 3 + 2 * coord[2]); });
             } else {
             }
             delete ilc;

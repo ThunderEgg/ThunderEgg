@@ -31,7 +31,7 @@ TEST_CASE("Vector<1> getNumGhostCells default constructor")
 
   Vector<1> vec;
 
-  CHECK(vec.getNumGhostCells() == 0);
+  CHECK_EQ(vec.getNumGhostCells(), 0);
 }
 TEST_CASE("Vector<1> getMPIComm default constructor")
 {
@@ -47,7 +47,7 @@ TEST_CASE("Vector<1> getNumLocalPatches default constructor")
 
   Vector<1> vec;
 
-  CHECK(vec.getNumLocalPatches() == 0);
+  CHECK_EQ(vec.getNumLocalPatches(), 0);
 }
 TEST_CASE("Vector<1> getNumComponents default constructor")
 {
@@ -55,7 +55,7 @@ TEST_CASE("Vector<1> getNumComponents default constructor")
 
   Vector<1> vec;
 
-  CHECK(vec.getNumComponents() == 0);
+  CHECK_EQ(vec.getNumComponents(), 0);
 }
 TEST_CASE("Vector<1> getNumLocalCells default constructor")
 {
@@ -63,7 +63,7 @@ TEST_CASE("Vector<1> getNumLocalCells default constructor")
 
   Vector<1> vec;
 
-  CHECK(vec.getNumLocalCells() == 0);
+  CHECK_EQ(vec.getNumLocalCells(), 0);
 }
 TEST_CASE("Vector<2> getNumGhostCells default constructor")
 {
@@ -71,7 +71,7 @@ TEST_CASE("Vector<2> getNumGhostCells default constructor")
 
   Vector<2> vec;
 
-  CHECK(vec.getNumGhostCells() == 0);
+  CHECK_EQ(vec.getNumGhostCells(), 0);
 }
 TEST_CASE("Vector<2> getMPIComm default constructor")
 {
@@ -83,25 +83,25 @@ TEST_CASE("Vector<2> getNumLocalPatches default constructor")
 {
   Vector<2> vec;
 
-  CHECK(vec.getNumLocalPatches() == 0);
+  CHECK_EQ(vec.getNumLocalPatches(), 0);
 }
 TEST_CASE("Vector<2> getNumComponents default constructor")
 {
   Vector<2> vec;
 
-  CHECK(vec.getNumComponents() == 0);
+  CHECK_EQ(vec.getNumComponents(), 0);
 }
 TEST_CASE("Vector<2> getNumLocalCells default constructor")
 {
   Vector<2> vec;
 
-  CHECK(vec.getNumLocalCells() == 0);
+  CHECK_EQ(vec.getNumLocalCells(), 0);
 }
 TEST_CASE("Vector<3> getNumGhostCells default constructor")
 {
   Vector<3> vec;
 
-  CHECK(vec.getNumGhostCells() == 0);
+  CHECK_EQ(vec.getNumGhostCells(), 0);
 }
 TEST_CASE("Vector<3> getMPIComm default constructor")
 {
@@ -113,19 +113,19 @@ TEST_CASE("Vector<3> getNumLocalPatches default constructor")
 {
   Vector<3> vec;
 
-  CHECK(vec.getNumLocalPatches() == 0);
+  CHECK_EQ(vec.getNumLocalPatches(), 0);
 }
 TEST_CASE("Vector<3> getNumComponents default constructor")
 {
   Vector<3> vec;
 
-  CHECK(vec.getNumComponents() == 0);
+  CHECK_EQ(vec.getNumComponents(), 0);
 }
 TEST_CASE("Vector<3> getNumLocalCells default constructor")
 {
   Vector<3> vec;
 
-  CHECK(vec.getNumLocalCells() == 0);
+  CHECK_EQ(vec.getNumLocalCells(), 0);
 }
 
 TEST_CASE("Vector<1> getComponentView.h default constructor")

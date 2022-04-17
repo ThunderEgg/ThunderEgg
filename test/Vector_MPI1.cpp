@@ -47,7 +47,7 @@ TEST_CASE("Vector<3> getMPIComm")
               INFO("num_local_patches: " << num_local_patches);
               INFO("num_components:    " << num_components);
 
-              // CHECK(vec.getMPIComm() == comm);
+              // CHECK_EQ(vec.getMPIComm(),comm);
             }
           }
         }
@@ -75,7 +75,7 @@ TEST_CASE("Vector<3> getNumComponents")
               INFO("num_local_patches: " << num_local_patches);
               INFO("num_components:    " << num_components);
 
-              CHECK(vec.getNumComponents() == num_components);
+              CHECK_EQ(vec.getNumComponents(), num_components);
             }
           }
         }
@@ -103,7 +103,7 @@ TEST_CASE("Vector<3> getNumLocalPatches")
               INFO("num_local_patches: " << num_local_patches);
               INFO("num_components:    " << num_components);
 
-              CHECK(vec.getNumLocalPatches() == num_local_patches);
+              CHECK_EQ(vec.getNumLocalPatches(), num_local_patches);
             }
           }
         }
@@ -131,7 +131,7 @@ TEST_CASE("Vector<3> getNumLocalCells")
               INFO("num_local_patches: " << num_local_patches);
               INFO("num_components:    " << num_components);
 
-              CHECK(vec.getNumLocalCells() == nx * ny * nz * num_local_patches);
+              CHECK_EQ(vec.getNumLocalCells(), nx * ny * nz * num_local_patches);
             }
           }
         }
@@ -163,7 +163,7 @@ TEST_CASE("Vector<3> getComponentViews")
                 auto lds = vec.getPatchView(i);
                 for (int c = 0; c < vec.getNumComponents(); c++) {
                   auto ld = vec.getComponentView(c, i);
-                  CHECK(&ld[{ 0, 0, 0 }] == &lds[{ 0, 0, 0, c }]);
+                  CHECK_EQ(&ld[{ 0, 0, 0 }], &lds[{ 0, 0, 0, c }]);
                 }
               }
             }
@@ -197,7 +197,7 @@ TEST_CASE("Vector<3> getComponentViews const")
                 auto lds = vec.getPatchView(i);
                 for (int c = 0; c < vec.getNumComponents(); c++) {
                   auto ld = vec.getComponentView(c, i);
-                  CHECK(&ld[{ 0, 0, 0 }] == &lds[{ 0, 0, 0, c }]);
+                  CHECK_EQ(&ld[{ 0, 0, 0 }], &lds[{ 0, 0, 0, c }]);
                 }
               }
             }
@@ -234,9 +234,9 @@ TEST_CASE("Vector<3> set")
                   auto ld = vec.getComponentView(c, i);
                   Loop::Nested<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3>& coord) {
                     if (isGhost(coord, ns, num_ghost_cells)) {
-                      CHECK(ld[coord] == 0);
+                      CHECK_EQ(ld[coord], 0);
                     } else {
-                      CHECK(ld[coord] == 28);
+                      CHECK_EQ(ld[coord], 28);
                     }
                   });
                 }
@@ -273,7 +273,7 @@ TEST_CASE("Vector<3> setWithGhost")
               for (int i = 0; i < vec.getNumLocalPatches(); i++) {
                 for (int c = 0; c < vec.getNumComponents(); c++) {
                   auto ld = vec.getComponentView(c, i);
-                  Loop::Nested<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3>& coord) { CHECK(ld[coord] == 28); });
+                  Loop::Nested<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3>& coord) { CHECK_EQ(ld[coord], 28); });
                 }
               }
             }
@@ -311,9 +311,9 @@ TEST_CASE("Vector<3> scale")
                   auto ld = vec.getComponentView(c, i);
                   Loop::Nested<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3>& coord) {
                     if (isGhost(coord, ns, num_ghost_cells)) {
-                      CHECK(ld[coord] == 28);
+                      CHECK_EQ(ld[coord], 28);
                     } else {
-                      CHECK(ld[coord] == doctest::Approx(7));
+                      CHECK_EQ(ld[coord], doctest::Approx(7));
                     }
                   });
                 }
@@ -353,9 +353,9 @@ TEST_CASE("Vector<3> shift")
                   auto ld = vec.getComponentView(c, i);
                   Loop::Nested<3>(ld.getGhostStart(), ld.getGhostEnd(), [&](std::array<int, 3>& coord) {
                     if (isGhost(coord, ns, num_ghost_cells)) {
-                      CHECK(ld[coord] == 1);
+                      CHECK_EQ(ld[coord], 1);
                     } else {
-                      CHECK(ld[coord] == doctest::Approx(29));
+                      CHECK_EQ(ld[coord], doctest::Approx(29));
                     }
                   });
                 }
@@ -403,9 +403,9 @@ TEST_CASE("Vector<3> copy")
                   auto b_ld = b.getComponentView(c, i);
                   Loop::Nested<3>(a_ld.getGhostStart(), a_ld.getGhostEnd(), [&](std::array<int, 3>& coord) {
                     if (isGhost(coord, ns, num_ghost_cells)) {
-                      CHECK(b_ld[coord] == 0);
+                      CHECK_EQ(b_ld[coord], 0);
                     } else {
-                      CHECK(b_ld[coord] == a_ld[coord]);
+                      CHECK_EQ(b_ld[coord], a_ld[coord]);
                     }
                   });
                 }
@@ -451,7 +451,7 @@ TEST_CASE("Vector<3> copyWithGhost")
                 for (int c = 0; c < a.getNumComponents(); c++) {
                   auto a_ld = a.getComponentView(c, i);
                   auto b_ld = b.getComponentView(c, i);
-                  Loop::Nested<3>(a_ld.getGhostStart(), a_ld.getGhostEnd(), [&](std::array<int, 3>& coord) { CHECK(b_ld[coord] == a_ld[coord]); });
+                  Loop::Nested<3>(a_ld.getGhostStart(), a_ld.getGhostEnd(), [&](std::array<int, 3>& coord) { CHECK_EQ(b_ld[coord], a_ld[coord]); });
                 }
               }
             }
@@ -513,9 +513,9 @@ TEST_CASE("Vector<3> add")
                   auto b_copy_ld = b_copy.getComponentView(c, i);
                   Loop::Nested<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3>& coord) {
                     if (isGhost(coord, ns, num_ghost_cells)) {
-                      CHECK(b_ld[coord] == b_copy_ld[coord]);
+                      CHECK_EQ(b_ld[coord], b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
+                      CHECK_EQ(b_ld[coord], doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -579,9 +579,9 @@ TEST_CASE("Vector<3> addScaled")
                   auto b_copy_ld = b_copy.getComponentView(c, i);
                   Loop::Nested<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3>& coord) {
                     if (isGhost(coord, ns, num_ghost_cells)) {
-                      CHECK(b_ld[coord] == b_copy_ld[coord]);
+                      CHECK_EQ(b_ld[coord], b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
+                      CHECK_EQ(b_ld[coord], doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -645,9 +645,9 @@ TEST_CASE("Vector<3> scaleThenAdd")
                   auto b_copy_ld = b_copy.getComponentView(c, i);
                   Loop::Nested<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3>& coord) {
                     if (isGhost(coord, ns, num_ghost_cells)) {
-                      CHECK(b_ld[coord] == b_copy_ld[coord]);
+                      CHECK_EQ(b_ld[coord], b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
+                      CHECK_EQ(b_ld[coord], doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -711,9 +711,9 @@ TEST_CASE("Vector<3> scaleThenAddScaled")
                   auto b_copy_ld = b_copy.getComponentView(c, i);
                   Loop::Nested<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3>& coord) {
                     if (isGhost(coord, ns, num_ghost_cells)) {
-                      CHECK(b_ld[coord] == b_copy_ld[coord]);
+                      CHECK_EQ(b_ld[coord], b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
+                      CHECK_EQ(b_ld[coord], doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -784,9 +784,9 @@ TEST_CASE("Vector<3> scaleThenAddScaled two vectors")
                   auto b_copy_ld = b_copy.getComponentView(c, i);
                   Loop::Nested<3>(b_ld.getGhostStart(), b_ld.getGhostEnd(), [&](std::array<int, 3>& coord) {
                     if (isGhost(coord, ns, num_ghost_cells)) {
-                      CHECK(b_ld[coord] == b_copy_ld[coord]);
+                      CHECK_EQ(b_ld[coord], b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
+                      CHECK_EQ(b_ld[coord], doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -836,7 +836,7 @@ TEST_CASE("Vector<3> twoNorm")
               }
               expected_norm = sqrt(expected_norm);
 
-              CHECK(vec.twoNorm() == doctest::Approx(expected_norm));
+              CHECK_EQ(vec.twoNorm(), doctest::Approx(expected_norm));
             }
           }
         }
@@ -881,7 +881,7 @@ TEST_CASE("Vector<3> infNorm")
                 }
               }
 
-              CHECK(vec.infNorm() == expected_norm);
+              CHECK_EQ(vec.infNorm(), expected_norm);
             }
           }
         }
@@ -932,7 +932,7 @@ TEST_CASE("Vector<3> dot")
                 }
               }
 
-              CHECK(a.dot(b) == doctest::Approx(expected_value));
+              CHECK_EQ(a.dot(b), doctest::Approx(expected_value));
             }
           }
         }

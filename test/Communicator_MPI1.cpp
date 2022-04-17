@@ -58,8 +58,8 @@ TEST_CASE("Comm Constructor getMPIComm")
   Communicator comm(world);
   int result;
   int err = MPI_Comm_compare(comm.getMPIComm(), world, &result);
-  REQUIRE(err == MPI_SUCCESS);
-  CHECK(result == MPI_CONGRUENT);
+  REQUIRE_EQ(err, MPI_SUCCESS);
+  CHECK_EQ(result, MPI_CONGRUENT);
 }
 TEST_CASE("Comm Constructor copy constructor")
 {
@@ -68,8 +68,8 @@ TEST_CASE("Comm Constructor copy constructor")
   Communicator comm_copy(comm);
   int result;
   int err = MPI_Comm_compare(comm.getMPIComm(), comm_copy.getMPIComm(), &result);
-  REQUIRE(err == MPI_SUCCESS);
-  CHECK(result == MPI_CONGRUENT);
+  REQUIRE_EQ(err, MPI_SUCCESS);
+  CHECK_EQ(result, MPI_CONGRUENT);
 }
 TEST_CASE("Comm Constructor copy assignment")
 {
@@ -79,8 +79,8 @@ TEST_CASE("Comm Constructor copy assignment")
   comm_copy = comm;
   int result;
   int err = MPI_Comm_compare(comm.getMPIComm(), comm_copy.getMPIComm(), &result);
-  REQUIRE(err == MPI_SUCCESS);
-  CHECK(result == MPI_CONGRUENT);
+  REQUIRE_EQ(err, MPI_SUCCESS);
+  CHECK_EQ(result, MPI_CONGRUENT);
 }
 TEST_CASE("Comm Constructor move constructor")
 {
@@ -89,8 +89,8 @@ TEST_CASE("Comm Constructor move constructor")
   Communicator moved_comm(std::move(comm));
   int result;
   int err = MPI_Comm_compare(world, moved_comm.getMPIComm(), &result);
-  REQUIRE(err == MPI_SUCCESS);
-  CHECK(result == MPI_CONGRUENT);
+  REQUIRE_EQ(err, MPI_SUCCESS);
+  CHECK_EQ(result, MPI_CONGRUENT);
   CHECK_THROWS_AS(comm.getMPIComm(), RuntimeError);
 }
 TEST_CASE("Comm Constructor move assignment")
@@ -101,17 +101,17 @@ TEST_CASE("Comm Constructor move assignment")
   moved_comm = std::move(comm);
   int result;
   int err = MPI_Comm_compare(world, moved_comm.getMPIComm(), &result);
-  REQUIRE(err == MPI_SUCCESS);
-  CHECK(result == MPI_CONGRUENT);
+  REQUIRE_EQ(err, MPI_SUCCESS);
+  CHECK_EQ(result, MPI_CONGRUENT);
   CHECK_THROWS_AS(comm.getMPIComm(), RuntimeError);
 }
 TEST_CASE("Comm Constructor getRank")
 {
   Communicator comm(MPI_COMM_WORLD);
-  CHECK(comm.getRank() == 0);
+  CHECK_EQ(comm.getRank(), 0);
 }
 TEST_CASE("Default Constructor getSize")
 {
   Communicator comm(MPI_COMM_WORLD);
-  CHECK(comm.getSize() == 1);
+  CHECK_EQ(comm.getSize(), 1);
 }

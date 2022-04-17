@@ -46,7 +46,7 @@ TEST_CASE("Vector<2> getNumGhostCells domain constructor")
 
             Vector<2> vec(domain, num_components);
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
           }
         }
       }
@@ -73,8 +73,8 @@ TEST_CASE("Vector<2> getMPIComm domain constructor")
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
           }
         }
       }
@@ -99,7 +99,7 @@ TEST_CASE("Vector<2> getNumLocalPatches domain constructor")
 
             Vector<2> vec(domain, num_components);
 
-            CHECK(vec.getNumLocalPatches() == domain.getNumLocalPatches());
+            CHECK_EQ(vec.getNumLocalPatches(), domain.getNumLocalPatches());
           }
         }
       }
@@ -124,7 +124,7 @@ TEST_CASE("Vector<2> getNumComponents domain constructor")
 
             Vector<2> vec(domain, num_components);
 
-            CHECK(vec.getNumComponents() == num_components);
+            CHECK_EQ(vec.getNumComponents(), num_components);
           }
         }
       }
@@ -149,7 +149,7 @@ TEST_CASE("Vector<2> getNumLocalCells domain constructor")
 
             Vector<2> vec(domain, num_components);
 
-            CHECK(vec.getNumLocalCells() == domain.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalCells(), domain.getNumLocalCells());
           }
         }
       }
@@ -182,8 +182,8 @@ TEST_CASE("Vector<2> getComponentView domain constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             if (ENABLE_DEBUG) {
@@ -224,8 +224,8 @@ TEST_CASE("Vector<2> getComponentView const domain constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             if (ENABLE_DEBUG) {
@@ -264,8 +264,8 @@ TEST_CASE("Vector<2> getPatchView domain constructor")
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               INFO("i:                 " << i);
               PatchView<double, 2> ld = vec.getPatchView(i);
-              CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
-              CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+              CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
+              CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
             }
             if (ENABLE_DEBUG) {
               CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
@@ -301,8 +301,8 @@ TEST_CASE("Vector<2> getPatchView const domain constructor")
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               INFO("i:                 " << i);
               PatchView<const double, 2> ld = vec.getPatchView(i);
-              CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
-              CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+              CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
+              CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
             }
             if (ENABLE_DEBUG) {
               CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);

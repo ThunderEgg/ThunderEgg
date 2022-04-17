@@ -27,11 +27,11 @@ TEST_CASE("View default constructor")
   View<double, 2> v;
 
   for (int i = 0; i < 2; i++) {
-    CHECK(v.getStrides()[i] == 0);
-    CHECK(v.getStart()[i] == 0);
-    CHECK(v.getEnd()[i] == -1);
-    CHECK(v.getGhostStart()[i] == 0);
-    CHECK(v.getGhostEnd()[i] == -1);
+    CHECK_EQ(v.getStrides()[i], 0);
+    CHECK_EQ(v.getStart()[i], 0);
+    CHECK_EQ(v.getEnd()[i], -1);
+    CHECK_EQ(v.getGhostStart()[i], 0);
+    CHECK_EQ(v.getGhostEnd()[i], -1);
   }
   if constexpr (ENABLE_DEBUG) {
     CHECK_THROWS_AS((v[{ 0, 0 }]), RuntimeError);
@@ -55,17 +55,17 @@ TEST_CASE("View constructor")
 
                       View<double, 2> v(&data, { x_stride, y_stride }, { x_ghost_start, y_ghost_start }, { x_start, y_start }, { x_end, y_end }, { x_ghost_end, y_ghost_end });
 
-                      CHECK(v.getStrides()[0] == x_stride);
-                      CHECK(v.getStrides()[1] == y_stride);
-                      CHECK(v.getGhostStart()[0] == x_ghost_start);
-                      CHECK(v.getGhostStart()[1] == y_ghost_start);
-                      CHECK(v.getStart()[0] == x_start);
-                      CHECK(v.getStart()[1] == y_start);
-                      CHECK(v.getEnd()[0] == x_end);
-                      CHECK(v.getEnd()[1] == y_end);
-                      CHECK(v.getGhostEnd()[0] == x_ghost_end);
-                      CHECK(v.getGhostEnd()[1] == y_ghost_end);
-                      CHECK(&v[v.getGhostStart()] == &data);
+                      CHECK_EQ(v.getStrides()[0], x_stride);
+                      CHECK_EQ(v.getStrides()[1], y_stride);
+                      CHECK_EQ(v.getGhostStart()[0], x_ghost_start);
+                      CHECK_EQ(v.getGhostStart()[1], y_ghost_start);
+                      CHECK_EQ(v.getStart()[0], x_start);
+                      CHECK_EQ(v.getStart()[1], y_start);
+                      CHECK_EQ(v.getEnd()[0], x_end);
+                      CHECK_EQ(v.getEnd()[1], y_end);
+                      CHECK_EQ(v.getGhostEnd()[0], x_ghost_end);
+                      CHECK_EQ(v.getGhostEnd()[1], y_ghost_end);
+                      CHECK_EQ(&v[v.getGhostStart()], &data);
                     }
                   }
                 }
@@ -106,7 +106,7 @@ TEST_CASE("View squarebracket operator")
                               CHECK_THROWS_AS((v[{ xi, yi }]), RuntimeError);
                             }
                           } else {
-                            CHECK(&v[{ xi, yi }] == origin + xi * x_stride + yi * y_stride);
+                            CHECK_EQ(&v[{ xi, yi }], origin + xi * x_stride + yi * y_stride);
                           }
                         }
                       }
@@ -150,7 +150,7 @@ TEST_CASE("View parens operator")
                               CHECK_THROWS_AS((v(xi, yi)), RuntimeError);
                             }
                           } else {
-                            CHECK(&v(xi, yi) == origin + xi * x_stride + yi * y_stride);
+                            CHECK_EQ(&v(xi, yi), origin + xi * x_stride + yi * y_stride);
                           }
                         }
                       }
@@ -195,7 +195,7 @@ TEST_CASE("View set")
                             }
                           } else {
                             v.set({ xi, yi }, value);
-                            CHECK(v[{ xi, yi }] == value);
+                            CHECK_EQ(v[{ xi, yi }], value);
                           }
                           value++;
                         }
@@ -246,7 +246,7 @@ TEST_CASE("View set const")
                             }
                           } else {
                             v.set({ xi, yi }, value);
-                            CHECK(v[{ xi, yi }] == value);
+                            CHECK_EQ(v[{ xi, yi }], value);
                           }
                           value++;
                         }
@@ -283,12 +283,12 @@ TEST_CASE("View implicit conversion to const type")
                       View<double, 2> v(data, { x_stride, y_stride }, { x_ghost_start, y_ghost_start }, { x_start, y_start }, { x_end, y_end }, { x_ghost_end, y_ghost_end });
                       View<const double, 2> vc = v;
 
-                      CHECK(vc.getGhostStart() == v.getGhostStart());
-                      CHECK(vc.getStart() == v.getStart());
-                      CHECK(vc.getEnd() == v.getEnd());
-                      CHECK(vc.getGhostEnd() == v.getGhostEnd());
-                      CHECK(vc.getStrides() == v.getStrides());
-                      CHECK(&vc[vc.getGhostStart()] == &v[v.getGhostStart()]);
+                      CHECK_EQ(vc.getGhostStart(), v.getGhostStart());
+                      CHECK_EQ(vc.getStart(), v.getStart());
+                      CHECK_EQ(vc.getEnd(), v.getEnd());
+                      CHECK_EQ(vc.getGhostEnd(), v.getGhostEnd());
+                      CHECK_EQ(vc.getStrides(), v.getStrides());
+                      CHECK_EQ(&vc[vc.getGhostStart()], &v[v.getGhostStart()]);
                     }
                   }
                 }

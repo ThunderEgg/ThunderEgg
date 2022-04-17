@@ -184,7 +184,7 @@ TEST_CASE("Timer to_json empty timer")
   Timer timer(comm);
   nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j == nullptr);
+  REQUIRE_EQ(j, nullptr);
 }
 TEST_CASE("Timer to_json unassociated timing")
 {
@@ -194,17 +194,17 @@ TEST_CASE("Timer to_json unassociated timing")
   timer.stop("A");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
 }
 TEST_CASE("Timer to_json unassociated timing with single int info")
 {
@@ -215,24 +215,24 @@ TEST_CASE("Timer to_json unassociated timing with single int info")
   timer.stop("A");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 1);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10);
 }
 TEST_CASE("Timer to_json unassociated timing with two int info calls")
 {
@@ -244,24 +244,24 @@ TEST_CASE("Timer to_json unassociated timing with two int info calls")
   timer.stop("A");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 1);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 2);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 11);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 11);
 }
 TEST_CASE("Timer to_json unassociated timing with single double info")
 {
@@ -272,24 +272,24 @@ TEST_CASE("Timer to_json unassociated timing with single double info")
   timer.stop("A");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 1);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10.0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10.0);
 }
 TEST_CASE("Timer to_json unassociated timing with two double info calls")
 {
@@ -301,24 +301,24 @@ TEST_CASE("Timer to_json unassociated timing with two double info calls")
   timer.stop("A");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 1);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 1.0);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 2);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 11.0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 11.0);
 }
 TEST_CASE("Timer to_json unassociated timing with two different double info calls")
 {
@@ -330,29 +330,29 @@ TEST_CASE("Timer to_json unassociated timing with two different double info call
   timer.stop("A");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 2);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example1");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10.0);
-  CHECK(j["timings"][0]["infos"][1]["name"] == "Example2");
-  CHECK(j["timings"][0]["infos"][1]["min"] == 1.0);
-  CHECK(j["timings"][0]["infos"][1]["max"] == 1.0);
-  CHECK(j["timings"][0]["infos"][1]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["sum"] == 1.0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example1");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["name"], "Example2");
+  CHECK_EQ(j["timings"][0]["infos"][1]["min"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["max"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["sum"], 1.0);
 }
 TEST_CASE("Timer to_json unassociated timing with two different int info calls")
 {
@@ -364,29 +364,29 @@ TEST_CASE("Timer to_json unassociated timing with two different int info calls")
   timer.stop("A");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 2);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example1");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10);
-  CHECK(j["timings"][0]["infos"][1]["name"] == "Example2");
-  CHECK(j["timings"][0]["infos"][1]["min"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["max"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["sum"] == 1);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example1");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][1]["name"], "Example2");
+  CHECK_EQ(j["timings"][0]["infos"][1]["min"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["max"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["sum"], 1);
 }
 TEST_CASE("Timer to_json unassociated timing with two different int and double info calls")
 {
@@ -398,29 +398,29 @@ TEST_CASE("Timer to_json unassociated timing with two different int and double i
   timer.stop("A");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 2);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example1");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10);
-  CHECK(j["timings"][0]["infos"][1]["name"] == "Example2");
-  CHECK(j["timings"][0]["infos"][1]["min"] == 1.0);
-  CHECK(j["timings"][0]["infos"][1]["max"] == 1.0);
-  CHECK(j["timings"][0]["infos"][1]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["sum"] == 1.0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example1");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][1]["name"], "Example2");
+  CHECK_EQ(j["timings"][0]["infos"][1]["min"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["max"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["sum"], 1.0);
 }
 TEST_CASE("Timer to_json two unassociated timings sequential")
 {
@@ -432,23 +432,23 @@ TEST_CASE("Timer to_json two unassociated timings sequential")
   timer.stop("B");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 2);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"].is_number());
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][1]["rank"] == 0);
-  CHECK(j["timings"][1]["min"].is_number());
-  CHECK(j["timings"][1]["max"].is_number());
-  CHECK(j["timings"][1]["sum"].is_number());
-  CHECK(j["timings"][1]["num_calls"].is_number());
-  CHECK(j["timings"][1]["name"] == "B");
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 2);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_UNARY(j["timings"][0]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_EQ(j["timings"][1]["rank"], 0);
+  CHECK_UNARY(j["timings"][1]["min"].is_number());
+  CHECK_UNARY(j["timings"][1]["max"].is_number());
+  CHECK_UNARY(j["timings"][1]["sum"].is_number());
+  CHECK_UNARY(j["timings"][1]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][1]["name"], "B");
 }
 TEST_CASE("Timer to_json nested timing")
 {
@@ -460,19 +460,19 @@ TEST_CASE("Timer to_json nested timing")
   timer.stop("A");
   const nlohmann::json j = timer;
   INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"].is_number());
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["timings"].is_array());
-  CHECK(j["timings"][0]["timings"].size() == 1);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_UNARY(j["timings"][0]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["timings"].is_array());
+  CHECK_EQ(j["timings"][0]["timings"].size(), 1);
 }
 TEST_CASE("Timer to_json domain timing")
 {
@@ -482,22 +482,22 @@ TEST_CASE("Timer to_json domain timing")
   timer.startDomainTiming(0, "A");
   timer.stopDomainTiming(0, "A");
   const nlohmann::json j = timer;
-  REQUIRE(j != nullptr);
+  REQUIRE_NE(j, nullptr);
   INFO(j.dump(4));
-  CHECK(j.size() == 3);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["domains"].is_array());
-  CHECK(j["domains"].size() == 1);
-  CHECK(j["domains"][0].is_array());
-  CHECK(j["domains"][0].size() == 2);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"].is_number());
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["domain_id"] == 0);
+  CHECK_EQ(j.size(), 3);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["domains"].is_array());
+  CHECK_EQ(j["domains"].size(), 1);
+  CHECK_UNARY(j["domains"][0].is_array());
+  CHECK_EQ(j["domains"][0].size(), 2);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_UNARY(j["timings"][0]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_EQ(j["timings"][0]["domain_id"], 0);
 }
 TEST_CASE("Timer to_json patch timing")
 {
@@ -507,23 +507,23 @@ TEST_CASE("Timer to_json patch timing")
   timer.startPatchTiming(0, 0, "A");
   timer.stopPatchTiming(0, 0, "A");
   const nlohmann::json j = timer;
-  REQUIRE(j != nullptr);
+  REQUIRE_NE(j, nullptr);
   INFO(j.dump(4));
-  CHECK(j.size() == 3);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["domains"].is_array());
-  CHECK(j["domains"].size() == 1);
-  CHECK(j["domains"][0].is_array());
-  CHECK(j["domains"][0].size() == 2);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"].is_number());
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["domain_id"] == 0);
-  CHECK(j["timings"][0]["patch_id"] == 0);
+  CHECK_EQ(j.size(), 3);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["domains"].is_array());
+  CHECK_EQ(j["domains"].size(), 1);
+  CHECK_UNARY(j["domains"][0].is_array());
+  CHECK_EQ(j["domains"][0].size(), 2);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_UNARY(j["timings"][0]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_EQ(j["timings"][0]["domain_id"], 0);
+  CHECK_EQ(j["timings"][0]["patch_id"], 0);
 }
 TEST_CASE("Timer ostream empty timing")
 {
@@ -533,7 +533,7 @@ TEST_CASE("Timer ostream empty timing")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "No timings to report") == 1);
+  CHECK_EQ(occurrences(s, "No timings to report"), 1);
 }
 TEST_CASE("Timer ostream unassociated timing")
 {
@@ -545,12 +545,12 @@ TEST_CASE("Timer ostream unassociated timing")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec)") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
 }
 TEST_CASE("Timer ostream unassociated timing with single int info")
 {
@@ -563,16 +563,16 @@ TEST_CASE("Timer ostream unassociated timing with single int info")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec)") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
-  CHECK(occurrences(s, "Example") == 1);
-  CHECK(occurrences(s, "Example avg") == 0);
-  CHECK(occurrences(s, "Example min") == 0);
-  CHECK(occurrences(s, "Example max") == 0);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
+  CHECK_EQ(occurrences(s, "Example"), 1);
+  CHECK_EQ(occurrences(s, "Example avg"), 0);
+  CHECK_EQ(occurrences(s, "Example min"), 0);
+  CHECK_EQ(occurrences(s, "Example max"), 0);
 }
 TEST_CASE("Timer ostream unassociated timing with two int info")
 {
@@ -586,16 +586,16 @@ TEST_CASE("Timer ostream unassociated timing with two int info")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec)") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
-  CHECK(occurrences(s, "Example") == 3);
-  CHECK(occurrences(s, "Example avg") == 1);
-  CHECK(occurrences(s, "Example min") == 1);
-  CHECK(occurrences(s, "Example max") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
+  CHECK_EQ(occurrences(s, "Example"), 3);
+  CHECK_EQ(occurrences(s, "Example avg"), 1);
+  CHECK_EQ(occurrences(s, "Example min"), 1);
+  CHECK_EQ(occurrences(s, "Example max"), 1);
 }
 TEST_CASE("Timer ostream nested unassociated timing")
 {
@@ -609,13 +609,13 @@ TEST_CASE("Timer ostream nested unassociated timing")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 2);
-  CHECK(occurrences(s, "B") == 1);
-  CHECK(occurrences(s, "time (sec)") == 2);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec/") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
+  CHECK_EQ(occurrences(s, "A"), 2);
+  CHECK_EQ(occurrences(s, "B"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 2);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec/"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
 }
 TEST_CASE("Timer ostream sequential unassociated timing")
 {
@@ -629,12 +629,12 @@ TEST_CASE("Timer ostream sequential unassociated timing")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 1);
-  CHECK(occurrences(s, "min (sec)") == 1);
-  CHECK(occurrences(s, "max (sec)") == 1);
-  CHECK(occurrences(s, "average calls per rank") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 1);
+  CHECK_EQ(occurrences(s, "min (sec)"), 1);
+  CHECK_EQ(occurrences(s, "max (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 1);
 }
 TEST_CASE("Timer ostream sequential patch timing")
 {
@@ -649,12 +649,12 @@ TEST_CASE("Timer ostream sequential patch timing")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 1);
-  CHECK(occurrences(s, "min (sec)") == 1);
-  CHECK(occurrences(s, "max (sec)") == 1);
-  CHECK(occurrences(s, "average calls per rank") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 1);
+  CHECK_EQ(occurrences(s, "min (sec)"), 1);
+  CHECK_EQ(occurrences(s, "max (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 1);
 }
 TEST_CASE("Timer ostream domain timing")
 {
@@ -667,12 +667,12 @@ TEST_CASE("Timer ostream domain timing")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec)") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential")
 {
@@ -688,12 +688,12 @@ TEST_CASE("Timer ostream domain timing two different domains sequential")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 1);
-  CHECK(occurrences(s, "min (sec)") == 1);
-  CHECK(occurrences(s, "max (sec)") == 1);
-  CHECK(occurrences(s, "average calls per rank") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 1);
+  CHECK_EQ(occurrences(s, "min (sec)"), 1);
+  CHECK_EQ(occurrences(s, "max (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 1);
 }
 TEST_CASE("Timer ostream domain timing two different domains with information sequential")
 {
@@ -711,16 +711,16 @@ TEST_CASE("Timer ostream domain timing two different domains with information se
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 1);
-  CHECK(occurrences(s, "min (sec)") == 1);
-  CHECK(occurrences(s, "max (sec)") == 1);
-  CHECK(occurrences(s, "average calls per rank") == 1);
-  CHECK(occurrences(s, "Example") == 3);
-  CHECK(occurrences(s, "Example avg") == 1);
-  CHECK(occurrences(s, "Example min") == 1);
-  CHECK(occurrences(s, "Example max") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 1);
+  CHECK_EQ(occurrences(s, "min (sec)"), 1);
+  CHECK_EQ(occurrences(s, "max (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 1);
+  CHECK_EQ(occurrences(s, "Example"), 3);
+  CHECK_EQ(occurrences(s, "Example avg"), 1);
+  CHECK_EQ(occurrences(s, "Example min"), 1);
+  CHECK_EQ(occurrences(s, "Example max"), 1);
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential nested")
 {
@@ -740,13 +740,13 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested")
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 2);
-  CHECK(occurrences(s, "B") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 2);
-  CHECK(occurrences(s, "min (sec)") == 2);
-  CHECK(occurrences(s, "max (sec)") == 2);
-  CHECK(occurrences(s, "average calls per rank") == 2);
+  CHECK_EQ(occurrences(s, "A"), 2);
+  CHECK_EQ(occurrences(s, "B"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 2);
+  CHECK_EQ(occurrences(s, "min (sec)"), 2);
+  CHECK_EQ(occurrences(s, "max (sec)"), 2);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 2);
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential nested first domain has "
           "extra timing")
@@ -769,14 +769,14 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested f
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 3);
-  CHECK(occurrences(s, "B") == 1);
-  CHECK(occurrences(s, "C") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 2);
-  CHECK(occurrences(s, "min (sec)") == 2);
-  CHECK(occurrences(s, "max (sec)") == 2);
-  CHECK(occurrences(s, "average calls per rank") == 2);
+  CHECK_EQ(occurrences(s, "A"), 3);
+  CHECK_EQ(occurrences(s, "B"), 1);
+  CHECK_EQ(occurrences(s, "C"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 2);
+  CHECK_EQ(occurrences(s, "min (sec)"), 2);
+  CHECK_EQ(occurrences(s, "max (sec)"), 2);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 2);
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential nested second domain has "
           "extra timing")
@@ -799,14 +799,14 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested s
   ss << timer;
   std::string s = ss.str();
   INFO(s);
-  CHECK(occurrences(s, "A") == 3);
-  CHECK(occurrences(s, "B") == 1);
-  CHECK(occurrences(s, "C") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 2);
-  CHECK(occurrences(s, "min (sec)") == 2);
-  CHECK(occurrences(s, "max (sec)") == 2);
-  CHECK(occurrences(s, "average calls per rank") == 2);
+  CHECK_EQ(occurrences(s, "A"), 3);
+  CHECK_EQ(occurrences(s, "B"), 1);
+  CHECK_EQ(occurrences(s, "C"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 2);
+  CHECK_EQ(occurrences(s, "min (sec)"), 2);
+  CHECK_EQ(occurrences(s, "max (sec)"), 2);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 2);
 }
 TEST_CASE("Timer saveToFile new empty file")
 {
@@ -834,7 +834,7 @@ TEST_CASE("Timer saveToFile new empty file")
   input >> file_j;
   nlohmann::json extra_j;
   CHECK_THROWS(input >> extra_j);
-  CHECK(file_j.dump() == j.dump());
+  CHECK_EQ(file_j.dump(), j.dump());
   input.close();
   std::remove("timerne.json");
 }
@@ -865,7 +865,7 @@ TEST_CASE("Timer saveToFile overwrites file")
   input >> file_j;
   nlohmann::json extra_j;
   CHECK_THROWS(input >> extra_j);
-  CHECK(file_j.dump() == j.dump());
+  CHECK_EQ(file_j.dump(), j.dump());
   input.close();
   std::remove("timerow.json");
 }

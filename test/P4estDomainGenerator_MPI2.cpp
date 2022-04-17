@@ -108,95 +108,95 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
 
             P4estDomainGenerator dg(p4est, { nx, ny }, num_ghost_cells, bmf);
 
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_2 = dg.getFinestDomain();
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_1 = dg.getCoarserDomain();
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_0 = dg.getCoarserDomain();
-            CHECK_FALSE(dg.hasCoarserDomain());
+            CHECK_UNARY_FALSE(dg.hasCoarserDomain());
 
             // SECTION("correct number of patches")
             {
-              CHECK(domain_2.getNumGlobalPatches() == 16);
-              CHECK(domain_1.getNumGlobalPatches() == 4);
-              CHECK(domain_0.getNumGlobalPatches() == 1);
+              CHECK_EQ(domain_2.getNumGlobalPatches(), 16);
+              CHECK_EQ(domain_1.getNumGlobalPatches(), 4);
+              CHECK_EQ(domain_0.getNumGlobalPatches(), 1);
             }
             // SECTION("patches have correct spacings")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.25 / ny));
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.5 / ny));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 1.0 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 1.0 / ny));
               }
             }
             // SECTION("patches have correct ns")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
             }
 
             // SECTION("patches have refine_level set")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.refine_level == 2);
+                CHECK_EQ(patch.refine_level, 2);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.refine_level == 1);
+                CHECK_EQ(patch.refine_level, 1);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.refine_level == 0);
+                CHECK_EQ(patch.refine_level, 0);
               }
             }
             // SECTION("patches have ranks set")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.rank == rank);
+                CHECK_EQ(patch.rank, rank);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.rank == rank);
+                CHECK_EQ(patch.rank, rank);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.rank == rank);
+                CHECK_EQ(patch.rank, rank);
               }
             }
             // SECTION("patches have num_ghost_cells set")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.num_ghost_cells == num_ghost_cells);
+                CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.num_ghost_cells == num_ghost_cells);
+                CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.num_ghost_cells == num_ghost_cells);
+                CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
               }
             }
 
@@ -313,64 +313,64 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
 
               domain_0_coarser_patch = &domain_0_patches[0];
 
-              REQUIRE(domain_2_sw_sw_patch != nullptr);
-              REQUIRE(domain_2_sw_se_patch != nullptr);
-              REQUIRE(domain_2_sw_nw_patch != nullptr);
-              REQUIRE(domain_2_sw_ne_patch != nullptr);
+              REQUIRE_NE(domain_2_sw_sw_patch, nullptr);
+              REQUIRE_NE(domain_2_sw_se_patch, nullptr);
+              REQUIRE_NE(domain_2_sw_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_sw_ne_patch, nullptr);
 
-              REQUIRE(domain_2_se_sw_patch != nullptr);
-              REQUIRE(domain_2_se_se_patch != nullptr);
-              REQUIRE(domain_2_se_nw_patch != nullptr);
-              REQUIRE(domain_2_se_ne_patch != nullptr);
+              REQUIRE_NE(domain_2_se_sw_patch, nullptr);
+              REQUIRE_NE(domain_2_se_se_patch, nullptr);
+              REQUIRE_NE(domain_2_se_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_se_ne_patch, nullptr);
 
-              REQUIRE(domain_2_nw_sw_patch != nullptr);
-              REQUIRE(domain_2_nw_se_patch != nullptr);
-              REQUIRE(domain_2_nw_nw_patch != nullptr);
-              REQUIRE(domain_2_nw_ne_patch != nullptr);
+              REQUIRE_NE(domain_2_nw_sw_patch, nullptr);
+              REQUIRE_NE(domain_2_nw_se_patch, nullptr);
+              REQUIRE_NE(domain_2_nw_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_nw_ne_patch, nullptr);
 
-              REQUIRE(domain_2_ne_sw_patch != nullptr);
-              REQUIRE(domain_2_ne_se_patch != nullptr);
-              REQUIRE(domain_2_ne_nw_patch != nullptr);
-              REQUIRE(domain_2_ne_ne_patch != nullptr);
+              REQUIRE_NE(domain_2_ne_sw_patch, nullptr);
+              REQUIRE_NE(domain_2_ne_se_patch, nullptr);
+              REQUIRE_NE(domain_2_ne_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_ne_ne_patch, nullptr);
 
-              REQUIRE(domain_1_sw_patch != nullptr);
-              REQUIRE(domain_1_se_patch != nullptr);
-              REQUIRE(domain_1_nw_patch != nullptr);
-              REQUIRE(domain_1_ne_patch != nullptr);
+              REQUIRE_NE(domain_1_sw_patch, nullptr);
+              REQUIRE_NE(domain_1_se_patch, nullptr);
+              REQUIRE_NE(domain_1_nw_patch, nullptr);
+              REQUIRE_NE(domain_1_ne_patch, nullptr);
 
-              CHECK(domain_0_coarser_patch->starts[0] == doctest::Approx(0.0));
-              CHECK(domain_0_coarser_patch->starts[1] == doctest::Approx(0.0));
+              CHECK_EQ(domain_0_coarser_patch->starts[0], doctest::Approx(0.0));
+              CHECK_EQ(domain_0_coarser_patch->starts[1], doctest::Approx(0.0));
             }
 
             // SECTION("parent ids are set correctly")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->parent_id == domain_1_sw_patch->id);
-                CHECK(domain_2_sw_se_patch->parent_id == domain_1_sw_patch->id);
-                CHECK(domain_2_sw_nw_patch->parent_id == domain_1_sw_patch->id);
-                CHECK(domain_2_sw_ne_patch->parent_id == domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_sw_patch->parent_id, domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->parent_id, domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->parent_id, domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->parent_id, domain_1_sw_patch->id);
 
-                CHECK(domain_2_se_sw_patch->parent_id == domain_1_se_patch->id);
-                CHECK(domain_2_se_se_patch->parent_id == domain_1_se_patch->id);
-                CHECK(domain_2_se_nw_patch->parent_id == domain_1_se_patch->id);
-                CHECK(domain_2_se_ne_patch->parent_id == domain_1_se_patch->id);
+                CHECK_EQ(domain_2_se_sw_patch->parent_id, domain_1_se_patch->id);
+                CHECK_EQ(domain_2_se_se_patch->parent_id, domain_1_se_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->parent_id, domain_1_se_patch->id);
+                CHECK_EQ(domain_2_se_ne_patch->parent_id, domain_1_se_patch->id);
 
-                CHECK(domain_2_nw_sw_patch->parent_id == domain_1_nw_patch->id);
-                CHECK(domain_2_nw_se_patch->parent_id == domain_1_nw_patch->id);
-                CHECK(domain_2_nw_nw_patch->parent_id == domain_1_nw_patch->id);
-                CHECK(domain_2_nw_ne_patch->parent_id == domain_1_nw_patch->id);
+                CHECK_EQ(domain_2_nw_sw_patch->parent_id, domain_1_nw_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->parent_id, domain_1_nw_patch->id);
+                CHECK_EQ(domain_2_nw_nw_patch->parent_id, domain_1_nw_patch->id);
+                CHECK_EQ(domain_2_nw_ne_patch->parent_id, domain_1_nw_patch->id);
 
-                CHECK(domain_2_ne_sw_patch->parent_id == domain_1_ne_patch->id);
-                CHECK(domain_2_ne_se_patch->parent_id == domain_1_ne_patch->id);
-                CHECK(domain_2_ne_nw_patch->parent_id == domain_1_ne_patch->id);
-                CHECK(domain_2_ne_ne_patch->parent_id == domain_1_ne_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->parent_id, domain_1_ne_patch->id);
+                CHECK_EQ(domain_2_ne_se_patch->parent_id, domain_1_ne_patch->id);
+                CHECK_EQ(domain_2_ne_nw_patch->parent_id, domain_1_ne_patch->id);
+                CHECK_EQ(domain_2_ne_ne_patch->parent_id, domain_1_ne_patch->id);
 
-                CHECK(domain_1_sw_patch->parent_id == domain_0_coarser_patch->id);
-                CHECK(domain_1_se_patch->parent_id == domain_0_coarser_patch->id);
-                CHECK(domain_1_nw_patch->parent_id == domain_0_coarser_patch->id);
-                CHECK(domain_1_ne_patch->parent_id == domain_0_coarser_patch->id);
+                CHECK_EQ(domain_1_sw_patch->parent_id, domain_0_coarser_patch->id);
+                CHECK_EQ(domain_1_se_patch->parent_id, domain_0_coarser_patch->id);
+                CHECK_EQ(domain_1_nw_patch->parent_id, domain_0_coarser_patch->id);
+                CHECK_EQ(domain_1_ne_patch->parent_id, domain_0_coarser_patch->id);
 
-                CHECK(domain_0_coarser_patch->parent_id == -1);
+                CHECK_EQ(domain_0_coarser_patch->parent_id, -1);
               }
             }
             // SECTION("child ids are set correctly")
@@ -378,113 +378,113 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
                   INFO("i: " << i);
-                  CHECK(domain_2_sw_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_sw_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_2_se_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_se_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_2_nw_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_nw_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_2_ne_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_ne_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_ne_patch->child_ids[i], -1);
                 }
 
-                CHECK(domain_1_sw_patch->child_ids[0] == domain_2_sw_sw_patch->id);
-                CHECK(domain_1_sw_patch->child_ids[1] == domain_2_sw_se_patch->id);
-                CHECK(domain_1_sw_patch->child_ids[2] == domain_2_sw_nw_patch->id);
-                CHECK(domain_1_sw_patch->child_ids[3] == domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[0], domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[1], domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[2], domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[3], domain_2_sw_ne_patch->id);
 
-                CHECK(domain_1_se_patch->child_ids[0] == domain_2_se_sw_patch->id);
-                CHECK(domain_1_se_patch->child_ids[1] == domain_2_se_se_patch->id);
-                CHECK(domain_1_se_patch->child_ids[2] == domain_2_se_nw_patch->id);
-                CHECK(domain_1_se_patch->child_ids[3] == domain_2_se_ne_patch->id);
+                CHECK_EQ(domain_1_se_patch->child_ids[0], domain_2_se_sw_patch->id);
+                CHECK_EQ(domain_1_se_patch->child_ids[1], domain_2_se_se_patch->id);
+                CHECK_EQ(domain_1_se_patch->child_ids[2], domain_2_se_nw_patch->id);
+                CHECK_EQ(domain_1_se_patch->child_ids[3], domain_2_se_ne_patch->id);
 
-                CHECK(domain_1_nw_patch->child_ids[0] == domain_2_nw_sw_patch->id);
-                CHECK(domain_1_nw_patch->child_ids[1] == domain_2_nw_se_patch->id);
-                CHECK(domain_1_nw_patch->child_ids[2] == domain_2_nw_nw_patch->id);
-                CHECK(domain_1_nw_patch->child_ids[3] == domain_2_nw_ne_patch->id);
+                CHECK_EQ(domain_1_nw_patch->child_ids[0], domain_2_nw_sw_patch->id);
+                CHECK_EQ(domain_1_nw_patch->child_ids[1], domain_2_nw_se_patch->id);
+                CHECK_EQ(domain_1_nw_patch->child_ids[2], domain_2_nw_nw_patch->id);
+                CHECK_EQ(domain_1_nw_patch->child_ids[3], domain_2_nw_ne_patch->id);
 
-                CHECK(domain_1_ne_patch->child_ids[0] == domain_2_ne_sw_patch->id);
-                CHECK(domain_1_ne_patch->child_ids[1] == domain_2_ne_se_patch->id);
-                CHECK(domain_1_ne_patch->child_ids[2] == domain_2_ne_nw_patch->id);
-                CHECK(domain_1_ne_patch->child_ids[3] == domain_2_ne_ne_patch->id);
+                CHECK_EQ(domain_1_ne_patch->child_ids[0], domain_2_ne_sw_patch->id);
+                CHECK_EQ(domain_1_ne_patch->child_ids[1], domain_2_ne_se_patch->id);
+                CHECK_EQ(domain_1_ne_patch->child_ids[2], domain_2_ne_nw_patch->id);
+                CHECK_EQ(domain_1_ne_patch->child_ids[3], domain_2_ne_ne_patch->id);
 
-                CHECK(domain_0_coarser_patch->child_ids[0] == domain_1_sw_patch->id);
-                CHECK(domain_0_coarser_patch->child_ids[1] == domain_1_se_patch->id);
-                CHECK(domain_0_coarser_patch->child_ids[2] == domain_1_nw_patch->id);
-                CHECK(domain_0_coarser_patch->child_ids[3] == domain_1_ne_patch->id);
+                CHECK_EQ(domain_0_coarser_patch->child_ids[0], domain_1_sw_patch->id);
+                CHECK_EQ(domain_0_coarser_patch->child_ids[1], domain_1_se_patch->id);
+                CHECK_EQ(domain_0_coarser_patch->child_ids[2], domain_1_nw_patch->id);
+                CHECK_EQ(domain_0_coarser_patch->child_ids[3], domain_1_ne_patch->id);
               }
             }
             // SECTION("orth on parent is set correctly")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_2_sw_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_2_sw_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_2_sw_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_2_sw_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_2_sw_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_2_sw_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_2_sw_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_2_se_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_2_se_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_2_se_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_2_se_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_2_se_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_2_se_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_2_se_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_2_se_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_2_nw_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_2_nw_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_2_nw_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_2_nw_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_2_nw_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_2_nw_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_2_nw_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_2_nw_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_2_ne_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_2_ne_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_2_ne_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_2_ne_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_2_ne_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_2_ne_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_2_ne_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_2_ne_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_1_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_1_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_1_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_1_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_1_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_1_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_1_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_1_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_0_coarser_patch->orth_on_parent == Orthant<2>::null());
+                CHECK_EQ(domain_0_coarser_patch->orth_on_parent, Orthant<2>::null());
               }
             }
             // SECTION("parent ranks are set correctly")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->parent_rank == domain_1_sw_patch->rank);
-                CHECK(domain_2_sw_se_patch->parent_rank == domain_1_sw_patch->rank);
-                CHECK(domain_2_sw_nw_patch->parent_rank == domain_1_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->parent_rank == domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->parent_rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->parent_rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->parent_rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->parent_rank, domain_1_sw_patch->rank);
 
-                CHECK(domain_2_se_sw_patch->parent_rank == domain_1_se_patch->rank);
-                CHECK(domain_2_se_se_patch->parent_rank == domain_1_se_patch->rank);
-                CHECK(domain_2_se_nw_patch->parent_rank == domain_1_se_patch->rank);
-                CHECK(domain_2_se_ne_patch->parent_rank == domain_1_se_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->parent_rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_2_se_se_patch->parent_rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->parent_rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->parent_rank, domain_1_se_patch->rank);
 
-                CHECK(domain_2_nw_sw_patch->parent_rank == domain_1_nw_patch->rank);
-                CHECK(domain_2_nw_se_patch->parent_rank == domain_1_nw_patch->rank);
-                CHECK(domain_2_nw_nw_patch->parent_rank == domain_1_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->parent_rank == domain_1_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->parent_rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->parent_rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_nw_patch->parent_rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->parent_rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_2_ne_sw_patch->parent_rank == domain_1_ne_patch->rank);
-                CHECK(domain_2_ne_se_patch->parent_rank == domain_1_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->parent_rank == domain_1_ne_patch->rank);
-                CHECK(domain_2_ne_ne_patch->parent_rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->parent_rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->parent_rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->parent_rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_ne_patch->parent_rank, domain_1_ne_patch->rank);
 
-                CHECK(domain_1_sw_patch->parent_rank == domain_0_coarser_patch->rank);
-                CHECK(domain_1_se_patch->parent_rank == domain_0_coarser_patch->rank);
-                CHECK(domain_1_nw_patch->parent_rank == domain_0_coarser_patch->rank);
-                CHECK(domain_1_ne_patch->parent_rank == domain_0_coarser_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->parent_rank, domain_0_coarser_patch->rank);
+                CHECK_EQ(domain_1_se_patch->parent_rank, domain_0_coarser_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->parent_rank, domain_0_coarser_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->parent_rank, domain_0_coarser_patch->rank);
 
-                CHECK(domain_0_coarser_patch->parent_rank == -1);
+                CHECK_EQ(domain_0_coarser_patch->parent_rank, -1);
               }
             }
             // SECTION("child ranks are set correctly")
@@ -492,453 +492,453 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
                   INFO("i: " << i);
-                  CHECK(domain_2_sw_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_sw_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_2_se_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_se_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_2_nw_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_nw_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_2_ne_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_ne_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_ne_patch->child_ids[i], -1);
                 }
 
-                CHECK(domain_1_sw_patch->child_ranks[0] == domain_2_sw_sw_patch->rank);
-                CHECK(domain_1_sw_patch->child_ranks[1] == domain_2_sw_se_patch->rank);
-                CHECK(domain_1_sw_patch->child_ranks[2] == domain_2_sw_nw_patch->rank);
-                CHECK(domain_1_sw_patch->child_ranks[3] == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[0], domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[1], domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[2], domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[3], domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_1_se_patch->child_ranks[0] == domain_2_se_sw_patch->rank);
-                CHECK(domain_1_se_patch->child_ranks[1] == domain_2_se_se_patch->rank);
-                CHECK(domain_1_se_patch->child_ranks[2] == domain_2_se_nw_patch->rank);
-                CHECK(domain_1_se_patch->child_ranks[3] == domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_1_se_patch->child_ranks[0], domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_1_se_patch->child_ranks[1], domain_2_se_se_patch->rank);
+                CHECK_EQ(domain_1_se_patch->child_ranks[2], domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_1_se_patch->child_ranks[3], domain_2_se_ne_patch->rank);
 
-                CHECK(domain_1_nw_patch->child_ranks[0] == domain_2_nw_sw_patch->rank);
-                CHECK(domain_1_nw_patch->child_ranks[1] == domain_2_nw_se_patch->rank);
-                CHECK(domain_1_nw_patch->child_ranks[2] == domain_2_nw_nw_patch->rank);
-                CHECK(domain_1_nw_patch->child_ranks[3] == domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->child_ranks[0], domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->child_ranks[1], domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->child_ranks[2], domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->child_ranks[3], domain_2_nw_ne_patch->rank);
 
-                CHECK(domain_1_ne_patch->child_ranks[0] == domain_2_ne_sw_patch->rank);
-                CHECK(domain_1_ne_patch->child_ranks[1] == domain_2_ne_se_patch->rank);
-                CHECK(domain_1_ne_patch->child_ranks[2] == domain_2_ne_nw_patch->rank);
-                CHECK(domain_1_ne_patch->child_ranks[3] == domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->child_ranks[0], domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->child_ranks[1], domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->child_ranks[2], domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->child_ranks[3], domain_2_ne_ne_patch->rank);
 
-                CHECK(domain_0_coarser_patch->child_ranks[0] == domain_1_sw_patch->rank);
-                CHECK(domain_0_coarser_patch->child_ranks[1] == domain_1_se_patch->rank);
-                CHECK(domain_0_coarser_patch->child_ranks[2] == domain_1_nw_patch->rank);
-                CHECK(domain_0_coarser_patch->child_ranks[3] == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_0_coarser_patch->child_ranks[0], domain_1_sw_patch->rank);
+                CHECK_EQ(domain_0_coarser_patch->child_ranks[1], domain_1_se_patch->rank);
+                CHECK_EQ(domain_0_coarser_patch->child_ranks[2], domain_1_nw_patch->rank);
+                CHECK_EQ(domain_0_coarser_patch->child_ranks[3], domain_1_ne_patch->rank);
               }
             }
             // SECTION("nbr_info ids are correct")
             {
               if (rank == 0) {
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_sw_se_patch->id);
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_sw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_sw_nw_patch->id);
 
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_sw_patch->id);
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_se_sw_patch->id);
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_se_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_sw_ne_patch->id);
 
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_se_patch->id);
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_se_se_patch->id);
-                CHECK_FALSE(domain_2_se_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_se_nw_patch->id);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_se_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_se_nw_patch->id);
 
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_se_sw_patch->id);
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_se_ne_patch->id);
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_se_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_se_ne_patch->id);
 
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_sw_patch->id);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_nw_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_nw_sw_patch->id);
 
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_se_nw_patch->id);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_se_patch->id);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_nw_se_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_se_nw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_nw_se_patch->id);
 
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_se_ne_patch->id);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_se_sw_patch->id);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_ne_sw_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_se_ne_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_se_sw_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_ne_sw_patch->id);
 
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_se_nw_patch->id);
-                CHECK_FALSE(domain_2_se_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_se_se_patch->id);
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_ne_se_patch->id);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_se_se_patch->id);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_ne_se_patch->id);
 
-                CHECK_FALSE(domain_2_nw_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_nw_se_patch->id);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_nw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_nw_se_patch->id);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_nw_nw_patch->id);
 
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_nw_sw_patch->id);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_ne_sw_patch->id);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_nw_ne_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_nw_sw_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_ne_sw_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_nw_ne_patch->id);
 
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_nw_se_patch->id);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_ne_se_patch->id);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_se_nw_patch->id);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_ne_nw_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_nw_se_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_ne_se_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_se_nw_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_ne_nw_patch->id);
 
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_ne_sw_patch->id);
-                CHECK_FALSE(domain_2_ne_se_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_se_ne_patch->id);
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_ne_ne_patch->id);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_se_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_se_ne_patch->id);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_ne_ne_patch->id);
 
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_nw_ne_patch->id);
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_nw_sw_patch->id);
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_nw_ne_patch->id);
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_nw_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_nw_se_patch->rank);
-                CHECK_FALSE(domain_2_nw_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_nw_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_2_nw_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_ne_sw_patch->rank);
-                CHECK_FALSE(domain_2_ne_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_ne_sw_patch->rank);
+                CHECK_UNARY_FALSE(domain_2_ne_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_ne_nw_patch->rank);
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_ne_se_patch->rank);
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_ne_nw_patch->rank);
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_ne_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_se_patch->rank);
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_nw_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_sw_patch->rank);
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_sw_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_ne_patch->rank);
 
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_ne_patch->rank);
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_sw_patch->rank);
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_sw_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_nw_patch->rank);
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_se_patch->rank);
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_nw_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::west()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::south()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::west()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::south()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::north()));
               }
             }
             // SECTION("nbr_info ranks are correct")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_sw_nw_patch->rank);
 
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_se_se_patch->rank);
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_se_se_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_se_nw_patch->rank);
 
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_se_ne_patch->rank);
 
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_nw_sw_patch->rank);
 
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_nw_se_patch->rank);
 
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_se_ne_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_se_se_patch->rank);
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_se_se_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_ne_se_patch->rank);
 
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_nw_se_patch->rank);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_nw_nw_patch->rank);
 
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_sw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_sw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_nw_ne_patch->rank);
 
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_se_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_se_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_ne_nw_patch->rank);
 
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_ne_sw_patch->rank);
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_se_ne_patch->rank);
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_ne_ne_patch->rank);
 
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_nw_ne_patch->rank);
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_nw_sw_patch->rank);
 
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_nw_se_patch->rank);
 
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_ne_nw_patch->rank);
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_ne_se_patch->rank);
 
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_se_patch->rank);
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_nw_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_sw_patch->rank);
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_ne_patch->rank);
 
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_ne_patch->rank);
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_sw_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_sw_patch->rank);
 
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_nw_patch->rank);
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_se_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_se_patch->rank);
               }
             }
             // SECTION("corner_nbr_info ids are correct")
             {
               if (rank == 0) {
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_2_sw_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_sw_ne_patch->id);
 
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_sw_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_sw_se_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_sw_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_sw_nw_patch->id);
+                CHECK_UNARY(domain_2_sw_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_se_nw_patch->id);
 
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_sw_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_sw_se_patch->id);
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_nw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_nw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_2_sw_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_2_sw_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_nw_se_patch->id);
 
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_sw_sw_patch->id);
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_se_sw_patch->id);
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_nw_sw_patch->id);
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_ne_sw_patch->id);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_sw_sw_patch->id);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_se_sw_patch->id);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_nw_sw_patch->id);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_ne_sw_patch->id);
 
-                CHECK_FALSE(domain_2_se_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_se_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_se_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_se_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_se_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_se_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_se_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_sw_ne_patch->id);
+                CHECK_UNARY(domain_2_se_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_se_ne_patch->id);
 
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_se_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_se_nw_patch->id);
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_se_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_se_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_sw_se_patch->id);
-                CHECK(domain_2_se_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_se_se_patch->id);
-                CHECK(domain_2_se_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_nw_se_patch->id);
-                CHECK(domain_2_se_nw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_ne_se_patch->id);
+                CHECK_UNARY(domain_2_se_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_sw_se_patch->id);
+                CHECK_UNARY(domain_2_se_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_se_se_patch->id);
+                CHECK_UNARY(domain_2_se_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_nw_se_patch->id);
+                CHECK_UNARY(domain_2_se_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_ne_se_patch->id);
 
-                CHECK(domain_2_se_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_se_sw_patch->id);
-                CHECK_FALSE(domain_2_se_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_se_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_ne_sw_patch->id);
-                CHECK_FALSE(domain_2_se_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_se_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_se_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_se_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_2_nw_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_nw_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_sw_ne_patch->id);
-                CHECK_FALSE(domain_2_nw_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_nw_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_nw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_2_nw_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_2_nw_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_nw_ne_patch->id);
 
-                CHECK(domain_2_nw_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_nw_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_se_nw_patch->id);
-                CHECK(domain_2_nw_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_nw_nw_patch->id);
-                CHECK(domain_2_nw_se_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_ne_nw_patch->id);
+                CHECK_UNARY(domain_2_nw_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_sw_nw_patch->id);
+                CHECK_UNARY(domain_2_nw_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_se_nw_patch->id);
+                CHECK_UNARY(domain_2_nw_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_nw_nw_patch->id);
+                CHECK_UNARY(domain_2_nw_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_ne_nw_patch->id);
 
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_nw_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_nw_se_patch->id);
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_2_nw_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_nw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_nw_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_nw_sw_patch->id);
-                CHECK(domain_2_nw_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_ne_sw_patch->id);
-                CHECK_FALSE(domain_2_nw_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_nw_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_nw_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_nw_sw_patch->id);
+                CHECK_UNARY(domain_2_nw_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_nw_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_ne_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_ne_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_se_ne_patch->id);
-                CHECK(domain_2_ne_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_nw_ne_patch->id);
-                CHECK(domain_2_ne_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_ne_ne_patch->id);
+                CHECK_UNARY(domain_2_ne_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_sw_ne_patch->id);
+                CHECK_UNARY(domain_2_ne_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_se_ne_patch->id);
+                CHECK_UNARY(domain_2_ne_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_nw_ne_patch->id);
+                CHECK_UNARY(domain_2_ne_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_ne_ne_patch->id);
 
-                CHECK(domain_2_ne_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_se_nw_patch->id);
-                CHECK_FALSE(domain_2_ne_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_ne_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_ne_nw_patch->id);
-                CHECK_FALSE(domain_2_ne_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_ne_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_ne_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_ne_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_ne_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_nw_se_patch->id);
-                CHECK(domain_2_ne_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_ne_se_patch->id);
-                CHECK_FALSE(domain_2_ne_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_ne_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_ne_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_nw_se_patch->id);
+                CHECK_UNARY(domain_2_ne_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_ne_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_ne_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_ne_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_ne_sw_patch->id);
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_ne_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_1_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_1_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_1_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_1_ne_patch->id);
 
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_1_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_1_nw_patch->id);
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_1_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_1_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_1_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_1_se_patch->id);
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_1_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_1_se_patch->id);
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_1_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_1_sw_patch->id);
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_1_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_1_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::ne()));
               }
             }
             // SECTION("corner_nbr_info ranks are correct")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_se_nw_patch->rank);
 
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_nw_se_patch->rank);
 
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_nw_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_se_ne_patch->rank);
 
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_se_nw_patch->rank);
 
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_se_se_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_nw_se_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_se_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_ne_se_patch->rank);
 
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_nw_ne_patch->rank);
 
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_nw_nw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_ne_nw_patch->rank);
 
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_nw_se_patch->rank);
 
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_nw_sw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_se_ne_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_nw_ne_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_ne_ne_patch->rank);
 
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_ne_nw_patch->rank);
 
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_nw_se_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_ne_se_patch->rank);
 
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_1_ne_patch->rank);
 
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_1_nw_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_1_se_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_1_se_patch->rank);
 
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_1_sw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_1_sw_patch->rank);
               }
             }
           }
@@ -981,58 +981,58 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
 
             P4estDomainGenerator dg(p4est, { nx, ny }, num_ghost_cells, bmf);
 
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_2 = dg.getFinestDomain();
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_1 = dg.getCoarserDomain();
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_0 = dg.getCoarserDomain();
-            CHECK_FALSE(dg.hasCoarserDomain());
+            CHECK_UNARY_FALSE(dg.hasCoarserDomain());
 
             // SECTION("patches have correct ns")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
             }
             // SECTION("patches have ranks set")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.rank == rank);
+                CHECK_EQ(patch.rank, rank);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.rank == rank);
+                CHECK_EQ(patch.rank, rank);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.rank == rank);
+                CHECK_EQ(patch.rank, rank);
               }
             }
 
             // SECTION("patches have num_ghost_cells set")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.num_ghost_cells == num_ghost_cells);
+                CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.num_ghost_cells == num_ghost_cells);
+                CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.num_ghost_cells == num_ghost_cells);
+                CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
               }
             }
 
@@ -1101,438 +1101,438 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
 
               domain_0_patch = &domain_0_patches[0];
 
-              REQUIRE(domain_2_sw_sw_patch != nullptr);
-              REQUIRE(domain_2_sw_se_patch != nullptr);
-              REQUIRE(domain_2_sw_nw_patch != nullptr);
-              REQUIRE(domain_2_sw_ne_patch != nullptr);
-              REQUIRE(domain_2_se_patch != nullptr);
-              REQUIRE(domain_2_nw_patch != nullptr);
-              REQUIRE(domain_2_ne_patch != nullptr);
+              REQUIRE_NE(domain_2_sw_sw_patch, nullptr);
+              REQUIRE_NE(domain_2_sw_se_patch, nullptr);
+              REQUIRE_NE(domain_2_sw_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_sw_ne_patch, nullptr);
+              REQUIRE_NE(domain_2_se_patch, nullptr);
+              REQUIRE_NE(domain_2_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_ne_patch, nullptr);
 
-              REQUIRE(domain_1_sw_patch != nullptr);
-              REQUIRE(domain_1_se_patch != nullptr);
-              REQUIRE(domain_1_nw_patch != nullptr);
-              REQUIRE(domain_1_ne_patch != nullptr);
+              REQUIRE_NE(domain_1_sw_patch, nullptr);
+              REQUIRE_NE(domain_1_se_patch, nullptr);
+              REQUIRE_NE(domain_1_nw_patch, nullptr);
+              REQUIRE_NE(domain_1_ne_patch, nullptr);
 
-              CHECK(domain_0_patch->starts[0] == doctest::Approx(0.0));
-              CHECK(domain_0_patch->starts[1] == doctest::Approx(0.0));
+              CHECK_EQ(domain_0_patch->starts[0], doctest::Approx(0.0));
+              CHECK_EQ(domain_0_patch->starts[1], doctest::Approx(0.0));
             }
 
             // SECTION("patches have correct spacings")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_2_sw_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_2_sw_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_2_sw_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_2_sw_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_2_sw_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_2_sw_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_2_sw_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_2_sw_sw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_2_sw_sw_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_2_sw_se_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_2_sw_se_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_2_sw_nw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_2_sw_nw_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_2_sw_ne_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_2_sw_ne_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
 
-                CHECK(domain_2_se_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_2_se_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_2_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_2_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_2_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_2_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(domain_2_se_patch->spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(domain_2_se_patch->spacings[1], doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(domain_2_nw_patch->spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(domain_2_nw_patch->spacings[1], doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(domain_2_ne_patch->spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(domain_2_ne_patch->spacings[1], doctest::Approx(scale_y * 0.5 / ny));
 
-                CHECK(domain_1_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_1_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_1_se_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_1_se_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_1_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_1_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_1_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_1_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(domain_1_sw_patch->spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(domain_1_sw_patch->spacings[1], doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(domain_1_se_patch->spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(domain_1_se_patch->spacings[1], doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(domain_1_nw_patch->spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(domain_1_nw_patch->spacings[1], doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(domain_1_ne_patch->spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(domain_1_ne_patch->spacings[1], doctest::Approx(scale_y * 0.5 / ny));
 
-                CHECK(domain_0_patch->spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
-                CHECK(domain_0_patch->spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
+                CHECK_EQ(domain_0_patch->spacings[0], doctest::Approx(scale_x * 1.0 / nx));
+                CHECK_EQ(domain_0_patch->spacings[1], doctest::Approx(scale_y * 1.0 / ny));
               }
             }
 
             // SECTION("patches have refine_level set")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_2_sw_sw_patch->refine_level == 2);
-                CHECK(domain_2_sw_se_patch->refine_level == 2);
-                CHECK(domain_2_sw_nw_patch->refine_level == 2);
-                CHECK(domain_2_sw_ne_patch->refine_level == 2);
+                CHECK_EQ(domain_2_sw_sw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_2_sw_sw_patch->refine_level, 2);
+                CHECK_EQ(domain_2_sw_se_patch->refine_level, 2);
+                CHECK_EQ(domain_2_sw_nw_patch->refine_level, 2);
+                CHECK_EQ(domain_2_sw_ne_patch->refine_level, 2);
 
-                CHECK(domain_2_se_patch->refine_level == 1);
-                CHECK(domain_2_nw_patch->refine_level == 1);
-                CHECK(domain_2_ne_patch->refine_level == 1);
+                CHECK_EQ(domain_2_se_patch->refine_level, 1);
+                CHECK_EQ(domain_2_nw_patch->refine_level, 1);
+                CHECK_EQ(domain_2_ne_patch->refine_level, 1);
 
-                CHECK(domain_1_sw_patch->refine_level == 1);
-                CHECK(domain_1_se_patch->refine_level == 1);
-                CHECK(domain_1_nw_patch->refine_level == 1);
-                CHECK(domain_1_ne_patch->refine_level == 1);
+                CHECK_EQ(domain_1_sw_patch->refine_level, 1);
+                CHECK_EQ(domain_1_se_patch->refine_level, 1);
+                CHECK_EQ(domain_1_nw_patch->refine_level, 1);
+                CHECK_EQ(domain_1_ne_patch->refine_level, 1);
 
-                CHECK(domain_0_patch->refine_level == 0);
+                CHECK_EQ(domain_0_patch->refine_level, 0);
               }
             }
 
             // SECTION("parent ids are set correctly")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->parent_id == domain_1_sw_patch->id);
-                CHECK(domain_2_sw_se_patch->parent_id == domain_1_sw_patch->id);
-                CHECK(domain_2_sw_nw_patch->parent_id == domain_1_sw_patch->id);
-                CHECK(domain_2_sw_ne_patch->parent_id == domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_sw_patch->parent_id, domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->parent_id, domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->parent_id, domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->parent_id, domain_1_sw_patch->id);
 
-                CHECK(domain_2_se_patch->parent_id == domain_1_se_patch->id);
-                CHECK(domain_2_nw_patch->parent_id == domain_1_nw_patch->id);
-                CHECK(domain_2_ne_patch->parent_id == domain_1_ne_patch->id);
+                CHECK_EQ(domain_2_se_patch->parent_id, domain_1_se_patch->id);
+                CHECK_EQ(domain_2_nw_patch->parent_id, domain_1_nw_patch->id);
+                CHECK_EQ(domain_2_ne_patch->parent_id, domain_1_ne_patch->id);
 
-                CHECK(domain_1_sw_patch->parent_id == domain_0_patch->id);
-                CHECK(domain_1_se_patch->parent_id == domain_0_patch->id);
-                CHECK(domain_1_nw_patch->parent_id == domain_0_patch->id);
-                CHECK(domain_1_ne_patch->parent_id == domain_0_patch->id);
+                CHECK_EQ(domain_1_sw_patch->parent_id, domain_0_patch->id);
+                CHECK_EQ(domain_1_se_patch->parent_id, domain_0_patch->id);
+                CHECK_EQ(domain_1_nw_patch->parent_id, domain_0_patch->id);
+                CHECK_EQ(domain_1_ne_patch->parent_id, domain_0_patch->id);
 
-                CHECK(domain_0_patch->parent_id == -1);
+                CHECK_EQ(domain_0_patch->parent_id, -1);
               }
             }
             // SECTION("child ids are set correctly")
             {
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
-                  CHECK(domain_2_sw_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_ne_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_sw_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_ne_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_patch->child_ids[i], -1);
                 }
 
-                CHECK(domain_1_sw_patch->child_ids[0] == domain_2_sw_sw_patch->id);
-                CHECK(domain_1_sw_patch->child_ids[1] == domain_2_sw_se_patch->id);
-                CHECK(domain_1_sw_patch->child_ids[2] == domain_2_sw_nw_patch->id);
-                CHECK(domain_1_sw_patch->child_ids[3] == domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[0], domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[1], domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[2], domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[3], domain_2_sw_ne_patch->id);
 
-                CHECK(domain_1_se_patch->child_ids[0] == domain_2_se_patch->id);
-                CHECK(domain_1_nw_patch->child_ids[0] == domain_2_nw_patch->id);
-                CHECK(domain_1_ne_patch->child_ids[0] == domain_2_ne_patch->id);
+                CHECK_EQ(domain_1_se_patch->child_ids[0], domain_2_se_patch->id);
+                CHECK_EQ(domain_1_nw_patch->child_ids[0], domain_2_nw_patch->id);
+                CHECK_EQ(domain_1_ne_patch->child_ids[0], domain_2_ne_patch->id);
 
                 for (int i = 1; i < 4; i++) {
-                  CHECK(domain_1_se_patch->child_ids[i] == -1);
-                  CHECK(domain_1_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_1_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_1_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_1_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_1_ne_patch->child_ids[i], -1);
                 }
 
-                CHECK(domain_0_patch->child_ids[0] == domain_1_sw_patch->id);
-                CHECK(domain_0_patch->child_ids[1] == domain_1_se_patch->id);
-                CHECK(domain_0_patch->child_ids[2] == domain_1_nw_patch->id);
-                CHECK(domain_0_patch->child_ids[3] == domain_1_ne_patch->id);
+                CHECK_EQ(domain_0_patch->child_ids[0], domain_1_sw_patch->id);
+                CHECK_EQ(domain_0_patch->child_ids[1], domain_1_se_patch->id);
+                CHECK_EQ(domain_0_patch->child_ids[2], domain_1_nw_patch->id);
+                CHECK_EQ(domain_0_patch->child_ids[3], domain_1_ne_patch->id);
               }
             }
             // SECTION("orth on parent is set correctly")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_2_sw_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_2_sw_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_2_sw_ne_patch->orth_on_parent == Orthant<2>::ne());
-                CHECK(domain_2_se_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_2_nw_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_2_ne_patch->orth_on_parent == Orthant<2>::null());
+                CHECK_EQ(domain_2_sw_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_2_sw_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_2_sw_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_2_sw_ne_patch->orth_on_parent, Orthant<2>::ne());
+                CHECK_EQ(domain_2_se_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_2_nw_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_2_ne_patch->orth_on_parent, Orthant<2>::null());
 
-                CHECK(domain_1_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_1_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_1_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_1_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_1_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_1_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_1_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_1_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_0_patch->orth_on_parent == Orthant<2>::null());
+                CHECK_EQ(domain_0_patch->orth_on_parent, Orthant<2>::null());
               }
             }
             // SECTION("parent ranks are set correctly")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->parent_rank == domain_1_sw_patch->rank);
-                CHECK(domain_2_sw_se_patch->parent_rank == domain_1_sw_patch->rank);
-                CHECK(domain_2_sw_nw_patch->parent_rank == domain_1_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->parent_rank == domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->parent_rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->parent_rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->parent_rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->parent_rank, domain_1_sw_patch->rank);
 
-                CHECK(domain_2_se_patch->parent_rank == domain_1_se_patch->rank);
-                CHECK(domain_2_nw_patch->parent_rank == domain_1_nw_patch->rank);
-                CHECK(domain_2_ne_patch->parent_rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_2_se_patch->parent_rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_2_nw_patch->parent_rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_patch->parent_rank, domain_1_ne_patch->rank);
 
-                CHECK(domain_1_sw_patch->parent_rank == domain_0_patch->rank);
-                CHECK(domain_1_se_patch->parent_rank == domain_0_patch->rank);
-                CHECK(domain_1_nw_patch->parent_rank == domain_0_patch->rank);
-                CHECK(domain_1_ne_patch->parent_rank == domain_0_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->parent_rank, domain_0_patch->rank);
+                CHECK_EQ(domain_1_se_patch->parent_rank, domain_0_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->parent_rank, domain_0_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->parent_rank, domain_0_patch->rank);
 
-                CHECK(domain_0_patch->parent_rank == -1);
+                CHECK_EQ(domain_0_patch->parent_rank, -1);
               }
             }
             // SECTION("child ranks are set correctly")
             {
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
-                  CHECK(domain_2_sw_sw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_sw_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_sw_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_sw_ne_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_2_sw_sw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_sw_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_sw_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_sw_ne_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_ne_patch->child_ranks[i], -1);
                 }
 
-                CHECK(domain_1_sw_patch->child_ranks[0] == domain_2_sw_sw_patch->rank);
-                CHECK(domain_1_sw_patch->child_ranks[1] == domain_2_sw_se_patch->rank);
-                CHECK(domain_1_sw_patch->child_ranks[2] == domain_2_sw_nw_patch->rank);
-                CHECK(domain_1_sw_patch->child_ranks[3] == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[0], domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[1], domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[2], domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[3], domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_1_se_patch->child_ranks[0] == domain_2_se_patch->rank);
-                CHECK(domain_1_nw_patch->child_ranks[0] == domain_2_nw_patch->rank);
-                CHECK(domain_1_ne_patch->child_ranks[0] == domain_2_ne_patch->rank);
+                CHECK_EQ(domain_1_se_patch->child_ranks[0], domain_2_se_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->child_ranks[0], domain_2_nw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->child_ranks[0], domain_2_ne_patch->rank);
 
                 for (int i = 1; i < 4; i++) {
-                  CHECK(domain_1_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_1_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_1_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_1_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_1_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_1_ne_patch->child_ranks[i], -1);
                 }
 
-                CHECK(domain_0_patch->child_ranks[0] == domain_1_sw_patch->rank);
-                CHECK(domain_0_patch->child_ranks[1] == domain_1_se_patch->rank);
-                CHECK(domain_0_patch->child_ranks[2] == domain_1_nw_patch->rank);
-                CHECK(domain_0_patch->child_ranks[3] == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_0_patch->child_ranks[0], domain_1_sw_patch->rank);
+                CHECK_EQ(domain_0_patch->child_ranks[1], domain_1_se_patch->rank);
+                CHECK_EQ(domain_0_patch->child_ranks[2], domain_1_nw_patch->rank);
+                CHECK_EQ(domain_0_patch->child_ranks[3], domain_1_ne_patch->rank);
               }
             }
             // SECTION("nbr_info ids are correct")
             {
               if (rank == 0) {
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_sw_se_patch->id);
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_sw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_sw_nw_patch->id);
 
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_sw_patch->id);
-                CHECK(domain_2_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).id == domain_2_se_patch->id);
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).id, domain_2_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_sw_ne_patch->id);
 
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_sw_patch->id);
-                CHECK(domain_2_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).id == domain_2_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).id, domain_2_nw_patch->id);
 
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).id == domain_2_se_patch->id);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_se_patch->id);
-                CHECK(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).id == domain_2_nw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).id, domain_2_se_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).id, domain_2_nw_patch->id);
 
-                CHECK(domain_2_se_patch->getFineNbrInfo(Side<2>::west()).ids[0] == domain_2_sw_se_patch->id);
-                CHECK(domain_2_se_patch->getFineNbrInfo(Side<2>::west()).ids[1] == domain_2_sw_ne_patch->id);
-                CHECK_FALSE(domain_2_se_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_2_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_ne_patch->id);
+                CHECK_EQ(domain_2_se_patch->getFineNbrInfo(Side<2>::west()).ids[0], domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_2_se_patch->getFineNbrInfo(Side<2>::west()).ids[1], domain_2_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_2_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_ne_patch->id);
 
-                CHECK_FALSE(domain_2_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_ne_patch->id);
-                CHECK(domain_2_nw_patch->getFineNbrInfo(Side<2>::south()).ids[0] == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_nw_patch->getFineNbrInfo(Side<2>::south()).ids[1] == domain_2_sw_ne_patch->id);
-                CHECK_FALSE(domain_2_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_2_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_ne_patch->id);
+                CHECK_EQ(domain_2_nw_patch->getFineNbrInfo(Side<2>::south()).ids[0], domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_2_nw_patch->getFineNbrInfo(Side<2>::south()).ids[1], domain_2_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_2_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_nw_patch->id);
-                CHECK_FALSE(domain_2_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_2_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_se_patch->id);
-                CHECK_FALSE(domain_2_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_2_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_2_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_1_se_patch->id);
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_1_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_1_se_patch->id);
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_1_nw_patch->id);
 
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_1_sw_patch->id);
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_1_ne_patch->id);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_1_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_1_ne_patch->id);
 
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_1_ne_patch->id);
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_1_sw_patch->id);
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_1_ne_patch->id);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_1_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_1_nw_patch->id);
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_1_se_patch->id);
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_1_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_1_se_patch->id);
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK_FALSE(domain_0_patch->hasNbr(Side<2>::west()));
-                CHECK_FALSE(domain_0_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_0_patch->hasNbr(Side<2>::south()));
-                CHECK_FALSE(domain_0_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_0_patch->hasNbr(Side<2>::west()));
+                CHECK_UNARY_FALSE(domain_0_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_0_patch->hasNbr(Side<2>::south()));
+                CHECK_UNARY_FALSE(domain_0_patch->hasNbr(Side<2>::north()));
               }
             }
             // SECTION("nbr_info ranks are correct")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_sw_nw_patch->rank);
 
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_2_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).rank == domain_2_se_patch->rank);
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).rank, domain_2_se_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_2_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).rank == domain_2_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).rank, domain_2_nw_patch->rank);
 
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).rank == domain_2_se_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).rank == domain_2_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).rank, domain_2_se_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).rank, domain_2_nw_patch->rank);
 
-                CHECK(domain_2_se_patch->getFineNbrInfo(Side<2>::west()).ranks[0] == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_se_patch->getFineNbrInfo(Side<2>::west()).ranks[1] == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_ne_patch->rank);
+                CHECK_EQ(domain_2_se_patch->getFineNbrInfo(Side<2>::west()).ranks[0], domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_se_patch->getFineNbrInfo(Side<2>::west()).ranks[1], domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_ne_patch->rank);
 
-                CHECK(domain_2_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_patch->rank);
-                CHECK(domain_2_nw_patch->getFineNbrInfo(Side<2>::south()).ranks[0] == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_nw_patch->getFineNbrInfo(Side<2>::south()).ranks[1] == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_patch->getFineNbrInfo(Side<2>::south()).ranks[0], domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_patch->getFineNbrInfo(Side<2>::south()).ranks[1], domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_2_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_patch->rank);
-                CHECK(domain_2_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_se_patch->rank);
+                CHECK_EQ(domain_2_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_se_patch->rank);
 
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_se_patch->rank);
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_nw_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_sw_patch->rank);
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_ne_patch->rank);
 
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_ne_patch->rank);
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_sw_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_sw_patch->rank);
 
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_nw_patch->rank);
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_se_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_se_patch->rank);
               }
             }
             // SECTION("nbr_info orth_on_coarse are correct")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).orth_on_coarse == Orthant<1>::lower());
+                CHECK_EQ(domain_2_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).orth_on_coarse, Orthant<1>::lower());
 
-                CHECK(domain_2_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).orth_on_coarse == Orthant<1>::lower());
+                CHECK_EQ(domain_2_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).orth_on_coarse, Orthant<1>::lower());
 
-                CHECK(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).orth_on_coarse == Orthant<1>::upper());
-                CHECK(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).orth_on_coarse == Orthant<1>::upper());
+                CHECK_EQ(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).orth_on_coarse, Orthant<1>::upper());
+                CHECK_EQ(domain_2_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).orth_on_coarse, Orthant<1>::upper());
               }
             }
             // SECTION("corner_nbr_info ids are correct")
             {
               if (rank == 0) {
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_2_sw_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_sw_ne_patch->id);
 
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_sw_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_sw_nw_patch->id);
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_sw_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_sw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_sw_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_sw_se_patch->id);
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_2_sw_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_sw_sw_patch->id);
-                CHECK_FALSE(domain_2_sw_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_2_sw_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_ne_patch->getCoarseNbrInfo(Corner<2>::ne()).id == domain_2_ne_patch->id);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_sw_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_2_sw_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_ne_patch->getCoarseNbrInfo(Corner<2>::ne()).id, domain_2_ne_patch->id);
 
-                CHECK_FALSE(domain_2_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_nw_patch->id);
-                CHECK_FALSE(domain_2_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_2_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_2_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_se_patch->id);
-                CHECK_FALSE(domain_2_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_2_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_2_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_patch->getFineNbrInfo(Corner<2>::sw()).ids[0] == domain_2_sw_ne_patch->id);
-                CHECK_FALSE(domain_2_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_2_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_patch->getFineNbrInfo(Corner<2>::sw()).ids[0], domain_2_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_2_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_1_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_1_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_1_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_1_ne_patch->id);
 
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_1_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_1_nw_patch->id);
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_1_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_1_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_1_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_1_se_patch->id);
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_1_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_1_se_patch->id);
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_1_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_1_sw_patch->id);
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_1_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_1_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_0_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_0_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_0_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_0_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_0_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_0_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_0_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_0_patch->hasNbr(Corner<2>::ne()));
               }
             }
             // SECTION("corner_nbr_info ranks are correct")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_sw_ne_patch->rank);
+                CHECK_UNARY(domain_2_sw_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_2_sw_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_sw_nw_patch->rank);
+                CHECK_UNARY(domain_2_sw_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_sw_nw_patch->rank);
 
-                CHECK(domain_2_sw_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_sw_se_patch->rank);
+                CHECK_UNARY(domain_2_sw_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_sw_se_patch->rank);
 
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_ne_patch->getCoarseNbrInfo(Corner<2>::ne()).rank == domain_2_ne_patch->rank);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_sw_sw_patch->rank);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_ne_patch->getCoarseNbrInfo(Corner<2>::ne()).rank, domain_2_ne_patch->rank);
 
-                CHECK(domain_2_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_nw_patch->rank);
+                CHECK_UNARY(domain_2_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_nw_patch->rank);
 
-                CHECK(domain_2_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_se_patch->rank);
+                CHECK_UNARY(domain_2_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_se_patch->rank);
 
-                CHECK(domain_2_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_patch->getFineNbrInfo(Corner<2>::sw()).ranks[0] == domain_2_sw_ne_patch->rank);
+                CHECK_UNARY(domain_2_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_patch->getFineNbrInfo(Corner<2>::sw()).ranks[0], domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_1_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_1_ne_patch->rank);
+                CHECK_UNARY(domain_1_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_1_ne_patch->rank);
 
-                CHECK(domain_1_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_1_nw_patch->rank);
+                CHECK_UNARY(domain_1_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_1_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_1_se_patch->rank);
+                CHECK_UNARY(domain_1_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_1_se_patch->rank);
 
-                CHECK(domain_1_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_1_sw_patch->rank);
+                CHECK_UNARY(domain_1_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_1_sw_patch->rank);
               }
             }
           }
@@ -1576,73 +1576,73 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
 
             P4estDomainGenerator dg(p4est, { nx, ny }, num_ghost_cells, bmf);
 
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_3 = dg.getFinestDomain();
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_2 = dg.getCoarserDomain();
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_1 = dg.getCoarserDomain();
-            CHECK(dg.hasCoarserDomain());
+            CHECK_UNARY(dg.hasCoarserDomain());
             Domain<2> domain_0 = dg.getCoarserDomain();
-            CHECK_FALSE(dg.hasCoarserDomain());
+            CHECK_UNARY_FALSE(dg.hasCoarserDomain());
 
             // SECTION("correct number of patches")
             {
-              CHECK(domain_3.getNumGlobalPatches() == 19);
-              CHECK(domain_2.getNumGlobalPatches() == 16);
-              CHECK(domain_1.getNumGlobalPatches() == 4);
-              CHECK(domain_0.getNumGlobalPatches() == 1);
+              CHECK_EQ(domain_3.getNumGlobalPatches(), 19);
+              CHECK_EQ(domain_2.getNumGlobalPatches(), 16);
+              CHECK_EQ(domain_1.getNumGlobalPatches(), 4);
+              CHECK_EQ(domain_0.getNumGlobalPatches(), 1);
             }
 
             // SECTION("patches have correct ns")
             {
               for (auto patch : domain_3.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
 
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.ns[0] == nx);
-                CHECK(patch.ns[1] == ny);
+                CHECK_EQ(patch.ns[0], nx);
+                CHECK_EQ(patch.ns[1], ny);
               }
             }
 
             // SECTION("patches have ranks set")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.rank == rank);
+                CHECK_EQ(patch.rank, rank);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.rank == rank);
+                CHECK_EQ(patch.rank, rank);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.rank == rank);
+                CHECK_EQ(patch.rank, rank);
               }
             }
             // SECTION("patches have num_ghost_cells set")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.num_ghost_cells == num_ghost_cells);
+                CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.num_ghost_cells == num_ghost_cells);
+                CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.num_ghost_cells == num_ghost_cells);
+                CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
               }
             }
 
@@ -1849,214 +1849,214 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
 
               domain_0_coarser_patch = &domain_0_patches[0];
 
-              REQUIRE(domain_3_sw_sw_sw_patch != nullptr);
-              REQUIRE(domain_3_sw_sw_se_patch != nullptr);
-              REQUIRE(domain_3_sw_sw_nw_patch != nullptr);
-              REQUIRE(domain_3_sw_sw_ne_patch != nullptr);
-              REQUIRE(domain_3_sw_se_patch != nullptr);
-              REQUIRE(domain_3_sw_nw_patch != nullptr);
-              REQUIRE(domain_3_sw_ne_patch != nullptr);
+              REQUIRE_NE(domain_3_sw_sw_sw_patch, nullptr);
+              REQUIRE_NE(domain_3_sw_sw_se_patch, nullptr);
+              REQUIRE_NE(domain_3_sw_sw_nw_patch, nullptr);
+              REQUIRE_NE(domain_3_sw_sw_ne_patch, nullptr);
+              REQUIRE_NE(domain_3_sw_se_patch, nullptr);
+              REQUIRE_NE(domain_3_sw_nw_patch, nullptr);
+              REQUIRE_NE(domain_3_sw_ne_patch, nullptr);
 
-              REQUIRE(domain_3_se_sw_patch != nullptr);
-              REQUIRE(domain_3_se_se_patch != nullptr);
-              REQUIRE(domain_3_se_nw_patch != nullptr);
-              REQUIRE(domain_3_se_ne_patch != nullptr);
+              REQUIRE_NE(domain_3_se_sw_patch, nullptr);
+              REQUIRE_NE(domain_3_se_se_patch, nullptr);
+              REQUIRE_NE(domain_3_se_nw_patch, nullptr);
+              REQUIRE_NE(domain_3_se_ne_patch, nullptr);
 
-              REQUIRE(domain_3_nw_sw_patch != nullptr);
-              REQUIRE(domain_3_nw_se_patch != nullptr);
-              REQUIRE(domain_3_nw_nw_patch != nullptr);
-              REQUIRE(domain_3_nw_ne_patch != nullptr);
+              REQUIRE_NE(domain_3_nw_sw_patch, nullptr);
+              REQUIRE_NE(domain_3_nw_se_patch, nullptr);
+              REQUIRE_NE(domain_3_nw_nw_patch, nullptr);
+              REQUIRE_NE(domain_3_nw_ne_patch, nullptr);
 
-              REQUIRE(domain_3_ne_sw_patch != nullptr);
-              REQUIRE(domain_3_ne_se_patch != nullptr);
-              REQUIRE(domain_3_ne_nw_patch != nullptr);
-              REQUIRE(domain_3_ne_ne_patch != nullptr);
+              REQUIRE_NE(domain_3_ne_sw_patch, nullptr);
+              REQUIRE_NE(domain_3_ne_se_patch, nullptr);
+              REQUIRE_NE(domain_3_ne_nw_patch, nullptr);
+              REQUIRE_NE(domain_3_ne_ne_patch, nullptr);
 
-              REQUIRE(domain_2_sw_sw_patch != nullptr);
-              REQUIRE(domain_2_sw_se_patch != nullptr);
-              REQUIRE(domain_2_sw_nw_patch != nullptr);
-              REQUIRE(domain_2_sw_ne_patch != nullptr);
+              REQUIRE_NE(domain_2_sw_sw_patch, nullptr);
+              REQUIRE_NE(domain_2_sw_se_patch, nullptr);
+              REQUIRE_NE(domain_2_sw_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_sw_ne_patch, nullptr);
 
-              REQUIRE(domain_2_se_sw_patch != nullptr);
-              REQUIRE(domain_2_se_se_patch != nullptr);
-              REQUIRE(domain_2_se_nw_patch != nullptr);
-              REQUIRE(domain_2_se_ne_patch != nullptr);
+              REQUIRE_NE(domain_2_se_sw_patch, nullptr);
+              REQUIRE_NE(domain_2_se_se_patch, nullptr);
+              REQUIRE_NE(domain_2_se_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_se_ne_patch, nullptr);
 
-              REQUIRE(domain_2_nw_sw_patch != nullptr);
-              REQUIRE(domain_2_nw_se_patch != nullptr);
-              REQUIRE(domain_2_nw_nw_patch != nullptr);
-              REQUIRE(domain_2_nw_ne_patch != nullptr);
+              REQUIRE_NE(domain_2_nw_sw_patch, nullptr);
+              REQUIRE_NE(domain_2_nw_se_patch, nullptr);
+              REQUIRE_NE(domain_2_nw_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_nw_ne_patch, nullptr);
 
-              REQUIRE(domain_2_ne_sw_patch != nullptr);
-              REQUIRE(domain_2_ne_se_patch != nullptr);
-              REQUIRE(domain_2_ne_nw_patch != nullptr);
-              REQUIRE(domain_2_ne_ne_patch != nullptr);
+              REQUIRE_NE(domain_2_ne_sw_patch, nullptr);
+              REQUIRE_NE(domain_2_ne_se_patch, nullptr);
+              REQUIRE_NE(domain_2_ne_nw_patch, nullptr);
+              REQUIRE_NE(domain_2_ne_ne_patch, nullptr);
 
-              REQUIRE(domain_1_sw_patch != nullptr);
-              REQUIRE(domain_1_se_patch != nullptr);
-              REQUIRE(domain_1_nw_patch != nullptr);
-              REQUIRE(domain_1_ne_patch != nullptr);
+              REQUIRE_NE(domain_1_sw_patch, nullptr);
+              REQUIRE_NE(domain_1_se_patch, nullptr);
+              REQUIRE_NE(domain_1_nw_patch, nullptr);
+              REQUIRE_NE(domain_1_ne_patch, nullptr);
 
-              CHECK(domain_0_coarser_patch->starts[0] == doctest::Approx(0.0));
-              CHECK(domain_0_coarser_patch->starts[1] == doctest::Approx(0.0));
+              CHECK_EQ(domain_0_coarser_patch->starts[0], doctest::Approx(0.0));
+              CHECK_EQ(domain_0_coarser_patch->starts[1], doctest::Approx(0.0));
             }
 
             // SECTION("patches have correct spacings")
             {
               if (rank == 0) {
-                CHECK(domain_3_sw_sw_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
-                CHECK(domain_3_sw_sw_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
-                CHECK(domain_3_sw_sw_se_patch->spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
-                CHECK(domain_3_sw_sw_se_patch->spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
-                CHECK(domain_3_sw_sw_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
-                CHECK(domain_3_sw_sw_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
-                CHECK(domain_3_sw_sw_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
-                CHECK(domain_3_sw_sw_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
+                CHECK_EQ(domain_3_sw_sw_sw_patch->spacings[0], doctest::Approx(scale_x * 0.125 / nx));
+                CHECK_EQ(domain_3_sw_sw_sw_patch->spacings[1], doctest::Approx(scale_y * 0.125 / ny));
+                CHECK_EQ(domain_3_sw_sw_se_patch->spacings[0], doctest::Approx(scale_x * 0.125 / nx));
+                CHECK_EQ(domain_3_sw_sw_se_patch->spacings[1], doctest::Approx(scale_y * 0.125 / ny));
+                CHECK_EQ(domain_3_sw_sw_nw_patch->spacings[0], doctest::Approx(scale_x * 0.125 / nx));
+                CHECK_EQ(domain_3_sw_sw_nw_patch->spacings[1], doctest::Approx(scale_y * 0.125 / ny));
+                CHECK_EQ(domain_3_sw_sw_ne_patch->spacings[0], doctest::Approx(scale_x * 0.125 / nx));
+                CHECK_EQ(domain_3_sw_sw_ne_patch->spacings[1], doctest::Approx(scale_y * 0.125 / ny));
 
-                CHECK(domain_3_sw_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_sw_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_sw_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_sw_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_sw_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_sw_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_sw_se_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_sw_se_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_sw_nw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_sw_nw_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_sw_ne_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_sw_ne_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
 
-                CHECK(domain_3_se_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_se_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_se_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_se_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_se_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_se_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_se_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_se_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_se_sw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_se_sw_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_se_se_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_se_se_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_se_nw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_se_nw_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_se_ne_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_se_ne_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
 
-                CHECK(domain_3_nw_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_nw_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_nw_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_nw_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_nw_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_nw_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_nw_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_nw_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_nw_sw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_nw_sw_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_nw_se_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_nw_se_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_nw_nw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_nw_nw_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_nw_ne_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_nw_ne_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
 
-                CHECK(domain_3_ne_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_ne_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_ne_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_ne_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_ne_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_ne_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_ne_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_ne_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_ne_sw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_ne_sw_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_ne_se_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_ne_se_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_ne_nw_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_ne_nw_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(domain_3_ne_ne_patch->spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(domain_3_ne_ne_patch->spacings[1], doctest::Approx(scale_y * 0.25 / ny));
               }
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.25 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.25 / ny));
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.5 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.5 / ny));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
+                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 1.0 / nx));
+                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 1.0 / ny));
               }
             }
 
             // SECTION("patches have refine_level set")
             {
               if (rank == 0) {
-                CHECK(domain_3_sw_sw_sw_patch->refine_level == 3);
-                CHECK(domain_3_sw_sw_se_patch->refine_level == 3);
-                CHECK(domain_3_sw_sw_nw_patch->refine_level == 3);
-                CHECK(domain_3_sw_sw_ne_patch->refine_level == 3);
+                CHECK_EQ(domain_3_sw_sw_sw_patch->refine_level, 3);
+                CHECK_EQ(domain_3_sw_sw_se_patch->refine_level, 3);
+                CHECK_EQ(domain_3_sw_sw_nw_patch->refine_level, 3);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->refine_level, 3);
 
-                CHECK(domain_3_sw_se_patch->refine_level == 2);
-                CHECK(domain_3_sw_nw_patch->refine_level == 2);
-                CHECK(domain_3_sw_ne_patch->refine_level == 2);
+                CHECK_EQ(domain_3_sw_se_patch->refine_level, 2);
+                CHECK_EQ(domain_3_sw_nw_patch->refine_level, 2);
+                CHECK_EQ(domain_3_sw_ne_patch->refine_level, 2);
 
-                CHECK(domain_3_se_sw_patch->refine_level == 2);
-                CHECK(domain_3_se_se_patch->refine_level == 2);
-                CHECK(domain_3_se_nw_patch->refine_level == 2);
-                CHECK(domain_3_se_ne_patch->refine_level == 2);
+                CHECK_EQ(domain_3_se_sw_patch->refine_level, 2);
+                CHECK_EQ(domain_3_se_se_patch->refine_level, 2);
+                CHECK_EQ(domain_3_se_nw_patch->refine_level, 2);
+                CHECK_EQ(domain_3_se_ne_patch->refine_level, 2);
 
-                CHECK(domain_3_nw_sw_patch->refine_level == 2);
-                CHECK(domain_3_nw_se_patch->refine_level == 2);
-                CHECK(domain_3_nw_nw_patch->refine_level == 2);
-                CHECK(domain_3_nw_ne_patch->refine_level == 2);
+                CHECK_EQ(domain_3_nw_sw_patch->refine_level, 2);
+                CHECK_EQ(domain_3_nw_se_patch->refine_level, 2);
+                CHECK_EQ(domain_3_nw_nw_patch->refine_level, 2);
+                CHECK_EQ(domain_3_nw_ne_patch->refine_level, 2);
 
-                CHECK(domain_3_ne_sw_patch->refine_level == 2);
-                CHECK(domain_3_ne_se_patch->refine_level == 2);
-                CHECK(domain_3_ne_nw_patch->refine_level == 2);
-                CHECK(domain_3_ne_ne_patch->refine_level == 2);
+                CHECK_EQ(domain_3_ne_sw_patch->refine_level, 2);
+                CHECK_EQ(domain_3_ne_se_patch->refine_level, 2);
+                CHECK_EQ(domain_3_ne_nw_patch->refine_level, 2);
+                CHECK_EQ(domain_3_ne_ne_patch->refine_level, 2);
               }
 
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.refine_level == 2);
+                CHECK_EQ(patch.refine_level, 2);
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.refine_level == 1);
+                CHECK_EQ(patch.refine_level, 1);
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.refine_level == 0);
+                CHECK_EQ(patch.refine_level, 0);
               }
             }
 
             // SECTION("parent ids are set correctly")
             {
               if (rank == 0) {
-                CHECK(domain_3_sw_sw_sw_patch->parent_id == domain_2_sw_sw_patch->id);
-                CHECK(domain_3_sw_sw_se_patch->parent_id == domain_2_sw_sw_patch->id);
-                CHECK(domain_3_sw_sw_nw_patch->parent_id == domain_2_sw_sw_patch->id);
-                CHECK(domain_3_sw_sw_ne_patch->parent_id == domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_3_sw_sw_sw_patch->parent_id, domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_3_sw_sw_se_patch->parent_id, domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_3_sw_sw_nw_patch->parent_id, domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->parent_id, domain_2_sw_sw_patch->id);
 
-                CHECK(domain_3_sw_se_patch->parent_id == domain_2_sw_se_patch->id);
-                CHECK(domain_3_sw_nw_patch->parent_id == domain_2_sw_nw_patch->id);
-                CHECK(domain_3_sw_ne_patch->parent_id == domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_3_sw_se_patch->parent_id, domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_3_sw_nw_patch->parent_id, domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_3_sw_ne_patch->parent_id, domain_2_sw_ne_patch->id);
 
-                CHECK(domain_3_se_sw_patch->parent_id == domain_2_se_sw_patch->id);
-                CHECK(domain_3_se_se_patch->parent_id == domain_2_se_se_patch->id);
-                CHECK(domain_3_se_nw_patch->parent_id == domain_2_se_nw_patch->id);
-                CHECK(domain_3_se_ne_patch->parent_id == domain_2_se_ne_patch->id);
+                CHECK_EQ(domain_3_se_sw_patch->parent_id, domain_2_se_sw_patch->id);
+                CHECK_EQ(domain_3_se_se_patch->parent_id, domain_2_se_se_patch->id);
+                CHECK_EQ(domain_3_se_nw_patch->parent_id, domain_2_se_nw_patch->id);
+                CHECK_EQ(domain_3_se_ne_patch->parent_id, domain_2_se_ne_patch->id);
 
-                CHECK(domain_3_nw_sw_patch->parent_id == domain_2_nw_sw_patch->id);
-                CHECK(domain_3_nw_se_patch->parent_id == domain_2_nw_se_patch->id);
-                CHECK(domain_3_nw_nw_patch->parent_id == domain_2_nw_nw_patch->id);
-                CHECK(domain_3_nw_ne_patch->parent_id == domain_2_nw_ne_patch->id);
+                CHECK_EQ(domain_3_nw_sw_patch->parent_id, domain_2_nw_sw_patch->id);
+                CHECK_EQ(domain_3_nw_se_patch->parent_id, domain_2_nw_se_patch->id);
+                CHECK_EQ(domain_3_nw_nw_patch->parent_id, domain_2_nw_nw_patch->id);
+                CHECK_EQ(domain_3_nw_ne_patch->parent_id, domain_2_nw_ne_patch->id);
 
-                CHECK(domain_3_ne_sw_patch->parent_id == domain_2_ne_sw_patch->id);
-                CHECK(domain_3_ne_se_patch->parent_id == domain_2_ne_se_patch->id);
-                CHECK(domain_3_ne_nw_patch->parent_id == domain_2_ne_nw_patch->id);
-                CHECK(domain_3_ne_ne_patch->parent_id == domain_2_ne_ne_patch->id);
+                CHECK_EQ(domain_3_ne_sw_patch->parent_id, domain_2_ne_sw_patch->id);
+                CHECK_EQ(domain_3_ne_se_patch->parent_id, domain_2_ne_se_patch->id);
+                CHECK_EQ(domain_3_ne_nw_patch->parent_id, domain_2_ne_nw_patch->id);
+                CHECK_EQ(domain_3_ne_ne_patch->parent_id, domain_2_ne_ne_patch->id);
 
-                CHECK(domain_2_sw_sw_patch->parent_id == domain_1_sw_patch->id);
-                CHECK(domain_2_sw_se_patch->parent_id == domain_1_sw_patch->id);
-                CHECK(domain_2_sw_nw_patch->parent_id == domain_1_sw_patch->id);
-                CHECK(domain_2_sw_ne_patch->parent_id == domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_sw_patch->parent_id, domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->parent_id, domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->parent_id, domain_1_sw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->parent_id, domain_1_sw_patch->id);
 
-                CHECK(domain_2_se_sw_patch->parent_id == domain_1_se_patch->id);
-                CHECK(domain_2_se_se_patch->parent_id == domain_1_se_patch->id);
-                CHECK(domain_2_se_nw_patch->parent_id == domain_1_se_patch->id);
-                CHECK(domain_2_se_ne_patch->parent_id == domain_1_se_patch->id);
+                CHECK_EQ(domain_2_se_sw_patch->parent_id, domain_1_se_patch->id);
+                CHECK_EQ(domain_2_se_se_patch->parent_id, domain_1_se_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->parent_id, domain_1_se_patch->id);
+                CHECK_EQ(domain_2_se_ne_patch->parent_id, domain_1_se_patch->id);
 
-                CHECK(domain_2_nw_sw_patch->parent_id == domain_1_nw_patch->id);
-                CHECK(domain_2_nw_se_patch->parent_id == domain_1_nw_patch->id);
-                CHECK(domain_2_nw_nw_patch->parent_id == domain_1_nw_patch->id);
-                CHECK(domain_2_nw_ne_patch->parent_id == domain_1_nw_patch->id);
+                CHECK_EQ(domain_2_nw_sw_patch->parent_id, domain_1_nw_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->parent_id, domain_1_nw_patch->id);
+                CHECK_EQ(domain_2_nw_nw_patch->parent_id, domain_1_nw_patch->id);
+                CHECK_EQ(domain_2_nw_ne_patch->parent_id, domain_1_nw_patch->id);
 
-                CHECK(domain_2_ne_sw_patch->parent_id == domain_1_ne_patch->id);
-                CHECK(domain_2_ne_se_patch->parent_id == domain_1_ne_patch->id);
-                CHECK(domain_2_ne_nw_patch->parent_id == domain_1_ne_patch->id);
-                CHECK(domain_2_ne_ne_patch->parent_id == domain_1_ne_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->parent_id, domain_1_ne_patch->id);
+                CHECK_EQ(domain_2_ne_se_patch->parent_id, domain_1_ne_patch->id);
+                CHECK_EQ(domain_2_ne_nw_patch->parent_id, domain_1_ne_patch->id);
+                CHECK_EQ(domain_2_ne_ne_patch->parent_id, domain_1_ne_patch->id);
 
-                CHECK(domain_1_sw_patch->parent_id == domain_0_coarser_patch->id);
-                CHECK(domain_1_se_patch->parent_id == domain_0_coarser_patch->id);
-                CHECK(domain_1_nw_patch->parent_id == domain_0_coarser_patch->id);
-                CHECK(domain_1_ne_patch->parent_id == domain_0_coarser_patch->id);
+                CHECK_EQ(domain_1_sw_patch->parent_id, domain_0_coarser_patch->id);
+                CHECK_EQ(domain_1_se_patch->parent_id, domain_0_coarser_patch->id);
+                CHECK_EQ(domain_1_nw_patch->parent_id, domain_0_coarser_patch->id);
+                CHECK_EQ(domain_1_ne_patch->parent_id, domain_0_coarser_patch->id);
 
-                CHECK(domain_0_coarser_patch->parent_id == -1);
+                CHECK_EQ(domain_0_coarser_patch->parent_id, -1);
               }
             }
             // SECTION("child ids are set correctly")
@@ -2064,210 +2064,210 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
                   INFO("i: " << i);
-                  CHECK(domain_3_sw_sw_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_3_sw_sw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_3_sw_sw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_3_sw_sw_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_3_sw_sw_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_sw_sw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_sw_sw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_sw_sw_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_3_sw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_3_sw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_3_sw_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_3_sw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_sw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_sw_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_3_se_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_3_se_se_patch->child_ids[i] == -1);
-                  CHECK(domain_3_se_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_3_se_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_3_se_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_se_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_se_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_se_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_3_nw_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_3_nw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_3_nw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_3_nw_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_3_nw_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_nw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_nw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_nw_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_3_ne_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_3_ne_se_patch->child_ids[i] == -1);
-                  CHECK(domain_3_ne_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_3_ne_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_3_ne_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_ne_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_ne_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_3_ne_ne_patch->child_ids[i], -1);
                 }
 
-                CHECK(domain_2_sw_sw_patch->child_ids[0] == domain_3_sw_sw_sw_patch->id);
-                CHECK(domain_2_sw_sw_patch->child_ids[1] == domain_3_sw_sw_se_patch->id);
-                CHECK(domain_2_sw_sw_patch->child_ids[2] == domain_3_sw_sw_nw_patch->id);
-                CHECK(domain_2_sw_sw_patch->child_ids[3] == domain_3_sw_sw_ne_patch->id);
+                CHECK_EQ(domain_2_sw_sw_patch->child_ids[0], domain_3_sw_sw_sw_patch->id);
+                CHECK_EQ(domain_2_sw_sw_patch->child_ids[1], domain_3_sw_sw_se_patch->id);
+                CHECK_EQ(domain_2_sw_sw_patch->child_ids[2], domain_3_sw_sw_nw_patch->id);
+                CHECK_EQ(domain_2_sw_sw_patch->child_ids[3], domain_3_sw_sw_ne_patch->id);
 
-                CHECK(domain_2_sw_se_patch->child_ids[0] == domain_3_sw_se_patch->id);
-                CHECK(domain_2_sw_nw_patch->child_ids[0] == domain_3_sw_nw_patch->id);
-                CHECK(domain_2_sw_ne_patch->child_ids[0] == domain_3_sw_ne_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->child_ids[0], domain_3_sw_se_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->child_ids[0], domain_3_sw_nw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->child_ids[0], domain_3_sw_ne_patch->id);
 
-                CHECK(domain_2_se_sw_patch->child_ids[0] == domain_3_se_sw_patch->id);
-                CHECK(domain_2_se_se_patch->child_ids[0] == domain_3_se_se_patch->id);
-                CHECK(domain_2_se_nw_patch->child_ids[0] == domain_3_se_nw_patch->id);
-                CHECK(domain_2_se_ne_patch->child_ids[0] == domain_3_se_ne_patch->id);
+                CHECK_EQ(domain_2_se_sw_patch->child_ids[0], domain_3_se_sw_patch->id);
+                CHECK_EQ(domain_2_se_se_patch->child_ids[0], domain_3_se_se_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->child_ids[0], domain_3_se_nw_patch->id);
+                CHECK_EQ(domain_2_se_ne_patch->child_ids[0], domain_3_se_ne_patch->id);
 
-                CHECK(domain_2_nw_sw_patch->child_ids[0] == domain_3_nw_sw_patch->id);
-                CHECK(domain_2_nw_se_patch->child_ids[0] == domain_3_nw_se_patch->id);
-                CHECK(domain_2_nw_nw_patch->child_ids[0] == domain_3_nw_nw_patch->id);
-                CHECK(domain_2_nw_ne_patch->child_ids[0] == domain_3_nw_ne_patch->id);
+                CHECK_EQ(domain_2_nw_sw_patch->child_ids[0], domain_3_nw_sw_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->child_ids[0], domain_3_nw_se_patch->id);
+                CHECK_EQ(domain_2_nw_nw_patch->child_ids[0], domain_3_nw_nw_patch->id);
+                CHECK_EQ(domain_2_nw_ne_patch->child_ids[0], domain_3_nw_ne_patch->id);
 
-                CHECK(domain_2_ne_sw_patch->child_ids[0] == domain_3_ne_sw_patch->id);
-                CHECK(domain_2_ne_se_patch->child_ids[0] == domain_3_ne_se_patch->id);
-                CHECK(domain_2_ne_nw_patch->child_ids[0] == domain_3_ne_nw_patch->id);
-                CHECK(domain_2_ne_ne_patch->child_ids[0] == domain_3_ne_ne_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->child_ids[0], domain_3_ne_sw_patch->id);
+                CHECK_EQ(domain_2_ne_se_patch->child_ids[0], domain_3_ne_se_patch->id);
+                CHECK_EQ(domain_2_ne_nw_patch->child_ids[0], domain_3_ne_nw_patch->id);
+                CHECK_EQ(domain_2_ne_ne_patch->child_ids[0], domain_3_ne_ne_patch->id);
 
                 for (int i = 1; i < 4; i++) {
-                  CHECK(domain_2_sw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_sw_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_sw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_sw_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_2_se_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_se_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_se_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_se_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_2_nw_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_nw_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_nw_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_nw_ne_patch->child_ids[i], -1);
 
-                  CHECK(domain_2_ne_sw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_se_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_nw_patch->child_ids[i] == -1);
-                  CHECK(domain_2_ne_ne_patch->child_ids[i] == -1);
+                  CHECK_EQ(domain_2_ne_sw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_se_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_nw_patch->child_ids[i], -1);
+                  CHECK_EQ(domain_2_ne_ne_patch->child_ids[i], -1);
                 }
 
-                CHECK(domain_1_sw_patch->child_ids[0] == domain_2_sw_sw_patch->id);
-                CHECK(domain_1_sw_patch->child_ids[1] == domain_2_sw_se_patch->id);
-                CHECK(domain_1_sw_patch->child_ids[2] == domain_2_sw_nw_patch->id);
-                CHECK(domain_1_sw_patch->child_ids[3] == domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[0], domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[1], domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[2], domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_1_sw_patch->child_ids[3], domain_2_sw_ne_patch->id);
 
-                CHECK(domain_1_se_patch->child_ids[0] == domain_2_se_sw_patch->id);
-                CHECK(domain_1_se_patch->child_ids[1] == domain_2_se_se_patch->id);
-                CHECK(domain_1_se_patch->child_ids[2] == domain_2_se_nw_patch->id);
-                CHECK(domain_1_se_patch->child_ids[3] == domain_2_se_ne_patch->id);
+                CHECK_EQ(domain_1_se_patch->child_ids[0], domain_2_se_sw_patch->id);
+                CHECK_EQ(domain_1_se_patch->child_ids[1], domain_2_se_se_patch->id);
+                CHECK_EQ(domain_1_se_patch->child_ids[2], domain_2_se_nw_patch->id);
+                CHECK_EQ(domain_1_se_patch->child_ids[3], domain_2_se_ne_patch->id);
 
-                CHECK(domain_1_nw_patch->child_ids[0] == domain_2_nw_sw_patch->id);
-                CHECK(domain_1_nw_patch->child_ids[1] == domain_2_nw_se_patch->id);
-                CHECK(domain_1_nw_patch->child_ids[2] == domain_2_nw_nw_patch->id);
-                CHECK(domain_1_nw_patch->child_ids[3] == domain_2_nw_ne_patch->id);
+                CHECK_EQ(domain_1_nw_patch->child_ids[0], domain_2_nw_sw_patch->id);
+                CHECK_EQ(domain_1_nw_patch->child_ids[1], domain_2_nw_se_patch->id);
+                CHECK_EQ(domain_1_nw_patch->child_ids[2], domain_2_nw_nw_patch->id);
+                CHECK_EQ(domain_1_nw_patch->child_ids[3], domain_2_nw_ne_patch->id);
 
-                CHECK(domain_1_ne_patch->child_ids[0] == domain_2_ne_sw_patch->id);
-                CHECK(domain_1_ne_patch->child_ids[1] == domain_2_ne_se_patch->id);
-                CHECK(domain_1_ne_patch->child_ids[2] == domain_2_ne_nw_patch->id);
-                CHECK(domain_1_ne_patch->child_ids[3] == domain_2_ne_ne_patch->id);
+                CHECK_EQ(domain_1_ne_patch->child_ids[0], domain_2_ne_sw_patch->id);
+                CHECK_EQ(domain_1_ne_patch->child_ids[1], domain_2_ne_se_patch->id);
+                CHECK_EQ(domain_1_ne_patch->child_ids[2], domain_2_ne_nw_patch->id);
+                CHECK_EQ(domain_1_ne_patch->child_ids[3], domain_2_ne_ne_patch->id);
 
-                CHECK(domain_0_coarser_patch->child_ids[0] == domain_1_sw_patch->id);
-                CHECK(domain_0_coarser_patch->child_ids[1] == domain_1_se_patch->id);
-                CHECK(domain_0_coarser_patch->child_ids[2] == domain_1_nw_patch->id);
-                CHECK(domain_0_coarser_patch->child_ids[3] == domain_1_ne_patch->id);
+                CHECK_EQ(domain_0_coarser_patch->child_ids[0], domain_1_sw_patch->id);
+                CHECK_EQ(domain_0_coarser_patch->child_ids[1], domain_1_se_patch->id);
+                CHECK_EQ(domain_0_coarser_patch->child_ids[2], domain_1_nw_patch->id);
+                CHECK_EQ(domain_0_coarser_patch->child_ids[3], domain_1_ne_patch->id);
               }
             }
             // SECTION("orth on parent is set correctly")
             {
               if (rank == 0) {
-                CHECK(domain_3_sw_sw_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_3_sw_sw_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_3_sw_sw_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_3_sw_sw_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_3_sw_sw_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_3_sw_sw_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_3_sw_sw_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_3_sw_sw_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_3_sw_se_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_sw_nw_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_sw_ne_patch->orth_on_parent == Orthant<2>::null());
+                CHECK_EQ(domain_3_sw_se_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_sw_nw_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_sw_ne_patch->orth_on_parent, Orthant<2>::null());
 
-                CHECK(domain_3_se_sw_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_se_se_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_se_nw_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_se_ne_patch->orth_on_parent == Orthant<2>::null());
+                CHECK_EQ(domain_3_se_sw_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_se_se_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_se_nw_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_se_ne_patch->orth_on_parent, Orthant<2>::null());
 
-                CHECK(domain_3_nw_sw_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_nw_se_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_nw_nw_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_nw_ne_patch->orth_on_parent == Orthant<2>::null());
+                CHECK_EQ(domain_3_nw_sw_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_nw_se_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_nw_nw_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_nw_ne_patch->orth_on_parent, Orthant<2>::null());
 
-                CHECK(domain_3_ne_sw_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_ne_se_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_ne_nw_patch->orth_on_parent == Orthant<2>::null());
-                CHECK(domain_3_ne_ne_patch->orth_on_parent == Orthant<2>::null());
+                CHECK_EQ(domain_3_ne_sw_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_ne_se_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_ne_nw_patch->orth_on_parent, Orthant<2>::null());
+                CHECK_EQ(domain_3_ne_ne_patch->orth_on_parent, Orthant<2>::null());
 
-                CHECK(domain_2_sw_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_2_sw_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_2_sw_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_2_sw_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_2_sw_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_2_sw_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_2_sw_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_2_sw_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_2_se_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_2_se_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_2_se_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_2_se_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_2_se_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_2_se_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_2_se_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_2_se_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_2_nw_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_2_nw_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_2_nw_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_2_nw_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_2_nw_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_2_nw_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_2_nw_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_2_nw_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_2_ne_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_2_ne_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_2_ne_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_2_ne_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_2_ne_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_2_ne_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_2_ne_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_2_ne_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_1_sw_patch->orth_on_parent == Orthant<2>::sw());
-                CHECK(domain_1_se_patch->orth_on_parent == Orthant<2>::se());
-                CHECK(domain_1_nw_patch->orth_on_parent == Orthant<2>::nw());
-                CHECK(domain_1_ne_patch->orth_on_parent == Orthant<2>::ne());
+                CHECK_EQ(domain_1_sw_patch->orth_on_parent, Orthant<2>::sw());
+                CHECK_EQ(domain_1_se_patch->orth_on_parent, Orthant<2>::se());
+                CHECK_EQ(domain_1_nw_patch->orth_on_parent, Orthant<2>::nw());
+                CHECK_EQ(domain_1_ne_patch->orth_on_parent, Orthant<2>::ne());
 
-                CHECK(domain_0_coarser_patch->orth_on_parent == Orthant<2>::null());
+                CHECK_EQ(domain_0_coarser_patch->orth_on_parent, Orthant<2>::null());
               }
             }
             // SECTION("parent ranks are set correctly")
             {
               if (rank == 0) {
-                CHECK(domain_3_sw_sw_sw_patch->parent_rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_3_sw_sw_se_patch->parent_rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_3_sw_sw_nw_patch->parent_rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_3_sw_sw_ne_patch->parent_rank == domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_sw_patch->parent_rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_se_patch->parent_rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_nw_patch->parent_rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->parent_rank, domain_2_sw_sw_patch->rank);
 
-                CHECK(domain_3_sw_se_patch->parent_rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_3_sw_nw_patch->parent_rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_3_sw_ne_patch->parent_rank == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_se_patch->parent_rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_nw_patch->parent_rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_ne_patch->parent_rank, domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_3_se_sw_patch->parent_rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_3_se_se_patch->parent_rank == domain_2_se_se_patch->rank);
-                CHECK(domain_3_se_nw_patch->parent_rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_3_se_ne_patch->parent_rank == domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_3_se_sw_patch->parent_rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_3_se_se_patch->parent_rank, domain_2_se_se_patch->rank);
+                CHECK_EQ(domain_3_se_nw_patch->parent_rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_3_se_ne_patch->parent_rank, domain_2_se_ne_patch->rank);
 
-                CHECK(domain_3_nw_sw_patch->parent_rank == domain_2_nw_sw_patch->rank);
-                CHECK(domain_3_nw_se_patch->parent_rank == domain_2_nw_se_patch->rank);
-                CHECK(domain_3_nw_nw_patch->parent_rank == domain_2_nw_nw_patch->rank);
-                CHECK(domain_3_nw_ne_patch->parent_rank == domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_3_nw_sw_patch->parent_rank, domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_3_nw_se_patch->parent_rank, domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_3_nw_nw_patch->parent_rank, domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_ne_patch->parent_rank, domain_2_nw_ne_patch->rank);
 
-                CHECK(domain_3_ne_sw_patch->parent_rank == domain_2_ne_sw_patch->rank);
-                CHECK(domain_3_ne_se_patch->parent_rank == domain_2_ne_se_patch->rank);
-                CHECK(domain_3_ne_nw_patch->parent_rank == domain_2_ne_nw_patch->rank);
-                CHECK(domain_3_ne_ne_patch->parent_rank == domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_sw_patch->parent_rank, domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_3_ne_se_patch->parent_rank, domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_3_ne_nw_patch->parent_rank, domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_3_ne_ne_patch->parent_rank, domain_2_ne_ne_patch->rank);
 
-                CHECK(domain_2_sw_sw_patch->parent_rank == domain_1_sw_patch->rank);
-                CHECK(domain_2_sw_se_patch->parent_rank == domain_1_sw_patch->rank);
-                CHECK(domain_2_sw_nw_patch->parent_rank == domain_1_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->parent_rank == domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->parent_rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->parent_rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->parent_rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->parent_rank, domain_1_sw_patch->rank);
 
-                CHECK(domain_2_se_sw_patch->parent_rank == domain_1_se_patch->rank);
-                CHECK(domain_2_se_se_patch->parent_rank == domain_1_se_patch->rank);
-                CHECK(domain_2_se_nw_patch->parent_rank == domain_1_se_patch->rank);
-                CHECK(domain_2_se_ne_patch->parent_rank == domain_1_se_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->parent_rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_2_se_se_patch->parent_rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->parent_rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->parent_rank, domain_1_se_patch->rank);
 
-                CHECK(domain_2_nw_sw_patch->parent_rank == domain_1_nw_patch->rank);
-                CHECK(domain_2_nw_se_patch->parent_rank == domain_1_nw_patch->rank);
-                CHECK(domain_2_nw_nw_patch->parent_rank == domain_1_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->parent_rank == domain_1_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->parent_rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->parent_rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_nw_patch->parent_rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->parent_rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_2_ne_sw_patch->parent_rank == domain_1_ne_patch->rank);
-                CHECK(domain_2_ne_se_patch->parent_rank == domain_1_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->parent_rank == domain_1_ne_patch->rank);
-                CHECK(domain_2_ne_ne_patch->parent_rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->parent_rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->parent_rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->parent_rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_ne_patch->parent_rank, domain_1_ne_patch->rank);
 
-                CHECK(domain_1_sw_patch->parent_rank == domain_0_coarser_patch->rank);
-                CHECK(domain_1_se_patch->parent_rank == domain_0_coarser_patch->rank);
-                CHECK(domain_1_nw_patch->parent_rank == domain_0_coarser_patch->rank);
-                CHECK(domain_1_ne_patch->parent_rank == domain_0_coarser_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->parent_rank, domain_0_coarser_patch->rank);
+                CHECK_EQ(domain_1_se_patch->parent_rank, domain_0_coarser_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->parent_rank, domain_0_coarser_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->parent_rank, domain_0_coarser_patch->rank);
 
-                CHECK(domain_0_coarser_patch->parent_rank == -1);
+                CHECK_EQ(domain_0_coarser_patch->parent_rank, -1);
               }
             }
             // SECTION("child ranks are set correctly")
@@ -2275,872 +2275,872 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
                   INFO("i: " << i);
-                  CHECK(domain_3_sw_sw_sw_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_sw_sw_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_sw_sw_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_sw_sw_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_3_sw_sw_sw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_sw_sw_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_sw_sw_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_sw_sw_ne_patch->child_ranks[i], -1);
 
-                  CHECK(domain_3_sw_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_sw_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_sw_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_3_sw_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_sw_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_sw_ne_patch->child_ranks[i], -1);
 
-                  CHECK(domain_3_se_sw_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_se_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_se_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_se_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_3_se_sw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_se_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_se_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_se_ne_patch->child_ranks[i], -1);
 
-                  CHECK(domain_3_nw_sw_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_nw_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_nw_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_nw_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_3_nw_sw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_nw_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_nw_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_nw_ne_patch->child_ranks[i], -1);
 
-                  CHECK(domain_3_ne_sw_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_ne_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_ne_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_3_ne_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_3_ne_sw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_ne_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_ne_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_3_ne_ne_patch->child_ranks[i], -1);
                 }
 
-                CHECK(domain_2_sw_sw_patch->child_ranks[0] == domain_3_sw_sw_sw_patch->rank);
-                CHECK(domain_2_sw_sw_patch->child_ranks[1] == domain_3_sw_sw_se_patch->rank);
-                CHECK(domain_2_sw_sw_patch->child_ranks[2] == domain_3_sw_sw_nw_patch->rank);
-                CHECK(domain_2_sw_sw_patch->child_ranks[3] == domain_3_sw_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->child_ranks[0], domain_3_sw_sw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->child_ranks[1], domain_3_sw_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->child_ranks[2], domain_3_sw_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->child_ranks[3], domain_3_sw_sw_ne_patch->rank);
 
-                CHECK(domain_2_sw_se_patch->child_ranks[0] == domain_3_sw_se_patch->rank);
-                CHECK(domain_2_sw_nw_patch->child_ranks[0] == domain_3_sw_nw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->child_ranks[0] == domain_3_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->child_ranks[0], domain_3_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->child_ranks[0], domain_3_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->child_ranks[0], domain_3_sw_ne_patch->rank);
 
-                CHECK(domain_2_se_sw_patch->child_ranks[0] == domain_3_se_sw_patch->rank);
-                CHECK(domain_2_se_se_patch->child_ranks[0] == domain_3_se_se_patch->rank);
-                CHECK(domain_2_se_nw_patch->child_ranks[0] == domain_3_se_nw_patch->rank);
-                CHECK(domain_2_se_ne_patch->child_ranks[0] == domain_3_se_ne_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->child_ranks[0], domain_3_se_sw_patch->rank);
+                CHECK_EQ(domain_2_se_se_patch->child_ranks[0], domain_3_se_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->child_ranks[0], domain_3_se_nw_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->child_ranks[0], domain_3_se_ne_patch->rank);
 
-                CHECK(domain_2_nw_sw_patch->child_ranks[0] == domain_3_nw_sw_patch->rank);
-                CHECK(domain_2_nw_se_patch->child_ranks[0] == domain_3_nw_se_patch->rank);
-                CHECK(domain_2_nw_nw_patch->child_ranks[0] == domain_3_nw_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->child_ranks[0] == domain_3_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->child_ranks[0], domain_3_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->child_ranks[0], domain_3_nw_se_patch->rank);
+                CHECK_EQ(domain_2_nw_nw_patch->child_ranks[0], domain_3_nw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->child_ranks[0], domain_3_nw_ne_patch->rank);
 
-                CHECK(domain_2_ne_sw_patch->child_ranks[0] == domain_3_ne_sw_patch->rank);
-                CHECK(domain_2_ne_se_patch->child_ranks[0] == domain_3_ne_se_patch->rank);
-                CHECK(domain_2_ne_nw_patch->child_ranks[0] == domain_3_ne_nw_patch->rank);
-                CHECK(domain_2_ne_ne_patch->child_ranks[0] == domain_3_ne_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->child_ranks[0], domain_3_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->child_ranks[0], domain_3_ne_se_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->child_ranks[0], domain_3_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_ne_patch->child_ranks[0], domain_3_ne_ne_patch->rank);
 
                 for (int i = 1; i < 4; i++) {
-                  CHECK(domain_2_sw_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_sw_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_sw_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_2_sw_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_sw_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_sw_ne_patch->child_ranks[i], -1);
 
-                  CHECK(domain_2_se_sw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_se_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_se_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_se_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_2_se_sw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_se_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_se_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_se_ne_patch->child_ranks[i], -1);
 
-                  CHECK(domain_2_nw_sw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_nw_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_nw_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_nw_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_2_nw_sw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_nw_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_nw_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_nw_ne_patch->child_ranks[i], -1);
 
-                  CHECK(domain_2_ne_sw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_ne_se_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_ne_nw_patch->child_ranks[i] == -1);
-                  CHECK(domain_2_ne_ne_patch->child_ranks[i] == -1);
+                  CHECK_EQ(domain_2_ne_sw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_ne_se_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_ne_nw_patch->child_ranks[i], -1);
+                  CHECK_EQ(domain_2_ne_ne_patch->child_ranks[i], -1);
                 }
 
-                CHECK(domain_1_sw_patch->child_ranks[0] == domain_2_sw_sw_patch->rank);
-                CHECK(domain_1_sw_patch->child_ranks[1] == domain_2_sw_se_patch->rank);
-                CHECK(domain_1_sw_patch->child_ranks[2] == domain_2_sw_nw_patch->rank);
-                CHECK(domain_1_sw_patch->child_ranks[3] == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[0], domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[1], domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[2], domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->child_ranks[3], domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_1_se_patch->child_ranks[0] == domain_2_se_sw_patch->rank);
-                CHECK(domain_1_se_patch->child_ranks[1] == domain_2_se_se_patch->rank);
-                CHECK(domain_1_se_patch->child_ranks[2] == domain_2_se_nw_patch->rank);
-                CHECK(domain_1_se_patch->child_ranks[3] == domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_1_se_patch->child_ranks[0], domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_1_se_patch->child_ranks[1], domain_2_se_se_patch->rank);
+                CHECK_EQ(domain_1_se_patch->child_ranks[2], domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_1_se_patch->child_ranks[3], domain_2_se_ne_patch->rank);
 
-                CHECK(domain_1_nw_patch->child_ranks[0] == domain_2_nw_sw_patch->rank);
-                CHECK(domain_1_nw_patch->child_ranks[1] == domain_2_nw_se_patch->rank);
-                CHECK(domain_1_nw_patch->child_ranks[2] == domain_2_nw_nw_patch->rank);
-                CHECK(domain_1_nw_patch->child_ranks[3] == domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->child_ranks[0], domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->child_ranks[1], domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->child_ranks[2], domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->child_ranks[3], domain_2_nw_ne_patch->rank);
 
-                CHECK(domain_1_ne_patch->child_ranks[0] == domain_2_ne_sw_patch->rank);
-                CHECK(domain_1_ne_patch->child_ranks[1] == domain_2_ne_se_patch->rank);
-                CHECK(domain_1_ne_patch->child_ranks[2] == domain_2_ne_nw_patch->rank);
-                CHECK(domain_1_ne_patch->child_ranks[3] == domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->child_ranks[0], domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->child_ranks[1], domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->child_ranks[2], domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->child_ranks[3], domain_2_ne_ne_patch->rank);
 
-                CHECK(domain_0_coarser_patch->child_ranks[0] == domain_1_sw_patch->rank);
-                CHECK(domain_0_coarser_patch->child_ranks[1] == domain_1_se_patch->rank);
-                CHECK(domain_0_coarser_patch->child_ranks[2] == domain_1_nw_patch->rank);
-                CHECK(domain_0_coarser_patch->child_ranks[3] == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_0_coarser_patch->child_ranks[0], domain_1_sw_patch->rank);
+                CHECK_EQ(domain_0_coarser_patch->child_ranks[1], domain_1_se_patch->rank);
+                CHECK_EQ(domain_0_coarser_patch->child_ranks[2], domain_1_nw_patch->rank);
+                CHECK_EQ(domain_0_coarser_patch->child_ranks[3], domain_1_ne_patch->rank);
               }
             }
             // SECTION("nbr_info ids are correct")
             {
               if (rank == 0) {
-                CHECK_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_sw_sw_se_patch->id);
-                CHECK_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_sw_sw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_sw_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_sw_sw_nw_patch->id);
 
-                CHECK(domain_3_sw_sw_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_sw_sw_sw_patch->id);
-                CHECK(domain_3_sw_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).id == domain_3_sw_se_patch->id);
-                CHECK_FALSE(domain_3_sw_sw_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_3_sw_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_sw_sw_ne_patch->id);
+                CHECK_EQ(domain_3_sw_sw_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_sw_sw_sw_patch->id);
+                CHECK_EQ(domain_3_sw_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).id, domain_3_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_sw_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_3_sw_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_sw_sw_ne_patch->id);
 
-                CHECK_FALSE(domain_3_sw_sw_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_sw_sw_ne_patch->id);
-                CHECK(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_sw_sw_sw_patch->id);
-                CHECK(domain_3_sw_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).id == domain_3_sw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_sw_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_sw_sw_ne_patch->id);
+                CHECK_EQ(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_sw_sw_sw_patch->id);
+                CHECK_EQ(domain_3_sw_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).id, domain_3_sw_nw_patch->id);
 
-                CHECK(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_sw_sw_nw_patch->id);
-                CHECK(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).id == domain_3_sw_se_patch->id);
-                CHECK(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_sw_sw_se_patch->id);
-                CHECK(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).id == domain_3_sw_nw_patch->id);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_sw_sw_nw_patch->id);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).id, domain_3_sw_se_patch->id);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_sw_sw_se_patch->id);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).id, domain_3_sw_nw_patch->id);
 
-                CHECK(domain_3_sw_se_patch->getFineNbrInfo(Side<2>::west()).ids[0] == domain_3_sw_sw_se_patch->id);
-                CHECK(domain_3_sw_se_patch->getFineNbrInfo(Side<2>::west()).ids[1] == domain_3_sw_sw_ne_patch->id);
-                CHECK(domain_3_sw_se_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_se_sw_patch->id);
-                CHECK_FALSE(domain_3_sw_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_3_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_sw_ne_patch->id);
+                CHECK_EQ(domain_3_sw_se_patch->getFineNbrInfo(Side<2>::west()).ids[0], domain_3_sw_sw_se_patch->id);
+                CHECK_EQ(domain_3_sw_se_patch->getFineNbrInfo(Side<2>::west()).ids[1], domain_3_sw_sw_ne_patch->id);
+                CHECK_EQ(domain_3_sw_se_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_se_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_3_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_sw_ne_patch->id);
 
-                CHECK_FALSE(domain_3_sw_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_3_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_sw_ne_patch->id);
-                CHECK(domain_3_sw_nw_patch->getFineNbrInfo(Side<2>::south()).ids[0] == domain_3_sw_sw_nw_patch->id);
-                CHECK(domain_3_sw_nw_patch->getFineNbrInfo(Side<2>::south()).ids[1] == domain_3_sw_sw_ne_patch->id);
-                CHECK(domain_3_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_nw_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_3_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_sw_ne_patch->id);
+                CHECK_EQ(domain_3_sw_nw_patch->getFineNbrInfo(Side<2>::south()).ids[0], domain_3_sw_sw_nw_patch->id);
+                CHECK_EQ(domain_3_sw_nw_patch->getFineNbrInfo(Side<2>::south()).ids[1], domain_3_sw_sw_ne_patch->id);
+                CHECK_EQ(domain_3_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_nw_sw_patch->id);
 
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_sw_nw_patch->id);
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_se_nw_patch->id);
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_sw_se_patch->id);
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_nw_se_patch->id);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_sw_nw_patch->id);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_se_nw_patch->id);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_sw_se_patch->id);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_nw_se_patch->id);
 
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_sw_se_patch->id);
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_se_se_patch->id);
-                CHECK_FALSE(domain_3_se_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_se_nw_patch->id);
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_sw_se_patch->id);
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_se_se_patch->id);
+                CHECK_UNARY_FALSE(domain_3_se_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_se_nw_patch->id);
 
-                CHECK(domain_3_se_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_se_sw_patch->id);
-                CHECK_FALSE(domain_3_se_se_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_3_se_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_3_se_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_se_ne_patch->id);
+                CHECK_EQ(domain_3_se_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_se_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_se_se_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_3_se_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_3_se_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_se_ne_patch->id);
 
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_sw_ne_patch->id);
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_se_ne_patch->id);
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_se_sw_patch->id);
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_ne_sw_patch->id);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_sw_ne_patch->id);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_se_ne_patch->id);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_se_sw_patch->id);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_ne_sw_patch->id);
 
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_se_nw_patch->id);
-                CHECK_FALSE(domain_3_se_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_se_se_patch->id);
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_ne_se_patch->id);
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_se_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_se_se_patch->id);
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_ne_se_patch->id);
 
-                CHECK_FALSE(domain_3_nw_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_nw_se_patch->id);
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_sw_nw_patch->id);
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_nw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_nw_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_nw_se_patch->id);
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_sw_nw_patch->id);
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_nw_nw_patch->id);
 
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_nw_sw_patch->id);
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_ne_sw_patch->id);
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_sw_ne_patch->id);
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_nw_ne_patch->id);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_nw_sw_patch->id);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_ne_sw_patch->id);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_sw_ne_patch->id);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_nw_ne_patch->id);
 
-                CHECK_FALSE(domain_3_nw_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_3_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_nw_ne_patch->id);
-                CHECK(domain_3_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_nw_sw_patch->id);
-                CHECK_FALSE(domain_3_nw_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_3_nw_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_3_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_nw_ne_patch->id);
+                CHECK_EQ(domain_3_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_nw_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_nw_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_nw_nw_patch->rank);
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_ne_nw_patch->rank);
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_nw_se_patch->rank);
-                CHECK_FALSE(domain_3_nw_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_nw_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_ne_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_nw_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_3_nw_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_nw_se_patch->id);
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_3_ne_se_patch->id);
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_se_nw_patch->id);
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_ne_nw_patch->id);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_nw_se_patch->id);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_3_ne_se_patch->id);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_se_nw_patch->id);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_ne_nw_patch->id);
 
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_3_ne_sw_patch->id);
-                CHECK_FALSE(domain_3_ne_se_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::south()).id == domain_3_se_ne_patch->id);
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_3_ne_ne_patch->id);
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_3_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_ne_se_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::south()).id, domain_3_se_ne_patch->id);
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_3_ne_ne_patch->id);
 
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_nw_ne_patch->rank);
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_ne_ne_patch->rank);
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_ne_sw_patch->rank);
-                CHECK_FALSE(domain_3_ne_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_nw_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_ne_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_ne_sw_patch->rank);
+                CHECK_UNARY_FALSE(domain_3_ne_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_3_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_ne_nw_patch->rank);
-                CHECK_FALSE(domain_3_ne_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_3_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_ne_se_patch->rank);
-                CHECK_FALSE(domain_3_ne_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_3_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_ne_nw_patch->rank);
+                CHECK_UNARY_FALSE(domain_3_ne_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_3_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_ne_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_3_ne_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_sw_se_patch->id);
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_sw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_sw_nw_patch->id);
 
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_sw_patch->id);
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_se_sw_patch->id);
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_se_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_sw_ne_patch->id);
 
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_sw_patch->id);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_nw_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_sw_patch->id);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_nw_sw_patch->id);
 
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_se_nw_patch->id);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_se_patch->id);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_nw_se_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_se_nw_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_nw_se_patch->id);
 
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_se_patch->id);
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_se_se_patch->id);
-                CHECK_FALSE(domain_2_se_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_se_nw_patch->id);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_se_patch->id);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_se_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_se_nw_patch->id);
 
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_se_sw_patch->id);
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_se_ne_patch->id);
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_se_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_se_ne_patch->id);
 
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_se_ne_patch->id);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_se_sw_patch->id);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_ne_sw_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_se_ne_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_se_sw_patch->id);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_ne_sw_patch->id);
 
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_se_nw_patch->id);
-                CHECK_FALSE(domain_2_se_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_se_se_patch->id);
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_ne_se_patch->id);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_se_se_patch->id);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_ne_se_patch->id);
 
-                CHECK_FALSE(domain_2_nw_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_nw_se_patch->id);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_nw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_nw_se_patch->id);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_nw_patch->id);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_nw_nw_patch->id);
 
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_nw_sw_patch->id);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_ne_sw_patch->id);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_nw_ne_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_nw_sw_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_ne_sw_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_sw_ne_patch->id);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_nw_ne_patch->id);
 
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_nw_ne_patch->id);
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_nw_sw_patch->id);
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_nw_ne_patch->id);
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_nw_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_nw_se_patch->rank);
-                CHECK_FALSE(domain_2_nw_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_nw_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_2_nw_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_nw_se_patch->id);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).id == domain_2_ne_se_patch->id);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_se_nw_patch->id);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_ne_nw_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_nw_se_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).id, domain_2_ne_se_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_se_nw_patch->id);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_ne_nw_patch->id);
 
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::west()).id == domain_2_ne_sw_patch->id);
-                CHECK_FALSE(domain_2_ne_se_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::south()).id == domain_2_se_ne_patch->id);
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::north()).id == domain_2_ne_ne_patch->id);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::west()).id, domain_2_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_se_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::south()).id, domain_2_se_ne_patch->id);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::north()).id, domain_2_ne_ne_patch->id);
 
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_ne_sw_patch->rank);
-                CHECK_FALSE(domain_2_ne_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_ne_sw_patch->rank);
+                CHECK_UNARY_FALSE(domain_2_ne_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_ne_nw_patch->rank);
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_ne_se_patch->rank);
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_ne_nw_patch->rank);
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_ne_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_se_patch->rank);
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_nw_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_sw_patch->rank);
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Side<2>::south()));
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_sw_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Side<2>::south()));
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_ne_patch->rank);
 
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Side<2>::west()));
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_ne_patch->rank);
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_sw_patch->rank);
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Side<2>::west()));
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_sw_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Side<2>::north()));
 
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_nw_patch->rank);
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Side<2>::east()));
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_se_patch->rank);
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Side<2>::north()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_nw_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Side<2>::east()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_se_patch->rank);
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Side<2>::north()));
 
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::west()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::east()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::south()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::north()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::west()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::east()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::south()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Side<2>::north()));
               }
             }
             // SECTION("nbr_info ranks are correct")
             {
               if (rank == 0) {
-                CHECK(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_sw_sw_se_patch->rank);
-                CHECK(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_sw_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_sw_sw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_sw_sw_nw_patch->rank);
 
-                CHECK(domain_3_sw_sw_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_sw_sw_sw_patch->rank);
-                CHECK(domain_3_sw_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).rank == domain_3_sw_se_patch->rank);
-                CHECK(domain_3_sw_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_sw_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_sw_sw_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_se_patch->getCoarseNbrInfo(Side<2>::east()).rank, domain_3_sw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_sw_sw_ne_patch->rank);
 
-                CHECK(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_sw_sw_ne_patch->rank);
-                CHECK(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_sw_sw_sw_patch->rank);
-                CHECK(domain_3_sw_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).rank == domain_3_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_sw_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_sw_sw_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_nw_patch->getCoarseNbrInfo(Side<2>::north()).rank, domain_3_sw_nw_patch->rank);
 
-                CHECK(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_sw_sw_nw_patch->rank);
-                CHECK(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).rank == domain_3_sw_nw_patch->rank);
-                CHECK(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_sw_sw_se_patch->rank);
-                CHECK(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).rank == domain_3_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_sw_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Side<2>::east()).rank, domain_3_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_sw_sw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Side<2>::north()).rank, domain_3_sw_nw_patch->rank);
 
-                CHECK(domain_3_sw_se_patch->getFineNbrInfo(Side<2>::west()).ranks[0] == domain_3_sw_sw_se_patch->rank);
-                CHECK(domain_3_sw_se_patch->getFineNbrInfo(Side<2>::west()).ranks[1] == domain_3_sw_sw_ne_patch->rank);
-                CHECK(domain_3_sw_se_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_se_sw_patch->rank);
-                CHECK(domain_3_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_se_patch->getFineNbrInfo(Side<2>::west()).ranks[0], domain_3_sw_sw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_se_patch->getFineNbrInfo(Side<2>::west()).ranks[1], domain_3_sw_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_se_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_se_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_sw_ne_patch->rank);
 
-                CHECK(domain_3_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_sw_ne_patch->rank);
-                CHECK(domain_3_sw_nw_patch->getFineNbrInfo(Side<2>::south()).ranks[0] == domain_3_sw_sw_nw_patch->rank);
-                CHECK(domain_3_sw_nw_patch->getFineNbrInfo(Side<2>::south()).ranks[1] == domain_3_sw_sw_ne_patch->rank);
-                CHECK(domain_3_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_nw_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_nw_patch->getFineNbrInfo(Side<2>::south()).ranks[0], domain_3_sw_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_nw_patch->getFineNbrInfo(Side<2>::south()).ranks[1], domain_3_sw_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_nw_sw_patch->rank);
 
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_sw_nw_patch->rank);
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_se_nw_patch->rank);
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_sw_se_patch->rank);
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_nw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_se_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_sw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_nw_se_patch->rank);
 
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_sw_se_patch->rank);
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_se_se_patch->rank);
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_se_nw_patch->rank);
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_sw_se_patch->rank);
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_se_se_patch->rank);
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_se_nw_patch->rank);
 
-                CHECK(domain_3_se_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_se_sw_patch->rank);
-                CHECK(domain_3_se_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_se_ne_patch->rank);
+                CHECK_EQ(domain_3_se_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_se_sw_patch->rank);
+                CHECK_EQ(domain_3_se_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_se_ne_patch->rank);
 
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_sw_ne_patch->rank);
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_se_ne_patch->rank);
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_se_sw_patch->rank);
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_ne_sw_patch->rank);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_se_ne_patch->rank);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_se_sw_patch->rank);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_ne_sw_patch->rank);
 
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_se_nw_patch->rank);
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_se_se_patch->rank);
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_ne_se_patch->rank);
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_se_nw_patch->rank);
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_se_se_patch->rank);
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_ne_se_patch->rank);
 
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_nw_se_patch->rank);
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_sw_nw_patch->rank);
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_nw_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_nw_se_patch->rank);
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_nw_nw_patch->rank);
 
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_nw_sw_patch->rank);
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_ne_sw_patch->rank);
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_sw_ne_patch->rank);
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_nw_ne_patch->rank);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_nw_sw_patch->rank);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_ne_sw_patch->rank);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_nw_ne_patch->rank);
 
-                CHECK(domain_3_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_nw_ne_patch->rank);
-                CHECK(domain_3_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_nw_sw_patch->rank);
+                CHECK_EQ(domain_3_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_nw_ne_patch->rank);
+                CHECK_EQ(domain_3_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_nw_sw_patch->rank);
 
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_nw_nw_patch->rank);
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_ne_nw_patch->rank);
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_nw_se_patch->rank);
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_nw_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_ne_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_nw_se_patch->rank);
 
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_nw_se_patch->rank);
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_ne_se_patch->rank);
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_se_nw_patch->rank);
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_ne_nw_patch->rank);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_nw_se_patch->rank);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_ne_se_patch->rank);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_se_nw_patch->rank);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_ne_nw_patch->rank);
 
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_ne_sw_patch->rank);
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_se_ne_patch->rank);
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_3_ne_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_ne_sw_patch->rank);
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_se_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_3_ne_ne_patch->rank);
 
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_nw_ne_patch->rank);
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_3_ne_ne_patch->rank);
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_ne_sw_patch->rank);
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_nw_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_3_ne_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_ne_sw_patch->rank);
 
-                CHECK(domain_3_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_3_ne_nw_patch->rank);
-                CHECK(domain_3_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_3_ne_se_patch->rank);
+                CHECK_EQ(domain_3_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_3_ne_nw_patch->rank);
+                CHECK_EQ(domain_3_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_3_ne_se_patch->rank);
 
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_sw_nw_patch->rank);
 
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_se_se_patch->rank);
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_se_se_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_se_nw_patch->rank);
 
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_se_ne_patch->rank);
 
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_nw_sw_patch->rank);
 
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_nw_se_patch->rank);
 
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_se_ne_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_se_se_patch->rank);
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_se_se_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_ne_se_patch->rank);
 
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_nw_se_patch->rank);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_nw_nw_patch->rank);
 
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_sw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_sw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_nw_ne_patch->rank);
 
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_se_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_se_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_ne_nw_patch->rank);
 
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_ne_sw_patch->rank);
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_se_ne_patch->rank);
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_2_ne_ne_patch->rank);
 
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_nw_ne_patch->rank);
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_nw_sw_patch->rank);
 
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_nw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_nw_se_patch->rank);
 
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_nw_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_2_ne_ne_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_2_ne_nw_patch->rank);
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_2_ne_se_patch->rank);
 
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_se_patch->rank);
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_nw_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_se_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_sw_patch->rank);
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_sw_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Side<2>::north()).rank, domain_1_ne_patch->rank);
 
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank == domain_1_ne_patch->rank);
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_sw_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::east()).rank, domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_sw_patch->rank);
 
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank == domain_1_nw_patch->rank);
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank == domain_1_se_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::west()).rank, domain_1_nw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Side<2>::south()).rank, domain_1_se_patch->rank);
               }
             }
             // SECTION("corner_nbr_info ids are correct")
             {
               if (rank == 0) {
-                CHECK_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_sw_sw_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_3_sw_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_3_sw_sw_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_3_sw_sw_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_3_sw_sw_ne_patch->id);
 
-                CHECK_FALSE(domain_3_sw_sw_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_3_sw_sw_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_sw_sw_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_sw_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_sw_sw_nw_patch->id);
-                CHECK_FALSE(domain_3_sw_sw_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_3_sw_sw_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_3_sw_sw_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_3_sw_sw_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_sw_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_sw_sw_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_sw_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_3_sw_sw_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_sw_sw_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_sw_sw_se_patch->id);
-                CHECK_FALSE(domain_3_sw_sw_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_3_sw_sw_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_3_sw_sw_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_3_sw_sw_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_sw_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_sw_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_3_sw_sw_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_3_sw_sw_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_3_sw_sw_sw_patch->id);
-                CHECK_FALSE(domain_3_sw_sw_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_3_sw_sw_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_sw_sw_ne_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Corner<2>::ne()).id == domain_3_sw_ne_patch->id);
+                CHECK_UNARY(domain_3_sw_sw_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_3_sw_sw_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_sw_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_3_sw_sw_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_3_sw_sw_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Corner<2>::ne()).id, domain_3_sw_ne_patch->id);
 
-                CHECK_FALSE(domain_3_sw_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_3_sw_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_sw_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_sw_nw_patch->id);
-                CHECK(domain_3_sw_se_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_3_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_3_sw_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_3_sw_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_sw_nw_patch->id);
+                CHECK_UNARY(domain_3_sw_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_3_se_nw_patch->id);
 
-                CHECK_FALSE(domain_3_sw_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_sw_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_sw_se_patch->id);
-                CHECK_FALSE(domain_3_sw_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_sw_nw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_3_nw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_3_sw_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_3_sw_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_3_sw_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_3_nw_se_patch->id);
 
-                CHECK(domain_3_sw_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_sw_ne_patch->getFineNbrInfo(Corner<2>::sw()).ids[0] == domain_3_sw_sw_ne_patch->id);
-                CHECK(domain_3_sw_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_se_sw_patch->id);
-                CHECK(domain_3_sw_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_nw_sw_patch->id);
-                CHECK(domain_3_sw_ne_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_3_ne_sw_patch->id);
+                CHECK_UNARY(domain_3_sw_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_sw_ne_patch->getFineNbrInfo(Corner<2>::sw()).ids[0], domain_3_sw_sw_ne_patch->id);
+                CHECK_UNARY(domain_3_sw_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_se_sw_patch->id);
+                CHECK_UNARY(domain_3_sw_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_nw_sw_patch->id);
+                CHECK_UNARY(domain_3_sw_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_3_ne_sw_patch->id);
 
-                CHECK_FALSE(domain_3_se_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_3_se_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_se_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_sw_ne_patch->id);
-                CHECK(domain_3_se_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_3_se_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_3_se_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_3_se_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_3_se_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_sw_ne_patch->id);
+                CHECK_UNARY(domain_3_se_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_3_se_ne_patch->id);
 
-                CHECK_FALSE(domain_3_se_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_3_se_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_se_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_se_nw_patch->id);
-                CHECK_FALSE(domain_3_se_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_3_se_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_3_se_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_3_se_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_se_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_3_se_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_3_sw_se_patch->id);
-                CHECK(domain_3_se_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_se_se_patch->id);
-                CHECK(domain_3_se_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_nw_se_patch->id);
-                CHECK(domain_3_se_nw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_3_ne_se_patch->id);
+                CHECK_UNARY(domain_3_se_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_3_sw_se_patch->id);
+                CHECK_UNARY(domain_3_se_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_se_se_patch->id);
+                CHECK_UNARY(domain_3_se_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_nw_se_patch->id);
+                CHECK_UNARY(domain_3_se_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_3_ne_se_patch->id);
 
-                CHECK(domain_3_se_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_3_se_sw_patch->id);
-                CHECK_FALSE(domain_3_se_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_se_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_ne_sw_patch->id);
-                CHECK_FALSE(domain_3_se_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_3_se_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_3_se_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_se_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_3_se_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_se_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_3_nw_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_nw_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_sw_ne_patch->id);
-                CHECK_FALSE(domain_3_nw_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_nw_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_3_nw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_3_nw_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_3_nw_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_3_nw_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_3_nw_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_3_nw_ne_patch->id);
 
-                CHECK(domain_3_nw_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_3_sw_nw_patch->id);
-                CHECK(domain_3_nw_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_se_nw_patch->id);
-                CHECK(domain_3_nw_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_nw_nw_patch->id);
-                CHECK(domain_3_nw_se_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_3_ne_nw_patch->id);
+                CHECK_UNARY(domain_3_nw_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_3_sw_nw_patch->id);
+                CHECK_UNARY(domain_3_nw_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_se_nw_patch->id);
+                CHECK_UNARY(domain_3_nw_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_nw_nw_patch->id);
+                CHECK_UNARY(domain_3_nw_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_3_ne_nw_patch->id);
 
-                CHECK_FALSE(domain_3_nw_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_nw_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_nw_se_patch->id);
-                CHECK_FALSE(domain_3_nw_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_3_nw_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_3_nw_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_3_nw_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_nw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_3_nw_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_3_nw_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_3_nw_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_3_nw_sw_patch->id);
-                CHECK(domain_3_nw_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_ne_sw_patch->id);
-                CHECK_FALSE(domain_3_nw_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_3_nw_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_3_nw_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_3_nw_sw_patch->id);
+                CHECK_UNARY(domain_3_nw_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_nw_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_3_nw_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_3_ne_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_3_sw_ne_patch->id);
-                CHECK(domain_3_ne_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_se_ne_patch->id);
-                CHECK(domain_3_ne_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_nw_ne_patch->id);
-                CHECK(domain_3_ne_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_3_ne_ne_patch->id);
+                CHECK_UNARY(domain_3_ne_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_3_sw_ne_patch->id);
+                CHECK_UNARY(domain_3_ne_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_se_ne_patch->id);
+                CHECK_UNARY(domain_3_ne_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_nw_ne_patch->id);
+                CHECK_UNARY(domain_3_ne_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_3_ne_ne_patch->id);
 
-                CHECK(domain_3_ne_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_3_se_nw_patch->id);
-                CHECK_FALSE(domain_3_ne_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_ne_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_3_ne_nw_patch->id);
-                CHECK_FALSE(domain_3_ne_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_3_ne_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_3_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_ne_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_3_ne_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_3_ne_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_ne_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_3_ne_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_3_nw_se_patch->id);
-                CHECK(domain_3_ne_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_3_ne_se_patch->id);
-                CHECK_FALSE(domain_3_ne_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_3_ne_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_3_ne_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_3_nw_se_patch->id);
+                CHECK_UNARY(domain_3_ne_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_3_ne_se_patch->id);
+                CHECK_UNARY_FALSE(domain_3_ne_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_3_ne_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_3_ne_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_3_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_3_ne_sw_patch->id);
-                CHECK_FALSE(domain_3_ne_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_3_ne_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_3_ne_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_3_ne_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_3_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_3_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_3_ne_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_3_ne_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_3_ne_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_2_sw_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_2_sw_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_sw_ne_patch->id);
 
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_sw_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_sw_se_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_sw_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_sw_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_sw_nw_patch->id);
+                CHECK_UNARY(domain_2_sw_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_se_nw_patch->id);
 
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_sw_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_sw_se_patch->id);
-                CHECK_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_nw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_nw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_2_sw_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_sw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_sw_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_2_sw_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_nw_se_patch->id);
 
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_sw_sw_patch->id);
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_se_sw_patch->id);
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_nw_sw_patch->id);
-                CHECK(domain_2_sw_ne_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_ne_sw_patch->id);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_sw_sw_patch->id);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_se_sw_patch->id);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_nw_sw_patch->id);
+                CHECK_UNARY(domain_2_sw_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_ne_sw_patch->id);
 
-                CHECK_FALSE(domain_2_se_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_se_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_se_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_se_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_se_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_se_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_se_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_sw_ne_patch->id);
+                CHECK_UNARY(domain_2_se_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_se_ne_patch->id);
 
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_se_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_se_nw_patch->id);
-                CHECK_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_se_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_se_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_sw_se_patch->id);
-                CHECK(domain_2_se_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_se_se_patch->id);
-                CHECK(domain_2_se_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_nw_se_patch->id);
-                CHECK(domain_2_se_nw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_ne_se_patch->id);
+                CHECK_UNARY(domain_2_se_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_sw_se_patch->id);
+                CHECK_UNARY(domain_2_se_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_se_se_patch->id);
+                CHECK_UNARY(domain_2_se_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_nw_se_patch->id);
+                CHECK_UNARY(domain_2_se_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_ne_se_patch->id);
 
-                CHECK(domain_2_se_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_se_sw_patch->id);
-                CHECK_FALSE(domain_2_se_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_se_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_ne_sw_patch->id);
-                CHECK_FALSE(domain_2_se_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_se_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_se_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_se_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_se_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_2_nw_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_nw_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_sw_ne_patch->id);
-                CHECK_FALSE(domain_2_nw_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_nw_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_nw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_2_nw_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_sw_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_2_nw_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_nw_ne_patch->id);
 
-                CHECK(domain_2_nw_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_sw_nw_patch->id);
-                CHECK(domain_2_nw_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_se_nw_patch->id);
-                CHECK(domain_2_nw_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_nw_nw_patch->id);
-                CHECK(domain_2_nw_se_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_ne_nw_patch->id);
+                CHECK_UNARY(domain_2_nw_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_sw_nw_patch->id);
+                CHECK_UNARY(domain_2_nw_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_se_nw_patch->id);
+                CHECK_UNARY(domain_2_nw_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_nw_nw_patch->id);
+                CHECK_UNARY(domain_2_nw_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_ne_nw_patch->id);
 
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_nw_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_nw_se_patch->id);
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_2_nw_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_nw_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_nw_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_nw_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_nw_sw_patch->id);
-                CHECK(domain_2_nw_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_ne_sw_patch->id);
-                CHECK_FALSE(domain_2_nw_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_nw_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_nw_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_nw_sw_patch->id);
+                CHECK_UNARY(domain_2_nw_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_nw_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_nw_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_ne_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_sw_ne_patch->id);
-                CHECK(domain_2_ne_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_se_ne_patch->id);
-                CHECK(domain_2_ne_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_nw_ne_patch->id);
-                CHECK(domain_2_ne_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_2_ne_ne_patch->id);
+                CHECK_UNARY(domain_2_ne_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_sw_ne_patch->id);
+                CHECK_UNARY(domain_2_ne_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_se_ne_patch->id);
+                CHECK_UNARY(domain_2_ne_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_nw_ne_patch->id);
+                CHECK_UNARY(domain_2_ne_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_2_ne_ne_patch->id);
 
-                CHECK(domain_2_ne_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_se_nw_patch->id);
-                CHECK_FALSE(domain_2_ne_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_ne_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_2_ne_nw_patch->id);
-                CHECK_FALSE(domain_2_ne_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_ne_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_se_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_2_ne_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_2_ne_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_ne_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_nw_se_patch->id);
-                CHECK(domain_2_ne_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_2_ne_se_patch->id);
-                CHECK_FALSE(domain_2_ne_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_ne_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_ne_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_nw_se_patch->id);
+                CHECK_UNARY(domain_2_ne_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_2_ne_se_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_ne_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_2_ne_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_2_ne_sw_patch->id);
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_2_ne_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_2_ne_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_2_ne_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_1_sw_patch->hasNbr(Corner<2>::ne()));
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id == domain_1_ne_patch->id);
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_1_sw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY(domain_1_sw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).id, domain_1_ne_patch->id);
 
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_1_se_patch->hasNbr(Corner<2>::nw()));
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).id == domain_1_nw_patch->id);
-                CHECK_FALSE(domain_1_se_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY(domain_1_se_patch->hasNbr(Corner<2>::nw()));
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).id, domain_1_nw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_se_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_1_nw_patch->hasNbr(Corner<2>::se()));
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).id == domain_1_se_patch->id);
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY(domain_1_nw_patch->hasNbr(Corner<2>::se()));
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).id, domain_1_se_patch->id);
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_1_nw_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK(domain_1_ne_patch->hasNbr(Corner<2>::sw()));
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id == domain_1_sw_patch->id);
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY(domain_1_ne_patch->hasNbr(Corner<2>::sw()));
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).id, domain_1_sw_patch->id);
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_1_ne_patch->hasNbr(Corner<2>::ne()));
 
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::sw()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::se()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::nw()));
-                CHECK_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::ne()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::sw()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::se()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::nw()));
+                CHECK_UNARY_FALSE(domain_0_coarser_patch->hasNbr(Corner<2>::ne()));
               }
             }
             // SECTION("corner_nbr_info ranks are correct")
             {
               if (rank == 0) {
-                CHECK(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_sw_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_3_sw_sw_ne_patch->rank);
 
-                CHECK(domain_3_sw_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_sw_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_sw_sw_nw_patch->rank);
 
-                CHECK(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_sw_sw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_sw_sw_se_patch->rank);
 
-                CHECK(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_3_sw_sw_sw_patch->rank);
-                CHECK(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Corner<2>::ne()).rank == domain_3_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_3_sw_sw_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_sw_ne_patch->getCoarseNbrInfo(Corner<2>::ne()).rank, domain_3_sw_ne_patch->rank);
 
-                CHECK(domain_3_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_sw_nw_patch->rank);
-                CHECK(domain_3_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_se_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_3_se_nw_patch->rank);
 
-                CHECK(domain_3_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_sw_se_patch->rank);
-                CHECK(domain_3_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_nw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_sw_se_patch->rank);
+                CHECK_EQ(domain_3_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_3_nw_se_patch->rank);
 
-                CHECK(domain_3_sw_ne_patch->getFineNbrInfo(Corner<2>::sw()).ranks[0] == domain_3_sw_sw_ne_patch->rank);
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_se_sw_patch->rank);
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_nw_sw_patch->rank);
-                CHECK(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_ne_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_ne_patch->getFineNbrInfo(Corner<2>::sw()).ranks[0], domain_3_sw_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_se_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_nw_sw_patch->rank);
+                CHECK_EQ(domain_3_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_3_ne_sw_patch->rank);
 
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_sw_ne_patch->rank);
-                CHECK(domain_3_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_se_ne_patch->rank);
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_3_se_ne_patch->rank);
 
-                CHECK(domain_3_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_se_nw_patch->rank);
+                CHECK_EQ(domain_3_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_se_nw_patch->rank);
 
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_3_sw_se_patch->rank);
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_se_se_patch->rank);
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_nw_se_patch->rank);
-                CHECK(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_ne_se_patch->rank);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_3_sw_se_patch->rank);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_se_se_patch->rank);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_nw_se_patch->rank);
+                CHECK_EQ(domain_3_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_3_ne_se_patch->rank);
 
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_3_se_sw_patch->rank);
-                CHECK(domain_3_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_ne_sw_patch->rank);
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_3_se_sw_patch->rank);
+                CHECK_EQ(domain_3_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_ne_sw_patch->rank);
 
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_sw_ne_patch->rank);
-                CHECK(domain_3_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_nw_ne_patch->rank);
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_3_nw_ne_patch->rank);
 
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_3_sw_nw_patch->rank);
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_se_nw_patch->rank);
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_nw_nw_patch->rank);
-                CHECK(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_ne_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_3_sw_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_se_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_nw_nw_patch->rank);
+                CHECK_EQ(domain_3_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_3_ne_nw_patch->rank);
 
-                CHECK(domain_3_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_nw_se_patch->rank);
+                CHECK_EQ(domain_3_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_nw_se_patch->rank);
 
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_3_nw_sw_patch->rank);
-                CHECK(domain_3_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_ne_sw_patch->rank);
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_3_nw_sw_patch->rank);
+                CHECK_EQ(domain_3_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_ne_sw_patch->rank);
 
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_3_sw_ne_patch->rank);
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_se_ne_patch->rank);
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_nw_ne_patch->rank);
-                CHECK(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_3_ne_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_3_sw_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_se_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_nw_ne_patch->rank);
+                CHECK_EQ(domain_3_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_3_ne_ne_patch->rank);
 
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_3_se_nw_patch->rank);
-                CHECK(domain_3_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_3_ne_nw_patch->rank);
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_3_se_nw_patch->rank);
+                CHECK_EQ(domain_3_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_3_ne_nw_patch->rank);
 
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_3_nw_se_patch->rank);
-                CHECK(domain_3_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_3_ne_se_patch->rank);
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_3_nw_se_patch->rank);
+                CHECK_EQ(domain_3_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_3_ne_se_patch->rank);
 
-                CHECK(domain_3_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_3_ne_sw_patch->rank);
+                CHECK_EQ(domain_3_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_3_ne_sw_patch->rank);
 
-                CHECK(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_sw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_sw_ne_patch->rank);
 
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_sw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_se_nw_patch->rank);
 
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_sw_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_nw_se_patch->rank);
 
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_sw_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_nw_sw_patch->rank);
-                CHECK(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_sw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_sw_ne_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_se_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_se_ne_patch->rank);
 
-                CHECK(domain_2_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_se_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_se_nw_patch->rank);
 
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_sw_se_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_se_se_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_nw_se_patch->rank);
-                CHECK(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_sw_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_se_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_se_nw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_ne_se_patch->rank);
 
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_se_sw_patch->rank);
-                CHECK(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_se_sw_patch->rank);
+                CHECK_EQ(domain_2_se_ne_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_nw_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_nw_ne_patch->rank);
 
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_sw_nw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_nw_nw_patch->rank);
-                CHECK(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_sw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_nw_nw_patch->rank);
+                CHECK_EQ(domain_2_nw_se_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_ne_nw_patch->rank);
 
-                CHECK(domain_2_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_nw_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_nw_se_patch->rank);
 
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_nw_sw_patch->rank);
-                CHECK(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_nw_sw_patch->rank);
+                CHECK_EQ(domain_2_nw_ne_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_sw_ne_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_se_ne_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_nw_ne_patch->rank);
-                CHECK(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_2_ne_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_sw_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_se_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_nw_ne_patch->rank);
+                CHECK_EQ(domain_2_ne_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_2_ne_ne_patch->rank);
 
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_se_nw_patch->rank);
-                CHECK(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_2_ne_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_se_nw_patch->rank);
+                CHECK_EQ(domain_2_ne_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_2_ne_nw_patch->rank);
 
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_nw_se_patch->rank);
-                CHECK(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_2_ne_se_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_nw_se_patch->rank);
+                CHECK_EQ(domain_2_ne_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_2_ne_se_patch->rank);
 
-                CHECK(domain_2_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_2_ne_sw_patch->rank);
+                CHECK_EQ(domain_2_ne_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_2_ne_sw_patch->rank);
 
-                CHECK(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank == domain_1_ne_patch->rank);
+                CHECK_EQ(domain_1_sw_patch->getNormalNbrInfo(Corner<2>::ne()).rank, domain_1_ne_patch->rank);
 
-                CHECK(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank == domain_1_nw_patch->rank);
+                CHECK_EQ(domain_1_se_patch->getNormalNbrInfo(Corner<2>::nw()).rank, domain_1_nw_patch->rank);
 
-                CHECK(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank == domain_1_se_patch->rank);
+                CHECK_EQ(domain_1_nw_patch->getNormalNbrInfo(Corner<2>::se()).rank, domain_1_se_patch->rank);
 
-                CHECK(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank == domain_1_sw_patch->rank);
+                CHECK_EQ(domain_1_ne_patch->getNormalNbrInfo(Corner<2>::sw()).rank, domain_1_sw_patch->rank);
               }
             }
           }

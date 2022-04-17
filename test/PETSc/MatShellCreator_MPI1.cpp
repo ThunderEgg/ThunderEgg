@@ -72,7 +72,7 @@ TEST_CASE("PETSc::MatShellCreator works with 0.5I")
     VecGetArray(x, &x_view);
     VecGetArray(b, &b_view);
     for (int i = 0; i < d_fine.getNumLocalCells() * 1; i++) {
-      CHECK(x_view[i] * 0.5 == b_view[i]);
+      CHECK_EQ(x_view[i] * 0.5, b_view[i]);
     }
     VecRestoreArray(x, &x_view);
     VecRestoreArray(b, &b_view);
@@ -113,7 +113,7 @@ TEST_CASE("PETSc::MatShellCreator works with 0.5I two components")
     VecGetArray(x, &x_view);
     VecGetArray(b, &b_view);
     for (int i = 0; i < d_fine.getNumLocalCells() * 2; i++) {
-      CHECK(x_view[i] * 0.5 == b_view[i]);
+      CHECK_EQ(x_view[i] * 0.5, b_view[i]);
     }
     VecRestoreArray(x, &x_view);
     VecRestoreArray(b, &b_view);

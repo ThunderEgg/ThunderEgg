@@ -52,7 +52,7 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length")
           // the patch operator is just a 0.5I operator
           MockPatchOperator<2> mpo(d_fine, mgf);
           MockSolver<2> ms([](const Operator<2>& A, Vector<2>& x, const Vector<2>& b, const Operator<2>* Mr) {
-            CHECK(x.getNumLocalPatches() == 1);
+            CHECK_EQ(x.getNumLocalPatches(), 1);
             return 1;
           });
 
@@ -94,10 +94,10 @@ TEST_CASE("Iterative::PatchSolver passes modified operator")
           Iterative::PatchSolver<2> bcgs_solver(ms, mpo);
 
           bcgs_solver.smooth(f, u);
-          CHECK(mpo.getNumApplyCalls() == 1);
-          CHECK(mpo.rhsWasModified());
-          CHECK(mpo.boundaryConditionsEnforced());
-          CHECK(mpo.internalBoundaryConditionsEnforced());
+          CHECK_EQ(mpo.getNumApplyCalls(), 1);
+          CHECK_UNARY(mpo.rhsWasModified());
+          CHECK_UNARY(mpo.boundaryConditionsEnforced());
+          CHECK_UNARY(mpo.internalBoundaryConditionsEnforced());
         }
       }
     }

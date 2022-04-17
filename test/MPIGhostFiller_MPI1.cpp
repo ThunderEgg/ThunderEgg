@@ -51,7 +51,7 @@ TEST_CASE("No calls for 1 patch domain")
 
           mgf.fillGhost(vec);
 
-          CHECK(mgf.called == true);
+          CHECK_EQ(mgf.called, true);
           mgf.checkCalls();
         }
       }
@@ -75,7 +75,7 @@ TEST_CASE("Calls for various domains 2d face cases")
 
           mgf.fillGhost(vec);
 
-          CHECK(mgf.called == true);
+          CHECK_EQ(mgf.called, true);
 
           mgf.checkCalls();
         }
@@ -100,7 +100,7 @@ TEST_CASE("Calls for various domains 2d corner cases")
 
           mgf.fillGhost(vec);
 
-          CHECK(mgf.called == true);
+          CHECK_EQ(mgf.called, true);
 
           mgf.checkCalls();
         }
@@ -126,7 +126,7 @@ TEST_CASE("Calls for various domains 3d face cases")
 
             mgf.fillGhost(vec);
 
-            CHECK(mgf.called == true);
+            CHECK_EQ(mgf.called, true);
 
             mgf.checkCalls();
           }
@@ -153,7 +153,7 @@ TEST_CASE("Calls for various domains 3d edge cases")
 
             mgf.fillGhost(vec);
 
-            CHECK(mgf.called == true);
+            CHECK_EQ(mgf.called, true);
 
             mgf.checkCalls();
           }
@@ -180,7 +180,7 @@ TEST_CASE("Calls for various domains 3d corner cases")
 
             mgf.fillGhost(vec);
 
-            CHECK(mgf.called == true);
+            CHECK_EQ(mgf.called, true);
 
             mgf.checkCalls();
           }

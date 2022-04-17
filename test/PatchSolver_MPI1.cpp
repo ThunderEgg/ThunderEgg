@@ -56,11 +56,11 @@ TEST_CASE("PatchSolver apply for various domains")
             for (int i = 0; i < u.getNumLocalPatches(); i++) {
               for (int c = 0; c < u.getNumComponents(); c++) {
                 auto ld = u.getComponentView(c, i);
-                Loop::Nested<2>(ld.getStart(), ld.getEnd(), [&](const std::array<int, 2>& coord) { CHECK(ld[coord] == 0); });
+                Loop::Nested<2>(ld.getStart(), ld.getEnd(), [&](const std::array<int, 2>& coord) { CHECK_EQ(ld[coord], 0); });
               }
             }
-            CHECK_FALSE(mgf.wasCalled());
-            CHECK(mps.allPatchesCalled());
+            CHECK_UNARY_FALSE(mgf.wasCalled());
+            CHECK_UNARY(mps.allPatchesCalled());
           }
         }
       }
@@ -93,15 +93,15 @@ TEST_CASE("PatchSolver apply for various domains with timer")
             for (int i = 0; i < u.getNumLocalPatches(); i++) {
               for (int c = 0; c < u.getNumComponents(); c++) {
                 auto ld = u.getComponentView(c, i);
-                Loop::Nested<2>(ld.getStart(), ld.getEnd(), [&](const std::array<int, 2>& coord) { CHECK(ld[coord] == 0); });
+                Loop::Nested<2>(ld.getStart(), ld.getEnd(), [&](const std::array<int, 2>& coord) { CHECK_EQ(ld[coord], 0); });
               }
             }
-            CHECK_FALSE(mgf.wasCalled());
-            CHECK(mps.allPatchesCalled());
+            CHECK_UNARY_FALSE(mgf.wasCalled());
+            CHECK_UNARY(mps.allPatchesCalled());
             stringstream ss;
             ss << *d_fine.getTimer();
-            CHECK(ss.str().find("Total Patch") != string::npos);
-            CHECK(ss.str().find("Single Patch") != string::npos);
+            CHECK_NE(ss.str().find("Total Patch"), string::npos);
+            CHECK_NE(ss.str().find("Single Patch"), string::npos);
           }
         }
       }
@@ -134,15 +134,15 @@ TEST_CASE("PatchSolver smooth for various domains")
             for (int i = 0; i < u.getNumLocalPatches(); i++) {
               for (int c = 0; c < u.getNumComponents(); c++) {
                 auto ld = u.getComponentView(c, i);
-                Loop::Nested<2>(ld.getStart(), ld.getEnd(), [&](const std::array<int, 2>& coord) { CHECK(ld[coord] == 1); });
+                Loop::Nested<2>(ld.getStart(), ld.getEnd(), [&](const std::array<int, 2>& coord) { CHECK_EQ(ld[coord], 1); });
               }
             }
-            CHECK(mgf.wasCalled());
-            CHECK(mps.allPatchesCalled());
+            CHECK_UNARY(mgf.wasCalled());
+            CHECK_UNARY(mps.allPatchesCalled());
             stringstream ss;
             ss << *d_fine.getTimer();
-            CHECK(ss.str().find("Total Patch") != string::npos);
-            CHECK(ss.str().find("Single Patch") != string::npos);
+            CHECK_NE(ss.str().find("Total Patch"), string::npos);
+            CHECK_NE(ss.str().find("Single Patch"), string::npos);
           }
         }
       }
@@ -173,11 +173,11 @@ TEST_CASE("PatchSolver smooth for various domains with timer")
             for (int i = 0; i < u.getNumLocalPatches(); i++) {
               for (int c = 0; c < u.getNumComponents(); c++) {
                 auto ld = u.getComponentView(c, i);
-                Loop::Nested<2>(ld.getStart(), ld.getEnd(), [&](const std::array<int, 2>& coord) { CHECK(ld[coord] == 1); });
+                Loop::Nested<2>(ld.getStart(), ld.getEnd(), [&](const std::array<int, 2>& coord) { CHECK_EQ(ld[coord], 1); });
               }
             }
-            CHECK(mgf.wasCalled());
-            CHECK(mps.allPatchesCalled());
+            CHECK_UNARY(mgf.wasCalled());
+            CHECK_UNARY(mps.allPatchesCalled());
           }
         }
       }
@@ -200,7 +200,7 @@ TEST_CASE("PatchSolver getDomain")
         MockGhostFiller<2> mgf;
         MockPatchSolver<2> mps(d_fine, mgf);
 
-        CHECK(mps.getDomain().getNumLocalPatches() == d_fine.getNumLocalPatches());
+        CHECK_EQ(mps.getDomain().getNumLocalPatches(), d_fine.getNumLocalPatches());
       }
     }
   }
@@ -222,7 +222,7 @@ TEST_CASE("PatchSolver getGhostFiller")
         MockPatchSolver<2> mps(d_fine, mgf);
 
         const GhostFiller<2>& mps_mgf = mps.getGhostFiller();
-        CHECK(typeid(mps_mgf) == typeid(mgf));
+        CHECK_EQ(typeid(mps_mgf), typeid(mgf));
       }
     }
   }

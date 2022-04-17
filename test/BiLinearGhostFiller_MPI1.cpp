@@ -103,12 +103,12 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
         Loop::Nested<2>(patch_1.getStart(), patch_1.getEnd(), [&](const std::array<int, 2> coord) {
           std::array<double, 2> real_coord;
           DomainTools::GetRealCoord<2>(pinfos[0], coord, real_coord);
-          CHECK(patch_1[coord] == f(real_coord));
+          CHECK_EQ(patch_1[coord], f(real_coord));
         });
         // check that west values are not modified
         {
           auto west_ghost = patch_1.getSliceOn(Side<2>::west(), { -1 });
-          Loop::Nested<1>(west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
+          Loop::Nested<1>(west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK_EQ(west_ghost[coord], 0); });
         }
         // check that east values are correct
         {
@@ -116,13 +116,13 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
           Loop::Nested<1>(east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[0], { nx, coord[0] }, real_coord);
-            CHECK(east_ghost[coord] == Approx(f(real_coord)));
+            CHECK_EQ(east_ghost[coord], Approx(f(real_coord)));
           });
         }
         // check that south values are not modified
         {
           auto south_ghost = patch_1.getSliceOn(Side<2>::south(), { -1 });
-          Loop::Nested<1>(south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
+          Loop::Nested<1>(south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK_EQ(south_ghost[coord], 0); });
         }
         // check that north values are correct
         {
@@ -130,7 +130,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
           Loop::Nested<1>(north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[0], { coord[0], ny }, real_coord);
-            CHECK(north_ghost[coord] == Approx(f(real_coord)));
+            CHECK_EQ(north_ghost[coord], Approx(f(real_coord)));
           });
         }
       }
@@ -141,7 +141,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
         Loop::Nested<2>(patch_2.getStart(), patch_2.getEnd(), [&](const std::array<int, 2> coord) {
           std::array<double, 2> real_coord;
           DomainTools::GetRealCoord<2>(pinfos[1], coord, real_coord);
-          CHECK(patch_2[coord] == f(real_coord));
+          CHECK_EQ(patch_2[coord], f(real_coord));
         });
         // check that west values correct
         {
@@ -149,18 +149,18 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
           Loop::Nested<1>(west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[1], { -1, coord[0] }, real_coord);
-            CHECK(west_ghost[coord] == Approx(f(real_coord)));
+            CHECK_EQ(west_ghost[coord], Approx(f(real_coord)));
           });
         }
         // check that east values are not modified
         {
           auto east_ghost = patch_2.getSliceOn(Side<2>::east(), { -1 });
-          Loop::Nested<1>(east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
+          Loop::Nested<1>(east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK_EQ(east_ghost[coord], 0); });
         }
         // check that south values are not modified
         {
           auto south_ghost = patch_2.getSliceOn(Side<2>::south(), { -1 });
-          Loop::Nested<1>(south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK(south_ghost[coord] == 0); });
+          Loop::Nested<1>(south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK_EQ(south_ghost[coord], 0); });
         }
         // check that north values are correct
         {
@@ -168,7 +168,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
           Loop::Nested<1>(north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[1], { coord[0], ny }, real_coord);
-            CHECK(north_ghost[coord] == Approx(f(real_coord)));
+            CHECK_EQ(north_ghost[coord], Approx(f(real_coord)));
           });
         }
       }
@@ -179,12 +179,12 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
         Loop::Nested<2>(patch_3.getStart(), patch_3.getEnd(), [&](const std::array<int, 2> coord) {
           std::array<double, 2> real_coord;
           DomainTools::GetRealCoord<2>(pinfos[2], coord, real_coord);
-          CHECK(patch_3[coord] == f(real_coord));
+          CHECK_EQ(patch_3[coord], f(real_coord));
         });
         // check that west values are not modified
         {
           auto west_ghost = patch_3.getSliceOn(Side<2>::west(), { -1 });
-          Loop::Nested<1>(west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK(west_ghost[coord] == 0); });
+          Loop::Nested<1>(west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK_EQ(west_ghost[coord], 0); });
         }
         // check that east values are correct
         {
@@ -192,7 +192,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
           Loop::Nested<1>(east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[2], { nx, coord[0] }, real_coord);
-            CHECK(east_ghost[coord] == Approx(f(real_coord)));
+            CHECK_EQ(east_ghost[coord], Approx(f(real_coord)));
           });
         }
         // check that south values are not modified
@@ -201,13 +201,13 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
           Loop::Nested<1>(south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[2], { coord[0], -1 }, real_coord);
-            CHECK(south_ghost[coord] == Approx(f(real_coord)));
+            CHECK_EQ(south_ghost[coord], Approx(f(real_coord)));
           });
         }
         // check that north values are correct
         {
           auto north_ghost = patch_3.getSliceOn(Side<2>::north(), { -1 });
-          Loop::Nested<1>(north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
+          Loop::Nested<1>(north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK_EQ(north_ghost[coord], 0); });
         }
       }
       // patch 4
@@ -217,7 +217,7 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
         Loop::Nested<2>(patch_4.getStart(), patch_4.getEnd(), [&](const std::array<int, 2> coord) {
           std::array<double, 2> real_coord;
           DomainTools::GetRealCoord<2>(pinfos[3], coord, real_coord);
-          CHECK(patch_4[coord] == f(real_coord));
+          CHECK_EQ(patch_4[coord], f(real_coord));
         });
         // check that west values correct
         {
@@ -225,13 +225,13 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
           Loop::Nested<1>(west_ghost.getStart(), west_ghost.getEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[3], { -1, coord[0] }, real_coord);
-            CHECK(west_ghost[coord] == Approx(f(real_coord)));
+            CHECK_EQ(west_ghost[coord], Approx(f(real_coord)));
           });
         }
         // check that east values are not modified
         {
           auto east_ghost = patch_4.getSliceOn(Side<2>::east(), { -1 });
-          Loop::Nested<1>(east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK(east_ghost[coord] == 0); });
+          Loop::Nested<1>(east_ghost.getStart(), east_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK_EQ(east_ghost[coord], 0); });
         }
         // check that south values are correct
         {
@@ -239,13 +239,13 @@ TEST_CASE("exchange uniform 2D quad BiLinearGhostFiller")
           Loop::Nested<1>(south_ghost.getStart(), south_ghost.getEnd(), [&](const std::array<int, 1> coord) {
             std::array<double, 2> real_coord;
             DomainTools::GetRealCoordGhost<2>(pinfos[3], { coord[0], -1 }, real_coord);
-            CHECK(south_ghost[coord] == Approx(f(real_coord)));
+            CHECK_EQ(south_ghost[coord], Approx(f(real_coord)));
           });
         }
         // check that north values are not modified
         {
           auto north_ghost = patch_4.getSliceOn(Side<2>::north(), { -1 });
-          Loop::Nested<1>(north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK(north_ghost[coord] == 0); });
+          Loop::Nested<1>(north_ghost.getStart(), north_ghost.getEnd(), [&](const std::array<int, 1> coord) { CHECK_EQ(north_ghost[coord], 0); });
         }
       }
     }
@@ -287,7 +287,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller")
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
             ///
-            REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+            REQUIRE_EQ(vec_ld[coord], Approx(expected_ld[coord]));
           });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
@@ -298,7 +298,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller")
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -343,7 +343,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set")
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
             ///
-            REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+            REQUIRE_EQ(vec_ld[coord], Approx(expected_ld[coord]));
           });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
@@ -354,7 +354,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set")
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -406,7 +406,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components")
           ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
             ///
-            REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+            REQUIRE_EQ(vec_ld[coord], Approx(expected_ld[coord]));
           });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
@@ -417,11 +417,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components")
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
-          Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord])); });
+          Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld2[coord], Approx(expected_ld2[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -430,7 +430,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components")
               INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -480,7 +480,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
           ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld[coord] == Approx(expected_ld[coord])); });
+          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld[coord], Approx(expected_ld[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -489,11 +489,11 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
               INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
-          Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord])); });
+          Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld2[coord], Approx(expected_ld2[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -502,7 +502,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
               INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -547,7 +547,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners")
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
             ///
-            REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+            REQUIRE_EQ(vec_ld[coord], Approx(expected_ld[coord]));
           });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
@@ -558,7 +558,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners")
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -568,7 +568,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners")
             if (pinfo.hasNbr(c)) {
               INFO("corner:    " << c);
               INFO("nbr-type:  " << pinfo.getNbrType(c));
-              CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+              CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
         }
@@ -612,7 +612,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
             ///
-            REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+            REQUIRE_EQ(vec_ld[coord], Approx(expected_ld[coord]));
           });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
@@ -623,7 +623,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -633,7 +633,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
             if (pinfo.hasNbr(c)) {
               INFO("corner:    " << c);
               INFO("nbr-type:  " << pinfo.getNbrType(c));
-              CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+              CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
         }
@@ -684,7 +684,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
           ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
             ///
-            REQUIRE(vec_ld[coord] == Approx(expected_ld[coord]));
+            REQUIRE_EQ(vec_ld[coord], Approx(expected_ld[coord]));
           });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
@@ -695,7 +695,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -705,10 +705,10 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
             if (pinfo.hasNbr(c)) {
               INFO("corner:    " << c);
               INFO("nbr-type:  " << pinfo.getNbrType(c));
-              CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+              CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
-          Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord])); });
+          Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld2[coord], Approx(expected_ld2[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -717,7 +717,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
               INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -727,7 +727,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
             if (pinfo.hasNbr(c)) {
               INFO("corner:    " << c);
               INFO("nbr-type:  " << pinfo.getNbrType(c));
-              CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+              CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
         }
@@ -776,7 +776,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
           ComponentView<double, 2> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld[coord] == Approx(expected_ld[coord])); });
+          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld[coord], Approx(expected_ld[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -785,7 +785,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
               INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -795,10 +795,10 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
             if (pinfo.hasNbr(c)) {
               INFO("corner:    " << c);
               INFO("nbr-type:  " << pinfo.getNbrType(c));
-              CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+              CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
-          Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld2[coord] == Approx(expected_ld2[coord])); });
+          Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld2[coord], Approx(expected_ld2[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -807,7 +807,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
               INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 INFO("coord:  " << coord[0]);
-                CHECK(vec_ghost[coord] == Approx(expected_ghost[coord]));
+                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
           }
@@ -817,7 +817,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
             if (pinfo.hasNbr(c)) {
               INFO("corner:    " << c);
               INFO("nbr-type:  " << pinfo.getNbrType(c));
-              CHECK(vec_ghost[{}] == Approx(expected_ghost[{}]));
+              CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
         }

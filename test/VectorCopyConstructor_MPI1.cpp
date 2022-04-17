@@ -57,26 +57,26 @@ TEST_CASE("Vector<2> copy from domain constructor")
 
             Vector<2> vec(vec_to_copy);
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view != view_to_copy);
+            CHECK_NE(view, view_to_copy);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -87,14 +87,14 @@ TEST_CASE("Vector<2> copy from domain constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_copy[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_copy[coord]); });
             }
           }
         }
@@ -129,26 +129,26 @@ TEST_CASE("Vector<2> copy from managed constructor")
 
             Vector<2> vec(vec_to_copy);
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view != view_to_copy);
+            CHECK_NE(view, view_to_copy);
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -159,14 +159,14 @@ TEST_CASE("Vector<2> copy from managed constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < num_local_patches; i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_copy[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_copy[coord]); });
             }
           }
         }
@@ -208,26 +208,26 @@ TEST_CASE("Vector<2> copy from unmanaged constructor")
 
             Vector<2> vec(vec_to_copy);
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view != view_to_copy);
+            CHECK_NE(view, view_to_copy);
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -238,14 +238,14 @@ TEST_CASE("Vector<2> copy from unmanaged constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < num_local_patches; i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_copy[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_copy[coord]); });
             }
           }
         }
@@ -283,26 +283,26 @@ TEST_CASE("Vector<2> copy assign from domain constructor")
             Vector<2> vec;
             vec = vec_to_copy;
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view != view_to_copy);
+            CHECK_NE(view, view_to_copy);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -313,14 +313,14 @@ TEST_CASE("Vector<2> copy assign from domain constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_copy[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_copy[coord]); });
             }
           }
         }
@@ -356,26 +356,26 @@ TEST_CASE("Vector<2> copy assign from managed constructor")
             Vector<2> vec;
             vec = vec_to_copy;
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view != view_to_copy);
+            CHECK_NE(view, view_to_copy);
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -386,14 +386,14 @@ TEST_CASE("Vector<2> copy assign from managed constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < num_local_patches; i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_copy[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_copy[coord]); });
             }
           }
         }
@@ -436,26 +436,26 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor")
             Vector<2> vec;
             vec = vec_to_copy;
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
 
-            CHECK(vec.getNumLocalPatches() == vec_to_copy.getNumLocalPatches());
-            CHECK(vec.getNumComponents() == vec_to_copy.getNumComponents());
-            CHECK(vec.getNumLocalCells() == vec_to_copy.getNumLocalCells());
+            CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
+            CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
+            CHECK_EQ(vec.getNumLocalCells(), vec_to_copy.getNumLocalCells());
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
-            CHECK(view != view_to_copy);
+            CHECK_NE(view, view_to_copy);
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -466,14 +466,14 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             for (int i = 0; i < num_local_patches; i++) {
               PatchView<double, 2> view = vec.getPatchView(i);
               PatchView<double, 2> view_to_copy = vec_to_copy.getPatchView(i);
-              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK(view[coord] == view_to_copy[coord]); });
+              Loop::OverAllIndexes<3>(view, [&](const std::array<int, 3> coord) { CHECK_EQ(view[coord], view_to_copy[coord]); });
             }
           }
         }

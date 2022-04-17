@@ -68,7 +68,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller")
             INFO("nz:    " << pinfo.ns[2]);
             ComponentView<double, 3> vec_ld = vec.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
-            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -77,7 +77,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller")
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -133,7 +133,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components")
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
             ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -142,11 +142,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components")
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
-            Loop::Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld2[coord] == doctest::Approx(expected_ld2[coord])); });
+            Loop::Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld2[coord], doctest::Approx(expected_ld2[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -155,7 +155,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components")
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -211,7 +211,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
             ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -220,11 +220,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
-            Loop::Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld2[coord] == doctest::Approx(expected_ld2[coord])); });
+            Loop::Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld2[coord], doctest::Approx(expected_ld2[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -233,7 +233,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -281,7 +281,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set")
             INFO("nz:    " << pinfo.ns[2]);
             ComponentView<double, 3> vec_ld = vec.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
-            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -290,7 +290,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set")
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -360,7 +360,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges")
             INFO("nz:    " << pinfo.ns[2]);
             ComponentView<double, 3> vec_ld = vec.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
-            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -369,7 +369,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges")
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -381,7 +381,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller edges")
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -437,7 +437,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
             ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -446,7 +446,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -458,11 +458,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
-            Loop::Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld2[coord] == doctest::Approx(expected_ld2[coord])); });
+            Loop::Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld2[coord], doctest::Approx(expected_ld2[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -471,7 +471,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -483,7 +483,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components edges"
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -539,7 +539,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
             ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -548,7 +548,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -560,11 +560,11 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
-            Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld2[coord] == doctest::Approx(expected_ld2[coord])); });
+            Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld2[coord], doctest::Approx(expected_ld2[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -573,7 +573,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -585,7 +585,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -633,7 +633,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
             INFO("nz:    " << pinfo.ns[2]);
             ComponentView<double, 3> vec_ld = vec.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
-            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -642,7 +642,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -654,7 +654,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set edg
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -702,7 +702,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners")
             INFO("nz:    " << pinfo.ns[2]);
             ComponentView<double, 3> vec_ld = vec.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
-            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -711,7 +711,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners")
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -723,7 +723,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners")
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -733,7 +733,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller corners")
               if (pinfo.hasNbr(c)) {
                 INFO("side:      " << c);
                 INFO("nbr-type:  " << pinfo.getNbrType(c));
-                CHECK(vec_ghost[{}] == doctest::Approx(expected_ghost[{}]));
+                CHECK_EQ(vec_ghost[{}], doctest::Approx(expected_ghost[{}]));
               }
             }
           }
@@ -788,7 +788,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
             ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -797,7 +797,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -809,7 +809,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -819,10 +819,10 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
               if (pinfo.hasNbr(c)) {
                 INFO("side:      " << c);
                 INFO("nbr-type:  " << pinfo.getNbrType(c));
-                CHECK(vec_ghost[{}] == doctest::Approx(expected_ghost[{}]));
+                CHECK_EQ(vec_ghost[{}], doctest::Approx(expected_ghost[{}]));
               }
             }
-            Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld2[coord] == doctest::Approx(expected_ld2[coord])); });
+            Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld2[coord], doctest::Approx(expected_ld2[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -831,7 +831,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -843,7 +843,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -853,7 +853,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller two components corner
               if (pinfo.hasNbr(c)) {
                 INFO("side:      " << c);
                 INFO("nbr-type:  " << pinfo.getNbrType(c));
-                CHECK(vec_ghost[{}] == doctest::Approx(expected_ghost[{}]));
+                CHECK_EQ(vec_ghost[{}], doctest::Approx(expected_ghost[{}]));
               }
             }
           }
@@ -908,7 +908,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
             ComponentView<double, 3> expected_ld2 = expected.getComponentView(1, pinfo.local_index);
-            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -917,7 +917,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -929,7 +929,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -939,10 +939,10 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
               if (pinfo.hasNbr(c)) {
                 INFO("side:      " << c);
                 INFO("nbr-type:  " << pinfo.getNbrType(c));
-                CHECK(vec_ghost[{}] == doctest::Approx(expected_ghost[{}]));
+                CHECK_EQ(vec_ghost[{}], doctest::Approx(expected_ghost[{}]));
               }
             }
-            Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld2[coord] == doctest::Approx(expected_ld2[coord])); });
+            Loop::Nested<3>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld2[coord], doctest::Approx(expected_ld2[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
@@ -951,7 +951,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -963,7 +963,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -973,7 +973,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set two
               if (pinfo.hasNbr(c)) {
                 INFO("side:      " << c);
                 INFO("nbr-type:  " << pinfo.getNbrType(c));
-                CHECK(vec_ghost[{}] == doctest::Approx(expected_ghost[{}]));
+                CHECK_EQ(vec_ghost[{}], doctest::Approx(expected_ghost[{}]));
               }
             }
           }
@@ -1020,7 +1020,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
             INFO("nz:    " << pinfo.ns[2]);
             ComponentView<double, 3> vec_ld = vec.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> expected_ld = expected.getComponentView(0, pinfo.local_index);
-            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
+            Loop::Nested<3>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
             for (Side<3> s : Side<3>::getValues()) {
               View<double, 2> vec_ghost = vec_ld.getSliceOn(s, { -1 });
               View<double, 2> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -1029,7 +1029,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
                 INFO("nbr-type:  " << pinfo.getNbrType(s));
                 Loop::Nested<2>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 2>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -1041,7 +1041,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
                 INFO("nbr-type:  " << pinfo.getNbrType(e));
                 Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                   INFO("coord:  " << coord[0] << ", " << coord[1]);
-                  CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
+                  CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 });
               }
             }
@@ -1051,7 +1051,7 @@ TEST_CASE("exchange various meshes 3D TriLinearGhostFiller ghost already set cor
               if (pinfo.hasNbr(c)) {
                 INFO("side:      " << c);
                 INFO("nbr-type:  " << pinfo.getNbrType(c));
-                CHECK(vec_ghost[{}] == doctest::Approx(expected_ghost[{}]));
+                CHECK_EQ(vec_ghost[{}], doctest::Approx(expected_ghost[{}]));
               }
             }
           }

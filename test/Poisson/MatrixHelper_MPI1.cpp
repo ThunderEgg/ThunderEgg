@@ -69,7 +69,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
           PETSc::MatWrapper<3> m_operator(A);
           m_operator.apply(g_vec, f_vec);
 
-          REQUIRE(f_vec.infNorm() > 0);
+          REQUIRE_GT(f_vec.infNorm(), 0);
 
           for (auto pinfo : d_fine.getPatchInfoVector()) {
             INFO("Patch: " << pinfo.id);
@@ -87,7 +87,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
               INFO("xi:    " << coord[0]);
               INFO("yi:    " << coord[1]);
               INFO("zi:    " << coord[2]);
-              CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
+              CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
             });
           }
           MatDestroy(&A);
@@ -131,7 +131,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
           PETSc::MatWrapper<3> m_operator(A);
           m_operator.apply(g_vec, f_vec);
 
-          REQUIRE(f_vec.infNorm() > 0);
+          REQUIRE_GT(f_vec.infNorm(), 0);
 
           for (auto pinfo : d_fine.getPatchInfoVector()) {
             INFO("Patch: " << pinfo.id);
@@ -150,7 +150,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
               INFO("xi:    " << coord[0]);
               INFO("yi:    " << coord[1]);
               INFO("zi:    " << coord[2]);
-              CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
+              CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
             });
           }
           MatDestroy(&A);

@@ -75,7 +75,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I")
       Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) {
         INFO("xi:    " << coord[0]);
         INFO("yi:    " << coord[1]);
-        CHECK(0.5 * x_ld[coord] == doctest::Approx(b_ld[coord]));
+        CHECK_EQ(0.5 * x_ld[coord], doctest::Approx(b_ld[coord]));
       });
     }
     MatDestroy(&A);
@@ -129,14 +129,14 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components")
       Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) {
         INFO("xi:    " << coord[0]);
         INFO("yi:    " << coord[1]);
-        CHECK(0.5 * x_ld[coord] == doctest::Approx(b_ld[coord]));
+        CHECK_EQ(0.5 * x_ld[coord], doctest::Approx(b_ld[coord]));
       });
       ComponentView<double, 2> x_ld2 = x.getComponentView(1, pinfo.local_index);
       ComponentView<double, 2> b_ld2 = b.getComponentView(1, pinfo.local_index);
       Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) {
         INFO("xi:    " << coord[0]);
         INFO("yi:    " << coord[1]);
-        CHECK(0.5 * x_ld2[coord] == doctest::Approx(b_ld2[coord]));
+        CHECK_EQ(0.5 * x_ld2[coord], doctest::Approx(b_ld2[coord]));
       });
     }
     MatDestroy(&A);

@@ -124,9 +124,9 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
     m_operator->apply(g_vec, f_vec);
 
-    CHECK(f_vec.infNorm() == doctest::Approx(f_vec_expected.infNorm()));
-    CHECK(f_vec.twoNorm() == doctest::Approx(f_vec_expected.twoNorm()));
-    REQUIRE(f_vec.infNorm() > 0);
+    CHECK_EQ(f_vec.infNorm(), doctest::Approx(f_vec_expected.infNorm()));
+    CHECK_EQ(f_vec.twoNorm(), doctest::Approx(f_vec_expected.twoNorm()));
+    REQUIRE_GT(f_vec.infNorm(), 0);
 
     for (auto iface : iface_domain.getInterfaces()) {
       INFO("ID: " << iface->id);
@@ -136,7 +136,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, iface->local_index);
       Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
         INFO("xi:    " << coord[0]);
-        CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
+        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
       });
     }
     MatDestroy(&A);
@@ -180,16 +180,16 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
     m_operator->apply(g_vec, f_vec);
 
-    CHECK(f_vec.infNorm() == doctest::Approx(f_vec_expected.infNorm()));
-    CHECK(f_vec.twoNorm() == doctest::Approx(f_vec_expected.twoNorm()));
-    REQUIRE(f_vec.infNorm() > 0);
+    CHECK_EQ(f_vec.infNorm(), doctest::Approx(f_vec_expected.infNorm()));
+    CHECK_EQ(f_vec.twoNorm(), doctest::Approx(f_vec_expected.twoNorm()));
+    REQUIRE_GT(f_vec.infNorm(), 0);
 
     for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
       ComponentView<double, 1> f_vec_ld = f_vec.getComponentView(0, i);
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
       Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
         INFO("xi:    " << coord[0]);
-        CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
+        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
       });
     }
     MatDestroy(&A);
@@ -233,16 +233,16 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
     m_operator->apply(g_vec, f_vec);
 
-    CHECK(f_vec.infNorm() == doctest::Approx(f_vec_expected.infNorm()));
-    CHECK(f_vec.twoNorm() == doctest::Approx(f_vec_expected.twoNorm()));
-    REQUIRE(f_vec.infNorm() > 0);
+    CHECK_EQ(f_vec.infNorm(), doctest::Approx(f_vec_expected.infNorm()));
+    CHECK_EQ(f_vec.twoNorm(), doctest::Approx(f_vec_expected.twoNorm()));
+    REQUIRE_GT(f_vec.infNorm(), 0);
 
     for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
       ComponentView<double, 1> f_vec_ld = f_vec.getComponentView(0, i);
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
       Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
         INFO("xi:    " << coord[0]);
-        CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
+        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
       });
     }
     MatDestroy(&A);
@@ -286,16 +286,16 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
     m_operator->apply(g_vec, f_vec);
 
-    CHECK(f_vec.infNorm() == doctest::Approx(f_vec_expected.infNorm()));
-    CHECK(f_vec.twoNorm() == doctest::Approx(f_vec_expected.twoNorm()));
-    REQUIRE(f_vec.infNorm() > 0);
+    CHECK_EQ(f_vec.infNorm(), doctest::Approx(f_vec_expected.infNorm()));
+    CHECK_EQ(f_vec.twoNorm(), doctest::Approx(f_vec_expected.twoNorm()));
+    REQUIRE_GT(f_vec.infNorm(), 0);
 
     for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
       ComponentView<double, 1> f_vec_ld = f_vec.getComponentView(0, i);
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
       Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
         INFO("xi:    " << coord[0]);
-        CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
+        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
       });
     }
     MatDestroy(&A);

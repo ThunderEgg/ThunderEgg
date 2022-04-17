@@ -47,7 +47,7 @@ TEST_CASE("Vector<1> getNumGhostCells unmanaged constructor")
           }
           Vector<1> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-          CHECK(vec.getNumGhostCells() == num_ghost_cells);
+          CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
         }
       }
     }
@@ -77,8 +77,8 @@ TEST_CASE("Vector<1> getMPIComm unmanaged constructor")
 
           int result;
           int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-          REQUIRE(err == MPI_SUCCESS);
-          CHECK(result == MPI_CONGRUENT);
+          REQUIRE_EQ(err, MPI_SUCCESS);
+          CHECK_EQ(result, MPI_CONGRUENT);
         }
       }
     }
@@ -106,7 +106,7 @@ TEST_CASE("Vector<1> getNumLocalPatches unmanaged constructor")
           }
           Vector<1> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-          CHECK(vec.getNumLocalPatches() == num_local_patches);
+          CHECK_EQ(vec.getNumLocalPatches(), num_local_patches);
         }
       }
     }
@@ -134,7 +134,7 @@ TEST_CASE("Vector<1> getNumComponents unmanaged constructor")
           }
           Vector<1> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-          CHECK(vec.getNumComponents() == num_components);
+          CHECK_EQ(vec.getNumComponents(), num_components);
         }
       }
     }
@@ -162,7 +162,7 @@ TEST_CASE("Vector<1> getNumLocalCells unmanaged constructor")
           }
           Vector<1> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-          CHECK(vec.getNumLocalCells() == nx * num_local_patches);
+          CHECK_EQ(vec.getNumLocalCells(), nx * num_local_patches);
         }
       }
     }
@@ -192,7 +192,7 @@ TEST_CASE("Vector<2> getNumGhostCells unmanaged constructor")
             }
             Vector<2> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-            CHECK(vec.getNumGhostCells() == num_ghost_cells);
+            CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
           }
         }
       }
@@ -225,8 +225,8 @@ TEST_CASE("Vector<2> getMPIComm unmanaged constructor")
 
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-            REQUIRE(err == MPI_SUCCESS);
-            CHECK(result == MPI_CONGRUENT);
+            REQUIRE_EQ(err, MPI_SUCCESS);
+            CHECK_EQ(result, MPI_CONGRUENT);
           }
         }
       }
@@ -257,7 +257,7 @@ TEST_CASE("Vector<2> getNumLocalPatches unmanaged constructor")
             }
             Vector<2> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-            CHECK(vec.getNumLocalPatches() == num_local_patches);
+            CHECK_EQ(vec.getNumLocalPatches(), num_local_patches);
           }
         }
       }
@@ -288,7 +288,7 @@ TEST_CASE("Vector<2> getNumComponents unmanaged constructor")
             }
             Vector<2> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-            CHECK(vec.getNumComponents() == num_components);
+            CHECK_EQ(vec.getNumComponents(), num_components);
           }
         }
       }
@@ -319,7 +319,7 @@ TEST_CASE("Vector<2> getNumLocalCells unmanaged constructor")
             }
             Vector<2> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-            CHECK(vec.getNumLocalCells() == nx * ny * num_local_patches);
+            CHECK_EQ(vec.getNumLocalCells(), nx * ny * num_local_patches);
           }
         }
       }
@@ -352,7 +352,7 @@ TEST_CASE("Vector<3> getNumGhostCells unmanaged constructor")
               }
               Vector<3> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-              CHECK(vec.getNumGhostCells() == num_ghost_cells);
+              CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
             }
           }
         }
@@ -388,8 +388,8 @@ TEST_CASE("Vector<3> getMPIComm unmanaged constructor")
 
               int result;
               int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
-              REQUIRE(err == MPI_SUCCESS);
-              CHECK(result == MPI_CONGRUENT);
+              REQUIRE_EQ(err, MPI_SUCCESS);
+              CHECK_EQ(result, MPI_CONGRUENT);
             }
           }
         }
@@ -423,7 +423,7 @@ TEST_CASE("Vector<3> getNumLocalPatches unmanaged constructor")
               }
               Vector<3> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-              CHECK(vec.getNumLocalPatches() == num_local_patches);
+              CHECK_EQ(vec.getNumLocalPatches(), num_local_patches);
             }
           }
         }
@@ -457,7 +457,7 @@ TEST_CASE("Vector<3> getNumComponents unmanaged constructor")
               }
               Vector<3> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-              CHECK(vec.getNumComponents() == num_components);
+              CHECK_EQ(vec.getNumComponents(), num_components);
             }
           }
         }
@@ -491,7 +491,7 @@ TEST_CASE("Vector<3> getNumLocalCells unmanaged constructor")
               }
               Vector<3> vec(comm, patch_starts, strides, lengths, num_ghost_cells);
 
-              CHECK(vec.getNumLocalCells() == nx * ny * nz * num_local_patches);
+              CHECK_EQ(vec.getNumLocalCells(), nx * ny * nz * num_local_patches);
             }
           }
         }
@@ -530,8 +530,8 @@ TEST_CASE("Vector<1> getComponentView unmanaged constructor")
             for (int c = 0; c < num_components; c++) {
               INFO("c:                 " << c);
               ComponentView<double, 1> ld = vec.getComponentView(c, i);
-              CHECK(&ld[ld.getGhostStart()] == view + (patch_stride * i + c * component_stride));
-              CHECK(&ld[ld.getGhostEnd()] == view + (patch_stride * i + (c + 1) * component_stride) - 1);
+              CHECK_EQ(&ld[ld.getGhostStart()], view + (patch_stride * i + c * component_stride));
+              CHECK_EQ(&ld[ld.getGhostEnd()], view + (patch_stride * i + (c + 1) * component_stride) - 1);
             }
           }
           if (ENABLE_DEBUG) {
@@ -575,8 +575,8 @@ TEST_CASE("Vector<1> getComponentView const unmanaged constructor")
             for (int c = 0; c < num_components; c++) {
               INFO("c:                 " << c);
               ComponentView<const double, 1> ld = vec.getComponentView(c, i);
-              CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-              CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+              CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+              CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
             }
           }
           if (ENABLE_DEBUG) {
@@ -622,8 +622,8 @@ TEST_CASE("Vector<2> getComponentView unmanaged constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
             if (ENABLE_DEBUG) {
@@ -670,8 +670,8 @@ TEST_CASE("Vector<2> getComponentView const unmanaged constructor")
               for (int c = 0; c < num_components; c++) {
                 INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = vec.getComponentView(c, i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
               }
             }
 
@@ -720,8 +720,8 @@ TEST_CASE("Vector<3> getComponentView unmanaged constructor")
                 INFO("i:                 " << i);
                 for (int c = 0; c < num_components; c++) {
                   ComponentView<double, 3> ld = vec.getComponentView(c, i);
-                  CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                  CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                  CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                  CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
                 }
               }
               if (ENABLE_DEBUG) {
@@ -771,8 +771,8 @@ TEST_CASE("Vector<3> getComponentView const unmanaged constructor")
                 for (int c = 0; c < num_components; c++) {
                   INFO("c:                 " << c);
                   ComponentView<const double, 3> ld = vec.getComponentView(c, i);
-                  CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i + c * component_stride);
-                  CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * i + (c + 1) * component_stride - 1);
+                  CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
+                  CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
                 }
               }
               if (ENABLE_DEBUG) {
@@ -817,8 +817,8 @@ TEST_CASE("Vector<1> getPatchView unmanaged constructor")
           for (int i = 0; i < num_local_patches; i++) {
             INFO("i:                 " << i);
             PatchView<double, 1> ld = vec.getPatchView(i);
-            CHECK(&ld[ld.getGhostStart()] == view + (patch_stride * i));
-            CHECK(&ld[ld.getGhostEnd()] == view + (patch_stride * (i + 1) - 1));
+            CHECK_EQ(&ld[ld.getGhostStart()], view + (patch_stride * i));
+            CHECK_EQ(&ld[ld.getGhostEnd()], view + (patch_stride * (i + 1) - 1));
           }
           if (ENABLE_DEBUG) {
             CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
@@ -857,8 +857,8 @@ TEST_CASE("Vector<1> getPatchView const unmanaged constructor")
           for (int i = 0; i < num_local_patches; i++) {
             INFO("i:                 " << i);
             PatchView<const double, 1> ld = vec.getPatchView(i);
-            CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
-            CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+            CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
+            CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
           }
           if (ENABLE_DEBUG) {
             CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
@@ -899,8 +899,8 @@ TEST_CASE("Vector<2> getPatchView unmanaged constructor")
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               PatchView<double, 2> ld = vec.getPatchView(i);
-              CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
-              CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+              CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
+              CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
             }
             if (ENABLE_DEBUG) {
               CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
@@ -942,8 +942,8 @@ TEST_CASE("Vector<2> getPatchView const unmanaged constructor")
             for (int i = 0; i < num_local_patches; i++) {
               INFO("i:                 " << i);
               PatchView<const double, 2> ld = vec.getPatchView(i);
-              CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
-              CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+              CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
+              CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
             }
 
             if (ENABLE_DEBUG) {
@@ -988,8 +988,8 @@ TEST_CASE("Vector<3> getPatchView unmanaged constructor")
               for (int i = 0; i < num_local_patches; i++) {
                 INFO("i:                 " << i);
                 PatchView<double, 3> ld = vec.getPatchView(i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
               }
               if (ENABLE_DEBUG) {
                 CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);
@@ -1034,8 +1034,8 @@ TEST_CASE("Vector<3> getPatchView const unmanaged constructor")
               for (int i = 0; i < num_local_patches; i++) {
                 INFO("i:                 " << i);
                 PatchView<const double, 3> ld = vec.getPatchView(i);
-                CHECK(&ld[ld.getGhostStart()] == view + patch_stride * i);
-                CHECK(&ld[ld.getGhostEnd()] == view + patch_stride * (i + 1) - 1);
+                CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
+                CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
               }
               if (ENABLE_DEBUG) {
                 CHECK_THROWS_AS(vec.getPatchView(-1), RuntimeError);

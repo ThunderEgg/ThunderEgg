@@ -101,7 +101,7 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS")
         Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
           INFO("xi:    " << coord[0]);
           INFO("yi:    " << coord[1]);
-          REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord]));
+          REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord]));
         });
       }
     }
@@ -142,7 +142,7 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff")
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
             INFO("xi:    " << coord[0]);
             INFO("yi:    " << coord[1]);
-            CHECK(vec_ld[coord] + 1 == doctest::Approx(1));
+            CHECK_EQ(vec_ld[coord] + 1, doctest::Approx(1));
           });
         }
       }
@@ -194,7 +194,7 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff")
       errors[i] = error_vec.twoNorm() / f_vec_expected.twoNorm();
     }
     INFO("Errors: " << errors[0] << ", " << errors[1]);
-    CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
+    CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
   }
 }
 TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff")
@@ -246,7 +246,7 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff")
       errors[i] = error_vec.twoNorm() / f_vec_expected.twoNorm();
     }
     INFO("Errors: " << errors[0] << ", " << errors[1]);
-    CHECK(log(errors[0] / errors[1]) / log(2) > 1.8);
+    CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
   }
 }
 TEST_CASE("Test VarPoisson::StarPatchOperator constructor throws exception with no ghost cells")

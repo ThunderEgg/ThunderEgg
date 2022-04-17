@@ -66,7 +66,7 @@ TEST_CASE("Vector<3> twoNorm")
               MPI_Allreduce(&expected_norm, &global_expected_norm, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
               global_expected_norm = sqrt(global_expected_norm);
 
-              CHECK(vec.twoNorm() == doctest::Approx(global_expected_norm));
+              CHECK_EQ(vec.twoNorm(), doctest::Approx(global_expected_norm));
             }
           }
         }
@@ -113,7 +113,7 @@ TEST_CASE("Vector<3> infNorm")
               double global_expected_norm;
               MPI_Allreduce(&expected_norm, &global_expected_norm, 1, MPI_DOUBLE, MPI_MAX, comm.getMPIComm());
 
-              CHECK(vec.infNorm() == global_expected_norm);
+              CHECK_EQ(vec.infNorm(), global_expected_norm);
             }
           }
         }
@@ -166,7 +166,7 @@ TEST_CASE("Vector<3> dot")
               double global_expected_value;
               MPI_Allreduce(&expected_value, &global_expected_value, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
 
-              CHECK(a.dot(b) == doctest::Approx(global_expected_value));
+              CHECK_EQ(a.dot(b), doctest::Approx(global_expected_value));
             }
           }
         }

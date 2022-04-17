@@ -28,12 +28,12 @@ using namespace ThunderEgg;
 void
 Check4x4x4RefinedBSWDomainEdgeNeighborOrths(const PatchVector& domain)
 {
-  CHECK(domain["bsw_bsw_tnw"]->getCoarseNbrInfo(Edge::tn()).orth_on_coarse == Orthant<1>::lower());
-  CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Edge::tn()).orth_on_coarse == Orthant<1>::upper());
+  CHECK_EQ(domain["bsw_bsw_tnw"]->getCoarseNbrInfo(Edge::tn()).orth_on_coarse, Orthant<1>::lower());
+  CHECK_EQ(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Edge::tn()).orth_on_coarse, Orthant<1>::upper());
 
-  CHECK(domain["bsw_bsw_tse"]->getCoarseNbrInfo(Edge::te()).orth_on_coarse == Orthant<1>::lower());
-  CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Edge::te()).orth_on_coarse == Orthant<1>::upper());
+  CHECK_EQ(domain["bsw_bsw_tse"]->getCoarseNbrInfo(Edge::te()).orth_on_coarse, Orthant<1>::lower());
+  CHECK_EQ(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Edge::te()).orth_on_coarse, Orthant<1>::upper());
 
-  CHECK(domain["bsw_bsw_bne"]->getCoarseNbrInfo(Edge::ne()).orth_on_coarse == Orthant<1>::lower());
-  CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Edge::ne()).orth_on_coarse == Orthant<1>::upper());
+  CHECK_EQ(domain["bsw_bsw_bne"]->getCoarseNbrInfo(Edge::ne()).orth_on_coarse, Orthant<1>::lower());
+  CHECK_EQ(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Edge::ne()).orth_on_coarse, Orthant<1>::upper());
 }

@@ -72,20 +72,20 @@ TEST_CASE("CycleBuilder with two levels")
   auto cycle = builder.getCycle();
 
   const GMG::Level<2>& finest_level = cycle->getFinestLevel();
-  CHECK(dynamic_cast<const MockOperator&>(finest_level.getOperator()).magic_number == ops[0].magic_number);
-  CHECK(dynamic_cast<const MockSmoother&>(finest_level.getSmoother()).magic_number == smoothers[0].magic_number);
-  CHECK(dynamic_cast<const MockRestrictor&>(finest_level.getRestrictor()).magic_number == restrictor.magic_number);
+  CHECK_EQ(dynamic_cast<const MockOperator&>(finest_level.getOperator()).magic_number, ops[0].magic_number);
+  CHECK_EQ(dynamic_cast<const MockSmoother&>(finest_level.getSmoother()).magic_number, smoothers[0].magic_number);
+  CHECK_EQ(dynamic_cast<const MockRestrictor&>(finest_level.getRestrictor()).magic_number, restrictor.magic_number);
   CHECK_THROWS_AS(finest_level.getInterpolator(), RuntimeError);
-  CHECK(finest_level.finest());
-  CHECK_FALSE(finest_level.coarsest());
+  CHECK_UNARY(finest_level.finest());
+  CHECK_UNARY_FALSE(finest_level.coarsest());
 
   const GMG::Level<2>& coarsest_level = finest_level.getCoarser();
-  CHECK(dynamic_cast<const MockOperator&>(coarsest_level.getOperator()).magic_number == ops[1].magic_number);
-  CHECK(dynamic_cast<const MockSmoother&>(coarsest_level.getSmoother()).magic_number == smoothers[1].magic_number);
+  CHECK_EQ(dynamic_cast<const MockOperator&>(coarsest_level.getOperator()).magic_number, ops[1].magic_number);
+  CHECK_EQ(dynamic_cast<const MockSmoother&>(coarsest_level.getSmoother()).magic_number, smoothers[1].magic_number);
   CHECK_THROWS_AS(coarsest_level.getRestrictor(), RuntimeError);
-  CHECK(dynamic_cast<const MockInterpolator&>(coarsest_level.getInterpolator()).magic_number == interpolator.magic_number);
-  CHECK_FALSE(coarsest_level.finest());
-  CHECK(coarsest_level.coarsest());
+  CHECK_EQ(dynamic_cast<const MockInterpolator&>(coarsest_level.getInterpolator()).magic_number, interpolator.magic_number);
+  CHECK_UNARY_FALSE(coarsest_level.finest());
+  CHECK_UNARY(coarsest_level.coarsest());
   CHECK_THROWS_AS(coarsest_level.getCoarser(), RuntimeError);
 }
 TEST_CASE("CycleBuilder with three levels")
@@ -112,28 +112,28 @@ TEST_CASE("CycleBuilder with three levels")
   auto cycle = builder.getCycle();
 
   const GMG::Level<2>& finest_level = cycle->getFinestLevel();
-  CHECK(dynamic_cast<const MockOperator&>(finest_level.getOperator()).magic_number == ops[0].magic_number);
-  CHECK(dynamic_cast<const MockSmoother&>(finest_level.getSmoother()).magic_number == smoothers[0].magic_number);
-  CHECK(dynamic_cast<const MockRestrictor&>(finest_level.getRestrictor()).magic_number == restrictors[0].magic_number);
+  CHECK_EQ(dynamic_cast<const MockOperator&>(finest_level.getOperator()).magic_number, ops[0].magic_number);
+  CHECK_EQ(dynamic_cast<const MockSmoother&>(finest_level.getSmoother()).magic_number, smoothers[0].magic_number);
+  CHECK_EQ(dynamic_cast<const MockRestrictor&>(finest_level.getRestrictor()).magic_number, restrictors[0].magic_number);
   CHECK_THROWS_AS(finest_level.getInterpolator(), RuntimeError);
-  CHECK(finest_level.finest());
-  CHECK_FALSE(finest_level.coarsest());
+  CHECK_UNARY(finest_level.finest());
+  CHECK_UNARY_FALSE(finest_level.coarsest());
 
   const GMG::Level<2>& second_level = finest_level.getCoarser();
-  CHECK(dynamic_cast<const MockOperator&>(second_level.getOperator()).magic_number == ops[1].magic_number);
-  CHECK(dynamic_cast<const MockSmoother&>(second_level.getSmoother()).magic_number == smoothers[1].magic_number);
-  CHECK(dynamic_cast<const MockRestrictor&>(second_level.getRestrictor()).magic_number == restrictors[1].magic_number);
-  CHECK(dynamic_cast<const MockInterpolator&>(second_level.getInterpolator()).magic_number == interpolators[0].magic_number);
-  CHECK_FALSE(second_level.finest());
-  CHECK_FALSE(second_level.coarsest());
+  CHECK_EQ(dynamic_cast<const MockOperator&>(second_level.getOperator()).magic_number, ops[1].magic_number);
+  CHECK_EQ(dynamic_cast<const MockSmoother&>(second_level.getSmoother()).magic_number, smoothers[1].magic_number);
+  CHECK_EQ(dynamic_cast<const MockRestrictor&>(second_level.getRestrictor()).magic_number, restrictors[1].magic_number);
+  CHECK_EQ(dynamic_cast<const MockInterpolator&>(second_level.getInterpolator()).magic_number, interpolators[0].magic_number);
+  CHECK_UNARY_FALSE(second_level.finest());
+  CHECK_UNARY_FALSE(second_level.coarsest());
 
   const GMG::Level<2>& coarsest_level = second_level.getCoarser();
-  CHECK(dynamic_cast<const MockOperator&>(coarsest_level.getOperator()).magic_number == ops[2].magic_number);
-  CHECK(dynamic_cast<const MockSmoother&>(coarsest_level.getSmoother()).magic_number == smoothers[2].magic_number);
+  CHECK_EQ(dynamic_cast<const MockOperator&>(coarsest_level.getOperator()).magic_number, ops[2].magic_number);
+  CHECK_EQ(dynamic_cast<const MockSmoother&>(coarsest_level.getSmoother()).magic_number, smoothers[2].magic_number);
   CHECK_THROWS_AS(coarsest_level.getRestrictor(), RuntimeError);
-  CHECK(dynamic_cast<const MockInterpolator&>(coarsest_level.getInterpolator()).magic_number == interpolators[1].magic_number);
-  CHECK_FALSE(coarsest_level.finest());
-  CHECK(coarsest_level.coarsest());
+  CHECK_EQ(dynamic_cast<const MockInterpolator&>(coarsest_level.getInterpolator()).magic_number, interpolators[1].magic_number);
+  CHECK_UNARY_FALSE(coarsest_level.finest());
+  CHECK_UNARY(coarsest_level.coarsest());
   CHECK_THROWS_AS(coarsest_level.getCoarser(), RuntimeError);
 }
 TEST_CASE("CycleBuilder with four levels")
@@ -161,36 +161,36 @@ TEST_CASE("CycleBuilder with four levels")
   auto cycle = builder.getCycle();
 
   const GMG::Level<2>& finest_level = cycle->getFinestLevel();
-  CHECK(dynamic_cast<const MockOperator&>(finest_level.getOperator()).magic_number == ops[0].magic_number);
-  CHECK(dynamic_cast<const MockSmoother&>(finest_level.getSmoother()).magic_number == smoothers[0].magic_number);
-  CHECK(dynamic_cast<const MockRestrictor&>(finest_level.getRestrictor()).magic_number == restrictors[0].magic_number);
+  CHECK_EQ(dynamic_cast<const MockOperator&>(finest_level.getOperator()).magic_number, ops[0].magic_number);
+  CHECK_EQ(dynamic_cast<const MockSmoother&>(finest_level.getSmoother()).magic_number, smoothers[0].magic_number);
+  CHECK_EQ(dynamic_cast<const MockRestrictor&>(finest_level.getRestrictor()).magic_number, restrictors[0].magic_number);
   CHECK_THROWS_AS(finest_level.getInterpolator(), RuntimeError);
-  CHECK(finest_level.finest());
-  CHECK_FALSE(finest_level.coarsest());
+  CHECK_UNARY(finest_level.finest());
+  CHECK_UNARY_FALSE(finest_level.coarsest());
 
   const GMG::Level<2>& second_level = finest_level.getCoarser();
-  CHECK(dynamic_cast<const MockOperator&>(second_level.getOperator()).magic_number == ops[1].magic_number);
-  CHECK(dynamic_cast<const MockSmoother&>(second_level.getSmoother()).magic_number == smoothers[1].magic_number);
-  CHECK(dynamic_cast<const MockRestrictor&>(second_level.getRestrictor()).magic_number == restrictors[1].magic_number);
-  CHECK(dynamic_cast<const MockInterpolator&>(second_level.getInterpolator()).magic_number == interpolators[0].magic_number);
-  CHECK_FALSE(second_level.finest());
-  CHECK_FALSE(second_level.coarsest());
+  CHECK_EQ(dynamic_cast<const MockOperator&>(second_level.getOperator()).magic_number, ops[1].magic_number);
+  CHECK_EQ(dynamic_cast<const MockSmoother&>(second_level.getSmoother()).magic_number, smoothers[1].magic_number);
+  CHECK_EQ(dynamic_cast<const MockRestrictor&>(second_level.getRestrictor()).magic_number, restrictors[1].magic_number);
+  CHECK_EQ(dynamic_cast<const MockInterpolator&>(second_level.getInterpolator()).magic_number, interpolators[0].magic_number);
+  CHECK_UNARY_FALSE(second_level.finest());
+  CHECK_UNARY_FALSE(second_level.coarsest());
 
   const GMG::Level<2>& third_level = second_level.getCoarser();
-  CHECK(dynamic_cast<const MockOperator&>(third_level.getOperator()).magic_number == ops[2].magic_number);
-  CHECK(dynamic_cast<const MockSmoother&>(third_level.getSmoother()).magic_number == smoothers[2].magic_number);
-  CHECK(dynamic_cast<const MockRestrictor&>(third_level.getRestrictor()).magic_number == restrictors[2].magic_number);
-  CHECK(dynamic_cast<const MockInterpolator&>(third_level.getInterpolator()).magic_number == interpolators[1].magic_number);
-  CHECK_FALSE(third_level.finest());
-  CHECK_FALSE(third_level.coarsest());
+  CHECK_EQ(dynamic_cast<const MockOperator&>(third_level.getOperator()).magic_number, ops[2].magic_number);
+  CHECK_EQ(dynamic_cast<const MockSmoother&>(third_level.getSmoother()).magic_number, smoothers[2].magic_number);
+  CHECK_EQ(dynamic_cast<const MockRestrictor&>(third_level.getRestrictor()).magic_number, restrictors[2].magic_number);
+  CHECK_EQ(dynamic_cast<const MockInterpolator&>(third_level.getInterpolator()).magic_number, interpolators[1].magic_number);
+  CHECK_UNARY_FALSE(third_level.finest());
+  CHECK_UNARY_FALSE(third_level.coarsest());
 
   const GMG::Level<2>& coarsest_level = third_level.getCoarser();
-  CHECK(dynamic_cast<const MockOperator&>(coarsest_level.getOperator()).magic_number == ops[3].magic_number);
-  CHECK(dynamic_cast<const MockSmoother&>(coarsest_level.getSmoother()).magic_number == smoothers[3].magic_number);
+  CHECK_EQ(dynamic_cast<const MockOperator&>(coarsest_level.getOperator()).magic_number, ops[3].magic_number);
+  CHECK_EQ(dynamic_cast<const MockSmoother&>(coarsest_level.getSmoother()).magic_number, smoothers[3].magic_number);
   CHECK_THROWS_AS(coarsest_level.getRestrictor(), RuntimeError);
-  CHECK(dynamic_cast<const MockInterpolator&>(coarsest_level.getInterpolator()).magic_number == interpolators[2].magic_number);
-  CHECK_FALSE(coarsest_level.finest());
-  CHECK(coarsest_level.coarsest());
+  CHECK_EQ(dynamic_cast<const MockInterpolator&>(coarsest_level.getInterpolator()).magic_number, interpolators[2].magic_number);
+  CHECK_UNARY_FALSE(coarsest_level.finest());
+  CHECK_UNARY(coarsest_level.coarsest());
   CHECK_THROWS_AS(coarsest_level.getCoarser(), RuntimeError);
 }
 TEST_CASE("CycleBuilder addFinestLevel throws exception if called twice")

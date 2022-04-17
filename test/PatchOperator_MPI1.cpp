@@ -51,8 +51,8 @@ TEST_CASE("Check PatchOperator calls for various domains")
 
             mpo.apply(u, f);
 
-            CHECK(mgf.wasCalled());
-            CHECK(mpo.allPatchesCalled());
+            CHECK_UNARY(mgf.wasCalled());
+            CHECK_UNARY(mpo.allPatchesCalled());
           }
         }
       }
@@ -76,7 +76,7 @@ TEST_CASE("PatchOperator check getDomain")
           MockGhostFiller<2> mgf;
           MockPatchOperator<2> mpo(d_fine, mgf);
 
-          CHECK(mpo.getDomain().getNumLocalPatches() == d_fine.getNumLocalPatches());
+          CHECK_EQ(mpo.getDomain().getNumLocalPatches(), d_fine.getNumLocalPatches());
         }
       }
     }
@@ -100,7 +100,7 @@ TEST_CASE("PatchOperator check getGhostFiller")
           MockPatchOperator<2> mpo(d_fine, mgf);
 
           const GhostFiller<2>& mpo_mgf = mpo.getGhostFiller();
-          CHECK(typeid(mpo_mgf) == typeid(mgf));
+          CHECK_EQ(typeid(mpo_mgf), typeid(mgf));
         }
       }
     }

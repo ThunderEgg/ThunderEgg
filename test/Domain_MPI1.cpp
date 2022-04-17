@@ -44,21 +44,21 @@ TEST_CASE("Domain constructors work")
 
         // check getters
         for (int ni : d.getNs()) {
-          CHECK(ni == n);
+          CHECK_EQ(ni, n);
         }
-        CHECK(d.getNumGlobalPatches() == 1);
-        CHECK(d.getNumLocalPatches() == 1);
-        CHECK(d.getNumGlobalCells() == n * n);
-        CHECK(d.getNumLocalCells() == n * n);
-        CHECK(d.getNumLocalCellsWithGhost() == (n + 2 * num_ghost) * (n + 2 * num_ghost));
-        CHECK(d.getNumCellsInPatch() == n * n);
-        CHECK(d.getNumGhostCells() == num_ghost);
-        CHECK(d.volume() == doctest::Approx(spacing * spacing * n * n));
+        CHECK_EQ(d.getNumGlobalPatches(), 1);
+        CHECK_EQ(d.getNumLocalPatches(), 1);
+        CHECK_EQ(d.getNumGlobalCells(), n * n);
+        CHECK_EQ(d.getNumLocalCells(), n * n);
+        CHECK_EQ(d.getNumLocalCellsWithGhost(), (n + 2 * num_ghost) * (n + 2 * num_ghost));
+        CHECK_EQ(d.getNumCellsInPatch(), n * n);
+        CHECK_EQ(d.getNumGhostCells(), num_ghost);
+        CHECK_EQ(d.volume(), doctest::Approx(spacing * spacing * n * n));
 
         int result;
         int err = MPI_Comm_compare(comm.getMPIComm(), d.getCommunicator().getMPIComm(), &result);
-        REQUIRE(err == MPI_SUCCESS);
-        CHECK(result == MPI_CONGRUENT);
+        REQUIRE_EQ(err, MPI_SUCCESS);
+        CHECK_EQ(result, MPI_CONGRUENT);
       }
     }
   }
@@ -81,8 +81,8 @@ TEST_CASE("Domain setTimer")
 
   auto timer = make_shared<Timer>(comm);
   d.setTimer(timer);
-  CHECK(d.getTimer() == timer);
-  CHECK(d.hasTimer());
+  CHECK_EQ(d.getTimer(), timer);
+  CHECK_UNARY(d.hasTimer());
 }
 TEST_CASE("Domain setTimer adds domain to timer")
 {
@@ -122,8 +122,8 @@ TEST_CASE("Domain getTimer default is no timer")
   pinfos[0].num_ghost_cells = num_ghost;
   Domain<2> d(comm, 0, { n, n }, num_ghost, pinfos.begin(), pinfos.end());
 
-  CHECK(d.getTimer() == nullptr);
-  CHECK_FALSE(d.hasTimer());
+  CHECK_EQ(d.getTimer(), nullptr);
+  CHECK_UNARY_FALSE(d.hasTimer());
 }
 TEST_CASE("Domain id in constructor")
 {
@@ -142,7 +142,7 @@ TEST_CASE("Domain id in constructor")
     pinfos[0].num_ghost_cells = num_ghost;
     Domain<2> d(comm, id, { n, n }, num_ghost, pinfos.begin(), pinfos.end());
 
-    CHECK(d.getId() == id);
+    CHECK_EQ(d.getId(), id);
   }
 }
 TEST_CASE("Domain to_json")
@@ -162,64 +162,64 @@ TEST_CASE("Domain to_json")
   Domain<2> d(comm, 0, { n, n }, num_ghost, pinfos.begin(), pinfos.end());
 
   nlohmann::json j = d;
-  REQUIRE(j.is_array());
-  REQUIRE(j.size() == 1);
-  REQUIRE(j[0]["id"] == 0);
+  REQUIRE_UNARY(j.is_array());
+  REQUIRE_EQ(j.size(), 1);
+  REQUIRE_EQ(j[0]["id"], 0);
 }
 TEST_CASE("Domain<2> numLocalPatches")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", { 10, 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
-  CHECK(domain.getNumLocalPatches() == 15);
+  CHECK_EQ(domain.getNumLocalPatches(), 15);
 }
 TEST_CASE("Domain<2> numGlobalPatches")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", { 10, 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
 
-  CHECK(domain.getNumGlobalPatches() == 15);
+  CHECK_EQ(domain.getNumGlobalPatches(), 15);
 }
 TEST_CASE("Domain<2> numLocalCells")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", { 10, 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
-  CHECK(domain.getNumLocalCells() == 15 * 10 * 10 * 10);
+  CHECK_EQ(domain.getNumLocalCells(), 15 * 10 * 10 * 10);
 }
 TEST_CASE("Domain<2> numGlobalCells")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", { 10, 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
 
-  CHECK(domain.getNumGlobalCells() == 15 * 10 * 10 * 10);
+  CHECK_EQ(domain.getNumGlobalCells(), 15 * 10 * 10 * 10);
 }
 TEST_CASE("Domain<2> getNumGhostCells")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", { 10, 10, 10 }, 2);
   auto domain = domain_reader.getFinerDomain();
-  CHECK(domain.getNumGhostCells() == 2);
+  CHECK_EQ(domain.getNumGhostCells(), 2);
 }
 TEST_CASE("Domain<2> numLocalCellsWithGhost")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", { 10, 10, 10 }, 2);
   auto domain = domain_reader.getFinerDomain();
 
-  CHECK(domain.getNumLocalCellsWithGhost() == 15 * 14 * 14 * 14);
+  CHECK_EQ(domain.getNumLocalCellsWithGhost(), 15 * 14 * 14 * 14);
 }
 TEST_CASE("Domain<2> getNs")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", { 10, 11, 12 }, 2);
   auto domain = domain_reader.getFinerDomain();
 
-  CHECK(domain.getNs()[0] == 10);
-  CHECK(domain.getNs()[1] == 11);
-  CHECK(domain.getNs()[2] == 12);
+  CHECK_EQ(domain.getNs()[0], 10);
+  CHECK_EQ(domain.getNs()[1], 11);
+  CHECK_EQ(domain.getNs()[2], 12);
 }
 TEST_CASE("Domain<2> getPatchInfoVector size")
 {
   DomainReader<3> domain_reader("mesh_inputs/3d_refined_bnw_2x2x2_mpi1.json", { 10, 10, 10 }, 0);
   auto domain = domain_reader.getFinerDomain();
 
-  CHECK(domain.getPatchInfoVector().size() == 15);
+  CHECK_EQ(domain.getPatchInfoVector().size(), 15);
 }
 TEST_CASE("Domain<3> local indexes match position in pinfo vector")
 {
@@ -228,7 +228,7 @@ TEST_CASE("Domain<3> local indexes match position in pinfo vector")
 
   auto pinfo_vector = domain.getPatchInfoVector();
   for (size_t i = 0; i < pinfo_vector.size(); i++) {
-    CHECK(pinfo_vector[i].local_index == (int)i);
+    CHECK_EQ(pinfo_vector[i].local_index, (int)i);
   }
 }
 TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consistent")
@@ -245,9 +245,9 @@ TEST_CASE("Schur::InterfaceDomain<2> local indexes in neighbor info are consiste
   auto checkIdAndLocalIndex = [&](int id, int local_index) {
     auto iter = id_to_local_index_map.find(id);
     if (iter != id_to_local_index_map.end()) {
-      CHECK(local_index == iter->second);
+      CHECK_EQ(local_index, iter->second);
     } else {
-      CHECK(local_index == -1);
+      CHECK_EQ(local_index, -1);
     }
   };
   for (auto pinfo : domain.getPatchInfoVector()) {
@@ -311,7 +311,7 @@ TEST_CASE("Domain<3> global indexes match position in pinfo vector")
 
   auto pinfo_vector = domain.getPatchInfoVector();
   for (size_t i = 0; i < pinfo_vector.size(); i++) {
-    CHECK(pinfo_vector[i].global_index == (int)i);
+    CHECK_EQ(pinfo_vector[i].global_index, (int)i);
   }
 }
 TEST_CASE("Domain<3> global indexes in neighbor info are consistent")
@@ -325,7 +325,7 @@ TEST_CASE("Domain<3> global indexes in neighbor info are consistent")
     id_to_global_index_map[pinfo.id] = pinfo.local_index;
   }
 
-  auto checkIdAndLocalIndex = [&](int id, int global_index) { CHECK(global_index == id_to_global_index_map.at(id)); };
+  auto checkIdAndLocalIndex = [&](int id, int global_index) { CHECK_EQ(global_index, id_to_global_index_map.at(id)); };
   for (auto pinfo : domain.getPatchInfoVector()) {
     for (Side<3> s : Side<3>::getValues()) {
       if (pinfo.hasNbr(s)) {
