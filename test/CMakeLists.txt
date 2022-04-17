@@ -1,17 +1,6 @@
-#cmake_policy(SET CMP0110 NEW)
-include(FetchContent)
-FetchContent_Declare(
-  catch2
-  GIT_REPOSITORY https://github.com/catchorg/Catch2
-  GIT_TAG        v3.0.0-preview4
-)
-
-FetchContent_MakeAvailable(catch2)
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 
-
-include(Catch)
 
 set(TE_TEST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 configure_file(TestConfig.h.in TestConfig.h)
@@ -164,22 +153,19 @@ target_compile_definitions(test_shared PRIVATE ${TEST_COMPILE_FLAGS})
 
 # -- link libraries
 
-target_link_libraries(test_shared PUBLIC ThunderEgg Catch2)
+target_link_libraries(test_shared PUBLIC ThunderEgg)
 
 target_link_libraries(unit_tests_mpi1 test_shared)
 target_link_libraries(unit_tests_mpi2 test_shared)
 target_link_libraries(unit_tests_mpi3 test_shared)
 
-    #target_include_directories(unit_tests_mpi${ARG2}
-    #                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+include(cmake/doctest.cmake)
 
-set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
+function(add_mpi_test TARGET NUMPROC)
+  set_target_properties(${TARGET} PROPERTIES CROSSCOMPILING_EMULATOR "${MPIEXEC};${MPIEXEC_NUMPROC_FLAG};${NUMPROC};${THUNDEREGG_MPIEXEC_FLAGS}")
+  doctest_discover_tests(${TARGET} TEST_PREFIX "${TARGET}___" PROPERTIES PROCESSORS ${NUMPROC})
+endfunction(add_mpi_test)
 
-#function(add_mpi_test TARGET NUMPROC)
-#  set_target_properties(${TARGET} PROPERTIES CROSSCOMPILING_EMULATOR "${MPIEXEC};${MPIEXEC_NUMPROC_FLAG};${NUMPROC};${THUNDEREGG_MPIEXEC_FLAGS}")
-#  catch_discover_tests(${TARGET} TEST_PREFIX "${TARGET}___" PROPERTIES PROCESSORS ${NUMPROC})
-#endfunction(add_mpi_test)
-
-#add_mpi_test(unit_tests_mpi1 1)
-#add_mpi_test(unit_tests_mpi2 2)
-#add_mpi_test(unit_tests_mpi3 3)
+add_mpi_test(unit_tests_mpi1 1)
+add_mpi_test(unit_tests_mpi2 2)
+add_mpi_test(unit_tests_mpi3 3)

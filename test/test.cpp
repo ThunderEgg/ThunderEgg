@@ -34,7 +34,10 @@ main(int argc, char* argv[])
 {
   bool catch_add_tests = false;
   for (int i = 0; i < argc; i++) {
-    catch_add_tests = strcmp(argv[i], "--list-tests") == 0;
+    catch_add_tests = strcmp(argv[i], "--list-test-cases") == 0;
+    if (catch_add_tests)
+      break;
+    catch_add_tests = strcmp(argv[i], "--list-test-suites") == 0;
     if (catch_add_tests)
       break;
     catch_add_tests = strcmp(argv[i], "--list-reporters") == 0;
