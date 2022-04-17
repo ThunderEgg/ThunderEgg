@@ -47,8 +47,9 @@ TEST_CASE("Schur::PatchIfaceScatter<2> throws exception for non-square patches")
         INFO("NY: " << ny);
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, 0);
         auto domain = domain_reader.getFinerDomain();
+        Schur::InterfaceDomain<2> iface_domain(domain);
 
-        auto construct = [&]() { Schur::InterfaceDomain<2> iface_domain(domain); };
+        auto construct = [&]() { Schur::PatchIfaceScatter<2> scatter(iface_domain); };
         CHECK_THROWS_AS(construct(), RuntimeError);
       }
     }
