@@ -23,9 +23,7 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -65,7 +63,7 @@ TEST_CASE("Linear Test LinearRestrictor")
         INFO("ny:    " << pinfo.ns[1]);
         ComponentView<double, 2> vec_ld = coarse_vec.getComponentView(0, pinfo.local_index);
         ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
-        Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord])); });
+        Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord])); });
         for (Side<2> s : Side<2>::getValues()) {
           View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
           View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
@@ -73,7 +71,7 @@ TEST_CASE("Linear Test LinearRestrictor")
             INFO("side:      " << s);
             Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
               INFO("coord:  " << coord[0]);
-              CHECK(vec_ghost[coord] == Catch::Approx(expected_ghost[coord]));
+              CHECK(vec_ghost[coord] == doctest::Approx(expected_ghost[coord]));
             });
           }
         }

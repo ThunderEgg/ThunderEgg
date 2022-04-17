@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -444,12 +444,10 @@ TEST_CASE("Orthant<3> isOnSide is as expected")
 }
 TEST_CASE("Orthant<1> getValuesOnSide is as expected")
 {
-  SECTION("Side<1>::west()")
   {
     std::array<Orthant<1>, 1> values = Orthant<1>::getValuesOnSide(Side<1>::west());
     CHECK(values[0] == Orthant<1>::lower());
   }
-  SECTION("Side<1>::east()")
   {
     std::array<Orthant<1>, 1> values = Orthant<1>::getValuesOnSide(Side<1>::east());
     CHECK(values[0] == Orthant<1>::upper());

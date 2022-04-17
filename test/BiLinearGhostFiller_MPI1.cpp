@@ -21,13 +21,11 @@
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/DomainTools.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace Catch;
+using namespace doctest;
 
 constexpr auto single_mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
 constexpr auto refined_mesh_file = "mesh_inputs/2d_uniform_2x2_refined_nw_mpi1.json";

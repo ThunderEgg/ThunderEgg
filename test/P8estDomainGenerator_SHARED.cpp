@@ -22,11 +22,11 @@
 #include "mpi.h"
 #include <ThunderEgg/tpl/json.hpp>
 #include <algorithm>
-#include <catch2/catch_approx.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 PatchVector::PatchVector(const ThunderEgg::Domain<3>& domain, int max_level)
   : max_level(max_level)

@@ -25,8 +25,6 @@
 #include <list>
 #include <sstream>
 
-#include <catch2/generators/catch_generators.hpp>
-
 using namespace std;
 using namespace ThunderEgg;
 

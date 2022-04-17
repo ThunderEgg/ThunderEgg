@@ -26,9 +26,7 @@
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -89,7 +87,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
               INFO("xi:    " << coord[0]);
               INFO("yi:    " << coord[1]);
               INFO("zi:    " << coord[2]);
-              CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
+              CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
             });
           }
           MatDestroy(&A);
@@ -152,7 +150,7 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
               INFO("xi:    " << coord[0]);
               INFO("yi:    " << coord[1]);
               INFO("zi:    " << coord[2]);
-              CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
+              CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
             });
           }
           MatDestroy(&A);

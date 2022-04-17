@@ -21,8 +21,7 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace ThunderEgg;
 using namespace std;
@@ -290,8 +289,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches on uniform quad")
 }
 TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when start isn't called "
           "before finish on "
-          "uniform quad",
-          "[GMG::InterLevelComm]")
+          "uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2 }) {
@@ -330,8 +328,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sta
 }
 TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when start and finish are "
           "called on "
-          "different ghost vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different ghost vectors on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2 }) {
@@ -372,8 +369,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sta
 }
 TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when start and finish are "
           "called on "
-          "different vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different vectors on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -414,8 +410,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sta
 }
 TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when start and finish are "
           "called on "
-          "different vectors and ghost vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different vectors and ghost vectors on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -495,8 +490,7 @@ TEST_CASE("2-processor sendGhostPatches throws exception when start is called tw
 }
 TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when get start is called "
           "after send start "
-          "on uniform quad",
-          "[GMG::InterLevelComm]")
+          "on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -536,8 +530,7 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when get
 }
 TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sned start is called "
           "after get start "
-          "on uniform quad",
-          "[GMG::InterLevelComm]")
+          "on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -636,8 +629,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches on uniform quad")
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when start isn't called "
           "before finish on "
-          "uniform quad",
-          "[GMG::InterLevelComm]")
+          "uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -675,8 +667,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
   }
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when start and finish are called on "
-          "different ghost vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different ghost vectors on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -716,8 +707,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
   }
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when start and finish are called on "
-          "different vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different vectors on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -757,8 +747,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
   }
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when start and finish are called on "
-          "different vectors and ghost vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different vectors and ghost vectors on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -799,8 +788,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
   }
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when start is called twice "
-          "on uniform quad",
-          "[GMG::InterLevelComm]")
+          "on uniform quad")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -839,8 +827,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
   }
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when send finish is called "
-          "on get start",
-          "[GMG::InterLevelComm]")
+          "on get start")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -879,8 +866,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when send
   }
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when get finish is called "
-          "on send start",
-          "[GMG::InterLevelComm]")
+          "on send start")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -919,8 +905,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when get 
   }
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when send start is called "
-          "after get start",
-          "[GMG::InterLevelComm]")
+          "after get start")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -959,8 +944,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when send
   }
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when get start is called "
-          "after send start",
-          "[GMG::InterLevelComm]")
+          "after send start")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -1000,8 +984,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when get 
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when send finish is called "
           "after get start "
-          "and finish",
-          "[GMG::InterLevelComm]")
+          "and finish")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
@@ -1042,8 +1025,7 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when send
 }
 TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when get finish is called "
           "after send start "
-          "and finish",
-          "[GMG::InterLevelComm]")
+          "and finish")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {

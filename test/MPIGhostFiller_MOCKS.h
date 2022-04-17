@@ -27,7 +27,7 @@
 #include <list>
 #include <tuple>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 namespace ThunderEgg {
 template<int D>
@@ -36,26 +36,16 @@ class CallMockMPIGhostFiller : public MPIGhostFiller<D>
 private:
   int num_components;
 
-  mutable std::list<
-    std::tuple<const PatchInfo<D>*, Side<D>, const NbrType, const Orthant<D - 1>, int, int>>
-    nbr_calls;
+  mutable std::list<std::tuple<const PatchInfo<D>*, Side<D>, const NbrType, const Orthant<D - 1>, int, int>> nbr_calls;
 
-  mutable std::list<
-    std::tuple<const PatchInfo<D>*, Edge, const NbrType, const Orthant<1>, int, int>>
-    edge_nbr_calls;
+  mutable std::list<std::tuple<const PatchInfo<D>*, Edge, const NbrType, const Orthant<1>, int, int>> edge_nbr_calls;
 
-  mutable std::list<std::tuple<const PatchInfo<D>*, Corner<D>, const NbrType, int, int>>
-    corner_nbr_calls;
+  mutable std::list<std::tuple<const PatchInfo<D>*, Corner<D>, const NbrType, int, int>> corner_nbr_calls;
 
   mutable std::list<std::tuple<const PatchInfo<D>*, int>> local_calls;
 
 public:
-  void fillGhostCellsForNbrPatch(const PatchInfo<D>& pinfo,
-                                 const PatchView<const double, D>& local_view,
-                                 const PatchView<const double, D>& nbr_view,
-                                 Side<D> side,
-                                 NbrType nbr_type,
-                                 Orthant<D - 1> orth_on_coarse) const override
+  void fillGhostCellsForNbrPatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& local_view, const PatchView<const double, D>& nbr_view, Side<D> side, NbrType nbr_type, Orthant<D - 1> orth_on_coarse) const override
   {
     INFO("Side: " << side);
     INFO("NbrType: " << nbr_type);
@@ -85,8 +75,7 @@ public:
       } else {
         expected_start[side.getAxisIndex()] = expected_end[side.getAxisIndex()] + 1;
         expected_ghost_start[side.getAxisIndex()] = expected_end[side.getAxisIndex()] + 1;
-        expected_ghost_end[side.getAxisIndex()] =
-          expected_end[side.getAxisIndex()] + num_ghost_cells;
+        expected_ghost_end[side.getAxisIndex()] = expected_end[side.getAxisIndex()] + num_ghost_cells;
       }
       CHECK(nbr_view.getGhostStart() == expected_ghost_start);
       CHECK(nbr_view.getStart() == expected_start);
@@ -98,16 +87,10 @@ public:
       CHECK(local_view.getEnd() == nbr_view.getEnd());
       CHECK(local_view.getGhostEnd() == nbr_view.getGhostEnd());
     }
-    nbr_calls.emplace_back(
-      &pinfo, side, nbr_type, orth_on_coarse, local_view.getEnd()[D] + 1, nbr_view.getEnd()[D] + 1);
+    nbr_calls.emplace_back(&pinfo, side, nbr_type, orth_on_coarse, local_view.getEnd()[D] + 1, nbr_view.getEnd()[D] + 1);
   }
 
-  void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D>& pinfo,
-                                     const PatchView<const double, D>& local_view,
-                                     const PatchView<const double, D>& nbr_view,
-                                     Edge edge,
-                                     NbrType nbr_type,
-                                     Orthant<1> orth_on_coarse) const override
+  void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& local_view, const PatchView<const double, D>& nbr_view, Edge edge, NbrType nbr_type, Orthant<1> orth_on_coarse) const override
   {
     if constexpr (D == 3) {
       INFO("Edge: " << edge);
@@ -139,8 +122,7 @@ public:
           } else {
             expected_start[side.getAxisIndex()] = expected_end[side.getAxisIndex()] + 1;
             expected_ghost_start[side.getAxisIndex()] = expected_end[side.getAxisIndex()] + 1;
-            expected_ghost_end[side.getAxisIndex()] =
-              expected_end[side.getAxisIndex()] + num_ghost_cells;
+            expected_ghost_end[side.getAxisIndex()] = expected_end[side.getAxisIndex()] + num_ghost_cells;
           }
         }
         CHECK(nbr_view.getGhostStart() == expected_ghost_start);
@@ -153,20 +135,11 @@ public:
         CHECK(local_view.getEnd() == nbr_view.getEnd());
         CHECK(local_view.getGhostEnd() == nbr_view.getGhostEnd());
       }
-      edge_nbr_calls.emplace_back(&pinfo,
-                                  edge,
-                                  nbr_type,
-                                  orth_on_coarse,
-                                  local_view.getEnd()[D] + 1,
-                                  local_view.getEnd()[D] + 1);
+      edge_nbr_calls.emplace_back(&pinfo, edge, nbr_type, orth_on_coarse, local_view.getEnd()[D] + 1, local_view.getEnd()[D] + 1);
     }
   }
 
-  void fillGhostCellsForCornerNbrPatch(const PatchInfo<D>& pinfo,
-                                       const PatchView<const double, D>& local_view,
-                                       const PatchView<const double, D>& nbr_view,
-                                       Corner<D> corner,
-                                       NbrType nbr_type) const override
+  void fillGhostCellsForCornerNbrPatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& local_view, const PatchView<const double, D>& nbr_view, Corner<D> corner, NbrType nbr_type) const override
   {
     INFO("Corner: " << corner);
     INFO("NbrType: " << nbr_type);
@@ -197,8 +170,7 @@ public:
         } else {
           expected_start[side.getAxisIndex()] = expected_end[side.getAxisIndex()] + 1;
           expected_ghost_start[side.getAxisIndex()] = expected_end[side.getAxisIndex()] + 1;
-          expected_ghost_end[side.getAxisIndex()] =
-            expected_end[side.getAxisIndex()] + num_ghost_cells;
+          expected_ghost_end[side.getAxisIndex()] = expected_end[side.getAxisIndex()] + num_ghost_cells;
         }
       }
       CHECK(nbr_view.getGhostStart() == expected_ghost_start);
@@ -211,12 +183,10 @@ public:
       CHECK(local_view.getEnd() == nbr_view.getEnd());
       CHECK(local_view.getGhostEnd() == nbr_view.getGhostEnd());
     }
-    corner_nbr_calls.emplace_back(
-      &pinfo, corner, nbr_type, local_view.getEnd()[D] + 1, nbr_view.getEnd()[D] + 1);
+    corner_nbr_calls.emplace_back(&pinfo, corner, nbr_type, local_view.getEnd()[D] + 1, nbr_view.getEnd()[D] + 1);
   }
 
-  void fillGhostCellsForLocalPatch(const PatchInfo<D>& pinfo,
-                                   const PatchView<const double, D>& local_view) const override
+  void fillGhostCellsForLocalPatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& local_view) const override
   {
     called = true;
     local_calls.emplace_back(&pinfo, local_view.getEnd()[D] + 1);
@@ -225,7 +195,8 @@ public:
   CallMockMPIGhostFiller(const Domain<D>& domain, int num_components, GhostFillingType fill_type)
     : MPIGhostFiller<D>(domain, fill_type)
     , num_components(num_components)
-  {}
+  {
+  }
   CallMockMPIGhostFiller<D>* clone() const override { throw 3; }
 
   /**
@@ -238,19 +209,16 @@ public:
     // remove from this collection the calls
     auto remaining_nbr_calls = nbr_calls;
 
-    auto check_for_nbr_call =
-      [&](const std::
-            tuple<const PatchInfo<D>*, Side<D>, const NbrType, const Orthant<D - 1>, int, int>&
-              call) {
-        // check if call was made for neighbor
-        auto found_call = std::find(remaining_nbr_calls.begin(), remaining_nbr_calls.end(), call);
+    auto check_for_nbr_call = [&](const std::tuple<const PatchInfo<D>*, Side<D>, const NbrType, const Orthant<D - 1>, int, int>& call) {
+      // check if call was made for neighbor
+      auto found_call = std::find(remaining_nbr_calls.begin(), remaining_nbr_calls.end(), call);
 
-        CHECK(found_call != remaining_nbr_calls.end());
+      CHECK(found_call != remaining_nbr_calls.end());
 
-        if (found_call != remaining_nbr_calls.end()) {
-          remaining_nbr_calls.erase(found_call);
-        }
-      };
+      if (found_call != remaining_nbr_calls.end()) {
+        remaining_nbr_calls.erase(found_call);
+      }
+    };
     for (const PatchInfo<D>& patch : this->getDomain().getPatchInfoVector()) {
       INFO("id: " << patch.id);
       std::string starts = "starts: ";
@@ -266,12 +234,7 @@ public:
             case NbrType::Normal: {
               INFO("NbrType: Normal");
 
-              auto call = std::make_tuple(&patch,
-                                          side,
-                                          NbrType::Normal,
-                                          Orthant<D - 1>::null(),
-                                          num_components,
-                                          num_components);
+              auto call = std::make_tuple(&patch, side, NbrType::Normal, Orthant<D - 1>::null(), num_components, num_components);
               check_for_nbr_call(call);
 
             } break;
@@ -280,8 +243,7 @@ public:
 
               for (auto orthant : Orthant<D - 1>::getValues()) {
                 INFO("Orthant: " << orthant.getIndex());
-                auto call = std::make_tuple(
-                  &patch, side, NbrType::Fine, orthant, num_components, num_components);
+                auto call = std::make_tuple(&patch, side, NbrType::Fine, orthant, num_components, num_components);
                 check_for_nbr_call(call);
               }
             } break;
@@ -292,8 +254,7 @@ public:
 
               INFO("Orthant: " << orthant.getIndex());
 
-              auto call = std::make_tuple(
-                &patch, side, NbrType::Coarse, orthant, num_components, num_components);
+              auto call = std::make_tuple(&patch, side, NbrType::Coarse, orthant, num_components, num_components);
               check_for_nbr_call(call);
 
             } break;
@@ -339,18 +300,16 @@ public:
       // remove from this collection the calls
       auto remaining_nbr_calls = edge_nbr_calls;
 
-      auto check_for_nbr_call =
-        [&](const std::tuple<const PatchInfo<D>*, Edge, const NbrType, const Orthant<1>, int, int>&
-              call) {
-          // check if call was made for neighbor
-          auto found_call = std::find(remaining_nbr_calls.begin(), remaining_nbr_calls.end(), call);
+      auto check_for_nbr_call = [&](const std::tuple<const PatchInfo<D>*, Edge, const NbrType, const Orthant<1>, int, int>& call) {
+        // check if call was made for neighbor
+        auto found_call = std::find(remaining_nbr_calls.begin(), remaining_nbr_calls.end(), call);
 
-          CHECK(found_call != remaining_nbr_calls.end());
+        CHECK(found_call != remaining_nbr_calls.end());
 
-          if (found_call != remaining_nbr_calls.end()) {
-            remaining_nbr_calls.erase(found_call);
-          }
-        };
+        if (found_call != remaining_nbr_calls.end()) {
+          remaining_nbr_calls.erase(found_call);
+        }
+      };
       for (const PatchInfo<D>& patch : this->getDomain().getPatchInfoVector()) {
         INFO("id: " << patch.id);
         std::string starts = "starts: ";
@@ -366,12 +325,7 @@ public:
               case NbrType::Normal: {
                 INFO("NbrType: Normal");
 
-                auto call = std::make_tuple(&patch,
-                                            edge,
-                                            NbrType::Normal,
-                                            Orthant<1>::null(),
-                                            num_components,
-                                            num_components);
+                auto call = std::make_tuple(&patch, edge, NbrType::Normal, Orthant<1>::null(), num_components, num_components);
                 check_for_nbr_call(call);
 
               } break;
@@ -380,8 +334,7 @@ public:
 
                 for (auto orthant : Orthant<1>::getValues()) {
                   INFO("Orthant: " << orthant.getIndex());
-                  auto call = std::make_tuple(
-                    &patch, edge, NbrType::Fine, orthant, num_components, num_components);
+                  auto call = std::make_tuple(&patch, edge, NbrType::Fine, orthant, num_components, num_components);
                   check_for_nbr_call(call);
                 }
               } break;
@@ -392,8 +345,7 @@ public:
 
                 INFO("Orthant: " << orthant.getIndex());
 
-                auto call = std::make_tuple(
-                  &patch, edge, NbrType::Coarse, orthant, num_components, num_components);
+                auto call = std::make_tuple(&patch, edge, NbrType::Coarse, orthant, num_components, num_components);
                 check_for_nbr_call(call);
 
               } break;
@@ -439,17 +391,16 @@ public:
     // remove from this collection the calls
     auto remaining_nbr_calls = corner_nbr_calls;
 
-    auto check_for_nbr_call =
-      [&](const std::tuple<const PatchInfo<D>*, Corner<D>, const NbrType, int, int>& call) {
-        // check if call was made for neighbor
-        auto found_call = std::find(remaining_nbr_calls.begin(), remaining_nbr_calls.end(), call);
+    auto check_for_nbr_call = [&](const std::tuple<const PatchInfo<D>*, Corner<D>, const NbrType, int, int>& call) {
+      // check if call was made for neighbor
+      auto found_call = std::find(remaining_nbr_calls.begin(), remaining_nbr_calls.end(), call);
 
-        CHECK(found_call != remaining_nbr_calls.end());
+      CHECK(found_call != remaining_nbr_calls.end());
 
-        if (found_call != remaining_nbr_calls.end()) {
-          remaining_nbr_calls.erase(found_call);
-        }
-      };
+      if (found_call != remaining_nbr_calls.end()) {
+        remaining_nbr_calls.erase(found_call);
+      }
+    };
     for (const PatchInfo<D>& patch : this->getDomain().getPatchInfoVector()) {
       INFO("id: " << patch.id);
       std::string starts = "starts: ";
@@ -465,23 +416,20 @@ public:
             case NbrType::Normal: {
               INFO("NbrType: Normal");
 
-              auto call =
-                std::make_tuple(&patch, corner, NbrType::Normal, num_components, num_components);
+              auto call = std::make_tuple(&patch, corner, NbrType::Normal, num_components, num_components);
               check_for_nbr_call(call);
 
             } break;
             case NbrType::Fine: {
               INFO("NbrType: Fine");
 
-              auto call =
-                std::make_tuple(&patch, corner, NbrType::Fine, num_components, num_components);
+              auto call = std::make_tuple(&patch, corner, NbrType::Fine, num_components, num_components);
               check_for_nbr_call(call);
             } break;
             case NbrType::Coarse: {
               INFO("NbrType: Coarse");
 
-              auto call =
-                std::make_tuple(&patch, corner, NbrType::Coarse, num_components, num_components);
+              auto call = std::make_tuple(&patch, corner, NbrType::Coarse, num_components, num_components);
               check_for_nbr_call(call);
 
             } break;
@@ -534,9 +482,7 @@ public:
       INFO(starts);
 
       // check for local call
-      auto found_call = std::find(remaining_local_calls.begin(),
-                                  remaining_local_calls.end(),
-                                  std::make_tuple(&patch, num_components));
+      auto found_call = std::find(remaining_local_calls.begin(), remaining_local_calls.end(), std::make_tuple(&patch, num_components));
 
       CHECK(found_call != remaining_local_calls.end());
 
@@ -566,12 +512,7 @@ template<int D>
 class ExchangeMockMPIGhostFiller : public MPIGhostFiller<D>
 {
 public:
-  void fillGhostCellsForNbrPatch(const PatchInfo<D>& pinfo,
-                                 const PatchView<const double, D>& local_view,
-                                 const PatchView<const double, D>& nbr_view,
-                                 Side<D> side,
-                                 NbrType nbr_type,
-                                 Orthant<D - 1> orthant) const override
+  void fillGhostCellsForNbrPatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& local_view, const PatchView<const double, D>& nbr_view, Side<D> side, NbrType nbr_type, Orthant<D - 1> orthant) const override
   {
     int index = 0;
     for (int i = 0; i < pinfo.num_ghost_cells; i++) {
@@ -586,19 +527,13 @@ public:
     }
   }
 
-  void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D>& pinfo,
-                                     const PatchView<const double, D>& local_view,
-                                     const PatchView<const double, D>& nbr_view,
-                                     Edge edge,
-                                     NbrType nbr_type,
-                                     Orthant<1> orthant) const override
+  void fillGhostCellsForEdgeNbrPatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& local_view, const PatchView<const double, D>& nbr_view, Edge edge, NbrType nbr_type, Orthant<1> orthant) const override
   {
     if constexpr (D == 3) {
       int index = 0;
       for (int j = 0; j < pinfo.num_ghost_cells; j++) {
         for (int i = 0; i < pinfo.num_ghost_cells; i++) {
-          View<double, 2> slice =
-            nbr_view.getGhostSliceOn(edge.opposite(), { (size_t)i, (size_t)j });
+          View<double, 2> slice = nbr_view.getGhostSliceOn(edge.opposite(), { (size_t)i, (size_t)j });
           Loop::Nested<2>(slice.getStart(), slice.getEnd(), [&](const std::array<int, 2>& coord) {
             slice[coord] += pinfo.id + index;
             index++;
@@ -608,11 +543,7 @@ public:
     }
   }
 
-  void fillGhostCellsForCornerNbrPatch(const PatchInfo<D>& pinfo,
-                                       const PatchView<const double, D>& local_view,
-                                       const PatchView<const double, D>& nbr_view,
-                                       Corner<D> corner,
-                                       NbrType nbr_type) const override
+  void fillGhostCellsForCornerNbrPatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& local_view, const PatchView<const double, D>& nbr_view, Corner<D> corner, NbrType nbr_type) const override
   {
     int index = 0;
     std::array<size_t, D> start;
@@ -628,17 +559,13 @@ public:
     });
   }
 
-  void fillGhostCellsForLocalPatch(const PatchInfo<D>& pinfo,
-                                   const PatchView<const double, D>& local_data) const override
-  {}
+  void fillGhostCellsForLocalPatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& local_data) const override {}
 
   ExchangeMockMPIGhostFiller(const Domain<D>& domain_in, GhostFillingType fill_type)
     : MPIGhostFiller<D>(domain_in, fill_type)
-  {}
-  ExchangeMockMPIGhostFiller<D>* clone() const override
   {
-    return new ExchangeMockMPIGhostFiller<D>(*this);
   }
+  ExchangeMockMPIGhostFiller<D>* clone() const override { return new ExchangeMockMPIGhostFiller<D>(*this); }
 
   void checkInterior(const Vector<D>& vec)
   {
@@ -822,16 +749,15 @@ public:
                   for (int i = 0; i < pinfo.num_ghost_cells; i++) {
                     auto slice = data.getGhostSliceOn(e, { (size_t)i, (size_t)j });
 
-                    Loop::Nested<2>(
-                      slice.getStart(), slice.getEnd(), [&](std::array<int, 2>& coord) {
-                        std::string coord_str = "coord: ";
-                        for (size_t i = 0; i < 2; i++) {
-                          coord_str += " " + std::to_string(coord[i]);
-                        }
-                        INFO(coord_str);
-                        CHECK(slice[coord] == nbrinfo.id + index);
-                        index++;
-                      });
+                    Loop::Nested<2>(slice.getStart(), slice.getEnd(), [&](std::array<int, 2>& coord) {
+                      std::string coord_str = "coord: ";
+                      for (size_t i = 0; i < 2; i++) {
+                        coord_str += " " + std::to_string(coord[i]);
+                      }
+                      INFO(coord_str);
+                      CHECK(slice[coord] == nbrinfo.id + index);
+                      index++;
+                    });
                   }
                 }
 
@@ -850,16 +776,15 @@ public:
                 for (int j = 0; j < pinfo.num_ghost_cells; j++) {
                   for (int i = 0; i < pinfo.num_ghost_cells; i++) {
                     auto slice = data.getGhostSliceOn(e, { (size_t)i, (size_t)j });
-                    Loop::Nested<2>(
-                      slice.getStart(), slice.getEnd(), [&](std::array<int, 2>& coord) {
-                        std::string coord_str = "coord: ";
-                        for (size_t i = 0; i < 2; i++) {
-                          coord_str += " " + std::to_string(coord[i]);
-                        }
-                        INFO(coord_str);
-                        CHECK(slice[coord] == ids + 2 * (index));
-                        index++;
-                      });
+                    Loop::Nested<2>(slice.getStart(), slice.getEnd(), [&](std::array<int, 2>& coord) {
+                      std::string coord_str = "coord: ";
+                      for (size_t i = 0; i < 2; i++) {
+                        coord_str += " " + std::to_string(coord[i]);
+                      }
+                      INFO(coord_str);
+                      CHECK(slice[coord] == ids + 2 * (index));
+                      index++;
+                    });
                   }
                 }
               } break;
@@ -872,16 +797,15 @@ public:
                 for (int j = 0; j < pinfo.num_ghost_cells; j++) {
                   for (int i = 0; i < pinfo.num_ghost_cells; i++) {
                     auto slice = data.getGhostSliceOn(e, { (size_t)i, (size_t)j });
-                    Loop::Nested<2>(
-                      slice.getStart(), slice.getEnd(), [&](std::array<int, 2>& coord) {
-                        std::string coord_str = "coord: ";
-                        for (size_t i = 0; i < 2; i++) {
-                          coord_str += " " + std::to_string(coord[i]);
-                        }
-                        INFO(coord_str);
-                        CHECK(slice[coord] == (double)(nbrinfo.id + index));
-                        index++;
-                      });
+                    Loop::Nested<2>(slice.getStart(), slice.getEnd(), [&](std::array<int, 2>& coord) {
+                      std::string coord_str = "coord: ";
+                      for (size_t i = 0; i < 2; i++) {
+                        coord_str += " " + std::to_string(coord[i]);
+                      }
+                      INFO(coord_str);
+                      CHECK(slice[coord] == (double)(nbrinfo.id + index));
+                      index++;
+                    });
                   }
                 }
 

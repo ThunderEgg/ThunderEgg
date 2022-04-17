@@ -23,9 +23,7 @@
 #include <p4est.h>
 #include <p4est_mesh.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -50,10 +48,10 @@ TEST_CASE("SinglePatch")
   CHECK_FALSE(patch.hasNbr(Corner<2>::se()));
   CHECK_FALSE(patch.hasNbr(Corner<2>::nw()));
   CHECK_FALSE(patch.hasNbr(Corner<2>::ne()));
-  CHECK(patch.spacings[0] == Catch::Approx(1.0 / 10));
-  CHECK(patch.spacings[1] == Catch::Approx(1.0 / 10));
-  CHECK(patch.starts[0] == Catch::Approx(0));
-  CHECK(patch.starts[1] == Catch::Approx(0));
+  CHECK(patch.spacings[0] == doctest::Approx(1.0 / 10));
+  CHECK(patch.spacings[1] == doctest::Approx(1.0 / 10));
+  CHECK(patch.starts[0] == doctest::Approx(0));
+  CHECK(patch.starts[1] == doctest::Approx(0));
   CHECK(patch.ns[0] == 10);
   CHECK(patch.ns[1] == 10);
 
@@ -100,14 +98,14 @@ TEST_CASE("P4estDomainGenerator 2x2 Uniform")
             // SECTION("patches have correct spacings")
             {
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
               }
 
               auto patch = domain_0.getPatchInfoVector()[0];
 
-              CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-              CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
+              CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
+              CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
             }
             // SECTION("patches have correct ns")
             {
@@ -160,16 +158,16 @@ TEST_CASE("P4estDomainGenerator 2x2 Uniform")
             for (const PatchInfo<2>& patch : domain_1.getPatchInfoVector()) {
               double x = patch.starts[0];
               double y = patch.starts[1];
-              if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+              if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                 domain_1_sw_patch = &patch;
               }
-              if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+              if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                 domain_1_se_patch = &patch;
               }
-              if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+              if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                 domain_1_nw_patch = &patch;
               }
-              if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+              if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                 domain_1_ne_patch = &patch;
               }
             }
@@ -183,8 +181,8 @@ TEST_CASE("P4estDomainGenerator 2x2 Uniform")
               REQUIRE(domain_1_nw_patch != nullptr);
               REQUIRE(domain_1_ne_patch != nullptr);
 
-              CHECK(domain_0_coarser_patch->starts[0] == Catch::Approx(0.0));
-              CHECK(domain_0_coarser_patch->starts[1] == Catch::Approx(0.0));
+              CHECK(domain_0_coarser_patch->starts[0] == doctest::Approx(0.0));
+              CHECK(domain_0_coarser_patch->starts[1] == doctest::Approx(0.0));
             }
             // SECTION("parent ids are set correctly")
             {
@@ -461,25 +459,25 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
             for (const PatchInfo<2>& patch : domain_2.getPatchInfoVector()) {
               double x = patch.starts[0];
               double y = patch.starts[1];
-              if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+              if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                 domain_2_sw_sw_patch = &patch;
               }
-              if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0)) {
+              if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0)) {
                 domain_2_sw_se_patch = &patch;
               }
-              if (x == Catch::Approx(0) && y == Catch::Approx(0.25 * scale_y)) {
+              if (x == doctest::Approx(0) && y == doctest::Approx(0.25 * scale_y)) {
                 domain_2_sw_nw_patch = &patch;
               }
-              if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+              if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                 domain_2_sw_ne_patch = &patch;
               }
-              if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+              if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                 domain_2_se_patch = &patch;
               }
-              if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+              if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                 domain_2_nw_patch = &patch;
               }
-              if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+              if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                 domain_2_ne_patch = &patch;
               }
             }
@@ -487,16 +485,16 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
             for (const PatchInfo<2>& patch : domain_1.getPatchInfoVector()) {
               double x = patch.starts[0];
               double y = patch.starts[1];
-              if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+              if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                 domain_1_sw_patch = &patch;
               }
-              if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+              if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                 domain_1_se_patch = &patch;
               }
-              if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+              if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                 domain_1_nw_patch = &patch;
               }
-              if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+              if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                 domain_1_ne_patch = &patch;
               }
             }
@@ -518,37 +516,37 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
               REQUIRE(domain_1_nw_patch != nullptr);
               REQUIRE(domain_1_ne_patch != nullptr);
 
-              CHECK(domain_0_patch->starts[0] == Catch::Approx(0.0));
-              CHECK(domain_0_patch->starts[1] == Catch::Approx(0.0));
+              CHECK(domain_0_patch->starts[0] == doctest::Approx(0.0));
+              CHECK(domain_0_patch->starts[1] == doctest::Approx(0.0));
             }
 
             // SECTION("patches have correct spacings")
             {
-              CHECK(domain_2_sw_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-              CHECK(domain_2_sw_sw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-              CHECK(domain_2_sw_se_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-              CHECK(domain_2_sw_se_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-              CHECK(domain_2_sw_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-              CHECK(domain_2_sw_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-              CHECK(domain_2_sw_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-              CHECK(domain_2_sw_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
+              CHECK(domain_2_sw_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+              CHECK(domain_2_sw_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+              CHECK(domain_2_sw_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+              CHECK(domain_2_sw_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+              CHECK(domain_2_sw_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+              CHECK(domain_2_sw_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+              CHECK(domain_2_sw_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+              CHECK(domain_2_sw_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
 
-              CHECK(domain_2_se_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-              CHECK(domain_2_se_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-              CHECK(domain_2_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-              CHECK(domain_2_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-              CHECK(domain_2_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-              CHECK(domain_2_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
+              CHECK(domain_2_se_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+              CHECK(domain_2_se_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+              CHECK(domain_2_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+              CHECK(domain_2_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+              CHECK(domain_2_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+              CHECK(domain_2_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
               }
 
               auto patch = domain_0.getPatchInfoVector()[0];
 
-              CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-              CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
+              CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
+              CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
             }
 
             // SECTION("patches have refine_level set")
@@ -935,10 +933,10 @@ TEST_CASE("2x1 brick")
   CHECK(patch1.hasNbr(Side<2>::east()));
   CHECK_FALSE(patch1.hasNbr(Side<2>::south()));
   CHECK_FALSE(patch1.hasNbr(Side<2>::north()));
-  CHECK(patch1.spacings[0] == Catch::Approx(1.0 / 10));
-  CHECK(patch1.spacings[1] == Catch::Approx(1.0 / 10));
-  CHECK(patch1.starts[0] == Catch::Approx(0));
-  CHECK(patch1.starts[1] == Catch::Approx(0));
+  CHECK(patch1.spacings[0] == doctest::Approx(1.0 / 10));
+  CHECK(patch1.spacings[1] == doctest::Approx(1.0 / 10));
+  CHECK(patch1.starts[0] == doctest::Approx(0));
+  CHECK(patch1.starts[1] == doctest::Approx(0));
   CHECK(patch1.ns[0] == 10);
   CHECK(patch1.ns[1] == 10);
   auto patch2 = domain.getPatchInfoVector()[1];
@@ -946,10 +944,10 @@ TEST_CASE("2x1 brick")
   CHECK_FALSE(patch2.hasNbr(Side<2>::east()));
   CHECK_FALSE(patch2.hasNbr(Side<2>::south()));
   CHECK_FALSE(patch2.hasNbr(Side<2>::north()));
-  CHECK(patch2.spacings[0] == Catch::Approx(1.0 / 10));
-  CHECK(patch2.spacings[1] == Catch::Approx(1.0 / 10));
-  CHECK(patch2.starts[0] == Catch::Approx(0));
-  CHECK(patch2.starts[1] == Catch::Approx(0));
+  CHECK(patch2.spacings[0] == doctest::Approx(1.0 / 10));
+  CHECK(patch2.spacings[1] == doctest::Approx(1.0 / 10));
+  CHECK(patch2.starts[0] == doctest::Approx(0));
+  CHECK(patch2.starts[1] == doctest::Approx(0));
   CHECK(patch2.ns[0] == 10);
   CHECK(patch2.ns[1] == 10);
 

@@ -23,8 +23,7 @@
 
 #include <algorithm>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -122,7 +121,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector refined interface on
     for (auto piinfo : piinfos) {
       double x = piinfo->pinfo.starts[0];
       double y = piinfo->pinfo.starts[1];
-      if (x == Catch::Approx(1) && y == Catch::Approx(0)) {
+      if (x == doctest::Approx(1) && y == doctest::Approx(0)) {
         ref_sw_piinfo = piinfo;
         break;
       }
@@ -132,7 +131,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector refined interface on
     for (auto piinfo : piinfos) {
       double x = piinfo->pinfo.starts[0];
       double y = piinfo->pinfo.starts[1];
-      if (x == Catch::Approx(1.5) && y == Catch::Approx(0)) {
+      if (x == doctest::Approx(1.5) && y == doctest::Approx(0)) {
         ref_se_piinfo = piinfo;
         break;
       }
@@ -142,7 +141,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector refined interface on
     for (auto piinfo : piinfos) {
       double x = piinfo->pinfo.starts[0];
       double y = piinfo->pinfo.starts[1];
-      if (x == Catch::Approx(1) && y == Catch::Approx(.5)) {
+      if (x == doctest::Approx(1) && y == doctest::Approx(.5)) {
         ref_nw_piinfo = piinfo;
         break;
       }
@@ -152,7 +151,7 @@ TEST_CASE("Schur::Interface enumerateIfacesFromPiinfoVector refined interface on
     for (auto piinfo : piinfos) {
       double x = piinfo->pinfo.starts[0];
       double y = piinfo->pinfo.starts[1];
-      if (x == Catch::Approx(1.5) && y == Catch::Approx(.5)) {
+      if (x == doctest::Approx(1.5) && y == doctest::Approx(.5)) {
         ref_ne_piinfo = piinfo;
         break;
       }

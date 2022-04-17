@@ -22,6 +22,7 @@ add_executable(unit_tests_mpi3)
 
 add_library(test_shared test.cpp)
 target_include_directories(test_shared PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(test_shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # -- add subdirectories
 
@@ -154,6 +155,7 @@ if(TARGET PETSC::PETSC)
 endif(TARGET PETSC::PETSC)
 
 list(APPEND TEST_COMPILE_FLAGS TEST_DIRECTORY=\"${CMAKE_CURRENT_SOURCE_DIR}\")
+list(APPEND TEST_COMPILE_FLAGS DOCTEST_CONFIG_SUPER_FAST_ASSERTS)
 
 target_compile_definitions(unit_tests_mpi1 PRIVATE ${TEST_COMPILE_FLAGS})
 target_compile_definitions(unit_tests_mpi2 PRIVATE ${TEST_COMPILE_FLAGS})
@@ -173,11 +175,11 @@ target_link_libraries(unit_tests_mpi3 test_shared)
 
 set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
 
-function(add_mpi_test TARGET NUMPROC)
-  set_target_properties(${TARGET} PROPERTIES CROSSCOMPILING_EMULATOR "${MPIEXEC};${MPIEXEC_NUMPROC_FLAG};${NUMPROC};${THUNDEREGG_MPIEXEC_FLAGS}")
-  catch_discover_tests(${TARGET} TEST_PREFIX "${TARGET}___" PROPERTIES PROCESSORS ${NUMPROC})
-endfunction(add_mpi_test)
+#function(add_mpi_test TARGET NUMPROC)
+#  set_target_properties(${TARGET} PROPERTIES CROSSCOMPILING_EMULATOR "${MPIEXEC};${MPIEXEC_NUMPROC_FLAG};${NUMPROC};${THUNDEREGG_MPIEXEC_FLAGS}")
+#  catch_discover_tests(${TARGET} TEST_PREFIX "${TARGET}___" PROPERTIES PROCESSORS ${NUMPROC})
+#endfunction(add_mpi_test)
 
-add_mpi_test(unit_tests_mpi1 1)
-add_mpi_test(unit_tests_mpi2 2)
-add_mpi_test(unit_tests_mpi3 3)
+#add_mpi_test(unit_tests_mpi1 1)
+#add_mpi_test(unit_tests_mpi2 2)
+#add_mpi_test(unit_tests_mpi3 3)

@@ -21,9 +21,7 @@
 #include "Vector_MOCKS.h"
 #include "utils/DomainReader.h"
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -68,7 +66,7 @@ TEST_CASE("Vector<3> twoNorm")
               MPI_Allreduce(&expected_norm, &global_expected_norm, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
               global_expected_norm = sqrt(global_expected_norm);
 
-              CHECK(vec.twoNorm() == Catch::Approx(global_expected_norm));
+              CHECK(vec.twoNorm() == doctest::Approx(global_expected_norm));
             }
           }
         }
@@ -168,7 +166,7 @@ TEST_CASE("Vector<3> dot")
               double global_expected_value;
               MPI_Allreduce(&expected_value, &global_expected_value, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
 
-              CHECK(a.dot(b) == Catch::Approx(global_expected_value));
+              CHECK(a.dot(b) == doctest::Approx(global_expected_value));
             }
           }
         }

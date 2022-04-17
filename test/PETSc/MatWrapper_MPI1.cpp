@@ -24,9 +24,7 @@
 
 #include <petscmat.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -77,7 +75,7 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I")
       Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) {
         INFO("xi:    " << coord[0]);
         INFO("yi:    " << coord[1]);
-        CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
+        CHECK(0.5 * x_ld[coord] == doctest::Approx(b_ld[coord]));
       });
     }
     MatDestroy(&A);
@@ -131,14 +129,14 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components")
       Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) {
         INFO("xi:    " << coord[0]);
         INFO("yi:    " << coord[1]);
-        CHECK(0.5 * x_ld[coord] == Catch::Approx(b_ld[coord]));
+        CHECK(0.5 * x_ld[coord] == doctest::Approx(b_ld[coord]));
       });
       ComponentView<double, 2> x_ld2 = x.getComponentView(1, pinfo.local_index);
       ComponentView<double, 2> b_ld2 = b.getComponentView(1, pinfo.local_index);
       Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) {
         INFO("xi:    " << coord[0]);
         INFO("yi:    " << coord[1]);
-        CHECK(0.5 * x_ld2[coord] == Catch::Approx(b_ld2[coord]));
+        CHECK(0.5 * x_ld2[coord] == doctest::Approx(b_ld2[coord]));
       });
     }
     MatDestroy(&A);

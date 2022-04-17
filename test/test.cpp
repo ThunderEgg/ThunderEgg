@@ -18,7 +18,7 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 #define CATCH_CONFIG_RUNNER
-#include <catch2/catch_session.hpp>
+
 #include <mpi.h>
 #if TEST_P4EST
 #include <sc.h>
@@ -27,6 +27,8 @@
 #include <petscsys.h>
 #endif
 
+#define DOCTEST_CONFIG_IMPLEMENT
+#include <doctest.h>
 int
 main(int argc, char* argv[])
 {
@@ -52,16 +54,18 @@ main(int argc, char* argv[])
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   int result = 0;
+  doctest::Context context;
+  context.applyCommandLine(argc, argv);
   if (!catch_add_tests || rank == 0) {
-    result = Catch::Session().run(argc, argv);
+    result = context.run();
   }
 
   // abort if failure, some tests can hang otherwise
-  if (!catch_add_tests && result > 0) {
+  if (!catch_add_tests && (result > 0 || context.shouldExit())) {
     MPI_Abort(MPI_COMM_WORLD, result);
   }
 
-  // global clean-up...
+// global clean-up...
 #if TEST_PETSC
   PetscFinalize();
 #else

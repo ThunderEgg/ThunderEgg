@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include <ThunderEgg/NbrType.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;

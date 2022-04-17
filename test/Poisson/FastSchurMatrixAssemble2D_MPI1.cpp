@@ -29,9 +29,7 @@
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 #include <ThunderEgg/Schur/PatchSolverWrapper.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -89,8 +87,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws with unsupported ghost fill
   }
 }
 TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
-          "Poisson::StarPatchOperator bilinear ghost filler",
-          "[Poisson::FastSchurMatrixAssemble2D]")
+          "Poisson::StarPatchOperator bilinear ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -127,8 +124,8 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
     m_operator->apply(g_vec, f_vec);
 
-    CHECK(f_vec.infNorm() == Catch::Approx(f_vec_expected.infNorm()));
-    CHECK(f_vec.twoNorm() == Catch::Approx(f_vec_expected.twoNorm()));
+    CHECK(f_vec.infNorm() == doctest::Approx(f_vec_expected.infNorm()));
+    CHECK(f_vec.twoNorm() == doctest::Approx(f_vec_expected.twoNorm()));
     REQUIRE(f_vec.infNorm() > 0);
 
     for (auto iface : iface_domain.getInterfaces()) {
@@ -139,15 +136,14 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, iface->local_index);
       Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
         INFO("xi:    " << coord[0]);
-        CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
+        CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
       });
     }
     MatDestroy(&A);
   }
 }
 TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
-          "Poisson::StarPatchOperator with Neumann BC bilinear ghost filler",
-          "[Poisson::FastSchurMatrixAssemble2D]")
+          "Poisson::StarPatchOperator with Neumann BC bilinear ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -184,8 +180,8 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
     m_operator->apply(g_vec, f_vec);
 
-    CHECK(f_vec.infNorm() == Catch::Approx(f_vec_expected.infNorm()));
-    CHECK(f_vec.twoNorm() == Catch::Approx(f_vec_expected.twoNorm()));
+    CHECK(f_vec.infNorm() == doctest::Approx(f_vec_expected.infNorm()));
+    CHECK(f_vec.twoNorm() == doctest::Approx(f_vec_expected.twoNorm()));
     REQUIRE(f_vec.infNorm() > 0);
 
     for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
@@ -193,15 +189,14 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
       Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
         INFO("xi:    " << coord[0]);
-        CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
+        CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
       });
     }
     MatDestroy(&A);
   }
 }
 TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
-          "Poisson::StarPatchOperator Biquadratic ghost filler",
-          "[Poisson::FastSchurMatrixAssemble2D]")
+          "Poisson::StarPatchOperator Biquadratic ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -238,8 +233,8 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
     m_operator->apply(g_vec, f_vec);
 
-    CHECK(f_vec.infNorm() == Catch::Approx(f_vec_expected.infNorm()));
-    CHECK(f_vec.twoNorm() == Catch::Approx(f_vec_expected.twoNorm()));
+    CHECK(f_vec.infNorm() == doctest::Approx(f_vec_expected.infNorm()));
+    CHECK(f_vec.twoNorm() == doctest::Approx(f_vec_expected.twoNorm()));
     REQUIRE(f_vec.infNorm() > 0);
 
     for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
@@ -247,15 +242,14 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
       Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
         INFO("xi:    " << coord[0]);
-        CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
+        CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
       });
     }
     MatDestroy(&A);
   }
 }
 TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
-          "Poisson::StarPatchOperator with Neumann BC BiQuadratic ghost filler",
-          "[Poisson::FastSchurMatrixAssemble2D]")
+          "Poisson::StarPatchOperator with Neumann BC BiQuadratic ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
     INFO("MESH FILE " << mesh_file);
@@ -292,8 +286,8 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     auto m_operator = make_shared<PETSc::MatWrapper<1>>(A);
     m_operator->apply(g_vec, f_vec);
 
-    CHECK(f_vec.infNorm() == Catch::Approx(f_vec_expected.infNorm()));
-    CHECK(f_vec.twoNorm() == Catch::Approx(f_vec_expected.twoNorm()));
+    CHECK(f_vec.infNorm() == doctest::Approx(f_vec_expected.infNorm()));
+    CHECK(f_vec.twoNorm() == doctest::Approx(f_vec_expected.twoNorm()));
     REQUIRE(f_vec.infNorm() > 0);
 
     for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
@@ -301,7 +295,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
       Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
         INFO("xi:    " << coord[0]);
-        CHECK(f_vec_ld[coord] == Catch::Approx(f_vec_expected_ld[coord]));
+        CHECK(f_vec_ld[coord] == doctest::Approx(f_vec_expected_ld[coord]));
       });
     }
     MatDestroy(&A);

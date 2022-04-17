@@ -24,9 +24,7 @@
 #include <p4est.h>
 #include <p4est_mesh.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -127,18 +125,18 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
             // SECTION("patches have correct spacings")
             {
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
               }
             }
             // SECTION("patches have correct ns")
@@ -243,55 +241,55 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
               for (PatchInfo<2>& patch : domain_2_patches) {
                 double x = patch.starts[0];
                 double y = patch.starts[1];
-                if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                   domain_2_sw_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0)) {
                   domain_2_sw_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                   domain_2_se_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0)) {
                   domain_2_se_se_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_sw_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_sw_ne_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_se_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_se_ne_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_nw_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_nw_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_ne_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_ne_se_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_2_nw_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_2_nw_ne_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_2_ne_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_2_ne_ne_patch = &patch;
                 }
               }
@@ -299,16 +297,16 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
               for (PatchInfo<2>& patch : domain_1_patches) {
                 double x = patch.starts[0];
                 double y = patch.starts[1];
-                if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                   domain_1_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                   domain_1_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_1_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_1_ne_patch = &patch;
                 }
               }
@@ -340,8 +338,8 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
               REQUIRE(domain_1_nw_patch != nullptr);
               REQUIRE(domain_1_ne_patch != nullptr);
 
-              CHECK(domain_0_coarser_patch->starts[0] == Catch::Approx(0.0));
-              CHECK(domain_0_coarser_patch->starts[1] == Catch::Approx(0.0));
+              CHECK(domain_0_coarser_patch->starts[0] == doctest::Approx(0.0));
+              CHECK(domain_0_coarser_patch->starts[1] == doctest::Approx(0.0));
             }
 
             // SECTION("parent ids are set correctly")
@@ -1061,25 +1059,25 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
               for (PatchInfo<2>& patch : domain_2_patches) {
                 double x = patch.starts[0];
                 double y = patch.starts[1];
-                if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                   domain_2_sw_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0)) {
                   domain_2_sw_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_sw_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_sw_ne_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                   domain_2_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_ne_patch = &patch;
                 }
               }
@@ -1087,16 +1085,16 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
               for (PatchInfo<2>& patch : domain_1_patches) {
                 double x = patch.starts[0];
                 double y = patch.starts[1];
-                if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                   domain_1_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                   domain_1_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_1_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_1_ne_patch = &patch;
                 }
               }
@@ -1116,47 +1114,47 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
               REQUIRE(domain_1_nw_patch != nullptr);
               REQUIRE(domain_1_ne_patch != nullptr);
 
-              CHECK(domain_0_patch->starts[0] == Catch::Approx(0.0));
-              CHECK(domain_0_patch->starts[1] == Catch::Approx(0.0));
+              CHECK(domain_0_patch->starts[0] == doctest::Approx(0.0));
+              CHECK(domain_0_patch->starts[1] == doctest::Approx(0.0));
             }
 
             // SECTION("patches have correct spacings")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_2_sw_sw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_2_sw_se_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_2_sw_se_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_2_sw_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_2_sw_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_2_sw_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_2_sw_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_2_sw_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_2_sw_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_2_sw_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_2_sw_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_2_sw_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_2_sw_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_2_sw_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_2_sw_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
 
-                CHECK(domain_2_se_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_2_se_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_2_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_2_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_2_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_2_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
+                CHECK(domain_2_se_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(domain_2_se_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK(domain_2_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(domain_2_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK(domain_2_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(domain_2_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
 
-                CHECK(domain_1_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_1_sw_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_1_se_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_1_se_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_1_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_1_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-                CHECK(domain_1_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(domain_1_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
+                CHECK(domain_1_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(domain_1_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK(domain_1_se_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(domain_1_se_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK(domain_1_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(domain_1_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK(domain_1_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(domain_1_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
 
-                CHECK(domain_0_patch->spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-                CHECK(domain_0_patch->spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
+                CHECK(domain_0_patch->spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
+                CHECK(domain_0_patch->spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
               }
             }
 
             // SECTION("patches have refine_level set")
             {
               if (rank == 0) {
-                CHECK(domain_2_sw_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_2_sw_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
                 CHECK(domain_2_sw_sw_patch->refine_level == 2);
                 CHECK(domain_2_sw_se_patch->refine_level == 2);
                 CHECK(domain_2_sw_nw_patch->refine_level == 2);
@@ -1713,65 +1711,65 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
               for (PatchInfo<2>& patch : domain_3_patches) {
                 double x = patch.starts[0];
                 double y = patch.starts[1];
-                if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                   domain_3_sw_sw_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.125 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.125 * scale_x) && y == doctest::Approx(0)) {
                   domain_3_sw_sw_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.125 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.125 * scale_y)) {
                   domain_3_sw_sw_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.125 * scale_x) && y == Catch::Approx(0.125 * scale_y)) {
+                if (x == doctest::Approx(0.125 * scale_x) && y == doctest::Approx(0.125 * scale_y)) {
                   domain_3_sw_sw_ne_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0)) {
                   domain_3_sw_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                   domain_3_se_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0)) {
                   domain_3_se_se_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_3_sw_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_3_sw_ne_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_3_se_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_3_se_ne_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_3_nw_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_3_nw_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_3_ne_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_3_ne_se_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_3_nw_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_3_nw_ne_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_3_ne_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_3_ne_ne_patch = &patch;
                 }
               }
@@ -1779,55 +1777,55 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
               for (PatchInfo<2>& patch : domain_2_patches) {
                 double x = patch.starts[0];
                 double y = patch.starts[1];
-                if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                   domain_2_sw_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0)) {
                   domain_2_sw_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                   domain_2_se_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0)) {
                   domain_2_se_se_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_sw_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_sw_ne_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_se_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0.25 * scale_y)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0.25 * scale_y)) {
                   domain_2_se_ne_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_nw_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_nw_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_ne_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_2_ne_se_patch = &patch;
                 }
 
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_2_nw_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.25 * scale_x) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0.25 * scale_x) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_2_nw_ne_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_2_ne_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.75 * scale_x) && y == Catch::Approx(0.75 * scale_y)) {
+                if (x == doctest::Approx(0.75 * scale_x) && y == doctest::Approx(0.75 * scale_y)) {
                   domain_2_ne_ne_patch = &patch;
                 }
               }
@@ -1835,16 +1833,16 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
               for (PatchInfo<2>& patch : domain_1_patches) {
                 double x = patch.starts[0];
                 double y = patch.starts[1];
-                if (x == Catch::Approx(0) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0)) {
                   domain_1_sw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0)) {
                   domain_1_se_patch = &patch;
                 }
-                if (x == Catch::Approx(0) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_1_nw_patch = &patch;
                 }
-                if (x == Catch::Approx(0.5 * scale_x) && y == Catch::Approx(0.5 * scale_y)) {
+                if (x == doctest::Approx(0.5 * scale_x) && y == doctest::Approx(0.5 * scale_y)) {
                   domain_1_ne_patch = &patch;
                 }
               }
@@ -1899,69 +1897,69 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
               REQUIRE(domain_1_nw_patch != nullptr);
               REQUIRE(domain_1_ne_patch != nullptr);
 
-              CHECK(domain_0_coarser_patch->starts[0] == Catch::Approx(0.0));
-              CHECK(domain_0_coarser_patch->starts[1] == Catch::Approx(0.0));
+              CHECK(domain_0_coarser_patch->starts[0] == doctest::Approx(0.0));
+              CHECK(domain_0_coarser_patch->starts[1] == doctest::Approx(0.0));
             }
 
             // SECTION("patches have correct spacings")
             {
               if (rank == 0) {
-                CHECK(domain_3_sw_sw_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.125 / nx));
-                CHECK(domain_3_sw_sw_sw_patch->spacings[1] == Catch::Approx(scale_y * 0.125 / ny));
-                CHECK(domain_3_sw_sw_se_patch->spacings[0] == Catch::Approx(scale_x * 0.125 / nx));
-                CHECK(domain_3_sw_sw_se_patch->spacings[1] == Catch::Approx(scale_y * 0.125 / ny));
-                CHECK(domain_3_sw_sw_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.125 / nx));
-                CHECK(domain_3_sw_sw_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.125 / ny));
-                CHECK(domain_3_sw_sw_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.125 / nx));
-                CHECK(domain_3_sw_sw_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.125 / ny));
+                CHECK(domain_3_sw_sw_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
+                CHECK(domain_3_sw_sw_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
+                CHECK(domain_3_sw_sw_se_patch->spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
+                CHECK(domain_3_sw_sw_se_patch->spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
+                CHECK(domain_3_sw_sw_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
+                CHECK(domain_3_sw_sw_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
+                CHECK(domain_3_sw_sw_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
+                CHECK(domain_3_sw_sw_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
 
-                CHECK(domain_3_sw_se_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_sw_se_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_sw_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_sw_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_sw_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_sw_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_sw_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_sw_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_sw_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_sw_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_sw_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_sw_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
 
-                CHECK(domain_3_se_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_se_sw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_se_se_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_se_se_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_se_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_se_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_se_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_se_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_se_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_se_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_se_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_se_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_se_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_se_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_se_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_se_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
 
-                CHECK(domain_3_nw_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_nw_sw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_nw_se_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_nw_se_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_nw_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_nw_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_nw_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_nw_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_nw_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_nw_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_nw_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_nw_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_nw_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_nw_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_nw_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_nw_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
 
-                CHECK(domain_3_ne_sw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_ne_sw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_ne_se_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_ne_se_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_ne_nw_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_ne_nw_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(domain_3_ne_ne_patch->spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(domain_3_ne_ne_patch->spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_ne_sw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_ne_sw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_ne_se_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_ne_se_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_ne_nw_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_ne_nw_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(domain_3_ne_ne_patch->spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(domain_3_ne_ne_patch->spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
               }
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
               }
             }
 

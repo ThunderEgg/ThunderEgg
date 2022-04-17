@@ -19,13 +19,11 @@
  ***************************************************************************/
 #include <ThunderEgg/DomainTools.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
-using namespace Catch;
+using namespace doctest;
 
 TEST_CASE("DomainTools::GetRealCoord 1D")
 {

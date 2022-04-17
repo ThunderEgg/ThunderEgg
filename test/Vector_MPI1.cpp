@@ -21,9 +21,7 @@
 #include "Vector_MOCKS.h"
 #include "utils/DomainReader.h"
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -315,7 +313,7 @@ TEST_CASE("Vector<3> scale")
                     if (isGhost(coord, ns, num_ghost_cells)) {
                       CHECK(ld[coord] == 28);
                     } else {
-                      CHECK(ld[coord] == Catch::Approx(7));
+                      CHECK(ld[coord] == doctest::Approx(7));
                     }
                   });
                 }
@@ -357,7 +355,7 @@ TEST_CASE("Vector<3> shift")
                     if (isGhost(coord, ns, num_ghost_cells)) {
                       CHECK(ld[coord] == 1);
                     } else {
-                      CHECK(ld[coord] == Catch::Approx(29));
+                      CHECK(ld[coord] == doctest::Approx(29));
                     }
                   });
                 }
@@ -517,7 +515,7 @@ TEST_CASE("Vector<3> add")
                     if (isGhost(coord, ns, num_ghost_cells)) {
                       CHECK(b_ld[coord] == b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == Catch::Approx(expected_ld[coord]));
+                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -583,7 +581,7 @@ TEST_CASE("Vector<3> addScaled")
                     if (isGhost(coord, ns, num_ghost_cells)) {
                       CHECK(b_ld[coord] == b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == Catch::Approx(expected_ld[coord]));
+                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -649,7 +647,7 @@ TEST_CASE("Vector<3> scaleThenAdd")
                     if (isGhost(coord, ns, num_ghost_cells)) {
                       CHECK(b_ld[coord] == b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == Catch::Approx(expected_ld[coord]));
+                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -715,7 +713,7 @@ TEST_CASE("Vector<3> scaleThenAddScaled")
                     if (isGhost(coord, ns, num_ghost_cells)) {
                       CHECK(b_ld[coord] == b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == Catch::Approx(expected_ld[coord]));
+                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -788,7 +786,7 @@ TEST_CASE("Vector<3> scaleThenAddScaled two vectors")
                     if (isGhost(coord, ns, num_ghost_cells)) {
                       CHECK(b_ld[coord] == b_copy_ld[coord]);
                     } else {
-                      CHECK(b_ld[coord] == Catch::Approx(expected_ld[coord]));
+                      CHECK(b_ld[coord] == doctest::Approx(expected_ld[coord]));
                     }
                   });
                 }
@@ -838,7 +836,7 @@ TEST_CASE("Vector<3> twoNorm")
               }
               expected_norm = sqrt(expected_norm);
 
-              CHECK(vec.twoNorm() == Catch::Approx(expected_norm));
+              CHECK(vec.twoNorm() == doctest::Approx(expected_norm));
             }
           }
         }
@@ -934,7 +932,7 @@ TEST_CASE("Vector<3> dot")
                 }
               }
 
-              CHECK(a.dot(b) == Catch::Approx(expected_value));
+              CHECK(a.dot(b) == doctest::Approx(expected_value));
             }
           }
         }

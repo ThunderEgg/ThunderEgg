@@ -23,7 +23,7 @@
 
 #include <set>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 namespace ThunderEgg {
 namespace {
@@ -53,9 +53,7 @@ public:
     }
   }
   MockPatchSolver<D>* clone() const override { return new MockPatchSolver<D>(*this); }
-  void solveSinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& fs,
-                        const PatchView<double, D>& us) const override
+  void solveSinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& fs, const PatchView<double, D>& us) const override
   {
     CHECK(patches_to_be_called.count(pinfo.id) == 1);
     patches_to_be_called.erase(pinfo.id);

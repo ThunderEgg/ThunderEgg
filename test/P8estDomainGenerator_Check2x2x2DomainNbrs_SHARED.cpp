@@ -19,11 +19,11 @@
  ***************************************************************************/
 
 #include "P8estDomainGenerator_SHARED.h"
-#include <catch2/catch_approx.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 void
 Check2x2x2DomainNeighbors(const ThunderEgg::Domain<3>& domain)
@@ -45,28 +45,28 @@ Check2x2x2DomainNeighbors(const ThunderEgg::Domain<3>& domain)
       double x = patch.starts[0];
       double y = patch.starts[1];
       double z = patch.starts[2];
-      if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0) && z == doctest::Approx(0)) {
         domain_bsw_patch = &patch;
       }
-      if (x == Catch::Approx(0.5) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0.5) && y == doctest::Approx(0) && z == doctest::Approx(0)) {
         domain_bse_patch = &patch;
       }
-      if (x == Catch::Approx(0) && y == Catch::Approx(0.5) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0.5) && z == doctest::Approx(0)) {
         domain_bnw_patch = &patch;
       }
-      if (x == Catch::Approx(0.5) && y == Catch::Approx(0.5) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0.5) && y == doctest::Approx(0.5) && z == doctest::Approx(0)) {
         domain_bne_patch = &patch;
       }
-      if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0.5)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0) && z == doctest::Approx(0.5)) {
         domain_tsw_patch = &patch;
       }
-      if (x == Catch::Approx(0.5) && y == Catch::Approx(0) && z == Catch::Approx(0.5)) {
+      if (x == doctest::Approx(0.5) && y == doctest::Approx(0) && z == doctest::Approx(0.5)) {
         domain_tse_patch = &patch;
       }
-      if (x == Catch::Approx(0) && y == Catch::Approx(0.5) && z == Catch::Approx(0.5)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0.5) && z == doctest::Approx(0.5)) {
         domain_tnw_patch = &patch;
       }
-      if (x == Catch::Approx(0.5) && y == Catch::Approx(0.5) && z == Catch::Approx(0.5)) {
+      if (x == doctest::Approx(0.5) && y == doctest::Approx(0.5) && z == doctest::Approx(0.5)) {
         domain_tne_patch = &patch;
       }
     }

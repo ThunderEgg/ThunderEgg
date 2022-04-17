@@ -18,8 +18,8 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 #include <ThunderEgg/View.h>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
+
 using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("View default constructor")

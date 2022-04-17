@@ -21,9 +21,7 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace ThunderEgg;
 using namespace std;
@@ -184,7 +182,7 @@ TEST_CASE("InterLevelComm 1-processor sendGhostPatches on uniform 4x4")
           for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
             PatchView<double, 2> vec_view = coarse_vec.getPatchView(i);
             PatchView<double, 2> expected_view = coarse_expected.getPatchView(i);
-            Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord])); });
+            Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE(vec_view[coord] == doctest::Approx(expected_view[coord])); });
           }
           delete ilc;
         }

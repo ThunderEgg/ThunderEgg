@@ -19,11 +19,11 @@
  ***************************************************************************/
 
 #include "P8estDomainGenerator_SHARED.h"
-#include <catch2/catch_approx.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 void
 Check4x4x4DomainEdgeNeighborRanks(const PatchVector& domain)

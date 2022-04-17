@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;

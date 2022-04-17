@@ -25,9 +25,7 @@
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -100,7 +98,7 @@ TEST_CASE("Test Poisson::StarPatchOperator add ghost to RHS")
         Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
           INFO("xi:    " << coord[0]);
           INFO("yi:    " << coord[1]);
-          REQUIRE(vec_ld[coord] == Catch::Approx(expected_ld[coord]));
+          REQUIRE(vec_ld[coord] == doctest::Approx(expected_ld[coord]));
         });
       }
     }
@@ -147,7 +145,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff")
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
             INFO("xi:    " << coord[0]);
             INFO("yi:    " << coord[1]);
-            CHECK(vec_ld[coord] + 1 == Catch::Approx(1 + expected_vec_ld[coord]));
+            CHECK(vec_ld[coord] + 1 == doctest::Approx(1 + expected_vec_ld[coord]));
           });
         }
       }
@@ -197,7 +195,7 @@ TEST_CASE("Test Poisson::StarPatchOperator apply on linear lhs constant coeff wi
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
             INFO("xi:    " << coord[0]);
             INFO("yi:    " << coord[1]);
-            CHECK(vec_ld[coord] + 1 == Catch::Approx(1 + exptected_vec_ld[coord]));
+            CHECK(vec_ld[coord] + 1 == doctest::Approx(1 + exptected_vec_ld[coord]));
           });
         }
       }

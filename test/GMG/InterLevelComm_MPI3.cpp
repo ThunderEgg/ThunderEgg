@@ -21,8 +21,7 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace ThunderEgg;
 using namespace std;
@@ -158,8 +157,7 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad")
   }
 }
 TEST_CASE("3-processor sendGhostPatches throws exception when start isn't called before finish on "
-          "uniform quad",
-          "[GMG::InterLevelComm]")
+          "uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -178,8 +176,7 @@ TEST_CASE("3-processor sendGhostPatches throws exception when start isn't called
   }
 }
 TEST_CASE("3-processor sendGhostPatches throws exception when start and finish are called on "
-          "different ghost vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different ghost vectors on uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -200,8 +197,7 @@ TEST_CASE("3-processor sendGhostPatches throws exception when start and finish a
   }
 }
 TEST_CASE("3-processor sendGhostPatches throws exception when start and finish are called on "
-          "different vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different vectors on uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -222,8 +218,7 @@ TEST_CASE("3-processor sendGhostPatches throws exception when start and finish a
   }
 }
 TEST_CASE("3-processor sendGhostPatches throws exception when start and finish are called on "
-          "different vectors and ghost vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different vectors and ghost vectors on uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -304,8 +299,7 @@ TEST_CASE("3-processor getGhostPatches on uniform quad")
   }
 }
 TEST_CASE("3-processor getGhostPatches throws exception when start isn't called before finish on "
-          "uniform quad",
-          "[GMG::InterLevelComm]")
+          "uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -324,8 +318,7 @@ TEST_CASE("3-processor getGhostPatches throws exception when start isn't called 
   }
 }
 TEST_CASE("3-processor getGhostPatches throws exception when start and finish are called on "
-          "different ghost vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different ghost vectors on uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -346,8 +339,7 @@ TEST_CASE("3-processor getGhostPatches throws exception when start and finish ar
   }
 }
 TEST_CASE("3-processor getGhostPatches throws exception when start and finish are called on "
-          "different vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different vectors on uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {
@@ -368,8 +360,7 @@ TEST_CASE("3-processor getGhostPatches throws exception when start and finish ar
   }
 }
 TEST_CASE("3-processor getGhostPatches throws exception when start and finish are called on "
-          "different vectors and ghost vectors on uniform quad",
-          "[GMG::InterLevelComm]")
+          "different vectors and ghost vectors on uniform quad")
 {
   for (auto nx : { 2, 10 }) {
     for (auto ny : { 2, 10 }) {

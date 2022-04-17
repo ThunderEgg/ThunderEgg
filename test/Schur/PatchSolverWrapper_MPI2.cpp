@@ -24,9 +24,6 @@
 
 #include <limits>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/generators/catch_generators.hpp>
-
 using namespace std;
 using namespace ThunderEgg;
 
@@ -102,7 +99,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
           CHECK(ghost_filler.wasCalled());
           for (int i = 0; i < b.getNumLocalPatches(); i++) {
             auto local_data = b.getComponentView(0, i);
-            Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value)); });
+            Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == doctest::Approx(schur_fill_value - domain_fill_value)); });
           }
         }
       }
@@ -110,8 +107,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
   }
 }
 TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur matrix with rhs "
-          "already set",
-          "[Schur::PatchSolverWrapper]")
+          "already set")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {
@@ -137,7 +133,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
           CHECK(ghost_filler.wasCalled());
           for (int i = 0; i < b.getNumLocalPatches(); i++) {
             auto local_data = b.getComponentView(0, i);
-            Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == Catch::Approx(schur_fill_value - domain_fill_value)); });
+            Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == doctest::Approx(schur_fill_value - domain_fill_value)); });
           }
         }
       }
@@ -192,15 +188,14 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS gives expected 
         CHECK(ghost_filler.wasCalled());
         for (int i = 0; i < schur_b.getNumLocalPatches(); i++) {
           auto local_data = schur_b.getComponentView(0, i);
-          Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == Catch::Approx(domain_fill_value)); });
+          Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == doctest::Approx(domain_fill_value)); });
         }
       }
     }
   }
 }
 TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS gives expected rhs value for "
-          "Schur matrix with rhs already set",
-          "[Schur::PatchSolverWrapper]")
+          "Schur matrix with rhs already set")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {
@@ -224,7 +219,7 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS gives expected 
         CHECK(ghost_filler.wasCalled());
         for (int i = 0; i < schur_b.getNumLocalPatches(); i++) {
           auto local_data = schur_b.getComponentView(0, i);
-          Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == Catch::Approx(domain_fill_value)); });
+          Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK(local_data[coord] == doctest::Approx(domain_fill_value)); });
         }
       }
     }

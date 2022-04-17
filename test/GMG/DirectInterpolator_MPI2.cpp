@@ -23,9 +23,7 @@
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/DirectInterpolator.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -77,7 +75,7 @@ TEST_CASE("Test DirectInterpolator")
           INFO("ny:    " << pinfo.ns[1]);
           PatchView<double, 2> vec_view = fine_vec.getPatchView(pinfo.local_index);
           PatchView<double, 2> expected_view = fine_expected.getPatchView(pinfo.local_index);
-          Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord])); });
+          Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE(vec_view[coord] == doctest::Approx(expected_view[coord])); });
         }
       }
     }
@@ -130,7 +128,7 @@ TEST_CASE("Linear Test DirectInterpolator with values already set")
           INFO("ny:    " << pinfo.ns[1]);
           PatchView<double, 2> vec_view = fine_vec.getPatchView(pinfo.local_index);
           PatchView<double, 2> expected_view = fine_expected.getPatchView(pinfo.local_index);
-          Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE(vec_view[coord] == Catch::Approx(expected_view[coord])); });
+          Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE(vec_view[coord] == doctest::Approx(expected_view[coord])); });
         }
       }
     }

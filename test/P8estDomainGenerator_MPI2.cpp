@@ -25,9 +25,7 @@
 #include <p8est_extended.h>
 #include <p8est_mesh.h>
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -154,21 +152,21 @@ TEST_CASE("P8estDomainGenerator 4x4x4 spacings")
               Domain<3> domain_0 = dg.getCoarserDomain();
 
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.25 / nz));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.25 / nz));
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-                CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.5 / nz));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.5 / nz));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
-                CHECK(patch.spacings[2] == Catch::Approx(scale_z * 1.0 / nz));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
+                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 1.0 / nz));
               }
             }
           }
@@ -423,32 +421,32 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw spacings")
 
               for (auto patch : domain_3.getPatchInfoVector()) {
                 if (patch.starts[0] < 0.24 * scale_x && patch.starts[1] < 0.24 * scale_y && patch.starts[2] < 0.24 * scale_z) {
-                  CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.125 / nx));
-                  CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.125 / ny));
-                  CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.125 / nz));
+                  CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.125 / nx));
+                  CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.125 / ny));
+                  CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.125 / nz));
                 } else {
-                  CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                  CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                  CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.25 / nz));
+                  CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                  CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                  CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.25 / nz));
                 }
               }
 
               for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.25 / nz));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.25 / nz));
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-                CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.5 / nz));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.5 / nz));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
-                CHECK(patch.spacings[2] == Catch::Approx(scale_z * 1.0 / nz));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
+                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 1.0 / nz));
               }
             }
           }
@@ -703,26 +701,26 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw spacings")
 
               for (auto patch : domain_2.getPatchInfoVector()) {
                 if (patch.starts[0] < 0.5 * scale_x && patch.starts[1] < 0.5 * scale_y && patch.starts[2] < 0.5 * scale_z) {
-                  CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.25 / nx));
-                  CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.25 / ny));
-                  CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.25 / nz));
+                  CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.25 / nx));
+                  CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.25 / ny));
+                  CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.25 / nz));
                 } else {
-                  CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                  CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-                  CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.5 / nz));
+                  CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                  CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                  CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.5 / nz));
                 }
               }
 
               for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 0.5 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 0.5 / ny));
-                CHECK(patch.spacings[2] == Catch::Approx(scale_z * 0.5 / nz));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 0.5 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 0.5 / ny));
+                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 0.5 / nz));
               }
 
               for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK(patch.spacings[0] == Catch::Approx(scale_x * 1.0 / nx));
-                CHECK(patch.spacings[1] == Catch::Approx(scale_y * 1.0 / ny));
-                CHECK(patch.spacings[2] == Catch::Approx(scale_z * 1.0 / nz));
+                CHECK(patch.spacings[0] == doctest::Approx(scale_x * 1.0 / nx));
+                CHECK(patch.spacings[1] == doctest::Approx(scale_y * 1.0 / ny));
+                CHECK(patch.spacings[2] == doctest::Approx(scale_z * 1.0 / nz));
               }
             }
           }

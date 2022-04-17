@@ -24,8 +24,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -622,8 +621,7 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested")
   }
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential nested first domain has "
-          "extra timing",
-          "[Timer]")
+          "extra timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -657,8 +655,7 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested f
   }
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential nested second domain has "
-          "extra timing",
-          "[Timer]")
+          "extra timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);

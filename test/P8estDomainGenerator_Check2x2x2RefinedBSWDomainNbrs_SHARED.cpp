@@ -19,11 +19,11 @@
  ***************************************************************************/
 
 #include "P8estDomainGenerator_SHARED.h"
-#include <catch2/catch_approx.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 void
 Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
@@ -54,50 +54,50 @@ Check2x2x2RefinedBSWDomainNeighbors(const ThunderEgg::Domain<3>& domain)
       double y = patch.starts[1];
       double z = patch.starts[2];
 
-      if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0) && z == doctest::Approx(0)) {
         domain_2_bsw_bsw_patch = &patch;
       }
-      if (x == Catch::Approx(0.25) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0.25) && y == doctest::Approx(0) && z == doctest::Approx(0)) {
         domain_2_bsw_bse_patch = &patch;
       }
-      if (x == Catch::Approx(0) && y == Catch::Approx(0.25) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0.25) && z == doctest::Approx(0)) {
         domain_2_bsw_bnw_patch = &patch;
       }
-      if (x == Catch::Approx(0.25) && y == Catch::Approx(0.25) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0.25) && y == doctest::Approx(0.25) && z == doctest::Approx(0)) {
         domain_2_bsw_bne_patch = &patch;
       }
-      if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0.25)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0) && z == doctest::Approx(0.25)) {
         domain_2_bsw_tsw_patch = &patch;
       }
-      if (x == Catch::Approx(0.25) && y == Catch::Approx(0) && z == Catch::Approx(0.25)) {
+      if (x == doctest::Approx(0.25) && y == doctest::Approx(0) && z == doctest::Approx(0.25)) {
         domain_2_bsw_tse_patch = &patch;
       }
-      if (x == Catch::Approx(0) && y == Catch::Approx(0.25) && z == Catch::Approx(0.25)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0.25) && z == doctest::Approx(0.25)) {
         domain_2_bsw_tnw_patch = &patch;
       }
-      if (x == Catch::Approx(0.25) && y == Catch::Approx(0.25) && z == Catch::Approx(0.25)) {
+      if (x == doctest::Approx(0.25) && y == doctest::Approx(0.25) && z == doctest::Approx(0.25)) {
         domain_2_bsw_tne_patch = &patch;
       }
 
-      if (x == Catch::Approx(0.5) && y == Catch::Approx(0) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0.5) && y == doctest::Approx(0) && z == doctest::Approx(0)) {
         domain_2_bse_patch = &patch;
       }
-      if (x == Catch::Approx(0) && y == Catch::Approx(0.5) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0.5) && z == doctest::Approx(0)) {
         domain_2_bnw_patch = &patch;
       }
-      if (x == Catch::Approx(0.5) && y == Catch::Approx(0.5) && z == Catch::Approx(0)) {
+      if (x == doctest::Approx(0.5) && y == doctest::Approx(0.5) && z == doctest::Approx(0)) {
         domain_2_bne_patch = &patch;
       }
-      if (x == Catch::Approx(0) && y == Catch::Approx(0) && z == Catch::Approx(0.5)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0) && z == doctest::Approx(0.5)) {
         domain_2_tsw_patch = &patch;
       }
-      if (x == Catch::Approx(0.5) && y == Catch::Approx(0) && z == Catch::Approx(0.5)) {
+      if (x == doctest::Approx(0.5) && y == doctest::Approx(0) && z == doctest::Approx(0.5)) {
         domain_2_tse_patch = &patch;
       }
-      if (x == Catch::Approx(0) && y == Catch::Approx(0.5) && z == Catch::Approx(0.5)) {
+      if (x == doctest::Approx(0) && y == doctest::Approx(0.5) && z == doctest::Approx(0.5)) {
         domain_2_tnw_patch = &patch;
       }
-      if (x == Catch::Approx(0.5) && y == Catch::Approx(0.5) && z == Catch::Approx(0.5)) {
+      if (x == doctest::Approx(0.5) && y == doctest::Approx(0.5) && z == doctest::Approx(0.5)) {
         domain_2_tne_patch = &patch;
       }
     }

@@ -21,9 +21,7 @@
 
 #include "utils/DomainReader.h"
 
-#include <catch2/catch_approx.hpp>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -55,7 +53,7 @@ TEST_CASE("Domain constructors work")
         CHECK(d.getNumLocalCellsWithGhost() == (n + 2 * num_ghost) * (n + 2 * num_ghost));
         CHECK(d.getNumCellsInPatch() == n * n);
         CHECK(d.getNumGhostCells() == num_ghost);
-        CHECK(d.volume() == Catch::Approx(spacing * spacing * n * n));
+        CHECK(d.volume() == doctest::Approx(spacing * spacing * n * n));
 
         int result;
         int err = MPI_Comm_compare(comm.getMPIComm(), d.getCommunicator().getMPIComm(), &result);
