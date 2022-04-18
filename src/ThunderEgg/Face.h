@@ -30,6 +30,19 @@
 #include <array>
 
 namespace ThunderEgg {
+
+template<int D, int M>
+constexpr bool is_supported_face_dimension = (D <= 3 && D >= 0) && (M >= 0 && M <= D);
+
+template<int D, int M>
+constexpr bool is_valid_side_dimension = is_supported_face_dimension<D, M> && (M == D - 1);
+
+template<int D, int M>
+constexpr bool is_valid_edge_dimension = is_supported_face_dimension<D, M> && (M == 1);
+
+template<int D, int M>
+constexpr bool is_valid_corner_dimension = is_supported_face_dimension<D, M> && (M == 0);
+
 /**
  * @brief Enum-style class for the faces of an n-dimensional cube
  *
@@ -39,7 +52,7 @@ namespace ThunderEgg {
  * For 3D, this class represents corners (`M = 0`), edges (`M = 1`), and faces (`M = 2`).
  */
 template<int D, int M>
-  requires(D <= 3 && D >= 0) && (M >= 0 && M <= D)
+  requires is_supported_face_dimension<D, M>
 class Face
 {
 private:
@@ -128,8 +141,9 @@ public:
    * @brief west side
    */
   template<int N = 0>
-  static auto
-  west() -> typename std::enable_if<D <= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  west()
+    requires is_valid_side_dimension<D, M>
   {
     return Face<D, M>(0b000);
   }
@@ -138,8 +152,9 @@ public:
    * @brief east side
    */
   template<int N = 0>
-  static auto
-  east() -> typename std::enable_if<D <= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  east()
+    requires is_valid_side_dimension<D, M>
   {
     return Face<D, M>(0b001);
   }
@@ -147,9 +162,9 @@ public:
   /**
    * @brief south side
    */
-  template<int N = 0>
-  static auto
-  south() -> typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  south()
+    requires is_valid_side_dimension<D, M> && (D >= 2)
   {
     return Face<D, M>(0b010);
   }
@@ -157,9 +172,9 @@ public:
   /**
    * @brief north side
    */
-  template<int N = 0>
-  static auto
-  north() -> typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  north()
+    requires is_valid_side_dimension<D, M> && (D >= 2)
   {
     return Face<D, M>(0b011);
   }
@@ -167,9 +182,9 @@ public:
   /**
    * @brief bottom side
    */
-  template<int N = 0>
-  static auto
-  bottom() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  bottom()
+    requires is_valid_side_dimension<D, M> && (D >= 3)
   {
     return Face<D, M>(0b100);
   }
@@ -177,9 +192,9 @@ public:
   /**
    * @brief top side
    */
-  template<int N = 0>
-  static auto
-  top() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  top()
+    requires is_valid_side_dimension<D, M> && (D >= 3)
   {
     return Face<D, M>(0b101);
   }
@@ -187,9 +202,9 @@ public:
   /**
    * @brief southwest corner
    */
-  template<int N = 0>
-  static auto
-  sw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  sw()
+    requires is_valid_corner_dimension<D, M> && (D == 2)
   {
     return Face<D, M>(0b00);
   }
@@ -197,9 +212,9 @@ public:
   /**
    * @brief southeast corner
    */
-  template<int N = 0>
-  static auto
-  se() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  se()
+    requires is_valid_corner_dimension<D, M> && (D == 2)
   {
     return Face<D, M>(0b01);
   }
@@ -207,9 +222,9 @@ public:
   /**
    * @brief northwest corner
    */
-  template<int N = 0>
-  static auto
-  nw() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  nw()
+    requires is_valid_corner_dimension<D, M> && (D == 2)
   {
     return Face<D, M>(0b10);
   }
@@ -217,9 +232,9 @@ public:
   /**
    * @brief northeast corner
    */
-  template<int N = 0>
-  static auto
-  ne() -> typename std::enable_if<D == 2 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  ne()
+    requires is_valid_corner_dimension<D, M> && (D == 2)
   {
     return Face<D, M>(0b11);
   }
@@ -227,9 +242,9 @@ public:
   /**
    * @brief bottom-south-west corner
    */
-  template<int N = 0>
-  static auto
-  bsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  bsw()
+    requires is_valid_corner_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b000);
   }
@@ -237,9 +252,9 @@ public:
   /**
    * @brief bottom-south-east corner
    */
-  template<int N = 0>
-  static auto
-  bse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  bse()
+    requires is_valid_corner_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b001);
   }
@@ -247,9 +262,9 @@ public:
   /**
    * @brief bottom-north-west corner
    */
-  template<int N = 0>
-  static auto
-  bnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  bnw()
+    requires is_valid_corner_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b010);
   }
@@ -257,9 +272,9 @@ public:
   /**
    * @brief bottom-north-east corner
    */
-  template<int N = 0>
-  static auto
-  bne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  bne()
+    requires is_valid_corner_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b011);
   }
@@ -267,9 +282,9 @@ public:
   /**
    * @brief top-south-west corner
    */
-  template<int N = 0>
-  static auto
-  tsw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  tsw()
+    requires is_valid_corner_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b100);
   }
@@ -277,9 +292,9 @@ public:
   /**
    * @brief top-south-east corner
    */
-  template<int N = 0>
-  static auto
-  tse() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  tse()
+    requires is_valid_corner_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b101);
   }
@@ -287,9 +302,9 @@ public:
   /**
    * @brief top-north-west corner
    */
-  template<int N = 0>
-  static auto
-  tnw() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  tnw()
+    requires is_valid_corner_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b110);
   }
@@ -297,9 +312,9 @@ public:
   /**
    * @brief top-north-east corner
    */
-  template<int N = 0>
-  static auto
-  tne() -> typename std::enable_if<D == 3 && M == 0 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  tne()
+    requires is_valid_corner_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b111);
   }
@@ -307,9 +322,9 @@ public:
   /**
    * @brief bottom-south edge
    */
-  template<int N = 0>
-  static auto
-  bs() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  bs()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b0000);
   }
@@ -317,9 +332,9 @@ public:
   /**
    * @brief bottom-north edge
    */
-  template<int N = 0>
-  static auto
-  bn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  bn()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b0001);
   }
@@ -327,9 +342,9 @@ public:
   /**
    * @brief top-south edge
    */
-  template<int N = 0>
-  static auto
-  ts() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  ts()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b0010);
   }
@@ -337,9 +352,9 @@ public:
   /**
    * @brief top-north edge
    */
-  template<int N = 0>
-  static auto
-  tn() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  tn()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b0011);
   }
@@ -347,9 +362,9 @@ public:
   /**
    * @brief bottom-west edge
    */
-  template<int N = 0>
-  static auto
-  bw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  bw()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b0100);
   }
@@ -357,9 +372,9 @@ public:
   /**
    * @brief bottom-east edge
    */
-  template<int N = 0>
-  static auto
-  be() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  be()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b0101);
   }
@@ -367,9 +382,9 @@ public:
   /**
    * @brief top-west edge
    */
-  template<int N = 0>
-  static auto
-  tw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  tw()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b0110);
   }
@@ -377,9 +392,9 @@ public:
   /**
    * @brief top-east edge
    */
-  template<int N = 0>
-  static auto
-  te() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  te()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b0111);
   }
@@ -387,9 +402,9 @@ public:
   /**
    * @brief south-west edge
    */
-  template<int N = 0>
-  static auto
-  sw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  sw()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b1000);
   }
@@ -397,9 +412,9 @@ public:
   /**
    * @brief south-east edge
    */
-  template<int N = 0>
-  static auto
-  se() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  se()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b1001);
   }
@@ -407,9 +422,9 @@ public:
   /**
    * @brief north-west edge
    */
-  template<int N = 0>
-  static auto
-  nw() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  nw()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b1010);
   }
@@ -417,9 +432,9 @@ public:
   /**
    * @brief north-east edge
    */
-  template<int N = 0>
-  static auto
-  ne() -> typename std::enable_if<D == 3 && M == 1 && N == N, Face<D, M>>::type
+  static Face<D, M>
+  ne()
+    requires is_valid_edge_dimension<D, M> && (D == 3)
   {
     return Face<D, M>(0b1011);
   }
