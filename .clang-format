@@ -4,6 +4,9 @@ AlwaysBreakTemplateDeclarations: true
 RequiresClausePosition: OwnLine
 IndentRequiresClause: true
 AlwaysBreakAfterReturnType: All
+AlwaysBreakAfterDefinitionReturnType: All
 AlwaysBreakTemplateDeclarations: Yes
 AllowShortFunctionsOnASingleLine: None
 SeparateDefinitionBlocks: Always
+FixNamespaceComments: true
+NamespaceIndentation: Inner
