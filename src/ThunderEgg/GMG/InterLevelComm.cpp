@@ -19,5 +19,731 @@
  ***************************************************************************/
 
 #include <ThunderEgg/GMG/InterLevelComm.h>
-template class ThunderEgg::GMG::InterLevelComm<2>;
-template class ThunderEgg::GMG::InterLevelComm<3>;
+
+namespace ThunderEgg::GMG {
+
+template<int D>
+  requires is_supported_dimension<D>
+class InterLevelComm<D>::Implimentation
+{
+private:
+  /**
+   * @brief The communicator
+   */
+  Communicator comm;
+  /**
+   * @brief The coarser domain
+   */
+  Domain<D> coarser_domain;
+  /**
+   * @brief The finer domain
+   */
+  Domain<D> finer_domain;
+  /**
+   * @brief Dimensions of a patch
+   */
+  std::array<int, D> ns;
+  /**
+   * @brief Number of ghost cells
+   */
+  int num_ghost_cells;
+  /**
+   * @brief Number of ghost patches
+   */
+  int num_ghost_patches;
+  /**
+   * @brief Number of values in a patch. (including ghost values)
+   */
+  int patch_size;
+  /**
+   * @brief Patches with a local parent
+   *
+   * First value: local index of coarser patch
+   * Second value: the PatchInfo object
+   */
+  std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> patches_with_local_parent;
+  /**
+   * @brief Patches with a ghost parent
+   *
+   * First value: local index in the ghost vector of coarser patch
+   * Second value: the PatchInfo object
+   */
+  std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> patches_with_ghost_parent;
+  /**
+   * @brief A vector of pairs where the first value is the rank, and the second vector is the
+   * local_indexes of patches in the order that the other processor is expecting them.
+   */
+  std::vector<std::pair<int, std::vector<int>>> rank_and_local_indexes_for_vector;
+  /**
+   * @brief A vector of pairs where the first value is the rank, and the second vector is the
+   * local_indexes of ghost patches in the order that the other processor is expecting them.
+   */
+  std::vector<std::pair<int, std::vector<int>>> rank_and_local_indexes_for_ghost_vector;
+  bool communicating = false;
+  bool sending = false;
+
+  const Vector<D>* current_vector = nullptr;
+  const Vector<D>* current_ghost_vector = nullptr;
+
+  std::vector<std::vector<double>> recv_buffers;
+  std::vector<MPI_Request> recv_requests;
+  std::vector<std::vector<double>> send_buffers;
+  std::vector<MPI_Request> send_requests;
+
+public:
+  /**
+   * @brief Create a new InterLevelComm object.
+   *
+   * @param coarse_domain the coarser DomainCollection.
+   * @param fine_domain the finer DomainCollection.
+   */
+  Implimentation(const Domain<D>& coarser_domain, const Domain<D>& finer_domain)
+    : comm(coarser_domain.getCommunicator())
+    , coarser_domain(coarser_domain)
+    , finer_domain(finer_domain)
+    , ns(finer_domain.getNs())
+    , num_ghost_cells(finer_domain.getNumGhostCells())
+  {
+    int my_patch_size = 1;
+    for (size_t axis = 0; axis < D; axis++) {
+      my_patch_size *= ns[axis] + 2 * num_ghost_cells;
+    }
+    patch_size = my_patch_size;
+
+    // sort into patches with local parents and patches with ghost parents
+    std::deque<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>> local_parents;
+    std::deque<std::reference_wrapper<const PatchInfo<D>>> ghost_parents;
+    std::set<int> ghost_parents_ids;
+
+    int rank;
+    MPI_Comm_rank(comm.getMPIComm(), &rank);
+    // TODO this has to be changed when domain class is updated
+    std::map<int, int> coarser_domain_id_to_local_index_map;
+    for (const PatchInfo<D>& pinfo : this->coarser_domain.getPatchInfoVector()) {
+      coarser_domain_id_to_local_index_map[pinfo.id] = pinfo.local_index;
+    }
+    for (const PatchInfo<D>& patch : this->finer_domain.getPatchInfoVector()) {
+      if (patch.parent_rank == rank) {
+        local_parents.emplace_back(coarser_domain_id_to_local_index_map[patch.parent_id], patch);
+      } else {
+        ghost_parents.push_back(patch);
+        ghost_parents_ids.insert(patch.parent_id);
+      }
+    }
+    num_ghost_patches = ghost_parents_ids.size();
+
+    // fill in local vector
+    patches_with_local_parent =
+      std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>(local_parents.begin(),
+                                                                              local_parents.end());
+    // find local coarse patches that are ghost paches on other ranks
+    std::map<int, std::map<int, int>>
+      ranks_and_local_patches; // map from rank -> (map of ids -> local
+                               // indexes). The second map is for when
+                               // local indexes are iterated over, they
+                               // are sorted by their cooresponding id
+    for (const PatchInfo<D>& pinfo : this->coarser_domain.getPatchInfoVector()) {
+      for (int child_rank : pinfo.child_ranks) {
+        if (child_rank != -1 && child_rank != rank)
+          ranks_and_local_patches[child_rank][pinfo.id] = pinfo.local_index;
+      }
+    }
+
+    rank_and_local_indexes_for_vector.reserve(ranks_and_local_patches.size());
+    for (auto pair : ranks_and_local_patches) {
+      std::vector<int> local_indexes;
+      // the map sould have sorted patches by id, the other processors will expect things in
+      // this order
+      local_indexes.reserve(pair.second.size());
+      for (auto id_local_index_pair : pair.second) {
+        local_indexes.push_back(id_local_index_pair.second);
+      }
+      rank_and_local_indexes_for_vector.emplace_back(pair.first, local_indexes);
+    }
+
+    // fill in ghost vector
+    // first, assign local indexes in ghost vector for ghost patches
+    std::map<int, int> id_ghost_vector_local_index_map;
+    int index = 0;
+    for (int id : ghost_parents_ids) {
+      id_ghost_vector_local_index_map[id] = index;
+      index++;
+    }
+
+    std::map<int, std::map<int, int>>
+      ranks_and_ghost_patches; // map from rank -> (map of ids -> ghost
+                               // indexes). The second map is for when
+                               // local indexes are iterated over, they
+                               // are sorted by their cooresponding id
+    patches_with_ghost_parent.reserve(ghost_parents.size());
+    for (auto patch_ref_wrap : ghost_parents) {
+      const PatchInfo<D>& patch = patch_ref_wrap.get();
+      int ghost_local_index = id_ghost_vector_local_index_map[patch.parent_id];
+
+      ranks_and_ghost_patches[patch.parent_rank][patch.parent_id] = ghost_local_index;
+
+      patches_with_ghost_parent.emplace_back(ghost_local_index, patch);
+    }
+
+    rank_and_local_indexes_for_ghost_vector.reserve(ranks_and_local_patches.size());
+    for (auto pair : ranks_and_ghost_patches) {
+      // the map sould have sorted patches by id, the other processors will expect things in
+      // this order
+      std::vector<int> local_indexes;
+      local_indexes.reserve(pair.second.size());
+      for (auto id_local_index_pair : pair.second) {
+        local_indexes.push_back(id_local_index_pair.second);
+      }
+      rank_and_local_indexes_for_ghost_vector.emplace_back(pair.first, local_indexes);
+    }
+  }
+
+  /**
+   * @brief Copy construct a new Inter Level Comm object
+   *
+   * @param other the InterLevelComm to copy
+   */
+  Implimentation(const Implimentation& other)
+    : comm(other.comm)
+    , coarser_domain(other.coarser_domain)
+    , finer_domain(other.finer_domain)
+    , ns(other.ns)
+    , num_ghost_cells(other.num_ghost_cells)
+    , num_ghost_patches(other.num_ghost_patches)
+    , patch_size(other.patch_size)
+    , rank_and_local_indexes_for_vector(other.rank_and_local_indexes_for_vector)
+    , rank_and_local_indexes_for_ghost_vector(other.rank_and_local_indexes_for_ghost_vector)
+  {
+    patches_with_local_parent.reserve(other.patches_with_local_parent.size());
+    for (auto pair : other.patches_with_local_parent) {
+      patches_with_local_parent.emplace_back(
+        pair.first, finer_domain.getPatchInfoVector()[pair.second.get().local_index]);
+    }
+    patches_with_ghost_parent.reserve(other.patches_with_ghost_parent.size());
+    for (auto pair : other.patches_with_ghost_parent) {
+      patches_with_ghost_parent.emplace_back(
+        pair.first, finer_domain.getPatchInfoVector()[pair.second.get().local_index]);
+    }
+  }
+
+  /**
+   * @brief Copy assign a new Inter Level Comm object
+   *
+   * @param other the InterLevelComm to copy
+   */
+  Implimentation&
+  operator=(const Implimentation& other)
+  {
+    comm = other.comm;
+    coarser_domain = other.coarser_domain;
+    finer_domain = other.finer_domain;
+    ns = other.ns;
+    num_ghost_cells = other.num_ghost_cells;
+    num_ghost_patches = other.num_ghost_patches;
+    patch_size = other.patch_size;
+    rank_and_local_indexes_for_vector = other.rank_and_local_indexes_for_vector;
+    rank_and_local_indexes_for_ghost_vector = other.rank_and_local_indexes_for_ghost_vector;
+
+    patches_with_local_parent.clear();
+    patches_with_local_parent.reserve(other.patches_with_local_parent.size());
+    for (auto pair : other.patches_with_local_parent) {
+      patches_with_local_parent.emplace_back(
+        pair.first, finer_domain.getPatchInfoVector()[pair.second.get().local_index]);
+    }
+    patches_with_ghost_parent.clear();
+    patches_with_ghost_parent.reserve(other.patches_with_ghost_parent.size());
+    for (auto pair : other.patches_with_ghost_parent) {
+      patches_with_ghost_parent.emplace_back(
+        pair.first, finer_domain.getPatchInfoVector()[pair.second.get().local_index]);
+    }
+    return *this;
+  }
+
+  /**
+   * @brief Destroy the InterLevelComm object
+   */
+  ~InterLevelComm()
+  {
+    if (!(send_requests.empty() && recv_requests.empty())) {
+      // destructor is being called with unfinished communication
+      // finish communication (this will free mpi allocated stuff)
+      MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUS_IGNORE);
+      MPI_Waitall(recv_requests.size(), recv_requests.data(), MPI_STATUS_IGNORE);
+    }
+  }
+
+  /**
+   * @brief Allocate a new vector for ghost patch values
+   * @param num_components the number of components
+   * @return the newly allocated vector.
+   */
+  Vector<D>
+  getNewGhostVector(int num_components) const
+  {
+    return Vector<D>(
+      finer_domain.getCommunicator(), ns, num_components, num_ghost_patches, num_ghost_cells);
+  }
+
+  /**
+   * @brief Get the vector of finer patches that have a local parent
+   *
+   * The vector will consist of pair values:
+   * 		- First value: the local index of the parent patch
+   * 		- Second value: a reference to the child patch
+   *
+   * @return const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& the
+   * vector
+   */
+  const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>&
+  getPatchesWithLocalParent() const
+  {
+    return patches_with_local_parent;
+  }
+
+  /**
+   * @brief Get the vector of finer patches that have a ghost parent
+   *
+   * The vector will consist of pair values:
+   * 		- First value: the local index in the ghost vector of the parent patch
+   * 		- Second value: a reference to the child patch
+   *
+   * @return const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& the
+   * vector
+   */
+  const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>&
+  getPatchesWithGhostParent() const
+  {
+    return patches_with_ghost_parent;
+  }
+
+  /**
+   * @brief Start the communication for sending ghost values.
+   *
+   * This will send the values in the ghost vector and will add them to the values in the vector.
+   * This is essentially a reverse scatter.
+   *
+   * This function is seperated into a Start and Finish function, this allows for other
+   * computations to happen while the communicating.
+   *
+   * @param vector the vector
+   * @param ghost_vector the associated ghost vector
+   */
+  void
+  sendGhostPatchesStart(Vector<D>& vector, const Vector<D>& ghost_vector)
+  {
+    if (communicating) {
+      if (sending) {
+        throw RuntimeError("InterLevelComm has a sendGhostPatches posted that is unfinished");
+      } else {
+        throw RuntimeError("InterLevelComm has a getGhostPatches posted that is unfinished");
+      }
+    }
+
+    // keep track of what vectors we are using
+    current_ghost_vector = &ghost_vector;
+    current_vector = &vector;
+
+    // post receives
+    recv_buffers.reserve(rank_and_local_indexes_for_vector.size());
+    recv_requests.reserve(rank_and_local_indexes_for_vector.size());
+    for (auto rank_indexes_pair : rank_and_local_indexes_for_vector) {
+      // allocate buffer
+      recv_buffers.emplace_back(vector.getNumComponents() * patch_size *
+                                rank_indexes_pair.second.size());
+
+      // post the receive
+      int rank = rank_indexes_pair.first;
+      recv_requests.emplace_back();
+      MPI_Irecv(recv_buffers.back().data(),
+                recv_buffers.back().size(),
+                MPI_DOUBLE,
+                rank,
+                0,
+                comm.getMPIComm(),
+                &recv_requests.back());
+    }
+    send_buffers.reserve(rank_and_local_indexes_for_ghost_vector.size());
+    send_requests.reserve(rank_and_local_indexes_for_ghost_vector.size());
+    // post sends
+    for (auto rank_indexes_pair : rank_and_local_indexes_for_ghost_vector) {
+      // allocate buffer
+      send_buffers.emplace_back(vector.getNumComponents() * patch_size *
+                                rank_indexes_pair.second.size());
+
+      // fill buffer with values
+      int buffer_idx = 0;
+      for (int local_index : rank_indexes_pair.second) {
+        PatchView<const double, D> view = ghost_vector.getPatchView(local_index);
+        Loop::OverAllIndexes<D + 1>(view, [&](const std::array<int, D + 1>& coord) {
+          send_buffers.back()[buffer_idx] = view[coord];
+          buffer_idx++;
+        });
+      }
+
+      // post the send
+      int rank = rank_indexes_pair.first;
+      send_requests.emplace_back();
+      MPI_Isend(send_buffers.back().data(),
+                send_buffers.back().size(),
+                MPI_DOUBLE,
+                rank,
+                0,
+                comm.getMPIComm(),
+                &send_requests.back());
+    }
+
+    // set state
+    communicating = true;
+    sending = true;
+  }
+
+  /**
+   * @brief Finish the communication for sending ghost values.
+   *
+   * This will send the values in the ghost vector and will add them to the values in the
+   * vector. This is essentially a reverse scatter.
+   *
+   * This function is seperated into a Start and Finish function, this allows for other
+   * computations to happen while the communicating.
+   *
+   * @param vector the vector
+   * @param ghost_vector the associated ghost vector
+   */
+  void
+  sendGhostPatchesFinish(Vector<D>& vector, const Vector<D>& ghost_vector)
+  {
+    if (!communicating) {
+      throw RuntimeError(
+        "InterLevelComm cannot finish sendGhostPatches since communication was not started");
+    } else if (!sending) {
+      throw RuntimeError("InterLevelComm sendGhostPatchesFinish is being called after "
+                         "getGhostPatchesStart was called");
+    }
+    if (&vector != current_vector) {
+      throw RuntimeError("InterLevelComm sendGhostPatchesFinish is being called with a different "
+                         "vector than when sendGhostPatchesStart was called");
+    }
+    if (&ghost_vector != current_ghost_vector) {
+      throw RuntimeError("InterLevelComm senGhostPatchesFinish is being called with a different "
+                         "ghost vector than when sendGhostPatchesStart was called");
+    }
+
+    // finish recvs
+    for (size_t i = 0; i < rank_and_local_indexes_for_vector.size(); i++) {
+      int finished_idx;
+      MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx, MPI_STATUS_IGNORE);
+
+      // get local indexes for the buffer that was received
+      const std::vector<int>& local_indexes =
+        rank_and_local_indexes_for_vector.at(finished_idx).second;
+
+      // add the values in the buffer to the vector
+      std::vector<double>& buffer = recv_buffers.at(finished_idx);
+      int buffer_idx = 0;
+      for (int local_index : local_indexes) {
+        PatchView<double, D> view = vector.getPatchView(local_index);
+        Loop::OverAllIndexes<D + 1>(view, [&](const std::array<int, D + 1>& coord) {
+          view[coord] += buffer[buffer_idx];
+          buffer_idx++;
+        });
+      }
+    }
+
+    // wait for sends for finish
+    MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUS_IGNORE);
+
+    // clear buffers
+    recv_requests.clear();
+    recv_buffers.clear();
+    send_requests.clear();
+    send_buffers.clear();
+
+    // set state
+    communicating = false;
+    current_ghost_vector = nullptr;
+    current_vector = nullptr;
+  }
+
+  /**
+   * @brief Start the communication for getting ghost values.
+   *
+   * This will send the values in the vector to the ghost vector, and will overwrite the
+   * values in the ghost vector. This is essentially a forward scatter.
+   *
+   * This function is seperated into a Start and Finish function, this allows for other
+   * computations to happen while the communicating.
+   *
+   * @param vector the vector
+   * @param ghost_vector the associated ghost vector
+   */
+  void
+  getGhostPatchesStart(const Vector<D>& vector, Vector<D>& ghost_vector)
+  {
+    if (communicating) {
+      if (sending) {
+        throw RuntimeError("InterLevelComm has a sendGhostPatches posted that is unfinished");
+      } else {
+        throw RuntimeError("InterLevelComm has a getGhostPatches posted that is unfinished");
+      }
+    }
+
+    // keep track of what vectors we are using
+    current_ghost_vector = &ghost_vector;
+    current_vector = &vector;
+
+    // post receives
+    recv_buffers.reserve(rank_and_local_indexes_for_ghost_vector.size());
+    recv_requests.reserve(rank_and_local_indexes_for_ghost_vector.size());
+    for (auto rank_indexes_pair : rank_and_local_indexes_for_ghost_vector) {
+      // allocate buffer
+      recv_buffers.emplace_back(vector.getNumComponents() * patch_size *
+                                rank_indexes_pair.second.size());
+
+      // post the recieve
+      int rank = rank_indexes_pair.first;
+      recv_requests.emplace_back();
+      MPI_Irecv(recv_buffers.back().data(),
+                recv_buffers.back().size(),
+                MPI_DOUBLE,
+                rank,
+                0,
+                comm.getMPIComm(),
+                &recv_requests.back());
+    }
+    send_buffers.reserve(rank_and_local_indexes_for_vector.size());
+    send_requests.reserve(rank_and_local_indexes_for_vector.size());
+    // post sends
+    for (auto rank_indexes_pair : rank_and_local_indexes_for_vector) {
+      // allocate buffer
+      send_buffers.emplace_back(vector.getNumComponents() * patch_size *
+                                rank_indexes_pair.second.size());
+
+      // fill buffer with values
+      int buffer_idx = 0;
+      for (int local_index : rank_indexes_pair.second) {
+        PatchView<const double, D> local_view = vector.getPatchView(local_index);
+        Loop::OverAllIndexes<D + 1>(local_view, [&](const std::array<int, D + 1>& coord) {
+          send_buffers.back()[buffer_idx] = local_view[coord];
+          buffer_idx++;
+        });
+      }
+
+      // post the send
+      int rank = rank_indexes_pair.first;
+      send_requests.emplace_back();
+      MPI_Isend(send_buffers.back().data(),
+                send_buffers.back().size(),
+                MPI_DOUBLE,
+                rank,
+                0,
+                comm.getMPIComm(),
+                &send_requests.back());
+    }
+
+    // set state
+    communicating = true;
+    sending = false;
+  }
+
+  /**
+   * @brief Finish the communication for getting ghost values.
+   *
+   * This will send the values in the vector to the ghost vector, and will overwrite the
+   * values in the ghost vector. This is essentially a forward scatter.
+   *
+   * This function is seperated into a Start and Finish function, this allows for other
+   * computations to happen while communicating.
+   *
+   * @param vector the vector
+   * @param ghost_vector the associated ghost vector
+   */
+  void
+  getGhostPatchesFinish(const Vector<D>& vector, Vector<D>& ghost_vector)
+  {
+    if (!communicating) {
+      throw RuntimeError(
+        "InterLevelComm cannot finish sendGhostPatches since communication was not started");
+    } else if (sending) {
+      throw RuntimeError("InterLevelComm getGhostPatchesFinish is being called after "
+                         "sendGhostPatchesStart was called");
+    }
+    if (&vector != current_vector) {
+      throw RuntimeError("InterLevelComm getGhostPatchesFinish is being called with a different "
+                         "vector than when getGhostPatchesStart was called");
+    }
+    if (&ghost_vector != current_ghost_vector) {
+      throw RuntimeError("InterLevelComm getGhostPatchesFinish is being called with a different "
+                         "ghost vector than when getGhostPatchesStart was called");
+    }
+
+    // finish recvs
+    for (size_t i = 0; i < rank_and_local_indexes_for_ghost_vector.size(); i++) {
+      int finished_idx;
+      MPI_Waitany(recv_requests.size(), recv_requests.data(), &finished_idx, MPI_STATUS_IGNORE);
+
+      // get local indexes for the buffer that was recieved
+      const std::vector<int>& local_indexes =
+        rank_and_local_indexes_for_ghost_vector.at(finished_idx).second;
+
+      // add the values in the buffer to the vector
+      std::vector<double>& buffer = recv_buffers.at(finished_idx);
+      int buffer_idx = 0;
+      for (int local_index : local_indexes) {
+        PatchView<double, D> local_view = ghost_vector.getPatchView(local_index);
+        Loop::OverAllIndexes<D + 1>(local_view, [&](const std::array<int, D + 1>& coord) {
+          local_view[coord] = buffer[buffer_idx];
+          buffer_idx++;
+        });
+      }
+    }
+
+    // wait for sends for finish
+    MPI_Waitall(send_requests.size(), send_requests.data(), MPI_STATUS_IGNORE);
+
+    // clear buffers
+    recv_requests.clear();
+    recv_buffers.clear();
+    send_requests.clear();
+    send_buffers.clear();
+
+    // set state
+    communicating = false;
+    current_ghost_vector = nullptr;
+    current_vector = nullptr;
+  }
+
+  /**
+   * @brief Get the coarser Domain
+   *
+   * @return const Domain<D>& the coarser Domain
+   */
+  const Domain<D>&
+  getCoarserDomain() const
+  {
+    return coarser_domain;
+  }
+
+  /**
+   * @brief Get the finer Domain
+   *
+   * @return const Domain<D>& the finer Domain
+   */
+  const Domain<D>&
+  getFinerDomain() const
+  {
+    return finer_domain;
+  }
+};
+
+template<int D>
+  requires is_supported_dimension<D>
+InterLevelComm<D>::InterLevelComm(const Domain<D>& coarser_domain, const Domain<D>& finer_domain)
+  : implimentation(new Implimentation(coarser_domain, finer_domain))
+{
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+InterLevelComm<D>::~InterLevelComm() = default;
+
+template<int D>
+  requires is_supported_dimension<D>
+InterLevelComm<D>::InterLevelComm(const InterLevelComm<D>& other)
+  : implimentation(new Implimentation(*other.implimentation))
+{
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+InterLevelComm<D>::InterLevelComm(InterLevelComm&& other) = default;
+
+template<int D>
+  requires is_supported_dimension<D>
+InterLevelComm<D>&
+InterLevelComm<D>::operator=(const InterLevelComm& other)
+{
+  implimentation.reset(new Implimentation(*other.implimentation));
+  return *this;
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+InterLevelComm<D>&
+InterLevelComm<D>::operator=(InterLevelComm&& other) = default;
+
+template<int D>
+  requires is_supported_dimension<D>
+Vector<D>
+InterLevelComm<D>::getNewGhostVector(int num_components) const
+{
+  return implimentation->getNewGhostVector(num_components);
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>&
+InterLevelComm<D>::getPatchesWithLocalParent() const
+{
+  return implimentation->getPatchesWithLocalParent();
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>&
+InterLevelComm<D>::getPatchesWithGhostParent() const
+{
+  return implimentation->getPatchesWithGhostParent();
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+void
+InterLevelComm<D>::sendGhostPatchesStart(Vector<D>& vector, const Vector<D>& ghost_vector)
+{
+  return implimentation->sendGhostPatchesStart(vector, ghost_vector);
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+void
+InterLevelComm<D>::sendGhostPatchesFinish(Vector<D>& vector, const Vector<D>& ghost_vector)
+{
+  return implimentation->sendGhostPatchesFinish(vector, ghost_vector);
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+void
+InterLevelComm<D>::getGhostPatchesStart(const Vector<D>& vector, Vector<D>& ghost_vector)
+{
+  return implimentation->getGhostPatchesStart(vector, ghost_vector);
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+void
+InterLevelComm<D>::getGhostPatchesFinish(const Vector<D>& vector, Vector<D>& ghost_vector)
+{
+  return implimentation->getGhostPatchesFinish(vector, ghost_vector);
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+const Domain<D>&
+InterLevelComm<D>::getCoarserDomain() const
+{
+  return implimentation->getCoarserDomain();
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+const Domain<D>&
+InterLevelComm<D>::getFinerDomain() const
+{
+  return implimentation->getFinerDomain();
+}
+
+template class InterLevelComm<2>;
+template class InterLevelComm<3>;
+
+} // namespace ThunderEgg::GMG
