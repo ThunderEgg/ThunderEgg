@@ -31,19 +31,26 @@
 #include <list>
 
 namespace ThunderEgg::GMG {
+
 /**
  * @brief Base abstract class for cycles.
  *
  * There is an abstract visit() function for base classes to implement.
  */
 template<int D>
+  requires is_supported_dimension<D>
 class Cycle : public Operator<D>
 {
 private:
   /**
-   * @brief pointer to the finest level
+   * @brief Implimentation class
    */
-  std::shared_ptr<const Level<D>> finest_level;
+  class Implimentation;
+
+  /**
+   * @brief pointer to the implimentation
+   */
+  std::shared_ptr<const Implimentation> implimentation;
 
 protected:
   /**
@@ -54,15 +61,7 @@ protected:
    * @param u the solution vector cooresponding to the level
    * @return Vector<D> the restricted residual vector
    */
-  Vector<D> restrict(const Level<D>& level, const Vector<D>& f, const Vector<D>& u) const
-  {
-    // calculate residual
-    Vector<D> r = u.getZeroClone();
-    level.getOperator().apply(u, r);
-    r.scaleThenAdd(-1, f);
-    // create vectors for coarser levels
-    return level.getRestrictor().restrict(r);
-  }
+  Vector<D> restrict(const Level<D>& level, const Vector<D>& f, const Vector<D>& u) const;
 
   /**
    * @brief Virtual visit function that needs to be implemented in derived classes.
@@ -71,7 +70,8 @@ protected:
    * @param f the rhs vector cooresponding to the level
    * @param u the solution vector cooresponding to the level
    */
-  virtual void visit(const Level<D>& level, const Vector<D>& f, Vector<D>& u) const = 0;
+  virtual void
+  visit(const Level<D>& level, const Vector<D>& f, Vector<D>& u) const = 0;
 
 public:
   /**
@@ -79,9 +79,8 @@ public:
    *
    * @param finest_level the finest level object.
    */
-  Cycle(const Level<D>& finest_level)
-    : finest_level(new Level<D>(finest_level))
-  {}
+  Cycle(const Level<D>& finest_level);
+
   /**
    * @brief Run one iteration of the cycle.
    *
@@ -91,17 +90,16 @@ public:
    * @param f the RHS vector.
    * @param u the solution vector.
    */
-  void apply(const Vector<D>& f, Vector<D>& u) const
-  {
-    u.setWithGhost(0);
-    visit(*finest_level, f, u);
-  }
+  void
+  apply(const Vector<D>& f, Vector<D>& u) const override;
+
   /**
    * @brief Get the finest Level
    *
    * @return const Level<D>& the Level
    */
-  const Level<D>& getFinestLevel() const { return *finest_level; }
+  const Level<D>&
+  getFinestLevel() const;
 };
 extern template class Cycle<2>;
 extern template class Cycle<3>;

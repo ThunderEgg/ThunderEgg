@@ -27,47 +27,32 @@
  */
 #include <ThunderEgg/GMG/Cycle.h>
 #include <ThunderEgg/GMG/CycleOpts.h>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Implementation of a V-cycle
  */
 template<int D>
+  requires is_supported_dimension<D>
 class VCycle : public Cycle<D>
 {
 private:
-  int num_pre_sweeps = 1;
-  int num_post_sweeps = 1;
-  int num_coarse_sweeps = 1;
+  /**
+   * @brief Implimentation class
+   */
+  class Implimentation;
+
+  /**
+   * @brief pointer to the implimentation
+   */
+  std::shared_ptr<const Implimentation> implimentation;
 
 protected:
   /*
    * @brief Implements V-cycle. Pre-smooth, visit coarser level and then post-smooth.
    */
-  void visit(const Level<D>& level, const Vector<D>& f, Vector<D>& u) const override
-  {
-    if (level.coarsest()) {
-      for (int i = 0; i < num_coarse_sweeps; i++) {
-        level.getSmoother().smooth(f, u);
-      }
-    } else {
-      for (int i = 0; i < num_pre_sweeps; i++) {
-        level.getSmoother().smooth(f, u);
-      }
-
-      Vector<D> coarser_f = this->restrict(level, f, u);
-
-      const Level<D>& coarser_level = level.getCoarser();
-      Vector<D> coarser_u = coarser_f.getZeroClone();
-
-      this->visit(coarser_level, coarser_f, coarser_u);
-
-      coarser_level.getInterpolator().interpolate(coarser_u, u);
-
-      for (int i = 0; i < num_post_sweeps; i++) {
-        level.getSmoother().smooth(f, u);
-      }
-    }
-  }
+  void
+  visit(const Level<D>& level, const Vector<D>& f, Vector<D>& u) const override;
 
 public:
   /**
@@ -75,19 +60,15 @@ public:
    *
    * @param finest_level a pointer to the finest level
    */
-  VCycle(const Level<D>& finest_level, const CycleOpts& opts)
-    : Cycle<D>(finest_level)
-  {
-    num_pre_sweeps = opts.pre_sweeps;
-    num_post_sweeps = opts.post_sweeps;
-    num_coarse_sweeps = opts.coarse_sweeps;
-  }
+  VCycle(const Level<D>& finest_level, const CycleOpts& opts);
+
   /**
    * @brief Get a clone of this VCycle
    *
    * @return VCycle<D>* a newly allocated copy
    */
-  VCycle<D>* clone() const override { return new VCycle(*this); }
+  VCycle<D>*
+  clone() const override;
 };
 extern template class VCycle<2>;
 extern template class VCycle<3>;

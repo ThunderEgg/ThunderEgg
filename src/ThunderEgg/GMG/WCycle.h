@@ -27,18 +27,25 @@
  */
 #include <ThunderEgg/GMG/Cycle.h>
 #include <ThunderEgg/GMG/CycleOpts.h>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Implementation of a W-cycle
  */
 template<int D>
+  requires is_supported_dimension<D>
 class WCycle : public Cycle<D>
 {
 private:
-  int num_pre_sweeps = 1;
-  int num_post_sweeps = 1;
-  int num_coarse_sweeps = 1;
-  int num_mid_sweeps = 1;
+  /**
+   * @brief Implimentation class
+   */
+  class Implimentation;
+
+  /**
+   * @brief pointer to the implimentation
+   */
+  std::shared_ptr<const Implimentation> implimentation;
 
 protected:
   /**
@@ -47,41 +54,8 @@ protected:
    *
    * @param level the current level that is being visited.
    */
-  void visit(const Level<D>& level, const Vector<D>& f, Vector<D>& u) const override
-  {
-    if (level.coarsest()) {
-      for (int i = 0; i < num_coarse_sweeps; i++) {
-        level.getSmoother().smooth(f, u);
-      }
-    } else {
-      for (int i = 0; i < num_pre_sweeps; i++) {
-        level.getSmoother().smooth(f, u);
-      }
-
-      Vector<D> coarser_f = this->restrict(level, f, u);
-
-      const Level<D>& coarser_level = level.getCoarser();
-      Vector<D> coarser_u = coarser_f.getZeroClone();
-
-      this->visit(coarser_level, coarser_f, coarser_u);
-
-      coarser_level.getInterpolator().interpolate(coarser_u, u);
-
-      for (int i = 0; i < num_mid_sweeps; i++) {
-        level.getSmoother().smooth(f, u);
-      }
-
-      coarser_f = this->restrict(level, f, u);
-
-      this->visit(coarser_level, coarser_f, coarser_u);
-
-      coarser_level.getInterpolator().interpolate(coarser_u, u);
-
-      for (int i = 0; i < num_post_sweeps; i++) {
-        level.getSmoother().smooth(f, u);
-      }
-    }
-  }
+  void
+  visit(const Level<D>& level, const Vector<D>& f, Vector<D>& u) const override;
 
 public:
   /**
@@ -89,20 +63,15 @@ public:
    *
    * @param finest_level a pointer to the finest level
    */
-  WCycle(const Level<D>& finest_level, const CycleOpts& opts)
-    : Cycle<D>(finest_level)
-  {
-    num_pre_sweeps = opts.pre_sweeps;
-    num_post_sweeps = opts.post_sweeps;
-    num_coarse_sweeps = opts.coarse_sweeps;
-    num_mid_sweeps = opts.mid_sweeps;
-  }
+  WCycle(const Level<D>& finest_level, const CycleOpts& opts);
+
   /**
    * @brief Get a clone of this WCycle
    *
    * @return WCycle<D>* a newly allocated copy
    */
-  WCycle<D>* clone() const override { return new WCycle(*this); }
+  WCycle<D>*
+  clone() const override;
 };
 extern template class WCycle<2>;
 extern template class WCycle<3>;
