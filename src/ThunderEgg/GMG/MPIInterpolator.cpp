@@ -19,5 +19,111 @@
  ***************************************************************************/
 
 #include <ThunderEgg/GMG/MPIInterpolator.h>
-template class ThunderEgg::GMG::MPIInterpolator<2>;
-template class ThunderEgg::GMG::MPIInterpolator<3>;
+
+namespace ThunderEgg::GMG {
+
+template<int D>
+  requires is_supported_dimension<D>
+class MPIInterpolator<D>::Implimentation
+{
+private:
+  /**
+   * @brief The communication package for restricting between levels.
+   */
+  InterLevelComm<D> ilc;
+
+public:
+  /**
+   * @brief Create new MPIInterpolator object.
+   *
+   * @param ilc the communcation package for the two levels.
+   */
+  Implimentation(const Domain<D>& coarser_domain, const Domain<D>& finer_domain)
+    : ilc(coarser_domain, finer_domain)
+  {
+  }
+
+  /**
+   * @brief interpolation function
+   *
+   * @param coarse the input vector that is interpolated from
+   * @param fine the output vector that is interpolated to.
+   */
+  void
+  interpolate(const MPIInterpolator<D>& interpolator, const Vector<D>& coarse, Vector<D>& fine)
+  {
+    if constexpr (ENABLE_DEBUG) {
+      if (coarse.getNumLocalPatches() != ilc.getCoarserDomain().getNumLocalPatches()) {
+        throw RuntimeError("coarse vector is incorrect length. Expected Length of " +
+                           std::to_string(ilc.getCoarserDomain().getNumLocalPatches()) +
+                           " but vector was length " + std::to_string(coarse.getNumLocalPatches()));
+      }
+      if (fine.getNumLocalPatches() != ilc.getFinerDomain().getNumLocalPatches()) {
+        throw RuntimeError("fine vector is incorrect length. Expected Length of " +
+                           std::to_string(ilc.getFinerDomain().getNumLocalPatches()) +
+                           " but vector was length " + std::to_string(fine.getNumLocalPatches()));
+      }
+    }
+    Vector<D> coarse_ghost = ilc.getNewGhostVector(coarse.getNumComponents());
+
+    // start scatter for ghost values
+    ilc.getGhostPatchesStart(coarse, coarse_ghost);
+
+    // interpolate form local values
+    interpolator.interpolatePatches(ilc.getPatchesWithLocalParent(), coarse, fine);
+
+    // finish scatter for ghost values
+    ilc.getGhostPatchesFinish(coarse, coarse_ghost);
+
+    // interpolator from ghost values
+    interpolator.interpolatePatches(ilc.getPatchesWithGhostParent(), coarse_ghost, fine);
+  }
+};
+
+template<int D>
+  requires is_supported_dimension<D>
+MPIInterpolator<D>::MPIInterpolator(const Domain<D>& coarser_domain, const Domain<D>& finer_domain)
+  : implimentation(new Implimentation(coarser_domain, finer_domain))
+{
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+MPIInterpolator<D>::~MPIInterpolator() = default;
+
+template<int D>
+  requires is_supported_dimension<D>
+MPIInterpolator<D>::MPIInterpolator(const MPIInterpolator& other)
+  : implimentation(new Implimentation(*other.implimentation))
+{
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+MPIInterpolator<D>::MPIInterpolator(MPIInterpolator&& other) = default;
+
+template<int D>
+  requires is_supported_dimension<D>
+MPIInterpolator<D>&
+MPIInterpolator<D>::operator=(const MPIInterpolator& other)
+{
+  implimentation.reset(new Implimentation(*other.implimentation));
+  return *this;
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+MPIInterpolator<D>&
+MPIInterpolator<D>::operator=(MPIInterpolator&& other) = default;
+
+template<int D>
+  requires is_supported_dimension<D>
+void
+MPIInterpolator<D>::interpolate(const Vector<D>& coarse, Vector<D>& fine) const
+{
+  implimentation->interpolate(*this, coarse, fine);
+}
+
+template class MPIInterpolator<2>;
+template class MPIInterpolator<3>;
+} // namespace ThunderEgg::GMG

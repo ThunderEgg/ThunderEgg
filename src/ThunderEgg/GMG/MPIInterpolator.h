@@ -29,19 +29,26 @@
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/Interpolator.h>
 #include <ThunderEgg/GMG/Level.h>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Base class that makes the necessary mpi calls, derived classes only have to
  * implement interpolatePatches() method
  */
 template<int D>
+  requires is_supported_dimension<D>
 class MPIInterpolator : public Interpolator<D>
 {
 private:
   /**
-   * @brief The communication package for restricting between levels.
+   * @brief Implimentation class
    */
-  mutable InterLevelComm<D> ilc;
+  class Implimentation;
+
+  /**
+   * @brief pointer to the implimentation
+   */
+  std::unique_ptr<const Implimentation> implimentation;
 
 public:
   /**
@@ -49,9 +56,45 @@ public:
    *
    * @param ilc the communcation package for the two levels.
    */
-  MPIInterpolator(const Domain<D>& coarser_domain, const Domain<D>& finer_domain)
-    : ilc(coarser_domain, finer_domain)
-  {}
+  MPIInterpolator(const Domain<D>& coarser_domain, const Domain<D>& finer_domain);
+
+  /**
+   * @brief Destroy the MPIInterpolator object
+   */
+  ~MPIInterpolator();
+
+  /**
+   * @brief Copy constructor
+   *
+   * @param other other MPIInterpolator
+   */
+  MPIInterpolator(const MPIInterpolator& other);
+
+  /**
+   * @brief Move constructor
+   *
+   * @param other MPIInterpolator
+   */
+  MPIInterpolator(MPIInterpolator&& other);
+
+  /**
+   * @brief copy assignment
+   *
+   * @param other MPIInterpolator
+   * @return MPIInterpolator& this
+   */
+  MPIInterpolator&
+  operator=(const MPIInterpolator& other);
+
+  /**
+   * @brief move assignment
+   *
+   * @param other MPIInterpolator
+   * @return MPIInterpolator& this
+   */
+  MPIInterpolator&
+  operator=(MPIInterpolator&& other);
+
   /**
    * @brief Interpolate values from coarse vector to the finer vector
    *
@@ -65,7 +108,8 @@ public:
    * @param finer_vector the finer vector
    * @param coarser_vector the coarser vector
    */
-  virtual void interpolatePatches(
+  virtual void
+  interpolatePatches(
     const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches,
     const Vector<D>& coarser_vector,
     Vector<D>& finer_vector) const = 0;
@@ -76,37 +120,14 @@ public:
    * @param coarse the input vector that is interpolated from
    * @param fine the output vector that is interpolated to.
    */
-  void interpolate(const Vector<D>& coarse, Vector<D>& fine) const
-  {
-    if constexpr (ENABLE_DEBUG) {
-      if (coarse.getNumLocalPatches() != ilc.getCoarserDomain().getNumLocalPatches()) {
-        throw RuntimeError("coarse vector is incorrect length. Expected Length of " +
-                           std::to_string(ilc.getCoarserDomain().getNumLocalPatches()) +
-                           " but vector was length " + std::to_string(coarse.getNumLocalPatches()));
-      }
-      if (fine.getNumLocalPatches() != ilc.getFinerDomain().getNumLocalPatches()) {
-        throw RuntimeError("fine vector is incorrect length. Expected Length of " +
-                           std::to_string(ilc.getFinerDomain().getNumLocalPatches()) +
-                           " but vector was length " + std::to_string(fine.getNumLocalPatches()));
-      }
-    }
-    Vector<D> coarse_ghost = ilc.getNewGhostVector(coarse.getNumComponents());
-
-    // start scatter for ghost values
-    ilc.getGhostPatchesStart(coarse, coarse_ghost);
-
-    // interpolate form local values
-    interpolatePatches(ilc.getPatchesWithLocalParent(), coarse, fine);
-
-    // finish scatter for ghost values
-    ilc.getGhostPatchesFinish(coarse, coarse_ghost);
-
-    // interpolator from ghost values
-    interpolatePatches(ilc.getPatchesWithGhostParent(), coarse_ghost, fine);
-  }
+  void
+  interpolate(const Vector<D>& coarse, Vector<D>& fine) const;
 };
-} // namespace ThunderEgg::GMG
+
 // explicit instantiation
-extern template class ThunderEgg::GMG::MPIInterpolator<2>;
-extern template class ThunderEgg::GMG::MPIInterpolator<3>;
+
+extern template class MPIInterpolator<2>;
+extern template class MPIInterpolator<3>;
+
+} // namespace ThunderEgg::GMG
 #endif
