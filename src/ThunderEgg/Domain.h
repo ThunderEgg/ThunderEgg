@@ -33,6 +33,15 @@
 
 namespace ThunderEgg {
 /**
+ * @brief Implimentation of Domain class
+ *
+ * @tparam D the number of Cartesian dimensions
+ */
+template<int D>
+  requires is_supported_dimension<D>
+class DomainImpl;
+
+/**
  * @brief Uses a collection of PatchInfo objects to represent the domain of the problem.
  *
  * Each patch passed to the constructor needs to have the following complete information:
@@ -47,168 +56,39 @@ namespace ThunderEgg {
  * @tparam D the number of Cartesian dimensions
  */
 template<int D>
-requires is_supported_dimension<D>
+  requires is_supported_dimension<D>
 class Domain
 {
 private:
   /**
-   * @brief The communicator associated with the domain
+   * @brief implimenation of Domain
    */
-  Communicator comm;
+  std::shared_ptr<const DomainImpl<D>> implimentation;
   /**
    * @brief The id of the domain
    */
   int id = -1;
-  /**
-   * @brief The number of cells in each direction
-   */
-  std::array<int, D> ns;
-  /**
-   * @brief number of ghost cells on each side of the patch
-   */
-  int num_ghost_cells;
-  /**
-   * @brief The number of cells in a patch
-   */
-  int num_cells_in_patch;
-  /**
-   * @brief The number of cells(including ghost cells) in a patch
-   */
-  int num_cells_in_patch_with_ghost;
-  /**
-   * @brief Vector of PatchInfo pointers where index in the vector corresponds to the patch's
-   * local index
-   */
-  std::vector<PatchInfo<D>> pinfos;
-  /**
-   * @brief The global number of patches
-   */
-  int global_num_patches = 1;
   /**
    * @brief The timer
    */
   mutable std::shared_ptr<Timer> timer;
 
   /**
-   * @brief Give the patches local indexes.
+   * @brief
+   *
+   * @param comm
+   * @param id
+   * @param ns
+   * @param num_ghost_cells
+   * @param pinfos
+   * @return DomainImpl<D>*
    */
-  void indexPatchesLocal()
-  {
-    // index patches
-    int curr_index = 0;
-    std::map<int, int> id_to_local_index;
-    for (auto& pinfo : pinfos) {
-      pinfo.local_index = curr_index;
-      id_to_local_index[pinfo.id] = pinfo.local_index;
-      curr_index++;
-    }
-
-    // set local index in nbrinfo objects
-    for (auto& pinfo : pinfos) {
-      pinfo.setNeighborLocalIndexes(id_to_local_index);
-    }
-  }
-  /**
-   * @brief Give the patches global indexes
-   */
-  void indexPatchesGlobal()
-  {
-    // get starting global index
-    int num_local_patches = (int)pinfos.size();
-    int curr_global_index;
-    MPI_Scan(&num_local_patches, &curr_global_index, 1, MPI_INT, MPI_SUM, comm.getMPIComm());
-    curr_global_index -= num_local_patches;
-
-    // index the patches
-    std::map<int, int> id_to_global_index;
-    for (auto& pinfo : pinfos) {
-      pinfo.global_index = curr_global_index;
-      id_to_global_index[pinfo.id] = pinfo.global_index;
-      curr_global_index++;
-    }
-
-    std::map<int, std::set<std::pair<int, int>>> ranks_to_ids_and_global_indexes_outgoing;
-    std::map<int, std::set<int>> ranks_to_ids_incoming;
-    for (auto& pinfo : pinfos) {
-      auto ranks = pinfo.getNbrRanks();
-      auto ids = pinfo.getNbrIds();
-      for (size_t idx = 0; idx < ranks.size(); idx++) {
-        int nbr_id = ids[idx];
-        int nbr_rank = ranks[idx];
-        if (nbr_rank != comm.getRank()) {
-          ranks_to_ids_and_global_indexes_outgoing[nbr_rank].insert(
-            std::make_pair(pinfo.id, pinfo.global_index));
-          ranks_to_ids_incoming[nbr_rank].insert(nbr_id);
-        }
-      }
-    }
-
-    // prepare to recieve data
-    std::vector<MPI_Request> recv_requests;
-
-    // allocate incoming vectors and post recvs
-    std::map<int, std::vector<int>> rank_to_incoming_data;
-    for (const auto& pair : ranks_to_ids_incoming) {
-      int source_rank = pair.first;
-      std::vector<int>& incoming_data = rank_to_incoming_data[source_rank];
-      incoming_data.resize(pair.second.size());
-
-      MPI_Request request;
-      MPI_Irecv(incoming_data.data(),
-                (int)incoming_data.size(),
-                MPI_INT,
-                source_rank,
-                0,
-                comm.getMPIComm(),
-                &request);
-      recv_requests.push_back(request);
-    }
-
-    // prepare outgoing vector of data and send it
-    std::vector<MPI_Request> send_requests;
-
-    // post sends
-    std::map<int, std::vector<int>> rank_to_outgoing_data;
-    for (const auto& pair : ranks_to_ids_and_global_indexes_outgoing) {
-      int dest_rank = pair.first;
-      // allocate and fill vector
-      std::vector<int>& data = rank_to_outgoing_data[dest_rank];
-      data.reserve(pair.second.size());
-      for (const auto& id_and_global_index : pair.second) {
-        data.push_back(id_and_global_index.second);
-      }
-      MPI_Request request;
-      MPI_Isend(data.data(), (int)data.size(), MPI_INT, dest_rank, 0, comm.getMPIComm(), &request);
-      send_requests.push_back(request);
-    }
-
-    // add global indexes to map as recvs come in
-    for (size_t i = 0; i < recv_requests.size(); i++) {
-      MPI_Status status;
-      int request_index;
-      MPI_Waitany((int)recv_requests.size(), recv_requests.data(), &request_index, &status);
-
-      int source_rank = status.MPI_SOURCE;
-      const std::set<int>& incoming_ids = ranks_to_ids_incoming[source_rank];
-      const std::vector<int>& data = rank_to_incoming_data[source_rank];
-
-      auto curr_id = incoming_ids.cbegin();
-      auto curr_global_index_iter = data.cbegin();
-      while (curr_id != incoming_ids.cend()) {
-        id_to_global_index[*curr_id] = *curr_global_index_iter;
-        curr_id++;
-        curr_global_index_iter++;
-      }
-    }
-
-    // wait for all the sends to finsh
-    MPI_Waitall((int)send_requests.size(), send_requests.data(), MPI_STATUSES_IGNORE);
-
-    // update global indexes in nbrinfo objects
-    for (auto& pinfo : pinfos) {
-      pinfo.setNeighborGlobalIndexes(id_to_global_index);
-    }
-  }
+  static std::shared_ptr<const DomainImpl<D>>
+  NewDomainImpl(const Communicator& comm,
+                int id,
+                const std::array<int, D>& ns,
+                int num_ghost_cells,
+                std::vector<PatchInfo<D>>&& pinfos);
 
 public:
   /**
@@ -228,115 +108,117 @@ public:
          int num_ghost_cells,
          InputIterator first_pinfo,
          InputIterator last_pinfo)
-    : comm(comm)
+    : implimentation(NewDomainImpl(comm,
+                                   id,
+                                   ns,
+                                   num_ghost_cells,
+                                   std::vector<PatchInfo<D>>(first_pinfo, last_pinfo)))
     , id(id)
-    , ns(ns)
-    , num_ghost_cells(num_ghost_cells)
-    , pinfos(first_pinfo, last_pinfo)
   {
-    num_cells_in_patch = 1;
-    num_cells_in_patch_with_ghost = 1;
-    for (size_t i = 0; i < D; i++) {
-      num_cells_in_patch *= ns[i];
-      num_cells_in_patch_with_ghost *= (ns[i] + 2 * num_ghost_cells);
-    }
-
-    int num_local_domains = pinfos.size();
-    MPI_Allreduce(&num_local_domains, &global_num_patches, 1, MPI_INT, MPI_SUM, comm.getMPIComm());
-
-    indexPatchesLocal();
-    indexPatchesGlobal();
   }
+
   /**
    * @brief Get the Communicator object associated with this domain
    *
    * @return const Communicator& the Communicator
    */
-  const Communicator& getCommunicator() const { return comm; }
+  const Communicator&
+  getCommunicator() const;
+
   /**
    * @brief Get a vector of PatchInfo pointers where index in the vector corresponds to the
    * patch's local index
    */
-  const std::vector<PatchInfo<D>>& getPatchInfoVector() const { return pinfos; }
+  const std::vector<PatchInfo<D>>&
+  getPatchInfoVector() const;
+
   /**
    * @brief Get the number of cells in each direction
    *
    */
-  const std::array<int, D>& getNs() const { return ns; }
+  const std::array<int, D>&
+  getNs() const;
+
   /**
    * @brief Get the number of global patches
    */
-  int getNumGlobalPatches() const { return global_num_patches; }
+  int
+  getNumGlobalPatches() const;
+
   /**
    * @brief Get the number of local patches
    */
-  int getNumLocalPatches() const { return (int)pinfos.size(); }
+  int
+  getNumLocalPatches() const;
+
   /**
    * @brief get the number of global cells
    */
-  int getNumGlobalCells() const { return global_num_patches * num_cells_in_patch; }
+  int
+  getNumGlobalCells() const;
+
   /**
    * @brief Get get the number of local cells
    */
-  int getNumLocalCells() const { return ((int)pinfos.size()) * num_cells_in_patch; }
+  int
+  getNumLocalCells() const;
+
   /**
    * @brief Get get the number of local cells (including ghost cells)
    */
-  int getNumLocalCellsWithGhost() const
-  {
-    return ((int)pinfos.size()) * num_cells_in_patch_with_ghost;
-  }
+  int
+  getNumLocalCellsWithGhost() const;
+
   /**
    * @brief Get the number of cells in a patch
    */
-  int getNumCellsInPatch() const { return num_cells_in_patch; }
+  int
+  getNumCellsInPatch() const;
+
   /**
    * @brief get the number of ghost cell on each side of a patch
    */
-  int getNumGhostCells() const { return num_ghost_cells; }
+  int
+  getNumGhostCells() const;
+
   /**
    * @brief Get the volume of the domain.
    *
    * For 2D, this will be the area.
    */
-  double volume() const
-  {
-    double sum = 0;
-    for (auto& pinfo : pinfos) {
-      double patch_vol = 1;
-      for (size_t i = 0; i < D; i++) {
-        patch_vol *= pinfo.spacings[i] * pinfo.ns[i];
-      }
-      sum += patch_vol;
-    }
-    double retval;
-    MPI_Allreduce(&sum, &retval, 1, MPI_DOUBLE, MPI_SUM, comm.getMPIComm());
-    return retval;
-  }
+  double
+  volume() const;
+
   /**
    * @brief Set the Timer object
    *
    * @param timer the timer
    */
-  void setTimer(std::shared_ptr<Timer> timer) const;
+  void
+  setTimer(std::shared_ptr<Timer> timer) const;
 
   /**
    * @brief Get the Timer object
    *
    * @return std::shared_ptr<Timer> the timer
    */
-  std::shared_ptr<Timer> getTimer() const { return timer; }
+  std::shared_ptr<Timer>
+  getTimer() const;
+
   /**
    * @brief Check if the Domain has a timer associated with it
    * @return true if the Domain has a timer associated with it
    */
-  bool hasTimer() const { return timer != nullptr; }
+  bool
+  hasTimer() const;
+
   /**
    * @brief Get the domain's id
    *
    * @return int the id
    */
-  int getId() const { return id; }
+  int
+  getId() const;
 };
 
 template<int D>
