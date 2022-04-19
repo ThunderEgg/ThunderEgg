@@ -94,7 +94,6 @@ TEST_CASE("BiCGStab solves poisson problem withing given tolerance")
 {
   for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
     string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
-    INFO("MESH FILE " << mesh_file);
     DomainReader<2> domain_reader(mesh_file, { 32, 32 }, 1);
     Domain<2> domain = domain_reader.getCoarserDomain();
 
@@ -134,7 +133,6 @@ TEST_CASE("BiCGStab handles zero rhs vector")
 {
   for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
     string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
-    INFO("MESH FILE " << mesh_file);
     DomainReader<2> domain_reader(mesh_file, { 32, 32 }, 1);
     Domain<2> domain = domain_reader.getCoarserDomain();
 
@@ -157,7 +155,6 @@ TEST_CASE("BiCGStab handles zero rhs vector")
 TEST_CASE("outputs iteration count and residual to output")
 {
   string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
-  INFO("MESH FILE " << mesh_file);
   DomainReader<2> domain_reader(mesh_file, { 32, 32 }, 1);
   Domain<2> domain = domain_reader.getCoarserDomain();
 
@@ -192,7 +189,6 @@ TEST_CASE("outputs iteration count and residual to output")
   solver.setTolerance(tolerance);
   solver.solve(p_operator, g_vec, f_vec, nullptr, true, ss);
 
-  INFO(ss.str());
   int prev_iteration;
   double resid;
   ss >> prev_iteration >> resid;
@@ -206,7 +202,6 @@ TEST_CASE("outputs iteration count and residual to output")
 TEST_CASE("giving a good initial guess reduces the iterations")
 {
   string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
-  INFO("MESH FILE " << mesh_file);
   DomainReader<2> domain_reader(mesh_file, { 32, 32 }, 1);
   Domain<2> domain = domain_reader.getCoarserDomain();
 
@@ -264,7 +259,6 @@ TEST_CASE("BiCGStab solves poisson 2I problem")
 {
   for (double tolerance : { 1e-9, 1e-7, 1e-5 }) {
     string mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
-    INFO("MESH FILE " << mesh_file);
     DomainReader<2> domain_reader(mesh_file, { 32, 32 }, 1);
     Domain<2> domain = domain_reader.getCoarserDomain();
 

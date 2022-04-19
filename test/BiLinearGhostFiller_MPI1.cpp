@@ -256,7 +256,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller")
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
 
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
@@ -278,11 +277,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller")
         blgf.fillGhost(vec);
 
         for (auto pinfo : d.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           ComponentView<double, 2> vec_ld = vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
@@ -293,11 +287,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller")
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
-                INFO("coord:  " << coord[0]);
                 CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
@@ -312,7 +303,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set")
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
 
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
@@ -334,11 +324,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set")
         blgf.fillGhost(vec);
 
         for (auto pinfo : d.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           ComponentView<double, 2> vec_ld = vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
@@ -349,11 +334,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set")
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
-                INFO("coord:  " << coord[0]);
                 CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
@@ -368,7 +350,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components")
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
 
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
@@ -395,11 +376,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components")
         blgf.fillGhost(vec);
 
         for (auto pinfo : d.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           ComponentView<double, 2> vec_ld = vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
@@ -412,11 +388,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components")
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
-                INFO("coord:  " << coord[0]);
                 CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
@@ -426,12 +399,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components")
             View<double, 1> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
-              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-                INFO("coord:  " << coord[0]);
-                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
-              });
+              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord])); });
             }
           }
         }
@@ -444,7 +412,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
 
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
@@ -471,11 +438,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
         blgf.fillGhost(vec);
 
         for (auto pinfo : d.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           ComponentView<double, 2> vec_ld = vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
@@ -485,12 +447,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
-              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-                INFO("coord:  " << coord[0]);
-                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
-              });
+              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord])); });
             }
           }
           Loop::Nested<2>(vec_ld2.getStart(), vec_ld2.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld2[coord], Approx(expected_ld2[coord])); });
@@ -498,12 +455,7 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
             View<double, 1> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
-              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-                INFO("coord:  " << coord[0]);
-                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
-              });
+              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord])); });
             }
           }
         }
@@ -516,7 +468,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners")
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
 
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
@@ -538,11 +489,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners")
         blgf.fillGhost(vec);
 
         for (auto pinfo : d.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           ComponentView<double, 2> vec_ld = vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
@@ -553,11 +499,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners")
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
-                INFO("coord:  " << coord[0]);
                 CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
@@ -566,8 +509,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller corners")
             View<double, 0> vec_ghost = vec_ld.getSliceOn(c, { -1, -1 });
             View<double, 0> expected_ghost = expected_ld.getSliceOn(c, { -1, -1 });
             if (pinfo.hasNbr(c)) {
-              INFO("corner:    " << c);
-              INFO("nbr-type:  " << pinfo.getNbrType(c));
               CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
@@ -581,7 +522,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
 
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
@@ -603,11 +543,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
         blgf.fillGhost(vec);
 
         for (auto pinfo : d.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           ComponentView<double, 2> vec_ld = vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
@@ -618,11 +553,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
-                INFO("coord:  " << coord[0]);
                 CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
@@ -631,8 +563,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set corn
             View<double, 0> vec_ghost = vec_ld.getSliceOn(c, { -1, -1 });
             View<double, 0> expected_ghost = expected_ld.getSliceOn(c, { -1, -1 });
             if (pinfo.hasNbr(c)) {
-              INFO("corner:    " << c);
-              INFO("nbr-type:  " << pinfo.getNbrType(c));
               CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
@@ -646,7 +576,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
 
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
@@ -673,11 +602,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
         blgf.fillGhost(vec);
 
         for (auto pinfo : d.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           ComponentView<double, 2> vec_ld = vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
@@ -690,11 +614,8 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
                 ///
-                INFO("coord:  " << coord[0]);
                 CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
               });
             }
@@ -703,8 +624,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
             View<double, 0> vec_ghost = vec_ld.getSliceOn(c, { -1, -1 });
             View<double, 0> expected_ghost = expected_ld.getSliceOn(c, { -1, -1 });
             if (pinfo.hasNbr(c)) {
-              INFO("corner:    " << c);
-              INFO("nbr-type:  " << pinfo.getNbrType(c));
               CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
@@ -713,20 +632,13 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller two components corners
             View<double, 1> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
-              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-                INFO("coord:  " << coord[0]);
-                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
-              });
+              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord])); });
             }
           }
           for (Corner<2> c : Corner<2>::getValues()) {
             View<double, 0> vec_ghost = vec_ld2.getSliceOn(c, { -1, -1 });
             View<double, 0> expected_ghost = expected_ld2.getSliceOn(c, { -1, -1 });
             if (pinfo.hasNbr(c)) {
-              INFO("corner:    " << c);
-              INFO("nbr-type:  " << pinfo.getNbrType(c));
               CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
@@ -740,7 +652,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
 
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
@@ -767,11 +678,6 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
         blgf.fillGhost(vec);
 
         for (auto pinfo : d.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           ComponentView<double, 2> vec_ld = vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = expected.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> vec_ld2 = vec.getComponentView(1, pinfo.local_index);
@@ -781,20 +687,13 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
-              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-                INFO("coord:  " << coord[0]);
-                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
-              });
+              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord])); });
             }
           }
           for (Corner<2> c : Corner<2>::getValues()) {
             View<double, 0> vec_ghost = vec_ld.getSliceOn(c, { -1, -1 });
             View<double, 0> expected_ghost = expected_ld.getSliceOn(c, { -1, -1 });
             if (pinfo.hasNbr(c)) {
-              INFO("corner:    " << c);
-              INFO("nbr-type:  " << pinfo.getNbrType(c));
               CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }
@@ -803,20 +702,13 @@ TEST_CASE("exchange various meshes 2D BiLinearGhostFiller ghost already set two 
             View<double, 1> vec_ghost = vec_ld2.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld2.getSliceOn(s, { -1 });
             if (pinfo.hasNbr(s)) {
-              INFO("side:      " << s);
-              INFO("nbr-type:  " << pinfo.getNbrType(s));
-              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-                INFO("coord:  " << coord[0]);
-                CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord]));
-              });
+              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(vec_ghost[coord], Approx(expected_ghost[coord])); });
             }
           }
           for (Corner<2> c : Corner<2>::getValues()) {
             View<double, 0> vec_ghost = vec_ld2.getSliceOn(c, { -1, -1 });
             View<double, 0> expected_ghost = expected_ld2.getSliceOn(c, { -1, -1 });
             if (pinfo.hasNbr(c)) {
-              INFO("corner:    " << c);
-              INFO("nbr-type:  " << pinfo.getNbrType(c));
               CHECK_EQ(vec_ghost[{}], Approx(expected_ghost[{}]));
             }
           }

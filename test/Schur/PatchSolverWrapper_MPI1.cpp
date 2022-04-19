@@ -32,9 +32,6 @@ TEST_CASE("Schur::PatchSolverWrapper<2> throws exception for non-square patches"
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 5, 7 }) {
       for (auto ny : { 6, 8 }) {
-        INFO("MESH: " << mesh_file);
-        INFO("NX: " << nx);
-        INFO("NY: " << ny);
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, 1);
         auto domain = domain_reader.getFinerDomain();
         Schur::InterfaceDomain<2> iface_domain(domain);
@@ -51,8 +48,6 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply fills ghost in rhs as expected")
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {
       for (double schur_fill_value : { 1.0, 1.3, 8.0, 2.0, -1.0 }) {
-        INFO("MESH: " << mesh_file);
-        INFO("N: " << n);
         DomainReader<2> domain_reader(mesh_file, { n, n }, 1);
         auto domain = domain_reader.getFinerDomain();
         Schur::InterfaceDomain<2> iface_domain(domain);
@@ -78,8 +73,6 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
     for (auto n : { 5, 7 }) {
       for (auto schur_fill_value : { 1.0, 1.3, 8.0, 2.0, -1.0 }) {
         for (auto domain_fill_value : { 1.0, 1.3, 8.0, 2.0, -1.0 }) {
-          INFO("MESH: " << mesh_file);
-          INFO("N: " << n);
           DomainReader<2> domain_reader(mesh_file, { n, n }, 1);
           auto domain = domain_reader.getFinerDomain();
           Schur::InterfaceDomain<2> iface_domain(domain);
@@ -111,8 +104,6 @@ TEST_CASE("Schur::PatchSolverWrapper<2> apply gives expected rhs value for Schur
     for (auto n : { 5, 7 }) {
       for (auto schur_fill_value : { 1.0, 1.3, 8.0, 2.0, -1.0 }) {
         for (auto domain_fill_value : { 1.0, 1.3, 8.0, 2.0, -1.0 }) {
-          INFO("MESH: " << mesh_file);
-          INFO("N: " << n);
           DomainReader<2> domain_reader(mesh_file, { n, n }, 1);
           auto domain = domain_reader.getFinerDomain();
           Schur::InterfaceDomain<2> iface_domain(domain);
@@ -143,8 +134,6 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS fills ghost in 
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {
       for (auto domain_fill_value : { 1.0, 1.3, 8.0, 2.0, -1.0 }) {
-        INFO("MESH: " << mesh_file);
-        INFO("N: " << n);
         DomainReader<2> domain_reader(mesh_file, { n, n }, 1);
         auto domain = domain_reader.getFinerDomain();
         Schur::InterfaceDomain<2> iface_domain(domain);
@@ -169,8 +158,6 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS gives expected 
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {
       for (auto domain_fill_value : { 1.0, 1.3, 8.0, 2.0, -1.0 }) {
-        INFO("MESH: " << mesh_file);
-        INFO("N: " << n);
         DomainReader<2> domain_reader(mesh_file, { n, n }, 1);
         auto domain = domain_reader.getFinerDomain();
         Schur::InterfaceDomain<2> iface_domain(domain);
@@ -198,8 +185,6 @@ TEST_CASE("Schur::PatchSolverWrapper<2> getSchurRHSFromDomainRHS gives expected 
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 7 }) {
       for (auto domain_fill_value : { 1.0, 1.3, 8.0, 2.0, -1.0 }) {
-        INFO("MESH: " << mesh_file);
-        INFO("N: " << n);
         DomainReader<2> domain_reader(mesh_file, { n, n }, 1);
         auto domain = domain_reader.getFinerDomain();
         Schur::InterfaceDomain<2> iface_domain(domain);

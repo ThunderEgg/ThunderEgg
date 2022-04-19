@@ -39,7 +39,6 @@ TEST_CASE("PatchSolver apply for various domains")
       for (auto ny : { 2, 5 }) {
         for (auto u_num_components : { 1, 2, 3 }) {
           for (auto f_num_components : { 1, 2, 3 }) {
-            INFO("MESH: " << mesh_file);
             int num_ghost = 1;
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
             Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -75,7 +74,6 @@ TEST_CASE("PatchSolver apply for various domains with timer")
         for (auto u_num_components : { 1, 2, 3 }) {
           for (auto f_num_components : { 1, 2, 3 }) {
             Communicator comm(MPI_COMM_WORLD);
-            INFO("MESH: " << mesh_file);
             int num_ghost = 1;
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
             Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -116,7 +114,6 @@ TEST_CASE("PatchSolver smooth for various domains")
         for (auto u_num_components : { 1, 2, 3 }) {
           for (auto f_num_components : { 1, 2, 3 }) {
             Communicator comm(MPI_COMM_WORLD);
-            INFO("MESH: " << mesh_file);
             int num_ghost = 1;
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
             Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -156,7 +153,6 @@ TEST_CASE("PatchSolver smooth for various domains with timer")
       for (auto ny : { 2, 5 }) {
         for (auto u_num_components : { 1, 2, 3 }) {
           for (auto f_num_components : { 1, 2, 3 }) {
-            INFO("MESH: " << mesh_file);
             int num_ghost = 1;
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
             Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -189,7 +185,6 @@ TEST_CASE("PatchSolver getDomain")
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
       for (auto ny : { 2, 5 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
         Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -210,7 +205,6 @@ TEST_CASE("PatchSolver getGhostFiller")
   for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
     for (auto nx : { 2, 5 }) {
       for (auto ny : { 2, 5 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
         Domain<2> d_fine = domain_reader.getFinerDomain();

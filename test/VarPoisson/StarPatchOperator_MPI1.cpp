@@ -91,18 +91,9 @@ TEST_CASE("Test StarPatchOperator add ghost to RHS")
       }
 
       for (auto pinfo : d_fine.getPatchInfoVector()) {
-        INFO("Patch: " << pinfo.id);
-        INFO("x:     " << pinfo.starts[0]);
-        INFO("y:     " << pinfo.starts[1]);
-        INFO("nx:    " << pinfo.ns[0]);
-        INFO("ny:    " << pinfo.ns[1]);
         ComponentView<double, 2> vec_ld = f_vec.getComponentView(0, pinfo.local_index);
         ComponentView<double, 2> expected_ld = f_expected.getComponentView(0, pinfo.local_index);
-        Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
-          INFO("xi:    " << coord[0]);
-          INFO("yi:    " << coord[1]);
-          REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord]));
-        });
+        Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
       }
     }
   }
@@ -112,7 +103,6 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff")
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH FILE " << mesh_file);
         int num_ghost = 1;
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
         Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -133,17 +123,8 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff")
         p_operator.apply(f_vec, g_vec);
 
         for (auto pinfo : d_fine.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           ComponentView<double, 2> vec_ld = g_vec.getComponentView(0, pinfo.local_index);
-          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) {
-            INFO("xi:    " << coord[0]);
-            INFO("yi:    " << coord[1]);
-            CHECK_EQ(vec_ld[coord] + 1, doctest::Approx(1));
-          });
+          Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { CHECK_EQ(vec_ld[coord] + 1, doctest::Approx(1)); });
         }
       }
     }
@@ -152,7 +133,6 @@ TEST_CASE("Test StarPatchOperator apply on linear lhs constant coeff")
 TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int ns[2] = { 32, 64 };
     int num_ghost = 1;
     double errors[2];
@@ -193,14 +173,12 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence const coeff")
       error_vec.addScaled(1.0, f_vec, -1.0, f_vec_expected);
       errors[i] = error_vec.twoNorm() / f_vec_expected.twoNorm();
     }
-    INFO("Errors: " << errors[0] << ", " << errors[1]);
     CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
   }
 }
 TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int ns[2] = { 32, 64 };
     int num_ghost = 1;
     double errors[2];
@@ -245,14 +223,12 @@ TEST_CASE("Test StarPatchOperator gets 2nd order convergence variable coeff")
       error_vec.addScaled(1.0, f_vec, -1.0, f_vec_expected);
       errors[i] = error_vec.twoNorm() / f_vec_expected.twoNorm();
     }
-    INFO("Errors: " << errors[0] << ", " << errors[1]);
     CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
   }
 }
 TEST_CASE("Test VarPoisson::StarPatchOperator constructor throws exception with no ghost cells")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 0;
 

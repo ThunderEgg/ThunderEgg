@@ -183,7 +183,6 @@ TEST_CASE("Timer to_json empty timer")
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
   nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_EQ(j, nullptr);
 }
 TEST_CASE("Timer to_json unassociated timing")
@@ -193,7 +192,6 @@ TEST_CASE("Timer to_json unassociated timing")
   timer.start("A");
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -214,7 +212,6 @@ TEST_CASE("Timer to_json unassociated timing with single int info")
   timer.addIntInfo("Example", 10);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -243,7 +240,6 @@ TEST_CASE("Timer to_json unassociated timing with two int info calls")
   timer.addIntInfo("Example", 1);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -271,7 +267,6 @@ TEST_CASE("Timer to_json unassociated timing with single double info")
   timer.addDoubleInfo("Example", 10.0);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -300,7 +295,6 @@ TEST_CASE("Timer to_json unassociated timing with two double info calls")
   timer.addDoubleInfo("Example", 1.0);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -329,7 +323,6 @@ TEST_CASE("Timer to_json unassociated timing with two different double info call
   timer.addDoubleInfo("Example2", 1.0);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -363,7 +356,6 @@ TEST_CASE("Timer to_json unassociated timing with two different int info calls")
   timer.addIntInfo("Example2", 1);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -397,7 +389,6 @@ TEST_CASE("Timer to_json unassociated timing with two different int and double i
   timer.addDoubleInfo("Example2", 1.0);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -431,7 +422,6 @@ TEST_CASE("Timer to_json two unassociated timings sequential")
   timer.start("B");
   timer.stop("B");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -459,7 +449,6 @@ TEST_CASE("Timer to_json nested timing")
   timer.stop("B");
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_NE(j, nullptr);
   CHECK_EQ(j.size(), 2);
   CHECK_EQ(j["comm_size"], 1);
@@ -483,7 +472,6 @@ TEST_CASE("Timer to_json domain timing")
   timer.stopDomainTiming(0, "A");
   const nlohmann::json j = timer;
   REQUIRE_NE(j, nullptr);
-  INFO(j.dump(4));
   CHECK_EQ(j.size(), 3);
   CHECK_EQ(j["comm_size"], 1);
   CHECK_UNARY(j["domains"].is_array());
@@ -508,7 +496,6 @@ TEST_CASE("Timer to_json patch timing")
   timer.stopPatchTiming(0, 0, "A");
   const nlohmann::json j = timer;
   REQUIRE_NE(j, nullptr);
-  INFO(j.dump(4));
   CHECK_EQ(j.size(), 3);
   CHECK_EQ(j["comm_size"], 1);
   CHECK_UNARY(j["domains"].is_array());
@@ -532,7 +519,6 @@ TEST_CASE("Timer ostream empty timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "No timings to report"), 1);
 }
 TEST_CASE("Timer ostream unassociated timing")
@@ -544,7 +530,6 @@ TEST_CASE("Timer ostream unassociated timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 1);
   CHECK_EQ(occurrences(s, "average (sec)"), 0);
@@ -562,7 +547,6 @@ TEST_CASE("Timer ostream unassociated timing with single int info")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 1);
   CHECK_EQ(occurrences(s, "average (sec)"), 0);
@@ -585,7 +569,6 @@ TEST_CASE("Timer ostream unassociated timing with two int info")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 1);
   CHECK_EQ(occurrences(s, "average (sec)"), 0);
@@ -608,7 +591,6 @@ TEST_CASE("Timer ostream nested unassociated timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 2);
   CHECK_EQ(occurrences(s, "B"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 2);
@@ -628,7 +610,6 @@ TEST_CASE("Timer ostream sequential unassociated timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 0);
   CHECK_EQ(occurrences(s, "average (sec)"), 1);
@@ -648,7 +629,6 @@ TEST_CASE("Timer ostream sequential patch timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 0);
   CHECK_EQ(occurrences(s, "average (sec)"), 1);
@@ -666,7 +646,6 @@ TEST_CASE("Timer ostream domain timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 1);
   CHECK_EQ(occurrences(s, "average (sec)"), 0);
@@ -687,7 +666,6 @@ TEST_CASE("Timer ostream domain timing two different domains sequential")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 0);
   CHECK_EQ(occurrences(s, "average (sec)"), 1);
@@ -710,7 +688,6 @@ TEST_CASE("Timer ostream domain timing two different domains with information se
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 0);
   CHECK_EQ(occurrences(s, "average (sec)"), 1);
@@ -739,7 +716,6 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 2);
   CHECK_EQ(occurrences(s, "B"), 1);
   CHECK_EQ(occurrences(s, "time (sec)"), 0);
@@ -768,7 +744,6 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested f
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 3);
   CHECK_EQ(occurrences(s, "B"), 1);
   CHECK_EQ(occurrences(s, "C"), 1);
@@ -798,7 +773,6 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested s
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   CHECK_EQ(occurrences(s, "A"), 3);
   CHECK_EQ(occurrences(s, "B"), 1);
   CHECK_EQ(occurrences(s, "C"), 1);

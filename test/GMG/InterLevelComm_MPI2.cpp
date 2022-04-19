@@ -37,15 +37,11 @@ TEST_CASE("InterLevelComm Check number of local and ghost parents")
     for (auto nx : { 2 }) {
       for (auto ny : { 2 }) {
         for (std::string construction_type : { "direct", "copy", "copy_assign" }) {
-          INFO("MESH FILE " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
-          INFO("d_fine: " << d_fine.getNumLocalPatches());
-          INFO("d_coarse: " << d_coarse.getNumLocalPatches());
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -62,7 +58,6 @@ TEST_CASE("InterLevelComm Check number of local and ghost parents")
 
           int rank;
           MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-          INFO("RANK " << rank);
           size_t num_ghost_parents = 0;
           size_t num_local_parents = 0;
           map<int, set<int>> my_local_parents_to_children;
@@ -87,15 +82,11 @@ TEST_CASE("InterLevelComm Check that parents have unique local indexes")
     for (auto nx : { 2 }) {
       for (auto ny : { 2 }) {
         for (std::string construction_type : { "direct", "copy", "copy_assign" }) {
-          INFO("MESH FILE " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
-          INFO("d_fine: " << d_fine.getNumLocalPatches());
-          INFO("d_coarse: " << d_coarse.getNumLocalPatches());
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -112,7 +103,6 @@ TEST_CASE("InterLevelComm Check that parents have unique local indexes")
 
           int rank;
           MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-          INFO("RANK " << rank);
 
           map<int, set<int>> local_index_id_map;
           for (auto pair : ilc->getPatchesWithLocalParent()) {
@@ -140,15 +130,11 @@ TEST_CASE("InterLevelComm Check that getPatches points to correct patches")
     for (auto nx : { 2 }) {
       for (auto ny : { 2 }) {
         for (std::string construction_type : { "direct", "copy", "copy_assign" }) {
-          INFO("MESH FILE " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
-          INFO("d_fine: " << d_fine.getNumLocalPatches());
-          INFO("d_coarse: " << d_coarse.getNumLocalPatches());
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -165,7 +151,6 @@ TEST_CASE("InterLevelComm Check that getPatches points to correct patches")
 
           int rank;
           MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-          INFO("RANK " << rank);
 
           for (auto pair : ilc->getPatchesWithLocalParent()) {
             CHECK_EQ(&pair.second.get(), &ilc->getFinerDomain().getPatchInfoVector().at(pair.second.get().local_index));
@@ -191,7 +176,6 @@ TEST_CASE("InterLevelComm 2-processor getNewGhostVector on uniform quad")
             Domain<2> d_fine = domain_reader.getFinerDomain();
             Domain<2> d_coarse = domain_reader.getCoarserDomain();
             GMG::InterLevelComm<2>* ilc = nullptr;
-            INFO("construction_type: " << construction_type);
             if (construction_type == "direct") {
               // direct construction
               ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -235,7 +219,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches on uniform quad")
             Domain<2> d_fine = domain_reader.getFinerDomain();
             Domain<2> d_coarse = domain_reader.getCoarserDomain();
             GMG::InterLevelComm<2>* ilc = nullptr;
-            INFO("construction_type: " << construction_type);
             if (construction_type == "direct") {
               // direct construction
               ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -258,9 +241,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches on uniform quad")
             MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
             // info
-            INFO("nx: " << nx);
-            INFO("ny: " << ny);
-            INFO("rank: " << rank);
 
             // fill vectors with rank+c+1
             for (int i = 0; i < coarse_vec.getNumLocalPatches(); i++) {
@@ -300,7 +280,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sta
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -339,7 +318,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sta
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -380,7 +358,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sta
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -421,7 +398,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sta
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -461,7 +437,6 @@ TEST_CASE("2-processor sendGhostPatches throws exception when start is called tw
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -501,7 +476,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when get
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -541,7 +515,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches throws exception when sne
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -580,7 +553,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches on uniform quad")
             Domain<2> d_fine = domain_reader.getFinerDomain();
             Domain<2> d_coarse = domain_reader.getCoarserDomain();
             GMG::InterLevelComm<2>* ilc = nullptr;
-            INFO("construction_type: " << construction_type);
             if (construction_type == "direct") {
               // direct construction
               ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -640,7 +612,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -678,7 +649,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -718,7 +688,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -758,7 +727,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -799,7 +767,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when star
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -838,7 +805,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when send
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -877,7 +843,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when get 
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -916,7 +881,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when send
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -955,7 +919,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when get 
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -995,7 +958,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when send
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -1036,7 +998,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches throws exception when get 
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -1076,7 +1037,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches called twice on uniform qu
             Domain<2> d_fine = domain_reader.getFinerDomain();
             Domain<2> d_coarse = domain_reader.getCoarserDomain();
             GMG::InterLevelComm<2>* ilc = nullptr;
-            INFO("construction_type: " << construction_type);
             if (construction_type == "direct") {
               // direct construction
               ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -1095,7 +1055,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches called twice on uniform qu
             MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
             for (int i = 0; i < 2; i++) {
-              INFO("Call" << i);
               Vector<2> coarse_vec(d_coarse, num_components);
 
               Vector<2> ghost_vec = ilc->getNewGhostVector(num_components);
@@ -1138,7 +1097,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches called twice on uniform q
             Domain<2> d_fine = domain_reader.getFinerDomain();
             Domain<2> d_coarse = domain_reader.getCoarserDomain();
             GMG::InterLevelComm<2>* ilc = nullptr;
-            INFO("construction_type: " << construction_type);
             if (construction_type == "direct") {
               // direct construction
               ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -1199,7 +1157,6 @@ TEST_CASE("InterLevelComm 2-processor sendGhostPatches then getGhostPaches calle
             Domain<2> d_fine = domain_reader.getFinerDomain();
             Domain<2> d_coarse = domain_reader.getCoarserDomain();
             GMG::InterLevelComm<2>* ilc = nullptr;
-            INFO("construction_type: " << construction_type);
             if (construction_type == "direct") {
               // direct construction
               ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -1276,7 +1233,6 @@ TEST_CASE("InterLevelComm 2-processor getGhostPatches then sendGhostPaches calle
             Domain<2> d_fine = domain_reader.getFinerDomain();
             Domain<2> d_coarse = domain_reader.getCoarserDomain();
             GMG::InterLevelComm<2>* ilc = nullptr;
-            INFO("construction_type: " << construction_type);
             if (construction_type == "direct") {
               // direct construction
               ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);

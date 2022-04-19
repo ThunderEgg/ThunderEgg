@@ -243,15 +243,9 @@ TEST_CASE("P8estDomainGenerator 4x4x4 Uniform neighbor nfos")
   Domain<3> domain_1 = dg.getCoarserDomain();
   Domain<3> domain_0 = dg.getCoarserDomain();
 
-  INFO("Checking domain 0 neighbors");
-
   CheckRootDomainNeighbors(domain_0);
 
-  INFO("Checking domain 1 neighbors");
-
   Check2x2x2DomainNeighbors(domain_1);
-
-  INFO("Checking domain 2 neighbors");
 
   Check4x4x4DomainNeighbors(domain_2);
 }
@@ -536,19 +530,11 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw neighbor nfos")
   Domain<3> domain_1 = dg.getCoarserDomain();
   Domain<3> domain_0 = dg.getCoarserDomain();
 
-  INFO("Checking domain 0 neighbors");
-
   CheckRootDomainNeighbors(domain_0);
-
-  INFO("Checking domain 1 neighbors");
 
   Check2x2x2DomainNeighbors(domain_1);
 
-  INFO("Checking domain 2 neighbors");
-
   Check4x4x4DomainNeighbors(domain_2);
-
-  INFO("Checking domain 3 neighbors");
 
   Check4x4x4RefinedBSWDomainNeighbors(domain_3);
 }
@@ -798,15 +784,9 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw neighbor nfos")
   Domain<3> domain_1 = dg.getCoarserDomain();
   Domain<3> domain_0 = dg.getCoarserDomain();
 
-  INFO("Checking domain 0 neighbors");
-
   CheckRootDomainNeighbors(domain_0);
 
-  INFO("Checking domain 1 neighbors");
-
   Check2x2x2DomainNeighbors(domain_1);
-
-  INFO("Checking domain 2 neighbors");
 
   Check2x2x2RefinedBSWDomainNeighbors(domain_2);
 }

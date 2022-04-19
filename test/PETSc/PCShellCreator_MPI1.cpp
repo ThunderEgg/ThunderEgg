@@ -44,7 +44,6 @@ public:
 TEST_CASE("PETSc::PCShellCreator works with 0.5I")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 0;
     DomainReader<2> domain_reader(mesh_file, { n, n }, num_ghost);
@@ -86,7 +85,6 @@ TEST_CASE("PETSc::PCShellCreator works with 0.5I")
 TEST_CASE("PETSc::PCShellCreator works with 0.5I and two components")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 0;
     DomainReader<2> domain_reader(mesh_file, { n, n }, num_ghost);

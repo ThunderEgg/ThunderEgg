@@ -71,12 +71,6 @@ TEST_CASE("P4estDomainGenerator 2x2 Uniform")
             p4est_refine(
               p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
 
-            INFO("nx: " << nx);
-            INFO("ny: " << ny);
-            INFO("scale_x: " << scale_x);
-            INFO("scale_x: " << scale_y);
-            INFO("num_ghost_cells: " << num_ghost_cells);
-
             P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y, double& x, double& y) {
               x = scale_x * unit_x;
               y = scale_y * unit_y;
@@ -376,12 +370,6 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
               p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
             p4est_refine(
               p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return (quadrant->x == 0 && quadrant->y == 0); }, nullptr);
-
-            INFO("nx: " << nx);
-            INFO("ny: " << ny);
-            INFO("scale_x: " << scale_x);
-            INFO("scale_x: " << scale_y);
-            INFO("num_ghost_cells: " << num_ghost_cells);
 
             P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y, double& x, double& y) {
               x = scale_x * unit_x;

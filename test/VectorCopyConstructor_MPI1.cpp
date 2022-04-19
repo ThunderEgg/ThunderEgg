@@ -42,10 +42,6 @@ TEST_CASE("Vector<2> copy from domain constructor")
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             Vector<2> vec_to_copy(domain, num_components);
 
             double* view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
@@ -71,9 +67,7 @@ TEST_CASE("Vector<2> copy from domain constructor")
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             CHECK_NE(view, view_to_copy);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -83,9 +77,7 @@ TEST_CASE("Vector<2> copy from domain constructor")
             const Vector<2>& const_vec = vec;
 
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -114,10 +106,6 @@ TEST_CASE("Vector<2> copy from managed constructor")
             int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
             int patch_stride = component_stride * num_components;
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             Vector<2> vec_to_copy(comm, { nx, ny }, num_components, num_local_patches, num_ghost_cells);
 
             double* view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
@@ -143,9 +131,7 @@ TEST_CASE("Vector<2> copy from managed constructor")
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             CHECK_NE(view, view_to_copy);
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -155,9 +141,7 @@ TEST_CASE("Vector<2> copy from managed constructor")
             const Vector<2>& const_vec = vec;
 
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -185,10 +169,6 @@ TEST_CASE("Vector<2> copy from unmanaged constructor")
 
             int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
             int patch_stride = component_stride * num_components;
-
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
 
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
@@ -222,9 +202,7 @@ TEST_CASE("Vector<2> copy from unmanaged constructor")
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             CHECK_NE(view, view_to_copy);
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -234,9 +212,7 @@ TEST_CASE("Vector<2> copy from unmanaged constructor")
             const Vector<2>& const_vec = vec;
 
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -267,10 +243,6 @@ TEST_CASE("Vector<2> copy assign from domain constructor")
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             Vector<2> vec_to_copy(domain, num_components);
 
             double* view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
@@ -297,9 +269,7 @@ TEST_CASE("Vector<2> copy assign from domain constructor")
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             CHECK_NE(view, view_to_copy);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -309,9 +279,7 @@ TEST_CASE("Vector<2> copy assign from domain constructor")
             const Vector<2>& const_vec = vec;
 
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -340,10 +308,6 @@ TEST_CASE("Vector<2> copy assign from managed constructor")
             int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
             int patch_stride = component_stride * num_components;
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             Vector<2> vec_to_copy(comm, { nx, ny }, num_components, num_local_patches, num_ghost_cells);
 
             double* view_to_copy = &vec_to_copy.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
@@ -370,9 +334,7 @@ TEST_CASE("Vector<2> copy assign from managed constructor")
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             CHECK_NE(view, view_to_copy);
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -382,9 +344,7 @@ TEST_CASE("Vector<2> copy assign from managed constructor")
             const Vector<2>& const_vec = vec;
 
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -412,10 +372,6 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor")
 
             int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
             int patch_stride = component_stride * num_components;
-
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
 
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
@@ -450,9 +406,7 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor")
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             CHECK_NE(view, view_to_copy);
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -462,9 +416,7 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor")
             const Vector<2>& const_vec = vec;
 
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = const_vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);

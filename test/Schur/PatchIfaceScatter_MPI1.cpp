@@ -41,9 +41,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> throws exception for non-square patches")
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 5, 7 }) {
       for (auto ny : { 6, 8 }) {
-        INFO("MESH: " << mesh_file);
-        INFO("NX: " << nx);
-        INFO("NY: " << ny);
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, 0);
         auto domain = domain_reader.getFinerDomain();
         Schur::InterfaceDomain<2> iface_domain(domain);
@@ -58,8 +55,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatterFinish throws exception when calle
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("N" << n);
 
       DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
       auto domain = domain_reader.getFinerDomain();
@@ -81,8 +76,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatterFinish throws exception when calle
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("N" << n);
 
       DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
       auto domain = domain_reader.getFinerDomain();
@@ -104,8 +97,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatterFinish throws exception when calle
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("N" << n);
 
       DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
       auto domain = domain_reader.getFinerDomain();
@@ -133,8 +124,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vecto
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("N" << n);
 
       DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
       auto domain = domain_reader.getFinerDomain();
@@ -153,8 +142,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> getNewLocalPatchIfaceVector returns vecto
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("N" << n);
 
       DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
       auto domain = domain_reader.getFinerDomain();
@@ -181,8 +168,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("N" << n);
 
       DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
       auto domain = domain_reader.getFinerDomain();
@@ -200,7 +185,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter local interfaces are copied")
       }
       auto state = scatter.scatterStart(global_vector, *local_vector);
       for (auto iface : iface_domain.getInterfaces()) {
-        INFO("IFACE_ID: " << iface->id);
         auto local_data = local_vector->getComponentView(0, iface->local_index);
         Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK_EQ(local_data[coord], doctest::Approx(iface->global_index + 1 + coord[0])); });
       }
@@ -211,8 +195,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("N" << n);
 
       DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
       auto domain = domain_reader.getFinerDomain();
@@ -231,10 +213,8 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter")
       auto state = scatter.scatterStart(global_vector, *local_vector);
       scatter.scatterFinish(state, global_vector, *local_vector);
       for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
-        INFO("PATCH_ID: " << piinfo->pinfo.id);
         for (Side<2> s : Side<2>::getValues()) {
           if (piinfo->pinfo.hasNbr(s)) {
-            INFO("Side: " << s);
             auto iface_info = piinfo->getIfaceInfo(s);
             auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
             Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK_EQ(local_data[coord], doctest::Approx(iface_info->global_index + 1 + coord[0])); });
@@ -248,8 +228,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice")
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("N" << n);
 
       DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
       auto domain = domain_reader.getFinerDomain();
@@ -270,10 +248,8 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter twice")
       state = scatter.scatterStart(global_vector, *local_vector);
       scatter.scatterFinish(state, global_vector, *local_vector);
       for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
-        INFO("PATCH_ID: " << piinfo->pinfo.id);
         for (Side<2> s : Side<2>::getValues()) {
           if (piinfo->pinfo.hasNbr(s)) {
-            INFO("Side: " << s);
             auto iface_info = piinfo->getIfaceInfo(s);
             auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
             Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK_EQ(local_data[coord], doctest::Approx(iface_info->global_index + 1 + coord[0])); });
@@ -287,8 +263,6 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled"
 {
   for (auto mesh_file : { MESHES }) {
     for (auto n : { 5, 10 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("N" << n);
 
       DomainReader<2> domain_reader(mesh_file, { n, n }, 0);
       auto domain = domain_reader.getFinerDomain();
@@ -308,10 +282,8 @@ TEST_CASE("Schur::PatchIfaceScatter<2> scatter with local vector already filled"
       auto state = scatter.scatterStart(global_vector, *local_vector);
       scatter.scatterFinish(state, global_vector, *local_vector);
       for (auto piinfo : iface_domain.getPatchIfaceInfos()) {
-        INFO("PATCH_ID: " << piinfo->pinfo.id);
         for (Side<2> s : Side<2>::getValues()) {
           if (piinfo->pinfo.hasNbr(s)) {
-            INFO("Side: " << s);
             auto iface_info = piinfo->getIfaceInfo(s);
             auto local_data = local_vector->getComponentView(0, iface_info->patch_local_index);
             Loop::Nested<1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, 1>& coord) { CHECK_EQ(local_data[coord], doctest::Approx(iface_info->global_index + 1 + coord[0])); });

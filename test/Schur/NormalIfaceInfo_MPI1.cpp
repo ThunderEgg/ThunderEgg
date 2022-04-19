@@ -44,7 +44,6 @@ TEST_CASE("Schur::NormalIfaceInfo constructor")
     pinfo.setNbrInfo(s, new NormalNbrInfo<1>(nbr_id));
     pinfo.getNormalNbrInfo(s).rank = 1;
     Schur::NormalIfaceInfo<2> iface_info(pinfo, s);
-    INFO("Side: " << s);
     if (s.isHigherOnAxis()) {
       // check that iface belongs to this
       CHECK_EQ(iface_info.rank, 0);

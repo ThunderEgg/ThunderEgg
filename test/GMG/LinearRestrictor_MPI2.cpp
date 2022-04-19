@@ -56,11 +56,6 @@ TEST_CASE("Linear Test LinearRestrictor")
       Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
       for (auto pinfo : d_coarse.getPatchInfoVector()) {
-        INFO("Patch: " << pinfo.id);
-        INFO("x:     " << pinfo.starts[0]);
-        INFO("y:     " << pinfo.starts[1]);
-        INFO("nx:    " << pinfo.ns[0]);
-        INFO("ny:    " << pinfo.ns[1]);
         ComponentView<double, 2> vec_ld = coarse_vec.getComponentView(0, pinfo.local_index);
         ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
         Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
@@ -68,11 +63,7 @@ TEST_CASE("Linear Test LinearRestrictor")
           View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
           View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
           if (!pinfo.hasNbr(s)) {
-            INFO("side:      " << s);
-            Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-              INFO("coord:  " << coord[0]);
-              CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
-            });
+            Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord])); });
           }
         }
       }

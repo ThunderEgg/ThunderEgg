@@ -38,7 +38,6 @@ TEST_CASE("Check PatchOperator calls for various domains")
       for (auto ny : { 2, 5 }) {
         for (auto u_num_components : { 1, 2, 3 }) {
           for (auto f_num_components : { 1, 2, 3 }) {
-            INFO("MESH: " << mesh_file);
             int num_ghost = 1;
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
             Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -65,7 +64,6 @@ TEST_CASE("PatchOperator check getDomain")
     for (auto num_components : { 1, 2, 3 }) {
       for (auto nx : { 2, 5 }) {
         for (auto ny : { 2, 5 }) {
-          INFO("MESH: " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -88,7 +86,6 @@ TEST_CASE("PatchOperator check getGhostFiller")
     for (auto num_components : { 1, 2, 3 }) {
       for (auto nx : { 2, 5 }) {
         for (auto ny : { 2, 5 }) {
-          INFO("MESH: " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();

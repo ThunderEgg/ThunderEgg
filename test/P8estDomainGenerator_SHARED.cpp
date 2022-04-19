@@ -262,7 +262,6 @@ CheckParentAndChildIdsAndRanksRefined(const ThunderEgg::Domain<3>& coarser_domai
   //
   if (rank == 0) {
     int n = 0b1 << finer_max_level;
-    INFO("N: " << n);
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {
         for (int k = 0; k < n; k++) {
@@ -270,8 +269,6 @@ CheckParentAndChildIdsAndRanksRefined(const ThunderEgg::Domain<3>& coarser_domai
             string child_str = getString(finer_max_level, i, j, k);
             string parent_str = child_str.substr(0, std::max<int>((int)child_str.size() - 4, 0));
 
-            INFO("Child Patch: " << child_str);
-            INFO("Praent Patch: " << parent_str);
             const PatchInfo<3>* child_patch = finer_pvector[child_str];
             const PatchInfo<3>* parent_patch = coarser_pvector[parent_str];
 
@@ -287,7 +284,6 @@ CheckParentAndChildIdsAndRanksRefined(const ThunderEgg::Domain<3>& coarser_domai
             string child_str = getString(finer_max_level, i, j, k);
             string parent_str = child_str.substr(0, std::max<int>((int)child_str.size() - 4, 0));
 
-            INFO("Patch: " << parent_str);
             const PatchInfo<3>* child_patch = finer_pvector[parent_str];
             const PatchInfo<3>* parent_patch = coarser_pvector[parent_str];
 

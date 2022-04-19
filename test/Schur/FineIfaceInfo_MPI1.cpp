@@ -44,7 +44,6 @@ TEST_CASE("Schur::FineIfaceInfo constructor")
     pinfo.getFineNbrInfo(s).ranks[0] = 1;
     pinfo.getFineNbrInfo(s).ranks[1] = 2;
     Schur::FineIfaceInfo<2> iface_info(pinfo, s);
-    INFO("Side: " << s);
     CHECK_EQ(iface_info.rank, 0);
     CHECK_EQ(iface_info.fine_ranks[0], 1);
     CHECK_EQ(iface_info.fine_ranks[1], 2);

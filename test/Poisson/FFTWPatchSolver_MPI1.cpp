@@ -38,14 +38,10 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence")
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 10, 13 }) {
       for (auto ny : { 10, 13 }) {
-        INFO("MESH FILE " << mesh_file);
-        INFO("NX        " << nx);
-        INFO("NY        " << ny);
         int num_ghost = 1;
         bitset<4> neumann;
         double errors[2];
         for (int i = 1; i <= 2; i++) {
-          INFO("MULT      " << i);
           DomainReader<2> domain_reader(mesh_file, { i * nx, i * ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
 
@@ -79,7 +75,6 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence")
           error_vec.addScaled(1.0, g_vec, -1.0, g_vec_expected);
           errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
         }
-        INFO("Errors: " << errors[0] << ", " << errors[1]);
         CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
       }
     }
@@ -90,14 +85,10 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
   for (auto mesh_file : { MESHES }) {
     for (auto nx : { 10, 13 }) {
       for (auto ny : { 10, 13 }) {
-        INFO("MESH FILE " << mesh_file);
-        INFO("NX        " << nx);
-        INFO("NY        " << ny);
         int num_ghost = 1;
         bitset<4> neumann = 0xF;
         double errors[2];
         for (int i = 1; i <= 2; i++) {
-          INFO("MULT      " << i);
           DomainReader<2> domain_reader(mesh_file, { i * nx, i * ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
 
@@ -143,7 +134,6 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
           error_vec.addScaled(1.0, g_vec, -1.0, g_vec_expected);
           errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
         }
-        INFO("Errors: " << errors[0] << ", " << errors[1]);
         CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
       }
     }
@@ -154,14 +144,10 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
   for (auto nx : { 10, 13 }) {
     for (auto ny : { 10, 13 }) {
       auto mesh_file = "mesh_inputs/2d_uniform_2x2_mpi1.json";
-      INFO("MESH FILE " << mesh_file);
-      INFO("NX        " << nx);
-      INFO("NY        " << ny);
       int num_ghost = 1;
       bitset<4> neumann = 0xF;
       double errors[2];
       for (int i = 1; i <= 2; i++) {
-        INFO("MULT      " << i);
         DomainReader<2> domain_reader(mesh_file, { i * nx, i * ny }, num_ghost);
         Domain<2> d_fine = domain_reader.getCoarserDomain();
 
@@ -207,7 +193,6 @@ TEST_CASE("Test Poisson::FFTWPatchSolver gets 2nd order convergence with neumann
         error_vec.addScaled(1.0, g_vec, -1.0, g_vec_expected);
         errors[i - 1] = error_vec.twoNorm() / g_vec_expected.twoNorm();
       }
-      INFO("Errors: " << errors[0] << ", " << errors[1]);
       CHECK_GT(log(errors[0] / errors[1]) / log(2), 1.8);
     }
   }

@@ -35,8 +35,6 @@ TEST_CASE("3-processor InterLevelComm GetPatches on uniform quad")
       DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
       Domain<2> d_fine = domain_reader.getFinerDomain();
       Domain<2> d_coarse = domain_reader.getCoarserDomain();
-      INFO("d_fine: " << d_fine.getNumLocalPatches());
-      INFO("d_coarse: " << d_coarse.getNumLocalPatches());
       GMG::InterLevelComm<2> ilc(d_coarse, d_fine);
 
       int rank;
@@ -144,9 +142,6 @@ TEST_CASE("3-processor sendGhostPatches on uniform quad")
           PatchView<double, 2> local_view = coarse_vec.getPatchView(0);
           Loop::OverAllIndexes<3>(local_view, [&](const std::array<int, 3>& coord) {
             for (int c = 0; c < num_components; c++) {
-              INFO("xi: " << coord[0]);
-              INFO("yi: " << coord[1]);
-              INFO("c " << coord[2]);
               CHECK_EQ(local_view[coord], 1 + 2 + 3 + 3 * coord[2]);
             }
           });

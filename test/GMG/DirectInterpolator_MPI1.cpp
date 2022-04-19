@@ -68,11 +68,6 @@ TEST_CASE("Test DirectInterpolator on uniform 4x4")
         interpolator.interpolate(coarse_vec, fine_vec);
 
         for (auto pinfo : d_fine.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("c:     " << pinfo.ns[1]);
           PatchView<double, 2> vec_view = fine_vec.getPatchView(pinfo.local_index);
           PatchView<double, 2> expected_view = fine_expected.getPatchView(pinfo.local_index);
           Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_view[coord], doctest::Approx(expected_view[coord])); });
@@ -121,11 +116,6 @@ TEST_CASE("Linear Test DirectInterpolator with values already set on uniform 4x4
         interpolator.interpolate(coarse_vec, fine_vec);
 
         for (auto pinfo : d_fine.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           PatchView<double, 2> vec_view = fine_vec.getPatchView(pinfo.local_index);
           PatchView<double, 2> expected_view = fine_expected.getPatchView(pinfo.local_index);
           Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_view[coord], doctest::Approx(expected_view[coord])); });
@@ -176,11 +166,6 @@ TEST_CASE("Test DirectInterpolator on refined 2x2")
         interpolator.interpolate(coarse_vec, fine_vec);
 
         for (auto pinfo : d_fine.getPatchInfoVector()) {
-          INFO("Patch: " << pinfo.id);
-          INFO("x:     " << pinfo.starts[0]);
-          INFO("y:     " << pinfo.starts[1]);
-          INFO("nx:    " << pinfo.ns[0]);
-          INFO("ny:    " << pinfo.ns[1]);
           PatchView<double, 2> vec_view = fine_vec.getPatchView(pinfo.local_index);
           PatchView<double, 2> expected_view = fine_expected.getPatchView(pinfo.local_index);
           Loop::OverInteriorIndexes<3>(vec_view, [&](const array<int, 3>& coord) { REQUIRE_EQ(vec_view[coord], doctest::Approx(expected_view[coord])); });

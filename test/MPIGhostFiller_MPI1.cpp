@@ -64,7 +64,6 @@ TEST_CASE("Calls for various domains 2d face cases")
     for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
       for (auto nx : { 2, 3 }) {
         for (auto ny : { 2, 3 }) {
-          INFO("MESH: " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -89,7 +88,6 @@ TEST_CASE("Calls for various domains 2d corner cases")
     for (auto mesh_file : { single_mesh_file, refined_mesh_file, cross_mesh_file }) {
       for (auto nx : { 2, 3 }) {
         for (auto ny : { 2, 3 }) {
-          INFO("MESH: " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -115,7 +113,6 @@ TEST_CASE("Calls for various domains 3d face cases")
       for (auto nx : { 2, 3 }) {
         for (auto ny : { 2, 3 }) {
           for (auto nz : { 2, 3 }) {
-            INFO("MESH: " << mesh_file);
             int num_ghost = 1;
             DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
             Domain<3> d_fine = domain_reader.getFinerDomain();
@@ -142,7 +139,6 @@ TEST_CASE("Calls for various domains 3d edge cases")
       for (auto nx : { 2, 3 }) {
         for (auto ny : { 2, 3 }) {
           for (auto nz : { 2, 3 }) {
-            INFO("MESH: " << mesh_file);
             int num_ghost = 1;
             DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
             Domain<3> d_fine = domain_reader.getFinerDomain();
@@ -169,7 +165,6 @@ TEST_CASE("Calls for various domains 3d corner cases")
       for (auto nx : { 2, 3 }) {
         for (auto ny : { 2, 3 }) {
           for (auto nz : { 2, 3 }) {
-            INFO("MESH: " << mesh_file);
             int num_ghost = 1;
             DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
             Domain<3> d_fine = domain_reader.getFinerDomain();
@@ -196,7 +191,6 @@ TEST_CASE("Exchange for various domains 2d face cases")
       for (auto nx : { 2, 3 }) {
         for (auto ny : { 2, 3 }) {
           for (int num_ghost : { 1, 2 }) {
-            INFO("MESH: " << mesh_file);
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
             Domain<2> d_fine = domain_reader.getFinerDomain();
 
@@ -227,7 +221,6 @@ TEST_CASE("Exchange for various domains 2d corner cases")
       for (auto nx : { 2, 3 }) {
         for (auto ny : { 2, 3 }) {
           for (int num_ghost : { 1, 2 }) {
-            INFO("MESH: " << mesh_file);
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
             Domain<2> d_fine = domain_reader.getFinerDomain();
 
@@ -259,7 +252,6 @@ TEST_CASE("Exchange for various domains 3d face cases")
         for (auto ny : { 2, 3 }) {
           for (auto nz : { 2, 3 }) {
             for (int num_ghost : { 1, 2 }) {
-              INFO("MESH: " << mesh_file);
               DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
               Domain<3> d_fine = domain_reader.getFinerDomain();
 
@@ -291,7 +283,6 @@ TEST_CASE("Exchange for various domains 3d edge cases")
         for (auto ny : { 2, 3 }) {
           for (auto nz : { 2, 3 }) {
             for (int num_ghost : { 1, 2 }) {
-              INFO("MESH: " << mesh_file);
               DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
               Domain<3> d_fine = domain_reader.getFinerDomain();
 
@@ -323,7 +314,6 @@ TEST_CASE("Exchange for various domains 3d corner cases")
         for (auto ny : { 2, 3 }) {
           for (auto nz : { 2, 3 }) {
             for (int num_ghost : { 1, 2 }) {
-              INFO("MESH: " << mesh_file);
               DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
               Domain<3> d_fine = domain_reader.getFinerDomain();
 
@@ -355,7 +345,6 @@ TEST_CASE("Two Exchanges for various domains 2d face cases")
       for (auto nx : { 2, 3 }) {
         for (auto ny : { 2, 3 }) {
           for (int num_ghost : { 1, 2 }) {
-            INFO("MESH: " << mesh_file);
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
             Domain<2> d_fine = domain_reader.getFinerDomain();
 
@@ -386,7 +375,6 @@ TEST_CASE("Two Exchanges for various domains 2d corner cases")
       for (auto nx : { 2, 3 }) {
         for (auto ny : { 2, 3 }) {
           for (int num_ghost : { 1, 2 }) {
-            INFO("MESH: " << mesh_file);
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
             Domain<2> d_fine = domain_reader.getFinerDomain();
 
@@ -418,7 +406,6 @@ TEST_CASE("Two Exchange for various domains 3d face cases")
         for (auto ny : { 2, 3 }) {
           for (auto nz : { 2, 3 }) {
             for (int num_ghost : { 1, 2 }) {
-              INFO("MESH: " << mesh_file);
               DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
               Domain<3> d_fine = domain_reader.getFinerDomain();
 
@@ -451,7 +438,6 @@ TEST_CASE("Two Exchange for various domains 3d edge cases")
         for (auto ny : { 2, 3 }) {
           for (auto nz : { 2, 3 }) {
             for (int num_ghost : { 1, 2 }) {
-              INFO("MESH: " << mesh_file);
               DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
               Domain<3> d_fine = domain_reader.getFinerDomain();
 
@@ -484,7 +470,6 @@ TEST_CASE("Two Exchange for various domains 3d corner cases")
         for (auto ny : { 2, 3 }) {
           for (auto nz : { 2, 3 }) {
             for (int num_ghost : { 1, 2 }) {
-              INFO("MESH: " << mesh_file);
               DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
               Domain<3> d_fine = domain_reader.getFinerDomain();
 

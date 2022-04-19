@@ -33,10 +33,6 @@ TEST_CASE("Vector<1> getNumGhostCells unmanaged constructor")
         for (int num_local_patches : { 1, 13 }) {
           Communicator comm(MPI_COMM_WORLD);
 
-          INFO("num_ghost_cells:   " << num_ghost_cells);
-          INFO("nx:                " << nx);
-          INFO("num_local_patches: " << num_local_patches);
-
           array<int, 2> lengths = { nx, num_components };
           array<int, 2> strides = { 1, nx + 2 * num_ghost_cells };
           int patch_stride = (nx + 2 * num_ghost_cells) * num_components;
@@ -60,10 +56,6 @@ TEST_CASE("Vector<1> getMPIComm unmanaged constructor")
       for (int nx : { 1, 4, 5 }) {
         for (int num_local_patches : { 1, 13 }) {
           Communicator comm(MPI_COMM_WORLD);
-
-          INFO("num_ghost_cells:   " << num_ghost_cells);
-          INFO("nx:                " << nx);
-          INFO("num_local_patches: " << num_local_patches);
 
           array<int, 2> lengths = { nx, num_components };
           array<int, 2> strides = { 1, nx + 2 * num_ghost_cells };
@@ -92,10 +84,6 @@ TEST_CASE("Vector<1> getNumLocalPatches unmanaged constructor")
         for (int num_local_patches : { 1, 13 }) {
           Communicator comm(MPI_COMM_WORLD);
 
-          INFO("num_ghost_cells:   " << num_ghost_cells);
-          INFO("nx:                " << nx);
-          INFO("num_local_patches: " << num_local_patches);
-
           array<int, 2> lengths = { nx, num_components };
           array<int, 2> strides = { 1, nx + 2 * num_ghost_cells };
           int patch_stride = (nx + 2 * num_ghost_cells) * num_components;
@@ -120,10 +108,6 @@ TEST_CASE("Vector<1> getNumComponents unmanaged constructor")
         for (int num_local_patches : { 1, 13 }) {
           Communicator comm(MPI_COMM_WORLD);
 
-          INFO("num_ghost_cells:   " << num_ghost_cells);
-          INFO("nx:                " << nx);
-          INFO("num_local_patches: " << num_local_patches);
-
           array<int, 2> lengths = { nx, num_components };
           array<int, 2> strides = { 1, nx + 2 * num_ghost_cells };
           int patch_stride = (nx + 2 * num_ghost_cells) * num_components;
@@ -147,10 +131,6 @@ TEST_CASE("Vector<1> getNumLocalCells unmanaged constructor")
       for (int nx : { 1, 4, 5 }) {
         for (int num_local_patches : { 1, 13 }) {
           Communicator comm(MPI_COMM_WORLD);
-
-          INFO("num_ghost_cells:   " << num_ghost_cells);
-          INFO("nx:                " << nx);
-          INFO("num_local_patches: " << num_local_patches);
 
           array<int, 2> lengths = { nx, num_components };
           array<int, 2> strides = { 1, nx + 2 * num_ghost_cells };
@@ -177,11 +157,6 @@ TEST_CASE("Vector<2> getNumGhostCells unmanaged constructor")
           for (int num_local_patches : { 1, 13 }) {
             Communicator comm(MPI_COMM_WORLD);
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-            INFO("num_local_patches: " << num_local_patches);
-
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
             int patch_stride = (ny + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * num_components;
@@ -207,11 +182,6 @@ TEST_CASE("Vector<2> getMPIComm unmanaged constructor")
         for (int ny : { 1, 4, 5 }) {
           for (int num_local_patches : { 1, 13 }) {
             Communicator comm(MPI_COMM_WORLD);
-
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-            INFO("num_local_patches: " << num_local_patches);
 
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
@@ -242,11 +212,6 @@ TEST_CASE("Vector<2> getNumLocalPatches unmanaged constructor")
           for (int num_local_patches : { 1, 13 }) {
             Communicator comm(MPI_COMM_WORLD);
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-            INFO("num_local_patches: " << num_local_patches);
-
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
             int patch_stride = (ny + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * num_components;
@@ -273,11 +238,6 @@ TEST_CASE("Vector<2> getNumComponents unmanaged constructor")
           for (int num_local_patches : { 1, 13 }) {
             Communicator comm(MPI_COMM_WORLD);
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-            INFO("num_local_patches: " << num_local_patches);
-
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
             int patch_stride = (ny + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * num_components;
@@ -303,11 +263,6 @@ TEST_CASE("Vector<2> getNumLocalCells unmanaged constructor")
         for (int ny : { 1, 4, 5 }) {
           for (int num_local_patches : { 1, 13 }) {
             Communicator comm(MPI_COMM_WORLD);
-
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-            INFO("num_local_patches: " << num_local_patches);
 
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
@@ -336,12 +291,6 @@ TEST_CASE("Vector<3> getNumGhostCells unmanaged constructor")
             for (int num_local_patches : { 1, 13 }) {
               Communicator comm(MPI_COMM_WORLD);
 
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-
               array<int, 4> lengths = { nx, ny, nz, num_components };
               array<int, 4> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
               int patch_stride = (nz + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * num_components;
@@ -369,12 +318,6 @@ TEST_CASE("Vector<3> getMPIComm unmanaged constructor")
           for (int nz : { 1, 4, 5 }) {
             for (int num_local_patches : { 1, 13 }) {
               Communicator comm(MPI_COMM_WORLD);
-
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
 
               array<int, 4> lengths = { nx, ny, nz, num_components };
               array<int, 4> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
@@ -407,12 +350,6 @@ TEST_CASE("Vector<3> getNumLocalPatches unmanaged constructor")
             for (int num_local_patches : { 1, 13 }) {
               Communicator comm(MPI_COMM_WORLD);
 
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-
               array<int, 4> lengths = { nx, ny, nz, num_components };
               array<int, 4> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
               int patch_stride = (nz + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * num_components;
@@ -441,12 +378,6 @@ TEST_CASE("Vector<3> getNumComponents unmanaged constructor")
             for (int num_local_patches : { 1, 13 }) {
               Communicator comm(MPI_COMM_WORLD);
 
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-
               array<int, 4> lengths = { nx, ny, nz, num_components };
               array<int, 4> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
               int patch_stride = (nz + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * num_components;
@@ -474,12 +405,6 @@ TEST_CASE("Vector<3> getNumLocalCells unmanaged constructor")
           for (int nz : { 1, 4, 5 }) {
             for (int num_local_patches : { 1, 13 }) {
               Communicator comm(MPI_COMM_WORLD);
-
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
 
               array<int, 4> lengths = { nx, ny, nz, num_components };
               array<int, 4> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
@@ -511,10 +436,6 @@ TEST_CASE("Vector<1> getComponentView unmanaged constructor")
           int component_stride = (nx + 2 * num_ghost_cells);
           int patch_stride = component_stride * num_components;
 
-          INFO("num_ghost_cells:   " << num_ghost_cells);
-          INFO("nx:                " << nx);
-          INFO("num_local_patches: " << num_local_patches);
-
           array<int, 2> lengths = { nx, num_components };
           array<int, 2> strides = { 1, nx + 2 * num_ghost_cells };
           double data[patch_stride * num_local_patches];
@@ -526,9 +447,7 @@ TEST_CASE("Vector<1> getComponentView unmanaged constructor")
 
           double* view = data;
           for (int i = 0; i < num_local_patches; i++) {
-            INFO("i:                 " << i);
             for (int c = 0; c < num_components; c++) {
-              INFO("c:                 " << c);
               ComponentView<double, 1> ld = vec.getComponentView(c, i);
               CHECK_EQ(&ld[ld.getGhostStart()], view + (patch_stride * i + c * component_stride));
               CHECK_EQ(&ld[ld.getGhostEnd()], view + (patch_stride * i + (c + 1) * component_stride) - 1);
@@ -556,10 +475,6 @@ TEST_CASE("Vector<1> getComponentView const unmanaged constructor")
           int component_stride = (nx + 2 * num_ghost_cells);
           int patch_stride = component_stride * num_components;
 
-          INFO("num_ghost_cells:   " << num_ghost_cells);
-          INFO("nx:                " << nx);
-          INFO("num_local_patches: " << num_local_patches);
-
           array<int, 2> lengths = { nx, num_components };
           array<int, 2> strides = { 1, nx + 2 * num_ghost_cells };
           double data[patch_stride * num_local_patches];
@@ -571,9 +486,7 @@ TEST_CASE("Vector<1> getComponentView const unmanaged constructor")
 
           const double* view = data;
           for (int i = 0; i < num_local_patches; i++) {
-            INFO("i:                 " << i);
             for (int c = 0; c < num_components; c++) {
-              INFO("c:                 " << c);
               ComponentView<const double, 1> ld = vec.getComponentView(c, i);
               CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
               CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -602,11 +515,6 @@ TEST_CASE("Vector<2> getComponentView unmanaged constructor")
             int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
             int patch_stride = component_stride * num_components;
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-            INFO("num_local_patches: " << num_local_patches);
-
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
             double data[patch_stride * num_local_patches];
@@ -618,9 +526,7 @@ TEST_CASE("Vector<2> getComponentView unmanaged constructor")
 
             double* view = data;
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -650,11 +556,6 @@ TEST_CASE("Vector<2> getComponentView const unmanaged constructor")
             int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
             int patch_stride = component_stride * num_components;
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-            INFO("num_local_patches: " << num_local_patches);
-
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
             double data[patch_stride * num_local_patches];
@@ -666,9 +567,7 @@ TEST_CASE("Vector<2> getComponentView const unmanaged constructor")
 
             const double* view = data;
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -700,12 +599,6 @@ TEST_CASE("Vector<3> getComponentView unmanaged constructor")
               int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
               int patch_stride = component_stride * num_components;
 
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-
               array<int, 4> lengths = { nx, ny, nz, num_components };
               array<int, 4> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
               double data[patch_stride * num_local_patches];
@@ -717,7 +610,6 @@ TEST_CASE("Vector<3> getComponentView unmanaged constructor")
 
               double* view = data;
               for (int i = 0; i < num_local_patches; i++) {
-                INFO("i:                 " << i);
                 for (int c = 0; c < num_components; c++) {
                   ComponentView<double, 3> ld = vec.getComponentView(c, i);
                   CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
@@ -750,12 +642,6 @@ TEST_CASE("Vector<3> getComponentView const unmanaged constructor")
               int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
               int patch_stride = component_stride * num_components;
 
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-
               array<int, 4> lengths = { nx, ny, nz, num_components };
               array<int, 4> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
               double data[patch_stride * num_local_patches];
@@ -767,9 +653,7 @@ TEST_CASE("Vector<3> getComponentView const unmanaged constructor")
 
               const double* view = data;
               for (int i = 0; i < num_local_patches; i++) {
-                INFO("i:                 " << i);
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c:                 " << c);
                   ComponentView<const double, 3> ld = vec.getComponentView(c, i);
                   CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                   CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -800,10 +684,6 @@ TEST_CASE("Vector<1> getPatchView unmanaged constructor")
           int component_stride = (nx + 2 * num_ghost_cells);
           int patch_stride = component_stride * num_components;
 
-          INFO("num_ghost_cells:   " << num_ghost_cells);
-          INFO("nx:                " << nx);
-          INFO("num_local_patches: " << num_local_patches);
-
           array<int, 2> lengths = { nx, num_components };
           array<int, 2> strides = { 1, nx + 2 * num_ghost_cells };
           double data[patch_stride * num_local_patches];
@@ -815,7 +695,6 @@ TEST_CASE("Vector<1> getPatchView unmanaged constructor")
 
           double* view = data;
           for (int i = 0; i < num_local_patches; i++) {
-            INFO("i:                 " << i);
             PatchView<double, 1> ld = vec.getPatchView(i);
             CHECK_EQ(&ld[ld.getGhostStart()], view + (patch_stride * i));
             CHECK_EQ(&ld[ld.getGhostEnd()], view + (patch_stride * (i + 1) - 1));
@@ -840,10 +719,6 @@ TEST_CASE("Vector<1> getPatchView const unmanaged constructor")
           int component_stride = (nx + 2 * num_ghost_cells);
           int patch_stride = component_stride * num_components;
 
-          INFO("num_ghost_cells:   " << num_ghost_cells);
-          INFO("nx:                " << nx);
-          INFO("num_local_patches: " << num_local_patches);
-
           array<int, 2> lengths = { nx, num_components };
           array<int, 2> strides = { 1, nx + 2 * num_ghost_cells };
           double data[patch_stride * num_local_patches];
@@ -855,7 +730,6 @@ TEST_CASE("Vector<1> getPatchView const unmanaged constructor")
 
           const double* view = data;
           for (int i = 0; i < num_local_patches; i++) {
-            INFO("i:                 " << i);
             PatchView<const double, 1> ld = vec.getPatchView(i);
             CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
             CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
@@ -881,11 +755,6 @@ TEST_CASE("Vector<2> getPatchView unmanaged constructor")
             int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
             int patch_stride = component_stride * num_components;
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-            INFO("num_local_patches: " << num_local_patches);
-
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
             double data[patch_stride * num_local_patches];
@@ -897,7 +766,6 @@ TEST_CASE("Vector<2> getPatchView unmanaged constructor")
 
             double* view = data;
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               PatchView<double, 2> ld = vec.getPatchView(i);
               CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
               CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
@@ -924,11 +792,6 @@ TEST_CASE("Vector<2> getPatchView const unmanaged constructor")
             int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
             int patch_stride = component_stride * num_components;
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-            INFO("num_local_patches: " << num_local_patches);
-
             array<int, 3> lengths = { nx, ny, num_components };
             array<int, 3> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
             double data[patch_stride * num_local_patches];
@@ -940,7 +803,6 @@ TEST_CASE("Vector<2> getPatchView const unmanaged constructor")
 
             const double* view = data;
             for (int i = 0; i < num_local_patches; i++) {
-              INFO("i:                 " << i);
               PatchView<const double, 2> ld = vec.getPatchView(i);
               CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
               CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
@@ -969,12 +831,6 @@ TEST_CASE("Vector<3> getPatchView unmanaged constructor")
               int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
               int patch_stride = component_stride * num_components;
 
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-
               array<int, 4> lengths = { nx, ny, nz, num_components };
               array<int, 4> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
               double data[patch_stride * num_local_patches];
@@ -986,7 +842,6 @@ TEST_CASE("Vector<3> getPatchView unmanaged constructor")
 
               double* view = data;
               for (int i = 0; i < num_local_patches; i++) {
-                INFO("i:                 " << i);
                 PatchView<double, 3> ld = vec.getPatchView(i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
@@ -1015,12 +870,6 @@ TEST_CASE("Vector<3> getPatchView const unmanaged constructor")
               int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells);
               int patch_stride = component_stride * num_components;
 
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-
               array<int, 4> lengths = { nx, ny, nz, num_components };
               array<int, 4> strides = { 1, nx + 2 * num_ghost_cells, (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells), (nz + 2 * num_ghost_cells) * (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) };
               double data[patch_stride * num_local_patches];
@@ -1032,7 +881,6 @@ TEST_CASE("Vector<3> getPatchView const unmanaged constructor")
 
               const double* view = data;
               for (int i = 0; i < num_local_patches; i++) {
-                INFO("i:                 " << i);
                 PatchView<const double, 3> ld = vec.getPatchView(i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);

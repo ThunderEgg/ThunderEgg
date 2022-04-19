@@ -36,7 +36,6 @@ TEST_CASE("Linear Test LinearRestrictor")
   for (auto mesh_file : { uniform_mesh_file, refined_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
         Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -59,24 +58,14 @@ TEST_CASE("Linear Test LinearRestrictor")
         Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
         for (auto pinfo : d_coarse.getPatchInfoVector()) {
-          INFO("Patch:          " << pinfo.id);
-          INFO("x:              " << pinfo.starts[0]);
-          INFO("y:              " << pinfo.starts[1]);
-          INFO("nx:             " << pinfo.ns[0]);
-          INFO("ny:             " << pinfo.ns[1]);
-          INFO("parent_orth:    " << pinfo.orth_on_parent);
           ComponentView<double, 2> vec_ld = coarse_vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
-            INFO("side:      " << s);
             if (!pinfo.hasNbr(s)) {
-              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-                INFO("coord:  " << coord[0]);
-                CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
-              });
+              Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord])); });
             }
           }
         }
@@ -89,7 +78,6 @@ TEST_CASE("Linear Test LinearRestrictor two components")
   for (auto mesh_file : { uniform_mesh_file, refined_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
         Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -117,12 +105,6 @@ TEST_CASE("Linear Test LinearRestrictor two components")
         Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
         for (auto pinfo : d_coarse.getPatchInfoVector()) {
-          INFO("Patch:          " << pinfo.id);
-          INFO("x:              " << pinfo.starts[0]);
-          INFO("y:              " << pinfo.starts[1]);
-          INFO("nx:             " << pinfo.ns[0]);
-          INFO("ny:             " << pinfo.ns[1]);
-          INFO("parent_orth:    " << pinfo.orth_on_parent);
           ComponentView<double, 2> vec_ld = coarse_vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> vec_ld2 = coarse_vec.getComponentView(1, pinfo.local_index);
@@ -136,10 +118,8 @@ TEST_CASE("Linear Test LinearRestrictor two components")
             View<double, 1> expected_ghost = expected_ld.getSliceOn(s, { -1 });
             View<double, 1> vec_ghost2 = vec_ld2.getSliceOn(s, { -1 });
             View<double, 1> expected_ghost2 = expected_ld2.getSliceOn(s, { -1 });
-            INFO("side:      " << s);
             if (!pinfo.hasNbr(s)) {
               Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-                INFO("coord:  " << coord[0]);
                 CHECK_EQ(vec_ghost[coord], doctest::Approx(expected_ghost[coord]));
                 CHECK_EQ(vec_ghost2[coord], doctest::Approx(expected_ghost2[coord]));
               });
@@ -155,7 +135,6 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts")
   for (auto mesh_file : { uniform_mesh_file, refined_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
         Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -178,22 +157,12 @@ TEST_CASE("Linear Test LinearRestrictor dont extrapolate bound ghosts")
         Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
         for (auto pinfo : d_coarse.getPatchInfoVector()) {
-          INFO("Patch:          " << pinfo.id);
-          INFO("x:              " << pinfo.starts[0]);
-          INFO("y:              " << pinfo.starts[1]);
-          INFO("nx:             " << pinfo.ns[0]);
-          INFO("ny:             " << pinfo.ns[1]);
-          INFO("parent_orth:    " << pinfo.orth_on_parent);
           ComponentView<double, 2> vec_ld = coarse_vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
           Loop::Nested<2>(vec_ld.getStart(), vec_ld.getEnd(), [&](const array<int, 2>& coord) { REQUIRE_EQ(vec_ld[coord], doctest::Approx(expected_ld[coord])); });
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
-            INFO("side:      " << s);
-            Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-              INFO("coord:  " << coord[0]);
-              CHECK_EQ(vec_ghost[coord], 0);
-            });
+            Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(vec_ghost[coord], 0); });
           }
         }
       }
@@ -205,7 +174,6 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
   for (auto mesh_file : { uniform_mesh_file, refined_mesh_file }) {
     for (auto nx : { 2, 10 }) {
       for (auto ny : { 2, 10 }) {
-        INFO("MESH: " << mesh_file);
         int num_ghost = 1;
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
         Domain<2> d_fine = domain_reader.getFinerDomain();
@@ -233,12 +201,6 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
         Vector<2> coarse_vec = restrictor.restrict(fine_vec);
 
         for (auto pinfo : d_coarse.getPatchInfoVector()) {
-          INFO("Patch:          " << pinfo.id);
-          INFO("x:              " << pinfo.starts[0]);
-          INFO("y:              " << pinfo.starts[1]);
-          INFO("nx:             " << pinfo.ns[0]);
-          INFO("ny:             " << pinfo.ns[1]);
-          INFO("parent_orth:    " << pinfo.orth_on_parent);
           ComponentView<double, 2> vec_ld = coarse_vec.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> expected_ld = coarse_expected.getComponentView(0, pinfo.local_index);
           ComponentView<double, 2> vec_ld2 = coarse_vec.getComponentView(1, pinfo.local_index);
@@ -250,9 +212,7 @@ TEST_CASE("Linear Test LinearRestrictor two components dont extrapolate boundary
           for (Side<2> s : Side<2>::getValues()) {
             View<double, 1> vec_ghost = vec_ld.getSliceOn(s, { -1 });
             View<double, 1> vec_ghost2 = vec_ld2.getSliceOn(s, { -1 });
-            INFO("side:      " << s);
             Loop::Nested<1>(vec_ghost.getStart(), vec_ghost.getEnd(), [&](const array<int, 1>& coord) {
-              INFO("coord:  " << coord[0]);
               CHECK_EQ(vec_ghost[coord], 0);
               CHECK_EQ(vec_ghost2[coord], 0);
             });

@@ -40,7 +40,6 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
     for (auto nx : { 8, 10 }) {
       for (auto ny : { 8, 10 }) {
         for (auto nz : { 8, 10 }) {
-          INFO("MESH FILE " << mesh_file);
           int num_ghost = 1;
           bitset<6> neumann;
           DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
@@ -72,23 +71,9 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
           REQUIRE_GT(f_vec.infNorm(), 0);
 
           for (auto pinfo : d_fine.getPatchInfoVector()) {
-            INFO("Patch: " << pinfo.id);
-            INFO("x:     " << pinfo.starts[0]);
-            INFO("y:     " << pinfo.starts[1]);
-            INFO("nx:    " << pinfo.ns[0]);
-            INFO("ny:    " << pinfo.ns[1]);
-            INFO("nz:    " << pinfo.ns[1]);
-            INFO("dx:    " << pinfo.spacings[0]);
-            INFO("dy:    " << pinfo.spacings[1]);
-            INFO("dz:    " << pinfo.spacings[1]);
             ComponentView<double, 3> f_vec_ld = f_vec.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> f_vec_expected_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
-            Loop::Nested<3>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 3>& coord) {
-              INFO("xi:    " << coord[0]);
-              INFO("yi:    " << coord[1]);
-              INFO("zi:    " << coord[2]);
-              CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
-            });
+            Loop::Nested<3>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 3>& coord) { CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord])); });
           }
           MatDestroy(&A);
         }
@@ -102,7 +87,6 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
     for (auto nx : { 8, 10 }) {
       for (auto ny : { 8, 10 }) {
         for (auto nz : { 8, 10 }) {
-          INFO("MESH FILE " << mesh_file);
           int num_ghost = 1;
           bitset<6> neumann = 0xFF;
           DomainReader<3> domain_reader(mesh_file, { nx, ny, nz }, num_ghost);
@@ -134,24 +118,9 @@ TEST_CASE("Poisson::MatrixHelper gives equivalent operator to Poisson::StarPatch
           REQUIRE_GT(f_vec.infNorm(), 0);
 
           for (auto pinfo : d_fine.getPatchInfoVector()) {
-            INFO("Patch: " << pinfo.id);
-            INFO("x:     " << pinfo.starts[0]);
-            INFO("y:     " << pinfo.starts[1]);
-            INFO("z:     " << pinfo.starts[2]);
-            INFO("nx:    " << pinfo.ns[0]);
-            INFO("ny:    " << pinfo.ns[1]);
-            INFO("nz:    " << pinfo.ns[2]);
-            INFO("dx:    " << pinfo.spacings[0]);
-            INFO("dy:    " << pinfo.spacings[1]);
-            INFO("dz:    " << pinfo.spacings[2]);
             ComponentView<double, 3> f_vec_ld = f_vec.getComponentView(0, pinfo.local_index);
             ComponentView<double, 3> f_vec_expected_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
-            Loop::Nested<3>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 3>& coord) {
-              INFO("xi:    " << coord[0]);
-              INFO("yi:    " << coord[1]);
-              INFO("zi:    " << coord[2]);
-              CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
-            });
+            Loop::Nested<3>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 3>& coord) { CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord])); });
           }
           MatDestroy(&A);
         }
@@ -163,8 +132,6 @@ TEST_CASE("Poisson::MatrixHelper constructor throws error with odd number of cel
 {
   for (auto mesh_file : { MESHES }) {
     for (auto axis : { 0, 1, 2 }) {
-      INFO("MESH: " << mesh_file);
-      INFO("axis: " << axis);
       int n_even = 10;
       int n_odd = 11;
       int num_ghost = 1;

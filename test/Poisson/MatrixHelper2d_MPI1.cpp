@@ -37,7 +37,6 @@ const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPatchOperator")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 1;
     bitset<4> neumann;
@@ -69,20 +68,9 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
     REQUIRE_GT(f_vec.infNorm(), 0);
 
     for (auto pinfo : d_fine.getPatchInfoVector()) {
-      INFO("Patch: " << pinfo.id);
-      INFO("x:     " << pinfo.starts[0]);
-      INFO("y:     " << pinfo.starts[1]);
-      INFO("nx:    " << pinfo.ns[0]);
-      INFO("ny:    " << pinfo.ns[1]);
-      INFO("dx:    " << pinfo.spacings[0]);
-      INFO("dy:    " << pinfo.spacings[1]);
       ComponentView<double, 2> f_vec_ld = f_vec.getComponentView(0, pinfo.local_index);
       ComponentView<double, 2> f_vec_expected_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
-      Loop::Nested<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2>& coord) {
-        INFO("xi:    " << coord[0]);
-        INFO("yi:    " << coord[1]);
-        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
-      });
+      Loop::Nested<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2>& coord) { CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord])); });
     }
     MatDestroy(&A);
   }
@@ -90,7 +78,6 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
 TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPatchOperator with Neumann BC")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 1;
     bitset<4> neumann = 0xF;
@@ -122,20 +109,9 @@ TEST_CASE("Poisson::MatrixHelper2d gives equivalent operator to Poisson::StarPat
     REQUIRE_GT(f_vec.infNorm(), 0);
 
     for (auto pinfo : d_fine.getPatchInfoVector()) {
-      INFO("Patch: " << pinfo.id);
-      INFO("x:     " << pinfo.starts[0]);
-      INFO("y:     " << pinfo.starts[1]);
-      INFO("nx:    " << pinfo.ns[0]);
-      INFO("ny:    " << pinfo.ns[1]);
-      INFO("dx:    " << pinfo.spacings[0]);
-      INFO("dy:    " << pinfo.spacings[1]);
       ComponentView<double, 2> f_vec_ld = f_vec.getComponentView(0, pinfo.local_index);
       ComponentView<double, 2> f_vec_expected_ld = f_vec_expected.getComponentView(0, pinfo.local_index);
-      Loop::Nested<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2>& coord) {
-        INFO("xi:    " << coord[0]);
-        INFO("yi:    " << coord[1]);
-        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
-      });
+      Loop::Nested<2>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 2>& coord) { CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord])); });
     }
     MatDestroy(&A);
   }

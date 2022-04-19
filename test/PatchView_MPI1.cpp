@@ -78,64 +78,52 @@ TEST_CASE("PatchView<double,2> getSliceOn<1>")
           PatchView<double, 2> pview(data, strides, lengths, num_ghost);
 
           for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-            INFO("xi: " << xi);
             View<double, 2> slice = pview.getSliceOn(Side<2>::west(), { xi });
             CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
             CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
             CHECK_EQ(slice.getEnd(), array<int, 2>({ ny - 1, num_components - 1 }));
             CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ ny - 1 + num_ghost, num_components - 1 }));
             for (int c = 0; c < num_components; c++) {
-              INFO("c: " << c);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                INFO("yi: " << yi);
                 CHECK_EQ(&pview[{ xi, yi, c }], &slice[{ yi, c }]);
               }
             }
           }
 
           for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-            INFO("xi: " << xi);
             View<double, 2> slice = pview.getSliceOn(Side<2>::east(), { xi });
             CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
             CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
             CHECK_EQ(slice.getEnd(), array<int, 2>({ ny - 1, num_components - 1 }));
             CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ ny - 1 + num_ghost, num_components - 1 }));
             for (int c = 0; c < num_components; c++) {
-              INFO("c: " << c);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                INFO("yi: " << yi);
                 CHECK_EQ(&pview[{ nx - 1 - xi, yi, c }], &slice[{ yi, c }]);
               }
             }
           }
 
           for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-            INFO("yi: " << yi);
             View<double, 2> slice = pview.getSliceOn(Side<2>::south(), { yi });
             CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
             CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
             CHECK_EQ(slice.getEnd(), array<int, 2>({ nx - 1, num_components - 1 }));
             CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nx - 1 + num_ghost, num_components - 1 }));
             for (int c = 0; c < num_components; c++) {
-              INFO("c: " << c);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 CHECK_EQ(&pview[{ xi, yi, c }], &slice[{ xi, c }]);
               }
             }
           }
 
           for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-            INFO("yi: " << yi);
             View<double, 2> slice = pview.getSliceOn(Side<2>::north(), { yi });
             CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
             CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
             CHECK_EQ(slice.getEnd(), array<int, 2>({ nx - 1, num_components - 1 }));
             CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nx - 1 + num_ghost, num_components - 1 }));
             for (int c = 0; c < num_components; c++) {
-              INFO("c: " << c);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 CHECK_EQ(&pview[{ xi, ny - 1 - yi, c }], &slice[{ xi, c }]);
               }
             }
@@ -165,7 +153,6 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
             PatchView<double, 3> pview(data, strides, lengths, num_ghost);
 
             for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-              INFO("xi: " << xi);
               View<double, 3> slice = pview.getSliceOn(Side<3>::west(), { xi });
               CHECK_EQ(slice.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, 0 }));
               CHECK_EQ(slice.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -173,11 +160,8 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
               CHECK_EQ(slice.getGhostEnd(), array<int, 3>({ ny - 1 + num_ghost, nz - 1 + num_ghost, num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                  INFO("zi: " << zi);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                    INFO("yi: " << yi);
                     CHECK_EQ(&pview[{ xi, yi, zi, c }], &slice[{ yi, zi, c }]);
                   }
                 }
@@ -185,7 +169,6 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
             }
 
             for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-              INFO("xi: " << xi);
               View<double, 3> slice = pview.getSliceOn(Side<3>::east(), { xi });
               CHECK_EQ(slice.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, 0 }));
               CHECK_EQ(slice.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -193,11 +176,8 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
               CHECK_EQ(slice.getGhostEnd(), array<int, 3>({ ny - 1 + num_ghost, nz - 1 + num_ghost, num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                  INFO("zi: " << zi);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                    INFO("yi: " << yi);
                     CHECK_EQ(&pview[{ nx - 1 - xi, yi, zi, c }], &slice[{ yi, zi, c }]);
                   }
                 }
@@ -205,7 +185,6 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
             }
 
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-              INFO("yi: " << yi);
               View<double, 3> slice = pview.getSliceOn(Side<3>::south(), { yi });
               CHECK_EQ(slice.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, 0 }));
               CHECK_EQ(slice.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -213,11 +192,8 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
               CHECK_EQ(slice.getGhostEnd(), array<int, 3>({ nx - 1 + num_ghost, nz - 1 + num_ghost, num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                  INFO("zi: " << zi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, yi, zi, c }], &slice[{ xi, zi, c }]);
                   }
                 }
@@ -225,7 +201,6 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
             }
 
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-              INFO("yi: " << yi);
               View<double, 3> slice = pview.getSliceOn(Side<3>::north(), { yi });
               CHECK_EQ(slice.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, 0 }));
               CHECK_EQ(slice.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -233,11 +208,8 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
               CHECK_EQ(slice.getGhostEnd(), array<int, 3>({ nx - 1 + num_ghost, nz - 1 + num_ghost, num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                  INFO("zi: " << zi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, ny - 1 - yi, zi, c }], &slice[{ xi, zi, c }]);
                   }
                 }
@@ -245,7 +217,6 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
             }
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               View<double, 3> slice = pview.getSliceOn(Side<3>::bottom(), { zi });
               CHECK_EQ(slice.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, 0 }));
               CHECK_EQ(slice.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -253,11 +224,8 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
               CHECK_EQ(slice.getGhostEnd(), array<int, 3>({ nx - 1 + num_ghost, ny - 1 + num_ghost, num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                  INFO("yi: " << yi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, yi, zi, c }], &slice[{ xi, yi, c }]);
                   }
                 }
@@ -265,7 +233,6 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
             }
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               View<double, 3> slice = pview.getSliceOn(Side<3>::top(), { zi });
               CHECK_EQ(slice.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, 0 }));
               CHECK_EQ(slice.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -273,11 +240,8 @@ TEST_CASE("PatchView<double,3> getSliceOn<2>")
               CHECK_EQ(slice.getGhostEnd(), array<int, 3>({ nx - 1 + num_ghost, ny - 1 + num_ghost, num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                  INFO("yi: " << yi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, yi, nz - 1 - zi, c }], &slice[{ xi, yi, c }]);
                   }
                 }
@@ -309,9 +273,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             PatchView<double, 3> pview(data, strides, lengths, num_ghost);
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                INFO("yi: " << yi);
                 View<double, 2> slice = pview.getSliceOn(Edge::bs(), { yi, zi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -319,9 +281,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nx - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, yi, zi, c }], &slice[{ xi, c }]);
                   }
                 }
@@ -329,9 +289,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                INFO("yi: " << yi);
                 View<double, 2> slice = pview.getSliceOn(Edge::tn(), { yi, zi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -339,9 +297,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nx - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, ny - 1 - yi, nz - 1 - zi, c }], &slice[{ xi, c }]);
                   }
                 }
@@ -349,9 +305,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                INFO("yi: " << yi);
                 View<double, 2> slice = pview.getSliceOn(Edge::bn(), { yi, zi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -359,9 +313,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nx - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, ny - 1 - yi, zi, c }], &slice[{ xi, c }]);
                   }
                 }
@@ -369,9 +321,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                INFO("yi: " << yi);
                 View<double, 2> slice = pview.getSliceOn(Edge::ts(), { yi, zi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -379,9 +329,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nx - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, yi, nz - 1 - zi, c }], &slice[{ xi, c }]);
                   }
                 }
@@ -389,9 +337,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice = pview.getSliceOn(Edge::bw(), { xi, zi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -399,9 +345,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ ny - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                    INFO("yi: " << yi);
                     CHECK_EQ(&pview[{ xi, yi, zi, c }], &slice[{ yi, c }]);
                   }
                 }
@@ -409,9 +353,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice = pview.getSliceOn(Edge::te(), { xi, zi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -419,9 +361,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ ny - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                    INFO("yi: " << yi);
                     CHECK_EQ(&pview[{ nx - 1 - xi, yi, nz - 1 - zi, c }], &slice[{ yi, c }]);
                   }
                 }
@@ -429,9 +369,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice = pview.getSliceOn(Edge::be(), { xi, zi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -439,9 +377,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ ny - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                    INFO("yi: " << yi);
                     CHECK_EQ(&pview[{ nx - 1 - xi, yi, zi, c }], &slice[{ yi, c }]);
                   }
                 }
@@ -449,9 +385,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice = pview.getSliceOn(Edge::tw(), { xi, zi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -459,9 +393,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ ny - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                    INFO("yi: " << yi);
                     CHECK_EQ(&pview[{ xi, yi, nz - 1 - zi, c }], &slice[{ yi, c }]);
                   }
                 }
@@ -469,9 +401,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-              INFO("yi: " << yi);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice = pview.getSliceOn(Edge::sw(), { xi, yi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -479,9 +409,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nz - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                    INFO("zi: " << zi);
                     CHECK_EQ(&pview[{ xi, yi, zi, c }], &slice[{ zi, c }]);
                   }
                 }
@@ -489,9 +417,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-              INFO("yi: " << yi);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice = pview.getSliceOn(Edge::ne(), { xi, yi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -499,9 +425,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nz - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                    INFO("zi: " << zi);
                     CHECK_EQ(&pview[{ nx - 1 - xi, ny - 1 - yi, zi, c }], &slice[{ zi, c }]);
                   }
                 }
@@ -509,9 +433,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-              INFO("yi: " << yi);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice = pview.getSliceOn(Edge::se(), { xi, yi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -519,9 +441,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nz - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                    INFO("zi: " << zi);
                     CHECK_EQ(&pview[{ nx - 1 - xi, yi, zi, c }], &slice[{ zi, c }]);
                   }
                 }
@@ -529,9 +449,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
             }
 
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-              INFO("yi: " << yi);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice = pview.getSliceOn(Edge::nw(), { xi, yi });
                 CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
@@ -539,9 +457,7 @@ TEST_CASE("PatchView<double,3> getSliceOn<1>")
                 CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nz - 1 + num_ghost, num_components - 1 }));
 
                 for (int c = 0; c < num_components; c++) {
-                  INFO("c: " << c);
                   for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                    INFO("zi: " << zi);
                     CHECK_EQ(&pview[{ xi, ny - 1 - yi, zi, c }], &slice[{ zi, c }]);
                   }
                 }
@@ -573,11 +489,8 @@ TEST_CASE("PatchView<double,3> getSliceOn<0>")
             PatchView<double, 3> pview(data, strides, lengths, num_ghost);
 
             for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                INFO("yi: " << yi);
                 for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                  INFO("xi: " << xi);
                   View<double, 1> bsw = pview.getSliceOn(Corner<3>::bsw(), { xi, yi, zi });
                   CHECK_EQ(bsw.getGhostStart(), array<int, 1>({ 0 }));
                   CHECK_EQ(bsw.getStart(), array<int, 1>({ 0 }));
@@ -627,7 +540,6 @@ TEST_CASE("PatchView<double,3> getSliceOn<0>")
                   CHECK_EQ(tne.getGhostEnd(), array<int, 1>({ num_components - 1 }));
 
                   for (int c = 0; c < num_components; c++) {
-                    INFO("c: " << c);
                     CHECK_EQ(&pview[{ xi, yi, zi, c }], &bsw[{ c }]);
                     CHECK_EQ(&pview[{ nx - 1 - xi, yi, zi, c }], &bse[{ c }]);
                     CHECK_EQ(&pview[{ xi, ny - 1 - yi, zi, c }], &bnw[{ c }]);
@@ -665,9 +577,7 @@ TEST_CASE("PatchView<double,2> getSliceOn<0>")
           PatchView<double, 2> pview(data, strides, lengths, num_ghost);
 
           for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-            INFO("yi: " << yi);
             for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-              INFO("xi: " << xi);
               View<double, 1> sw = pview.getSliceOn(Corner<2>::sw(), { xi, yi });
               CHECK_EQ(sw.getGhostStart(), array<int, 1>({ 0 }));
               CHECK_EQ(sw.getStart(), array<int, 1>({ 0 }));
@@ -693,7 +603,6 @@ TEST_CASE("PatchView<double,2> getSliceOn<0>")
               CHECK_EQ(ne.getGhostEnd(), array<int, 1>({ num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 CHECK_EQ(&pview[{ xi, yi, c }], &sw[{ c }]);
                 CHECK_EQ(&pview[{ nx - 1 - xi, yi, c }], &se[{ c }]);
                 CHECK_EQ(&pview[{ xi, ny - 1 - yi, c }], &nw[{ c }]);
@@ -726,7 +635,6 @@ TEST_CASE("PatchView<double,2> getGhostSliceOn<1>")
           PatchView<double, 2> pview(data, strides, lengths, num_ghost);
 
           for (unsigned char xi = 0; xi < num_ghost; xi++) {
-            INFO("xi: " << xi);
             View<double, 2> slice_w = pview.getGhostSliceOn(Side<2>::west(), { xi });
             CHECK_EQ(slice_w.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
             CHECK_EQ(slice_w.getStart(), array<int, 2>({ 0, 0 }));
@@ -740,9 +648,7 @@ TEST_CASE("PatchView<double,2> getGhostSliceOn<1>")
             CHECK_EQ(slice_e.getGhostEnd(), array<int, 2>({ ny - 1 + num_ghost, num_components - 1 }));
 
             for (int c = 0; c < num_components; c++) {
-              INFO("c: " << c);
               for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                INFO("yi: " << yi);
                 CHECK_EQ(&pview[{ -1 - xi, yi, c }], &slice_w[{ yi, c }]);
                 CHECK_EQ(&pview[{ nx + xi, yi, c }], &slice_e[{ yi, c }]);
               }
@@ -750,7 +656,6 @@ TEST_CASE("PatchView<double,2> getGhostSliceOn<1>")
           }
 
           for (unsigned char yi = 0; yi < num_ghost; yi++) {
-            INFO("yi: " << yi);
             View<double, 2> slice_s = pview.getGhostSliceOn(Side<2>::south(), { yi });
             CHECK_EQ(slice_s.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
             CHECK_EQ(slice_s.getStart(), array<int, 2>({ 0, 0 }));
@@ -764,9 +669,7 @@ TEST_CASE("PatchView<double,2> getGhostSliceOn<1>")
             CHECK_EQ(slice_s.getGhostEnd(), array<int, 2>({ nx - 1 + num_ghost, num_components - 1 }));
 
             for (int c = 0; c < num_components; c++) {
-              INFO("c: " << c);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 CHECK_EQ(&pview[{ xi, -1 - yi, c }], &slice_s[{ xi, c }]);
                 CHECK_EQ(&pview[{ xi, ny + yi, c }], &slice_n[{ xi, c }]);
               }
@@ -797,7 +700,6 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<2>")
             PatchView<double, 3> pview(data, strides, lengths, num_ghost);
 
             for (unsigned char xi = 0; xi < num_ghost; xi++) {
-              INFO("xi: " << xi);
               View<double, 3> slice_w = pview.getGhostSliceOn(Side<3>::west(), { xi });
               CHECK_EQ(slice_w.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, 0 }));
               CHECK_EQ(slice_w.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -811,11 +713,8 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<2>")
               CHECK_EQ(slice_e.getGhostEnd(), array<int, 3>({ ny - 1 + num_ghost, nz - 1 + num_ghost, num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                  INFO("zi: " << zi);
                   for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                    INFO("yi: " << yi);
                     CHECK_EQ(&pview[{ -1 - xi, yi, zi, c }], &slice_w[{ yi, zi, c }]);
                     CHECK_EQ(&pview[{ nx + xi, yi, zi, c }], &slice_e[{ yi, zi, c }]);
                   }
@@ -824,7 +723,6 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<2>")
             }
 
             for (unsigned char yi = 0; yi < num_ghost; yi++) {
-              INFO("yi: " << yi);
               View<double, 3> slice_s = pview.getGhostSliceOn(Side<3>::south(), { yi });
               CHECK_EQ(slice_s.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, 0 }));
               CHECK_EQ(slice_s.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -838,11 +736,8 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<2>")
               CHECK_EQ(slice_n.getGhostEnd(), array<int, 3>({ nx - 1 + num_ghost, nz - 1 + num_ghost, num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                  INFO("zi: " << zi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, -1 - yi, zi, c }], &slice_s[{ xi, zi, c }]);
                     CHECK_EQ(&pview[{ xi, ny + yi, zi, c }], &slice_n[{ xi, zi, c }]);
                   }
@@ -851,7 +746,6 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<2>")
             }
 
             for (unsigned char zi = 0; zi < num_ghost; zi++) {
-              INFO("zi: " << zi);
               View<double, 3> slice_b = pview.getGhostSliceOn(Side<3>::bottom(), { zi });
               CHECK_EQ(slice_b.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, 0 }));
               CHECK_EQ(slice_b.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -865,11 +759,8 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<2>")
               CHECK_EQ(slice_t.getGhostEnd(), array<int, 3>({ nx - 1 + num_ghost, ny - 1 + num_ghost, num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                  INFO("yi: " << yi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, yi, -1 - zi, c }], &slice_b[{ xi, yi, c }]);
                     CHECK_EQ(&pview[{ xi, yi, nz + zi, c }], &slice_t[{ xi, yi, c }]);
                   }
@@ -902,9 +793,7 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<1>")
             PatchView<double, 3> pview(data, strides, lengths, num_ghost);
 
             for (unsigned char zi = 0; zi < num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (unsigned char yi = 0; yi < num_ghost; yi++) {
-                INFO("yi: " << yi);
                 View<double, 2> slice_bs = pview.getGhostSliceOn(Edge::bs(), { yi, zi });
                 CHECK_EQ(slice_bs.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice_bs.getStart(), array<int, 2>({ 0, 0 }));
@@ -930,7 +819,6 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<1>")
                 CHECK_EQ(slice_ts.getGhostEnd(), array<int, 2>({ nx - 1 + num_ghost, num_components - 1 }));
 
                 for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                  INFO("xi: " << xi);
                   CHECK_EQ(&pview[{ xi, -1 - yi, -1 - zi }], &slice_bs[{ xi }]);
                   CHECK_EQ(&pview[{ xi, ny + yi, nz + zi }], &slice_tn[{ xi }]);
                   CHECK_EQ(&pview[{ xi, ny + yi, -1 - zi }], &slice_bn[{ xi }]);
@@ -940,9 +828,7 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<1>")
             }
 
             for (unsigned char zi = 0; zi < num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (unsigned char xi = 0; xi < num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice_bw = pview.getGhostSliceOn(Edge::bw(), { xi, zi });
                 CHECK_EQ(slice_bw.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice_bw.getStart(), array<int, 2>({ 0, 0 }));
@@ -968,7 +854,6 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<1>")
                 CHECK_EQ(slice_tw.getGhostEnd(), array<int, 2>({ ny - 1 + num_ghost, num_components - 1 }));
 
                 for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                  INFO("yi: " << yi);
                   CHECK_EQ(&pview[{ -1 - xi, yi, -1 - zi }], &slice_bw[{ yi }]);
                   CHECK_EQ(&pview[{ nx + xi, yi, nz + zi }], &slice_te[{ yi }]);
                   CHECK_EQ(&pview[{ nx + xi, yi, -1 - zi }], &slice_be[{ yi }]);
@@ -978,9 +863,7 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<1>")
             }
 
             for (unsigned char yi = 0; yi < num_ghost; yi++) {
-              INFO("yi: " << yi);
               for (unsigned char xi = 0; xi < num_ghost; xi++) {
-                INFO("xi: " << xi);
                 View<double, 2> slice_sw = pview.getGhostSliceOn(Edge::sw(), { xi, yi });
                 CHECK_EQ(slice_sw.getGhostStart(), array<int, 2>({ -num_ghost, 0 }));
                 CHECK_EQ(slice_sw.getStart(), array<int, 2>({ 0, 0 }));
@@ -1006,7 +889,6 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<1>")
                 CHECK_EQ(slice_nw.getGhostEnd(), array<int, 2>({ nz - 1 + num_ghost, num_components - 1 }));
 
                 for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                  INFO("zi: " << zi);
                   CHECK_EQ(&pview[{ -1 - xi, -1 - yi, zi }], &slice_sw[{ zi }]);
                   CHECK_EQ(&pview[{ nx + xi, ny + yi, zi }], &slice_ne[{ zi }]);
                   CHECK_EQ(&pview[{ nx + xi, -1 - yi, zi }], &slice_se[{ zi }]);
@@ -1040,11 +922,8 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<0>")
             PatchView<double, 3> pview(data, strides, lengths, num_ghost);
 
             for (unsigned char zi = 0; zi < num_ghost; zi++) {
-              INFO("zi: " << zi);
               for (unsigned char yi = 0; yi < num_ghost; yi++) {
-                INFO("yi: " << yi);
                 for (unsigned char xi = 0; xi < num_ghost; xi++) {
-                  INFO("xi: " << xi);
                   View<double, 1> bsw = pview.getGhostSliceOn(Corner<3>::bsw(), { xi, yi, zi });
                   CHECK_EQ(bsw.getGhostStart(), array<int, 1>({ 0 }));
                   CHECK_EQ(bsw.getStart(), array<int, 1>({ 0 }));
@@ -1094,7 +973,6 @@ TEST_CASE("PatchView<double,3> getGhostSliceOn<0>")
                   CHECK_EQ(tne.getGhostEnd(), array<int, 1>({ num_components - 1 }));
 
                   for (int c = 0; c < num_components; c++) {
-                    INFO("c: " << c);
                     CHECK_EQ(&pview[{ -1 - xi, -1 - yi, -1 - zi, c }], &bsw[{ c }]);
                     CHECK_EQ(&pview[{ nx + xi, -1 - yi, -1 - zi, c }], &bse[{ c }]);
                     CHECK_EQ(&pview[{ -1 - xi, ny + yi, -1 - zi, c }], &bnw[{ c }]);
@@ -1132,9 +1010,7 @@ TEST_CASE("PatchView<double,2> getGhostSliceOn<0>")
           PatchView<double, 2> pview(data, strides, lengths, num_ghost);
 
           for (unsigned char yi = 0; yi < num_ghost; yi++) {
-            INFO("yi: " << yi);
             for (unsigned char xi = 0; xi < num_ghost; xi++) {
-              INFO("xi: " << xi);
               View<double, 1> sw = pview.getGhostSliceOn(Corner<2>::sw(), { xi, yi });
               CHECK_EQ(sw.getGhostStart(), array<int, 1>({ 0 }));
               CHECK_EQ(sw.getStart(), array<int, 1>({ 0 }));
@@ -1160,7 +1036,6 @@ TEST_CASE("PatchView<double,2> getGhostSliceOn<0>")
               CHECK_EQ(ne.getGhostEnd(), array<int, 1>({ num_components - 1 }));
 
               for (int c = 0; c < num_components; c++) {
-                INFO("c: " << c);
                 CHECK_EQ(&pview[{ -xi - 1, -yi - 1, c }], &sw[{ c }]);
                 CHECK_EQ(&pview[{ nx + xi, -yi - 1, c }], &se[{ c }]);
                 CHECK_EQ(&pview[{ -xi - 1, ny + yi, c }], &nw[{ c }]);
@@ -1384,16 +1259,13 @@ TEST_CASE("PatchView<double,2> getComponentView")
           PatchView<double, 2> pview(data, strides, lengths, num_ghost);
 
           for (int c = 0; c < num_components; c++) {
-            INFO("c: " << c);
             ComponentView<double, 2> slice = pview.getComponentView(c);
             CHECK_EQ(slice.getGhostStart(), array<int, 2>({ -num_ghost, -num_ghost }));
             CHECK_EQ(slice.getStart(), array<int, 2>({ 0, 0 }));
             CHECK_EQ(slice.getEnd(), array<int, 2>({ nx - 1, ny - 1 }));
             CHECK_EQ(slice.getGhostEnd(), array<int, 2>({ nx - 1 + num_ghost, ny - 1 + num_ghost }));
             for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-              INFO("yi: " << yi);
               for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                INFO("xi: " << xi);
                 CHECK_EQ(&pview[{ xi, yi, c }], &slice[{ xi, yi }]);
               }
             }
@@ -1423,7 +1295,6 @@ TEST_CASE("PatchView<double,3> getComponentView")
             PatchView<double, 3> pview(data, strides, lengths, num_ghost);
 
             for (int c = 0; c < num_components; c++) {
-              INFO("c: " << c);
               ComponentView<double, 3> slice = pview.getComponentView(c);
               CHECK_EQ(slice.getGhostStart(), array<int, 3>({ -num_ghost, -num_ghost, -num_ghost }));
               CHECK_EQ(slice.getStart(), array<int, 3>({ 0, 0, 0 }));
@@ -1431,11 +1302,8 @@ TEST_CASE("PatchView<double,3> getComponentView")
               CHECK_EQ(slice.getGhostEnd(), array<int, 3>({ nx - 1 + num_ghost, ny - 1 + num_ghost, nz - 1 + num_ghost }));
 
               for (int zi = -num_ghost; zi < nz + num_ghost; zi++) {
-                INFO("zi: " << zi);
                 for (int yi = -num_ghost; yi < ny + num_ghost; yi++) {
-                  INFO("yi: " << yi);
                   for (int xi = -num_ghost; xi < nx + num_ghost; xi++) {
-                    INFO("xi: " << xi);
                     CHECK_EQ(&pview[{ xi, yi, zi, c }], &slice[{ xi, yi, zi }]);
                   }
                 }

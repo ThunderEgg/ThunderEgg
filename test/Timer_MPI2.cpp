@@ -65,7 +65,6 @@ TEST_CASE("Timer to_json empty timer")
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
   nlohmann::json j = timer;
-  INFO(j.dump(4));
   REQUIRE_EQ(j, nullptr);
 }
 TEST_CASE("Timer to_json unassociated timing")
@@ -77,7 +76,6 @@ TEST_CASE("Timer to_json unassociated timing")
   timer.stop("A");
 
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
 
   if (comm.getRank() == 0) {
     REQUIRE_NE(j, nullptr);
@@ -116,7 +114,6 @@ TEST_CASE("Timer to_json unassociated timing with int info")
   timer.stop("A");
 
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
 
   if (comm.getRank() == 0) {
     REQUIRE_NE(j, nullptr);
@@ -172,7 +169,6 @@ TEST_CASE("Timer to_json unassociated timing with double info")
   timer.stop("A");
 
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
 
   if (comm.getRank() == 0) {
     REQUIRE_NE(j, nullptr);
@@ -223,7 +219,6 @@ TEST_CASE("Timer to_json two unassociated timings sequential")
   timer.start("B");
   timer.stop("B");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
 
   if (comm.getRank() == 0) {
     REQUIRE_NE(j, nullptr);
@@ -273,7 +268,6 @@ TEST_CASE("Timer to_json nested timing")
   timer.stop("B");
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   if (comm.getRank() == 0) {
     REQUIRE_NE(j, nullptr);
     CHECK_EQ(j.size(), 2);
@@ -311,7 +305,6 @@ TEST_CASE("Timer to_json domain timing")
   timer.startDomainTiming(0, "A");
   timer.stopDomainTiming(0, "A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   if (comm.getRank() == 0) {
     REQUIRE_NE(j, nullptr);
     CHECK_EQ(j.size(), 3);
@@ -360,7 +353,6 @@ TEST_CASE("Timer to_json domain timing only on rank 0")
     timer.stopDomainTiming(0, "A");
   }
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   if (comm.getRank() == 0) {
     REQUIRE_NE(j, nullptr);
     CHECK_EQ(j.size(), 3);
@@ -401,7 +393,6 @@ TEST_CASE("Timer to_json domain timing only on rank 1")
     timer.stopDomainTiming(0, "A");
   }
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
   if (comm.getRank() == 0) {
     REQUIRE_NE(j, nullptr);
     CHECK_EQ(j.size(), 3);
@@ -438,7 +429,6 @@ TEST_CASE("Timer ostream empty timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "No timings to report"), 1);
   } else {
@@ -454,7 +444,6 @@ TEST_CASE("Timer ostream unassociated timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "A"), 1);
     CHECK_EQ(occurrences(s, "time (sec)"), 0);
@@ -477,7 +466,6 @@ TEST_CASE("Timer ostream nested unassociated timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "A"), 2);
     CHECK_EQ(occurrences(s, "B"), 1);
@@ -501,7 +489,6 @@ TEST_CASE("Timer ostream sequential unassociated timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "A"), 1);
     CHECK_EQ(occurrences(s, "time (sec)"), 0);
@@ -523,7 +510,6 @@ TEST_CASE("Timer ostream domain timing")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "A"), 1);
     CHECK_EQ(occurrences(s, "time (sec)"), 0);
@@ -548,7 +534,6 @@ TEST_CASE("Timer ostream domain timing two different domains sequential")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "A"), 1);
     CHECK_EQ(occurrences(s, "time (sec)"), 0);
@@ -577,7 +562,6 @@ TEST_CASE("Timer ostream domain timing two different domains sequential rank 0 h
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "A"), 1);
     CHECK_EQ(occurrences(s, "B"), 1);
@@ -607,7 +591,6 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "A"), 2);
     CHECK_EQ(occurrences(s, "B"), 1);
@@ -640,7 +623,6 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested f
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "A"), 3);
     CHECK_EQ(occurrences(s, "B"), 1);
@@ -674,7 +656,6 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested s
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
   if (comm.getRank() == 0) {
     CHECK_EQ(occurrences(s, "A"), 3);
     CHECK_EQ(occurrences(s, "B"), 1);

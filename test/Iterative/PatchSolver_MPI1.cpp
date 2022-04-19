@@ -39,12 +39,10 @@ TEST_CASE("Iterative::PatchSolver passes vectors of a single patch length")
     for (auto nx : { 2, 5 }) {
       for (auto ny : { 2, 5 }) {
         for (auto num_components : { 1, 2, 3 }) {
-          INFO("MESH: " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
 
-          INFO("num_components: " << num_components);
           Vector<2> u(d_fine, num_components);
           Vector<2> f(d_fine, num_components);
 
@@ -70,12 +68,10 @@ TEST_CASE("Iterative::PatchSolver passes modified operator")
     for (auto nx : { 2, 5 }) {
       for (auto ny : { 2, 5 }) {
         for (auto num_components : { 1, 2, 3 }) {
-          INFO("MESH: " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
 
-          INFO("num_components: " << num_components);
           Vector<2> u(d_fine, num_components);
           Vector<2> f(d_fine, num_components);
 
@@ -109,12 +105,10 @@ TEST_CASE("Iterative::PatchSolver propagates BreakdownError")
     for (auto nx : { 2, 5 }) {
       for (auto ny : { 2, 5 }) {
         for (auto num_components : { 1, 2, 3 }) {
-          INFO("MESH: " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
 
-          INFO("num_components: " << num_components);
           Vector<2> u(d_fine, num_components);
           Vector<2> f(d_fine, num_components);
           f.set(1);
@@ -141,12 +135,10 @@ TEST_CASE("Iterative::PatchSolver does not propagate BreakdownError")
     for (auto nx : { 2, 5 }) {
       for (auto ny : { 2, 5 }) {
         for (auto num_components : { 1, 2, 3 }) {
-          INFO("MESH: " << mesh_file);
           int num_ghost = 1;
           DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
           Domain<2> d_fine = domain_reader.getFinerDomain();
 
-          INFO("num_components: " << num_components);
           Vector<2> u(d_fine, num_components);
           Vector<2> f(d_fine, num_components);
           f.set(1);

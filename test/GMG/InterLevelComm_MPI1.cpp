@@ -37,10 +37,7 @@ TEST_CASE("1-processor InterLevelComm GetPatches on uniform 4x4")
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
         Domain<2> d_fine = domain_reader.getFinerDomain();
         Domain<2> d_coarse = domain_reader.getCoarserDomain();
-        INFO("d_fine: " << d_fine.getNumLocalPatches());
-        INFO("d_coarse: " << d_coarse.getNumLocalPatches());
         GMG::InterLevelComm<2>* ilc = nullptr;
-        INFO("construction_type: " << construction_type);
         if (construction_type == "direct") {
           // direct construction
           ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -103,7 +100,6 @@ TEST_CASE("InterLevelComm 1-processor getNewGhostVector on uniform 4x4")
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -139,7 +135,6 @@ TEST_CASE("InterLevelComm 1-processor sendGhostPatches on uniform 4x4")
           Domain<2> d_fine = domain_reader.getFinerDomain();
           Domain<2> d_coarse = domain_reader.getCoarserDomain();
           GMG::InterLevelComm<2>* ilc = nullptr;
-          INFO("construction_type: " << construction_type);
           if (construction_type == "direct") {
             // direct construction
             ilc = new GMG::InterLevelComm<2>(d_coarse, d_fine);
@@ -160,8 +155,6 @@ TEST_CASE("InterLevelComm 1-processor sendGhostPatches on uniform 4x4")
           Vector<2> ghost_vec = ilc->getNewGhostVector(num_components);
 
           // info
-          INFO("nx: " << nx);
-          INFO("ny: " << ny);
 
           auto f = [&](const std::array<double, 2> coord) -> double { return 1 + coord[0] + 2 * coord[1]; };
 

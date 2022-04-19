@@ -35,7 +35,6 @@ const string mesh_file = "mesh_inputs/2d_uniform_4x4_mpi1.json";
 TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 1;
     DomainReader<2> domain_reader(mesh_file, { n, n }, num_ghost);
@@ -63,20 +62,9 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I")
     m_operator.apply(x, b);
 
     for (auto pinfo : d_fine.getPatchInfoVector()) {
-      INFO("Patch: " << pinfo.id);
-      INFO("x:     " << pinfo.starts[0]);
-      INFO("y:     " << pinfo.starts[1]);
-      INFO("nx:    " << pinfo.ns[0]);
-      INFO("ny:    " << pinfo.ns[1]);
-      INFO("dx:    " << pinfo.spacings[0]);
-      INFO("dy:    " << pinfo.spacings[1]);
       ComponentView<double, 2> x_ld = x.getComponentView(0, pinfo.local_index);
       ComponentView<double, 2> b_ld = b.getComponentView(0, pinfo.local_index);
-      Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) {
-        INFO("xi:    " << coord[0]);
-        INFO("yi:    " << coord[1]);
-        CHECK_EQ(0.5 * x_ld[coord], doctest::Approx(b_ld[coord]));
-      });
+      Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) { CHECK_EQ(0.5 * x_ld[coord], doctest::Approx(b_ld[coord])); });
     }
     MatDestroy(&A);
   }
@@ -84,7 +72,6 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I")
 TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 1;
     DomainReader<2> domain_reader(mesh_file, { n, n }, num_ghost);
@@ -117,27 +104,12 @@ TEST_CASE("PETSc::MatWrapper works with ValVector and 0.5I two components")
     m_operator.apply(x, b);
 
     for (auto pinfo : d_fine.getPatchInfoVector()) {
-      INFO("Patch: " << pinfo.id);
-      INFO("x:     " << pinfo.starts[0]);
-      INFO("y:     " << pinfo.starts[1]);
-      INFO("nx:    " << pinfo.ns[0]);
-      INFO("ny:    " << pinfo.ns[1]);
-      INFO("dx:    " << pinfo.spacings[0]);
-      INFO("dy:    " << pinfo.spacings[1]);
       ComponentView<double, 2> x_ld = x.getComponentView(0, pinfo.local_index);
       ComponentView<double, 2> b_ld = b.getComponentView(0, pinfo.local_index);
-      Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) {
-        INFO("xi:    " << coord[0]);
-        INFO("yi:    " << coord[1]);
-        CHECK_EQ(0.5 * x_ld[coord], doctest::Approx(b_ld[coord]));
-      });
+      Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) { CHECK_EQ(0.5 * x_ld[coord], doctest::Approx(b_ld[coord])); });
       ComponentView<double, 2> x_ld2 = x.getComponentView(1, pinfo.local_index);
       ComponentView<double, 2> b_ld2 = b.getComponentView(1, pinfo.local_index);
-      Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) {
-        INFO("xi:    " << coord[0]);
-        INFO("yi:    " << coord[1]);
-        CHECK_EQ(0.5 * x_ld2[coord], doctest::Approx(b_ld2[coord]));
-      });
+      Loop::Nested<2>(x_ld.getStart(), x_ld.getEnd(), [&](const array<int, 2>& coord) { CHECK_EQ(0.5 * x_ld2[coord], doctest::Approx(b_ld2[coord])); });
     }
     MatDestroy(&A);
   }

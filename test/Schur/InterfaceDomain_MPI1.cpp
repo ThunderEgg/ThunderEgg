@@ -134,7 +134,6 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one patch interface local 
 
   REQUIRE_GT(id_to_local_indexes.size(), 0);
   for (auto pair : id_to_local_indexes) {
-    INFO("ID " << pair.first);
     CHECK_EQ(pair.second.size(), 1);
   }
 }
@@ -156,7 +155,6 @@ TEST_CASE("Schur::InterfaceDomain<2> each patch interface local index has only o
 
   REQUIRE_GT(local_index_to_ids.size(), 0);
   for (auto pair : local_index_to_ids) {
-    INFO("Local Index " << pair.first);
     CHECK_EQ(pair.second.size(), 1);
   }
 }
@@ -231,7 +229,6 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one row local index associ
 
   REQUIRE_GT(id_to_local_indexes.size(), 0);
   for (auto pair : id_to_local_indexes) {
-    INFO("ID " << pair.first);
     CHECK_EQ(pair.second.size(), 1);
   }
 }
@@ -258,7 +255,6 @@ TEST_CASE("Schur::InterfaceDomain<2> each row local index has only one id associ
 
   REQUIRE_GT(local_index_to_ids.size(), 0);
   for (auto pair : local_index_to_ids) {
-    INFO("Local Index " << pair.first);
     CHECK_EQ(pair.second.size(), 1);
   }
 }
@@ -396,7 +392,6 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one col local index associ
 
   REQUIRE_GT(id_to_local_indexes.size(), 0);
   for (auto pair : id_to_local_indexes) {
-    INFO("ID " << pair.first);
     CHECK_EQ(pair.second.size(), 1);
   }
 }
@@ -436,7 +431,6 @@ TEST_CASE("Schur::InterfaceDomain<2> each col local index has only one id associ
 
   REQUIRE_GT(local_index_to_ids.size(), 0);
   for (auto pair : local_index_to_ids) {
-    INFO("Local Index " << pair.first);
     CHECK_EQ(pair.second.size(), 1);
   }
 }
@@ -607,7 +601,6 @@ TEST_CASE("Schur::InterfaceDomain<2> each id has only one global index associate
 
   REQUIRE_GT(id_to_global_indexes.size(), 0);
   for (auto pair : id_to_global_indexes) {
-    INFO("ID " << pair.first);
     CHECK_EQ(pair.second.size(), 1);
   }
 }
@@ -665,7 +658,6 @@ TEST_CASE("Schur::InterfaceDomain<2> each global index has only one id associate
 
   REQUIRE_GT(global_index_to_ids.size(), 0);
   for (auto pair : global_index_to_ids) {
-    INFO("Global Index " << pair.first);
     CHECK_EQ(pair.second.size(), 1);
   }
 }

@@ -45,7 +45,6 @@ TEST_CASE("Schur::CoarseIfaceInfo constructor")
     pinfo.getCoarseNbrInfo(s).rank = 1;
     pinfo.getCoarseNbrInfo(s).orth_on_coarse = Orthant<1>::upper();
     Schur::CoarseIfaceInfo<2> iface_info(pinfo, s);
-    INFO("Side: " << s);
     CHECK_EQ(iface_info.rank, 0);
     CHECK_EQ(iface_info.coarse_rank, 1);
     // check that the id is encoded as expected

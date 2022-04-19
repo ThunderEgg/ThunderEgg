@@ -40,10 +40,6 @@ TEST_CASE("Vector<2> getNumGhostCells domain constructor")
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             Vector<2> vec(domain, num_components);
 
             CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
@@ -64,10 +60,6 @@ TEST_CASE("Vector<2> getMPIComm domain constructor")
 
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
-
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
 
             Vector<2> vec(domain, num_components);
 
@@ -93,10 +85,6 @@ TEST_CASE("Vector<2> getNumLocalPatches domain constructor")
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             Vector<2> vec(domain, num_components);
 
             CHECK_EQ(vec.getNumLocalPatches(), domain.getNumLocalPatches());
@@ -118,10 +106,6 @@ TEST_CASE("Vector<2> getNumComponents domain constructor")
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             Vector<2> vec(domain, num_components);
 
             CHECK_EQ(vec.getNumComponents(), num_components);
@@ -142,10 +126,6 @@ TEST_CASE("Vector<2> getNumLocalCells domain constructor")
 
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
-
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
 
             Vector<2> vec(domain, num_components);
 
@@ -170,17 +150,11 @@ TEST_CASE("Vector<2> getComponentView domain constructor")
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             Vector<2> vec(domain, num_components);
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -212,17 +186,11 @@ TEST_CASE("Vector<2> getComponentView const domain constructor")
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             const Vector<2> vec(domain, num_components);
 
             const double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
-              INFO("i:                 " << i);
               for (int c = 0; c < num_components; c++) {
-                INFO("c:                 " << c);
                 ComponentView<const double, 2> ld = vec.getComponentView(c, i);
                 CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i + c * component_stride);
                 CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * i + (c + 1) * component_stride - 1);
@@ -254,15 +222,10 @@ TEST_CASE("Vector<2> getPatchView domain constructor")
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             Vector<2> vec(domain, num_components);
 
             double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
-              INFO("i:                 " << i);
               PatchView<double, 2> ld = vec.getPatchView(i);
               CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
               CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);
@@ -291,15 +254,10 @@ TEST_CASE("Vector<2> getPatchView const domain constructor")
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
-            INFO("num_ghost_cells:   " << num_ghost_cells);
-            INFO("nx:                " << nx);
-            INFO("ny:                " << ny);
-
             const Vector<2> vec(domain, num_components);
 
             const double* view = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, 0);
             for (int i = 0; i < domain.getNumLocalPatches(); i++) {
-              INFO("i:                 " << i);
               PatchView<const double, 2> ld = vec.getPatchView(i);
               CHECK_EQ(&ld[ld.getGhostStart()], view + patch_stride * i);
               CHECK_EQ(&ld[ld.getGhostEnd()], view + patch_stride * (i + 1) - 1);

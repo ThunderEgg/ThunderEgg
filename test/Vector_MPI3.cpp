@@ -39,13 +39,6 @@ TEST_CASE("Vector<3> twoNorm")
 
               Vector<3> vec(comm, ns, num_components, num_local_patches, num_ghost_cells);
 
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-              INFO("num_components:    " << num_components);
-
               int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells) * num_components * num_local_patches;
               double* vec_data = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, -num_ghost_cells, 0);
               for (size_t i = 0; i < size; i++) {
@@ -87,13 +80,6 @@ TEST_CASE("Vector<3> infNorm")
 
               Vector<3> vec(comm, ns, num_components, num_local_patches, num_ghost_cells);
 
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-              INFO("num_components:    " << num_components);
-
               int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells) * num_components * num_local_patches;
               double* vec_data = &vec.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, -num_ghost_cells, 0);
               for (size_t i = 0; i < size; i++) {
@@ -134,13 +120,6 @@ TEST_CASE("Vector<3> dot")
 
               Vector<3> a(comm, ns, num_components, num_local_patches, num_ghost_cells);
               Vector<3> b(comm, ns, num_components, num_local_patches, num_ghost_cells);
-
-              INFO("num_ghost_cells:   " << num_ghost_cells);
-              INFO("nx:                " << nx);
-              INFO("ny:                " << ny);
-              INFO("nz:                " << nz);
-              INFO("num_local_patches: " << num_local_patches);
-              INFO("num_components:    " << num_components);
 
               int size = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells) * (nz + 2 * num_ghost_cells) * num_components * num_local_patches;
               double* a_data = &a.getPatchView(0)(-num_ghost_cells, -num_ghost_cells, -num_ghost_cells, 0);

@@ -42,7 +42,6 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws exception for non-square pa
   for (auto mesh_file : { MESHES }) {
     for (int nx : { 5, 8 }) {
       for (int ny : { 7, 10 }) {
-        INFO("MESH FILE " << mesh_file);
         int num_ghost = 1;
         bitset<4> neumann;
         DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost);
@@ -72,7 +71,6 @@ public:
 TEST_CASE("Poisson::FastSchurMatrixAssemble2D throws with unsupported ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int num_ghost = 1;
     bitset<4> neumann;
     DomainReader<2> domain_reader(mesh_file, { 10, 10 }, num_ghost);
@@ -90,7 +88,6 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
           "Poisson::StarPatchOperator bilinear ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 1;
     bitset<4> neumann;
@@ -129,15 +126,9 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     REQUIRE_GT(f_vec.infNorm(), 0);
 
     for (auto iface : iface_domain.getInterfaces()) {
-      INFO("ID: " << iface->id);
-      INFO("LOCAL_INDEX: " << iface->local_index);
-      INFO("type: " << iface->patches.size());
       ComponentView<double, 1> f_vec_ld = f_vec.getComponentView(0, iface->local_index);
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, iface->local_index);
-      Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
-        INFO("xi:    " << coord[0]);
-        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
-      });
+      Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord])); });
     }
     MatDestroy(&A);
   }
@@ -146,7 +137,6 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
           "Poisson::StarPatchOperator with Neumann BC bilinear ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 1;
     bitset<4> neumann = 0xF;
@@ -187,10 +177,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
       ComponentView<double, 1> f_vec_ld = f_vec.getComponentView(0, i);
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
-      Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
-        INFO("xi:    " << coord[0]);
-        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
-      });
+      Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord])); });
     }
     MatDestroy(&A);
   }
@@ -199,7 +186,6 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
           "Poisson::StarPatchOperator Biquadratic ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 1;
     bitset<4> neumann;
@@ -240,10 +226,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
       ComponentView<double, 1> f_vec_ld = f_vec.getComponentView(0, i);
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
-      Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
-        INFO("xi:    " << coord[0]);
-        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
-      });
+      Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord])); });
     }
     MatDestroy(&A);
   }
@@ -252,7 +235,6 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
           "Poisson::StarPatchOperator with Neumann BC BiQuadratic ghost filler")
 {
   for (auto mesh_file : { MESHES }) {
-    INFO("MESH FILE " << mesh_file);
     int n = 32;
     int num_ghost = 1;
     bitset<4> neumann = 0xF;
@@ -293,10 +275,7 @@ TEST_CASE("Poisson::FastSchurMatrixAssemble2D gives equivalent operator to "
     for (int i = 0; i < f_vec.getNumLocalPatches(); i++) {
       ComponentView<double, 1> f_vec_ld = f_vec.getComponentView(0, i);
       ComponentView<double, 1> f_vec_expected_ld = f_vec_expected.getComponentView(0, i);
-      Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) {
-        INFO("xi:    " << coord[0]);
-        CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord]));
-      });
+      Loop::Nested<1>(f_vec_ld.getStart(), f_vec_ld.getEnd(), [&](const array<int, 1>& coord) { CHECK_EQ(f_vec_ld[coord], doctest::Approx(f_vec_expected_ld[coord])); });
     }
     MatDestroy(&A);
   }

@@ -95,12 +95,6 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
 
             p4est_partition(p4est, true, nullptr);
 
-            INFO("nx: " << nx);
-            INFO("ny: " << ny);
-            INFO("scale_x: " << scale_x);
-            INFO("scale_y: " << scale_y);
-            INFO("num_ghost_cells: " << num_ghost_cells);
-
             P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y, double& x, double& y) {
               x = scale_x * unit_x;
               y = scale_y * unit_y;
@@ -203,12 +197,6 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
             std::vector<PatchInfo<2>> domain_2_patches = GetAllPatchesOnRank0(domain_2);
             std::vector<PatchInfo<2>> domain_1_patches = GetAllPatchesOnRank0(domain_1);
             std::vector<PatchInfo<2>> domain_0_patches = GetAllPatchesOnRank0(domain_0);
-
-            INFO("nx: " << nx);
-            INFO("ny: " << ny);
-            INFO("scale_x: " << scale_x);
-            INFO("scale_y: " << scale_y);
-            INFO("num_ghost_cells: " << num_ghost_cells);
 
             const PatchInfo<2>* domain_2_sw_sw_patch = nullptr;
             const PatchInfo<2>* domain_2_sw_se_patch = nullptr;
@@ -377,7 +365,6 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
             {
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
-                  INFO("i: " << i);
                   CHECK_EQ(domain_2_sw_sw_patch->child_ids[i], -1);
                   CHECK_EQ(domain_2_sw_se_patch->child_ids[i], -1);
                   CHECK_EQ(domain_2_sw_nw_patch->child_ids[i], -1);
@@ -491,7 +478,6 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
             {
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
-                  INFO("i: " << i);
                   CHECK_EQ(domain_2_sw_sw_patch->child_ids[i], -1);
                   CHECK_EQ(domain_2_sw_se_patch->child_ids[i], -1);
                   CHECK_EQ(domain_2_sw_nw_patch->child_ids[i], -1);
@@ -967,12 +953,6 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
               p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return (quadrant->x == 0 && quadrant->y == 0); }, nullptr);
 
             p4est_partition(p4est, true, nullptr);
-
-            INFO("nx: " << nx);
-            INFO("ny: " << ny);
-            INFO("scale_x: " << scale_x);
-            INFO("scale_y: " << scale_y);
-            INFO("num_ghost_cells: " << num_ghost_cells);
 
             P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y, double& x, double& y) {
               x = scale_x * unit_x;
@@ -1563,12 +1543,6 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
 
             p4est_partition(p4est, true, nullptr);
 
-            INFO("nx: " << nx);
-            INFO("ny: " << ny);
-            INFO("scale_x: " << scale_x);
-            INFO("scale_y: " << scale_y);
-            INFO("num_ghost_cells: " << num_ghost_cells);
-
             P4estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y, double& x, double& y) {
               x = scale_x * unit_x;
               y = scale_y * unit_y;
@@ -1650,12 +1624,6 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
             std::vector<PatchInfo<2>> domain_2_patches = GetAllPatchesOnRank0(domain_2);
             std::vector<PatchInfo<2>> domain_1_patches = GetAllPatchesOnRank0(domain_1);
             std::vector<PatchInfo<2>> domain_0_patches = GetAllPatchesOnRank0(domain_0);
-
-            INFO("nx: " << nx);
-            INFO("ny: " << ny);
-            INFO("scale_x: " << scale_x);
-            INFO("scale_y: " << scale_y);
-            INFO("num_ghost_cells: " << num_ghost_cells);
 
             const PatchInfo<2>* domain_3_sw_sw_sw_patch = nullptr;
             const PatchInfo<2>* domain_3_sw_sw_se_patch = nullptr;
@@ -2063,7 +2031,6 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
             {
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
-                  INFO("i: " << i);
                   CHECK_EQ(domain_3_sw_sw_sw_patch->child_ids[i], -1);
                   CHECK_EQ(domain_3_sw_sw_se_patch->child_ids[i], -1);
                   CHECK_EQ(domain_3_sw_sw_nw_patch->child_ids[i], -1);
@@ -2274,7 +2241,6 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
             {
               if (rank == 0) {
                 for (int i = 0; i < 4; i++) {
-                  INFO("i: " << i);
                   CHECK_EQ(domain_3_sw_sw_sw_patch->child_ranks[i], -1);
                   CHECK_EQ(domain_3_sw_sw_se_patch->child_ranks[i], -1);
                   CHECK_EQ(domain_3_sw_sw_nw_patch->child_ranks[i], -1);
