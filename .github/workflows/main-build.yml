@@ -13,7 +13,7 @@ jobs:
         include:
         - name: "gcc"
           preset: "ci-gcc"
-          ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev gcc-10 gxx-10"
+          ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev gcc-10 g++-10"
           analyze: false
         - name: "clang"
           preset: "ci-clang"
