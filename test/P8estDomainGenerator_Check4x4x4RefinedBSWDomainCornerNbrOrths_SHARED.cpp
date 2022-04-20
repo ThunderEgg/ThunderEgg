@@ -19,14 +19,14 @@
  ***************************************************************************/
 
 #include "P8estDomainGenerator_SHARED.h"
-#include <catch2/catch_approx.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 void
 Check4x4x4RefinedBSWDomainCornerNeighborOrths(const PatchVector& domain)
 {
-  CHECK(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Corner<3>::tne()).orth_on_coarse == Orthant<0>(0));
+  CHECK_EQ(domain["bsw_bsw_tne"]->getCoarseNbrInfo(Corner<3>::tne()).orth_on_coarse, Orthant<0>(0));
 }

@@ -19,651 +19,651 @@
  ***************************************************************************/
 
 #include "P8estDomainGenerator_SHARED.h"
-#include <catch2/catch_approx.hpp>
+
 using namespace std;
 using namespace ThunderEgg;
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 void
 Check4x4x4RefinedBSWDomainCornerHasNeighbors(const PatchVector& domain)
 {
-  CHECK_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bsw_bse"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bsw_bse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bsw_bnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bsw_bnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_bne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_bne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_bne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bsw_bne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bsw_bne"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bsw_bne"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bsw_bne"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bsw_bne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bsw_tsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bsw_tsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_tse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bsw_tse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bsw_tse"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bsw_tse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_tse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bsw_tse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bsw_tse"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bsw_tse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bsw_tnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bsw_tnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bsw_tnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bsw_tnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bsw_tnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bsw_tnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bsw_tnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bsw_tnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bsw_tne"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bsw_tne"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bsw_tne"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bsw_tne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bsw_tne"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bsw_tne"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bsw_tne"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bsw_tne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bse_bsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bse_bsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bse_bse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bse_bnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bse_bnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bse_bnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bse_bnw"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bse_bnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bse_bnw"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bse_bnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bse_bnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bse_bne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bse_bne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bse_tsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bse_tsw"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bse_tsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bse_tsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bse_tsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bse_tsw"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bse_tsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bse_tsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bse_tse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bse_tse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bse_tnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bse_tnw"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bse_tnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bse_tnw"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bse_tnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bse_tnw"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bse_tnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bse_tnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bse_tne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bse_tne"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bse_tne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bse_tne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bse_tne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bse_tne"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bse_tne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bse_tne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bnw_bsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bnw_bsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bnw_bse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bnw_bse"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bnw_bse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bnw_bse"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bnw_bse"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bnw_bse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bnw_bse"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bnw_bse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bnw_bnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bnw_bne"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bnw_bne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bnw_tsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bnw_tsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bnw_tsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bnw_tsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bnw_tsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bnw_tsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bnw_tsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bnw_tsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bnw_tse"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bnw_tse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bnw_tse"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bnw_tse"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bnw_tse"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bnw_tse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bnw_tse"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bnw_tse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bnw_tnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bnw_tnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bnw_tne"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bnw_tne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bnw_tne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bnw_tne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bnw_tne"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bnw_tne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bnw_tne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bnw_tne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bne_bsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bne_bsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bne_bsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bne_bsw"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bne_bsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bne_bsw"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bne_bsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bne_bsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bne_bse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bne_bse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bne_bnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bne_bnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bne_bne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bne_tsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bne_tsw"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bne_tsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["bne_tsw"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bne_tsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bne_tsw"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bne_tsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["bne_tsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bne_tse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bne_tse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["bne_tse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bne_tse"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bne_tse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bne_tse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["bne_tse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bne_tse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bne_tnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["bne_tnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bne_tnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bne_tnw"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bne_tnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["bne_tnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bne_tnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bne_tnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["bne_tne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["bne_tne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tsw_bsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["tsw_bsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tsw_bse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tsw_bse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tsw_bse"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tsw_bse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tsw_bse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tsw_bse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["tsw_bse"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["tsw_bse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tsw_bnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tsw_bnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tsw_bnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tsw_bnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tsw_bnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["tsw_bnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tsw_bnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["tsw_bnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tsw_bne"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tsw_bne"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tsw_bne"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tsw_bne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["tsw_bne"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["tsw_bne"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["tsw_bne"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["tsw_bne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tsw_tsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tsw_tse"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tsw_tse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tsw_tnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tsw_tnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tsw_tne"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tsw_tne"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tsw_tne"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tsw_tne"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tsw_tne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tsw_tne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tsw_tne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tsw_tne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tse_bsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tse_bsw"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tse_bsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tse_bsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tse_bsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tse_bsw"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["tse_bsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["tse_bsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tse_bse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["tse_bse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tse_bnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tse_bnw"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tse_bnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tse_bnw"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["tse_bnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["tse_bnw"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["tse_bnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["tse_bnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tse_bne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tse_bne"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tse_bne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tse_bne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["tse_bne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tse_bne"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["tse_bne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tse_bne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tse_tsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tse_tsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tse_tse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tse_tnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tse_tnw"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tse_tnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tse_tnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tse_tnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tse_tnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tse_tnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tse_tnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tse_tne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tse_tne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tnw_bsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tnw_bsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tnw_bsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tnw_bsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tnw_bsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["tnw_bsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tnw_bsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["tnw_bsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tnw_bse"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tnw_bse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tnw_bse"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tnw_bse"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["tnw_bse"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["tnw_bse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["tnw_bse"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["tnw_bse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tnw_bnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["tnw_bnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tnw_bne"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tnw_bne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tnw_bne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tnw_bne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["tnw_bne"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["tnw_bne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tnw_bne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tnw_bne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tnw_tsw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tnw_tsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tnw_tse"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tnw_tse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tnw_tse"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tnw_tse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tnw_tse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tnw_tse"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tnw_tse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tnw_tse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tnw_tnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tnw_tne"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tnw_tne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tne_bsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tne_bsw"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tne_bsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tne_bsw"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["tne_bsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["tne_bsw"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["tne_bsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK(domain["tne_bsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tne_bse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tne_bse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tne_bse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tne_bse"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["tne_bse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tne_bse"]->hasNbr(Corner<3>::tse()));
-  CHECK(domain["tne_bse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tne_bse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tne_bnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tne_bnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tne_bnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tne_bnw"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["tne_bnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK(domain["tne_bnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tne_bnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tne_bnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tne_bne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::bne()));
-  CHECK(domain["tne_bne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tne_tsw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tne_tsw"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tne_tsw"]->hasNbr(Corner<3>::bnw()));
-  CHECK(domain["tne_tsw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tne_tsw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tne_tsw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tne_tsw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tne_tsw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tne_tse"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::bse()));
-  CHECK(domain["tne_tse"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tne_tnw"]->hasNbr(Corner<3>::bsw()));
-  CHECK(domain["tne_tnw"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::tne()));
-
-  CHECK(domain["tne_tne"]->hasNbr(Corner<3>::bsw()));
-  CHECK_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::bse()));
-  CHECK_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::bnw()));
-  CHECK_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::bne()));
-  CHECK_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::tsw()));
-  CHECK_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::tse()));
-  CHECK_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::tnw()));
-  CHECK_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::tne()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bsw_bsw_bsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_bne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bsw_bsw_tne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bsw_bse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bsw_bse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bsw_bnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_bnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bsw_bnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_bne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_bne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_bne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bsw_bne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bsw_bne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bsw_bne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bsw_bne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bsw_bne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bsw_tsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_tsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bsw_tsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_tse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bsw_tse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bsw_tse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bsw_tse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_tse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bsw_tse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bsw_tse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bsw_tse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bsw_tnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bsw_tnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bsw_tnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bsw_tnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bsw_tnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bsw_tnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bsw_tnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bsw_tnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bsw_tne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bsw_tne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bsw_tne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bsw_tne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bsw_tne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bsw_tne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bsw_tne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bsw_tne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bse_bsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bse_bsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bse_bsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bse_bse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bse_bse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bse_bnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bse_bnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bse_bnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bse_bnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bse_bnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bse_bnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bse_bnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bse_bnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bse_bne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bse_bne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bse_bne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bse_tsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bse_tsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bse_tsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bse_tsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bse_tsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bse_tsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bse_tsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bse_tsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bse_tse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bse_tse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bse_tse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bse_tnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bse_tnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bse_tnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bse_tnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bse_tnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bse_tnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bse_tnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bse_tnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bse_tne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bse_tne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bse_tne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bse_tne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bse_tne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bse_tne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bse_tne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bse_tne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bnw_bsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bnw_bsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bnw_bsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bnw_bse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bnw_bse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bnw_bse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bnw_bse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bnw_bse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bnw_bse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bnw_bse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bnw_bse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bnw_bnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bnw_bnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bnw_bne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bnw_bne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bnw_bne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bnw_tsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bnw_tsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bnw_tsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bnw_tsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bnw_tsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bnw_tsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bnw_tsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bnw_tsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bnw_tse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bnw_tse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bnw_tse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bnw_tse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bnw_tse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bnw_tse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bnw_tse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bnw_tse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bnw_tnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bnw_tnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bnw_tnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bnw_tne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bnw_tne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bnw_tne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bnw_tne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bnw_tne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bnw_tne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bnw_tne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bnw_tne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bne_bsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bne_bsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bne_bsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bne_bsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bne_bsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bne_bsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bne_bsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bne_bsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bne_bse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bne_bse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bne_bse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bne_bnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bne_bnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bne_bnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bne_bne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bne_bne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bne_tsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bne_tsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bne_tsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["bne_tsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bne_tsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bne_tsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bne_tsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["bne_tsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bne_tse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bne_tse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["bne_tse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bne_tse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bne_tse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bne_tse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["bne_tse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bne_tse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bne_tnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["bne_tnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bne_tnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bne_tnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bne_tnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["bne_tnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bne_tnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bne_tnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["bne_tne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["bne_tne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["bne_tne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tsw_bsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tsw_bsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["tsw_bsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tsw_bse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tsw_bse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tsw_bse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tsw_bse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tsw_bse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tsw_bse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["tsw_bse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["tsw_bse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tsw_bnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tsw_bnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tsw_bnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tsw_bnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tsw_bnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["tsw_bnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tsw_bnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["tsw_bnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tsw_bne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tsw_bne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tsw_bne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tsw_bne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["tsw_bne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["tsw_bne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["tsw_bne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["tsw_bne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tsw_tsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tsw_tsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tsw_tse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tsw_tse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tsw_tse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tsw_tnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tsw_tnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tsw_tnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tsw_tne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tsw_tne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tsw_tne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tsw_tne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tsw_tne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tsw_tne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tsw_tne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tsw_tne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tse_bsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tse_bsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tse_bsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tse_bsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tse_bsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tse_bsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["tse_bsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["tse_bsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tse_bse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["tse_bse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tse_bse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tse_bnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tse_bnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tse_bnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tse_bnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["tse_bnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["tse_bnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["tse_bnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["tse_bnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tse_bne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tse_bne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tse_bne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tse_bne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["tse_bne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tse_bne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["tse_bne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tse_bne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tse_tsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tse_tsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tse_tsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tse_tse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tse_tse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tse_tnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tse_tnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tse_tnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tse_tnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tse_tnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tse_tnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tse_tnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tse_tnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tse_tne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tse_tne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tse_tne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tnw_bsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tnw_bsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tnw_bsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tnw_bsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tnw_bsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["tnw_bsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tnw_bsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["tnw_bsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tnw_bse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tnw_bse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tnw_bse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tnw_bse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["tnw_bse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["tnw_bse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["tnw_bse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["tnw_bse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tnw_bnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["tnw_bnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tnw_bnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tnw_bne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tnw_bne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tnw_bne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tnw_bne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["tnw_bne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["tnw_bne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tnw_bne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tnw_bne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tnw_tsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tnw_tsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tnw_tsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tnw_tse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tnw_tse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tnw_tse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tnw_tse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tnw_tse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tnw_tse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tnw_tse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tnw_tse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tnw_tnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tnw_tnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tnw_tne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tnw_tne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tnw_tne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tne_bsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tne_bsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tne_bsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tne_bsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["tne_bsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["tne_bsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["tne_bsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY(domain["tne_bsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tne_bse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tne_bse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tne_bse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tne_bse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["tne_bse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tne_bse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY(domain["tne_bse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tne_bse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tne_bnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tne_bnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tne_bnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tne_bnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["tne_bnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY(domain["tne_bnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tne_bnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tne_bnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tne_bne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY(domain["tne_bne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tne_bne"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tne_tsw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tne_tsw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tne_tsw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY(domain["tne_tsw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tne_tsw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tne_tsw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tne_tsw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tne_tsw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tne_tse"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY(domain["tne_tse"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tne_tse"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tne_tnw"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY(domain["tne_tnw"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tne_tnw"]->hasNbr(Corner<3>::tne()));
+
+  CHECK_UNARY(domain["tne_tne"]->hasNbr(Corner<3>::bsw()));
+  CHECK_UNARY_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::bse()));
+  CHECK_UNARY_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::bnw()));
+  CHECK_UNARY_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::bne()));
+  CHECK_UNARY_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::tsw()));
+  CHECK_UNARY_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::tse()));
+  CHECK_UNARY_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::tnw()));
+  CHECK_UNARY_FALSE(domain["tne_tne"]->hasNbr(Corner<3>::tne()));
 }

@@ -19,13 +19,12 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
 
-TEST_CASE("CoarseNbrInfo Serialization/Deserialization", "[CoarseNbrInfo]")
+TEST_CASE("CoarseNbrInfo Serialization/Deserialization")
 {
   CoarseNbrInfo<2> info;
   info.id = 5;
@@ -37,7 +36,7 @@ TEST_CASE("CoarseNbrInfo Serialization/Deserialization", "[CoarseNbrInfo]")
   CoarseNbrInfo<2> out;
   out.deserialize(buff);
   delete[] buff;
-  REQUIRE(out.id == 5);
-  REQUIRE(out.rank == 1);
-  REQUIRE(out.orth_on_coarse == Orthant<2>::nw());
+  REQUIRE_EQ(out.id, 5);
+  REQUIRE_EQ(out.rank, 1);
+  REQUIRE_EQ(out.orth_on_coarse, Orthant<2>::nw());
 }

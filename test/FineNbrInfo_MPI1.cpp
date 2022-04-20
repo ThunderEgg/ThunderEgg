@@ -19,14 +19,13 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("FineNbrInfo Serialization/Deserialization", "[FineNbrInfo]")
+TEST_CASE("FineNbrInfo Serialization/Deserialization")
 {
   FineNbrInfo<2> info;
   info.ids[0] = 1;
@@ -43,12 +42,12 @@ TEST_CASE("FineNbrInfo Serialization/Deserialization", "[FineNbrInfo]")
   FineNbrInfo<2> out;
   out.deserialize(buff);
   delete[] buff;
-  REQUIRE(out.ids[0] == 1);
-  REQUIRE(out.ids[1] == 2);
-  REQUIRE(out.ids[2] == 3);
-  REQUIRE(out.ids[3] == 4);
-  REQUIRE(out.ranks[0] == 9);
-  REQUIRE(out.ranks[1] == 8);
-  REQUIRE(out.ranks[2] == 7);
-  REQUIRE(out.ranks[3] == 6);
+  REQUIRE_EQ(out.ids[0], 1);
+  REQUIRE_EQ(out.ids[1], 2);
+  REQUIRE_EQ(out.ids[2], 3);
+  REQUIRE_EQ(out.ids[3], 4);
+  REQUIRE_EQ(out.ranks[0], 9);
+  REQUIRE_EQ(out.ranks[1], 8);
+  REQUIRE_EQ(out.ranks[2], 7);
+  REQUIRE_EQ(out.ranks[3], 6);
 }

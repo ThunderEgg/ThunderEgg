@@ -24,8 +24,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -58,7 +57,7 @@ occurrences(const std::string& s, const std::string& target)
   }
   return occurrences;
 }
-TEST_CASE("Two Timings Sequential Stop second before started", "[Timer]")
+TEST_CASE("Two Timings Sequential Stop second before started")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -66,7 +65,7 @@ TEST_CASE("Two Timings Sequential Stop second before started", "[Timer]")
   timer.stop("A");
   REQUIRE_THROWS_AS(timer.stop("B"), RuntimeError);
 }
-TEST_CASE("Two Timings Sequential Stop with empty string second before started", "[Timer]")
+TEST_CASE("Two Timings Sequential Stop with empty string second before started")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -74,7 +73,7 @@ TEST_CASE("Two Timings Sequential Stop with empty string second before started",
   timer.stop("A");
   REQUIRE_THROWS_AS(timer.stop(""), RuntimeError);
 }
-TEST_CASE("Two Timings Nested Wrong Order", "[Timer]")
+TEST_CASE("Two Timings Nested Wrong Order")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -82,7 +81,7 @@ TEST_CASE("Two Timings Nested Wrong Order", "[Timer]")
   timer.start("B");
   REQUIRE_THROWS_AS(timer.stop("A"), RuntimeError);
 }
-TEST_CASE("Timer ostream operator throws with unfinished timing", "[Timer]")
+TEST_CASE("Timer ostream operator throws with unfinished timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -91,18 +90,20 @@ TEST_CASE("Timer ostream operator throws with unfinished timing", "[Timer]")
   stringstream writer;
   REQUIRE_THROWS_AS(writer << timer, RuntimeError);
 }
-TEST_CASE("Timer Two DomainTimings Sequential Stop second before started", "[Timer]")
+TEST_CASE("Timer Two DomainTimings Sequential Stop second before started")
 {
-  Communicator comm(MPI_COMM_WORLD);
-  Timer timer(comm);
-  timer.addDomain(0, GetDomain(comm));
-  timer.startDomainTiming(0, "A");
-  timer.stopDomainTiming(0, "A");
-  int id = GENERATE(0, 1);
-  const string name = GENERATE("A", "B", "");
-  REQUIRE_THROWS_AS(timer.stopDomainTiming(id, name), RuntimeError);
+  for (int id : { 0, 1 }) {
+    for (const string name : { "A", "B", "" }) {
+      Communicator comm(MPI_COMM_WORLD);
+      Timer timer(comm);
+      timer.addDomain(0, GetDomain(comm));
+      timer.startDomainTiming(0, "A");
+      timer.stopDomainTiming(0, "A");
+      REQUIRE_THROWS_AS(timer.stopDomainTiming(id, name), RuntimeError);
+    }
+  }
 }
-TEST_CASE("Timer DomainTimings Nested Wrong id on stop", "[Timer]")
+TEST_CASE("Timer DomainTimings Nested Wrong id on stop")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -110,7 +111,7 @@ TEST_CASE("Timer DomainTimings Nested Wrong id on stop", "[Timer]")
   timer.startDomainTiming(0, "A");
   REQUIRE_THROWS_AS(timer.stopDomainTiming(1, "A"), RuntimeError);
 }
-TEST_CASE("Timer DomainTimings Nested Wrong name on stop", "[Timer]")
+TEST_CASE("Timer DomainTimings Nested Wrong name on stop")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -118,7 +119,7 @@ TEST_CASE("Timer DomainTimings Nested Wrong name on stop", "[Timer]")
   timer.startDomainTiming(0, "A");
   REQUIRE_THROWS_AS(timer.stopDomainTiming(0, "blah"), RuntimeError);
 }
-TEST_CASE("Timer DomainTimings Nested Wrong name and id on stop", "[Timer]")
+TEST_CASE("Timer DomainTimings Nested Wrong name and id on stop")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -126,7 +127,7 @@ TEST_CASE("Timer DomainTimings Nested Wrong name and id on stop", "[Timer]")
   timer.startDomainTiming(0, "A");
   REQUIRE_THROWS_AS(timer.stopDomainTiming(1, "blah"), RuntimeError);
 }
-TEST_CASE("Timer Two DomainTimings Nested Wrong Order", "[Timer]")
+TEST_CASE("Timer Two DomainTimings Nested Wrong Order")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -136,20 +137,20 @@ TEST_CASE("Timer Two DomainTimings Nested Wrong Order", "[Timer]")
   timer.startDomainTiming(1, "B");
   REQUIRE_THROWS_AS(timer.stopDomainTiming(0, "A"), RuntimeError);
 }
-TEST_CASE("Timer addDomain twice fails", "[Timer]")
+TEST_CASE("Timer addDomain twice fails")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
   timer.addDomain(0, GetDomain(comm));
   REQUIRE_THROWS_AS(timer.addDomain(0, GetDomain(comm)), RuntimeError);
 }
-TEST_CASE("Timer startDomainTiming fails without added domain", "[Timer]")
+TEST_CASE("Timer startDomainTiming fails without added domain")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
   REQUIRE_THROWS_AS(timer.startDomainTiming(0, "A"), RuntimeError);
 }
-TEST_CASE("Timer addDoubleInfo fails for existing int information", "[Timer]")
+TEST_CASE("Timer addDoubleInfo fails for existing int information")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -157,13 +158,13 @@ TEST_CASE("Timer addDoubleInfo fails for existing int information", "[Timer]")
   timer.addIntInfo("Example", 0);
   REQUIRE_THROWS_AS(timer.addDoubleInfo("Example", 0), RuntimeError);
 }
-TEST_CASE("Timer addDoubleInfo fails without timing", "[Timer]")
+TEST_CASE("Timer addDoubleInfo fails without timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
   REQUIRE_THROWS_AS(timer.addDoubleInfo("Example", 0), RuntimeError);
 }
-TEST_CASE("Timer addIntInfo fails for existing double information", "[Timer]")
+TEST_CASE("Timer addIntInfo fails for existing double information")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -171,41 +172,39 @@ TEST_CASE("Timer addIntInfo fails for existing double information", "[Timer]")
   timer.addDoubleInfo("Example", 0);
   REQUIRE_THROWS_AS(timer.addIntInfo("Example", 0), RuntimeError);
 }
-TEST_CASE("Timer addIntInfo fails without timing", "[Timer]")
+TEST_CASE("Timer addIntInfo fails without timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
   REQUIRE_THROWS_AS(timer.addIntInfo("Example", 0), RuntimeError);
 }
-TEST_CASE("Timer to_json empty timer", "[Timer]")
+TEST_CASE("Timer to_json empty timer")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
   nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j == nullptr);
+  REQUIRE_EQ(j, nullptr);
 }
-TEST_CASE("Timer to_json unassociated timing", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
   timer.start("A");
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
 }
-TEST_CASE("Timer to_json unassociated timing with single int info", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with single int info")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -213,27 +212,26 @@ TEST_CASE("Timer to_json unassociated timing with single int info", "[Timer]")
   timer.addIntInfo("Example", 10);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 1);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10);
 }
-TEST_CASE("Timer to_json unassociated timing with two int info calls", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with two int info calls")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -242,27 +240,26 @@ TEST_CASE("Timer to_json unassociated timing with two int info calls", "[Timer]"
   timer.addIntInfo("Example", 1);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 1);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 2);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 11);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 11);
 }
-TEST_CASE("Timer to_json unassociated timing with single double info", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with single double info")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -270,27 +267,26 @@ TEST_CASE("Timer to_json unassociated timing with single double info", "[Timer]"
   timer.addDoubleInfo("Example", 10.0);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 1);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10.0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10.0);
 }
-TEST_CASE("Timer to_json unassociated timing with two double info calls", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with two double info calls")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -299,27 +295,26 @@ TEST_CASE("Timer to_json unassociated timing with two double info calls", "[Time
   timer.addDoubleInfo("Example", 1.0);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 1);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 1.0);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 2);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 11.0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 11.0);
 }
-TEST_CASE("Timer to_json unassociated timing with two different double info calls", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with two different double info calls")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -328,32 +323,31 @@ TEST_CASE("Timer to_json unassociated timing with two different double info call
   timer.addDoubleInfo("Example2", 1.0);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 2);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example1");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10.0);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10.0);
-  CHECK(j["timings"][0]["infos"][1]["name"] == "Example2");
-  CHECK(j["timings"][0]["infos"][1]["min"] == 1.0);
-  CHECK(j["timings"][0]["infos"][1]["max"] == 1.0);
-  CHECK(j["timings"][0]["infos"][1]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["sum"] == 1.0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example1");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["name"], "Example2");
+  CHECK_EQ(j["timings"][0]["infos"][1]["min"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["max"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["sum"], 1.0);
 }
-TEST_CASE("Timer to_json unassociated timing with two different int info calls", "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with two different int info calls")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -362,33 +356,31 @@ TEST_CASE("Timer to_json unassociated timing with two different int info calls",
   timer.addIntInfo("Example2", 1);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 2);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example1");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10);
-  CHECK(j["timings"][0]["infos"][1]["name"] == "Example2");
-  CHECK(j["timings"][0]["infos"][1]["min"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["max"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["sum"] == 1);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example1");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][1]["name"], "Example2");
+  CHECK_EQ(j["timings"][0]["infos"][1]["min"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["max"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["sum"], 1);
 }
-TEST_CASE("Timer to_json unassociated timing with two different int and double info calls",
-          "[Timer]")
+TEST_CASE("Timer to_json unassociated timing with two different int and double info calls")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -397,32 +389,31 @@ TEST_CASE("Timer to_json unassociated timing with two different int and double i
   timer.addDoubleInfo("Example2", 1.0);
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["infos"].is_array());
-  CHECK(j["timings"][0]["infos"].size() == 2);
-  CHECK(j["timings"][0]["infos"][0]["name"] == "Example1");
-  CHECK(j["timings"][0]["infos"][0]["min"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["max"] == 10);
-  CHECK(j["timings"][0]["infos"][0]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][0]["sum"] == 10);
-  CHECK(j["timings"][0]["infos"][1]["name"] == "Example2");
-  CHECK(j["timings"][0]["infos"][1]["min"] == 1.0);
-  CHECK(j["timings"][0]["infos"][1]["max"] == 1.0);
-  CHECK(j["timings"][0]["infos"][1]["num_calls"] == 1);
-  CHECK(j["timings"][0]["infos"][1]["sum"] == 1.0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_EQ(j["timings"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["infos"].is_array());
+  CHECK_EQ(j["timings"][0]["infos"].size(), 2);
+  CHECK_EQ(j["timings"][0]["infos"][0]["name"], "Example1");
+  CHECK_EQ(j["timings"][0]["infos"][0]["min"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["max"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][0]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][0]["sum"], 10);
+  CHECK_EQ(j["timings"][0]["infos"][1]["name"], "Example2");
+  CHECK_EQ(j["timings"][0]["infos"][1]["min"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["max"], 1.0);
+  CHECK_EQ(j["timings"][0]["infos"][1]["num_calls"], 1);
+  CHECK_EQ(j["timings"][0]["infos"][1]["sum"], 1.0);
 }
-TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
+TEST_CASE("Timer to_json two unassociated timings sequential")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -431,26 +422,25 @@ TEST_CASE("Timer to_json two unassociated timings sequential", "[Timer]")
   timer.start("B");
   timer.stop("B");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 2);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"].is_number());
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][1]["rank"] == 0);
-  CHECK(j["timings"][1]["min"].is_number());
-  CHECK(j["timings"][1]["max"].is_number());
-  CHECK(j["timings"][1]["sum"].is_number());
-  CHECK(j["timings"][1]["num_calls"].is_number());
-  CHECK(j["timings"][1]["name"] == "B");
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 2);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_UNARY(j["timings"][0]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_EQ(j["timings"][1]["rank"], 0);
+  CHECK_UNARY(j["timings"][1]["min"].is_number());
+  CHECK_UNARY(j["timings"][1]["max"].is_number());
+  CHECK_UNARY(j["timings"][1]["sum"].is_number());
+  CHECK_UNARY(j["timings"][1]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][1]["name"], "B");
 }
-TEST_CASE("Timer to_json nested timing", "[Timer]")
+TEST_CASE("Timer to_json nested timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -459,22 +449,21 @@ TEST_CASE("Timer to_json nested timing", "[Timer]")
   timer.stop("B");
   timer.stop("A");
   const nlohmann::json j = timer;
-  INFO(j.dump(4));
-  REQUIRE(j != nullptr);
-  CHECK(j.size() == 2);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["rank"] == 0);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"].is_number());
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["timings"].is_array());
-  CHECK(j["timings"][0]["timings"].size() == 1);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 2);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_EQ(j["timings"][0]["rank"], 0);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_UNARY(j["timings"][0]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_UNARY(j["timings"][0]["timings"].is_array());
+  CHECK_EQ(j["timings"][0]["timings"].size(), 1);
 }
-TEST_CASE("Timer to_json domain timing", "[Timer]")
+TEST_CASE("Timer to_json domain timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -482,24 +471,23 @@ TEST_CASE("Timer to_json domain timing", "[Timer]")
   timer.startDomainTiming(0, "A");
   timer.stopDomainTiming(0, "A");
   const nlohmann::json j = timer;
-  REQUIRE(j != nullptr);
-  INFO(j.dump(4));
-  CHECK(j.size() == 3);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["domains"].is_array());
-  CHECK(j["domains"].size() == 1);
-  CHECK(j["domains"][0].is_array());
-  CHECK(j["domains"][0].size() == 2);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"].is_number());
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["domain_id"] == 0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 3);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["domains"].is_array());
+  CHECK_EQ(j["domains"].size(), 1);
+  CHECK_UNARY(j["domains"][0].is_array());
+  CHECK_EQ(j["domains"][0].size(), 2);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_UNARY(j["timings"][0]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_EQ(j["timings"][0]["domain_id"], 0);
 }
-TEST_CASE("Timer to_json patch timing", "[Timer]")
+TEST_CASE("Timer to_json patch timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -507,35 +495,33 @@ TEST_CASE("Timer to_json patch timing", "[Timer]")
   timer.startPatchTiming(0, 0, "A");
   timer.stopPatchTiming(0, 0, "A");
   const nlohmann::json j = timer;
-  REQUIRE(j != nullptr);
-  INFO(j.dump(4));
-  CHECK(j.size() == 3);
-  CHECK(j["comm_size"] == 1);
-  CHECK(j["domains"].is_array());
-  CHECK(j["domains"].size() == 1);
-  CHECK(j["domains"][0].is_array());
-  CHECK(j["domains"][0].size() == 2);
-  CHECK(j["timings"].is_array());
-  CHECK(j["timings"].size() == 1);
-  CHECK(j["timings"][0]["min"].is_number());
-  CHECK(j["timings"][0]["max"].is_number());
-  CHECK(j["timings"][0]["sum"].is_number());
-  CHECK(j["timings"][0]["num_calls"].is_number());
-  CHECK(j["timings"][0]["name"] == "A");
-  CHECK(j["timings"][0]["domain_id"] == 0);
-  CHECK(j["timings"][0]["patch_id"] == 0);
+  REQUIRE_NE(j, nullptr);
+  CHECK_EQ(j.size(), 3);
+  CHECK_EQ(j["comm_size"], 1);
+  CHECK_UNARY(j["domains"].is_array());
+  CHECK_EQ(j["domains"].size(), 1);
+  CHECK_UNARY(j["domains"][0].is_array());
+  CHECK_EQ(j["domains"][0].size(), 2);
+  CHECK_UNARY(j["timings"].is_array());
+  CHECK_EQ(j["timings"].size(), 1);
+  CHECK_UNARY(j["timings"][0]["min"].is_number());
+  CHECK_UNARY(j["timings"][0]["max"].is_number());
+  CHECK_UNARY(j["timings"][0]["sum"].is_number());
+  CHECK_UNARY(j["timings"][0]["num_calls"].is_number());
+  CHECK_EQ(j["timings"][0]["name"], "A");
+  CHECK_EQ(j["timings"][0]["domain_id"], 0);
+  CHECK_EQ(j["timings"][0]["patch_id"], 0);
 }
-TEST_CASE("Timer ostream empty timing", "[Timer]")
+TEST_CASE("Timer ostream empty timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "No timings to report") == 1);
+  CHECK_EQ(occurrences(s, "No timings to report"), 1);
 }
-TEST_CASE("Timer ostream unassociated timing", "[Timer]")
+TEST_CASE("Timer ostream unassociated timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -544,15 +530,14 @@ TEST_CASE("Timer ostream unassociated timing", "[Timer]")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec)") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
 }
-TEST_CASE("Timer ostream unassociated timing with single int info", "[Timer]")
+TEST_CASE("Timer ostream unassociated timing with single int info")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -562,19 +547,18 @@ TEST_CASE("Timer ostream unassociated timing with single int info", "[Timer]")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec)") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
-  CHECK(occurrences(s, "Example") == 1);
-  CHECK(occurrences(s, "Example avg") == 0);
-  CHECK(occurrences(s, "Example min") == 0);
-  CHECK(occurrences(s, "Example max") == 0);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
+  CHECK_EQ(occurrences(s, "Example"), 1);
+  CHECK_EQ(occurrences(s, "Example avg"), 0);
+  CHECK_EQ(occurrences(s, "Example min"), 0);
+  CHECK_EQ(occurrences(s, "Example max"), 0);
 }
-TEST_CASE("Timer ostream unassociated timing with two int info", "[Timer]")
+TEST_CASE("Timer ostream unassociated timing with two int info")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -585,19 +569,18 @@ TEST_CASE("Timer ostream unassociated timing with two int info", "[Timer]")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec)") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
-  CHECK(occurrences(s, "Example") == 3);
-  CHECK(occurrences(s, "Example avg") == 1);
-  CHECK(occurrences(s, "Example min") == 1);
-  CHECK(occurrences(s, "Example max") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
+  CHECK_EQ(occurrences(s, "Example"), 3);
+  CHECK_EQ(occurrences(s, "Example avg"), 1);
+  CHECK_EQ(occurrences(s, "Example min"), 1);
+  CHECK_EQ(occurrences(s, "Example max"), 1);
 }
-TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
+TEST_CASE("Timer ostream nested unassociated timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -608,16 +591,15 @@ TEST_CASE("Timer ostream nested unassociated timing", "[Timer]")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 2);
-  CHECK(occurrences(s, "B") == 1);
-  CHECK(occurrences(s, "time (sec)") == 2);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec/") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
+  CHECK_EQ(occurrences(s, "A"), 2);
+  CHECK_EQ(occurrences(s, "B"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 2);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec/"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
 }
-TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
+TEST_CASE("Timer ostream sequential unassociated timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -628,15 +610,14 @@ TEST_CASE("Timer ostream sequential unassociated timing", "[Timer]")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 1);
-  CHECK(occurrences(s, "min (sec)") == 1);
-  CHECK(occurrences(s, "max (sec)") == 1);
-  CHECK(occurrences(s, "average calls per rank") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 1);
+  CHECK_EQ(occurrences(s, "min (sec)"), 1);
+  CHECK_EQ(occurrences(s, "max (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 1);
 }
-TEST_CASE("Timer ostream sequential patch timing", "[Timer]")
+TEST_CASE("Timer ostream sequential patch timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -648,15 +629,14 @@ TEST_CASE("Timer ostream sequential patch timing", "[Timer]")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 1);
-  CHECK(occurrences(s, "min (sec)") == 1);
-  CHECK(occurrences(s, "max (sec)") == 1);
-  CHECK(occurrences(s, "average calls per rank") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 1);
+  CHECK_EQ(occurrences(s, "min (sec)"), 1);
+  CHECK_EQ(occurrences(s, "max (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 1);
 }
-TEST_CASE("Timer ostream domain timing", "[Timer]")
+TEST_CASE("Timer ostream domain timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -666,15 +646,14 @@ TEST_CASE("Timer ostream domain timing", "[Timer]")
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 0);
-  CHECK(occurrences(s, "min (sec)") == 0);
-  CHECK(occurrences(s, "max (sec)") == 0);
-  CHECK(occurrences(s, "average calls per rank") == 0);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 0);
+  CHECK_EQ(occurrences(s, "min (sec)"), 0);
+  CHECK_EQ(occurrences(s, "max (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 0);
 }
-TEST_CASE("Timer ostream domain timing two different domains sequential", "[Timer]")
+TEST_CASE("Timer ostream domain timing two different domains sequential")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -687,16 +666,14 @@ TEST_CASE("Timer ostream domain timing two different domains sequential", "[Time
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 1);
-  CHECK(occurrences(s, "min (sec)") == 1);
-  CHECK(occurrences(s, "max (sec)") == 1);
-  CHECK(occurrences(s, "average calls per rank") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 1);
+  CHECK_EQ(occurrences(s, "min (sec)"), 1);
+  CHECK_EQ(occurrences(s, "max (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 1);
 }
-TEST_CASE("Timer ostream domain timing two different domains with information sequential",
-          "[Timer]")
+TEST_CASE("Timer ostream domain timing two different domains with information sequential")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -711,19 +688,18 @@ TEST_CASE("Timer ostream domain timing two different domains with information se
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 1);
-  CHECK(occurrences(s, "min (sec)") == 1);
-  CHECK(occurrences(s, "max (sec)") == 1);
-  CHECK(occurrences(s, "average calls per rank") == 1);
-  CHECK(occurrences(s, "Example") == 3);
-  CHECK(occurrences(s, "Example avg") == 1);
-  CHECK(occurrences(s, "Example min") == 1);
-  CHECK(occurrences(s, "Example max") == 1);
+  CHECK_EQ(occurrences(s, "A"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 1);
+  CHECK_EQ(occurrences(s, "min (sec)"), 1);
+  CHECK_EQ(occurrences(s, "max (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 1);
+  CHECK_EQ(occurrences(s, "Example"), 3);
+  CHECK_EQ(occurrences(s, "Example avg"), 1);
+  CHECK_EQ(occurrences(s, "Example min"), 1);
+  CHECK_EQ(occurrences(s, "Example max"), 1);
 }
-TEST_CASE("Timer ostream domain timing two different domains sequential nested", "[Timer]")
+TEST_CASE("Timer ostream domain timing two different domains sequential nested")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -740,18 +716,16 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested",
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 2);
-  CHECK(occurrences(s, "B") == 1);
-  CHECK(occurrences(s, "time (sec)") == 0);
-  CHECK(occurrences(s, "average (sec)") == 2);
-  CHECK(occurrences(s, "min (sec)") == 2);
-  CHECK(occurrences(s, "max (sec)") == 2);
-  CHECK(occurrences(s, "average calls per rank") == 2);
+  CHECK_EQ(occurrences(s, "A"), 2);
+  CHECK_EQ(occurrences(s, "B"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 0);
+  CHECK_EQ(occurrences(s, "average (sec)"), 2);
+  CHECK_EQ(occurrences(s, "min (sec)"), 2);
+  CHECK_EQ(occurrences(s, "max (sec)"), 2);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 2);
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential nested first domain has "
-          "extra timing",
-          "[Timer]")
+          "extra timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -770,19 +744,17 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested f
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 3);
-  CHECK(occurrences(s, "B") == 1);
-  CHECK(occurrences(s, "C") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 2);
-  CHECK(occurrences(s, "min (sec)") == 2);
-  CHECK(occurrences(s, "max (sec)") == 2);
-  CHECK(occurrences(s, "average calls per rank") == 2);
+  CHECK_EQ(occurrences(s, "A"), 3);
+  CHECK_EQ(occurrences(s, "B"), 1);
+  CHECK_EQ(occurrences(s, "C"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 2);
+  CHECK_EQ(occurrences(s, "min (sec)"), 2);
+  CHECK_EQ(occurrences(s, "max (sec)"), 2);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 2);
 }
 TEST_CASE("Timer ostream domain timing two different domains sequential nested second domain has "
-          "extra timing",
-          "[Timer]")
+          "extra timing")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -801,17 +773,16 @@ TEST_CASE("Timer ostream domain timing two different domains sequential nested s
   stringstream ss;
   ss << timer;
   std::string s = ss.str();
-  INFO(s);
-  CHECK(occurrences(s, "A") == 3);
-  CHECK(occurrences(s, "B") == 1);
-  CHECK(occurrences(s, "C") == 1);
-  CHECK(occurrences(s, "time (sec)") == 1);
-  CHECK(occurrences(s, "average (sec)") == 2);
-  CHECK(occurrences(s, "min (sec)") == 2);
-  CHECK(occurrences(s, "max (sec)") == 2);
-  CHECK(occurrences(s, "average calls per rank") == 2);
+  CHECK_EQ(occurrences(s, "A"), 3);
+  CHECK_EQ(occurrences(s, "B"), 1);
+  CHECK_EQ(occurrences(s, "C"), 1);
+  CHECK_EQ(occurrences(s, "time (sec)"), 1);
+  CHECK_EQ(occurrences(s, "average (sec)"), 2);
+  CHECK_EQ(occurrences(s, "min (sec)"), 2);
+  CHECK_EQ(occurrences(s, "max (sec)"), 2);
+  CHECK_EQ(occurrences(s, "average calls per rank"), 2);
 }
-TEST_CASE("Timer saveToFile new empty file", "[Timer]")
+TEST_CASE("Timer saveToFile new empty file")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -837,11 +808,11 @@ TEST_CASE("Timer saveToFile new empty file", "[Timer]")
   input >> file_j;
   nlohmann::json extra_j;
   CHECK_THROWS(input >> extra_j);
-  CHECK(file_j.dump() == j.dump());
+  CHECK_EQ(file_j.dump(), j.dump());
   input.close();
   std::remove("timerne.json");
 }
-TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
+TEST_CASE("Timer saveToFile overwrites file")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -868,11 +839,11 @@ TEST_CASE("Timer saveToFile overwrites file", "[Timer]")
   input >> file_j;
   nlohmann::json extra_j;
   CHECK_THROWS(input >> extra_j);
-  CHECK(file_j.dump() == j.dump());
+  CHECK_EQ(file_j.dump(), j.dump());
   input.close();
   std::remove("timerow.json");
 }
-TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
+TEST_CASE("Timer saveToFile throws with nonexistant directory")
 {
   Communicator comm(MPI_COMM_WORLD);
   Timer timer(comm);
@@ -889,6 +860,5 @@ TEST_CASE("Timer saveToFile throws with nonexistant directory", "[Timer]")
   timer.stopDomainTiming(1, "B");
   timer.stopDomainTiming(1, "A");
 
-  CHECK_THROWS_AS(timer.saveToFile("surely/this/directory/does/not/exist/timer.json"),
-                  RuntimeError);
+  CHECK_THROWS_AS(timer.saveToFile("surely/this/directory/does/not/exist/timer.json"), RuntimeError);
 }

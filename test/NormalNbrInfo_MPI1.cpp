@@ -19,21 +19,20 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
 
-TEST_CASE("NormalNbrInfo getNbrType works", "[NormalNbrInfo]")
+TEST_CASE("NormalNbrInfo getNbrType works")
 {
   NbrInfo<3>* info = new NormalNbrInfo<3>();
-  REQUIRE(info->getNbrType() == NbrType::Normal);
+  REQUIRE_EQ(info->getNbrType(), NbrType::Normal);
   delete info;
 }
 
-TEST_CASE("NormalNbrInfo Serialization/Deserialization", "[NormalNbrInfo]")
+TEST_CASE("NormalNbrInfo Serialization/Deserialization")
 {
   NormalNbrInfo<3> info;
   info.id = 5;
@@ -44,6 +43,6 @@ TEST_CASE("NormalNbrInfo Serialization/Deserialization", "[NormalNbrInfo]")
   NormalNbrInfo<3> out;
   out.deserialize(buff);
   delete[] buff;
-  REQUIRE(out.id == 5);
-  REQUIRE(out.rank == 1);
+  REQUIRE_EQ(out.id, 5);
+  REQUIRE_EQ(out.rank, 1);
 }

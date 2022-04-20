@@ -23,7 +23,7 @@
 #include <ThunderEgg/PatchOperator.h>
 #include <set>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 namespace ThunderEgg {
 namespace {
@@ -46,29 +46,21 @@ private:
 public:
   MockPatchOperator(const Domain<D>& domain, const GhostFiller<D>& ghost_filler)
     : PatchOperator<D>(domain, ghost_filler)
-  {}
+  {
+  }
   MockPatchOperator<D>* clone() const override { return new MockPatchOperator<D>(*this); }
-  void applySinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& us,
-                        const PatchView<double, D>& fs) const override
+  void applySinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& us, const PatchView<double, D>& fs) const override
   {
     *bc_enforced = true;
     (*num_apply_calls)++;
   }
-  void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                                      const PatchView<const double, D>& us,
-                                                      const PatchView<double, D>& fs) const override
+  void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& us, const PatchView<double, D>& fs) const override
   {
     *bc_enforced = true;
     *interior_dirichlet = true;
     (*num_apply_calls)++;
   }
-  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                              const PatchView<const double, D>& us,
-                                              const PatchView<double, D>& fs) const override
-  {
-    *rhs_was_modified = true;
-  }
+  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& us, const PatchView<double, D>& fs) const override { *rhs_was_modified = true; }
   bool rhsWasModified() { return *rhs_was_modified; }
   bool boundaryConditionsEnforced() { return *bc_enforced; }
   bool internalBoundaryConditionsEnforced() { return *interior_dirichlet; }
@@ -85,32 +77,21 @@ private:
 public:
   NonLinMockPatchOperator(const Domain<D>& domain, const GhostFiller<D>& ghost_filler)
     : PatchOperator<D>(domain, ghost_filler)
-  {}
-  NonLinMockPatchOperator<D>* clone() const override
   {
-    return new NonLinMockPatchOperator<D>(*this);
   }
-  void applySinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& us,
-                        const PatchView<double, D>& fs) const override
+  NonLinMockPatchOperator<D>* clone() const override { return new NonLinMockPatchOperator<D>(*this); }
+  void applySinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& us, const PatchView<double, D>& fs) const override
   {
     *bc_enforced = true;
     Loop::OverInteriorIndexes<D>(fs, [&](const std::array<int, D + 1>& coord) { fs[coord] += 1; });
   }
-  void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                                      const PatchView<const double, D>& us,
-                                                      const PatchView<double, D>& fs) const override
+  void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& us, const PatchView<double, D>& fs) const override
   {
     *bc_enforced = true;
     *interior_dirichlet = true;
     Loop::OverInteriorIndexes<D>(fs, [&](const std::array<int, D + 1>& coord) { fs[coord] += 1; });
   }
-  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                              const PatchView<const double, D>& us,
-                                              const PatchView<double, D>& fs) const override
-  {
-    *rhs_was_modified = true;
-  }
+  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& us, const PatchView<double, D>& fs) const override { *rhs_was_modified = true; }
   bool rhsWasModified() { return *rhs_was_modified; }
   bool boundaryConditionsEnforced() { return *bc_enforced; }
   bool internalBoundaryConditionsEnforced() { return *interior_dirichlet; }
@@ -123,20 +104,11 @@ private:
 
 public:
   MockSolver<D>* clone() const override { return new MockSolver<D>(*this); }
-  MockSolver(
-    std::function<int(const Operator<D>&, Vector<D>&, const Vector<D>&, const Operator<D>*)>
-      callback)
+  MockSolver(std::function<int(const Operator<D>&, Vector<D>&, const Vector<D>&, const Operator<D>*)> callback)
     : callback(callback)
-  {}
-  int solve(const Operator<D>& A,
-            Vector<D>& x,
-            const Vector<D>& b,
-            const Operator<D>* Mr = nullptr,
-            bool output = false,
-            std::ostream& os = std::cout) const override
   {
-    return callback(A, x, b, Mr);
   }
+  int solve(const Operator<D>& A, Vector<D>& x, const Vector<D>& b, const Operator<D>* Mr = nullptr, bool output = false, std::ostream& os = std::cout) const override { return callback(A, x, b, Mr); }
 };
 
 } // namespace

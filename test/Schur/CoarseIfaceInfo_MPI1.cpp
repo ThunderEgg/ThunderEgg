@@ -22,7 +22,7 @@
 
 #include <algorithm>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -33,7 +33,7 @@ contains(Container& deque, Value a)
 {
   return find(deque.begin(), deque.end(), a) != deque.end();
 }
-TEST_CASE("Schur::CoarseIfaceInfo constructor", "[Schur::CoarseIfaceInfo]")
+TEST_CASE("Schur::CoarseIfaceInfo constructor")
 {
   for (Side<2> s : Side<2>::getValues()) {
     int id = 1;
@@ -45,21 +45,20 @@ TEST_CASE("Schur::CoarseIfaceInfo constructor", "[Schur::CoarseIfaceInfo]")
     pinfo.getCoarseNbrInfo(s).rank = 1;
     pinfo.getCoarseNbrInfo(s).orth_on_coarse = Orthant<1>::upper();
     Schur::CoarseIfaceInfo<2> iface_info(pinfo, s);
-    INFO("Side: " << s);
-    CHECK(iface_info.rank == 0);
-    CHECK(iface_info.coarse_rank == 1);
+    CHECK_EQ(iface_info.rank, 0);
+    CHECK_EQ(iface_info.coarse_rank, 1);
     // check that the id is encoded as expected
-    CHECK(iface_info.id / (int)Side<2>::number_of == id);
-    CHECK(iface_info.id % Side<2>::number_of == s.getIndex());
+    CHECK_EQ(iface_info.id / (int)Side<2>::number_of, id);
+    CHECK_EQ(iface_info.id % Side<2>::number_of, s.getIndex());
     // check that iface belongs to nbr
-    CHECK(iface_info.coarse_id / (int)Side<2>::number_of == nbr_id);
-    CHECK(iface_info.coarse_id % Side<2>::number_of == s.opposite().getIndex());
+    CHECK_EQ(iface_info.coarse_id / (int)Side<2>::number_of, nbr_id);
+    CHECK_EQ(iface_info.coarse_id % Side<2>::number_of, s.opposite().getIndex());
     // local and global index should be set to -1
-    CHECK(iface_info.patch_local_index == -1);
-    CHECK(iface_info.row_local_index == -1);
-    CHECK(iface_info.col_local_index == -1);
-    CHECK(iface_info.global_index == -1);
-    CHECK(iface_info.coarse_col_local_index == -1);
-    CHECK(iface_info.coarse_global_index == -1);
+    CHECK_EQ(iface_info.patch_local_index, -1);
+    CHECK_EQ(iface_info.row_local_index, -1);
+    CHECK_EQ(iface_info.col_local_index, -1);
+    CHECK_EQ(iface_info.global_index, -1);
+    CHECK_EQ(iface_info.coarse_col_local_index, -1);
+    CHECK_EQ(iface_info.coarse_global_index, -1);
   }
 }

@@ -26,7 +26,7 @@
 
 #include <set>
 
-#include <catch2/catch_test_macros.hpp>
+#include <doctest.h>
 
 namespace ThunderEgg {
 namespace {
@@ -57,9 +57,7 @@ public:
     }
   }
   MockPatchOperator<D>* clone() const override { return new MockPatchOperator<D>(*this); }
-  void applySinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& us,
-                        const PatchView<double, D>& fs) const override
+  void applySinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& us, const PatchView<double, D>& fs) const override
   {
     CHECK(patches_to_be_called->count(pinfo.id) == 1);
     patches_to_be_called->erase(pinfo.id);
@@ -67,14 +65,8 @@ public:
     std::array<int, D + 1> zero;
     zero.fill(0);
   }
-  void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                                      const PatchView<const double, D>& us,
-                                                      const PatchView<double, D>& fs) const override
-  {}
-  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                              const PatchView<const double, D>& us,
-                                              const PatchView<double, D>& fs) const override
-  {}
+  void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& us, const PatchView<double, D>& fs) const override {}
+  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& us, const PatchView<double, D>& fs) const override {}
   bool allPatchesCalled() { return patches_to_be_called->empty(); }
 };
 } // namespace
