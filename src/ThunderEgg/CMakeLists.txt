@@ -30,6 +30,7 @@ target_sources(ThunderEgg PRIVATE Domain.cpp)
 list(APPEND ThunderEgg_HDRS DomainGenerator.h)
 
 list(APPEND ThunderEgg_HDRS DomainTools.h)
+target_sources(ThunderEgg PRIVATE DomainTools.cpp)
 
 list(APPEND ThunderEgg_HDRS Face.h)
 target_sources(ThunderEgg PRIVATE Face.cpp)
