@@ -194,6 +194,36 @@ LinearRestrictor<D>::LinearRestrictor(const Domain<D>& fine_domain,
 
 template<int D>
   requires is_supported_dimension<D>
+LinearRestrictor<D>::~LinearRestrictor() = default;
+
+template<int D>
+  requires is_supported_dimension<D>
+LinearRestrictor<D>::LinearRestrictor(const LinearRestrictor& other)
+  : MPIRestrictor<D>(other)
+  , implimentation(new Implimentation(*other.implimentation))
+{
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+LinearRestrictor<D>::LinearRestrictor(LinearRestrictor&& other) = default;
+
+template<int D>
+  requires is_supported_dimension<D>
+LinearRestrictor<D>&
+LinearRestrictor<D>::operator=(const LinearRestrictor<D>& other)
+{
+  implimentation.reset(new Implimentation(*other.implimentation));
+  return *this;
+}
+
+template<int D>
+  requires is_supported_dimension<D>
+LinearRestrictor<D>&
+LinearRestrictor<D>::operator=(LinearRestrictor<D>&& other) = default;
+
+template<int D>
+  requires is_supported_dimension<D>
 LinearRestrictor<D>*
 LinearRestrictor<D>::clone() const
 {

@@ -44,7 +44,7 @@ private:
   /**
    * @brief pointer to the implimentation
    */
-  std::shared_ptr<const Implimentation> implimentation;
+  std::unique_ptr<Implimentation> implimentation;
 
 public:
   /**
@@ -58,6 +58,43 @@ public:
   LinearRestrictor(const Domain<D>& fine_domain,
                    const Domain<D>& coarse_domain,
                    bool extrapolate_boundary_ghosts = false);
+
+  /**
+   * @brief Destroy the LinearRestrictor object
+   */
+  ~LinearRestrictor();
+
+  /**
+   * @brief Copy constructor
+   *
+   * @param other other LinearRestrictor
+   */
+  LinearRestrictor(const LinearRestrictor& other);
+
+  /**
+   * @brief Move constructor
+   *
+   * @param other LinearRestrictor
+   */
+  LinearRestrictor(LinearRestrictor&& other);
+
+  /**
+   * @brief copy assignment
+   *
+   * @param other LinearRestrictor
+   * @return LinearRestrictor& this
+   */
+  LinearRestrictor&
+  operator=(const LinearRestrictor& other);
+
+  /**
+   * @brief move assignment
+   *
+   * @param other LinearRestrictor
+   * @return LinearRestrictor& this
+   */
+  LinearRestrictor&
+  operator=(LinearRestrictor&& other);
 
   /**
    * @brief Clone this restrictor

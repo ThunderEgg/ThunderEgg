@@ -26,10 +26,7 @@
  * @brief DirectInterpolator class
  */
 
-#include <ThunderEgg/Domain.h>
-#include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/MPIInterpolator.h>
-#include <memory>
 
 namespace ThunderEgg::GMG {
 /**
@@ -38,8 +35,20 @@ namespace ThunderEgg::GMG {
  * This is a piecewise constant interpolation scheme.
  */
 template<int D>
+  requires is_supported_dimension<D>
 class DirectInterpolator : public MPIInterpolator<D>
 {
+private:
+  /**
+   * @brief Implimentation class
+   */
+  class Implimentation;
+
+  /**
+   * @brief pointer to the implimentation
+   */
+  std::unique_ptr<Implimentation> implimentation;
+
 public:
   /**
    * @brief Create new DirectInterpolator object.
@@ -48,47 +57,58 @@ public:
    * @param fine_domain the finer Domain
    * @param num_components the number of components in each cell
    */
-  DirectInterpolator(const Domain<D>& coarse_domain, const Domain<D>& fine_domain)
-    : MPIInterpolator<D>(coarse_domain, fine_domain)
-  {}
+  DirectInterpolator(const Domain<D>& coarse_domain, const Domain<D>& fine_domain);
+
+  /**
+   * @brief Destroy the DirectInterpolator object
+   */
+  ~DirectInterpolator();
+
+  /**
+   * @brief Copy constructor
+   *
+   * @param other other DirectInterpolator
+   */
+  DirectInterpolator(const DirectInterpolator& other);
+
+  /**
+   * @brief Move constructor
+   *
+   * @param other DirectInterpolator
+   */
+  DirectInterpolator(DirectInterpolator&& other);
+
+  /**
+   * @brief copy assignment
+   *
+   * @param other DirectInterpolator
+   * @return DirectInterpolator& this
+   */
+  DirectInterpolator&
+  operator=(const DirectInterpolator& other);
+
+  /**
+   * @brief move assignment
+   *
+   * @param other DirectInterpolator
+   * @return DirectInterpolator& this
+   */
+  DirectInterpolator&
+  operator=(DirectInterpolator&& other);
+
   /**
    * @brief Clone this interpolator
    *
    * @return DirectInterpolator<D>* a newly allocated copy of this interpolator
    */
-  DirectInterpolator<D>* clone() const override { return new DirectInterpolator<D>(*this); }
-  void interpolatePatches(
+  DirectInterpolator<D>*
+  clone() const override;
+
+  void
+  interpolatePatches(
     const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches,
     const Vector<D>& coarser_vector,
-    Vector<D>& finer_vector) const override
-  {
-    for (auto pair : patches) {
-      const PatchInfo<D>& pinfo = pair.second.get();
-      PatchView<const double, D> coarse_view = coarser_vector.getPatchView(pair.first);
-      PatchView<double, D> fine_view = finer_vector.getPatchView(pinfo.local_index);
-
-      if (pinfo.hasCoarseParent()) {
-        Orthant<D> orth = pinfo.orth_on_parent;
-        std::array<int, D> starts;
-        for (size_t i = 0; i < D; i++) {
-          starts[i] = orth.isLowerOnAxis(i) ? 0 : (coarse_view.getEnd()[i] + 1);
-        }
-
-        Loop::OverInteriorIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1>& coord) {
-          std::array<int, D + 1> coarse_coord;
-          for (size_t x = 0; x < D; x++) {
-            coarse_coord[x] = (coord[x] + starts[x]) / 2;
-          }
-          coarse_coord[D] = coord[D];
-          fine_view[coord] += coarse_view[coarse_coord];
-        });
-      } else {
-        Loop::OverInteriorIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1>& coord) {
-          fine_view[coord] += coarse_view[coord];
-        });
-      }
-    }
-  }
+    Vector<D>& finer_vector) const override;
 };
 extern template class DirectInterpolator<2>;
 extern template class DirectInterpolator<3>;
