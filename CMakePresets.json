@@ -24,8 +24,8 @@
 				"lapack_required": true
 			},
 			"environment": {
-				"CXX": "g++",
-				"CC": "gcc"
+				"CXX": "g++-10",
+				"CC": "gcc-10"
 			}
 		},
 		{
