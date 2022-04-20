@@ -172,13 +172,12 @@ public:
   /**
    * @brief Compare the ids of the patches
    *
-   * @param l left operand
    * @param r right operand
    * @return true if r's id is lower
    * @return false if r's id is not lower
    */
-  friend bool
-  operator<(const PatchInfo& l, const PatchInfo& r);
+  bool
+  operator<(const PatchInfo<D>& r);
 
   /**
    * @brief Set the Nbr Info object to null

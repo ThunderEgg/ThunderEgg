@@ -90,9 +90,9 @@ PatchInfo<D>::operator=(const PatchInfo<D>& other_pinfo)
 
 template<int D>
   requires is_supported_dimension<D> bool
-operator<(const PatchInfo<D>& l, const PatchInfo<D>& r)
+PatchInfo<D>::operator<(const PatchInfo<D>& r)
 {
-  return l.id < r.id;
+  return id < r.id;
 }
 
 template<int D>

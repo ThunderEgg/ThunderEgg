@@ -262,7 +262,7 @@ public:
   /**
    * @brief Destroy the InterLevelComm object
    */
-  ~InterLevelComm()
+  ~Implimentation()
   {
     if (!(send_requests.empty() && recv_requests.empty())) {
       // destructor is being called with unfinished communication
