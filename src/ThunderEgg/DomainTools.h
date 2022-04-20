@@ -28,6 +28,7 @@
 
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
+#include <functional>
 
 namespace ThunderEgg {
 /**
