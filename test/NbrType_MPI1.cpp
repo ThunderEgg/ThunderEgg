@@ -20,6 +20,20 @@
 #include <ThunderEgg/NbrType.h>
 
 #include <doctest.h>
+#include <sstream>
 
 using namespace ThunderEgg;
 using namespace ThunderEgg::tpl;
+
+TEST_CASE("Test ostream for NbrType")
+{
+  std::stringstream ss;
+  ss << NbrType::Coarse;
+  CHECK_EQ(ss.str(), "NbrType::Coarse");
+  ss.str("");
+  ss << NbrType::Fine;
+  CHECK_EQ(ss.str(), "NbrType::Fine");
+  ss.str("");
+  ss << NbrType::Normal;
+  CHECK_EQ(ss.str(), "NbrType::Normal");
+}
