@@ -50,7 +50,9 @@ public:
    * @param fine the output vector that is interpolated to.
    */
   void
-  interpolate(const MPIInterpolator<D>& interpolator, const Vector<D>& coarse, Vector<D>& fine)
+  interpolate(const MPIInterpolator<D>& interpolator,
+              const Vector<D>& coarse,
+              Vector<D>& fine) const
   {
     if constexpr (ENABLE_DEBUG) {
       if (coarse.getNumLocalPatches() != ilc.getCoarserDomain().getNumLocalPatches()) {
@@ -66,14 +68,15 @@ public:
     }
     Vector<D> coarse_ghost = ilc.getNewGhostVector(coarse.getNumComponents());
 
+    InterLevelComm my_ilc = ilc;
     // start scatter for ghost values
-    ilc.getGhostPatchesStart(coarse, coarse_ghost);
+    my_ilc.getGhostPatchesStart(coarse, coarse_ghost);
 
     // interpolate form local values
     interpolator.interpolatePatches(ilc.getPatchesWithLocalParent(), coarse, fine);
 
     // finish scatter for ghost values
-    ilc.getGhostPatchesFinish(coarse, coarse_ghost);
+    my_ilc.getGhostPatchesFinish(coarse, coarse_ghost);
 
     // interpolator from ghost values
     interpolator.interpolatePatches(ilc.getPatchesWithGhostParent(), coarse_ghost, fine);

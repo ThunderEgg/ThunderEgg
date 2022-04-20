@@ -29,58 +29,72 @@
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/Restrictor.h>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Base class that makes the necessary mpi calls, derived classes only have to
  * implement restrictPatches() method
  */
 template<int D>
+  requires is_supported_dimension<D>
 class MPIRestrictor : public Restrictor<D>
 {
 private:
   /**
-   * @brief The communication package for restricting between levels.
+   * @brief Implimentation class
    */
-  mutable InterLevelComm<D> ilc;
+  class Implimentation;
+
+  /**
+   * @brief pointer to the implimentation
+   */
+  std::unique_ptr<const Implimentation> implimentation;
 
 public:
   /**
-   * @brief Create new LinearRestrictor object.
+   * @brief Create new MPIRestrictor object.
    *
    * @param ilc the communcation package for the two levels.
    */
-  MPIRestrictor(const Domain<D>& coarser_domain, const Domain<D>& finer_domain)
-    : ilc(coarser_domain, finer_domain)
-  {}
-  Vector<D> restrict(const Vector<D>& fine) const override
-  {
-    if constexpr (ENABLE_DEBUG) {
-      if (fine.getNumLocalPatches() != ilc.getFinerDomain().getNumLocalPatches()) {
-        throw RuntimeError("fine vector is incorrect length. Expected Length of " +
-                           std::to_string(ilc.getFinerDomain().getNumLocalPatches()) +
-                           " but vector was length " + std::to_string(fine.getNumLocalPatches()));
-      }
-    }
-    Vector<D> coarse(ilc.getCoarserDomain(), fine.getNumComponents());
-    Vector<D> coarse_ghost = ilc.getNewGhostVector(fine.getNumComponents());
+  MPIRestrictor(const Domain<D>& coarser_domain, const Domain<D>& finer_domain);
 
-    // fill in ghost values
-    restrictPatches(ilc.getPatchesWithGhostParent(), fine, coarse_ghost);
+  /**
+   * @brief Destroy the MPIRestrictor object
+   */
+  ~MPIRestrictor();
 
-    // clear values in coarse vector
-    coarse.setWithGhost(0);
+  /**
+   * @brief Copy construct a new Inter Level Comm object
+   *
+   * @param other the MPIRestrictor to copy
+   */
+  MPIRestrictor(const MPIRestrictor& other);
 
-    // start scatter for ghost values
-    ilc.sendGhostPatchesStart(coarse, coarse_ghost);
+  /**
+   * @brief Move construct a new Inter Level Comm object
+   *
+   * @param other the MPIRestrictor to copy
+   */
+  MPIRestrictor(MPIRestrictor&& other);
 
-    // fill in local values
-    restrictPatches(ilc.getPatchesWithLocalParent(), fine, coarse);
+  /**
+   * @brief Copy assign a new Inter Level Comm object
+   *
+   * @param other the MPIRestrictor to copy
+   */
+  MPIRestrictor&
+  operator=(const MPIRestrictor& other);
 
-    // finish scatter for ghost values
-    ilc.sendGhostPatchesFinish(coarse, coarse_ghost);
+  /**
+   * @brief Move assign a new MPIRestrictor object
+   *
+   * @param other the InterLevelComm to copy
+   */
+  MPIRestrictor&
+  operator=(MPIRestrictor&& other);
 
-    return coarse;
-  }
+  Vector<D> restrict(const Vector<D>& fine) const override;
+
   /**
    * @brief Restrict values into coarse vector
    *
@@ -93,7 +107,8 @@ public:
    * @param finer_vector the finer vector
    * @param coarser_vector the coarser vector
    */
-  virtual void restrictPatches(
+  virtual void
+  restrictPatches(
     const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches,
     const Vector<D>& finer_vector,
     Vector<D>& coarser_vector) const = 0;
