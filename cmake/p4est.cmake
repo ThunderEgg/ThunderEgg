@@ -2,9 +2,8 @@
 include(ExternalProject)
 
 # --- libsc externalProject
-# this keeps libsc scope totally separate from p4est, which avoids 
+# this keeps libsc scope totally separate from p4est, which avoids
 # tricky to diagnose behaviors
-
 if(NOT DEFINED P4EST_ROOT)
   set(P4EST_ROOT ${CMAKE_INSTALL_PREFIX})
 endif()
@@ -20,27 +19,27 @@ endif()
 set(P4EST_INCLUDE_DIRS ${P4EST_ROOT}/include)
 
 ExternalProject_Add(P4EST
-GIT_REPOSITORY https://github.com/cburstedde/p4est
-GIT_TAG        feature-cmake
-CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${P4EST_ROOT} -Dmpi:BOOL=TRUE -Dopenmp:BOOL=FALSE
-BUILD_BYPRODUCTS ${P4EST_LIBRARIES} ${SC_LIBRARIES}
+  GIT_REPOSITORY https://github.com/cburstedde/p4est
+  GIT_TAG bc4e9ce6ed64441891217b8a61cc87c3344d4467
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${P4EST_ROOT} -Dmpi:BOOL=TRUE -Dopenmp:BOOL=FALSE
+  BUILD_BYPRODUCTS ${P4EST_LIBRARIES} ${SC_LIBRARIES}
 )
 
 # --- imported target
-
 file(MAKE_DIRECTORY ${P4EST_INCLUDE_DIRS})
-# avoid race condition
 
+# avoid race condition
 find_package(ZLIB REQUIRED)
 
-# this GLOBAL is required to be visible via other 
+# this GLOBAL is required to be visible via other
 # project's FetchContent of this project
 if(BUILD_SHARED_LIBS)
   add_library(P4EST::P4EST SHARED IMPORTED GLOBAL)
 else()
   add_library(P4EST::P4EST STATIC IMPORTED GLOBAL)
 endif()
-set_target_properties(P4EST::P4EST PROPERTIES 
+
+set_target_properties(P4EST::P4EST PROPERTIES
   IMPORTED_LOCATION ${P4EST_LIBRARIES}
   INTERFACE_INCLUDE_DIRECTORIES ${P4EST_INCLUDE_DIRS}
   INTERFACE_LINK_LIBRARIES $<LINK_ONLY:SC::SC>
@@ -51,7 +50,8 @@ if(BUILD_SHARED_LIBS)
 else()
   add_library(SC::SC STATIC IMPORTED GLOBAL)
 endif()
-set_target_properties(SC::SC PROPERTIES 
+
+set_target_properties(SC::SC PROPERTIES
   IMPORTED_LOCATION ${SC_LIBRARIES}
   INTERFACE_INCLUDE_DIRECTORIES ${P4EST_INCLUDE_DIRS}
   INTERFACE_LINK_LIBRARIES $<LINK_ONLY:ZLIB::ZLIB>
