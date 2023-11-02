@@ -55,8 +55,8 @@ var NAVTREEINDEX =
 [
 "BiCGStab_8h.html",
 "classThunderEgg_1_1BiQuadraticGhostFiller.html",
-"classThunderEgg_1_1MPIGhostFiller.html",
-"classThunderEgg_1_1Schur_1_1InterfaceDomain.html#a08cedcf56da62af155343ee3444bb841"
+"classThunderEgg_1_1MPIGhostFiller.html#a805ba3473b2ecb50b7e3215046ecd27a",
+"classThunderEgg_1_1Schur_1_1InterfaceDomain.html#a9313e5945117a127e08e971a99f7186b"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

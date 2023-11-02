@@ -1,52 +1,52 @@
 <map id="src/ThunderEgg/VarPoisson/StarPatchOperator.h" name="src/ThunderEgg/VarPoisson/StarPatchOperator.h">
-<area shape="rect" id="node1" title="StarPatchOperator class." alt="" coords="1168,5,1365,47"/>
-<area shape="rect" id="node2" href="$DomainTools_8h.html" title="DomainTools class." alt="" coords="290,169,489,196"/>
-<area shape="rect" id="node3" href="$RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="1732,543,1932,569"/>
-<area shape="rect" id="node6" href="$Vector_8h.html" title="Vector class." alt="" coords="1024,244,1179,271"/>
-<area shape="rect" id="node44" href="$Level_8h.html" title="Level class." alt="" coords="885,95,1072,121"/>
-<area shape="rect" id="node49" href="$GhostFiller_8h.html" title="GhostFiller class." alt="" coords="1484,169,1668,196"/>
-<area shape="rect" id="node50" href="$PatchOperator_8h.html" title="PatchOperator class." alt="" coords="1331,95,1538,121"/>
-<area shape="rect" id="node43" title=" " alt="" coords="342,244,429,271"/>
-<area shape="rect" id="node4" title=" " alt="" coords="1821,617,1907,644"/>
-<area shape="rect" id="node5" title=" " alt="" coords="2053,617,2112,644"/>
-<area shape="rect" id="node7" href="$Domain_8h.html" title="Domain class." alt="" coords="2021,319,2187,345"/>
-<area shape="rect" id="node21" href="$Face_8h.html" title="Face class." alt="" coords="539,617,683,644"/>
-<area shape="rect" id="node32" title=" " alt="" coords="1976,543,2035,569"/>
-<area shape="rect" id="node36" href="$Loops_8h.html" title="Loop templates." alt="" coords="377,543,530,569"/>
-<area shape="rect" id="node37" href="$PatchView_8h.html" title="PatchView class." alt="" coords="248,319,429,345"/>
-<area shape="rect" id="node41" title=" " alt="" coords="1027,319,1090,345"/>
-<area shape="rect" id="node42" title=" " alt="" coords="1114,319,1174,345"/>
-<area shape="rect" id="node8" href="$PatchInfo_8h.html" title="PatchInfo class." alt="" coords="1395,393,1570,420"/>
-<area shape="rect" id="node19" title=" " alt="" coords="2377,699,2428,726"/>
-<area shape="rect" id="node25" title=" " alt="" coords="758,617,821,644"/>
-<area shape="rect" id="node30" href="$Timer_8h.html" title="Timer class." alt="" coords="2133,393,2285,420"/>
-<area shape="rect" id="node35" title=" " alt="" coords="2067,393,2109,420"/>
-<area shape="rect" id="node9" href="$CoarseNbrInfo_8h.html" title="CoarseNbrInfo class." alt="" coords="757,468,965,495"/>
-<area shape="rect" id="node11" href="$Serializable_8h.html" title="Serializable class." alt="" coords="1279,699,1470,726"/>
-<area shape="rect" id="node20" href="$Orthant_8h.html" title="Orthant class." alt="" coords="778,543,942,569"/>
-<area shape="rect" id="node26" href="$FineNbrInfo_8h.html" title="FineNbrInfo class." alt="" coords="990,468,1181,495"/>
-<area shape="rect" id="node27" href="$NormalNbrInfo_8h.html" title="NormalNbrType class." alt="" coords="1205,468,1416,495"/>
-<area shape="rect" id="node28" title=" " alt="" coords="1440,468,1525,495"/>
-<area shape="rect" id="node29" title=" " alt="" coords="1549,468,1608,495"/>
-<area shape="rect" id="node10" href="$BufferReader_8h.html" title="BufferReader class." alt="" coords="969,543,1167,569"/>
-<area shape="rect" id="node16" href="$BufferWriter_8h.html" title="BufferWriter class." alt="" coords="1191,543,1385,569"/>
-<area shape="rect" id="node17" href="$NbrInfo_8h.html" title="NbrInfo class." alt="" coords="1409,543,1572,569"/>
-<area shape="rect" id="node13" title=" " alt="" coords="1150,617,1221,644"/>
-<area shape="rect" id="node14" title=" " alt="" coords="1045,617,1125,644"/>
-<area shape="rect" id="node15" title=" " alt="" coords="1245,617,1337,644"/>
-<area shape="rect" id="node12" title=" " alt="" coords="68,781,145,808"/>
-<area shape="rect" id="node18" href="$NbrInfoBase_8h.html" title="NbrInfoBase class." alt="" coords="1601,617,1796,644"/>
-<area shape="rect" id="node23" title=" " alt="" coords="495,699,551,726"/>
-<area shape="rect" id="node24" title=" " alt="" coords="896,617,971,644"/>
-<area shape="rect" id="node22" title=" " alt="" coords="590,692,741,733"/>
-<area shape="rect" id="node31" href="$Communicator_8h.html" title="Communicator class." alt="" coords="1885,468,2096,495"/>
-<area shape="rect" id="node33" title=" " alt="" coords="2323,468,2365,495"/>
-<area shape="rect" id="node34" title=" " alt="" coords="2171,468,2247,495"/>
-<area shape="rect" id="node38" href="$ComponentView_8h.html" title="ComponentView class." alt="" coords="228,393,449,420"/>
-<area shape="rect" id="node39" href="$View_8h.html" title="View class." alt="" coords="265,468,412,495"/>
-<area shape="rect" id="node40" href="$Config_8h_source.html" title=" " alt="" coords="145,543,301,569"/>
-<area shape="rect" id="node45" href="$Interpolator_8h.html" title="Interpolator class." alt="" coords="988,169,1215,196"/>
-<area shape="rect" id="node46" href="$Restrictor_8h.html" title="Restrictor class." alt="" coords="513,169,727,196"/>
-<area shape="rect" id="node47" href="$Smoother_8h.html" title="Smoother class." alt="" coords="751,169,964,196"/>
-<area shape="rect" id="node48" href="$Operator_8h.html" title="Operator class." alt="" coords="1239,169,1409,196"/>
+<area shape="rect" id="node1" title="StarPatchOperator class." alt="" coords="1067,5,1264,47"/>
+<area shape="rect" id="node2" href="$DomainTools_8h.html" title="DomainTools class." alt="" coords="1273,169,1471,196"/>
+<area shape="rect" id="node3" href="$RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="1215,617,1415,644"/>
+<area shape="rect" id="node6" href="$Vector_8h.html" title="Vector class." alt="" coords="777,244,932,271"/>
+<area shape="rect" id="node44" href="$Level_8h.html" title="Level class." alt="" coords="427,95,613,121"/>
+<area shape="rect" id="node49" href="$GhostFiller_8h.html" title="GhostFiller class." alt="" coords="964,169,1148,196"/>
+<area shape="rect" id="node50" href="$PatchOperator_8h.html" title="PatchOperator class." alt="" coords="991,95,1198,121"/>
+<area shape="rect" id="node43" title=" " alt="" coords="1354,244,1441,271"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1271,699,1358,726"/>
+<area shape="rect" id="node5" title=" " alt="" coords="1168,699,1227,726"/>
+<area shape="rect" id="node7" href="$Domain_8h.html" title="Domain class." alt="" coords="1354,319,1521,345"/>
+<area shape="rect" id="node21" href="$Face_8h.html" title="Face class." alt="" coords="619,617,763,644"/>
+<area shape="rect" id="node32" title=" " alt="" coords="837,617,896,644"/>
+<area shape="rect" id="node36" href="$Loops_8h.html" title="Loop templates." alt="" coords="158,617,311,644"/>
+<area shape="rect" id="node37" href="$PatchView_8h.html" title="PatchView class." alt="" coords="496,319,677,345"/>
+<area shape="rect" id="node41" title=" " alt="" coords="762,319,825,345"/>
+<area shape="rect" id="node42" title=" " alt="" coords="849,319,909,345"/>
+<area shape="rect" id="node8" href="$PatchInfo_8h.html" title="PatchInfo class." alt="" coords="1730,393,1905,420"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1565,699,1616,726"/>
+<area shape="rect" id="node25" title=" " alt="" coords="1490,617,1553,644"/>
+<area shape="rect" id="node30" href="$Timer_8h.html" title="Timer class." alt="" coords="1116,468,1268,495"/>
+<area shape="rect" id="node35" title=" " alt="" coords="1409,393,1452,420"/>
+<area shape="rect" id="node9" href="$CoarseNbrInfo_8h.html" title="CoarseNbrInfo class." alt="" coords="2087,468,2295,495"/>
+<area shape="rect" id="node11" href="$Serializable_8h.html" title="Serializable class." alt="" coords="2046,699,2237,726"/>
+<area shape="rect" id="node20" href="$Orthant_8h.html" title="Orthant class." alt="" coords="1631,543,1795,569"/>
+<area shape="rect" id="node26" href="$FineNbrInfo_8h.html" title="FineNbrInfo class." alt="" coords="1871,468,2062,495"/>
+<area shape="rect" id="node27" href="$NormalNbrInfo_8h.html" title="NormalNbrType class." alt="" coords="2319,468,2529,495"/>
+<area shape="rect" id="node28" title=" " alt="" coords="1679,468,1764,495"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1788,468,1847,495"/>
+<area shape="rect" id="node10" href="$BufferReader_8h.html" title="BufferReader class." alt="" coords="2063,543,2262,569"/>
+<area shape="rect" id="node16" href="$BufferWriter_8h.html" title="BufferWriter class." alt="" coords="2286,543,2479,569"/>
+<area shape="rect" id="node17" href="$NbrInfo_8h.html" title="NbrInfo class." alt="" coords="1876,543,2039,569"/>
+<area shape="rect" id="node13" title=" " alt="" coords="2295,617,2366,644"/>
+<area shape="rect" id="node14" title=" " alt="" coords="2024,617,2104,644"/>
+<area shape="rect" id="node15" title=" " alt="" coords="2179,617,2271,644"/>
+<area shape="rect" id="node12" title=" " alt="" coords="603,781,680,808"/>
+<area shape="rect" id="node18" href="$NbrInfoBase_8h.html" title="NbrInfoBase class." alt="" coords="1796,617,1991,644"/>
+<area shape="rect" id="node23" title=" " alt="" coords="576,699,632,726"/>
+<area shape="rect" id="node24" title=" " alt="" coords="1679,617,1753,644"/>
+<area shape="rect" id="node22" title=" " alt="" coords="702,692,853,733"/>
+<area shape="rect" id="node31" href="$Communicator_8h.html" title="Communicator class." alt="" coords="820,543,1031,569"/>
+<area shape="rect" id="node33" title=" " alt="" coords="1055,543,1097,569"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1122,543,1198,569"/>
+<area shape="rect" id="node38" href="$ComponentView_8h.html" title="ComponentView class." alt="" coords="472,468,693,495"/>
+<area shape="rect" id="node39" href="$View_8h.html" title="View class." alt="" coords="400,543,547,569"/>
+<area shape="rect" id="node40" href="$Config_8h_source.html" title=" " alt="" coords="387,617,543,644"/>
+<area shape="rect" id="node45" href="$Interpolator_8h.html" title="Interpolator class." alt="" coords="44,169,271,196"/>
+<area shape="rect" id="node46" href="$Restrictor_8h.html" title="Restrictor class." alt="" coords="295,169,508,196"/>
+<area shape="rect" id="node47" href="$Smoother_8h.html" title="Smoother class." alt="" coords="532,169,745,196"/>
+<area shape="rect" id="node48" href="$Operator_8h.html" title="Operator class." alt="" coords="769,169,940,196"/>
 </map>

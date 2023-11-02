@@ -112,38 +112,34 @@ $(document).ready(function(){initNavTree('Communicator_8h_source.html',''); init
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="RuntimeError_8h.html">ThunderEgg/RuntimeError.h</a>&gt;</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;mpi.h&gt;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceThunderEgg.html">ThunderEgg</a> {</div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1Communicator.html">   36</a></span>&#160;<span class="keyword">class </span><a class="code" href="classThunderEgg_1_1Communicator.html">Communicator</a></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  MPI_Comm comm = MPI_COMM_NULL;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="classThunderEgg_1_1Communicator.html#ac4ec581c1f8c6c836fc528c39ac259d6">Communicator</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <a class="code" href="classThunderEgg_1_1Communicator.html#a8ec82d2e9a317e83cb44517100cebc35">~Communicator</a>();</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <a class="code" href="classThunderEgg_1_1Communicator.html#ac4ec581c1f8c6c836fc528c39ac259d6">Communicator</a>(<span class="keyword">const</span> <a class="code" href="classThunderEgg_1_1Communicator.html">Communicator</a>&amp; other);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <a class="code" href="classThunderEgg_1_1Communicator.html">Communicator</a>&amp; <a class="code" href="classThunderEgg_1_1Communicator.html#ad0157c551361e713a75d4c4c6b69202b">operator=</a>(<span class="keyword">const</span> <a class="code" href="classThunderEgg_1_1Communicator.html">Communicator</a>&amp; other);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <a class="code" href="classThunderEgg_1_1Communicator.html#ac4ec581c1f8c6c836fc528c39ac259d6">Communicator</a>(<a class="code" href="classThunderEgg_1_1Communicator.html">Communicator</a>&amp;&amp; other);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <a class="code" href="classThunderEgg_1_1Communicator.html">Communicator</a>&amp; <a class="code" href="classThunderEgg_1_1Communicator.html#ad0157c551361e713a75d4c4c6b69202b">operator=</a>(<a class="code" href="classThunderEgg_1_1Communicator.html">Communicator</a>&amp;&amp; other);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classThunderEgg_1_1Communicator.html#ac4ec581c1f8c6c836fc528c39ac259d6">Communicator</a>(MPI_Comm comm);</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  MPI_Comm <a class="code" href="classThunderEgg_1_1Communicator.html#af3149a9fc4ff72f30f49c32bd960825b">getMPIComm</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classThunderEgg_1_1Communicator.html#a98ed5269a5f040532342a567f5657954">getSize</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classThunderEgg_1_1Communicator.html#abb4a199f8353552014f934d1f992af84">getRank</a>() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;};</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;} <span class="comment">// namespace ThunderEgg</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceThunderEgg.html">ThunderEgg</a> {</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1Communicator.html">   42</a></span>&#160;<span class="keyword">class </span><a class="code" href="classThunderEgg_1_1Communicator.html">Communicator</a></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;{</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  std::shared_ptr&lt;MPI_Comm&gt; comm;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <a class="code" href="classThunderEgg_1_1Communicator.html#ac4ec581c1f8c6c836fc528c39ac259d6">Communicator</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <a class="code" href="classThunderEgg_1_1Communicator.html#acf2e377adf8ad0834ab6e0cab2909e6d">~Communicator</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classThunderEgg_1_1Communicator.html#ac4ec581c1f8c6c836fc528c39ac259d6">Communicator</a>(MPI_Comm comm);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  MPI_Comm <a class="code" href="classThunderEgg_1_1Communicator.html#af3149a9fc4ff72f30f49c32bd960825b">getMPIComm</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classThunderEgg_1_1Communicator.html#a98ed5269a5f040532342a567f5657954">getSize</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classThunderEgg_1_1Communicator.html#abb4a199f8353552014f934d1f992af84">getRank</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;};</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;} <span class="comment">// namespace ThunderEgg</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aRuntimeError_8h_html"><div class="ttname"><a href="RuntimeError_8h.html">RuntimeError.h</a></div><div class="ttdoc">RuntimeError struct.</div></div>
-<div class="ttc" id="aclassThunderEgg_1_1Communicator_html_a8ec82d2e9a317e83cb44517100cebc35"><div class="ttname"><a href="classThunderEgg_1_1Communicator.html#a8ec82d2e9a317e83cb44517100cebc35">ThunderEgg::Communicator::~Communicator</a></div><div class="ttdeci">~Communicator()</div><div class="ttdoc">Destroy the Communicator object.</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1Communicator_html_af3149a9fc4ff72f30f49c32bd960825b"><div class="ttname"><a href="classThunderEgg_1_1Communicator.html#af3149a9fc4ff72f30f49c32bd960825b">ThunderEgg::Communicator::getMPIComm</a></div><div class="ttdeci">MPI_Comm getMPIComm() const</div><div class="ttdoc">Get the raw MPI_Comm object.</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1Communicator_html_ac4ec581c1f8c6c836fc528c39ac259d6"><div class="ttname"><a href="classThunderEgg_1_1Communicator.html#ac4ec581c1f8c6c836fc528c39ac259d6">ThunderEgg::Communicator::Communicator</a></div><div class="ttdeci">Communicator()=default</div><div class="ttdoc">Construct a new Communicator with a null communicator.</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1Communicator_html_abb4a199f8353552014f934d1f992af84"><div class="ttname"><a href="classThunderEgg_1_1Communicator.html#abb4a199f8353552014f934d1f992af84">ThunderEgg::Communicator::getRank</a></div><div class="ttdeci">int getRank() const</div><div class="ttdoc">Get the rank of this processor.</div></div>
 <div class="ttc" id="anamespaceThunderEgg_html"><div class="ttname"><a href="namespaceThunderEgg.html">ThunderEgg</a></div><div class="ttdoc">The ThunderEgg namespace.</div><div class="ttdef"><b>Definition:</b> BiLinearGhostFiller.h:31</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1Communicator_html_a98ed5269a5f040532342a567f5657954"><div class="ttname"><a href="classThunderEgg_1_1Communicator.html#a98ed5269a5f040532342a567f5657954">ThunderEgg::Communicator::getSize</a></div><div class="ttdeci">int getSize() const</div><div class="ttdoc">Get the size of the communicator.</div></div>
-<div class="ttc" id="aclassThunderEgg_1_1Communicator_html"><div class="ttname"><a href="classThunderEgg_1_1Communicator.html">ThunderEgg::Communicator</a></div><div class="ttdoc">wrapper arount MPI_Comm, provides proper copy operators. Classes that have a communicator are meant t...</div><div class="ttdef"><b>Definition:</b> Communicator.h:36</div></div>
-<div class="ttc" id="aclassThunderEgg_1_1Communicator_html_ad0157c551361e713a75d4c4c6b69202b"><div class="ttname"><a href="classThunderEgg_1_1Communicator.html#ad0157c551361e713a75d4c4c6b69202b">ThunderEgg::Communicator::operator=</a></div><div class="ttdeci">Communicator &amp; operator=(const Communicator &amp;other)</div><div class="ttdoc">Copy the communcator object.</div></div>
+<div class="ttc" id="aclassThunderEgg_1_1Communicator_html_acf2e377adf8ad0834ab6e0cab2909e6d"><div class="ttname"><a href="classThunderEgg_1_1Communicator.html#acf2e377adf8ad0834ab6e0cab2909e6d">ThunderEgg::Communicator::~Communicator</a></div><div class="ttdeci">~Communicator()=default</div><div class="ttdoc">Destroy the Communicator object.</div></div>
+<div class="ttc" id="aclassThunderEgg_1_1Communicator_html"><div class="ttname"><a href="classThunderEgg_1_1Communicator.html">ThunderEgg::Communicator</a></div><div class="ttdoc">wrapper arount MPI_Comm, provides proper copy operators. Classes that have a communicator are meant t...</div><div class="ttdef"><b>Definition:</b> Communicator.h:42</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
