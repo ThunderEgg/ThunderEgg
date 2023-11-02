@@ -36,41 +36,17 @@ CheckErr(int err)
   }
 }
 } // namespace
-Communicator::Communicator(MPI_Comm comm)
+
+Communicator::Communicator(MPI_Comm comm) : comm(comm)
 {
-  CheckErr(MPI_Comm_dup(comm, &this->comm));
+
 }
-Communicator::Communicator(const Communicator& other)
-{
-  if (other.comm != MPI_COMM_NULL) {
-    CheckErr(MPI_Comm_dup(other.comm, &this->comm));
-  }
-}
-Communicator&
-Communicator::operator=(const Communicator& other)
-{
-  if (other.comm != MPI_COMM_NULL) {
-    CheckErr(MPI_Comm_dup(other.comm, &this->comm));
-  }
-  return *this;
-}
-Communicator::Communicator(Communicator&& other)
-  : comm(std::exchange(other.comm, MPI_COMM_NULL))
-{}
-Communicator&
-Communicator::operator=(Communicator&& other)
-{
-  std::swap(comm, other.comm);
-  return *this;
-}
+
 Communicator::~Communicator()
 {
-  int finalized;
-  MPI_Finalized(&finalized);
-  if (comm != MPI_COMM_NULL && !finalized) {
-    MPI_Comm_free(&comm);
-  }
+  //do nothing
 }
+
 MPI_Comm
 Communicator::getMPIComm() const
 {

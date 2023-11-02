@@ -51,21 +51,6 @@ public:
    */
   ~Communicator();
   /**
-   * @brief Construct a new Communicator object
-   *
-   * @param other the Communicator to copy
-   */
-  Communicator(const Communicator& other);
-  /**
-   * @brief Copy the communcator object
-   *
-   * @param other  the Communicator to copy
-   * @return Communicator&  this object
-   */
-  Communicator& operator=(const Communicator& other);
-  Communicator(Communicator&& other);
-  Communicator& operator=(Communicator&& other);
-  /**
    * @brief Construct a new Communicator from a specified MPI_Comm
    *
    * @param comm the comm
