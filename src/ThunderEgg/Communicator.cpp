@@ -47,6 +47,7 @@ Communicator::Communicator(MPI_Comm comm)
     if (*comm_ptr != MPI_COMM_NULL && !finalized) {
       MPI_Comm_free(comm_ptr);
     }
+    delete comm_ptr;
   });
 }
 
