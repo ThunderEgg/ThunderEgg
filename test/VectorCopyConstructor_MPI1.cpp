@@ -236,8 +236,6 @@ TEST_CASE("Vector<2> copy assign from domain constructor")
       for (auto num_ghost_cells : { 0, 1, 5 }) {
         for (int nx : { 1, 4, 5 }) {
           for (int ny : { 1, 4, 5 }) {
-            Communicator comm(MPI_COMM_WORLD);
-
             int component_stride = (nx + 2 * num_ghost_cells) * (ny + 2 * num_ghost_cells);
             int patch_stride = component_stride * num_components;
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
@@ -258,9 +256,9 @@ TEST_CASE("Vector<2> copy assign from domain constructor")
             CHECK_EQ(vec.getNumGhostCells(), num_ghost_cells);
 
             int result;
-            int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
+            int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), vec_to_copy.getCommunicator().getMPIComm(), &result);
             REQUIRE_EQ(err, MPI_SUCCESS);
-            CHECK_EQ(result, MPI_CONGRUENT);
+            CHECK_EQ(result, MPI_IDENT);
 
             CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
             CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
