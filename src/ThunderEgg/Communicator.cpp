@@ -41,9 +41,11 @@ Communicator::Communicator(MPI_Comm comm)
 {
   MPI_Comm* comm_dup = new MPI_Comm;
   CheckErr(MPI_Comm_dup(comm, comm_dup));
-  this->comm.reset(comm_dup, [](MPI_Comm* comm) {
-    if (*comm != MPI_COMM_NULL) {
-      CheckErr(MPI_Comm_free(comm));
+  this->comm.reset(comm_dup, [](MPI_Comm* comm_ptr) {
+    int finalized;
+    MPI_Finalized(&finalized);
+    if (*comm_ptr != MPI_COMM_NULL && !finalized) {
+      MPI_Comm_free(comm_ptr);
     }
   });
 }
