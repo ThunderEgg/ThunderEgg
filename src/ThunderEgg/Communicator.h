@@ -27,6 +27,7 @@
  */
 #include <ThunderEgg/RuntimeError.h>
 #include <mpi.h>
+#include <memory>
 
 namespace ThunderEgg {
 /**
