@@ -39,7 +39,7 @@ private:
   /**
    * @brief The communicator associated with the domain
    */
-  MPI_Comm comm = MPI_COMM_NULL;
+  std::shared_ptr<MPI_Comm> comm;
 
 public:
   /**

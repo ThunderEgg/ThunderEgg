@@ -37,9 +37,15 @@ CheckErr(int err)
 }
 } // namespace
 
-Communicator::Communicator(MPI_Comm comm) : comm(comm)
+Communicator::Communicator(MPI_Comm comm)
 {
-
+  MPI_Comm* comm_dup = new MPI_Comm;
+  CheckErr(MPI_Comm_dup(comm, comm_dup));
+  this->comm.reset(comm_dup, [](MPI_Comm* comm) {
+    if (*comm != MPI_COMM_NULL) {
+      CheckErr(MPI_Comm_free(comm));
+    }
+  });
 }
 
 Communicator::~Communicator()
@@ -50,29 +56,29 @@ Communicator::~Communicator()
 MPI_Comm
 Communicator::getMPIComm() const
 {
-  if (comm == MPI_COMM_NULL) {
+  if (comm == nullptr) {
     throw RuntimeError("Null communicator");
   }
-  return comm;
+  return *comm;
 }
 int
 Communicator::getRank() const
 {
-  if (comm == MPI_COMM_NULL) {
+  if (comm == nullptr) {
     throw RuntimeError("Null communicator");
   }
   int rank;
-  CheckErr(MPI_Comm_rank(comm, &rank));
+  CheckErr(MPI_Comm_rank(*comm, &rank));
   return rank;
 }
 int
 Communicator::getSize() const
 {
-  if (comm == MPI_COMM_NULL) {
+  if (comm == nullptr) {
     throw RuntimeError("Null communicator");
   }
   int size;
-  CheckErr(MPI_Comm_size(comm, &size));
+  CheckErr(MPI_Comm_size(*comm, &size));
   return size;
 }
 }; // namespace ThunderEgg
