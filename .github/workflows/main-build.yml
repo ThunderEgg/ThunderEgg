@@ -30,10 +30,8 @@ jobs:
         
     - name: Prepare cache timestamp
       id: cache_timestamp
-      shell: cmake -P {0}
       run: |
-        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
-        message("::set-output name=timestamp::${current_date}")
+        echo "timestamp=`date "+%Y-%m-%d-%H:%M:%S"`" >> $GITHUB_OUTPUT
 
     - name: ccache cache files
       uses: actions/cache@v3
