@@ -48,11 +48,6 @@ Communicator::Communicator(MPI_Comm comm)
   });
 }
 
-Communicator::~Communicator()
-{
-  //do nothing
-}
-
 MPI_Comm
 Communicator::getMPIComm() const
 {

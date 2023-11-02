@@ -37,7 +37,7 @@ class Communicator
 {
 private:
   /**
-   * @brief The communicator associated with the domain
+   * @brief The communicator
    */
   std::shared_ptr<MPI_Comm> comm;
 
@@ -49,7 +49,7 @@ public:
   /**
    * @brief Destroy the Communicator object
    */
-  ~Communicator();
+  ~Communicator() = default;
   /**
    * @brief Construct a new Communicator from a specified MPI_Comm
    *
