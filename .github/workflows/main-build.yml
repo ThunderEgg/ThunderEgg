@@ -27,16 +27,9 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install ${{ matrix.ubuntu_packages }} ninja-build ccache
-        
-    - name: Install Sonar Scanner
-      if: ${{ matrix.analyze }}
-      env:
-        SONAR_SCANNER_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
-      run: |
-        wget --quiet $SONAR_SCANNER_URL
-        unzip sonar-scanner-*-linux.zip
-        mv sonar-scanner-*-linux $HOME/sonar-scanner-linux
-        echo $HOME/sonar-scanner-linux/bin >> $GITHUB_PATH
+
+    - name: Install sonar-scanner and build-wrapper
+      uses: SonarSource/sonarcloud-github-c-cpp@v2 
 
     - name: Prepare cache timestamp
       id: cache_timestamp
