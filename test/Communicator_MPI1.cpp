@@ -69,7 +69,7 @@ TEST_CASE("Comm Constructor copy constructor")
   int result;
   int err = MPI_Comm_compare(comm.getMPIComm(), comm_copy.getMPIComm(), &result);
   REQUIRE_EQ(err, MPI_SUCCESS);
-  CHECK_EQ(result, MPI_CONGRUENT);
+  CHECK_EQ(result, MPI_IDENT);
 }
 TEST_CASE("Comm Constructor copy assignment")
 {
@@ -80,7 +80,7 @@ TEST_CASE("Comm Constructor copy assignment")
   int result;
   int err = MPI_Comm_compare(comm.getMPIComm(), comm_copy.getMPIComm(), &result);
   REQUIRE_EQ(err, MPI_SUCCESS);
-  CHECK_EQ(result, MPI_CONGRUENT);
+  CHECK_EQ(result, MPI_IDENT);
 }
 TEST_CASE("Comm Constructor move constructor")
 {

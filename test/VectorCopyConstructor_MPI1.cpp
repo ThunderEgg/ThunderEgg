@@ -122,7 +122,7 @@ TEST_CASE("Vector<2> copy from managed constructor")
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
             REQUIRE_EQ(err, MPI_SUCCESS);
-            CHECK_EQ(result, MPI_CONGRUENT);
+            CHECK_EQ(result, MPI_IDENT);
 
             CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
             CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
@@ -193,7 +193,7 @@ TEST_CASE("Vector<2> copy from unmanaged constructor")
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
             REQUIRE_EQ(err, MPI_SUCCESS);
-            CHECK_EQ(result, MPI_CONGRUENT);
+            CHECK_EQ(result, MPI_IDENT);
 
             CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
             CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
@@ -325,7 +325,7 @@ TEST_CASE("Vector<2> copy assign from managed constructor")
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
             REQUIRE_EQ(err, MPI_SUCCESS);
-            CHECK_EQ(result, MPI_CONGRUENT);
+            CHECK_EQ(result, MPI_IDENT);
 
             CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
             CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
@@ -397,7 +397,7 @@ TEST_CASE("Vector<2> copy assign from unmanaged constructor")
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
             REQUIRE_EQ(err, MPI_SUCCESS);
-            CHECK_EQ(result, MPI_CONGRUENT);
+            CHECK_EQ(result, MPI_IDENT);
 
             CHECK_EQ(vec.getNumLocalPatches(), vec_to_copy.getNumLocalPatches());
             CHECK_EQ(vec.getNumComponents(), vec_to_copy.getNumComponents());
