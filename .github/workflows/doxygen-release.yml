@@ -13,7 +13,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev ninja-build doxygen graphviz
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Cmake Configure
       run: cmake -DCMAKE_CXX_COMPILER=mpicxx -DCMAKE_C_COMPILER=mpicc -DPETSC_DIR=/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/ -GNinja .
     - name: Generate Doxygen
