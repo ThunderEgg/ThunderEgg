@@ -27,19 +27,25 @@
  */
 #include <ThunderEgg/RuntimeError.h>
 #include <mpi.h>
+#include <memory>
 
 namespace ThunderEgg {
 /**
  * @brief wrapper arount MPI_Comm, provides proper copy operators. Classes that have a communicator
  * are meant to store a Communicator object instead of a raw MPI_Comm
+ *
+ * This class will only call MPI_Comm_dup with the MPI_Comm constructor.
+ * When sharing the commmunicator whithin the ThunderEgg library,
+ * MPI_Comm_dup will not be called, and they will share the same MPI_Comm.
+ *
  */
 class Communicator
 {
 private:
   /**
-   * @brief The communicator associated with the domain
+   * @brief The communicator
    */
-  MPI_Comm comm = MPI_COMM_NULL;
+  std::shared_ptr<MPI_Comm> comm;
 
 public:
   /**
@@ -49,24 +55,11 @@ public:
   /**
    * @brief Destroy the Communicator object
    */
-  ~Communicator();
-  /**
-   * @brief Construct a new Communicator object
-   *
-   * @param other the Communicator to copy
-   */
-  Communicator(const Communicator& other);
-  /**
-   * @brief Copy the communcator object
-   *
-   * @param other  the Communicator to copy
-   * @return Communicator&  this object
-   */
-  Communicator& operator=(const Communicator& other);
-  Communicator(Communicator&& other);
-  Communicator& operator=(Communicator&& other);
+  ~Communicator() = default;
   /**
    * @brief Construct a new Communicator from a specified MPI_Comm
+   *
+   * This will call MPI_Comm_dup on the communicator.
    *
    * @param comm the comm
    */

@@ -58,7 +58,7 @@ TEST_CASE("Vector<1> getMPIComm managed constructor")
           int result;
           int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
           REQUIRE_EQ(err, MPI_SUCCESS);
-          CHECK_EQ(result, MPI_CONGRUENT);
+          CHECK_EQ(result, MPI_IDENT);
         }
       }
     }
@@ -154,7 +154,7 @@ TEST_CASE("Vector<2> getMPIComm managed constructor")
             int result;
             int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
             REQUIRE_EQ(err, MPI_SUCCESS);
-            CHECK_EQ(result, MPI_CONGRUENT);
+            CHECK_EQ(result, MPI_IDENT);
           }
         }
       }
@@ -260,7 +260,7 @@ TEST_CASE("Vector<3> getMPIComm managed constructor")
               int result;
               int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
               REQUIRE_EQ(err, MPI_SUCCESS);
-              CHECK_EQ(result, MPI_CONGRUENT);
+              CHECK_EQ(result, MPI_IDENT);
             }
           }
         }

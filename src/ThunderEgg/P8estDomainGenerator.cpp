@@ -226,6 +226,7 @@ P8estDomainGenerator::P8estDomainGenerator(p8est_t* p8est,
   : ns(ns)
   , num_ghost_cells(num_ghost_cells)
   , bmf(bmf)
+  , comm(p8est->mpicomm)
 {
   my_p8est = p8est_copy(p8est, false);
 
@@ -925,7 +926,6 @@ P8estDomainGenerator::getCoarserDomain()
   if (curr_level >= 0) {
     extractLevel();
   }
-  Communicator comm(my_p8est->mpicomm);
   Domain<3> domain(
     comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
   domain_patches.pop_back();
@@ -939,7 +939,6 @@ P8estDomainGenerator::getFinestDomain()
   if (curr_level >= 0) {
     extractLevel();
   }
-  Communicator comm(my_p8est->mpicomm);
   Domain<3> domain(
     comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
   domain_patches.pop_back();

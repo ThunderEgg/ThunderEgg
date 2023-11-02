@@ -56,17 +56,15 @@ TEST_CASE("Vector<2> getMPIComm domain constructor")
       for (auto num_ghost_cells : { 0, 1, 5 }) {
         for (int nx : { 1, 4, 5 }) {
           for (int ny : { 1, 4, 5 }) {
-            Communicator comm(MPI_COMM_WORLD);
-
             DomainReader<2> domain_reader(mesh_file, { nx, ny }, num_ghost_cells);
             Domain<2> domain = domain_reader.getFinerDomain();
 
             Vector<2> vec(domain, num_components);
 
             int result;
-            int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), comm.getMPIComm(), &result);
+            int err = MPI_Comm_compare(vec.getCommunicator().getMPIComm(), domain.getCommunicator().getMPIComm(), &result);
             REQUIRE_EQ(err, MPI_SUCCESS);
-            CHECK_EQ(result, MPI_CONGRUENT);
+            CHECK_EQ(result, MPI_IDENT);
           }
         }
       }

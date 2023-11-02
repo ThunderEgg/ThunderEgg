@@ -58,7 +58,7 @@ TEST_CASE("Domain constructors work")
         int result;
         int err = MPI_Comm_compare(comm.getMPIComm(), d.getCommunicator().getMPIComm(), &result);
         REQUIRE_EQ(err, MPI_SUCCESS);
-        CHECK_EQ(result, MPI_CONGRUENT);
+        CHECK_EQ(result, MPI_IDENT);
       }
     }
   }
