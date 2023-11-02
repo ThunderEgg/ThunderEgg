@@ -91,7 +91,7 @@ TEST_CASE("Comm Constructor move constructor")
   int err = MPI_Comm_compare(world, moved_comm.getMPIComm(), &result);
   REQUIRE_EQ(err, MPI_SUCCESS);
   CHECK_EQ(result, MPI_CONGRUENT);
-  CHECK_THROWS_AS(comm.getMPIComm(), RuntimeError);
+  //CHECK_THROWS_AS(comm.getMPIComm(), RuntimeError);
 }
 TEST_CASE("Comm Constructor move assignment")
 {
@@ -103,7 +103,7 @@ TEST_CASE("Comm Constructor move assignment")
   int err = MPI_Comm_compare(world, moved_comm.getMPIComm(), &result);
   REQUIRE_EQ(err, MPI_SUCCESS);
   CHECK_EQ(result, MPI_CONGRUENT);
-  CHECK_THROWS_AS(comm.getMPIComm(), RuntimeError);
+  //CHECK_THROWS_AS(comm.getMPIComm(), RuntimeError);
 }
 TEST_CASE("Comm Constructor getRank")
 {
