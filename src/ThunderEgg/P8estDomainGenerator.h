@@ -94,6 +94,11 @@ private:
   int id = 0;
 
   /**
+   * @brief The communicator used in ThunderEgg
+   */
+  Communicator comm;
+
+  /**
    * @brief Get a new coarser level and add it to the end of domain_list
    */
   void extractLevel();

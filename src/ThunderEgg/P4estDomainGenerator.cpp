@@ -209,6 +209,7 @@ P4estDomainGenerator::P4estDomainGenerator(p4est_t* p4est,
   : ns(ns)
   , num_ghost_cells(num_ghost_cells)
   , bmf(bmf)
+  , comm(p4est->mpicomm)
 {
   my_p4est = p4est_copy(p4est, false);
 
@@ -710,7 +711,6 @@ P4estDomainGenerator::getCoarserDomain()
   if (curr_level >= 0) {
     extractLevel();
   }
-  Communicator comm(my_p4est->mpicomm);
   Domain<2> domain(
     comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
   domain_patches.pop_back();
@@ -724,7 +724,6 @@ P4estDomainGenerator::getFinestDomain()
   if (curr_level >= 0) {
     extractLevel();
   }
-  Communicator comm(my_p4est->mpicomm);
   Domain<2> domain(
     comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
   domain_patches.pop_back();
