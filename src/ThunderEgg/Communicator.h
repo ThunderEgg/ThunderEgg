@@ -33,6 +33,11 @@ namespace ThunderEgg {
 /**
  * @brief wrapper arount MPI_Comm, provides proper copy operators. Classes that have a communicator
  * are meant to store a Communicator object instead of a raw MPI_Comm
+ *
+ * This class will only call MPI_Comm_dup with the MPI_Comm constructor.
+ * When sharing the commmunicator whithin the ThunderEgg library,
+ * MPI_Comm_dup will not be called, and they will share the same MPI_Comm.
+ *
  */
 class Communicator
 {
@@ -53,6 +58,8 @@ public:
   ~Communicator() = default;
   /**
    * @brief Construct a new Communicator from a specified MPI_Comm
+   *
+   * This will call MPI_Comm_dup on the communicator.
    *
    * @param comm the comm
    */
