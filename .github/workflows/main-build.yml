@@ -3,6 +3,7 @@ on:
   push:
     paths-ignore:
       - '.github/workflows/doxygen.yml'
+  pull_request:
 
 env:
   CMAKE_BUILD_PARALLEL_LEVEL: 2
