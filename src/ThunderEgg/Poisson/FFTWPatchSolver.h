@@ -33,6 +33,7 @@
 #include <fftw3.h>
 #include <map>
 #include <valarray>
+#include <functional>
 
 namespace ThunderEgg::Poisson {
 /**
