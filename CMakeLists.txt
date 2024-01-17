@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.18)
-project(ThunderEgg 
+cmake_minimum_required(VERSION 3.18...3.29)
+project(ThunderEgg
         VERSION 1.0.6
         LANGUAGES C CXX)
 enable_testing()
@@ -7,13 +7,12 @@ enable_testing()
 # set(CMAKE_CXX_EXTENSIONS OFF)
 include(GNUInstallDirs)
 
+include(cmake/GitSubmodule.cmake)
 include(cmake/options.cmake)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 set(CMAKE_CXX_STANDARD 17)
-
-set(CMAKE_FIND_PACKAGE_PREFER_CONFIG true)
 
 find_package(MPI REQUIRED COMPONENTS C CXX)
 
@@ -69,33 +68,25 @@ endif()
 
 if(p4est)
 
-  find_package(P4EST)
-  find_package(SC)
-
-  if(NOT (P4EST_FOUND AND SC_FOUND) AND p4est_external)
-    include(cmake/p4est.cmake)
-  endif()
-
-  if(p4est_required AND NOT TARGET P4EST::P4EST)
-    message(FATAL_ERROR "p4est was not found")
-  endif()
-  if(P4EST_FOUND AND NOT SC_FOUND)
-    message(FATAL_ERROR "SC was not found")
+  if(ThunderEgg_IS_TOP_LEVEL)
+    git_submodule(${CMAKE_CURRENT_SOURCE_DIR}/p4est)
+    add_subdirectory(p4est)
   endif()
 
   if(TARGET P4EST::P4EST)
     set(THUNDEREGG_P4EST_ENABLED TRUE)
     list(APPEND THUNDEREGG_ENABLED_COMPONENTS "P4EST")
+  elseif(p4est_required)
+    message(FATAL_ERROR "${PROJECT_NAME}: P4EST was requested but not found")
   endif()
 endif()
 
 add_subdirectory(src)
 
 
-include(CTest)
-if(BUILD_TESTING)
+if(ThunderEgg_BUILD_TESTING)
   add_subdirectory(test)
-endif(BUILD_TESTING)
+endif()
 
 include(cmake/documentation.cmake)
 
@@ -109,8 +100,6 @@ configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/Config.cmake.in
   install(FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindFFTW.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindPETSc.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindP4EST.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindSC.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/CorrectWindowsPaths.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/ResolveCompilerPaths.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindPackageMultipass.cmake
@@ -120,7 +109,7 @@ write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
   COMPATIBILITY SameMinorVersion)
 
-install(TARGETS ThunderEgg 
+install(TARGETS ThunderEgg
   EXPORT                        ThunderEggTargets
   RUNTIME DESTINATION           ${CMAKE_INSTALL_BINDIR}
           COMPONENT             ThunderEgg_RunTime
@@ -151,3 +140,7 @@ export(EXPORT ${PROJECT_NAME}Targets
 
 # -- generate a pkgconfig file
 include(cmake/pkgconfig.cmake)
+
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  file(GENERATE OUTPUT .gitignore CONTENT "*")
+endif()
