@@ -1,10 +1,9 @@
 {
-	"version": 2,
+	"version": 6,
 	"configurePresets": [
 		{
 			"name": "ci-gcc",
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
-			"generator": "Ninja",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
@@ -31,7 +30,6 @@
 		{
 			"name": "ci-clang",
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
-			"generator": "Ninja",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",

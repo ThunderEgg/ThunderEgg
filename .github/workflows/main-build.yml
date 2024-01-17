@@ -1,8 +1,13 @@
 name: Main ThunderEgg Build / Test / Analyze
-on: 
+on:
   push:
     paths-ignore:
       - '.github/workflows/doxygen.yml'
+
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 2
+  CTEST_PARALLEL_LEVEL: 2
+
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -26,8 +31,8 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install ${{ matrix.ubuntu_packages }} ninja-build ccache
-        
+        sudo apt-get install ${{ matrix.ubuntu_packages }} ccache
+
     - name: Prepare cache timestamp
       id: cache_timestamp
       run: |
@@ -49,10 +54,10 @@ jobs:
       run: cmake --preset ${{ matrix.preset }}
 
     - name: Build
-      run: cmake --build --preset ${{ matrix.preset }} -parallel 2
+      run: cmake --build --preset ${{ matrix.preset }}
 
     - name: Run Tests
-      run: ctest -j2 --preset ${{ matrix.preset }}
+      run: ctest --preset ${{ matrix.preset }}
 
     - name: Generate Coverage Report
       if: ${{ matrix.analyze }}
