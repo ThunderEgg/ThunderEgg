@@ -33,6 +33,7 @@
 #include <bitset>
 #include <map>
 #include <valarray>
+#include <functional>
 
 extern "C" void
 dgemv_(char&, int&, int&, double&, double*, int&, double*, int&, double&, double*, int&);
