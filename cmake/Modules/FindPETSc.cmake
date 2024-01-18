@@ -25,7 +25,7 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 #
-cmake_policy(VERSION 3.4)
+cmake_policy(VERSION 3.5)
 set(PETSC_VALID_COMPONENTS
   C
   CXX)
