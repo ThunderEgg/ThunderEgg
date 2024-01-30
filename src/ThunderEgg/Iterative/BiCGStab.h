@@ -54,21 +54,6 @@ private:
    */
   std::shared_ptr<Timer> timer = nullptr;
 
-  void applyWithPreconditioner(const Operator<D>* M_l,
-                               const Operator<D>& A,
-                               const Operator<D>* M_r,
-                               const Vector<D>& x,
-                               Vector<D>& b) const
-  {
-    if (M_l == nullptr && M_r == nullptr) {
-      A.apply(x, b);
-    } else if (M_l == nullptr && M_r != nullptr) {
-      Vector<D> tmp = b.getZeroClone();
-      M_r->apply(x, tmp);
-      A.apply(tmp, b);
-    }
-  }
-
 public:
   /**
    * @brief Clone this solver
@@ -123,20 +108,19 @@ public:
   std::shared_ptr<Timer> getTimer() const { return timer; }
 
 public:
-  int solve(const Operator<D>& A,
-            Vector<D>& x,
-            const Vector<D>& b,
-            const Operator<D>* Mr = nullptr,
-            bool output = false,
-            std::ostream& os = std::cout) const override
+  int solve(const Operator<D>& A, Vector<D>& x, const Vector<D>& b, const Operator<D>* Mr = nullptr, bool output = false, std::ostream& os = std::cout) const override
   {
     Vector<D> resid = b.getZeroClone();
 
+    Vector<D> ms;
+    Vector<D> mp;
+    if (Mr != nullptr) {
+      ms = b.getZeroClone();
+      mp = b.getZeroClone();
+    }
+
     A.apply(x, resid);
     resid.scaleThenAdd(-1, b);
-
-    Vector<D> initial_guess = x;
-    x.set(0);
 
     double r0_norm = b.twoNorm();
     Vector<D> rhat = resid;
@@ -163,11 +147,15 @@ public:
       }
 
       if (rho == 0) {
-        throw BreakdownError("BiCGStab broke down, rho was 0 on iteration " +
-                             std::to_string(num_its));
+        throw BreakdownError("BiCGStab broke down, rho was 0 on iteration " + std::to_string(num_its));
       }
 
-      applyWithPreconditioner(nullptr, A, Mr, p, ap);
+      if (Mr != nullptr) {
+        Mr->apply(p, mp);
+        A.apply(mp, ap);
+      } else {
+        A.apply(p, ap);
+      }
       double alpha = rho / rhat.dot(ap);
       s.copy(resid);
       s.addScaled(-alpha, ap);
@@ -178,11 +166,20 @@ public:
         }
         break;
       }
-      applyWithPreconditioner(nullptr, A, Mr, s, as);
+      if (Mr != nullptr) {
+        Mr->apply(s, ms);
+        A.apply(ms, as);
+      } else {
+        A.apply(s, as);
+      }
       double omega = as.dot(s) / as.dot(as);
-      x.addScaled(alpha, p, omega, s);
-      resid.addScaled(-alpha, ap);
-      resid.addScaled(-omega, as);
+      // update x and residual
+      if (Mr != nullptr) {
+        x.addScaled(alpha, mp, omega, ms);
+      } else {
+        x.addScaled(alpha, p, omega, s);
+      }
+      resid.addScaled(-alpha, ap, -omega, as);
 
       double rho_new = resid.dot(rhat);
       double beta = rho_new * alpha / (rho * omega);
@@ -202,11 +199,6 @@ public:
         timer->stop("Iteration");
       }
     }
-    if (Mr != nullptr) {
-      Mr->apply(x, resid);
-      x.copy(resid);
-    }
-    x.add(initial_guess);
     return num_its;
   }
 };
