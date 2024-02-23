@@ -53,6 +53,10 @@ jobs:
     - name: ${{ matrix.name }} workflow
       run: cmake --workflow --preset ${{ matrix.preset }}
 
+    - name: log if fail
+      if: failure()
+      run: cat out/build/${{ matrix.preset }}/CMakeFiles/CMakeConfigureLog.yaml
+
     - name: Generate Coverage Report
       if: ${{ matrix.analyze }}
       run: |
