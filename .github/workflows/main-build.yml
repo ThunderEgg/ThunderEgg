@@ -39,7 +39,7 @@ jobs:
         echo "timestamp=`date "+%Y-%m-%d-%H:%M:%S"`" >> $GITHUB_OUTPUT
 
     - name: ccache cache files
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.ccache
         key: ${{ matrix.name }}-ccache-${{ steps.cache_timestamp.outputs.timestamp }}
@@ -50,14 +50,8 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Configure
-      run: cmake --preset ${{ matrix.preset }}
-
-    - name: Build
-      run: cmake --build --preset ${{ matrix.preset }}
-
-    - name: Run Tests
-      run: ctest --preset ${{ matrix.preset }}
+    - name: ${{ matrix.name }} workflow
+      run: cmake --workflow --preset ${{ matrix.preset }}
 
     - name: Generate Coverage Report
       if: ${{ matrix.analyze }}

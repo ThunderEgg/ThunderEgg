@@ -2,7 +2,7 @@
 	"version": 6,
 	"configurePresets": [
 		{
-			"name": "ci-gcc",
+			"name": "ci", "hidden": true,
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
@@ -21,32 +21,19 @@
 				"p4est_required": true,
 				"lapack": true,
 				"lapack_required": true
-			},
+			}
+		},
+		{
+			"name": "ci-gcc", "inherits": "ci",
 			"environment": {
 				"CXX": "g++",
 				"CC": "gcc"
 			}
 		},
 		{
-			"name": "ci-clang",
-			"binaryDir": "${sourceDir}/out/build/${presetName}",
+			"name": "ci-clang", "inherits": "ci",
 			"cacheVariables": {
-				"CMAKE_BUILD_TYPE": "Release",
-				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-				"CMAKE_C_COMPILER_LAUNCHER": "ccache",
-				"CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
-				"CMAKE_CXX_FLAGS": "-O3 -fprofile-instr-generate -fcoverage-mapping",
-				"THUNDEREGG_ENABLE_DEBUG": true,
-				"PETSC_DIR": "/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/",
-				"THUNDEREGG_MPIEXEC_FLAGS": "--oversubscribe",
-				"petsc": true,
-				"petsc_required": true,
-				"fftw": true,
-				"fftw_required": true,
-				"p4est": true,
-				"p4est_required": true,
-				"lapack": true,
-				"lapack_required": true
+				"CMAKE_CXX_FLAGS": "-O3 -fprofile-instr-generate -fcoverage-mapping"
 			},
 			"environment": {
 				"CXX": "clang++",
@@ -82,5 +69,41 @@
 				"LLVM_PROFILE_FILE": "${sourceDir}/out/test/${presetName}/test.profraw.%p"
 			}
 		}
+	],
+	"workflowPresets": [
+	{
+		"name": "ci-gcc",
+		"steps": [
+		  {
+			"type": "configure",
+			"name": "ci-gcc"
+		  },
+		  {
+			"type": "build",
+			"name": "ci-gcc"
+		  },
+		  {
+			"type": "test",
+			"name": "ci-gcc"
+		  }
+		]
+	  },
+	  {
+		"name": "ci-clang",
+		"steps": [
+		  {
+			"type": "configure",
+			"name": "ci-clang"
+		  },
+		  {
+			"type": "build",
+			"name": "ci-clang"
+		  },
+		  {
+			"type": "test",
+			"name": "ci-clang"
+		  }
+		]
+	  }
 	]
 }
