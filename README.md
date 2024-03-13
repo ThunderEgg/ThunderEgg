@@ -1,15 +1,17 @@
 # thunderegg
+
 ![alt text](https://github.com/GEM3D/pressurePoissonSolver/blob/master/icon.png)
 
 ThunderEgg is an object-oriented C++ library designed for flexibility and to allow users to implement parallel multigrid preconditioners for various problems on octree and quadtree adaptive meshes.
 
-# Members of the team :
+## Members of the team
 
 * Scott Aiton
 * Donna Calhoun
 * Grady Wright
 
-# Required Software
+## Required Software
+
 * MPI
 * CMake
 
@@ -19,23 +21,28 @@ ThunderEgg is an object-oriented C++ library designed for flexibility and to all
 * PETSc - ThunderEgg provides [a set of interfaces](https://thunderegg.dev/ThunderEgg/docs/develop-wip/namespaceThunderEgg_1_1PETSc.html) to use PETSc Krylov Solvers and PETSc matrices.
 * p4est - for compatibility with the p4est quadtree library
 
+## Compiling
 
-# Compiling
-Create a seperate source directory and run cmake in the build directory:
+Configure CMake project:
+
+```sh
+cmake -S /path/to/source -B build
 ```
-$ cd build_dir
-$ cmake /path/to/source
-```
+
 Compilers can be specified in the following way
-```
-$ cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER /path/to/source
+
+```sh
+cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -S /path/to/source -B build
 ```
 
-Then compile with make:
+Then compile:
+
+```sh
+cmake --build build
 ```
-make
-```
+
 Some helpful CMake variables for configuration:
+
 Variable           | Default Value |   Description
 -------------------|:---------:|---------------------------------------
 PETSC_DIR          |         |    The PETSc directory
@@ -47,8 +54,6 @@ fftw               |   ON    |    allow the use the use of FFTW
 fftw_required      |   OFF   |    fail if FFTW is not found
 P4EST_ROOT         |         |    The p4est directory
 p4est              |   ON    |    allow the use the use of p4est
-p4est_external     |   ON    |    build p4est library if not found on system
 p4est_required     |   OFF   |    fail if p4est is not found
 lapack             |   ON    |    allow the use the use of lapack/blas
 lapack_required    |   OFF   |    fail if lapack/blas is not found
-
