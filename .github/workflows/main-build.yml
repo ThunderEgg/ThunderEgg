@@ -5,8 +5,10 @@ on:
       - '.github/workflows/doxygen.yml'
 
 env:
-  CMAKE_BUILD_PARALLEL_LEVEL: 2
-  CTEST_PARALLEL_LEVEL: 2
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
+  CTEST_PARALLEL_LEVEL: 4
+  ubuntu_pkg: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real-dev libblas-dev liblapack-dev"
+  brew_pkg: "open-mpi fftw petsc"
 
 jobs:
   build:
@@ -17,21 +19,24 @@ jobs:
       matrix:
         include:
         - name: "gcc"
-          preset: "ci-gcc"
-          ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev"
+          preset: "ci"
           analyze: false
         - name: "clang"
           preset: "ci-clang"
-          ubuntu_packages: "libfftw3-dev libopenmpi-dev openmpi-bin libpetsc-real3.12-dbg libblas-dev liblapack-dev llvm-11"
           analyze: true
 
     name: ${{ matrix.name }} Build on Linux
+
     steps:
 
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install ${{ matrix.ubuntu_packages }} ccache
+        sudo apt-get install ${{ env.ubuntu_pkg }} ccache
+
+    - name: Install LLVM deps
+      if: ${{ matrix.analyze }}
+      run: sudo apt-get install llvm-11
 
     - name: Prepare cache timestamp
       id: cache_timestamp
@@ -74,3 +79,67 @@ jobs:
     - name: Upload to codecov.io
       if: ${{ matrix.analyze }}
       run: bash <(curl -s https://codecov.io/bash)
+
+
+  old-gcc:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        gcc-version: [8]
+
+    env:
+      CC: gcc-${{ matrix.gcc-version }}
+      CXX: g++-${{ matrix.gcc-version }}
+
+    steps:
+
+    - name: install compilers
+      run: sudo apt install --no-install-recommends ${{ env.CC }} ${{ env.CXX }}
+
+    - name: Install dependencies
+      run: sudo apt-get install ${{ env.ubuntu_pkg }}
+
+    - uses: actions/checkout@v4
+
+    - name: CMake workflow
+      run: cmake --workflow --preset default
+
+
+  gcc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        gcc-version: [9, 13]
+
+    env:
+      CC: gcc-${{ matrix.gcc-version }}
+      CXX: g++-${{ matrix.gcc-version }}
+
+    steps:
+
+    - name: Install dependencies
+      run: sudo apt-get install ${{ env.ubuntu_pkg }}
+
+    - uses: actions/checkout@v4
+
+    - name: CMake workflow
+      run: cmake --workflow --preset default
+
+
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 15
+
+    steps:
+
+    - name: Install dependencies
+      run: brew install ${{ env.brew_pkg }}
+
+    - uses: actions/checkout@v4
+
+    - name: CMake workflow
+      run: cmake --workflow --preset default
