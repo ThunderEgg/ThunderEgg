@@ -4,14 +4,14 @@ unset(ThunderEgg_HDRS)
 
 # -- add sources
 
-if(TARGET PETSC::PETSC)
+if(TARGET PETSc::PETSc)
 
   list(APPEND ThunderEgg_HDRS KSPSolver.h)
   list(APPEND ThunderEgg_HDRS MatWrapper.h)
   list(APPEND ThunderEgg_HDRS MatShellCreator.h)
   list(APPEND ThunderEgg_HDRS PCShellCreator.h)
 
-endif(TARGET PETSC::PETSC)
+endif(TARGET PETSc::PETSc)
 
 # -- install public headers
 

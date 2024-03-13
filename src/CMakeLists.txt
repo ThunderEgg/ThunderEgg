@@ -40,9 +40,9 @@ if(TARGET FFTW::FFTW)
   target_link_libraries(ThunderEgg PUBLIC FFTW::FFTW)
 endif(TARGET FFTW::FFTW)
 
-if(TARGET PETSC::PETSC)
-  target_link_libraries(ThunderEgg PUBLIC PETSC::PETSC)
-endif(TARGET PETSC::PETSC)
+if(TARGET PETSc::PETSc)
+  target_link_libraries(ThunderEgg PUBLIC PETSc::PETSc)
+endif(TARGET PETSc::PETSc)
 
 if(TARGET LAPACK::LAPACK AND TARGET BLAS::BLAS)
   target_link_libraries(ThunderEgg PUBLIC LAPACK::LAPACK)

@@ -19,7 +19,7 @@ if(TARGET FFTW::FFTW)
 
 endif(TARGET FFTW::FFTW)
 
-if(TARGET PETSC::PETSC)
+if(TARGET PETSc::PETSc)
   if(TARGET FFTW::FFTW)
     list(APPEND ThunderEgg_HDRS FastSchurMatrixAssemble2D.h)
     target_sources(ThunderEgg PRIVATE
@@ -36,7 +36,7 @@ if(TARGET PETSC::PETSC)
   list(APPEND ThunderEgg_HDRS MatrixHelper2d.h)
   target_sources(ThunderEgg PRIVATE MatrixHelper2d.cpp)
 
-endif(TARGET PETSC::PETSC)
+endif(TARGET PETSc::PETSc)
 
 # -- install public headers
 

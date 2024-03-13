@@ -1,4 +1,4 @@
-if(TARGET PETSC::PETSC)
+if(TARGET PETSc::PETSc)
 
     target_sources(unit_tests_mpi1 PRIVATE MatShellCreator_MPI1.cpp)
 
@@ -6,4 +6,4 @@ if(TARGET PETSC::PETSC)
 
     target_sources(unit_tests_mpi1 PRIVATE PCShellCreator_MPI1.cpp)
 
-endif(TARGET PETSC::PETSC)
+endif(TARGET PETSc::PETSc)
