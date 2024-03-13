@@ -2,7 +2,7 @@
 if(TARGET FFTW::FFTW)
   string(APPEND pc_req_public " fftw3")
 endif()
-if(TARGET PETSC::PETSC)
+if(TARGET PETSc::PETSc)
   string(APPEND pc_req_public " PETSc")
 endif()
 if(TARGET P4EST::P4EST)
