@@ -1,10 +1,10 @@
 <map id="src/ThunderEgg/PatchSolver.h" name="src/ThunderEgg/PatchSolver.h">
 <area shape="rect" id="node1" title="PatchSolver class." alt="" coords="243,5,456,32"/>
-<area shape="rect" id="node2" href="$Iterative_2PatchSolver_8h.html" title="PatchSolver class." alt="" coords="5,169,187,211"/>
-<area shape="rect" id="node3" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="258,259,393,285"/>
+<area shape="rect" id="node2" href="$Iterative_2PatchSolver_8h.html" title="PatchSolver class." alt="" coords="5,80,187,121"/>
+<area shape="rect" id="node3" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="282,177,417,203"/>
 <area shape="rect" id="node4" href="$DFTPatchSolver_8h.html" title="DFTPatchSolver class." alt="" coords="261,80,437,121"/>
-<area shape="rect" id="node5" href="$FFTWPatchSolver_8h.html" title="FFTWPatchSolver class." alt="" coords="461,80,637,121"/>
-<area shape="rect" id="node8" href="$PatchSolverWrapper_8h.html" title="PatchSolverWrapper class." alt="" coords="724,80,892,121"/>
-<area shape="rect" id="node6" href="$FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="363,169,587,211"/>
-<area shape="rect" id="node7" href="$FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="611,169,835,211"/>
+<area shape="rect" id="node5" href="$FFTWPatchSolver_8h.html" title="FFTWPatchSolver class." alt="" coords="653,80,829,121"/>
+<area shape="rect" id="node8" href="$PatchSolverWrapper_8h.html" title="PatchSolverWrapper class." alt="" coords="461,80,629,121"/>
+<area shape="rect" id="node6" href="$FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="535,169,759,211"/>
+<area shape="rect" id="node7" href="$FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="783,169,1007,211"/>
 </map>

@@ -1,11 +1,11 @@
 <map id="src/ThunderEgg/PatchOperator.h" name="src/ThunderEgg/PatchOperator.h">
-<area shape="rect" id="node1" title="PatchOperator class." alt="" coords="320,5,549,32"/>
-<area shape="rect" id="node2" href="$Iterative_2PatchSolver_8h.html" title="PatchSolver class." alt="" coords="5,169,187,211"/>
-<area shape="rect" id="node3" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="482,259,617,285"/>
-<area shape="rect" id="node4" href="$DFTPatchSolver_8h.html" title="DFTPatchSolver class." alt="" coords="261,169,437,211"/>
-<area shape="rect" id="node5" href="$FFTWPatchSolver_8h.html" title="FFTWPatchSolver class." alt="" coords="421,80,597,121"/>
-<area shape="rect" id="node8" href="$Poisson_2StarPatchOperator_8h.html" title="StarPatchOperator class." alt="" coords="668,80,844,121"/>
-<area shape="rect" id="node9" href="$VarPoisson_2StarPatchOperator_8h.html" title="StarPatchOperator class." alt="" coords="961,80,1159,121"/>
-<area shape="rect" id="node6" href="$FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="512,169,736,211"/>
-<area shape="rect" id="node7" href="$FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="760,169,984,211"/>
+<area shape="rect" id="node1" title="PatchOperator class." alt="" coords="335,5,564,32"/>
+<area shape="rect" id="node2" href="$Iterative_2PatchSolver_8h.html" title="PatchSolver class." alt="" coords="5,80,187,121"/>
+<area shape="rect" id="node3" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="425,177,559,203"/>
+<area shape="rect" id="node4" href="$DFTPatchSolver_8h.html" title="DFTPatchSolver class." alt="" coords="261,80,437,121"/>
+<area shape="rect" id="node5" href="$FFTWPatchSolver_8h.html" title="FFTWPatchSolver class." alt="" coords="883,80,1059,121"/>
+<area shape="rect" id="node8" href="$Poisson_2StarPatchOperator_8h.html" title="StarPatchOperator class." alt="" coords="461,80,637,121"/>
+<area shape="rect" id="node9" href="$VarPoisson_2StarPatchOperator_8h.html" title="StarPatchOperator class." alt="" coords="661,80,859,121"/>
+<area shape="rect" id="node6" href="$FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="668,169,892,211"/>
+<area shape="rect" id="node7" href="$FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="916,169,1140,211"/>
 </map>

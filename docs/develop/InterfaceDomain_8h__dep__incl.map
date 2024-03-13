@@ -1,8 +1,8 @@
 <map id="src/ThunderEgg/Schur/InterfaceDomain.h" name="src/ThunderEgg/Schur/InterfaceDomain.h">
-<area shape="rect" id="node1" title="InterfaceDomain class." alt="" coords="260,5,423,47"/>
-<area shape="rect" id="node2" href="$FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="5,184,229,225"/>
-<area shape="rect" id="node3" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="349,273,483,300"/>
-<area shape="rect" id="node4" href="$FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="304,95,528,136"/>
-<area shape="rect" id="node5" href="$PatchIfaceScatter_8h.html" title="PatchIfaceScatter class." alt="" coords="552,95,715,136"/>
-<area shape="rect" id="node6" href="$PatchSolverWrapper_8h.html" title="PatchSolverWrapper class." alt="" coords="537,184,705,225"/>
+<area shape="rect" id="node1" title="InterfaceDomain class." alt="" coords="392,5,555,47"/>
+<area shape="rect" id="node2" href="$FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="5,95,229,136"/>
+<area shape="rect" id="node3" href="$FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="253,95,477,136"/>
+<area shape="rect" id="node4" href="$PatchIfaceScatter_8h.html" title="PatchIfaceScatter class." alt="" coords="501,95,664,136"/>
+<area shape="rect" id="node6" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="583,273,718,300"/>
+<area shape="rect" id="node5" href="$PatchSolverWrapper_8h.html" title="PatchSolverWrapper class." alt="" coords="445,184,613,225"/>
 </map>

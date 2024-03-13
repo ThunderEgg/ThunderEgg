@@ -1,8 +1,8 @@
 <map id="src/ThunderEgg/PatchArray.h" name="src/ThunderEgg/PatchArray.h">
 <area shape="rect" id="node1" title="PatchArray class." alt="" coords="115,5,322,32"/>
 <area shape="rect" id="node2" href="$DFTPatchSolver_8h.html" title="DFTPatchSolver class." alt="" coords="5,80,181,121"/>
-<area shape="rect" id="node3" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="202,259,337,285"/>
-<area shape="rect" id="node4" href="$FFTWPatchSolver_8h.html" title="FFTWPatchSolver class." alt="" coords="293,80,469,121"/>
-<area shape="rect" id="node5" href="$FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="307,169,531,211"/>
-<area shape="rect" id="node6" href="$FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="555,169,779,211"/>
+<area shape="rect" id="node3" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="73,177,207,203"/>
+<area shape="rect" id="node4" href="$FFTWPatchSolver_8h.html" title="FFTWPatchSolver class." alt="" coords="256,80,432,121"/>
+<area shape="rect" id="node5" href="$FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="232,169,456,211"/>
+<area shape="rect" id="node6" href="$FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="480,169,704,211"/>
 </map>
