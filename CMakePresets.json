@@ -2,16 +2,13 @@
 	"version": 6,
 	"configurePresets": [
 		{
-			"name": "ci", "hidden": true,
+			"name": "default",
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
 				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-				"CMAKE_C_COMPILER_LAUNCHER": "ccache",
-				"CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
 				"CMAKE_CXX_FLAGS": "-O3",
 				"THUNDEREGG_ENABLE_DEBUG": true,
-				"PETSC_DIR": "/usr/lib/petscdir/petsc3.12/x86_64-linux-gnu-real-debug/",
 				"THUNDEREGG_MPIEXEC_FLAGS": "--oversubscribe",
 				"petsc": true,
 				"petsc_required": true,
@@ -24,10 +21,10 @@
 			}
 		},
 		{
-			"name": "ci-gcc", "inherits": "ci",
-			"environment": {
-				"CXX": "g++",
-				"CC": "gcc"
+			"name": "ci", "inherits": "default",
+			"cacheVariables": {
+				"CMAKE_C_COMPILER_LAUNCHER": "ccache",
+				"CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
 			}
 		},
 		{
@@ -43,8 +40,12 @@
 	],
 	"buildPresets": [
 		{
-			"name": "ci-gcc",
-			"configurePreset": "ci-gcc"
+			"name": "default",
+			"configurePreset": "default"
+		},
+		{
+			"name": "ci",
+			"configurePreset": "ci"
 		},
 		{
 			"name": "ci-clang",
@@ -53,18 +54,25 @@
 	],
 	"testPresets": [
 		{
-			"name": "ci-gcc",
-			"configurePreset": "ci-gcc",
-			"output": {
-				"outputOnFailure": true
-			}
-		},
-		{
-			"name": "ci-clang",
-			"configurePreset": "ci-clang",
+			"name": "default",
+			"configurePreset": "default",
 			"output": {
 				"outputOnFailure": true
 			},
+			"execution": {
+				"noTestsAction": "error",
+				"scheduleRandom": true,
+				"stopOnFailure": false,
+				"timeout": 300
+			}
+		},
+		{
+			"name": "ci", "inherits": "default",
+			"configurePreset": "ci"
+		},
+		{
+			"name": "ci-clang", "inherits": "default",
+			"configurePreset": "ci-clang",
 			"environment": {
 				"LLVM_PROFILE_FILE": "${sourceDir}/out/test/${presetName}/test.profraw.%p"
 			}
@@ -72,19 +80,36 @@
 	],
 	"workflowPresets": [
 	{
-		"name": "ci-gcc",
+		"name": "default",
+		"steps": [
+			{
+			"type": "configure",
+			"name": "default"
+			},
+			{
+			"type": "build",
+			"name": "default"
+			},
+			{
+			"type": "test",
+			"name": "default"
+			}
+		]
+		},
+	{
+		"name": "ci",
 		"steps": [
 		  {
 			"type": "configure",
-			"name": "ci-gcc"
+			"name": "ci"
 		  },
 		  {
 			"type": "build",
-			"name": "ci-gcc"
+			"name": "ci"
 		  },
 		  {
 			"type": "test",
-			"name": "ci-gcc"
+			"name": "ci"
 		  }
 		]
 	  },
