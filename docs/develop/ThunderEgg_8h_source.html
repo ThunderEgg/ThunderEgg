@@ -125,66 +125,76 @@ $(document).ready(function(){initNavTree('ThunderEgg_8h_source.html',''); initRe
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Smoother_8h.html">ThunderEgg/GMG/Smoother.h</a>&gt;</span></div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="VCycle_8h.html">ThunderEgg/GMG/VCycle.h</a>&gt;</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="WCycle_8h.html">ThunderEgg/GMG/WCycle.h</a>&gt;</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Poisson_2StarPatchOperator_8h.html">ThunderEgg/Poisson/StarPatchOperator.h</a>&gt;</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="DFTPatchSolver_8h.html">ThunderEgg/Poisson/DFTPatchSolver.h</a>&gt;</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="FFTWPatchSolver_8h.html">ThunderEgg/Poisson/FFTWPatchSolver.h</a>&gt;</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="CoarseIfaceInfo_8h.html">ThunderEgg/Schur/CoarseIfaceInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="FineIfaceInfo_8h.html">ThunderEgg/Schur/FineIfaceInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="IfaceInfo_8h.html">ThunderEgg/Schur/IfaceInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="IfaceType_8h.html">ThunderEgg/Schur/IfaceType.h</a>&gt;</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Interface_8h.html">ThunderEgg/Schur/Interface.h</a>&gt;</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="InterfaceDomain_8h.html">ThunderEgg/Schur/InterfaceDomain.h</a>&gt;</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NormalIfaceInfo_8h.html">ThunderEgg/Schur/NormalIfaceInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchIfaceInfo_8h.html">ThunderEgg/Schur/PatchIfaceInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchIfaceScatter_8h.html">ThunderEgg/Schur/PatchIfaceScatter.h</a>&gt;</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchSolverWrapper_8h.html">ThunderEgg/Schur/PatchSolverWrapper.h</a>&gt;</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="VarPoisson_2StarPatchOperator_8h.html">ThunderEgg/VarPoisson/StarPatchOperator.h</a>&gt;</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BiCGStab_8h.html">ThunderEgg/Iterative/BiCGStab.h</a>&gt;</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BreakdownError_8h.html">ThunderEgg/Iterative/BreakdownError.h</a>&gt;</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="CG_8h.html">ThunderEgg/Iterative/CG.h</a>&gt;</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Iterative_2PatchSolver_8h.html">ThunderEgg/Iterative/PatchSolver.h</a>&gt;</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Solver_8h.html">ThunderEgg/Iterative/Solver.h</a>&gt;</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BiLinearGhostFiller_8h.html">ThunderEgg/BiLinearGhostFiller.h</a>&gt;</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BiQuadraticGhostFiller_8h.html">ThunderEgg/BiQuadraticGhostFiller.h</a>&gt;</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BufferReader_8h.html">ThunderEgg/BufferReader.h</a>&gt;</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BufferWriter_8h.html">ThunderEgg/BufferWriter.h</a>&gt;</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="CoarseNbrInfo_8h.html">ThunderEgg/CoarseNbrInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Communicator_8h.html">ThunderEgg/Communicator.h</a>&gt;</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="ComponentArray_8h.html">ThunderEgg/ComponentArray.h</a>&gt;</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="ComponentView_8h.html">ThunderEgg/ComponentView.h</a>&gt;</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="DimensionalArray_8h.html">ThunderEgg/DimensionalArray.h</a>&gt;</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Domain_8h.html">ThunderEgg/Domain.h</a>&gt;</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="DomainGenerator_8h.html">ThunderEgg/DomainGenerator.h</a>&gt;</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="DomainTools_8h.html">ThunderEgg/DomainTools.h</a>&gt;</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Face_8h.html">ThunderEgg/Face.h</a>&gt;</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="FineNbrInfo_8h.html">ThunderEgg/FineNbrInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="GhostFiller_8h.html">ThunderEgg/GhostFiller.h</a>&gt;</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="GhostFillingType_8h.html">ThunderEgg/GhostFillingType.h</a>&gt;</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Loops_8h.html">ThunderEgg/Loops.h</a>&gt;</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="MPIGhostFiller_8h.html">ThunderEgg/MPIGhostFiller.h</a>&gt;</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NbrInfo_8h.html">ThunderEgg/NbrInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NbrInfoBase_8h.html">ThunderEgg/NbrInfoBase.h</a>&gt;</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NbrType_8h.html">ThunderEgg/NbrType.h</a>&gt;</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NormalNbrInfo_8h.html">ThunderEgg/NormalNbrInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Operator_8h.html">ThunderEgg/Operator.h</a>&gt;</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Orthant_8h.html">ThunderEgg/Orthant.h</a>&gt;</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="P4estDomainGenerator_8h.html">ThunderEgg/P4estDomainGenerator.h</a>&gt;</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="P8estDomainGenerator_8h.html">ThunderEgg/P8estDomainGenerator.h</a>&gt;</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchInfo_8h.html">ThunderEgg/PatchInfo.h</a>&gt;</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchOperator_8h.html">ThunderEgg/PatchOperator.h</a>&gt;</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchSolver_8h.html">ThunderEgg/PatchSolver.h</a>&gt;</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchArray_8h.html">ThunderEgg/PatchArray.h</a>&gt;</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchView_8h.html">ThunderEgg/PatchView.h</a>&gt;</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="RuntimeError_8h.html">ThunderEgg/RuntimeError.h</a>&gt;</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Serializable_8h.html">ThunderEgg/Serializable.h</a>&gt;</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Timer_8h.html">ThunderEgg/Timer.h</a>&gt;</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="TriLinearGhostFiller_8h.html">ThunderEgg/TriLinearGhostFiller.h</a>&gt;</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Vector_8h.html">ThunderEgg/Vector.h</a>&gt;</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="View_8h.html">ThunderEgg/View.h</a>&gt;</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="KSPSolver_8h.html">ThunderEgg/PETSc/KSPSolver.h</a>&gt;</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="MatWrapper_8h.html">ThunderEgg/PETSc/MatWrapper.h</a>&gt;</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="MatShellCreator_8h.html">ThunderEgg/PETSc/MatShellCreator.h</a>&gt;</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PCShellCreator_8h.html">ThunderEgg/PETSc/PCShellCreator.h</a>&gt;</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Poisson_2StarPatchOperator_8h.html">ThunderEgg/Poisson/StarPatchOperator.h</a>&gt;</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="DFTPatchSolver_8h.html">ThunderEgg/Poisson/DFTPatchSolver.h</a>&gt;</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="FFTWPatchSolver_8h.html">ThunderEgg/Poisson/FFTWPatchSolver.h</a>&gt;</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="FastSchurMatrixAssemble2D_8h.html">ThunderEgg/Poisson/FastSchurMatrixAssemble2D.h</a>&gt;</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="FastSchurMatrixAssemble3D_8h.html">ThunderEgg/Poisson/FastSchurMatrixAssemble3D.h</a>&gt;</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="MatrixHelper_8h.html">ThunderEgg/Poisson/MatrixHelper.h</a>&gt;</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="MatrixHelper2d_8h.html">ThunderEgg/Poisson/MatrixHelper2d.h</a>&gt;</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="CoarseIfaceInfo_8h.html">ThunderEgg/Schur/CoarseIfaceInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="FineIfaceInfo_8h.html">ThunderEgg/Schur/FineIfaceInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="IfaceInfo_8h.html">ThunderEgg/Schur/IfaceInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="IfaceType_8h.html">ThunderEgg/Schur/IfaceType.h</a>&gt;</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Interface_8h.html">ThunderEgg/Schur/Interface.h</a>&gt;</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="InterfaceDomain_8h.html">ThunderEgg/Schur/InterfaceDomain.h</a>&gt;</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NormalIfaceInfo_8h.html">ThunderEgg/Schur/NormalIfaceInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchIfaceInfo_8h.html">ThunderEgg/Schur/PatchIfaceInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchIfaceScatter_8h.html">ThunderEgg/Schur/PatchIfaceScatter.h</a>&gt;</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchSolverWrapper_8h.html">ThunderEgg/Schur/PatchSolverWrapper.h</a>&gt;</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="VarPoisson_2StarPatchOperator_8h.html">ThunderEgg/VarPoisson/StarPatchOperator.h</a>&gt;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BiCGStab_8h.html">ThunderEgg/Iterative/BiCGStab.h</a>&gt;</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BreakdownError_8h.html">ThunderEgg/Iterative/BreakdownError.h</a>&gt;</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="CG_8h.html">ThunderEgg/Iterative/CG.h</a>&gt;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Iterative_2PatchSolver_8h.html">ThunderEgg/Iterative/PatchSolver.h</a>&gt;</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Solver_8h.html">ThunderEgg/Iterative/Solver.h</a>&gt;</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BiLinearGhostFiller_8h.html">ThunderEgg/BiLinearGhostFiller.h</a>&gt;</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BiQuadraticGhostFiller_8h.html">ThunderEgg/BiQuadraticGhostFiller.h</a>&gt;</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BufferReader_8h.html">ThunderEgg/BufferReader.h</a>&gt;</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="BufferWriter_8h.html">ThunderEgg/BufferWriter.h</a>&gt;</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="CoarseNbrInfo_8h.html">ThunderEgg/CoarseNbrInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Communicator_8h.html">ThunderEgg/Communicator.h</a>&gt;</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="ComponentArray_8h.html">ThunderEgg/ComponentArray.h</a>&gt;</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="ComponentView_8h.html">ThunderEgg/ComponentView.h</a>&gt;</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="DimensionalArray_8h.html">ThunderEgg/DimensionalArray.h</a>&gt;</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Domain_8h.html">ThunderEgg/Domain.h</a>&gt;</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="DomainGenerator_8h.html">ThunderEgg/DomainGenerator.h</a>&gt;</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="DomainTools_8h.html">ThunderEgg/DomainTools.h</a>&gt;</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Face_8h.html">ThunderEgg/Face.h</a>&gt;</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="FineNbrInfo_8h.html">ThunderEgg/FineNbrInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="GhostFiller_8h.html">ThunderEgg/GhostFiller.h</a>&gt;</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="GhostFillingType_8h.html">ThunderEgg/GhostFillingType.h</a>&gt;</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Loops_8h.html">ThunderEgg/Loops.h</a>&gt;</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="MPIGhostFiller_8h.html">ThunderEgg/MPIGhostFiller.h</a>&gt;</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NbrInfo_8h.html">ThunderEgg/NbrInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NbrInfoBase_8h.html">ThunderEgg/NbrInfoBase.h</a>&gt;</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NbrType_8h.html">ThunderEgg/NbrType.h</a>&gt;</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="NormalNbrInfo_8h.html">ThunderEgg/NormalNbrInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Operator_8h.html">ThunderEgg/Operator.h</a>&gt;</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Orthant_8h.html">ThunderEgg/Orthant.h</a>&gt;</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="P4estDomainGenerator_8h.html">ThunderEgg/P4estDomainGenerator.h</a>&gt;</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="P8estDomainGenerator_8h.html">ThunderEgg/P8estDomainGenerator.h</a>&gt;</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchInfo_8h.html">ThunderEgg/PatchInfo.h</a>&gt;</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchOperator_8h.html">ThunderEgg/PatchOperator.h</a>&gt;</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchSolver_8h.html">ThunderEgg/PatchSolver.h</a>&gt;</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchArray_8h.html">ThunderEgg/PatchArray.h</a>&gt;</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="PatchView_8h.html">ThunderEgg/PatchView.h</a>&gt;</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="RuntimeError_8h.html">ThunderEgg/RuntimeError.h</a>&gt;</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Serializable_8h.html">ThunderEgg/Serializable.h</a>&gt;</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Timer_8h.html">ThunderEgg/Timer.h</a>&gt;</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="TriLinearGhostFiller_8h.html">ThunderEgg/TriLinearGhostFiller.h</a>&gt;</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="Vector_8h.html">ThunderEgg/Vector.h</a>&gt;</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">#include&lt;<a class="code" href="View_8h.html">ThunderEgg/View.h</a>&gt;</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aRuntimeError_8h_html"><div class="ttname"><a href="RuntimeError_8h.html">RuntimeError.h</a></div><div class="ttdoc">RuntimeError struct.</div></div>
+<div class="ttc" id="aMatWrapper_8h_html"><div class="ttname"><a href="MatWrapper_8h.html">MatWrapper.h</a></div><div class="ttdoc">MatWrapper class.</div></div>
+<div class="ttc" id="aPCShellCreator_8h_html"><div class="ttname"><a href="PCShellCreator_8h.html">PCShellCreator.h</a></div><div class="ttdoc">PCShellCreator class.</div></div>
 <div class="ttc" id="aVector_8h_html"><div class="ttname"><a href="Vector_8h.html">Vector.h</a></div><div class="ttdoc">Vector class.</div></div>
 <div class="ttc" id="aBiLinearGhostFiller_8h_html"><div class="ttname"><a href="BiLinearGhostFiller_8h.html">BiLinearGhostFiller.h</a></div><div class="ttdoc">BiLinearGhostFiller class.</div></div>
 <div class="ttc" id="aComponentArray_8h_html"><div class="ttname"><a href="ComponentArray_8h.html">ComponentArray.h</a></div><div class="ttdoc">ComponentArray class.</div></div>
@@ -200,8 +210,10 @@ $(document).ready(function(){initNavTree('ThunderEgg_8h_source.html',''); initRe
 <div class="ttc" id="aMPIGhostFiller_8h_html"><div class="ttname"><a href="MPIGhostFiller_8h.html">MPIGhostFiller.h</a></div><div class="ttdoc">MPIGhostFiller class.</div></div>
 <div class="ttc" id="aP4estDomainGenerator_8h_html"><div class="ttname"><a href="P4estDomainGenerator_8h.html">P4estDomainGenerator.h</a></div><div class="ttdoc">P4estDomainGenerator class.</div></div>
 <div class="ttc" id="aLinearRestrictor_8h_html"><div class="ttname"><a href="LinearRestrictor_8h.html">LinearRestrictor.h</a></div><div class="ttdoc">LinearRestrictor class.</div></div>
+<div class="ttc" id="aKSPSolver_8h_html"><div class="ttname"><a href="KSPSolver_8h.html">KSPSolver.h</a></div><div class="ttdoc">KSPSolver class.</div></div>
 <div class="ttc" id="aPoisson_2StarPatchOperator_8h_html"><div class="ttname"><a href="Poisson_2StarPatchOperator_8h.html">StarPatchOperator.h</a></div><div class="ttdoc">StarPatchOperator class.</div></div>
 <div class="ttc" id="aFFTWPatchSolver_8h_html"><div class="ttname"><a href="FFTWPatchSolver_8h.html">FFTWPatchSolver.h</a></div><div class="ttdoc">FFTWPatchSolver class.</div></div>
+<div class="ttc" id="aFastSchurMatrixAssemble2D_8h_html"><div class="ttname"><a href="FastSchurMatrixAssemble2D_8h.html">FastSchurMatrixAssemble2D.h</a></div><div class="ttdoc">FastSchurMatrixAssemble2D class.</div></div>
 <div class="ttc" id="aDomainTools_8h_html"><div class="ttname"><a href="DomainTools_8h.html">DomainTools.h</a></div><div class="ttdoc">DomainTools class.</div></div>
 <div class="ttc" id="aCoarseIfaceInfo_8h_html"><div class="ttname"><a href="CoarseIfaceInfo_8h.html">CoarseIfaceInfo.h</a></div><div class="ttdoc">CoarseIfaceInfo class.</div></div>
 <div class="ttc" id="aCycle_8h_html"><div class="ttname"><a href="Cycle_8h.html">Cycle.h</a></div><div class="ttdoc">Cycle class.</div></div>
@@ -228,6 +240,7 @@ $(document).ready(function(){initNavTree('ThunderEgg_8h_source.html',''); initRe
 <div class="ttc" id="aPatchArray_8h_html"><div class="ttname"><a href="PatchArray_8h.html">PatchArray.h</a></div><div class="ttdoc">PatchArray class.</div></div>
 <div class="ttc" id="aGhostFillingType_8h_html"><div class="ttname"><a href="GhostFillingType_8h.html">GhostFillingType.h</a></div><div class="ttdoc">GhostFillingType enum.</div></div>
 <div class="ttc" id="aGhostFiller_8h_html"><div class="ttname"><a href="GhostFiller_8h.html">GhostFiller.h</a></div><div class="ttdoc">GhostFiller class.</div></div>
+<div class="ttc" id="aMatrixHelper2d_8h_html"><div class="ttname"><a href="MatrixHelper2d_8h.html">MatrixHelper2d.h</a></div><div class="ttdoc">MatrixHelper2D class.</div></div>
 <div class="ttc" id="aNormalNbrInfo_8h_html"><div class="ttname"><a href="NormalNbrInfo_8h.html">NormalNbrInfo.h</a></div><div class="ttdoc">NormalNbrType class.</div></div>
 <div class="ttc" id="aCG_8h_html"><div class="ttname"><a href="CG_8h.html">CG.h</a></div><div class="ttdoc">CG class.</div></div>
 <div class="ttc" id="aPatchInfo_8h_html"><div class="ttname"><a href="PatchInfo_8h.html">PatchInfo.h</a></div><div class="ttdoc">PatchInfo class.</div></div>
@@ -247,12 +260,15 @@ $(document).ready(function(){initNavTree('ThunderEgg_8h_source.html',''); initRe
 <div class="ttc" id="aCommunicator_8h_html"><div class="ttname"><a href="Communicator_8h.html">Communicator.h</a></div><div class="ttdoc">Communicator class.</div></div>
 <div class="ttc" id="aIfaceInfo_8h_html"><div class="ttname"><a href="IfaceInfo_8h.html">IfaceInfo.h</a></div><div class="ttdoc">IfaceInfo class.</div></div>
 <div class="ttc" id="aMPIInterpolator_8h_html"><div class="ttname"><a href="MPIInterpolator_8h.html">MPIInterpolator.h</a></div><div class="ttdoc">MPIInterpolator class.</div></div>
+<div class="ttc" id="aFastSchurMatrixAssemble3D_8h_html"><div class="ttname"><a href="FastSchurMatrixAssemble3D_8h.html">FastSchurMatrixAssemble3D.h</a></div><div class="ttdoc">FastSchurMatrixAssemble3D class.</div></div>
+<div class="ttc" id="aMatrixHelper_8h_html"><div class="ttname"><a href="MatrixHelper_8h.html">MatrixHelper.h</a></div><div class="ttdoc">MatrixHelper class.</div></div>
 <div class="ttc" id="aView_8h_html"><div class="ttname"><a href="View_8h.html">View.h</a></div><div class="ttdoc">View class.</div></div>
 <div class="ttc" id="aPatchSolver_8h_html"><div class="ttname"><a href="PatchSolver_8h.html">PatchSolver.h</a></div><div class="ttdoc">PatchSolver class.</div></div>
 <div class="ttc" id="aInterface_8h_html"><div class="ttname"><a href="Interface_8h.html">Interface.h</a></div><div class="ttdoc">Interface class.</div></div>
 <div class="ttc" id="aPatchIfaceInfo_8h_html"><div class="ttname"><a href="PatchIfaceInfo_8h.html">PatchIfaceInfo.h</a></div><div class="ttdoc">PatchIfaceInfo class.</div></div>
 <div class="ttc" id="aPatchSolverWrapper_8h_html"><div class="ttname"><a href="PatchSolverWrapper_8h.html">PatchSolverWrapper.h</a></div><div class="ttdoc">PatchSolverWrapper class.</div></div>
 <div class="ttc" id="aRestrictor_8h_html"><div class="ttname"><a href="Restrictor_8h.html">Restrictor.h</a></div><div class="ttdoc">Restrictor class.</div></div>
+<div class="ttc" id="aMatShellCreator_8h_html"><div class="ttname"><a href="MatShellCreator_8h.html">MatShellCreator.h</a></div><div class="ttdoc">MatShellCreator class.</div></div>
 <div class="ttc" id="aBreakdownError_8h_html"><div class="ttname"><a href="BreakdownError_8h.html">BreakdownError.h</a></div><div class="ttdoc">BreakdownError struct.</div></div>
 <div class="ttc" id="aOrthant_8h_html"><div class="ttname"><a href="Orthant_8h.html">Orthant.h</a></div><div class="ttdoc">Orthant class.</div></div>
 <!-- start footer part -->
