@@ -104,9 +104,6 @@ configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/Config.cmake.in
   install(FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindFFTW.cmake
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindPETSc.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/CorrectWindowsPaths.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/ResolveCompilerPaths.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/FindPackageMultipass.cmake
   DESTINATION lib/cmake/Modules)
 
 write_basic_package_version_file(
