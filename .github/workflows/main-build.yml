@@ -77,9 +77,10 @@ jobs:
           --ignore-filename-regex="((test|out|tpl)/.*)" \
           > coverage.txt
 
-    - name: Upload to codecov.io
-      if: ${{ matrix.analyze }}
-      run: bash <(curl -s https://codecov.io/bash)
+    - name: Upload coverage reports to Codecov with GitHub Action
+      uses: codecov/codecov-action@v5
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 
   old-gcc:
