@@ -19,8 +19,8 @@
  ***************************************************************************/
 
 #include "P8estDomainGenerator.h"
-#include "mpi.h"
-#include "p4est_base.h"
+#include <mpi.h>
+#include <p8est_mesh.h>
 
 #include <p8est_extended.h>
 
@@ -158,6 +158,7 @@ struct Data
 {
   int id;
   int rank;
+  int level;
   std::array<int, 8> child_ids;
   std::array<int, 8> child_ranks;
   PatchInfo<3>* pinfo;
@@ -169,6 +170,7 @@ InitData(p8est_t*, p4est_topidx_t, p8est_quadrant_t* quadrant)
   Data& data = *(Data*)quadrant->p.user_data;
   data.id = -1;
   data.rank = -1;
+  data.level = -1;
   data.child_ids.fill(-1);
   data.child_ranks.fill(-1);
   data.pinfo = nullptr;
@@ -207,6 +209,21 @@ SetIds(p8est_t* p8est)
       Data* data = (Data*)info->quad->p.user_data;
       data->id = curr_global_id;
       curr_global_id++;
+    },
+    nullptr,
+    nullptr,
+    nullptr,
+    false);
+}
+
+void SetLevels(p8est_t* p8est)
+{
+  p8est_iterate_ext(
+    p8est,
+    nullptr,
+    [](const p8est_iter_volume_info_t* info) {
+      Data* data = (Data*)info->quad->p.user_data;
+      data->level = info->quad->level;
     },
     nullptr,
     nullptr,
@@ -274,6 +291,7 @@ P8estDomainGenerator::extractLevel()
   }
 
   SetRanks(my_p8est);
+  SetLevels(my_p8est);
 
   createPatchInfos();
 
@@ -403,129 +421,6 @@ P8estDomainGenerator::createPatchInfos()
  * Functions for linkNeighbors
  */
 namespace {
-/**
- * @brief set the CoarseNbrInfos on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data
- */
-void
-addCoarseNbrInfo(const p8est_iter_face_side_t& side1,
-                 const p8est_iter_face_side_t& side2,
-                 const Data* ghost_data)
-{
-  const Data* nbr_data;
-  if (side2.is.full.is_ghost) {
-    nbr_data = ghost_data + side2.is.full.quadid;
-  } else {
-    nbr_data = (Data*)side2.is.full.quad->p.user_data;
-  }
-  for (unsigned char i = 0; i < 4; i++) {
-    if (!side1.is.hanging.is_ghost[i]) {
-      Data* data = (Data*)side1.is.hanging.quad[i]->p.user_data;
-
-      Side<3> side(side1.face);
-
-      CoarseNbrInfo<2>* nbr_info = new CoarseNbrInfo<2>();
-      nbr_info->id = nbr_data->id;
-      nbr_info->rank = nbr_data->rank;
-      nbr_info->orth_on_coarse = Orthant<2>(i);
-      data->pinfo->setNbrInfo(side, nbr_info);
-    }
-  }
-}
-
-/**
- * @brief set the FineNbrInfo on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data
- */
-void
-addFineNbrInfo(const p8est_iter_face_side_t& side1,
-               const p8est_iter_face_side_t& side2,
-               const Data* ghost_data)
-{
-  if (!side1.is.full.is_ghost) {
-    Data* data = (Data*)side1.is.full.quad->p.user_data;
-    const Data* nbr_datas[4];
-    for (int i = 0; i < 4; i++) {
-      if (side2.is.hanging.is_ghost[i]) {
-        nbr_datas[i] = ghost_data + side2.is.hanging.quadid[i];
-      } else {
-        nbr_datas[i] = (Data*)side2.is.hanging.quad[i]->p.user_data;
-      }
-    }
-
-    Side<3> side(side1.face);
-
-    FineNbrInfo<2>* nbr_info = new FineNbrInfo<2>();
-    for (int i = 0; i < 4; i++) {
-      nbr_info->ids[i] = nbr_datas[i]->id;
-      nbr_info->ranks[i] = nbr_datas[i]->rank;
-    }
-    data->pinfo->setNbrInfo(side, nbr_info);
-  }
-}
-
-/**
- * @brief Set the NormalNbrInfo on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data
- */
-void
-addNormalNbrInfo(const p8est_iter_face_side_t& side1,
-                 const p8est_iter_face_side_t& side2,
-                 const Data* ghost_data)
-{
-  if (!side1.is.full.is_ghost) {
-    Data* data = (Data*)side1.is.full.quad->p.user_data;
-    const Data* nbr_data;
-    if (side2.is.full.is_ghost) {
-      nbr_data = ghost_data + side2.is.full.quadid;
-    } else {
-      nbr_data = (Data*)side2.is.full.quad->p.user_data;
-    }
-
-    Side<3> side(side1.face);
-
-    NormalNbrInfo<2>* nbr_info = new NormalNbrInfo<2>(nbr_data->id);
-    nbr_info->rank = nbr_data->rank;
-    data->pinfo->setNbrInfo(side, nbr_info);
-  }
-}
-
-/**
- * @brief Add information from side2 to NbrInfo objects on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data p8est ghost data array
- */
-void
-addNbrInfo(const p8est_iter_face_side_t& side1,
-           const p8est_iter_face_side_t& side2,
-           const Data* ghost_data)
-{
-  if (side1.is_hanging) {
-    addCoarseNbrInfo(side1, side2, ghost_data);
-  } else if (side2.is_hanging) {
-    addFineNbrInfo(side1, side2, ghost_data);
-  } else {
-    addNormalNbrInfo(side1, side2, ghost_data);
-  }
-}
-
-/**
- * @brief Get the Edge object from a given p8est edge index
- *
- * @param p8est_edge
- * @return Edge
- */
 Edge
 getEdge(int p8est_edge)
 {
@@ -573,237 +468,193 @@ getEdge(int p8est_edge)
   return edge;
 }
 
-/**
- * @brief set the EdgeCoarseNbrInfos on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data
- */
 void
-addEdgeCoarseNbrInfo(const p8est_iter_edge_side_t& side1,
-                     const p8est_iter_edge_side_t& side2,
-                     const Data* ghost_data)
+SetFaceNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, int s)
 {
-  const Data* nbr_data;
-  if (side2.is.full.is_ghost) {
-    nbr_data = ghost_data + side2.is.full.quadid;
-  } else {
-    nbr_data = (Data*)side2.is.full.quad->p.user_data;
+  Data* data = data_ptrs[quadid];
+  Side<3> side(s);
+  int index = quadid * 6 + s;
+  p4est_locidx_t qtq = mesh->quad_to_quad[index];
+  int8_t qtf = mesh->quad_to_face[index];
+
+  if (qtq == quadid && qtf == s) {
+    return;
   }
-  for (unsigned char i = 0; i < 2; i++) {
-    if (!side1.is.hanging.is_ghost[i]) {
-      Data* data = (Data*)side1.is.hanging.quad[i]->p.user_data;
 
-      Edge edge = getEdge(side1.edge);
+  if (qtf >= 0 && qtf <= 23) {
 
-      CoarseNbrInfo<1>* nbr_info = new CoarseNbrInfo<1>();
-      nbr_info->id = nbr_data->id;
-      nbr_info->rank = nbr_data->rank;
-      nbr_info->orth_on_coarse = Orthant<1>(i);
+    NormalNbrInfo<2>* nbr_info = new NormalNbrInfo<2>(data_ptrs[qtq]->id);
+    nbr_info->rank = data_ptrs[qtq]->rank;
+
+    data->pinfo->setNbrInfo(side, nbr_info);
+
+  } else if (qtf >= 24 && qtf <= 119) {
+
+    CoarseNbrInfo<2>* nbr_info = new CoarseNbrInfo<2>();
+    nbr_info->id = data_ptrs[qtq]->id;
+    nbr_info->rank = data_ptrs[qtq]->rank;
+
+    int8_t nbr_subface = (qtf - 24) / 24;
+    nbr_info->orth_on_coarse = Orthant<2>(nbr_subface);
+
+    data->pinfo->setNbrInfo(side, nbr_info);
+
+  } else if (qtf >= -24 && qtf <= -1) {
+
+    FineNbrInfo<2>* nbr_info = new FineNbrInfo<2>();
+    p4est_locidx_t* qth = (p4est_locidx_t*)sc_array_index(mesh->quad_to_half, qtq);
+
+    for (int i = 0; i < 4; i++) {
+      nbr_info->ids[i] = data_ptrs[qth[i]]->id;
+      nbr_info->ranks[i] = data_ptrs[qth[i]]->rank;
+    }
+
+    data->pinfo->setNbrInfo(side, nbr_info);
+
+  } else {
+    throw RuntimeError("Invalid quad_to_face value");
+  }
+}
+
+void
+SetEdgeNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, int i)
+{
+  Data* data = data_ptrs[quadid];
+  Edge edge = getEdge(i);
+  int index = quadid * 12 + i;
+  p4est_locidx_t qte = mesh->quad_to_edge[index];
+
+  if (qte < 0) {
+    return;
+  }
+
+  if (qte < mesh->local_num_quadrants + mesh->ghost_num_quadrants) {
+    // inter-tree normal nbr
+
+    NormalNbrInfo<1>* nbr_info = new NormalNbrInfo<1>(data_ptrs[qte]->id);
+    nbr_info->rank = data_ptrs[qte]->rank;
+
+    data->pinfo->setNbrInfo(edge, nbr_info);
+
+  } else {
+    p4est_locidx_t offset_index = qte - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
+    p4est_locidx_t start_index = *(p4est_locidx_t*)sc_array_index(mesh->edge_offset, offset_index);
+    p4est_locidx_t end_index =
+      *(p4est_locidx_t*)sc_array_index(mesh->edge_offset, offset_index + 1);
+
+    int8_t ee = *(int8_t*)sc_array_index(mesh->edge_edge, start_index);
+
+    if ((ee >= 0 && end_index - start_index != 1) || (ee < 0 && end_index - start_index != 2)) {
+      throw RuntimeError("Unsupported number of edge neighbors");
+    }
+
+    if (ee >= 0 && ee <= 23) {
+      // intra-tree normal nbr
+
+      p4est_locidx_t eq = *(p4est_locidx_t*)sc_array_index(mesh->edge_quad, start_index);
+
+      NormalNbrInfo<1>* nbr_info = new NormalNbrInfo<1>(data_ptrs[eq]->id);
+      nbr_info->rank = data_ptrs[eq]->rank;
 
       data->pinfo->setNbrInfo(edge, nbr_info);
-    }
-  }
-}
 
-/**
- * @brief set the EdgeFineNbrInfo on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data
- */
-void
-addEdgeFineNbrInfo(const p8est_iter_edge_side_t& side1,
-                   const p8est_iter_edge_side_t& side2,
-                   const Data* ghost_data)
-{
-  if (!side1.is.full.is_ghost) {
-    Data* data = (Data*)side1.is.full.quad->p.user_data;
-    const Data* nbr_datas[2];
-    for (int i = 0; i < 2; i++) {
-      if (side2.is.hanging.is_ghost[i]) {
-        nbr_datas[i] = ghost_data + side2.is.hanging.quadid[i];
-      } else {
-        nbr_datas[i] = (Data*)side2.is.hanging.quad[i]->p.user_data;
+    } else if (ee >= 24 && ee <= 71) {
+
+      p4est_locidx_t eq = *(p4est_locidx_t*)sc_array_index(mesh->edge_quad, start_index);
+
+      CoarseNbrInfo<1>* nbr_info = new CoarseNbrInfo<1>();
+      nbr_info->id = data_ptrs[eq]->id;
+      nbr_info->rank = data_ptrs[eq]->rank;
+
+      uint8_t nbr_subface = (ee - 24) / 24;
+      nbr_info->orth_on_coarse = Orthant<1>(nbr_subface);
+
+      data->pinfo->setNbrInfo(edge, nbr_info);
+
+    } else if (ee >= -24 && ee <= -1) {
+
+      FineNbrInfo<1>* nbr_info = new FineNbrInfo<1>();
+
+      for (int i = 0; i < 2; i++) {
+        p4est_locidx_t eq = *(p4est_locidx_t*)sc_array_index(mesh->edge_quad, start_index + i);
+        nbr_info->ids[i] = data_ptrs[eq]->id;
+        nbr_info->ranks[i] = data_ptrs[eq]->rank;
       }
-    }
 
-    Edge edge = getEdge(side1.edge);
+      data->pinfo->setNbrInfo(edge, nbr_info);
 
-    FineNbrInfo<1>* nbr_info = new FineNbrInfo<1>();
-    for (int i = 0; i < 2; i++) {
-      nbr_info->ids[i] = nbr_datas[i]->id;
-      nbr_info->ranks[i] = nbr_datas[i]->rank;
-    }
-    data->pinfo->setNbrInfo(edge, nbr_info);
-  }
-}
-
-/**
- * @brief Set the EdgeNormalNbrInfo on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data
- */
-void
-addEdgeNormalNbrInfo(const p8est_iter_edge_side_t& side1,
-                     const p8est_iter_edge_side_t& side2,
-                     const Data* ghost_data)
-{
-  if (!side1.is.full.is_ghost) {
-    Data* data = (Data*)side1.is.full.quad->p.user_data;
-    const Data* nbr_data;
-    if (side2.is.full.is_ghost) {
-      nbr_data = ghost_data + side2.is.full.quadid;
     } else {
-      nbr_data = (Data*)side2.is.full.quad->p.user_data;
+      throw RuntimeError("Invalid quad_to_edge_face value");
     }
-
-    Edge edge = getEdge(side1.edge);
-
-    NormalNbrInfo<1>* nbr_info = new NormalNbrInfo<1>(nbr_data->id);
-    nbr_info->rank = nbr_data->rank;
-    data->pinfo->setNbrInfo(edge, nbr_info);
   }
 }
 
-/**
- * @brief Add information from side2 to NbrInfo objects on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data p8est ghost data array
- */
 void
-addEdgeNbrInfo(const p8est_iter_edge_side_t& side1,
-               const p8est_iter_edge_side_t& side2,
-               const Data* ghost_data)
+SetCornerNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, int i)
 {
-  if (side1.is_hanging) {
-    addEdgeCoarseNbrInfo(side1, side2, ghost_data);
-  } else if (side2.is_hanging) {
-    addEdgeFineNbrInfo(side1, side2, ghost_data);
+  Data* data = data_ptrs[quadid];
+  Corner<3> corner(i);
+  int index = quadid * 8 + i;
+  p4est_locidx_t qtc = mesh->quad_to_corner[index];
+
+  if (qtc < 0) {
+    return;
+  }
+
+  int nbr_id;
+  int nbr_rank;
+  int level_diff;
+  if (qtc < mesh->local_num_quadrants + mesh->ghost_num_quadrants) {
+    // inter-tree normal nbr
+
+    nbr_id = data_ptrs[qtc]->id;
+    nbr_rank = data_ptrs[qtc]->rank;
+    level_diff = data->level - data_ptrs[qtc]->level;
   } else {
-    addEdgeNormalNbrInfo(side1, side2, ghost_data);
-  }
-}
+    p4est_locidx_t offset_index = qtc - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
+    p4est_locidx_t start_index =
+      *(p4est_locidx_t*)sc_array_index(mesh->corner_offset, offset_index);
+    p4est_locidx_t end_index =
+      *(p4est_locidx_t*)sc_array_index(mesh->corner_offset, offset_index + 1);
 
-/**
- * @brief set the CornerFineNbrInfo on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data
- */
-void
-addCornerFineNbrInfo(const p8est_iter_corner_side_t& side1,
-                     const p8est_iter_corner_side_t& side2,
-                     const Data* ghost_data)
-{
-  if (!side1.is_ghost) {
-    Data* data = (Data*)side1.quad->p.user_data;
-    const Data* nbr_data;
-    if (side2.is_ghost) {
-      nbr_data = ghost_data + side2.quadid;
-    } else {
-      nbr_data = (Data*)side2.quad->p.user_data;
+    if (end_index - start_index != 1) {
+      throw RuntimeError("Unsupported number of corner neighbors");
     }
 
-    Corner<3> corner(side1.corner);
-
-    FineNbrInfo<0>* nbr_info = new FineNbrInfo<0>();
-    nbr_info->ids[0] = nbr_data->id;
-    nbr_info->ranks[0] = nbr_data->rank;
-
+    p4est_locidx_t cq = *(p4est_locidx_t*)sc_array_index(mesh->corner_quad, start_index);
+    nbr_id = data_ptrs[cq]->id;
+    nbr_rank = data_ptrs[cq]->rank;
+    level_diff = data->level - data_ptrs[cq]->level;
+  }
+  if(level_diff < -1 || level_diff > 1) {
+    throw RuntimeError("Invalid level difference between corner and neighbor");
+  }
+  if(level_diff == 0)
+  {
+    // normal nbr
+    NormalNbrInfo<0>* nbr_info = new NormalNbrInfo<0>(nbr_id);
+    nbr_info->rank = nbr_rank;
     data->pinfo->setNbrInfo(corner, nbr_info);
   }
-}
-
-/**
- * @brief set the CornerCoarseNbrInfos on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data
- */
-void
-addCornerCoarseNbrInfo(const p8est_iter_corner_side_t& side1,
-                       const p8est_iter_corner_side_t& side2,
-                       const Data* ghost_data)
-{
-  if (!side1.is_ghost) {
-    const Data* nbr_data;
-    if (side2.is_ghost) {
-      nbr_data = ghost_data + side2.quadid;
-    } else {
-      nbr_data = (Data*)side2.quad->p.user_data;
-    }
-    Data* data = (Data*)side1.quad->p.user_data;
-
-    Corner<3> corner(side1.corner);
-
+  else if(level_diff == 1)
+  {
+    // coarse nbr
     CoarseNbrInfo<0>* nbr_info = new CoarseNbrInfo<0>();
-    nbr_info->id = nbr_data->id;
-    nbr_info->rank = nbr_data->rank;
     nbr_info->orth_on_coarse = Orthant<0>(0);
-
+    nbr_info->id = nbr_id;
+    nbr_info->rank = nbr_rank;
+    data->pinfo->setNbrInfo(corner, nbr_info);
+  }
+  else if(level_diff == -1)
+  {
+    // fine nbr
+    FineNbrInfo<0>* nbr_info = new FineNbrInfo<0>();
+    nbr_info->ids[0] = nbr_id;
+    nbr_info->ranks[0] = nbr_rank;
     data->pinfo->setNbrInfo(corner, nbr_info);
   }
 }
 
-/**
- * @brief Set the CornerNormalNbrInfo on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data
- */
-void
-addCornerNormalNbrInfo(const p8est_iter_corner_side_t& side1,
-                       const p8est_iter_corner_side_t& side2,
-                       const Data* ghost_data)
-{
-  if (!side1.is_ghost) {
-    Data* data = (Data*)side1.quad->p.user_data;
-    const Data* nbr_data;
-    if (side2.is_ghost) {
-      nbr_data = ghost_data + side2.quadid;
-    } else {
-      nbr_data = (Data*)side2.quad->p.user_data;
-    }
-
-    Corner<3> corner(side1.corner);
-
-    NormalNbrInfo<0>* nbr_info = new NormalNbrInfo<0>(nbr_data->id);
-    nbr_info->rank = nbr_data->rank;
-
-    data->pinfo->setNbrInfo(corner, nbr_info);
-  }
-}
-
-/**
- * @brief Add information from side2 to NbrInfo objects on side1
- *
- * @param side1
- * @param side2
- * @param ghost_data p8est ghost data array
- */
-void
-addCornerNbrInfo(const p8est_iter_corner_side_t& side1,
-                 const p8est_iter_corner_side_t& side2,
-                 const Data* ghost_data)
-{
-  if (side1.quad->level > side2.quad->level) {
-    addCornerCoarseNbrInfo(side1, side2, ghost_data);
-  } else if (side1.quad->level < side2.quad->level) {
-    addCornerFineNbrInfo(side1, side2, ghost_data);
-  } else {
-    addCornerNormalNbrInfo(side1, side2, ghost_data);
-  }
-}
 } // namespace
 
 void
@@ -814,44 +665,46 @@ P8estDomainGenerator::linkNeighbors()
   Data ghost_data[ghost->ghosts.elem_count];
   p8est_ghost_exchange_data(my_p8est, ghost, ghost_data);
 
+  p8est_mesh_params_t mesh_params;
+  p8est_mesh_params_init(&mesh_params);
+  mesh_params.edgehanging_corners = 1;
+  mesh_params.btype = P8EST_CONNECT_CORNER;
+
+  p8est_mesh_t* mesh = p8est_mesh_new_params(my_p8est, ghost, &mesh_params);
+
+  Data* data_ptrs[my_p8est->local_num_quadrants + ghost->ghosts.elem_count];
+  p4est_locidx_t curr_id = 0;
   p8est_iterate_ext(
     my_p8est,
     ghost,
+    [&](const p8est_iter_volume_info_t* info) {
+      data_ptrs[curr_id] = (Data*)info->quad->p.user_data;
+      curr_id++;
+    },
     nullptr,
-    [&](const p8est_iter_face_info_t* info) {
-      if (info->sides.elem_count == 2) {
-        p8est_iter_face_side_t side1 = ((p8est_iter_face_side_t*)info->sides.array)[0];
-        p8est_iter_face_side_t side2 = ((p8est_iter_face_side_t*)info->sides.array)[1];
-        addNbrInfo(side1, side2, ghost_data);
-        addNbrInfo(side2, side1, ghost_data);
-      }
-    },
-    [&](const p8est_iter_edge_info* info) {
-      if (info->sides.elem_count == 4) {
-        p8est_iter_edge_side_t side1 = ((p8est_iter_edge_side_t*)info->sides.array)[0];
-        p8est_iter_edge_side_t side2 = ((p8est_iter_edge_side_t*)info->sides.array)[1];
-        p8est_iter_edge_side_t side3 = ((p8est_iter_edge_side_t*)info->sides.array)[2];
-        p8est_iter_edge_side_t side4 = ((p8est_iter_edge_side_t*)info->sides.array)[3];
-        addEdgeNbrInfo(side1, side4, ghost_data);
-        addEdgeNbrInfo(side4, side1, ghost_data);
-        addEdgeNbrInfo(side2, side3, ghost_data);
-        addEdgeNbrInfo(side3, side2, ghost_data);
-      }
-    },
-    [&](const p8est_iter_corner_info* info) {
-      if (info->sides.elem_count == 8) {
-        for (Corner<3> c : Corner<3>::getValues()) {
-          p8est_iter_corner_side_t side1 =
-            ((p8est_iter_corner_side_t*)info->sides.array)[c.getIndex()];
-          p8est_iter_corner_side_t side2 =
-            ((p8est_iter_corner_side_t*)info->sides.array)[c.opposite().getIndex()];
-          addCornerNbrInfo(side1, side2, ghost_data);
-        }
-      }
-    },
+    nullptr,
+    nullptr,
     false);
+  for (int i = 0; i < ghost->ghosts.elem_count; i++) {
+    data_ptrs[my_p8est->local_num_quadrants + i] = ghost_data + i;
+  }
+
+  for (p4est_locidx_t quadid = 0; quadid < mesh->local_num_quadrants; quadid++) {
+    for (int i = 0; i < 6; i++) {
+      SetFaceNbrInfo(mesh, data_ptrs, quadid, i);
+    }
+
+    for (int i = 0; i < 12; i++) {
+      SetEdgeNbrInfo(mesh, data_ptrs, quadid, i);
+    }
+
+    for (int i = 0; i < 8; i++) {
+      SetCornerNbrInfo(mesh, data_ptrs, quadid, i);
+    }
+  }
 
   p8est_ghost_destroy(ghost);
+  p8est_mesh_destroy(mesh);
 }
 
 void
