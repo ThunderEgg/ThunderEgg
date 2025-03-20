@@ -37,7 +37,7 @@ jobs:
 
     - name: Install LLVM deps
       if: ${{ matrix.analyze }}
-      run: sudo apt-get install llvm-14
+      run: sudo apt-get install llvm-18
 
     - name: Prepare cache timestamp
       id: cache_timestamp
@@ -66,10 +66,10 @@ jobs:
     - name: Generate Coverage Report
       if: ${{ matrix.analyze }}
       run: |
-        llvm-profdata-14 merge \
+        llvm-profdata-18 merge \
           -sparse out/test/${{ matrix.preset }}/test.profraw.* \
           -o test.profdata
-        llvm-cov-14 show \
+        llvm-cov-18 show \
           --instr-profile=test.profdata \
           -object out/build/${{ matrix.preset }}/test/unit_tests_mpi1 \
           -object out/build/${{ matrix.preset }}/test/unit_tests_mpi2 \
