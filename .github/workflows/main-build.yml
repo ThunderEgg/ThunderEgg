@@ -19,9 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - name: "gcc"
-          preset: "ci"
-          analyze: false
         - name: "clang"
           preset: "ci-clang"
           analyze: true
@@ -83,7 +80,7 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 
-  gcc-verions:
+  gcc-version:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
 
