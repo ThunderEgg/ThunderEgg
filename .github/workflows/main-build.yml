@@ -83,45 +83,27 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 
-  old-gcc:
-    runs-on: ubuntu-20.04
+  gcc-verions:
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     strategy:
       matrix:
-        gcc-version: [8]
+        gcc-version: [8, 9, 10, 11, 12, 13]
 
     env:
       CC: gcc-${{ matrix.gcc-version }}
       CXX: g++-${{ matrix.gcc-version }}
 
     steps:
+
+    - name: Add Ubuntu Toolchain PPA
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        sudo apt update
 
     - name: install compilers
       run: sudo apt install --no-install-recommends ${{ env.CC }} ${{ env.CXX }}
-
-    - name: Install dependencies
-      run: sudo apt-get install ${{ env.ubuntu_pkg }}
-
-    - uses: actions/checkout@v4
-
-    - name: CMake workflow
-      run: cmake --workflow --preset default
-
-
-  gcc:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 15
-
-    strategy:
-      matrix:
-        gcc-version: [9, 13]
-
-    env:
-      CC: gcc-${{ matrix.gcc-version }}
-      CXX: g++-${{ matrix.gcc-version }}
-
-    steps:
 
     - name: Install dependencies
       run: sudo apt-get install ${{ env.ubuntu_pkg }}
