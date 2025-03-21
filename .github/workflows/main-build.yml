@@ -124,13 +124,14 @@ jobs:
 
     steps:
 
-    - name: Add Ubuntu Toolchain PPA
+    - name: Add LLVM APT Repository
       run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        sudo apt update
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        sudo add-apt-repository "deb http://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs) main"
+        sudo apt-get update
 
     - name: install compilers
-      run: sudo apt install --no-install-recommends ${{ env.CC }} ${{ env.CXX }}
+      run: sudo apt-get install --no-install-recommends ${{ env.CC }} ${{ env.CXX }}
 
     - name: Install dependencies
       run: sudo apt-get install ${{ env.ubuntu_pkg }}
