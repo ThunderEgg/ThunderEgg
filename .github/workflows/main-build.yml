@@ -97,10 +97,10 @@ jobs:
     - name: Add Ubuntu Toolchain PPA
       run: |
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        sudo apt update
+        sudo apt-get update
 
     - name: install compilers
-      run: sudo apt install --no-install-recommends ${{ env.CC }} ${{ env.CXX }}
+      run: sudo apt-get install --no-install-recommends ${{ env.CC }} ${{ env.CXX }}
 
     - name: Install dependencies
       run: sudo apt-get install ${{ env.ubuntu_pkg }}
