@@ -27,8 +27,9 @@
  */
 
 #include <ThunderEgg/GMG/Level.h>
+#include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Vector.h>
-#include <list>
+#include <memory>
 
 namespace ThunderEgg::GMG {
 /**
@@ -81,7 +82,8 @@ public:
    */
   Cycle(const Level<D>& finest_level)
     : finest_level(new Level<D>(finest_level))
-  {}
+  {
+  }
   /**
    * @brief Run one iteration of the cycle.
    *
