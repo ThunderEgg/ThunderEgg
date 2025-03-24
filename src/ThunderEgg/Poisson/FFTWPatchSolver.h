@@ -25,15 +25,26 @@
  *
  * @brief FFTWPatchSolver class
  */
+
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PatchArray.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
+#include <ThunderEgg/PatchView.h>
 #include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
 #include <bitset>
+#include <cmath>
+#include <cstddef>
 #include <fftw3.h>
-#include <map>
-#include <valarray>
 #include <functional>
+#include <map>
+#include <math.h>
+#include <memory>
+#include <valarray>
 
 namespace ThunderEgg::Poisson {
 /**
@@ -80,10 +91,7 @@ private:
    * @return true if neumann
    * @return false if not neumann
    */
-  bool patchIsNeumannOnSide(const PatchInfo<D>& pinfo, Side<D> s)
-  {
-    return !pinfo.hasNbr(s) && neumann[s.getIndex()];
-  }
+  bool patchIsNeumannOnSide(const PatchInfo<D>& pinfo, Side<D> s) { return !pinfo.hasNbr(s) && neumann[s.getIndex()]; }
   /**
    * @brief Get the fft transform types for a patch
    *
@@ -96,8 +104,7 @@ private:
     // get transform types for each axis
     std::array<fftw_r2r_kind, D> transforms;
     for (size_t axis = 0; axis < D; axis++) {
-      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) &&
-          patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
+      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
         transforms[D - 1 - axis] = FFTW_REDFT10;
       } else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis))) {
         transforms[D - 1 - axis] = FFTW_REDFT11;
@@ -121,8 +128,7 @@ private:
     // get transform types for each axis
     std::array<fftw_r2r_kind, D> transforms_inv;
     for (size_t axis = 0; axis < D; axis++) {
-      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) &&
-          patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
+      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
         transforms_inv[D - 1 - axis] = FFTW_REDFT01;
       } else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis))) {
         transforms_inv[D - 1 - axis] = FFTW_REDFT11;
@@ -155,28 +161,23 @@ private:
       int n = pinfo.ns[axis];
       double h = pinfo.spacings[axis];
 
-      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) &&
-          patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
+      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
         for (int xi = 0; xi < n; xi++) {
           double val = 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2);
           View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), { xi });
-          Loop::OverInteriorIndexes<D>(
-            slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
+          Loop::OverInteriorIndexes<D>(slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
         }
-      } else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) ||
-                 patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
+      } else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) || patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
         for (int xi = 0; xi < n; xi++) {
           double val = 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2);
           View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), { xi });
-          Loop::OverInteriorIndexes<D>(
-            slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
+          Loop::OverInteriorIndexes<D>(slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
         }
       } else {
         for (int xi = 0; xi < n; xi++) {
           double val = 4 / (h * h) * pow(sin((xi + 1) * M_PI / (2 * n)), 2);
           View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), { xi });
-          Loop::OverInteriorIndexes<D>(
-            slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
+          Loop::OverInteriorIndexes<D>(slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
         }
       }
     }
@@ -202,8 +203,7 @@ public:
         a_neumann[s.getIndex()] = patchIsNeumannOnSide(a, s);
         b_neumann[s.getIndex()] = patchIsNeumannOnSide(b, s);
       }
-      return std::forward_as_tuple(a_neumann.to_ulong(), a.spacings[0]) <
-             std::forward_as_tuple(b_neumann.to_ulong(), b.spacings[0]);
+      return std::forward_as_tuple(a_neumann.to_ulong(), a.spacings[0]) < std::forward_as_tuple(b_neumann.to_ulong(), b.spacings[0]);
     };
 
     plan1 = std::map<const PatchInfo<D>, std::shared_ptr<fftw_plan>, CompareFunction>(compare);
@@ -221,24 +221,20 @@ public:
    * @return FFTWPatchSolver<D>* a newly allocated copy of this patch solver
    */
   FFTWPatchSolver<D>* clone() const override { return new FFTWPatchSolver<D>(*this); }
-  void solveSinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& f_view,
-                        const PatchView<double, D>& u_view) const override
+  void solveSinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& f_view, const PatchView<double, D>& u_view) const override
   {
     PatchArray<D> f_copy(pinfo.ns, 1, 0);
     PatchArray<D> tmp(pinfo.ns, 1, 0);
     PatchArray<D> sol(pinfo.ns, 1, 0);
 
-    Loop::OverInteriorIndexes<D + 1>(
-      f_copy, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
+    Loop::OverInteriorIndexes<D + 1>(f_copy, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
 
     op->modifyRHSForInternalBoundaryConditions(pinfo, u_view, f_copy.getView());
 
     fftw_execute_r2r(*plan1.at(pinfo), &f_copy[f_copy.getStart()], &tmp[tmp.getStart()]);
 
     const PatchArray<D>& eigen_vals_view = eigen_vals.at(pinfo);
-    Loop::OverInteriorIndexes<D + 1>(
-      tmp, [&](std::array<int, D + 1> coord) { tmp[coord] /= eigen_vals_view[coord]; });
+    Loop::OverInteriorIndexes<D + 1>(tmp, [&](std::array<int, D + 1> coord) { tmp[coord] /= eigen_vals_view[coord]; });
 
     if (neumann.all() && !pinfo.hasNbr()) {
       tmp[tmp.getStart()] = 0;
@@ -250,8 +246,7 @@ public:
     for (size_t axis = 0; axis < D; axis++) {
       scale *= 2.0 * this->getDomain().getNs()[axis];
     }
-    Loop::OverInteriorIndexes<D + 1>(
-      u_view, [&](std::array<int, D + 1> coord) { u_view[coord] = sol[coord] / scale; });
+    Loop::OverInteriorIndexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] = sol[coord] / scale; });
   }
   /**
    * @brief add a patch to the solver
@@ -277,12 +272,7 @@ public:
 
       fftw_plan* fftw_plan1 = new fftw_plan();
 
-      *fftw_plan1 = fftw_plan_r2r(D,
-                                  ns_reversed.data(),
-                                  &f_copy[f_copy.getStart()],
-                                  &tmp[tmp.getStart()],
-                                  transforms.data(),
-                                  FFTW_MEASURE | FFTW_DESTROY_INPUT | FFTW_UNALIGNED);
+      *fftw_plan1 = fftw_plan_r2r(D, ns_reversed.data(), &f_copy[f_copy.getStart()], &tmp[tmp.getStart()], transforms.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT | FFTW_UNALIGNED);
 
       plan1[pinfo] = std::shared_ptr<fftw_plan>(fftw_plan1, [](fftw_plan* plan) {
         fftw_destroy_plan(*plan);
@@ -291,12 +281,7 @@ public:
 
       fftw_plan* fftw_plan2 = new fftw_plan();
 
-      *fftw_plan2 = fftw_plan_r2r(D,
-                                  ns_reversed.data(),
-                                  &tmp[tmp.getStart()],
-                                  &sol[sol.getStart()],
-                                  transforms_inv.data(),
-                                  FFTW_MEASURE | FFTW_DESTROY_INPUT | FFTW_UNALIGNED);
+      *fftw_plan2 = fftw_plan_r2r(D, ns_reversed.data(), &tmp[tmp.getStart()], &sol[sol.getStart()], transforms_inv.data(), FFTW_MEASURE | FFTW_DESTROY_INPUT | FFTW_UNALIGNED);
 
       plan2[pinfo] = std::shared_ptr<fftw_plan>(fftw_plan2, [](fftw_plan* plan) {
         fftw_destroy_plan(*plan);

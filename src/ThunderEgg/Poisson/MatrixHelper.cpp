@@ -19,7 +19,22 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Poisson/MatrixHelper.h>
+
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <bitset>
+#include <memory>
+#include <mpi.h>
+#include <petscmat.h>
+#include <petscsystypes.h>
 #include <valarray>
+
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Poisson;

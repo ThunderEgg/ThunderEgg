@@ -26,12 +26,22 @@
  * @brief StarPatchOperator class
  */
 
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/PatchOperator.h>
+#include <ThunderEgg/PatchView.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <cstddef>
+#include <functional>
 
 namespace ThunderEgg::Poisson {
 /**
@@ -56,9 +66,7 @@ public:
    * @param ghost_filler the GhostFiller to use before calling applySinglePatch
    * @param neumann whether or not to use Neumann boundary conditions
    */
-  StarPatchOperator(const Domain<D>& domain,
-                    const GhostFiller<D>& ghost_filler,
-                    bool neumann = false)
+  StarPatchOperator(const Domain<D>& domain, const GhostFiller<D>& ghost_filler, bool neumann = false)
     : PatchOperator<D>(domain, ghost_filler)
     , neumann(neumann)
   {
@@ -72,10 +80,7 @@ public:
    * @return StarPatchOperator<D>* a newly allocated copy of this operator
    */
   StarPatchOperator<D>* clone() const override { return new StarPatchOperator<D>(*this); }
-  void applySinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& u_view,
-                        const PatchView<double, D>& f_view,
-                        bool internal) const
+  void applySinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view, bool internal) const
   {
     if (internal) {
       enforceInternalBoundaryConditions(pinfo, u_view);
@@ -99,21 +104,9 @@ public:
       });
     });
   }
-  void applySinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& u_view,
-                        const PatchView<double, D>& f_view) const override
-  {
-    applySinglePatch(pinfo, u_view, f_view, false);
-  }
-  void applySinglePatchWithInternalBoundaryConditions(
-    const PatchInfo<D>& pinfo,
-    const PatchView<const double, D>& u_view,
-    const PatchView<double, D>& f_view) const override
-  {
-    applySinglePatch(pinfo, u_view, f_view, true);
-  }
-  void enforceBoundaryConditions(const PatchInfo<D>& pinfo,
-                                 const PatchView<const double, D>& u_view) const
+  void applySinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view) const override { applySinglePatch(pinfo, u_view, f_view, false); }
+  void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view) const override { applySinglePatch(pinfo, u_view, f_view, true); }
+  void enforceBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view) const
   {
     for (int axis = 0; axis < D; axis++) {
       Side<D> lower_side = LowerSideOnAxis<D>(axis);
@@ -122,28 +115,23 @@ public:
         View<double, D> lower = u_view.getGhostSliceOn(lower_side, { 0 });
         View<const double, D> lower_mid = u_view.getSliceOn(lower_side, { 0 });
         if (neumann) {
-          Loop::OverInteriorIndexes<D>(
-            lower_mid, [&](std::array<int, D> coord) { lower[coord] = lower_mid[coord]; });
+          Loop::OverInteriorIndexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = lower_mid[coord]; });
         } else {
-          Loop::OverInteriorIndexes<D>(
-            lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
+          Loop::OverInteriorIndexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
         }
       }
       if (!pinfo.hasNbr(upper_side)) {
         View<double, D> upper = u_view.getGhostSliceOn(upper_side, { 0 });
         View<const double, D> upper_mid = u_view.getSliceOn(upper_side, { 0 });
         if (neumann) {
-          Loop::OverInteriorIndexes<D>(
-            upper_mid, [&](std::array<int, D> coord) { upper[coord] = upper_mid[coord]; });
+          Loop::OverInteriorIndexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = upper_mid[coord]; });
         } else {
-          Loop::OverInteriorIndexes<D>(
-            upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
+          Loop::OverInteriorIndexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
         }
       }
     }
   }
-  void enforceInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                         const PatchView<const double, D>& u_view) const
+  void enforceInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view) const
   {
     for (int axis = 0; axis < D; axis++) {
       Side<D> lower_side = LowerSideOnAxis<D>(axis);
@@ -151,20 +139,16 @@ public:
       if (pinfo.hasNbr(lower_side)) {
         View<double, D> lower = u_view.getGhostSliceOn(lower_side, { 0 });
         View<const double, D> lower_mid = u_view.getSliceOn(lower_side, { 0 });
-        Loop::OverInteriorIndexes<D>(
-          lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
+        Loop::OverInteriorIndexes<D>(lower_mid, [&](std::array<int, D> coord) { lower[coord] = -lower_mid[coord]; });
       }
       if (pinfo.hasNbr(upper_side)) {
         View<double, D> upper = u_view.getGhostSliceOn(upper_side, { 0 });
         View<const double, D> upper_mid = u_view.getSliceOn(upper_side, { 0 });
-        Loop::OverInteriorIndexes<D>(
-          upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
+        Loop::OverInteriorIndexes<D>(upper_mid, [&](std::array<int, D> coord) { upper[coord] = -upper_mid[coord]; });
       }
     }
   }
-  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                              const PatchView<const double, D>& u_view,
-                                              const PatchView<double, D>& f_view) const override
+  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view) const override
   {
     for (Side<D> s : Side<D>::getValues()) {
       if (pinfo.hasNbr(s)) {
@@ -172,9 +156,7 @@ public:
         View<double, D> f_inner = f_view.getSliceOn(s, { 0 });
         View<const double, D> u_ghost = u_view.getSliceOn(s, { -1 });
         View<const double, D> u_inner = u_view.getSliceOn(s, { 0 });
-        Loop::OverInteriorIndexes<D>(f_inner, [&](const std::array<int, D>& coord) {
-          f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2;
-        });
+        Loop::OverInteriorIndexes<D>(f_inner, [&](const std::array<int, D>& coord) { f_inner[coord] -= (u_ghost[coord] + u_inner[coord]) / h2; });
       }
     }
   }
@@ -209,10 +191,7 @@ public:
    * @param gfunc the exact solution
    * @param gfunc_grad the gradient of gfunc
    */
-  void addNeumannBCToRHS(
-    Vector<D>& f,
-    std::function<double(const std::array<double, D>&)> gfunc,
-    std::array<std::function<double(const std::array<double, D>&)>, D> gfunc_grad)
+  void addNeumannBCToRHS(Vector<D>& f, std::function<double(const std::array<double, D>&)> gfunc, std::array<std::function<double(const std::array<double, D>&)>, D> gfunc_grad)
   {
     for (int i = 0; i < f.getNumLocalPatches(); i++) {
       ComponentView<double, D> f_ld = f.getComponentView(0, i);
@@ -222,19 +201,17 @@ public:
           double h = pinfo.spacings[s.getAxisIndex()];
           View<double, D - 1> ld = f_ld.getSliceOn(s, { 0 });
           if (s.isLowerOnAxis()) {
-            Loop::Nested<D - 1>(
-              ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1>& coord) {
-                std::array<double, D> real_coord;
-                DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
-                ld[coord] += gfunc_grad[s.getAxisIndex()](real_coord) / h;
-              });
+            Loop::Nested<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1>& coord) {
+              std::array<double, D> real_coord;
+              DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
+              ld[coord] += gfunc_grad[s.getAxisIndex()](real_coord) / h;
+            });
           } else {
-            Loop::Nested<D - 1>(
-              ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1>& coord) {
-                std::array<double, D> real_coord;
-                DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
-                ld[coord] -= gfunc_grad[s.getAxisIndex()](real_coord) / h;
-              });
+            Loop::Nested<D - 1>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D - 1>& coord) {
+              std::array<double, D> real_coord;
+              DomainTools::GetRealCoordBound<D>(pinfo, coord, s, real_coord);
+              ld[coord] -= gfunc_grad[s.getAxisIndex()](real_coord) / h;
+            });
           }
         }
       }
