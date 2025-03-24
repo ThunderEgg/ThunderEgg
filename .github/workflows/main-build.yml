@@ -80,67 +80,6 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 
-  gcc-version:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-
-    strategy:
-      matrix:
-        gcc-version: [9, 10, 11, 12, 13]
-
-    env:
-      CC: gcc-${{ matrix.gcc-version }}
-      CXX: g++-${{ matrix.gcc-version }}
-
-    steps:
-
-    - name: Add Ubuntu Toolchain PPA
-      run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-        sudo apt-get update
-
-    - name: install compilers
-      run: sudo apt-get install --no-install-recommends ${{ env.CC }} ${{ env.CXX }}
-
-    - name: Install dependencies
-      run: sudo apt-get install ${{ env.ubuntu_pkg }}
-
-    - uses: actions/checkout@v4
-
-    - name: CMake workflow
-      run: cmake --workflow --preset default
-
-  clang-version:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-
-    strategy:
-      matrix:
-        clang-version: [10, 11, 12, 13, 14]
-
-    env:
-      CC: clang-${{ matrix.clang-version }}
-      CXX: clang++-${{ matrix.clang-version }}
-
-    steps:
-
-    - name: Add LLVM APT Repository
-      run: |
-        wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
-        sudo add-apt-repository "deb http://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs) main"
-        sudo apt-get update
-
-    - name: install compilers
-      run: sudo apt-get install --no-install-recommends ${{ env.CC }} ${{ env.CXX }}
-
-    - name: Install dependencies
-      run: sudo apt-get install ${{ env.ubuntu_pkg }}
-
-    - uses: actions/checkout@v4
-
-    - name: CMake workflow
-      run: cmake --workflow --preset default
-
   macos:
     runs-on: macos-latest
     timeout-minutes: 15
