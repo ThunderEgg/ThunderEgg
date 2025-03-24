@@ -26,11 +26,25 @@
  * @brief KSPSolver class
  */
 
+#include <ThunderEgg/ComponentView.h>
 #include <ThunderEgg/Iterative/Solver.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Operator.h>
 #include <ThunderEgg/PETSc/MatShellCreator.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
+#include <ThunderEgg/Vector.h>
+#include <cstddef>
+#include <cstdio>
+#include <iostream>
+#include <ostream>
 #include <petscksp.h>
 #include <petscmat.h>
+#include <petscpc.h>
+#include <petscpctypes.h>
+#include <petscsys.h>
+#include <petscsystypes.h>
+#include <petscvec.h>
+#include <string>
 
 namespace ThunderEgg::PETSc {
 /**
@@ -53,10 +67,7 @@ private:
   Vec getPetscVecWithoutGhost(const Vector<D>& vec) const
   {
     Vec petsc_vec;
-    VecCreateMPI(vec.getCommunicator().getMPIComm(),
-                 vec.getNumLocalCells() * vec.getNumComponents(),
-                 PETSC_DETERMINE,
-                 &petsc_vec);
+    VecCreateMPI(vec.getCommunicator().getMPIComm(), vec.getNumLocalCells() * vec.getNumComponents(), PETSC_DETERMINE, &petsc_vec);
     return petsc_vec;
   }
   /**
@@ -131,12 +142,7 @@ public:
   KSPSolver<D>* clone() const override { return new KSPSolver<D>(*this); }
 
   void setType(KSPType new_type) { type = new_type; }
-  int solve(const Operator<D>& A,
-            Vector<D>& x,
-            const Vector<D>& b,
-            const Operator<D>* Mr = nullptr,
-            bool output = false,
-            std::ostream& os = std::cout) const override
+  int solve(const Operator<D>& A, Vector<D>& x, const Vector<D>& b, const Operator<D>* Mr = nullptr, bool output = false, std::ostream& os = std::cout) const override
   {
     Mat A_PETSC = MatShellCreator<D>::GetNewMatShell(A, [&]() { return x.getZeroClone(); });
 
@@ -161,8 +167,7 @@ public:
     }
 
     if (output) {
-      KSPMonitorSet(
-        ksp, (PetscErrorCode(*)(KSP, PetscInt, PetscReal, void*)) & MonitorResidual, &os, nullptr);
+      KSPMonitorSet(ksp, (PetscErrorCode (*)(KSP, PetscInt, PetscReal, void*))&MonitorResidual, &os, nullptr);
     }
 
     KSPSolve(ksp, b_PETSC, x_PETSC);
