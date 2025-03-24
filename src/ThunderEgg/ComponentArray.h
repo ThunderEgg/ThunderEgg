@@ -20,7 +20,13 @@
 
 #ifndef THUNDEREGG_COMPONENTARRAY_H
 #define THUNDEREGG_COMPONENTARRAY_H
+
 #include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <vector>
+
 /**
  * @file
  *
@@ -65,14 +71,10 @@ public:
    */
   ComponentArray(const ComponentArray<D>& other)
     : vector(other.vector)
-    , view(vector.data(),
-           other.getStrides(),
-           other.getGhostStart(),
-           other.getStart(),
-           other.getEnd(),
-           other.getGhostEnd())
+    , view(vector.data(), other.getStrides(), other.getGhostStart(), other.getStart(), other.getEnd(), other.getGhostEnd())
 
-  {}
+  {
+  }
 
   /**
    * @brief Copy assignment
@@ -83,12 +85,7 @@ public:
   ComponentArray<D>& operator=(const ComponentArray<D>& other)
   {
     vector = other.vector;
-    view = ComponentView<double, D>(vector.data(),
-                                    other.getStrides(),
-                                    other.getGhostStart(),
-                                    other.getStart(),
-                                    other.getEnd(),
-                                    other.getGhostEnd());
+    view = ComponentView<double, D>(vector.data(), other.getStrides(), other.getGhostStart(), other.getStart(), other.getEnd(), other.getGhostEnd());
     return *this;
   }
   /**
@@ -131,8 +128,7 @@ public:
    * @return View<M> a view to the slice on the face
    */
   template<int M>
-  inline View<double, M> getGhostSliceOn(Face<D, M> f,
-                                         const std::array<size_t, D - M>& offset) const
+  inline View<double, M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M>& offset) const
   {
     return view.template getGhostSliceOn<M>(f, offset);
   }

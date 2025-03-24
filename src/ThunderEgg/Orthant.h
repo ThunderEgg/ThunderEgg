@@ -26,10 +26,12 @@
  * @brief Orthant class
  */
 #include <ThunderEgg/Face.h>
+#include <ThunderEgg/tpl/json_fwd.hpp>
 #include <array>
+#include <cstddef>
 #include <iostream>
-#include <numeric>
-#include <vector>
+#include <iterator>
+
 namespace ThunderEgg {
 /**
  * @brief An enum-style class that represents the octants of a cube.
@@ -57,7 +59,8 @@ public:
    */
   explicit Orthant(const unsigned char val_in)
     : val(val_in)
-  {}
+  {
+  }
   /**
    * @brief Default constructor that initializes the value to null().
    */
@@ -149,7 +152,8 @@ public:
        */
       explicit Iterator(Orthant<D> o_in)
         : o(o_in)
-      {}
+      {
+      }
       /**
        * @brief Increment the Orthant value
        *

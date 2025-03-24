@@ -25,10 +25,18 @@
  *
  * @brief P4estDomainGenerator class
  */
+
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainGenerator.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <array>
 #include <functional>
 #include <list>
-#include <p4est_extended.h>
+#include <p4est.h>
+#include <vector>
+
+
 namespace ThunderEgg {
 /**
  * @brief Generates Domain objects form a given p4est object

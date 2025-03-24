@@ -28,7 +28,6 @@
 
 #include <ThunderEgg/Serializable.h>
 #include <cstddef>
-#include <iostream>
 #include <type_traits>
 
 namespace ThunderEgg {

@@ -26,8 +26,16 @@
  * @brief TriLinearGhostFiller class
  */
 
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/GMG/Level.h>
+#include <ThunderEgg/GhostFillingType.h>
 #include <ThunderEgg/MPIGhostFiller.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+
 namespace ThunderEgg {
 /**
  * @brief Performs trilinear interpolation on coarse-fine boundaries of patches
@@ -38,28 +46,13 @@ namespace ThunderEgg {
 class TriLinearGhostFiller : public MPIGhostFiller<3>
 {
 public:
-  void fillGhostCellsForNbrPatch(const PatchInfo<3>& pinfo,
-                                 const PatchView<const double, 3>& local_view,
-                                 const PatchView<const double, 3>& nbr_view,
-                                 Side<3> side,
-                                 NbrType nbr_type,
-                                 Orthant<2> orthant_on_coarse) const override;
+  void fillGhostCellsForNbrPatch(const PatchInfo<3>& pinfo, const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Side<3> side, NbrType nbr_type, Orthant<2> orthant_on_coarse) const override;
 
-  void fillGhostCellsForEdgeNbrPatch(const PatchInfo<3>& pinfo,
-                                     const PatchView<const double, 3>& local_view,
-                                     const PatchView<const double, 3>& nbr_view,
-                                     Edge edge,
-                                     NbrType nbr_type,
-                                     Orthant<1> orthant_on_coarse) const override;
+  void fillGhostCellsForEdgeNbrPatch(const PatchInfo<3>& pinfo, const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Edge edge, NbrType nbr_type, Orthant<1> orthant_on_coarse) const override;
 
-  void fillGhostCellsForCornerNbrPatch(const PatchInfo<3>& pinfo,
-                                       const PatchView<const double, 3>& local_view,
-                                       const PatchView<const double, 3>& nbr_view,
-                                       Corner<3> corner,
-                                       NbrType nbr_type) const override;
+  void fillGhostCellsForCornerNbrPatch(const PatchInfo<3>& pinfo, const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Corner<3> corner, NbrType nbr_type) const override;
 
-  void fillGhostCellsForLocalPatch(const PatchInfo<3>& pinfo,
-                                   const PatchView<const double, 3>& view) const override;
+  void fillGhostCellsForLocalPatch(const PatchInfo<3>& pinfo, const PatchView<const double, 3>& view) const override;
   /**
    * @brief Construct a new TriLinearGhostFiller object
    *

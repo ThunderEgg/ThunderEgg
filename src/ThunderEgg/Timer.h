@@ -29,8 +29,10 @@
 #include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/tpl/json_fwd.hpp>
+#include <functional>
 #include <list>
 #include <map>
+#include <memory>
 #include <ostream>
 #include <string>
 namespace ThunderEgg {

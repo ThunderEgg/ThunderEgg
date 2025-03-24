@@ -25,10 +25,18 @@
  *
  * @brief Domain class
  */
+
+#include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/Timer.h>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <array>
+#include <cstddef>
 #include <map>
+#include <memory>
+#include <mpi.h>
 #include <set>
+#include <utility>
 #include <vector>
 
 namespace ThunderEgg {
@@ -135,8 +143,7 @@ private:
         int nbr_id = ids[idx];
         int nbr_rank = ranks[idx];
         if (nbr_rank != comm.getRank()) {
-          ranks_to_ids_and_global_indexes_outgoing[nbr_rank].insert(
-            std::make_pair(pinfo.id, pinfo.global_index));
+          ranks_to_ids_and_global_indexes_outgoing[nbr_rank].insert(std::make_pair(pinfo.id, pinfo.global_index));
           ranks_to_ids_incoming[nbr_rank].insert(nbr_id);
         }
       }
@@ -153,13 +160,7 @@ private:
       incoming_data.resize(pair.second.size());
 
       MPI_Request request;
-      MPI_Irecv(incoming_data.data(),
-                (int)incoming_data.size(),
-                MPI_INT,
-                source_rank,
-                0,
-                comm.getMPIComm(),
-                &request);
+      MPI_Irecv(incoming_data.data(), (int)incoming_data.size(), MPI_INT, source_rank, 0, comm.getMPIComm(), &request);
       recv_requests.push_back(request);
     }
 
@@ -221,12 +222,7 @@ public:
    * @param last_pinfo end iterator for PatchInfo objects
    */
   template<class InputIterator>
-  Domain(Communicator comm,
-         int id,
-         std::array<int, D> ns,
-         int num_ghost_cells,
-         InputIterator first_pinfo,
-         InputIterator last_pinfo)
+  Domain(Communicator comm, int id, std::array<int, D> ns, int num_ghost_cells, InputIterator first_pinfo, InputIterator last_pinfo)
     : comm(comm)
     , id(id)
     , ns(ns)
@@ -281,10 +277,7 @@ public:
   /**
    * @brief Get get the number of local cells (including ghost cells)
    */
-  int getNumLocalCellsWithGhost() const
-  {
-    return ((int)pinfos.size()) * num_cells_in_patch_with_ghost;
-  }
+  int getNumLocalCellsWithGhost() const { return ((int)pinfos.size()) * num_cells_in_patch_with_ghost; }
   /**
    * @brief Get the number of cells in a patch
    */

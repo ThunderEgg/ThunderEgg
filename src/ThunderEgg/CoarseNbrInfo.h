@@ -24,10 +24,17 @@
  *
  * @brief CoarseNbrInfo class
  */
+
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/NbrInfo.h>
+#include <ThunderEgg/NbrInfoBase.h>
+#include <ThunderEgg/NbrType.h>
 #include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <deque>
+#include <map>
+#include <memory>
 
 namespace ThunderEgg {
 /**
@@ -79,10 +86,7 @@ public:
   NbrType getNbrType() const override { return NbrType::Coarse; }
   void getNbrIds(std::deque<int>& nbr_ids) const override { nbr_ids.push_back(id); };
   void getNbrRanks(std::deque<int>& nbr_ranks) const override { nbr_ranks.push_back(rank); }
-  void setGlobalIndexes(const std::map<int, int>& id_to_global_index_map) override
-  {
-    global_index = id_to_global_index_map.at(id);
-  }
+  void setGlobalIndexes(const std::map<int, int>& id_to_global_index_map) override { global_index = id_to_global_index_map.at(id); }
   void setLocalIndexes(const std::map<int, int>& id_to_local_index_map) override
   {
     auto iter = id_to_local_index_map.find(id);
@@ -106,10 +110,7 @@ public:
     reader >> orth_on_coarse;
     return reader.getPos();
   }
-  std::unique_ptr<NbrInfoBase> clone() const override
-  {
-    return std::make_unique<CoarseNbrInfo<D>>(*this);
-  }
+  std::unique_ptr<NbrInfoBase> clone() const override { return std::make_unique<CoarseNbrInfo<D>>(*this); }
 };
 
 template<int D>
