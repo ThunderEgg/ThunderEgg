@@ -25,8 +25,11 @@
  *
  * @brief NormalIfaceInfo class
  */
+
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/Schur/IfaceInfo.h>
+
 namespace ThunderEgg {
 namespace Schur {
 /**
@@ -85,7 +88,8 @@ public:
    */
   NormalIfaceInfo(const PatchInfo<D>& pinfo, Side<D> s)
     : IfaceInfo<D>(GetRank(pinfo, s), GetId(pinfo, s))
-  {}
+  {
+  }
 };
 } // namespace Schur
 } // namespace ThunderEgg

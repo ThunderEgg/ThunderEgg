@@ -25,8 +25,12 @@
  *
  * @brief CoarseIfaceInfo class
  */
+
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/Schur/IfaceInfo.h>
+
 namespace ThunderEgg {
 namespace Schur {
 /**
@@ -48,10 +52,7 @@ private:
    * @param s the side
    * @return int the id
    */
-  static int GetId(const PatchInfo<D>& pinfo, Side<D> s)
-  {
-    return (int)(pinfo.id * Side<D>::number_of + s.getIndex());
-  }
+  static int GetId(const PatchInfo<D>& pinfo, Side<D> s) { return (int)(pinfo.id * Side<D>::number_of + s.getIndex()); }
 
 public:
   /**

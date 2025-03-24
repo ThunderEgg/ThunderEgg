@@ -25,15 +25,24 @@
  *
  * @brief Interface class
  */
+
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Schur/IfaceType.h>
 #include <ThunderEgg/Schur/PatchIfaceInfo.h>
-#include <bitset>
+#include <ThunderEgg/Serializable.h>
+#include <cstddef>
+#include <deque>
 #include <map>
+#include <memory>
 #include <mpi.h>
 #include <set>
 #include <vector>
+
 namespace ThunderEgg {
 namespace Schur {
 /**
@@ -86,10 +95,7 @@ public:
      *
      * @return std::shared_ptr<PatchIfaceInfo<D>> the piinfo object without the const modifer
      */
-    std::shared_ptr<PatchIfaceInfo<D>> getNonConstPiinfo()
-    {
-      return std::const_pointer_cast<PatchIfaceInfo<D>>(piinfo);
-    }
+    std::shared_ptr<PatchIfaceInfo<D>> getNonConstPiinfo() { return std::const_pointer_cast<PatchIfaceInfo<D>>(piinfo); }
 
     /**
      * @brief Construct a new Side Type Piinfo object
@@ -102,7 +108,8 @@ public:
       : side(side)
       , type(type)
       , piinfo(piinfo)
-    {}
+    {
+    }
   };
   /**
    * @brief SideTypePiinfo structs associated with this interface.
@@ -124,7 +131,8 @@ public:
    */
   explicit Interface(int id)
     : id(id)
-  {}
+  {
+  }
 
   /**
    * @brief Add an associated patch to this interface
@@ -214,12 +222,7 @@ private:
    * @param s the side of the patch that the interface is on
    * @param piinfo the PatchIfaceInfo object
    */
-  static void InsertPatchToInterface(
-    std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map,
-    int rank,
-    int id,
-    Side<D> s,
-    std::shared_ptr<const PatchIfaceInfo<D>> piinfo)
+  static void InsertPatchToInterface(std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map, int rank, int id, Side<D> s, std::shared_ptr<const PatchIfaceInfo<D>> piinfo)
   {
     std::shared_ptr<Interface<D>>& iface_ptr = rank_id_iface_map[rank][id];
     if (iface_ptr == nullptr) {
@@ -236,11 +239,7 @@ private:
    * @param piinfo the PatchIfaceInfo object
    * @param s the side of the patch that the interface is on
    */
-  static void InsertInterfaceWithNormalNbr(
-    std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map,
-    std::set<int>& incoming_procs,
-    std::shared_ptr<const PatchIfaceInfo<D>> piinfo,
-    Side<D> s)
+  static void InsertInterfaceWithNormalNbr(std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map, std::set<int>& incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<D> s)
   {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -260,11 +259,7 @@ private:
    * @param piinfo the PatchIfaceInfo object
    * @param s the side of the patch that the interface is on
    */
-  static void InsertInterfacesWithFineNbr(
-    std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map,
-    std::set<int>& incoming_procs,
-    std::shared_ptr<const PatchIfaceInfo<D>> piinfo,
-    Side<D> s)
+  static void InsertInterfacesWithFineNbr(std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map, std::set<int>& incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<D> s)
   {
     auto info = piinfo->getFineIfaceInfo(s);
 
@@ -287,11 +282,7 @@ private:
    * @param piinfo the PatchIfaceInfo object
    * @param s the side of the patch that the interface is on
    */
-  static void InsertInterfacesWithCoarseNbr(
-    std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map,
-    std::set<int>& incoming_procs,
-    std::shared_ptr<const PatchIfaceInfo<D>> piinfo,
-    Side<D> s)
+  static void InsertInterfacesWithCoarseNbr(std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map, std::set<int>& incoming_procs, std::shared_ptr<const PatchIfaceInfo<D>> piinfo, Side<D> s)
   {
     auto info = piinfo->getCoarseIfaceInfo(s);
 
@@ -314,10 +305,7 @@ public:
    * ranks will only contain the PatchIfaceInfo objects from this rank.
    * @param off_proc_piinfos a vector of piinfo objects received from other processors.
    */
-  static void EnumerateIfacesFromPiinfoVector(
-    std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> piinfos,
-    std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map,
-    std::vector<std::shared_ptr<PatchIfaceInfo<D>>>& off_proc_piinfos)
+  static void EnumerateIfacesFromPiinfoVector(std::vector<std::shared_ptr<const PatchIfaceInfo<D>>> piinfos, std::map<int, std::map<int, std::shared_ptr<Interface<D>>>>& rank_id_iface_map, std::vector<std::shared_ptr<PatchIfaceInfo<D>>>& off_proc_piinfos)
   {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -377,8 +365,7 @@ public:
       MPI_Get_count(&status, MPI_BYTE, &size);
       std::vector<char> buffer(size);
 
-      MPI_Recv(
-        buffer.data(), size, MPI_BYTE, status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      MPI_Recv(buffer.data(), size, MPI_BYTE, status.MPI_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
       BufferReader reader(buffer.data());
       while (reader.getPos() < size) {
