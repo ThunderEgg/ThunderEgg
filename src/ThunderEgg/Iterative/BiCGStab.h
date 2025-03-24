@@ -30,6 +30,11 @@
 #include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Timer.h>
+#include <ThunderEgg/Vector.h>
+#include <iostream>
+#include <memory>
+#include <ostream>
+#include <string>
 
 namespace ThunderEgg::Iterative {
 /**

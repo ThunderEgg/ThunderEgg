@@ -26,15 +26,20 @@
  * @brief PatchSolver class
  */
 
+#include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/Iterative/BreakdownError.h>
 #include <ThunderEgg/Iterative/Solver.h>
+#include <ThunderEgg/Operator.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
+#include <ThunderEgg/PatchView.h>
 #include <ThunderEgg/Vector.h>
-#include <bitset>
-#include <map>
+#include <array>
+#include <memory>
+#include <mpi.h>
 
 namespace ThunderEgg::Iterative {
 /**
@@ -72,7 +77,8 @@ private:
     SinglePatchOp(const PatchInfo<D>& pinfo, std::shared_ptr<const PatchOperator<D>> op)
       : op(op)
       , pinfo(pinfo)
-    {}
+    {
+    }
     void apply(const Vector<D>& x, Vector<D>& b) const override
     {
       PatchView<const double, D> x_view = x.getPatchView(0);
@@ -117,23 +123,20 @@ public:
    * @param op the PatchOperator to use
    * @param continue_on_breakdown continue on breakdown exception
    */
-  PatchSolver(const Iterative::Solver<D>& solver,
-              const PatchOperator<D>& op,
-              bool continue_on_breakdown = false)
+  PatchSolver(const Iterative::Solver<D>& solver, const PatchOperator<D>& op, bool continue_on_breakdown = false)
     : ThunderEgg::PatchSolver<D>(op.getDomain(), op.getGhostFiller())
     , solver(solver.clone())
     , op(op.clone())
     , continue_on_breakdown(continue_on_breakdown)
-  {}
+  {
+  }
   /**
    * @brief Clone this patch solver
    *
    * @return PatchSolver<D>* a newly allocated copy of this patch solver
    */
   PatchSolver<D>* clone() const override { return new PatchSolver<D>(*this); }
-  void solveSinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& f_view,
-                        const PatchView<double, D>& u_view) const override
+  void solveSinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& f_view, const PatchView<double, D>& u_view) const override
   {
     SinglePatchOp single_op(pinfo, op);
 
@@ -141,21 +144,13 @@ public:
     for (int i = 0; i < D + 1; i++) {
       f_lengths[i] = f_view.getEnd()[i] + 1;
     }
-    const Vector<D> f_single(Communicator(MPI_COMM_SELF),
-                             { const_cast<double*>(&f_view[f_view.getGhostStart()]) },
-                             f_view.getStrides(),
-                             f_lengths,
-                             this->getDomain().getNumGhostCells());
+    const Vector<D> f_single(Communicator(MPI_COMM_SELF), { const_cast<double*>(&f_view[f_view.getGhostStart()]) }, f_view.getStrides(), f_lengths, this->getDomain().getNumGhostCells());
 
     std::array<int, D + 1> u_lengths;
     for (int i = 0; i < D + 1; i++) {
       u_lengths[i] = u_view.getEnd()[i] + 1;
     }
-    Vector<D> u_single(Communicator(MPI_COMM_SELF),
-                       { &u_view[u_view.getGhostStart()] },
-                       u_view.getStrides(),
-                       u_lengths,
-                       this->getDomain().getNumGhostCells());
+    Vector<D> u_single(Communicator(MPI_COMM_SELF), { &u_view[u_view.getGhostStart()] }, u_view.getStrides(), u_lengths, this->getDomain().getNumGhostCells());
 
     Vector<D> f_copy = f_single.getZeroClone();
     f_copy.copy(f_single);
