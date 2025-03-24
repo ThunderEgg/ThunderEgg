@@ -26,12 +26,22 @@
  * @brief StarPatchOperator class
  */
 
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/PatchOperator.h>
+#include <ThunderEgg/PatchView.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <cstddef>
+#include <functional>
 
 namespace ThunderEgg {
 namespace VarPoisson {
@@ -58,9 +68,7 @@ public:
    * @param domain the Domain associated with the operator
    * @param ghost_filler the GhostFiller to use before calling applySinglePatch
    */
-  StarPatchOperator(const Vector<D>& coeffs,
-                    const Domain<D>& domain,
-                    const GhostFiller<D>& ghost_filler)
+  StarPatchOperator(const Vector<D>& coeffs, const Domain<D>& domain, const GhostFiller<D>& ghost_filler)
     : PatchOperator<D>(domain, ghost_filler)
     , coeffs(coeffs)
   {
@@ -75,10 +83,7 @@ public:
    * @return StarPatchOperator<D>* a newly allocated copy of this operator
    */
   StarPatchOperator<D>* clone() const override { return new StarPatchOperator<D>(*this); }
-  void applySinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& u_view,
-                        const PatchView<double, D>& f_view,
-                        bool interior) const
+  void applySinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view, bool interior) const
   {
     if (interior) {
       enforceInternalBoundaryConditions(pinfo, u_view);
@@ -102,29 +107,15 @@ public:
         double c_lower = *(c_ptr - c_stride);
         double c_mid = *c_ptr;
         double c_upper = *(c_ptr + c_stride);
-        f_view[coord] =
-          addValue(axis) * f_view[coord] +
-          ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower)) / (2 * h2[axis]);
+        f_view[coord] = addValue(axis) * f_view[coord] + ((c_upper + c_mid) * (upper - mid) - (c_lower + c_mid) * (mid - lower)) / (2 * h2[axis]);
       });
     });
   }
 
-  void applySinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& u_view,
-                        const PatchView<double, D>& f_view) const override
-  {
-    applySinglePatch(pinfo, u_view, f_view, false);
-  }
-  void applySinglePatchWithInternalBoundaryConditions(
-    const PatchInfo<D>& pinfo,
-    const PatchView<const double, D>& u_view,
-    const PatchView<double, D>& f_view) const override
-  {
-    applySinglePatch(pinfo, u_view, f_view, true);
-  }
+  void applySinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view) const override { applySinglePatch(pinfo, u_view, f_view, false); }
+  void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view) const override { applySinglePatch(pinfo, u_view, f_view, true); }
 
-  void enforceBoundaryConditions(const PatchInfo<D>& pinfo,
-                                 const PatchView<const double, D>& u_view) const
+  void enforceBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view) const
   {
     for (int axis = 0; axis < D; axis++) {
       Side<D> lower_side(axis * 2);
@@ -132,20 +123,17 @@ public:
       if (!pinfo.hasNbr(lower_side)) {
         View<double, D> lower = u_view.getGhostSliceOn(lower_side, { 0 });
         View<const double, D> mid = u_view.getSliceOn(lower_side, { 0 });
-        Loop::OverInteriorIndexes<D>(mid,
-                                     [&](std::array<int, D> coord) { lower[coord] = -mid[coord]; });
+        Loop::OverInteriorIndexes<D>(mid, [&](std::array<int, D> coord) { lower[coord] = -mid[coord]; });
       }
       if (!pinfo.hasNbr(upper_side)) {
         View<double, D> upper = u_view.getGhostSliceOn(upper_side, { 0 });
         View<const double, D> mid = u_view.getSliceOn(upper_side, { 0 });
-        Loop::OverInteriorIndexes<D>(mid,
-                                     [&](std::array<int, D> coord) { upper[coord] = -mid[coord]; });
+        Loop::OverInteriorIndexes<D>(mid, [&](std::array<int, D> coord) { upper[coord] = -mid[coord]; });
       }
     }
   }
 
-  void enforceInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                         const PatchView<const double, D>& u_view) const
+  void enforceInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view) const
   {
     for (int axis = 0; axis < D; axis++) {
       Side<D> lower_side(axis * 2);
@@ -153,21 +141,17 @@ public:
       if (pinfo.hasNbr(lower_side)) {
         View<double, D> lower = u_view.getGhostSliceOn(lower_side, { 0 });
         View<const double, D> mid = u_view.getSliceOn(lower_side, { 0 });
-        Loop::OverInteriorIndexes<D>(mid,
-                                     [&](std::array<int, D> coord) { lower[coord] = -mid[coord]; });
+        Loop::OverInteriorIndexes<D>(mid, [&](std::array<int, D> coord) { lower[coord] = -mid[coord]; });
       }
       if (pinfo.hasNbr(upper_side)) {
         View<double, D> upper = u_view.getGhostSliceOn(upper_side, { 0 });
         View<const double, D> mid = u_view.getSliceOn(upper_side, { 0 });
-        Loop::OverInteriorIndexes<D>(mid,
-                                     [&](std::array<int, D> coord) { upper[coord] = -mid[coord]; });
+        Loop::OverInteriorIndexes<D>(mid, [&](std::array<int, D> coord) { upper[coord] = -mid[coord]; });
       }
     }
   }
 
-  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                              const PatchView<const double, D>& u_view,
-                                              const PatchView<double, D>& f_view) const override
+  void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view) const override
   {
     PatchView<const double, D> c = coeffs.getPatchView(pinfo.local_index);
     for (Side<D> s : Side<D>::getValues()) {
@@ -178,9 +162,7 @@ public:
         View<const double, D> uner = u_view.getSliceOn(s, { 0 });
         View<const double, D> c_ghost = c.getSliceOn(s, { -1 });
         View<const double, D> cner = c.getSliceOn(s, { 0 });
-        Loop::OverInteriorIndexes<D>(fner, [&](const std::array<int, D>& coord) {
-          fner[coord] -= (u_ghost[coord] + uner[coord]) * (cner[coord] + c_ghost[coord]) / (2 * h2);
-        });
+        Loop::OverInteriorIndexes<D>(fner, [&](const std::array<int, D>& coord) { fner[coord] -= (u_ghost[coord] + uner[coord]) * (cner[coord] + c_ghost[coord]) / (2 * h2); });
       }
     }
   }
@@ -191,9 +173,7 @@ public:
    * @param gfunc the exact solution
    * @param hfunc the coefficients
    */
-  void addDrichletBCToRHS(Vector<D>& f,
-                          std::function<double(const std::array<double, D>&)> gfunc,
-                          std::function<double(const std::array<double, D>&)> hfunc)
+  void addDrichletBCToRHS(Vector<D>& f, std::function<double(const std::array<double, D>&)> gfunc, std::function<double(const std::array<double, D>&)> hfunc)
   {
     for (int i = 0; i < f.getNumLocalPatches(); i++) {
       ComponentView<double, D> f_ld = f.getComponentView(0, i);
