@@ -21,7 +21,12 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/Schur/Interface.h>
 
-#include <algorithm>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/Schur/PatchIfaceInfo.h>
+#include <map>
+#include <memory>
+#include <vector>
 
 #include <doctest.h>
 

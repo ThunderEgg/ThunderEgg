@@ -20,6 +20,7 @@
 
 #include <ThunderEgg/Schur/IfaceType.h>
 
+#include <ThunderEgg/Orthant.h>
 #include <set>
 
 #include <doctest.h>

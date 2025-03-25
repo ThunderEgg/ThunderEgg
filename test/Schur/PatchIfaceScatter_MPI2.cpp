@@ -21,7 +21,14 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/Schur/PatchIfaceScatter.h>
 
-#include <limits>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <mpi.h>
+#include <set>
 
 #include <doctest.h>
 

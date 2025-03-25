@@ -22,7 +22,11 @@
 #include "PatchSolverWrapper_MOCKS.h"
 #include <ThunderEgg/Schur/PatchSolverWrapper.h>
 
-#include <limits>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
 
 using namespace std;
 using namespace ThunderEgg;
