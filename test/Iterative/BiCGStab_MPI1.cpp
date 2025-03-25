@@ -19,9 +19,22 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/Iterative/BiCGStab.h>
+
+#include <ThunderEgg/BiLinearGhostFiller.h>
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/GhostFillingType.h>
+#include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
+#include <ThunderEgg/Timer.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <math.h>
+#include <memory>
+#include <mpi.h>
+#include <string>
 
 #include <sstream>
 
