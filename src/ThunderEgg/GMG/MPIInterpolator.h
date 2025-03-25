@@ -30,7 +30,6 @@
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/Interpolator.h>
-#include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>

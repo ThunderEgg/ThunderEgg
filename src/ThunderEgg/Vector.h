@@ -30,7 +30,6 @@
 #include <ThunderEgg/ComponentView.h>
 #include <ThunderEgg/Config.h>
 #include <ThunderEgg/Domain.h>
-#include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PatchView.h>
 #include <ThunderEgg/RuntimeError.h>

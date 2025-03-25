@@ -26,7 +26,6 @@
  * @brief DFTPatchSolver class
  */
 
-#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PatchArray.h>
@@ -34,7 +33,6 @@
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
 #include <ThunderEgg/PatchView.h>
-#include <ThunderEgg/Vector.h>
 #include <ThunderEgg/View.h>
 #include <array>
 #include <bitset>

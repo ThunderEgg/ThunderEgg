@@ -28,7 +28,6 @@
 
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Face.h>
-#include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GhostFillingType.h>
 #include <ThunderEgg/MPIGhostFiller.h>
 #include <ThunderEgg/NbrType.h>

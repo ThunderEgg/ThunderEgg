@@ -23,10 +23,8 @@
 
 #include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/Domain.h>
-#include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/Loops.h>
-#include <ThunderEgg/MPIGhostFiller.h>
 #include <ThunderEgg/Timer.h>
 #include <ThunderEgg/Vector.h>
 #include <array>

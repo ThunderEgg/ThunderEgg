@@ -25,7 +25,6 @@
  *
  * @brief Communicator class
  */
-#include <ThunderEgg/RuntimeError.h>
 #include <mpi.h>
 #include <memory>
 

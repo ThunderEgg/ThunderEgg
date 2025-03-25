@@ -18,8 +18,21 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
+#include <ThunderEgg/CoarseNbrInfo.h>
 #include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Timer.h>
 #include <ThunderEgg/tpl/json.hpp>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <array>
+#include <memory>
+#include <string>
 
 namespace ThunderEgg {
 

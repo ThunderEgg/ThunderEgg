@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include <ThunderEgg/CoarseNbrInfo.h>
-#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NbrType.h>

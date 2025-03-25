@@ -27,7 +27,6 @@
 #include <p4est.h>
 #include <p4est_base.h>
 #include <p4est_extended.h>
-#include <p4est_mesh.h>
 
 #include <doctest.h>
 

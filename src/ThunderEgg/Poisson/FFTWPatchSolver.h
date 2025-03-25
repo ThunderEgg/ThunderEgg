@@ -33,7 +33,6 @@
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
 #include <ThunderEgg/PatchView.h>
-#include <ThunderEgg/Vector.h>
 #include <ThunderEgg/View.h>
 #include <array>
 #include <bitset>

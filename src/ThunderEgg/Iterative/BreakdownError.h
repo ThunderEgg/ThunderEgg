@@ -27,6 +27,7 @@
  */
 
 #include <ThunderEgg/RuntimeError.h>
+#include <string>
 
 namespace ThunderEgg::Iterative {
 /**

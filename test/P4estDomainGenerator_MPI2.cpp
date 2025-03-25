@@ -23,15 +23,14 @@
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/P4estDomainGenerator.h>
 #include <ThunderEgg/PatchInfo.h>
-#include <ThunderEgg/tpl/json_fwd.hpp>
 #include <ThunderEgg/tpl/json.hpp>
+#include <ThunderEgg/tpl/json_fwd.hpp>
 #include <mpi.h>
 #include <p4est.h>
 #include <p4est_base.h>
 #include <p4est_extended.h>
-#include <p4est_mesh.h>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include <doctest.h>
 

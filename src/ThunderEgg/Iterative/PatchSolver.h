@@ -27,8 +27,6 @@
  */
 
 #include <ThunderEgg/Communicator.h>
-#include <ThunderEgg/Domain.h>
-#include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/Iterative/BreakdownError.h>
 #include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/Operator.h>

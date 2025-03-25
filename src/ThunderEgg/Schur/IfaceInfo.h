@@ -26,8 +26,6 @@
  * @brief IfaceInfo class
  */
 
-#include <ThunderEgg/Schur/IfaceType.h>
-
 namespace ThunderEgg {
 namespace Schur {
 /**

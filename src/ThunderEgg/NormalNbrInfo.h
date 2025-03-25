@@ -30,7 +30,6 @@
 #include <ThunderEgg/NbrInfo.h>
 #include <ThunderEgg/NbrInfoBase.h>
 #include <ThunderEgg/NbrType.h>
-#include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/tpl/json_fwd.hpp>
 #include <deque>
 #include <map>

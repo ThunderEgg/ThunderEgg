@@ -27,7 +27,6 @@
 #include <p8est.h>
 #include <p8est_connectivity.h>
 #include <p8est_extended.h>
-#include <p8est_mesh.h>
 
 #include <doctest.h>
 

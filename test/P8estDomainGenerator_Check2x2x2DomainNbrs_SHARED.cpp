@@ -23,7 +23,6 @@
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/PatchInfo.h>
-#include <ThunderEgg/Vector.h>
 #include <vector>
 #include <mpi.h>
 

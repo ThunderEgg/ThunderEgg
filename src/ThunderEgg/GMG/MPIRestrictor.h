@@ -29,7 +29,6 @@
 #include <ThunderEgg/Config.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
-#include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/Restrictor.h>
 #include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/RuntimeError.h>

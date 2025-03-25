@@ -18,8 +18,6 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <ThunderEgg/Vector.h>
-
 #include <array>
 #include <cstddef>
 

@@ -27,7 +27,6 @@
  */
 
 #include <ThunderEgg/Domain.h>
-#include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/MPIInterpolator.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/Orthant.h>

@@ -30,7 +30,6 @@
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/Face.h>
-#include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PatchInfo.h>

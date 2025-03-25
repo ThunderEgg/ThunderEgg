@@ -24,7 +24,6 @@
 #include <ThunderEgg/ComponentView.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/GhostFillingType.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>

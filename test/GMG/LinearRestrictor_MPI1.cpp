@@ -21,7 +21,6 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/GMG/LinearRestrictor.h>
 
-#include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/ComponentView.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>

@@ -23,7 +23,6 @@
 #include <ThunderEgg/CoarseNbrInfo.h>
 #include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/Domain.h>
-#include <ThunderEgg/DomainGenerator.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/FineNbrInfo.h>
 #include <ThunderEgg/NormalNbrInfo.h>

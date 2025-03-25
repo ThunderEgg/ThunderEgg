@@ -22,7 +22,6 @@
 #include <ThunderEgg/PETSc/PCShellCreator.h>
 
 #include <ThunderEgg/Domain.h>
-#include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Vector.h>
 #include <mpi.h>

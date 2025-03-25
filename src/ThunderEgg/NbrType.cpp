@@ -18,7 +18,6 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 #include <ThunderEgg/NbrType.h>
-#include <ThunderEgg/tpl/json.hpp>
 
 namespace ThunderEgg {
 } // namespace ThunderEgg

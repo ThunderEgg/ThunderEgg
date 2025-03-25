@@ -22,11 +22,10 @@
 
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Face.h>
-#include <ThunderEgg/GhostFillingType.h>
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/PatchInfo.h>
-#include <vector>
 #include <mpi.h>
+#include <vector>
 
 using namespace std;
 using namespace ThunderEgg;

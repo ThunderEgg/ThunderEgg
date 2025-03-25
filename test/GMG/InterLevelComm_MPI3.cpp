@@ -21,7 +21,6 @@
 #include <ThunderEgg/GMG/InterLevelComm.h>
 
 #include <ThunderEgg/Domain.h>
-#include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PatchView.h>
 #include <ThunderEgg/RuntimeError.h>
