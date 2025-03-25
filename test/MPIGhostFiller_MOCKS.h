@@ -21,10 +21,25 @@
 #ifndef MPIGHOSTFILLER_MOCKS_H
 #define MPIGHOSTFILLER_MOCKS_H
 
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/GhostFillingType.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/MPIGhostFiller.h>
-
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <cstddef>
 #include <list>
+#include <string>
 #include <tuple>
 
 #include <doctest.h>

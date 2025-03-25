@@ -19,6 +19,10 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Vector.h>
+
+#include <array>
+#include <cstddef>
+
 namespace ThunderEgg {
 /**
  * @brief Check if a coordinate is a ghost coordinate

@@ -18,6 +18,10 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 #include <ThunderEgg/ComponentArray.h>
+
+#include <ThunderEgg/View.h>
+#include <ThunderEgg/Face.h>
+
 #include <doctest.h>
 
 using namespace std;

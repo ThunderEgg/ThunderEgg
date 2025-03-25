@@ -20,6 +20,9 @@
 #include <ThunderEgg/View.h>
 #include <doctest.h>
 
+#include <ThunderEgg/Config.h>
+#include <ThunderEgg/RuntimeError.h>
+
 using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("View default constructor")

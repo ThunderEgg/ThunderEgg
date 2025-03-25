@@ -20,6 +20,11 @@
 
 #include <ThunderEgg/Vector.h>
 
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Config.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <mpi.h>
+
 #include <doctest.h>
 
 using namespace std;

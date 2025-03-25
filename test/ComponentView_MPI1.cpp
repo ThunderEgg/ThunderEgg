@@ -18,6 +18,17 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 #include <ThunderEgg/Vector.h>
+
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/View.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Config.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <numeric>
+#include <array>
+#include <cstddef>
+#include <vector>
+
 #include <doctest.h>
 
 using namespace std;

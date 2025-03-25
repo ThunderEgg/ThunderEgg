@@ -19,6 +19,25 @@
  ***************************************************************************/
 #include <ThunderEgg/DomainTools.h>
 
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/Timer.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <cstddef>
+#include <mpi.h>
+#include <vector>
+#include <array>
+
+
 #include <doctest.h>
 
 using namespace std;

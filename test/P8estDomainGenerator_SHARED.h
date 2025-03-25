@@ -19,6 +19,9 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Domain.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <string>
+#include <vector>
 
 class PatchVector
 {
@@ -36,20 +39,14 @@ void
 Ident(int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z);
 
 void
-CheckParentAndChildIdsAndRanks(const ThunderEgg::Domain<3>& coarser_domain,
-                               int coarser_max_level,
-                               const ThunderEgg::Domain<3>& finer_domain,
-                               int finer_max_level);
+CheckParentAndChildIdsAndRanks(const ThunderEgg::Domain<3>& coarser_domain, int coarser_max_level, const ThunderEgg::Domain<3>& finer_domain, int finer_max_level);
 void
 CheckParentIdsAndRanksNull(const ThunderEgg::Domain<3>& domain);
 void
 CheckChildIdsAndRanksNull(const ThunderEgg::Domain<3>& domain);
 
 void
-CheckParentAndChildIdsAndRanksRefined(const ThunderEgg::Domain<3>& coarser_domain,
-                                      int coarser_max_level,
-                                      const ThunderEgg::Domain<3>& finer_domain,
-                                      int finer_max_level);
+CheckParentAndChildIdsAndRanksRefined(const ThunderEgg::Domain<3>& coarser_domain, int coarser_max_level, const ThunderEgg::Domain<3>& finer_domain, int finer_max_level);
 
 void
 CheckRootDomainNeighbors(const ThunderEgg::Domain<3>& domain);

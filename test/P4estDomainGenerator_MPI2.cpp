@@ -18,11 +18,20 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/P4estDomainGenerator.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/tpl/json_fwd.hpp>
 #include <ThunderEgg/tpl/json.hpp>
-
+#include <mpi.h>
 #include <p4est.h>
+#include <p4est_base.h>
+#include <p4est_extended.h>
 #include <p4est_mesh.h>
+#include <vector>
+#include <string>
 
 #include <doctest.h>
 
@@ -88,10 +97,8 @@ TEST_CASE("P4estDomainGenerator 4x4 Uniform")
 
             p4est_t* p4est = p4est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
 
-            p4est_refine(
-              p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-            p4est_refine(
-              p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+            p4est_refine(p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+            p4est_refine(p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
 
             p4est_partition(p4est, true, nullptr);
 
@@ -947,10 +954,8 @@ TEST_CASE("P4estDomainGenerator 2x2 Refined SW")
 
             p4est_t* p4est = p4est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
 
-            p4est_refine(
-              p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-            p4est_refine(
-              p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return (quadrant->x == 0 && quadrant->y == 0); }, nullptr);
+            p4est_refine(p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+            p4est_refine(p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return (quadrant->x == 0 && quadrant->y == 0); }, nullptr);
 
             p4est_partition(p4est, true, nullptr);
 
@@ -1534,12 +1539,9 @@ TEST_CASE("P4estDomainGenerator 4x4 Refined SW")
 
             p4est_t* p4est = p4est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
 
-            p4est_refine(
-              p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-            p4est_refine(
-              p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-            p4est_refine(
-              p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return (quadrant->x == 0 && quadrant->y == 0); }, nullptr);
+            p4est_refine(p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+            p4est_refine(p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+            p4est_refine(p4est, false, [](p4est_t* p4est, p4est_topidx_t witch_tree, p4est_quadrant_t* quadrant) -> int { return (quadrant->x == 0 && quadrant->y == 0); }, nullptr);
 
             p4est_partition(p4est, true, nullptr);
 

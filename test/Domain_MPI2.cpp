@@ -21,6 +21,20 @@
 
 #include "utils/DomainReader.h"
 
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/Timer.h>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <cstddef>
+#include <map>
+#include <mpi.h>
+#include <vector>
+
 #include <doctest.h>
 
 using namespace std;

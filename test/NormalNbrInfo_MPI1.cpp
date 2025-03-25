@@ -17,7 +17,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+
+#include <ThunderEgg/NbrInfo.h>
+#include <ThunderEgg/NbrType.h>
 
 #include <doctest.h>
 
