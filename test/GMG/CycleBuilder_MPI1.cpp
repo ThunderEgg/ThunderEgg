@@ -20,6 +20,16 @@
 
 #include <ThunderEgg/GMG/CycleBuilder.h>
 
+#include <ThunderEgg/GMG/CycleOpts.h>
+#include <ThunderEgg/GMG/Interpolator.h>
+#include <ThunderEgg/GMG/Level.h>
+#include <ThunderEgg/GMG/Restrictor.h>
+#include <ThunderEgg/GMG/Smoother.h>
+#include <ThunderEgg/Operator.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+
 #include <doctest.h>
 
 using namespace std;

@@ -19,9 +19,20 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include <ThunderEgg/BiLinearGhostFiller.h>
-#include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/DirectInterpolator.h>
+
+#include <ThunderEgg/BiLinearGhostFiller.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <cstddef>
+#include <string>
+
 
 #include <doctest.h>
 
