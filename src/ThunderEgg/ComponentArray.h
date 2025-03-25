@@ -25,6 +25,7 @@
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/View.h>
 #include <array>
+#include <cstddef>
 #include <vector>
 
 /**

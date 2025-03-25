@@ -27,13 +27,14 @@
  */
 
 #include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Vector.h>
+#include <array>
 #include <cstddef>
 #include <petscmat.h>
 #include <petscsys.h>
 #include <petscvec.h>
-#include <ThunderEgg/Loops.h>
 
 namespace ThunderEgg::PETSc {
 /**

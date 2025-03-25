@@ -37,6 +37,7 @@
 #include <mpi.h>
 #include <p4est_base.h>
 #include <p8est.h>
+#include <p8est_connectivity.h>
 #include <p8est_extended.h>
 #include <p8est_ghost.h>
 #include <p8est_iterate.h>

@@ -26,6 +26,7 @@
  * @brief PatchIfaceScatter class
  */
 
+#include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/RuntimeError.h>
