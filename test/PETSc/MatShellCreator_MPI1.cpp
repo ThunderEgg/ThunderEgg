@@ -19,10 +19,18 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/PETSc/MatShellCreator.h>
 
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/Operator.h>
+#include <ThunderEgg/Vector.h>
 #include <doctest.h>
+#include <mpi.h>
+#include <petscmat.h>
+#include <petscsys.h>
+#include <petscvec.h>
+#include <string>
 
 using namespace std;
 using namespace ThunderEgg;
