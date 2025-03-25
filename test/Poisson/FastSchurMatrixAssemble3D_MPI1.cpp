@@ -19,14 +19,30 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
+#include <ThunderEgg/Poisson/FastSchurMatrixAssemble3D.h>
+
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
+#include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/GhostFillingType.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
 #include <ThunderEgg/Poisson/FFTWPatchSolver.h>
-#include <ThunderEgg/Poisson/FastSchurMatrixAssemble3D.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <ThunderEgg/Schur/PatchSolverWrapper.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
+#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <bitset>
+#include <math.h>
+#include <memory>
+#include <petscmat.h>
+#include <string>
 
 #include <doctest.h>
 

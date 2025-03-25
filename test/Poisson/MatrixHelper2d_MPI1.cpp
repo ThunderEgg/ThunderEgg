@@ -19,12 +19,23 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
+#include <ThunderEgg/Poisson/MatrixHelper2d.h>
+
 #include <ThunderEgg/BiQuadraticGhostFiller.h>
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/LinearRestrictor.h>
+#include <ThunderEgg/GhostFillingType.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
-#include <ThunderEgg/Poisson/MatrixHelper2d.h>
 #include <ThunderEgg/Poisson/StarPatchOperator.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <bitset>
+#include <math.h>
+#include <petscmat.h>
+#include <string>
 
 #include <doctest.h>
 
