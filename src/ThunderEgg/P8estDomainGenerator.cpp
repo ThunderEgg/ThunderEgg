@@ -464,7 +464,7 @@ SetFaceNbrInfo(p8est_mesh_t* mesh, vector<Data*>& data_ptrs, p4est_locidx_t quad
   } else if (qtf >= -24 && qtf <= -1) {
 
     FineNbrInfo<2>* nbr_info = new FineNbrInfo<2>();
-    p4est_locidx_t* qth = (p4est_locidx_t*)sc_array_index(mesh->quad_to_half, qtq);
+    const p4est_locidx_t* qth = (p4est_locidx_t*)sc_array_index(mesh->quad_to_half, qtq);
 
     for (int i = 0; i < 4; i++) {
       nbr_info->ids[i] = data_ptrs[qth[i]]->id;
