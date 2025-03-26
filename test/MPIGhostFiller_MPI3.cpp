@@ -27,7 +27,6 @@
 #include <ThunderEgg/Vector.h>
 #include <ThunderEgg/View.h>
 #include <array>
-#include <cstddef>
 #include <string>
 
 using namespace std;
