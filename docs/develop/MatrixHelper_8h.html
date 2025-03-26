@@ -95,47 +95,50 @@ $(document).ready(function(){initNavTree('MatrixHelper_8h.html',''); initResizab
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="Domain_8h_source.html">ThunderEgg/Domain.h</a>&gt;</code><br />
 <code>#include &lt;petscmat.h&gt;</code><br />
+<code>#include &lt;bitset&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for MatrixHelper.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="MatrixHelper_8h__incl.png" border="0" usemap="#src_2ThunderEgg_2Poisson_2MatrixHelper_8h" alt=""/></div>
 <map name="src_2ThunderEgg_2Poisson_2MatrixHelper_8h" id="src_2ThunderEgg_2Poisson_2MatrixHelper_8h">
-<area shape="rect" title="MatrixHelper class." alt="" coords="1147,5,1323,47"/>
-<area shape="rect" href="Domain_8h.html" title="Domain class." alt="" coords="1074,95,1241,121"/>
-<area shape="rect" title=" " alt="" coords="1265,95,1360,121"/>
-<area shape="rect" href="PatchInfo_8h.html" title="PatchInfo class." alt="" coords="562,169,737,196"/>
-<area shape="rect" title=" " alt="" coords="766,468,816,495"/>
-<area shape="rect" title=" " alt="" coords="1057,393,1120,420"/>
-<area shape="rect" href="Timer_8h.html" title="Timer class." alt="" coords="1195,393,1347,420"/>
-<area shape="rect" title=" " alt="" coords="1246,169,1288,196"/>
-<area shape="rect" href="CoarseNbrInfo_8h.html" title="CoarseNbrInfo class." alt="" coords="703,244,911,271"/>
-<area shape="rect" href="Serializable_8h.html" title="Serializable class." alt="" coords="205,468,396,495"/>
-<area shape="rect" href="Orthant_8h.html" title="Orthant class." alt="" coords="756,319,920,345"/>
-<area shape="rect" href="FineNbrInfo_8h.html" title="FineNbrInfo class." alt="" coords="296,244,486,271"/>
-<area shape="rect" href="NormalNbrInfo_8h.html" title="NormalNbrType class." alt="" coords="60,244,271,271"/>
-<area shape="rect" href="RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="1111,550,1311,577"/>
-<area shape="rect" title=" " alt="" coords="511,244,596,271"/>
-<area shape="rect" title=" " alt="" coords="620,244,679,271"/>
-<area shape="rect" href="BufferReader_8h.html" title="BufferReader class." alt="" coords="489,319,688,345"/>
-<area shape="rect" href="BufferWriter_8h.html" title="BufferWriter class." alt="" coords="272,319,465,345"/>
-<area shape="rect" href="NbrInfo_8h.html" title="NbrInfo class." alt="" coords="84,319,247,345"/>
-<area shape="rect" title=" " alt="" coords="438,393,509,420"/>
-<area shape="rect" title=" " alt="" coords="584,393,664,420"/>
-<area shape="rect" title=" " alt="" coords="322,393,414,420"/>
-<area shape="rect" title=" " alt="" coords="262,550,339,577"/>
-<area shape="rect" href="NbrInfoBase_8h.html" title="NbrInfoBase class." alt="" coords="52,393,247,420"/>
-<area shape="rect" href="NbrType_8h.html" title="NbrType class." alt="" coords="443,468,611,495"/>
-<area shape="rect" title=" " alt="" coords="118,468,181,495"/>
-<area shape="rect" title=" " alt="" coords="573,543,724,584"/>
-<area shape="rect" title=" " alt="" coords="808,550,884,577"/>
-<area shape="rect" href="Face_8h.html" title="Face class." alt="" coords="688,393,832,420"/>
-<area shape="rect" title=" " alt="" coords="686,468,742,495"/>
-<area shape="rect" title=" " alt="" coords="907,393,982,420"/>
-<area shape="rect" title=" " alt="" coords="1168,632,1254,659"/>
-<area shape="rect" title=" " alt="" coords="1303,632,1362,659"/>
-<area shape="rect" href="Communicator_8h.html" title="Communicator class." alt="" coords="942,468,1152,495"/>
-<area shape="rect" title=" " alt="" coords="1227,468,1270,495"/>
-<area shape="rect" title=" " alt="" coords="1018,550,1076,577"/>
+<area shape="rect" title="MatrixHelper class." alt="" coords="2961,5,3137,47"/>
+<area shape="rect" href="Domain_8h.html" title="Domain class." alt="" coords="2550,95,2717,121"/>
+<area shape="rect" title=" " alt="" coords="3047,244,3105,271"/>
+<area shape="rect" title=" " alt="" coords="3087,95,3182,121"/>
+<area shape="rect" href="Communicator_8h.html" title="Communicator class." alt="" coords="2284,393,2495,420"/>
+<area shape="rect" title=" " alt="" coords="1343,468,1401,495"/>
+<area shape="rect" title=" " alt="" coords="2017,468,2095,495"/>
+<area shape="rect" href="PatchInfo_8h.html" title="PatchInfo class." alt="" coords="1527,169,1702,196"/>
+<area shape="rect" title=" " alt="" coords="1027,468,1098,495"/>
+<area shape="rect" title=" " alt="" coords="470,543,621,584"/>
+<area shape="rect" title=" " alt="" coords="2557,468,2608,495"/>
+<area shape="rect" title=" " alt="" coords="191,468,247,495"/>
+<area shape="rect" href="Timer_8h.html" title="Timer class." alt="" coords="3056,319,3208,345"/>
+<area shape="rect" title=" " alt="" coords="2772,169,2815,196"/>
+<area shape="rect" title=" " alt="" coords="2839,169,2899,196"/>
+<area shape="rect" title=" " alt="" coords="2923,169,2986,196"/>
+<area shape="rect" href="BufferReader_8h.html" title="BufferReader class." alt="" coords="998,319,1197,345"/>
+<area shape="rect" href="Serializable_8h.html" title="Serializable class." alt="" coords="1426,468,1617,495"/>
+<area shape="rect" href="BufferWriter_8h.html" title="BufferWriter class." alt="" coords="1221,319,1414,345"/>
+<area shape="rect" href="CoarseNbrInfo_8h.html" title="CoarseNbrInfo class." alt="" coords="1511,244,1719,271"/>
+<area shape="rect" href="NbrInfo_8h.html" title="NbrInfo class." alt="" coords="1793,319,1956,345"/>
+<area shape="rect" href="NbrInfoBase_8h.html" title="NbrInfoBase class." alt="" coords="1711,393,1905,420"/>
+<area shape="rect" href="NbrType_8h.html" title="NbrType class." alt="" coords="2119,468,2287,495"/>
+<area shape="rect" title=" " alt="" coords="1255,468,1318,495"/>
+<area shape="rect" href="Orthant_8h.html" title="Orthant class." alt="" coords="455,319,619,345"/>
+<area shape="rect" href="Face_8h.html" title="Face class." alt="" coords="473,393,617,420"/>
+<area shape="rect" href="FineNbrInfo_8h.html" title="FineNbrInfo class." alt="" coords="1135,244,1326,271"/>
+<area shape="rect" href="NormalNbrInfo_8h.html" title="NormalNbrType class." alt="" coords="1909,244,2120,271"/>
+<area shape="rect" href="RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="2671,319,2871,345"/>
+<area shape="rect" title=" " alt="" coords="1401,244,1487,271"/>
+<area shape="rect" title=" " alt="" coords="847,468,939,495"/>
+<area shape="rect" title=" " alt="" coords="2165,550,2241,577"/>
+<area shape="rect" title=" " alt="" coords="430,468,501,495"/>
+<area shape="rect" title=" " alt="" coords="641,393,721,420"/>
+<area shape="rect" title=" " alt="" coords="2671,393,2758,420"/>
+<area shape="rect" title=" " alt="" coords="2783,393,2841,420"/>
+<area shape="rect" title=" " alt="" coords="3170,393,3257,420"/>
+<area shape="rect" title=" " alt="" coords="3281,393,3324,420"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">

@@ -112,26 +112,27 @@ $(document).ready(function(){initNavTree('MatrixHelper_8h_source.html',''); init
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Domain_8h.html">ThunderEgg/Domain.h</a>&gt;</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;petscmat.h&gt;</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceThunderEgg_1_1Poisson.html">ThunderEgg::Poisson</a> {</div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html">   38</a></span>&#160;<span class="keyword">class </span><a class="code" href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html">MatrixHelper</a></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="classThunderEgg_1_1Domain.html">Domain&lt;3&gt;</a> domain;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  std::bitset&lt;6&gt; neumann;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html#a390ef15d0a75a1cf0e5cc56b5fba5dc3">MatrixHelper</a>(<span class="keyword">const</span> <a class="code" href="classThunderEgg_1_1Domain.html">Domain&lt;3&gt;</a>&amp; domain, std::bitset&lt;6&gt; neumann);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  Mat <a class="code" href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html#af2d2f9a1a1156bf13ab5ddbe71f7d084">formCRSMatrix</a>();</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;};</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;} <span class="comment">// namespace ThunderEgg::Poisson</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &lt;bitset&gt;</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceThunderEgg_1_1Poisson.html">ThunderEgg::Poisson</a> {</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html">   39</a></span>&#160;<span class="keyword">class </span><a class="code" href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html">MatrixHelper</a></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;{</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <a class="code" href="classThunderEgg_1_1Domain.html">Domain&lt;3&gt;</a> domain;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  std::bitset&lt;6&gt; neumann;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keyword">explicit</span> <a class="code" href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html#a390ef15d0a75a1cf0e5cc56b5fba5dc3">MatrixHelper</a>(<span class="keyword">const</span> <a class="code" href="classThunderEgg_1_1Domain.html">Domain&lt;3&gt;</a>&amp; domain, std::bitset&lt;6&gt; neumann);</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  Mat <a class="code" href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html#af2d2f9a1a1156bf13ab5ddbe71f7d084">formCRSMatrix</a>();</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;};</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;} <span class="comment">// namespace ThunderEgg::Poisson</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassThunderEgg_1_1Poisson_1_1MatrixHelper_html"><div class="ttname"><a href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html">ThunderEgg::Poisson::MatrixHelper</a></div><div class="ttdoc">Create a matrix for the 3D second-order Laplacian operator.</div><div class="ttdef"><b>Definition:</b> MatrixHelper.h:38</div></div>
+<div class="ttc" id="aclassThunderEgg_1_1Poisson_1_1MatrixHelper_html"><div class="ttname"><a href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html">ThunderEgg::Poisson::MatrixHelper</a></div><div class="ttdoc">Create a matrix for the 3D second-order Laplacian operator.</div><div class="ttdef"><b>Definition:</b> MatrixHelper.h:39</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1Domain_html"><div class="ttname"><a href="classThunderEgg_1_1Domain.html">ThunderEgg::Domain&lt; 3 &gt;</a></div></div>
-<div class="ttc" id="anamespaceThunderEgg_1_1Poisson_html"><div class="ttname"><a href="namespaceThunderEgg_1_1Poisson.html">ThunderEgg::Poisson</a></div><div class="ttdoc">Classes specific to the Poisson equation.</div><div class="ttdef"><b>Definition:</b> DFTPatchSolver.h:41</div></div>
+<div class="ttc" id="anamespaceThunderEgg_1_1Poisson_html"><div class="ttname"><a href="namespaceThunderEgg_1_1Poisson.html">ThunderEgg::Poisson</a></div><div class="ttdoc">Classes specific to the Poisson equation.</div><div class="ttdef"><b>Definition:</b> DFTPatchSolver.h:51</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1Poisson_1_1MatrixHelper_html_af2d2f9a1a1156bf13ab5ddbe71f7d084"><div class="ttname"><a href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html#af2d2f9a1a1156bf13ab5ddbe71f7d084">ThunderEgg::Poisson::MatrixHelper::formCRSMatrix</a></div><div class="ttdeci">Mat formCRSMatrix()</div><div class="ttdoc">Form the matrix for the domain.</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1Poisson_1_1MatrixHelper_html_a390ef15d0a75a1cf0e5cc56b5fba5dc3"><div class="ttname"><a href="classThunderEgg_1_1Poisson_1_1MatrixHelper.html#a390ef15d0a75a1cf0e5cc56b5fba5dc3">ThunderEgg::Poisson::MatrixHelper::MatrixHelper</a></div><div class="ttdeci">MatrixHelper(const Domain&lt; 3 &gt; &amp;domain, std::bitset&lt; 6 &gt; neumann)</div><div class="ttdoc">Create a MatrixHelper for a given 3D domain.</div></div>
 <div class="ttc" id="aDomain_8h_html"><div class="ttname"><a href="Domain_8h.html">Domain.h</a></div><div class="ttdoc">Domain class.</div></div>

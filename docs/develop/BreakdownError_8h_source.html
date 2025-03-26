@@ -111,21 +111,22 @@ $(document).ready(function(){initNavTree('BreakdownError_8h_source.html',''); in
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#define THUNDEREGG_ITERATIVE_BREAKDOWNERROR_H</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="RuntimeError_8h.html">ThunderEgg/RuntimeError.h</a>&gt;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceThunderEgg_1_1Iterative.html">ThunderEgg::Iterative</a> {</div>
-<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="structThunderEgg_1_1Iterative_1_1BreakdownError.html">   35</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structThunderEgg_1_1Iterative_1_1BreakdownError.html">BreakdownError</a> : <a class="code" href="structThunderEgg_1_1RuntimeError.html">RuntimeError</a></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;{</div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="structThunderEgg_1_1Iterative_1_1BreakdownError.html#a5d8f071a15701d1836a8e51987006807">   42</a></span>&#160;  <a class="code" href="structThunderEgg_1_1Iterative_1_1BreakdownError.html#a5d8f071a15701d1836a8e51987006807">BreakdownError</a>(std::string message)</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    : <a class="code" href="structThunderEgg_1_1RuntimeError.html">RuntimeError</a>(message){};</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;} <span class="comment">// namespace ThunderEgg::Iterative</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceThunderEgg_1_1Iterative.html">ThunderEgg::Iterative</a> {</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="structThunderEgg_1_1Iterative_1_1BreakdownError.html">   36</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structThunderEgg_1_1Iterative_1_1BreakdownError.html">BreakdownError</a> : <a class="code" href="structThunderEgg_1_1RuntimeError.html">RuntimeError</a></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;{</div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="structThunderEgg_1_1Iterative_1_1BreakdownError.html#a5d8f071a15701d1836a8e51987006807">   43</a></span>&#160;  <a class="code" href="structThunderEgg_1_1Iterative_1_1BreakdownError.html#a5d8f071a15701d1836a8e51987006807">BreakdownError</a>(std::string message)</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    : <a class="code" href="structThunderEgg_1_1RuntimeError.html">RuntimeError</a>(message){};</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;} <span class="comment">// namespace ThunderEgg::Iterative</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aRuntimeError_8h_html"><div class="ttname"><a href="RuntimeError_8h.html">RuntimeError.h</a></div><div class="ttdoc">RuntimeError struct.</div></div>
-<div class="ttc" id="astructThunderEgg_1_1Iterative_1_1BreakdownError_html"><div class="ttname"><a href="structThunderEgg_1_1Iterative_1_1BreakdownError.html">ThunderEgg::Iterative::BreakdownError</a></div><div class="ttdoc">Breakdown exception for iterative methods.</div><div class="ttdef"><b>Definition:</b> BreakdownError.h:35</div></div>
-<div class="ttc" id="astructThunderEgg_1_1Iterative_1_1BreakdownError_html_a5d8f071a15701d1836a8e51987006807"><div class="ttname"><a href="structThunderEgg_1_1Iterative_1_1BreakdownError.html#a5d8f071a15701d1836a8e51987006807">ThunderEgg::Iterative::BreakdownError::BreakdownError</a></div><div class="ttdeci">BreakdownError(std::string message)</div><div class="ttdoc">Construct a new RuntimeError object.</div><div class="ttdef"><b>Definition:</b> BreakdownError.h:42</div></div>
-<div class="ttc" id="anamespaceThunderEgg_1_1Iterative_html"><div class="ttname"><a href="namespaceThunderEgg_1_1Iterative.html">ThunderEgg::Iterative</a></div><div class="ttdoc">Iterative Solvers.</div><div class="ttdef"><b>Definition:</b> BiCGStab.h:34</div></div>
+<div class="ttc" id="astructThunderEgg_1_1Iterative_1_1BreakdownError_html"><div class="ttname"><a href="structThunderEgg_1_1Iterative_1_1BreakdownError.html">ThunderEgg::Iterative::BreakdownError</a></div><div class="ttdoc">Breakdown exception for iterative methods.</div><div class="ttdef"><b>Definition:</b> BreakdownError.h:36</div></div>
+<div class="ttc" id="astructThunderEgg_1_1Iterative_1_1BreakdownError_html_a5d8f071a15701d1836a8e51987006807"><div class="ttname"><a href="structThunderEgg_1_1Iterative_1_1BreakdownError.html#a5d8f071a15701d1836a8e51987006807">ThunderEgg::Iterative::BreakdownError::BreakdownError</a></div><div class="ttdeci">BreakdownError(std::string message)</div><div class="ttdoc">Construct a new RuntimeError object.</div><div class="ttdef"><b>Definition:</b> BreakdownError.h:43</div></div>
+<div class="ttc" id="anamespaceThunderEgg_1_1Iterative_html"><div class="ttname"><a href="namespaceThunderEgg_1_1Iterative.html">ThunderEgg::Iterative</a></div><div class="ttdoc">Iterative Solvers.</div><div class="ttdef"><b>Definition:</b> BiCGStab.h:40</div></div>
 <div class="ttc" id="astructThunderEgg_1_1RuntimeError_html"><div class="ttname"><a href="structThunderEgg_1_1RuntimeError.html">ThunderEgg::RuntimeError</a></div><div class="ttdoc">ThunderEgg runtime exception.</div><div class="ttdef"><b>Definition:</b> RuntimeError.h:36</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

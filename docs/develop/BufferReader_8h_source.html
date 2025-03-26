@@ -112,52 +112,51 @@ $(document).ready(function(){initNavTree('BufferReader_8h_source.html',''); init
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="Serializable_8h.html">ThunderEgg/Serializable.h</a>&gt;</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;cstddef&gt;</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceThunderEgg.html">ThunderEgg</a> {</div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html">   38</a></span>&#160;<span class="keyword">class </span><a class="code" href="classThunderEgg_1_1BufferReader.html">BufferReader</a></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;{</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordtype">char</span>* buffer = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keywordtype">int</span> pos = 0;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> isSerializable()</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordflow">return</span> std::is_base_of&lt;Serializable, T&gt;::value;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  }</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html#a6d001689c6a4f230461eb6cd5446d96d">   68</a></span>&#160;  <a class="code" href="classThunderEgg_1_1BufferReader.html#a6d001689c6a4f230461eb6cd5446d96d">BufferReader</a>(<span class="keywordtype">char</span>* buffer) { this-&gt;buffer = buffer; }</div>
-<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html#a808035ac4805527404dc528921e22ecb">   74</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classThunderEgg_1_1BufferReader.html#a808035ac4805527404dc528921e22ecb">getPos</a>() { <span class="keywordflow">return</span> pos; }</div>
-<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html#afed9d6f9be0d0685a355f244e7af6d2b">   82</a></span>&#160;  <a class="code" href="classThunderEgg_1_1BufferReader.html">BufferReader</a>&amp; <a class="code" href="classThunderEgg_1_1BufferReader.html#afed9d6f9be0d0685a355f244e7af6d2b">operator&gt;&gt;</a>(<a class="code" href="classThunderEgg_1_1Serializable.html">Serializable</a>&amp; obj)</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  {</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    pos += obj.<a class="code" href="classThunderEgg_1_1Serializable.html#ac10c5217cf70fbe4d0d563586f9e552b">deserialize</a>(buffer + pos);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  }</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html#a244ed151a1f4f9e5dad9310d37c5586a">   96</a></span>&#160;  <span class="keyword">typename</span> std::enable_if&lt;!isSerializable&lt;T&gt;(), <a class="code" href="classThunderEgg_1_1BufferReader.html">BufferReader</a>&gt;::type&amp; <a class="code" href="classThunderEgg_1_1BufferReader.html#a244ed151a1f4f9e5dad9310d37c5586a">operator&gt;&gt;</a>(T&amp; obj)</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  {</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <span class="keyword">sizeof</span>(T); i++) {</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(&amp;obj)[i] = buffer[pos];</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      pos++;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    }</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;  }</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;};</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;} <span class="comment">// namespace ThunderEgg</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceThunderEgg.html">ThunderEgg</a> {</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html">   37</a></span>&#160;<span class="keyword">class </span><a class="code" href="classThunderEgg_1_1BufferReader.html">BufferReader</a></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;{</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordtype">char</span>* buffer = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordtype">int</span> pos = 0;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keyword">static</span> constexpr <span class="keywordtype">bool</span> isSerializable()</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  {</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">return</span> std::is_base_of&lt;Serializable, T&gt;::value;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  }</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html#a6d001689c6a4f230461eb6cd5446d96d">   67</a></span>&#160;  <a class="code" href="classThunderEgg_1_1BufferReader.html#a6d001689c6a4f230461eb6cd5446d96d">BufferReader</a>(<span class="keywordtype">char</span>* buffer) { this-&gt;buffer = buffer; }</div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html#a808035ac4805527404dc528921e22ecb">   73</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classThunderEgg_1_1BufferReader.html#a808035ac4805527404dc528921e22ecb">getPos</a>() { <span class="keywordflow">return</span> pos; }</div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html#afed9d6f9be0d0685a355f244e7af6d2b">   81</a></span>&#160;  <a class="code" href="classThunderEgg_1_1BufferReader.html">BufferReader</a>&amp; <a class="code" href="classThunderEgg_1_1BufferReader.html#afed9d6f9be0d0685a355f244e7af6d2b">operator&gt;&gt;</a>(<a class="code" href="classThunderEgg_1_1Serializable.html">Serializable</a>&amp; obj)</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    pos += obj.<a class="code" href="classThunderEgg_1_1Serializable.html#ac10c5217cf70fbe4d0d563586f9e552b">deserialize</a>(buffer + pos);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="classThunderEgg_1_1BufferReader.html#a244ed151a1f4f9e5dad9310d37c5586a">   95</a></span>&#160;  <span class="keyword">typename</span> std::enable_if&lt;!isSerializable&lt;T&gt;(), <a class="code" href="classThunderEgg_1_1BufferReader.html">BufferReader</a>&gt;::type&amp; <a class="code" href="classThunderEgg_1_1BufferReader.html#a244ed151a1f4f9e5dad9310d37c5586a">operator&gt;&gt;</a>(T&amp; obj)</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; <span class="keyword">sizeof</span>(T); i++) {</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(&amp;obj)[i] = buffer[pos];</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      pos++;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    }</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  }</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;};</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;} <span class="comment">// namespace ThunderEgg</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassThunderEgg_1_1Serializable_html"><div class="ttname"><a href="classThunderEgg_1_1Serializable.html">ThunderEgg::Serializable</a></div><div class="ttdoc">Interface for serializing objects.</div><div class="ttdef"><b>Definition:</b> Serializable.h:34</div></div>
-<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html_a244ed151a1f4f9e5dad9310d37c5586a"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html#a244ed151a1f4f9e5dad9310d37c5586a">ThunderEgg::BufferReader::operator&gt;&gt;</a></div><div class="ttdeci">std::enable_if&lt;!isSerializable&lt; T &gt;), BufferReader &gt;::type &amp; operator&gt;&gt;(T &amp;obj)</div><div class="ttdoc">Get an object from the buffer.</div><div class="ttdef"><b>Definition:</b> BufferReader.h:96</div></div>
-<div class="ttc" id="anamespaceThunderEgg_html"><div class="ttname"><a href="namespaceThunderEgg.html">ThunderEgg</a></div><div class="ttdoc">The ThunderEgg namespace.</div><div class="ttdef"><b>Definition:</b> BiLinearGhostFiller.h:31</div></div>
+<div class="ttc" id="aclassThunderEgg_1_1Serializable_html"><div class="ttname"><a href="classThunderEgg_1_1Serializable.html">ThunderEgg::Serializable</a></div><div class="ttdoc">Interface for serializing objects.</div><div class="ttdef"><b>Definition:</b> Serializable.h:33</div></div>
+<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html_a244ed151a1f4f9e5dad9310d37c5586a"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html#a244ed151a1f4f9e5dad9310d37c5586a">ThunderEgg::BufferReader::operator&gt;&gt;</a></div><div class="ttdeci">std::enable_if&lt;!isSerializable&lt; T &gt;), BufferReader &gt;::type &amp; operator&gt;&gt;(T &amp;obj)</div><div class="ttdoc">Get an object from the buffer.</div><div class="ttdef"><b>Definition:</b> BufferReader.h:95</div></div>
+<div class="ttc" id="anamespaceThunderEgg_html"><div class="ttname"><a href="namespaceThunderEgg.html">ThunderEgg</a></div><div class="ttdoc">The ThunderEgg namespace.</div><div class="ttdef"><b>Definition:</b> BiLinearGhostFiller.h:38</div></div>
 <div class="ttc" id="aSerializable_8h_html"><div class="ttname"><a href="Serializable_8h.html">Serializable.h</a></div><div class="ttdoc">Serializable class.</div></div>
-<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html_a6d001689c6a4f230461eb6cd5446d96d"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html#a6d001689c6a4f230461eb6cd5446d96d">ThunderEgg::BufferReader::BufferReader</a></div><div class="ttdeci">BufferReader(char *buffer)</div><div class="ttdoc">Create a new BufferReader with given buffer.</div><div class="ttdef"><b>Definition:</b> BufferReader.h:68</div></div>
-<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html_a808035ac4805527404dc528921e22ecb"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html#a808035ac4805527404dc528921e22ecb">ThunderEgg::BufferReader::getPos</a></div><div class="ttdeci">int getPos()</div><div class="ttdoc">get the current position in the buffer</div><div class="ttdef"><b>Definition:</b> BufferReader.h:74</div></div>
-<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html_afed9d6f9be0d0685a355f244e7af6d2b"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html#afed9d6f9be0d0685a355f244e7af6d2b">ThunderEgg::BufferReader::operator&gt;&gt;</a></div><div class="ttdeci">BufferReader &amp; operator&gt;&gt;(Serializable &amp;obj)</div><div class="ttdoc">Get an object of the buffer.</div><div class="ttdef"><b>Definition:</b> BufferReader.h:82</div></div>
+<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html_a6d001689c6a4f230461eb6cd5446d96d"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html#a6d001689c6a4f230461eb6cd5446d96d">ThunderEgg::BufferReader::BufferReader</a></div><div class="ttdeci">BufferReader(char *buffer)</div><div class="ttdoc">Create a new BufferReader with given buffer.</div><div class="ttdef"><b>Definition:</b> BufferReader.h:67</div></div>
+<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html_a808035ac4805527404dc528921e22ecb"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html#a808035ac4805527404dc528921e22ecb">ThunderEgg::BufferReader::getPos</a></div><div class="ttdeci">int getPos()</div><div class="ttdoc">get the current position in the buffer</div><div class="ttdef"><b>Definition:</b> BufferReader.h:73</div></div>
+<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html_afed9d6f9be0d0685a355f244e7af6d2b"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html#afed9d6f9be0d0685a355f244e7af6d2b">ThunderEgg::BufferReader::operator&gt;&gt;</a></div><div class="ttdeci">BufferReader &amp; operator&gt;&gt;(Serializable &amp;obj)</div><div class="ttdoc">Get an object of the buffer.</div><div class="ttdef"><b>Definition:</b> BufferReader.h:81</div></div>
 <div class="ttc" id="aclassThunderEgg_1_1Serializable_html_ac10c5217cf70fbe4d0d563586f9e552b"><div class="ttname"><a href="classThunderEgg_1_1Serializable.html#ac10c5217cf70fbe4d0d563586f9e552b">ThunderEgg::Serializable::deserialize</a></div><div class="ttdeci">virtual int deserialize(char *buffer)=0</div><div class="ttdoc">Deserialize an object.</div></div>
-<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html">ThunderEgg::BufferReader</a></div><div class="ttdoc">Class that is used to help read serialized objects from a buffer.</div><div class="ttdef"><b>Definition:</b> BufferReader.h:38</div></div>
+<div class="ttc" id="aclassThunderEgg_1_1BufferReader_html"><div class="ttname"><a href="classThunderEgg_1_1BufferReader.html">ThunderEgg::BufferReader</a></div><div class="ttdoc">Class that is used to help read serialized objects from a buffer.</div><div class="ttdef"><b>Definition:</b> BufferReader.h:37</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

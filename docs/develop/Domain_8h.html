@@ -94,50 +94,59 @@ $(document).ready(function(){initNavTree('Domain_8h.html',''); initResizable(); 
 
 <p>Domain class.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="PatchInfo_8h_source.html">ThunderEgg/PatchInfo.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="Communicator_8h_source.html">ThunderEgg/Communicator.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="PatchInfo_8h_source.html">ThunderEgg/PatchInfo.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="Timer_8h_source.html">ThunderEgg/Timer.h</a>&gt;</code><br />
+<code>#include &lt;ThunderEgg/tpl/json_fwd.hpp&gt;</code><br />
+<code>#include &lt;array&gt;</code><br />
+<code>#include &lt;cstddef&gt;</code><br />
 <code>#include &lt;map&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
+<code>#include &lt;mpi.h&gt;</code><br />
 <code>#include &lt;set&gt;</code><br />
+<code>#include &lt;utility&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Domain.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="Domain_8h__incl.png" border="0" usemap="#src_2ThunderEgg_2Domain_8h" alt=""/></div>
 <map name="src_2ThunderEgg_2Domain_8h" id="src_2ThunderEgg_2Domain_8h">
-<area shape="rect" title="Domain class." alt="" coords="1063,5,1252,32"/>
-<area shape="rect" href="PatchInfo_8h.html" title="PatchInfo class." alt="" coords="562,80,737,107"/>
-<area shape="rect" title=" " alt="" coords="766,379,816,405"/>
-<area shape="rect" title=" " alt="" coords="1057,304,1120,331"/>
-<area shape="rect" href="Timer_8h.html" title="Timer class." alt="" coords="1195,304,1347,331"/>
-<area shape="rect" title=" " alt="" coords="1246,80,1288,107"/>
-<area shape="rect" href="CoarseNbrInfo_8h.html" title="CoarseNbrInfo class." alt="" coords="703,155,911,181"/>
-<area shape="rect" href="Serializable_8h.html" title="Serializable class." alt="" coords="205,379,396,405"/>
-<area shape="rect" href="Orthant_8h.html" title="Orthant class." alt="" coords="756,229,920,256"/>
-<area shape="rect" href="FineNbrInfo_8h.html" title="FineNbrInfo class." alt="" coords="296,155,486,181"/>
-<area shape="rect" href="NormalNbrInfo_8h.html" title="NormalNbrType class." alt="" coords="60,155,271,181"/>
-<area shape="rect" href="RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="1111,461,1311,487"/>
-<area shape="rect" title=" " alt="" coords="511,155,596,181"/>
-<area shape="rect" title=" " alt="" coords="620,155,679,181"/>
-<area shape="rect" href="BufferReader_8h.html" title="BufferReader class." alt="" coords="489,229,688,256"/>
-<area shape="rect" href="BufferWriter_8h.html" title="BufferWriter class." alt="" coords="272,229,465,256"/>
-<area shape="rect" href="NbrInfo_8h.html" title="NbrInfo class." alt="" coords="84,229,247,256"/>
-<area shape="rect" title=" " alt="" coords="438,304,509,331"/>
-<area shape="rect" title=" " alt="" coords="584,304,664,331"/>
-<area shape="rect" title=" " alt="" coords="322,304,414,331"/>
-<area shape="rect" title=" " alt="" coords="262,461,339,487"/>
-<area shape="rect" href="NbrInfoBase_8h.html" title="NbrInfoBase class." alt="" coords="52,304,247,331"/>
-<area shape="rect" href="NbrType_8h.html" title="NbrType class." alt="" coords="443,379,611,405"/>
-<area shape="rect" title=" " alt="" coords="118,379,181,405"/>
-<area shape="rect" title=" " alt="" coords="573,453,724,495"/>
-<area shape="rect" title=" " alt="" coords="808,461,884,487"/>
-<area shape="rect" href="Face_8h.html" title="Face class." alt="" coords="688,304,832,331"/>
-<area shape="rect" title=" " alt="" coords="686,379,742,405"/>
-<area shape="rect" title=" " alt="" coords="907,304,982,331"/>
-<area shape="rect" title=" " alt="" coords="1168,543,1254,569"/>
-<area shape="rect" title=" " alt="" coords="1303,543,1362,569"/>
-<area shape="rect" href="Communicator_8h.html" title="Communicator class." alt="" coords="942,379,1152,405"/>
-<area shape="rect" title=" " alt="" coords="1227,379,1270,405"/>
-<area shape="rect" title=" " alt="" coords="1018,461,1076,487"/>
+<area shape="rect" title="Domain class." alt="" coords="2299,5,2488,32"/>
+<area shape="rect" href="Communicator_8h.html" title="Communicator class." alt="" coords="1176,304,1387,331"/>
+<area shape="rect" title=" " alt="" coords="1180,379,1239,405"/>
+<area shape="rect" title=" " alt="" coords="2339,379,2416,405"/>
+<area shape="rect" href="PatchInfo_8h.html" title="PatchInfo class." alt="" coords="1719,80,1894,107"/>
+<area shape="rect" title=" " alt="" coords="850,379,921,405"/>
+<area shape="rect" title=" " alt="" coords="1450,453,1601,495"/>
+<area shape="rect" title=" " alt="" coords="2476,379,2527,405"/>
+<area shape="rect" title=" " alt="" coords="129,379,185,405"/>
+<area shape="rect" href="Timer_8h.html" title="Timer class." alt="" coords="3067,229,3219,256"/>
+<area shape="rect" title=" " alt="" coords="3215,80,3257,107"/>
+<area shape="rect" title=" " alt="" coords="3282,80,3342,107"/>
+<area shape="rect" title=" " alt="" coords="3366,80,3429,107"/>
+<area shape="rect" href="BufferReader_8h.html" title="BufferReader class." alt="" coords="999,229,1198,256"/>
+<area shape="rect" href="Serializable_8h.html" title="Serializable class." alt="" coords="1767,379,1958,405"/>
+<area shape="rect" href="BufferWriter_8h.html" title="BufferWriter class." alt="" coords="1374,229,1567,256"/>
+<area shape="rect" href="CoarseNbrInfo_8h.html" title="CoarseNbrInfo class." alt="" coords="1703,155,1911,181"/>
+<area shape="rect" href="NbrInfo_8h.html" title="NbrInfo class." alt="" coords="1947,229,2109,256"/>
+<area shape="rect" href="NbrInfoBase_8h.html" title="NbrInfoBase class." alt="" coords="2117,304,2312,331"/>
+<area shape="rect" href="NbrType_8h.html" title="NbrType class." alt="" coords="2124,379,2292,405"/>
+<area shape="rect" title=" " alt="" coords="1595,379,1658,405"/>
+<area shape="rect" href="Orthant_8h.html" title="Orthant class." alt="" coords="710,229,874,256"/>
+<area shape="rect" href="Face_8h.html" title="Face class." alt="" coords="347,304,491,331"/>
+<area shape="rect" href="FineNbrInfo_8h.html" title="FineNbrInfo class." alt="" coords="1190,155,1381,181"/>
+<area shape="rect" href="NormalNbrInfo_8h.html" title="NormalNbrType class." alt="" coords="2079,155,2289,181"/>
+<area shape="rect" href="RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="2539,229,2739,256"/>
+<area shape="rect" title=" " alt="" coords="1511,155,1596,181"/>
+<area shape="rect" title=" " alt="" coords="1620,155,1679,181"/>
+<area shape="rect" title=" " alt="" coords="991,379,1083,405"/>
+<area shape="rect" title=" " alt="" coords="2170,461,2246,487"/>
+<area shape="rect" title=" " alt="" coords="501,379,571,405"/>
+<area shape="rect" title=" " alt="" coords="768,304,848,331"/>
+<area shape="rect" title=" " alt="" coords="2569,304,2655,331"/>
+<area shape="rect" title=" " alt="" coords="2680,304,2739,331"/>
+<area shape="rect" title=" " alt="" coords="3337,304,3423,331"/>
+<area shape="rect" title=" " alt="" coords="3219,304,3261,331"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -145,54 +154,54 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="Domain_8h__dep__incl.png" border="0" usemap="#src_2ThunderEgg_2Domain_8hdep" alt=""/></div>
 <map name="src_2ThunderEgg_2Domain_8hdep" id="src_2ThunderEgg_2Domain_8hdep">
-<area shape="rect" title="Domain class." alt="" coords="2264,5,2453,32"/>
-<area shape="rect" href="DomainGenerator_8h.html" title="DomainGenerator class." alt="" coords="109,445,363,471"/>
-<area shape="rect" href="ThunderEgg_8h_source.html" title=" " alt="" coords="2194,616,2329,643"/>
-<area shape="rect" href="DirectInterpolator_8h.html" title="DirectInterpolator class." alt="" coords="425,437,583,479"/>
-<area shape="rect" href="MPIInterpolator_8h.html" title="MPIInterpolator class." alt="" coords="589,348,747,389"/>
-<area shape="rect" href="MPIRestrictor_8h.html" title="MPIRestrictor class." alt="" coords="771,348,930,389"/>
-<area shape="rect" href="Iterative_2PatchSolver_8h.html" title="PatchSolver class." alt="" coords="3863,348,4044,389"/>
-<area shape="rect" href="MPIGhostFiller_8h.html" title="MPIGhostFiller class." alt="" coords="1637,266,1867,293"/>
-<area shape="rect" href="PatchOperator_8h.html" title="PatchOperator class." alt="" coords="2368,266,2597,293"/>
-<area shape="rect" href="DFTPatchSolver_8h.html" title="DFTPatchSolver class." alt="" coords="2741,348,2917,389"/>
-<area shape="rect" href="PatchSolver_8h.html" title="PatchSolver class." alt="" coords="3065,266,3279,293"/>
-<area shape="rect" href="MatrixHelper_8h.html" title="MatrixHelper class." alt="" coords="4196,80,4372,121"/>
-<area shape="rect" href="MatrixHelper2d_8h.html" title="MatrixHelper2D class." alt="" coords="4537,80,4713,121"/>
-<area shape="rect" href="Vector_8h.html" title="Vector class." alt="" coords="2396,87,2575,114"/>
-<area shape="rect" href="P4estDomainGenerator_8h.html" title="P4estDomainGenerator class." alt="" coords="93,527,307,568"/>
-<area shape="rect" href="P8estDomainGenerator_8h.html" title="P8estDomainGenerator class." alt="" coords="331,527,544,568"/>
-<area shape="rect" href="LinearRestrictor_8h.html" title="LinearRestrictor class." alt="" coords="721,527,879,568"/>
-<area shape="rect" href="BiLinearGhostFiller_8h.html" title="BiLinearGhostFiller class." alt="" coords="1635,348,1853,389"/>
-<area shape="rect" href="BiQuadraticGhostFiller_8h.html" title="BiQuadraticGhostFiller class." alt="" coords="1877,348,2080,389"/>
-<area shape="rect" href="TriLinearGhostFiller_8h.html" title="TriLinearGhostFiller class." alt="" coords="1429,348,1611,389"/>
-<area shape="rect" href="FFTWPatchSolver_8h.html" title="FFTWPatchSolver class." alt="" coords="3229,348,3405,389"/>
-<area shape="rect" href="Poisson_2StarPatchOperator_8h.html" title="StarPatchOperator class." alt="" coords="2256,348,2432,389"/>
-<area shape="rect" href="VarPoisson_2StarPatchOperator_8h.html" title="StarPatchOperator class." alt="" coords="1157,348,1355,389"/>
-<area shape="rect" href="FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="3327,437,3551,479"/>
-<area shape="rect" href="FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="3079,437,3303,479"/>
-<area shape="rect" href="PatchSolverWrapper_8h.html" title="PatchSolverWrapper class." alt="" coords="2841,527,3009,568"/>
-<area shape="rect" href="DomainTools_8h.html" title="DomainTools class." alt="" coords="1213,266,1435,293"/>
-<area shape="rect" href="GhostFiller_8h.html" title="GhostFiller class." alt="" coords="2114,177,2321,203"/>
-<area shape="rect" href="Cycle_8h.html" title="Cycle class." alt="" coords="2507,348,2666,389"/>
-<area shape="rect" href="InterLevelComm_8h.html" title="InterLevelComm class." alt="" coords="569,259,727,300"/>
-<area shape="rect" href="Interpolator_8h.html" title="Interpolator class." alt="" coords="854,169,1013,211"/>
-<area shape="rect" href="Restrictor_8h.html" title="Restrictor class." alt="" coords="1301,169,1459,211"/>
-<area shape="rect" href="Smoother_8h.html" title="Smoother class." alt="" coords="2629,169,2787,211"/>
-<area shape="rect" href="Operator_8h.html" title="Operator class." alt="" coords="3528,177,3723,203"/>
-<area shape="rect" href="InterfaceDomain_8h.html" title="InterfaceDomain class." alt="" coords="3043,348,3205,389"/>
-<area shape="rect" href="PatchIfaceScatter_8h.html" title="PatchIfaceScatter class." alt="" coords="2791,437,2953,479"/>
-<area shape="rect" href="FMGCycle_8h.html" title="FMGCycle class." alt="" coords="2455,437,2614,479"/>
-<area shape="rect" href="VCycle_8h.html" title="VCycle class." alt="" coords="2273,437,2431,479"/>
-<area shape="rect" href="WCycle_8h.html" title="WCycle class." alt="" coords="2090,437,2249,479"/>
-<area shape="rect" href="CycleBuilder_8h.html" title="CycleBuilder class." alt="" coords="2182,527,2341,568"/>
-<area shape="rect" href="Level_8h.html" title="Level class." alt="" coords="1899,259,2058,300"/>
-<area shape="rect" href="BiCGStab_8h.html" title="BiCGStab class." alt="" coords="4119,348,4300,389"/>
-<area shape="rect" href="CG_8h.html" title="CG class." alt="" coords="4375,355,4591,382"/>
-<area shape="rect" href="Solver_8h.html" title="Solver class." alt="" coords="4055,259,4236,300"/>
-<area shape="rect" href="MatShellCreator_8h.html" title="MatShellCreator class." alt="" coords="3673,348,3839,389"/>
-<area shape="rect" href="MatWrapper_8h.html" title="MatWrapper class." alt="" coords="3537,527,3703,568"/>
-<area shape="rect" href="KSPSolver_8h.html" title="KSPSolver class." alt="" coords="3917,527,4083,568"/>
-<area shape="rect" href="PCShellCreator_8h.html" title="PCShellCreator class." alt="" coords="3828,437,3993,479"/>
+<area shape="rect" title="Domain class." alt="" coords="1213,5,1403,32"/>
+<area shape="rect" href="BiLinearGhostFiller_8h.html" title="BiLinearGhostFiller class." alt="" coords="953,333,1170,375"/>
+<area shape="rect" href="ThunderEgg_8h_source.html" title=" " alt="" coords="2669,601,2803,628"/>
+<area shape="rect" href="BiQuadraticGhostFiller_8h.html" title="BiQuadraticGhostFiller class." alt="" coords="1195,333,1397,375"/>
+<area shape="rect" href="DomainGenerator_8h.html" title="DomainGenerator class." alt="" coords="220,80,473,107"/>
+<area shape="rect" href="P4estDomainGenerator_8h.html" title="P4estDomainGenerator class." alt="" coords="43,155,256,196"/>
+<area shape="rect" href="P8estDomainGenerator_8h.html" title="P8estDomainGenerator class." alt="" coords="331,155,544,196"/>
+<area shape="rect" href="DomainTools_8h.html" title="DomainTools class." alt="" coords="4989,251,5211,278"/>
+<area shape="rect" href="Poisson_2StarPatchOperator_8h.html" title="StarPatchOperator class." alt="" coords="4763,333,4939,375"/>
+<area shape="rect" href="VarPoisson_2StarPatchOperator_8h.html" title="StarPatchOperator class." alt="" coords="4963,333,5160,375"/>
+<area shape="rect" href="DirectInterpolator_8h.html" title="DirectInterpolator class." alt="" coords="667,333,826,375"/>
+<area shape="rect" href="InterLevelComm_8h.html" title="InterLevelComm class." alt="" coords="721,155,879,196"/>
+<area shape="rect" href="MPIInterpolator_8h.html" title="MPIInterpolator class." alt="" coords="1006,244,1165,285"/>
+<area shape="rect" href="MPIRestrictor_8h.html" title="MPIRestrictor class." alt="" coords="721,244,879,285"/>
+<area shape="rect" href="LinearRestrictor_8h.html" title="LinearRestrictor class." alt="" coords="382,333,541,375"/>
+<area shape="rect" href="MPIGhostFiller_8h.html" title="MPIGhostFiller class." alt="" coords="1422,251,1653,278"/>
+<area shape="rect" href="TriLinearGhostFiller_8h.html" title="TriLinearGhostFiller class." alt="" coords="1421,333,1603,375"/>
+<area shape="rect" href="PatchOperator_8h.html" title="PatchOperator class." alt="" coords="4483,251,4712,278"/>
+<area shape="rect" href="PatchSolver_8h.html" title="PatchSolver class." alt="" coords="4195,251,4408,278"/>
+<area shape="rect" href="MatrixHelper_8h.html" title="MatrixHelper class." alt="" coords="5285,512,5461,553"/>
+<area shape="rect" href="MatrixHelper2d_8h.html" title="MatrixHelper2D class." alt="" coords="5485,512,5661,553"/>
+<area shape="rect" href="InterfaceDomain_8h.html" title="InterfaceDomain class." alt="" coords="2461,155,2624,196"/>
+<area shape="rect" href="Vector_8h.html" title="Vector class." alt="" coords="2889,80,3068,107"/>
+<area shape="rect" href="Iterative_2PatchSolver_8h.html" title="PatchSolver class." alt="" coords="4005,333,4187,375"/>
+<area shape="rect" href="DFTPatchSolver_8h.html" title="DFTPatchSolver class." alt="" coords="4512,333,4688,375"/>
+<area shape="rect" href="FFTWPatchSolver_8h.html" title="FFTWPatchSolver class." alt="" coords="4211,333,4387,375"/>
+<area shape="rect" href="FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="2773,423,2997,464"/>
+<area shape="rect" href="FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="3021,423,3245,464"/>
+<area shape="rect" href="PatchSolverWrapper_8h.html" title="PatchSolverWrapper class." alt="" coords="2723,333,2891,375"/>
+<area shape="rect" href="PatchIfaceScatter_8h.html" title="PatchIfaceScatter class." alt="" coords="2343,244,2505,285"/>
+<area shape="rect" href="GhostFiller_8h.html" title="GhostFiller class." alt="" coords="4302,162,4509,189"/>
+<area shape="rect" href="Cycle_8h.html" title="Cycle class." alt="" coords="2083,333,2242,375"/>
+<area shape="rect" href="FMGCycle_8h.html" title="FMGCycle class." alt="" coords="1818,423,1977,464"/>
+<area shape="rect" href="VCycle_8h.html" title="VCycle class." alt="" coords="2001,423,2159,464"/>
+<area shape="rect" href="WCycle_8h.html" title="WCycle class." alt="" coords="2337,423,2495,464"/>
+<area shape="rect" href="Interpolator_8h.html" title="Interpolator class." alt="" coords="1595,155,1754,196"/>
+<area shape="rect" href="Restrictor_8h.html" title="Restrictor class." alt="" coords="2058,155,2217,196"/>
+<area shape="rect" href="Smoother_8h.html" title="Smoother class." alt="" coords="3118,155,3277,196"/>
+<area shape="rect" href="BiCGStab_8h.html" title="BiCGStab class." alt="" coords="2965,333,3147,375"/>
+<area shape="rect" href="CG_8h.html" title="CG class." alt="" coords="3171,341,3387,367"/>
+<area shape="rect" href="Solver_8h.html" title="Solver class." alt="" coords="3597,244,3779,285"/>
+<area shape="rect" href="KSPSolver_8h.html" title="KSPSolver class." alt="" coords="3613,423,3779,464"/>
+<area shape="rect" href="Operator_8h.html" title="Operator class." alt="" coords="3301,162,3496,189"/>
+<area shape="rect" href="MatShellCreator_8h.html" title="MatShellCreator class." alt="" coords="3357,244,3523,285"/>
+<area shape="rect" href="PCShellCreator_8h.html" title="PCShellCreator class." alt="" coords="3411,333,3576,375"/>
+<area shape="rect" href="MatWrapper_8h.html" title="MatWrapper class." alt="" coords="3904,244,4069,285"/>
+<area shape="rect" href="CycleBuilder_8h.html" title="CycleBuilder class." alt="" coords="2261,512,2419,553"/>
+<area shape="rect" href="Level_8h.html" title="Level class." alt="" coords="2058,244,2217,285"/>
 </map>
 </div>
 </div>

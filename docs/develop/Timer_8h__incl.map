@@ -1,13 +1,12 @@
 <map id="src/ThunderEgg/Timer.h" name="src/ThunderEgg/Timer.h">
-<area shape="rect" id="node1" title="Timer class." alt="" coords="453,5,627,32"/>
-<area shape="rect" id="node2" href="$Communicator_8h.html" title="Communicator class." alt="" coords="165,87,376,114"/>
-<area shape="rect" id="node3" href="$RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="5,169,205,196"/>
-<area shape="rect" id="node5" title=" " alt="" coords="285,244,344,271"/>
-<area shape="rect" id="node8" title=" " alt="" coords="465,80,615,121"/>
-<area shape="rect" id="node9" title=" " alt="" coords="640,87,683,114"/>
-<area shape="rect" id="node10" title=" " alt="" coords="707,87,757,114"/>
-<area shape="rect" id="node11" title=" " alt="" coords="782,87,858,114"/>
-<area shape="rect" id="node6" title=" " alt="" coords="229,169,288,196"/>
-<area shape="rect" id="node7" title=" " alt="" coords="312,169,389,196"/>
-<area shape="rect" id="node4" title=" " alt="" coords="62,244,149,271"/>
+<area shape="rect" id="node1" title="Timer class." alt="" coords="466,5,641,32"/>
+<area shape="rect" id="node2" href="$Communicator_8h.html" title="Communicator class." alt="" coords="5,87,216,114"/>
+<area shape="rect" id="node4" title=" " alt="" coords="189,169,267,196"/>
+<area shape="rect" id="node5" title=" " alt="" coords="291,80,442,121"/>
+<area shape="rect" id="node6" title=" " alt="" coords="466,87,553,114"/>
+<area shape="rect" id="node7" title=" " alt="" coords="577,87,620,114"/>
+<area shape="rect" id="node8" title=" " alt="" coords="644,87,695,114"/>
+<area shape="rect" id="node9" title=" " alt="" coords="719,87,795,114"/>
+<area shape="rect" id="node10" title=" " alt="" coords="820,87,879,114"/>
+<area shape="rect" id="node3" title=" " alt="" coords="81,169,140,196"/>
 </map>

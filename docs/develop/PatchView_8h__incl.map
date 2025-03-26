@@ -1,14 +1,17 @@
 <map id="src/ThunderEgg/PatchView.h" name="src/ThunderEgg/PatchView.h">
-<area shape="rect" id="node1" title="PatchView class." alt="" coords="437,5,641,32"/>
-<area shape="rect" id="node2" href="$ComponentView_8h.html" title="ComponentView class." alt="" coords="429,80,650,107"/>
-<area shape="rect" id="node3" href="$Face_8h.html" title="Face class." alt="" coords="122,155,266,181"/>
-<area shape="rect" id="node6" href="$View_8h.html" title="View class." alt="" coords="466,155,613,181"/>
-<area shape="rect" id="node12" title=" " alt="" coords="865,237,942,263"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,229,156,271"/>
-<area shape="rect" id="node5" title=" " alt="" coords="217,319,273,345"/>
-<area shape="rect" id="node7" href="$Config_8h_source.html" title=" " alt="" coords="283,237,439,263"/>
-<area shape="rect" id="node8" href="$Loops_8h.html" title="Loop templates." alt="" coords="463,237,616,263"/>
-<area shape="rect" id="node9" href="$RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="641,237,841,263"/>
-<area shape="rect" id="node10" title=" " alt="" coords="648,319,735,345"/>
-<area shape="rect" id="node11" title=" " alt="" coords="759,319,818,345"/>
+<area shape="rect" id="node1" title="PatchView class." alt="" coords="597,5,801,32"/>
+<area shape="rect" id="node2" href="$ComponentView_8h.html" title="ComponentView class." alt="" coords="441,80,662,107"/>
+<area shape="rect" id="node3" href="$Face_8h.html" title="Face class." alt="" coords="238,155,382,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="470,237,526,263"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,237,76,263"/>
+<area shape="rect" id="node9" title=" " alt="" coords="551,237,643,263"/>
+<area shape="rect" id="node10" href="$Loops_8h.html" title="Loop templates." alt="" coords="667,237,820,263"/>
+<area shape="rect" id="node11" href="$View_8h.html" title="View class." alt="" coords="687,155,834,181"/>
+<area shape="rect" id="node12" href="$Config_8h_source.html" title=" " alt="" coords="844,237,1000,263"/>
+<area shape="rect" id="node13" href="$RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="1025,237,1225,263"/>
+<area shape="rect" id="node4" title=" " alt="" coords="100,229,251,271"/>
+<area shape="rect" id="node7" title=" " alt="" coords="275,237,345,263"/>
+<area shape="rect" id="node8" title=" " alt="" coords="369,237,445,263"/>
+<area shape="rect" id="node14" title=" " alt="" coords="1032,319,1119,345"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1143,319,1202,345"/>
 </map>
