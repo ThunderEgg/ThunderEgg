@@ -19,10 +19,20 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/PETSc/MatWrapper.h>
 
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <cmath>
+#include <math.h>
+#include <mpi.h>
 #include <petscmat.h>
+#include <petscsys.h>
+#include <string>
 
 #include <doctest.h>
 

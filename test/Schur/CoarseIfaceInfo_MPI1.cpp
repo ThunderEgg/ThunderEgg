@@ -20,6 +20,10 @@
 
 #include <ThunderEgg/Schur/CoarseIfaceInfo.h>
 
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <algorithm>
 
 #include <doctest.h>

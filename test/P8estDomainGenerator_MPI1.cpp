@@ -21,9 +21,12 @@
 #include "P8estDomainGenerator_SHARED.h"
 #include <ThunderEgg/P8estDomainGenerator.h>
 
+#include <mpi.h>
+#include <p4est_base.h>
 #include <p8est.h>
+#include <p8est_connectivity.h>
 #include <p8est_extended.h>
-#include <p8est_mesh.h>
+#include <ThunderEgg/Domain.h>
 
 #include <doctest.h>
 
@@ -43,10 +46,8 @@ struct FourTreeBSW
 
     p8est = p8est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
 
-    p8est_refine(
-      p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-    p8est_refine(
-      p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
 
     p8est_partition(p8est, true, nullptr);
   }
@@ -284,12 +285,9 @@ struct FourTreeRefineBSW
 
     p8est = p8est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
 
-    p8est_refine(
-      p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-    p8est_refine(
-      p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-    p8est_refine(
-      p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return quadrant->x == 0 && quadrant->y == 0 && quadrant->z == 0; }, nullptr);
+    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return quadrant->x == 0 && quadrant->y == 0 && quadrant->z == 0; }, nullptr);
 
     p8est_partition(p8est, true, nullptr);
   }
@@ -572,10 +570,8 @@ struct TwoTreeRefineBSW
 
     p8est = p8est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
 
-    p8est_refine(
-      p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-    p8est_refine(
-      p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return quadrant->x == 0 && quadrant->y == 0 && quadrant->z == 0; }, nullptr);
+    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return quadrant->x == 0 && quadrant->y == 0 && quadrant->z == 0; }, nullptr);
 
     p8est_partition(p8est, true, nullptr);
   }

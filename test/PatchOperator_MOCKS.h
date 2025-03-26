@@ -21,9 +21,15 @@
 #ifndef MPIPATCHOPERATOR_MOCKS_H
 #define MPIPATCHOPERATOR_MOCKS_H
 
-#include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/PatchOperator.h>
 
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <memory>
 #include <set>
 
 #include <doctest.h>

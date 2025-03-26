@@ -25,9 +25,22 @@
  *
  * @brief PatchIfaceScatter class
  */
+
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Schur/InterfaceDomain.h>
 #include <ThunderEgg/Vector.h>
+#include <array>
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <mpi.h>
+#include <set>
+#include <utility>
+#include <vector>
+
 namespace ThunderEgg {
 namespace Schur {
 /**
@@ -64,7 +77,8 @@ private:
       , recv_buffers(recv_buffers_size)
       , send_requests(send_buffers_size)
       , recv_requests(recv_buffers_size)
-    {}
+    {
+    }
     ~StatePrivate()
     {
       if (communicating) {
@@ -80,7 +94,8 @@ private:
     std::shared_ptr<StatePrivate> ptr;
     State(size_t num_send, size_t num_recv)
       : ptr(new StatePrivate(num_send, num_recv))
-    {}
+    {
+    }
   };
 
 public:
@@ -139,8 +154,7 @@ public:
         if (piinfo->pinfo.hasNbr(s)) {
           auto iface_info = piinfo->getIfaceInfo(s);
           if (iface_info->rank != rank) {
-            incoming_ranks_to_id_local_index_pairs[iface_info->rank].emplace(
-              iface_info->id, iface_info->patch_local_index);
+            incoming_ranks_to_id_local_index_pairs[iface_info->rank].emplace(iface_info->id, iface_info->patch_local_index);
           }
         }
       }
@@ -182,10 +196,8 @@ public:
     std::map<int, std::set<std::pair<int, int>>> outgoing_ranks_to_id_local_index_pairs;
     for (auto iface : iface_domain.getInterfaces()) {
       for (auto patch : iface->patches) {
-        if ((patch.type.isNormal() || patch.type.isFineToFine() || patch.type.isCoarseToCoarse()) &&
-            patch.piinfo->pinfo.rank != rank) {
-          outgoing_ranks_to_id_local_index_pairs[patch.piinfo->pinfo.rank].emplace(
-            iface->id, iface->local_index);
+        if ((patch.type.isNormal() || patch.type.isFineToFine() || patch.type.isCoarseToCoarse()) && patch.piinfo->pinfo.rank != rank) {
+          outgoing_ranks_to_id_local_index_pairs[patch.piinfo->pinfo.rank].emplace(iface->id, iface->local_index);
         }
       }
     }
@@ -215,13 +227,11 @@ public:
     State state(send_ranks.size(), recv_ranks.size());
 
     for (int send_index = 0; send_index < num_sends; send_index++) {
-      state.ptr->send_buffers[send_index].resize(send_local_indexes[send_index].size() *
-                                                 iface_stride);
+      state.ptr->send_buffers[send_index].resize(send_local_indexes[send_index].size() * iface_stride);
     }
 
     for (int recv_index = 0; recv_index < num_recvs; recv_index++) {
-      state.ptr->recv_buffers[recv_index].resize(recv_local_indexes[recv_index].size() *
-                                                 iface_stride);
+      state.ptr->recv_buffers[recv_index].resize(recv_local_indexes[recv_index].size() * iface_stride);
     }
 
     return state;
@@ -238,8 +248,7 @@ public:
     std::array<int, D> ns = iface_domain.getDomain().getNs();
     for (int i = 1; i < D; i++) {
       if (ns[0] != ns[i]) {
-        throw RuntimeError(
-          "Cannot form Schur compliment vector for Domain with non-square patches");
+        throw RuntimeError("Cannot form Schur compliment vector for Domain with non-square patches");
       }
     }
 
@@ -253,11 +262,7 @@ public:
    *
    * @return std::shared_ptr<Vector<D - 1>> the new vector
    */
-  std::shared_ptr<Vector<D - 1>> getNewLocalPatchIfaceVector() const
-  {
-    return std::make_shared<Vector<D - 1>>(
-      Communicator(MPI_COMM_SELF), lengths, 1, num_local_patch_ifaces, 0);
-  }
+  std::shared_ptr<Vector<D - 1>> getNewLocalPatchIfaceVector() const { return std::make_shared<Vector<D - 1>>(Communicator(MPI_COMM_SELF), lengths, 1, num_local_patch_ifaces, 0); }
   /**
    * @brief Start the scatter from the global Schur compliment vector to the local patch iface
    * vector
@@ -270,28 +275,18 @@ public:
    * @param global_vector the global Schur compliment vector
    * @param local_patch_iface_vector the the local patch iface vector
    */
-  State scatterStart(const Vector<D - 1>& global_vector,
-                     Vector<D - 1>& local_patch_iface_vector) const
+  State scatterStart(const Vector<D - 1>& global_vector, Vector<D - 1>& local_patch_iface_vector) const
   {
     for (int i = 0; i < global_vector.getNumLocalPatches(); i++) {
       auto global_data = global_vector.getComponentView(0, i);
       auto local_data = local_patch_iface_vector.getComponentView(0, i);
-      Loop::Nested<D - 1>(
-        local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1>& coord) {
-          local_data[coord] = global_data[coord];
-        });
+      Loop::Nested<D - 1>(local_data.getStart(), local_data.getEnd(), [&](const std::array<int, D - 1>& coord) { local_data[coord] = global_data[coord]; });
     }
 
     State state = initializeMPIBuffers();
 
     for (int recv_index = 0; recv_index < num_recvs; recv_index++) {
-      MPI_Irecv(state.ptr->recv_buffers[recv_index].data(),
-                state.ptr->recv_buffers[recv_index].size(),
-                MPI_DOUBLE,
-                recv_ranks[recv_index],
-                0,
-                MPI_COMM_WORLD,
-                &state.ptr->recv_requests[recv_index]);
+      MPI_Irecv(state.ptr->recv_buffers[recv_index].data(), state.ptr->recv_buffers[recv_index].size(), MPI_DOUBLE, recv_ranks[recv_index], 0, MPI_COMM_WORLD, &state.ptr->recv_requests[recv_index]);
     }
 
     for (int send_index = 0; send_index < num_sends; send_index++) {
@@ -306,21 +301,13 @@ public:
         });
       }
 
-      MPI_Isend(buffer.data(),
-                buffer.size(),
-                MPI_DOUBLE,
-                send_ranks[send_index],
-                0,
-                MPI_COMM_WORLD,
-                &state.ptr->send_requests[send_index]);
+      MPI_Isend(buffer.data(), buffer.size(), MPI_DOUBLE, send_ranks[send_index], 0, MPI_COMM_WORLD, &state.ptr->send_requests[send_index]);
     }
 
     for (int local_iface = 0; local_iface < global_vector.getNumLocalPatches(); local_iface++) {
       auto global_data = global_vector.getComponentView(0, local_iface);
       auto local_data = local_patch_iface_vector.getComponentView(0, local_iface);
-      Loop::OverInteriorIndexes<D - 1>(local_data, [&](const std::array<int, D - 1>& coord) {
-        local_data[coord] = global_data[coord];
-      });
+      Loop::OverInteriorIndexes<D - 1>(local_data, [&](const std::array<int, D - 1>& coord) { local_data[coord] = global_data[coord]; });
     }
 
     state.ptr->curr_global_vector = &global_vector;
@@ -337,14 +324,10 @@ public:
    * @param global_vector the global Schur compliment vector
    * @param local_patch_iface_vector the the local patch iface vector
    */
-  void scatterFinish(const State& state,
-                     const Vector<D - 1>& global_vector,
-                     Vector<D - 1>& local_patch_iface_vector) const
+  void scatterFinish(const State& state, const Vector<D - 1>& global_vector, Vector<D - 1>& local_patch_iface_vector) const
   {
-    if (&global_vector != state.ptr->curr_global_vector ||
-        &local_patch_iface_vector != state.ptr->curr_local_vector) {
-      throw RuntimeError(
-        "Different vectors were passed ot scatterFinish than were passed to scatterStart");
+    if (&global_vector != state.ptr->curr_global_vector || &local_patch_iface_vector != state.ptr->curr_local_vector) {
+      throw RuntimeError("Different vectors were passed ot scatterFinish than were passed to scatterStart");
     }
 
     for (int i = 0; i < num_recvs; i++) {

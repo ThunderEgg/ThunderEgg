@@ -25,10 +25,18 @@
  *
  * @brief MPIInterpolator class
  */
+
+#include <ThunderEgg/Config.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/Interpolator.h>
-#include <ThunderEgg/GMG/Level.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Vector.h>
+#include <functional>
+#include <utility>
+#include <vector>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Base class that makes the necessary mpi calls, derived classes only have to
@@ -51,7 +59,8 @@ public:
    */
   MPIInterpolator(const Domain<D>& coarser_domain, const Domain<D>& finer_domain)
     : ilc(coarser_domain, finer_domain)
-  {}
+  {
+  }
   /**
    * @brief Interpolate values from coarse vector to the finer vector
    *
@@ -65,10 +74,7 @@ public:
    * @param finer_vector the finer vector
    * @param coarser_vector the coarser vector
    */
-  virtual void interpolatePatches(
-    const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches,
-    const Vector<D>& coarser_vector,
-    Vector<D>& finer_vector) const = 0;
+  virtual void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches, const Vector<D>& coarser_vector, Vector<D>& finer_vector) const = 0;
 
   /**
    * @brief interpolation function
@@ -80,14 +86,10 @@ public:
   {
     if constexpr (ENABLE_DEBUG) {
       if (coarse.getNumLocalPatches() != ilc.getCoarserDomain().getNumLocalPatches()) {
-        throw RuntimeError("coarse vector is incorrect length. Expected Length of " +
-                           std::to_string(ilc.getCoarserDomain().getNumLocalPatches()) +
-                           " but vector was length " + std::to_string(coarse.getNumLocalPatches()));
+        throw RuntimeError("coarse vector is incorrect length. Expected Length of " + std::to_string(ilc.getCoarserDomain().getNumLocalPatches()) + " but vector was length " + std::to_string(coarse.getNumLocalPatches()));
       }
       if (fine.getNumLocalPatches() != ilc.getFinerDomain().getNumLocalPatches()) {
-        throw RuntimeError("fine vector is incorrect length. Expected Length of " +
-                           std::to_string(ilc.getFinerDomain().getNumLocalPatches()) +
-                           " but vector was length " + std::to_string(fine.getNumLocalPatches()));
+        throw RuntimeError("fine vector is incorrect length. Expected Length of " + std::to_string(ilc.getFinerDomain().getNumLocalPatches()) + " but vector was length " + std::to_string(fine.getNumLocalPatches()));
       }
     }
     Vector<D> coarse_ghost = ilc.getNewGhostVector(coarse.getNumComponents());

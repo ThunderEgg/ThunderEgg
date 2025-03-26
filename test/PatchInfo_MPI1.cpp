@@ -19,6 +19,15 @@
  ***************************************************************************/
 #include <ThunderEgg/PatchInfo.h>
 
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/Orthant.h>
+#include <deque>
+#include <map>
+
 #include <doctest.h>
 
 using namespace std;

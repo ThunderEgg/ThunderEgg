@@ -19,10 +19,15 @@
  ***************************************************************************/
 #include "MPIGhostFiller_MOCKS.h"
 #include "utils/DomainReader.h"
-#include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/MPIGhostFiller.h>
 
-#include <list>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/GhostFillingType.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <string>
 
 using namespace std;
 using namespace ThunderEgg;

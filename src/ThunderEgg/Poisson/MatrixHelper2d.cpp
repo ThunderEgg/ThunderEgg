@@ -19,8 +19,17 @@
  ***************************************************************************/
 
 #include "MatrixHelper2d.h"
-#include <iostream>
+
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <bitset>
+#include <mpi.h>
+#include <petscmat.h>
+#include <petscsystypes.h>
 #include <valarray>
+
 using namespace std;
 using namespace ThunderEgg::Poisson;
 using namespace ThunderEgg;
@@ -184,12 +193,8 @@ public:
 class CoarseSH2d : public StencilHelper2d
 {
 private:
-  std::valarray<double> mid_coeffs = {
-    { -1.0 / 30, -1.0 / 30, 1.0 / 3, 1.0 / 3, 1.0 / 5, 1.0 / 5 }
-  };
-  std::valarray<double> end_coeffs = {
-    { -1.0 / 30, 1.0 / 15, -1.0 / 10, 1.0 / 3, 1.0 / 3, 1.0 / 5, 1.0 / 5 }
-  };
+  std::valarray<double> mid_coeffs = { { -1.0 / 30, -1.0 / 30, 1.0 / 3, 1.0 / 3, 1.0 / 5, 1.0 / 5 } };
+  std::valarray<double> end_coeffs = { { -1.0 / 30, 1.0 / 15, -1.0 / 10, 1.0 / 3, 1.0 / 3, 1.0 / 5, 1.0 / 5 } };
   int colz[7];
   int start;
   int bnbr_start;

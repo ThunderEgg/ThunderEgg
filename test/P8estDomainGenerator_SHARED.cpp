@@ -19,9 +19,17 @@
  ***************************************************************************/
 
 #include "P8estDomainGenerator_SHARED.h"
-#include "mpi.h"
 #include <ThunderEgg/tpl/json.hpp>
+
 #include <algorithm>
+#include <mpi.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <string>
+#include <vector>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <ThunderEgg/Orthant.h>
 
 using namespace std;
 using namespace ThunderEgg;

@@ -25,15 +25,25 @@
  *
  * @brief DFTPatchSolver class
  */
-#include <ThunderEgg/Domain.h>
+
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/PatchArray.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/PatchOperator.h>
 #include <ThunderEgg/PatchSolver.h>
-#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/View.h>
+#include <array>
 #include <bitset>
-#include <map>
-#include <valarray>
+#include <cmath>
+#include <cstddef>
 #include <functional>
+#include <map>
+#include <math.h>
+#include <memory>
+#include <tuple>
+#include <valarray>
 
 extern "C" void
 dgemv_(char&, int&, int&, double&, double*, int&, double*, int&, double&, double*, int&);
@@ -72,13 +82,11 @@ private:
   /**
    * @brief Map of patchinfo to DFT plan
    */
-  std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction>
-    plan1;
+  std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction> plan1;
   /**
    * @brief Map of patchinfo to inverse DFT plan
    */
-  std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction>
-    plan2;
+  std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction> plan2;
   /**
    * @brief Map of PatchInfo object to it's respective eigenvalue array.
    */
@@ -101,10 +109,7 @@ private:
    * @return true if neumann
    * @return false if not neumann
    */
-  bool patchIsNeumannOnSide(const PatchInfo<D>& pinfo, Side<D> s)
-  {
-    return !pinfo.hasNbr(s) && neumann[s.getIndex()];
-  }
+  bool patchIsNeumannOnSide(const PatchInfo<D>& pinfo, Side<D> s) { return !pinfo.hasNbr(s) && neumann[s.getIndex()]; }
   /**
    * @brief get arrays of coefficients necessary for each transform.
    *
@@ -202,9 +207,7 @@ private:
    * @param out the resulting values after the transform
    * @param inverse weather we a re calculate
    */
-  void executePlan(const std::array<std::shared_ptr<std::valarray<double>>, D>& plan,
-                   const PatchView<double, D>& in,
-                   const PatchView<double, D>& out) const
+  void executePlan(const std::array<std::shared_ptr<std::valarray<double>>, D>& plan, const PatchView<double, D>& in, const PatchView<double, D>& out) const
   {
     PatchView<double, D> prev_result = in;
 
@@ -246,19 +249,7 @@ private:
       char T = 'T';
       double one = 1;
       double zero = 0;
-      Loop::Nested<D + 1>(start, end, [&](std::array<int, D + 1> coord) {
-        dgemv_(T,
-               n,
-               n,
-               one,
-               &matrix[0],
-               n,
-               &prev_result[coord],
-               pstride,
-               zero,
-               &new_result[coord],
-               nstride);
-      });
+      Loop::Nested<D + 1>(start, end, [&](std::array<int, D + 1> coord) { dgemv_(T, n, n, one, &matrix[0], n, &prev_result[coord], pstride, zero, &new_result[coord], nstride); });
 
       prev_result = new_result;
     }
@@ -274,8 +265,7 @@ private:
     // get transform types for each axis
     std::array<DftType, D> transforms;
     for (size_t axis = 0; axis < D; axis++) {
-      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) &&
-          patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
+      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
         transforms[axis] = DftType::DCT_II;
       } else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis))) {
         transforms[axis] = DftType::DCT_IV;
@@ -298,8 +288,7 @@ private:
     // get transform types for each axis
     std::array<DftType, D> transforms_inv;
     for (size_t axis = 0; axis < D; axis++) {
-      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) &&
-          patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
+      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
         transforms_inv[axis] = DftType::DCT_III;
       } else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis))) {
         transforms_inv[axis] = DftType::DCT_IV;
@@ -332,28 +321,23 @@ private:
       int n = pinfo.ns[axis];
       double h = pinfo.spacings[axis];
 
-      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) &&
-          patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
+      if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) && patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
         for (int xi = 0; xi < n; xi++) {
           double val = 4 / (h * h) * pow(sin(xi * M_PI / (2 * n)), 2);
           View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), { xi });
-          Loop::OverInteriorIndexes<D>(
-            slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
+          Loop::OverInteriorIndexes<D>(slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
         }
-      } else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) ||
-                 patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
+      } else if (patchIsNeumannOnSide(pinfo, LowerSideOnAxis<D>(axis)) || patchIsNeumannOnSide(pinfo, HigherSideOnAxis<D>(axis))) {
         for (int xi = 0; xi < n; xi++) {
           double val = 4 / (h * h) * pow(sin((xi + 0.5) * M_PI / (2 * n)), 2);
           View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), { xi });
-          Loop::OverInteriorIndexes<D>(
-            slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
+          Loop::OverInteriorIndexes<D>(slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
         }
       } else {
         for (int xi = 0; xi < n; xi++) {
           double val = 4 / (h * h) * pow(sin((xi + 1) * M_PI / (2 * n)), 2);
           View<double, D> slice = retval.getSliceOn(Side<D>(2 * axis), { xi });
-          Loop::OverInteriorIndexes<D>(
-            slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
+          Loop::OverInteriorIndexes<D>(slice, [&](const std::array<int, D>& coord) { slice[coord] -= val; });
         }
       }
     }
@@ -394,16 +378,11 @@ public:
         a_neumann[s.getIndex()] = patchIsNeumannOnSide(a, s);
         b_neumann[s.getIndex()] = patchIsNeumannOnSide(b, s);
       }
-      return std::forward_as_tuple(a_neumann.to_ulong(), a.spacings[0]) <
-             std::forward_as_tuple(b_neumann.to_ulong(), b.spacings[0]);
+      return std::forward_as_tuple(a_neumann.to_ulong(), a.spacings[0]) < std::forward_as_tuple(b_neumann.to_ulong(), b.spacings[0]);
     };
 
-    plan1 = std::map<PatchInfo<D>,
-                     std::array<std::shared_ptr<std::valarray<double>>, D>,
-                     CompareFunction>(compare);
-    plan2 = std::map<PatchInfo<D>,
-                     std::array<std::shared_ptr<std::valarray<double>>, D>,
-                     CompareFunction>(compare);
+    plan1 = std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction>(compare);
+    plan2 = std::map<PatchInfo<D>, std::array<std::shared_ptr<std::valarray<double>>, D>, CompareFunction>(compare);
     eigen_vals = std::map<const PatchInfo<D>, PatchArray<D>, CompareFunction>(compare);
 
     // process patches
@@ -417,23 +396,19 @@ public:
    * @return DFTPatchSolver<D>* a newly allocated copy of this patch solver
    */
   DFTPatchSolver<D>* clone() const override { return new DFTPatchSolver<D>(*this); }
-  void solveSinglePatch(const PatchInfo<D>& pinfo,
-                        const PatchView<const double, D>& f_view,
-                        const PatchView<double, D>& u_view) const override
+  void solveSinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& f_view, const PatchView<double, D>& u_view) const override
   {
     PatchArray<D> f_copy(op->getDomain().getNs(), 1, 0);
     PatchArray<D> tmp(op->getDomain().getNs(), 1, 0);
 
-    Loop::OverInteriorIndexes<D + 1>(
-      f_view, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
+    Loop::OverInteriorIndexes<D + 1>(f_view, [&](std::array<int, D + 1> coord) { f_copy[coord] = f_view[coord]; });
 
     op->modifyRHSForInternalBoundaryConditions(pinfo, u_view, f_copy.getView());
 
     executePlan(plan1.at(pinfo), f_copy.getView(), tmp.getView());
 
     const PatchArray<D>& eigen_vals_view = eigen_vals.at(pinfo);
-    Loop::OverInteriorIndexes<D + 1>(
-      tmp, [&](std::array<int, D + 1> coord) { tmp[coord] /= eigen_vals_view[coord]; });
+    Loop::OverInteriorIndexes<D + 1>(tmp, [&](std::array<int, D + 1> coord) { tmp[coord] /= eigen_vals_view[coord]; });
 
     if (neumann.all() && !pinfo.hasNbr()) {
       tmp[tmp.getStart()] = 0;
@@ -445,8 +420,7 @@ public:
     for (size_t axis = 0; axis < D; axis++) {
       scale *= 2.0 / this->getDomain().getNs()[axis];
     }
-    Loop::OverInteriorIndexes<D + 1>(u_view,
-                                     [&](std::array<int, D + 1> coord) { u_view[coord] *= scale; });
+    Loop::OverInteriorIndexes<D + 1>(u_view, [&](std::array<int, D + 1> coord) { u_view[coord] *= scale; });
   }
 };
 

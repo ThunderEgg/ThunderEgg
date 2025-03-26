@@ -25,8 +25,19 @@
  *
  * @brief MatShellCreator class
  */
+
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/Operator.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <functional>
+#include <memory>
+#include <mpi.h>
 #include <petscmat.h>
+#include <petscsys.h>
+#include <petscvec.h>
+
 namespace ThunderEgg::PETSc {
 /**
  * @brief Wraps an Operator for use as a PETSc Mat
@@ -52,11 +63,11 @@ private:
    *
    * @param op the Operator
    */
-  explicit MatShellCreator(const Operator<D>& op,
-                           const std::function<Vector<D>()>& vector_allocator)
+  explicit MatShellCreator(const Operator<D>& op, const std::function<Vector<D>()>& vector_allocator)
     : op(op.clone())
     , getNewVector(vector_allocator)
-  {}
+  {
+  }
   /**
    * @brief Apply the PETSc MatShell
    *
@@ -129,8 +140,7 @@ public:
    * @param vector_allocator function that allocates need TE vectors
    * @return Mat the wrapped operator, user is responsible for calling MatDestroy on this
    */
-  static Mat GetNewMatShell(const Operator<D>& op,
-                            const std::function<Vector<D>()>& vector_allocator)
+  static Mat GetNewMatShell(const Operator<D>& op, const std::function<Vector<D>()>& vector_allocator)
   {
     MatShellCreator<D>* msc = new MatShellCreator(op, vector_allocator);
     Vector<D> vec = vector_allocator();

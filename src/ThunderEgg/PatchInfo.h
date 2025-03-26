@@ -24,14 +24,27 @@
  *
  * @brief PatchInfo class
  */
+
+#include <ThunderEgg/BufferReader.h>
+#include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/NbrInfo.h>
+#include <ThunderEgg/NbrInfoBase.h>
+#include <ThunderEgg/NbrType.h>
 #include <ThunderEgg/NormalNbrInfo.h>
 #include <ThunderEgg/Orthant.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Serializable.h>
+#include <ThunderEgg/tpl/json_fwd.hpp>
 #include <algorithm>
+#include <array>
 #include <bitset>
+#include <cstddef>
+#include <deque>
+#include <map>
+#include <memory>
 
 namespace ThunderEgg {
 /**
@@ -245,8 +258,7 @@ public:
   template<int M>
   NormalNbrInfo<M>& getNormalNbrInfo(Face<D, M> s) const
   {
-    return *dynamic_cast<NormalNbrInfo<M>*>(
-      nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
+    return *dynamic_cast<NormalNbrInfo<M>*>(nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
   }
   /**
    * @brief Get the CoarseNbrInfo object
@@ -258,8 +270,7 @@ public:
   template<int M>
   CoarseNbrInfo<M>& getCoarseNbrInfo(Face<D, M> s) const
   {
-    return *dynamic_cast<CoarseNbrInfo<M>*>(
-      nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
+    return *dynamic_cast<CoarseNbrInfo<M>*>(nbr_infos[Face<D, M>::sum_of_faces + s.getIndex()].get());
   }
   /**
    * @brief Get the FineNbrInfo object
@@ -291,10 +302,7 @@ public:
    */
   inline bool hasNbr() const
   {
-    return std::any_of(
-      nbr_infos.begin(), nbr_infos.end(), [](const std::unique_ptr<NbrInfoBase>& nbr_info) {
-        return nbr_info != nullptr;
-      });
+    return std::any_of(nbr_infos.begin(), nbr_infos.end(), [](const std::unique_ptr<NbrInfoBase>& nbr_info) { return nbr_info != nullptr; });
   }
   /**
    * @brief Return whether the patch has a coarser parent

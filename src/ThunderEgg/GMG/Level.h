@@ -29,6 +29,7 @@
 #include <ThunderEgg/GMG/Restrictor.h>
 #include <ThunderEgg/GMG/Smoother.h>
 #include <ThunderEgg/Operator.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <memory>
 namespace ThunderEgg::GMG {
 /**
@@ -69,10 +70,7 @@ public:
    *
    * @param restrictor the restriction operator.
    */
-  void setRestrictor(const Restrictor<D>& restrictor)
-  {
-    this->restrictor.reset(restrictor.clone());
-  }
+  void setRestrictor(const Restrictor<D>& restrictor) { this->restrictor.reset(restrictor.clone()); }
   /**
    * @brief Get the restriction operator for this level.
    *
@@ -90,10 +88,7 @@ public:
    *
    * @param interpolator the interpolation operator.
    */
-  void setInterpolator(const Interpolator<D>& interpolator)
-  {
-    this->interpolator.reset(interpolator.clone());
-  }
+  void setInterpolator(const Interpolator<D>& interpolator) { this->interpolator.reset(interpolator.clone()); }
   /**
    * @brief Get the interpolation operator for this level.
    *

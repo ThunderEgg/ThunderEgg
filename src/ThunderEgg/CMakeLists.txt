@@ -49,7 +49,6 @@ list(APPEND ThunderEgg_HDRS NbrInfo.h)
 list(APPEND ThunderEgg_HDRS NbrInfoBase.h)
 
 list(APPEND ThunderEgg_HDRS NbrType.h)
-target_sources(ThunderEgg PRIVATE NbrType.cpp)
 
 list(APPEND ThunderEgg_HDRS NormalNbrInfo.h)
 

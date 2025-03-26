@@ -20,6 +20,8 @@
 #define CATCH_CONFIG_RUNNER
 
 #include <mpi.h>
+#include <cstring>
+#include <cstddef>
 #if TEST_P4EST
 #include <sc.h>
 #endif

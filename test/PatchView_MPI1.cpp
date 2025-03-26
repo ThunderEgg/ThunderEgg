@@ -20,7 +20,16 @@
 #include <ThunderEgg/PatchView.h>
 #include <doctest.h>
 
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Config.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <cstddef>
 #include <numeric>
+#include <vector>
+
 using namespace std;
 using namespace ThunderEgg;
 TEST_CASE("PatchView constructor")

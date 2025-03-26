@@ -19,7 +19,12 @@
  ***************************************************************************/
 
 #include <ThunderEgg/Schur/FineIfaceInfo.h>
+
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <algorithm>
+#include <array>
 
 #include <doctest.h>
 

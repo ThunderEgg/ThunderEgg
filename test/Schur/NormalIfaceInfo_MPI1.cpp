@@ -20,6 +20,9 @@
 
 #include <ThunderEgg/Schur/NormalIfaceInfo.h>
 
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <algorithm>
 
 #include <doctest.h>

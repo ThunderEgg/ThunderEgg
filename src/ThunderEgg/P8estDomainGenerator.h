@@ -25,9 +25,17 @@
  *
  * @brief P8estDomainGenerator class
  */
+
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/DomainGenerator.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <array>
 #include <functional>
+#include <list>
 #include <p8est.h>
+#include <vector>
+
 namespace ThunderEgg {
 /**
  * @brief Generates Domain objects form a given p4est object
@@ -49,13 +57,7 @@ public:
    * @param y the resulting y coordinate of the mapping function
    * @param z the resulting z coordinate of the mapping function
    */
-  using BlockMapFunc = std::function<void(int block_no,
-                                          double unit_x,
-                                          double unit_y,
-                                          double unit_z,
-                                          double& x,
-                                          double& y,
-                                          double& z)>;
+  using BlockMapFunc = std::function<void(int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z)>;
 
 private:
   /**
@@ -132,10 +134,7 @@ public:
    * @param num_ghost_cells the number of ghost cells on each side of the patch
    * @param bmf the function used to map the blocks to the domain
    */
-  P8estDomainGenerator(p8est_t* p8est,
-                       const std::array<int, 3>& ns,
-                       int num_ghost_cells,
-                       const BlockMapFunc& bmf);
+  P8estDomainGenerator(p8est_t* p8est, const std::array<int, 3>& ns, int num_ghost_cells, const BlockMapFunc& bmf);
   P8estDomainGenerator(P8estDomainGenerator&);
   P8estDomainGenerator(P8estDomainGenerator&&) = default;
   P8estDomainGenerator& operator=(const P8estDomainGenerator&);

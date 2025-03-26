@@ -24,10 +24,19 @@
  *
  * @brief FineNbrInfo class
  */
+
 #include <ThunderEgg/BufferReader.h>
 #include <ThunderEgg/BufferWriter.h>
 #include <ThunderEgg/NbrInfo.h>
+#include <ThunderEgg/NbrInfoBase.h>
+#include <ThunderEgg/NbrType.h>
 #include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <array>
+#include <deque>
+#include <map>
+#include <memory>
+#include <cstddef>
 
 namespace ThunderEgg {
 /**
@@ -120,10 +129,7 @@ public:
     reader >> ids;
     return reader.getPos();
   }
-  std::unique_ptr<NbrInfoBase> clone() const override
-  {
-    return std::make_unique<FineNbrInfo<D>>(*this);
-  }
+  std::unique_ptr<NbrInfoBase> clone() const override { return std::make_unique<FineNbrInfo<D>>(*this); }
 };
 
 template<int D>

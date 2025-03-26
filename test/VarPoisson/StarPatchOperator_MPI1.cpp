@@ -19,10 +19,21 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include <ThunderEgg/BiLinearGhostFiller.h>
-#include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/GMG/LinearRestrictor.h>
 #include <ThunderEgg/VarPoisson/StarPatchOperator.h>
+
+#include <ThunderEgg/BiLinearGhostFiller.h>
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/GhostFillingType.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <cmath>
+#include <math.h>
+#include <string>
 
 #include <doctest.h>
 

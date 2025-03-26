@@ -25,9 +25,7 @@
  *
  * @brief IfaceInfo class
  */
-#include <ThunderEgg/Schur/IfaceType.h>
-#include <deque>
-#include <map>
+
 namespace ThunderEgg {
 namespace Schur {
 /**
@@ -78,7 +76,8 @@ public:
   IfaceInfo(int rank, int id)
     : rank(rank)
     , id(id)
-  {}
+  {
+  }
   /**
    * @brief Destroy the IfaceInfo object
    */

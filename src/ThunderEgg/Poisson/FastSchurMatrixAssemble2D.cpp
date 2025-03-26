@@ -19,10 +19,43 @@
  ***************************************************************************/
 
 #include "FastSchurMatrixAssemble2D.h"
+
 #include <ThunderEgg/BiLinearGhostFiller.h>
 #include <ThunderEgg/BiQuadraticGhostFiller.h>
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/MPIGhostFiller.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Schur/IfaceType.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
+#include <ThunderEgg/Schur/NormalIfaceInfo.h>
+#include <ThunderEgg/Schur/PatchIfaceInfo.h>
+#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <bitset>
+#include <cstddef>
+#include <functional>
+#include <map>
+#include <memory>
+#include <mpi.h>
 #include <numeric>
+#include <petscmat.h>
+#include <petscsystypes.h>
+#include <set>
+#include <tuple>
 #include <typeinfo>
+#include <utility>
+#include <vector>
+
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Schur;
@@ -30,12 +63,7 @@ namespace {
 /**
  * @brief Given The interface side, and an auxilary side,
  */
-const Side<2> rot_table[4][4] = {
-  { Side<2>::west(), Side<2>::east(), Side<2>::south(), Side<2>::north() },
-  { Side<2>::east(), Side<2>::west(), Side<2>::north(), Side<2>::south() },
-  { Side<2>::north(), Side<2>::south(), Side<2>::west(), Side<2>::east() },
-  { Side<2>::south(), Side<2>::north(), Side<2>::east(), Side<2>::west() }
-};
+const Side<2> rot_table[4][4] = { { Side<2>::west(), Side<2>::east(), Side<2>::south(), Side<2>::north() }, { Side<2>::east(), Side<2>::west(), Side<2>::north(), Side<2>::south() }, { Side<2>::north(), Side<2>::south(), Side<2>::west(), Side<2>::east() }, { Side<2>::south(), Side<2>::north(), Side<2>::east(), Side<2>::west() } };
 /**
  * @brief true of the the j indexes have to be flipped for an interfaces side
  */
@@ -89,20 +117,14 @@ public:
    * @param non_dirichlet_boundary true if side of patch has non dirichlet boundary conditions
    * @param type the type of interface
    */
-  Block(Side<2> main,
-        int j,
-        Side<2> aux,
-        int i,
-        bitset<4> non_dirichlet_boundary,
-        IfaceType<2> type)
+  Block(Side<2> main, int j, Side<2> aux, int i, bitset<4> non_dirichlet_boundary, IfaceType<2> type)
     : type(type)
     , i(i)
     , j(j)
   {
     s = rot_table[main.getIndex()][aux.getIndex()];
     for (int side_index = 0; side_index < 4; side_index++) {
-      this->non_dirichlet_boundary[rot_table[main.getIndex()][side_index].getIndex()] =
-        non_dirichlet_boundary[side_index];
+      this->non_dirichlet_boundary[rot_table[main.getIndex()][side_index].getIndex()] = non_dirichlet_boundary[side_index];
     }
     flip_j = flip_j_table[main.getIndex()];
     flip_i = flip_i_table[main.getIndex()][s.getIndex()];
@@ -110,14 +132,8 @@ public:
       this->type.setOrthant(type.getOrthant().getNbrOnSide(Side<1>::west()));
     }
   }
-  bool operator==(const Block& b) const
-  {
-    return non_dirichlet_boundary.to_ulong() == b.non_dirichlet_boundary.to_ulong();
-  }
-  bool operator<(const Block& b) const
-  {
-    return std::tie(type, i, j, flip_j) < std::tie(b.type, b.i, b.j, b.flip_j);
-  }
+  bool operator==(const Block& b) const { return non_dirichlet_boundary.to_ulong() == b.non_dirichlet_boundary.to_ulong(); }
+  bool operator<(const Block& b) const { return std::tie(type, i, j, flip_j) < std::tie(b.type, b.i, b.j, b.flip_j); }
 };
 /**
  * @brief Get the View object for the buffer
@@ -179,10 +195,7 @@ getPatchViewForBuffer(double* buffer_ptr, const PatchInfo<2>& pinfo, const Side<
  * @param block
  */
 void
-FillBlockColumnForNormalInterface(int j,
-                                  const PatchView<const double, 2>& u,
-                                  Side<2> s,
-                                  std::vector<double>& block)
+FillBlockColumnForNormalInterface(int j, const PatchView<const double, 2>& u, Side<2> s, std::vector<double>& block)
 {
   int n = u.getEnd()[0] + 1;
   auto slice = u.getSliceOn(s, { 0 });
@@ -201,12 +214,7 @@ FillBlockColumnForNormalInterface(int j,
  * @param block
  */
 void
-FillBlockColumnForCoarseToCoarseInterface(int j,
-                                          const PatchView<const double, 2>& u,
-                                          Side<2> s,
-                                          const MPIGhostFiller<2>& ghost_filler,
-                                          const PatchInfo<2>& pinfo,
-                                          std::vector<double>& block)
+FillBlockColumnForCoarseToCoarseInterface(int j, const PatchView<const double, 2>& u, Side<2> s, const MPIGhostFiller<2>& ghost_filler, const PatchInfo<2>& pinfo, std::vector<double>& block)
 {
   int n = pinfo.ns[0];
   PatchInfo<2> new_pinfo = pinfo;
@@ -232,13 +240,7 @@ FillBlockColumnForCoarseToCoarseInterface(int j,
  * @param block
  */
 void
-FillBlockColumnForFineToFineInterface(int j,
-                                      const PatchView<const double, 2>& u,
-                                      Side<2> s,
-                                      const MPIGhostFiller<2>& ghost_filler,
-                                      const PatchInfo<2>& pinfo,
-                                      IfaceType<2> type,
-                                      std::vector<double>& block)
+FillBlockColumnForFineToFineInterface(int j, const PatchView<const double, 2>& u, Side<2> s, const MPIGhostFiller<2>& ghost_filler, const PatchInfo<2>& pinfo, IfaceType<2> type, std::vector<double>& block)
 {
   int n = pinfo.ns[0];
   PatchInfo<2> new_pinfo = pinfo;
@@ -264,13 +266,7 @@ FillBlockColumnForFineToFineInterface(int j,
  * @param block
  */
 void
-FillBlockColumnForCoarseToFineInterface(int j,
-                                        const PatchView<const double, 2>& u,
-                                        Side<2> s,
-                                        const MPIGhostFiller<2>& ghost_filler,
-                                        const PatchInfo<2>& pinfo,
-                                        IfaceType<2> type,
-                                        std::vector<double>& block)
+FillBlockColumnForCoarseToFineInterface(int j, const PatchView<const double, 2>& u, Side<2> s, const MPIGhostFiller<2>& ghost_filler, const PatchInfo<2>& pinfo, IfaceType<2> type, std::vector<double>& block)
 {
   int n = pinfo.ns[0];
   PatchInfo<2> new_pinfo = pinfo;
@@ -278,8 +274,7 @@ FillBlockColumnForCoarseToFineInterface(int j,
   new_pinfo.setNbrInfo(s, new FineNbrInfo<1>());
   vector<double> ghosts(n);
   PatchView<const double, 2> nbr_view = getPatchViewForBuffer(ghosts.data(), pinfo, s.opposite());
-  ghost_filler.fillGhostCellsForNbrPatch(
-    new_pinfo, u, nbr_view, s, NbrType::Fine, type.getOrthant());
+  ghost_filler.fillGhostCellsForNbrPatch(new_pinfo, u, nbr_view, s, NbrType::Fine, type.getOrthant());
   for (int i = 0; i < n; i++) {
     block[i * n + j] = -ghosts[i] / 2;
   }
@@ -296,13 +291,7 @@ FillBlockColumnForCoarseToFineInterface(int j,
  * @param block
  */
 void
-FillBlockColumnForFineToCoarseInterface(int j,
-                                        const PatchView<const double, 2>& u,
-                                        Side<2> s,
-                                        const MPIGhostFiller<2>& ghost_filler,
-                                        const PatchInfo<2>& pinfo,
-                                        IfaceType<2> type,
-                                        std::vector<double>& block)
+FillBlockColumnForFineToCoarseInterface(int j, const PatchView<const double, 2>& u, Side<2> s, const MPIGhostFiller<2>& ghost_filler, const PatchInfo<2>& pinfo, IfaceType<2> type, std::vector<double>& block)
 {
   int n = pinfo.ns[0];
   PatchInfo<2> new_pinfo = pinfo;
@@ -310,8 +299,7 @@ FillBlockColumnForFineToCoarseInterface(int j,
   new_pinfo.setNbrInfo(s, new CoarseNbrInfo<1>(100, type.getOrthant()));
   vector<double> ghosts(n);
   PatchView<const double, 2> nbr_view = getPatchViewForBuffer(ghosts.data(), pinfo, s.opposite());
-  ghost_filler.fillGhostCellsForNbrPatch(
-    new_pinfo, u, nbr_view, s, NbrType::Coarse, type.getOrthant());
+  ghost_filler.fillGhostCellsForNbrPatch(new_pinfo, u, nbr_view, s, NbrType::Coarse, type.getOrthant());
   for (int i = 0; i < n; i++) {
     block[i * n + j] = -ghosts[i] / 2;
   }
@@ -366,8 +354,7 @@ FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<2>& pinfo, Poisson::FFTWPatchSo
 {
   auto ns = solver.getDomain().getNs();
   int n = ns[0];
-  const MPIGhostFiller<2>& ghost_filler =
-    dynamic_cast<const MPIGhostFiller<2>&>(solver.getGhostFiller());
+  const MPIGhostFiller<2>& ghost_filler = dynamic_cast<const MPIGhostFiller<2>&>(solver.getGhostFiller());
   for (int j = 0; j < n; j++) {
     // create some work vectors
     auto u_vec = make_shared<Vector<2>>(Communicator(MPI_COMM_SELF), ns, 1, 1, 1);
@@ -423,9 +410,7 @@ FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<2>& pinfo, Poisson::FFTWPatchSo
  */
 template<class Inserter>
 void
-assembleMatrix(const InterfaceDomain<2>& iface_domain,
-               Poisson::FFTWPatchSolver<2>& solver,
-               Inserter insertBlock)
+assembleMatrix(const InterfaceDomain<2>& iface_domain, Poisson::FFTWPatchSolver<2>& solver, Inserter insertBlock)
 {
   auto ns = iface_domain.getDomain().getNs();
   int n = ns[0];
@@ -452,10 +437,7 @@ assembleMatrix(const InterfaceDomain<2>& iface_domain,
     single_domain.push_back(piinfo);
 
     // coefficients are grouped by block's side and type
-    map<Block, shared_ptr<vector<double>>, std::function<bool(const Block& a, const Block& b)>>
-      coeffs([](const Block& a, const Block& b) {
-        return std::tie(a.s, a.type) < std::tie(b.s, b.type);
-      });
+    map<Block, shared_ptr<vector<double>>, std::function<bool(const Block& a, const Block& b)>> coeffs([](const Block& a, const Block& b) { return std::tie(a.s, a.type) < std::tie(b.s, b.type); });
 
     // allocate blocks of coefficients
     for (const Block& b : blocks) {
@@ -475,8 +457,7 @@ assembleMatrix(const InterfaceDomain<2>& iface_domain,
 }
 } // namespace
 Mat
-ThunderEgg::Poisson::FastSchurMatrixAssemble2D(const InterfaceDomain<2>& iface_domain,
-                                               Poisson::FFTWPatchSolver<2>& solver)
+ThunderEgg::Poisson::FastSchurMatrixAssemble2D(const InterfaceDomain<2>& iface_domain, Poisson::FFTWPatchSolver<2>& solver)
 {
   array<int, 2> ns = iface_domain.getDomain().getNs();
   if (ns[0] != ns[1]) {
@@ -484,8 +465,7 @@ ThunderEgg::Poisson::FastSchurMatrixAssemble2D(const InterfaceDomain<2>& iface_d
   }
   const GhostFiller<2>& gf = solver.getGhostFiller();
   if (typeid(gf) != typeid(BiLinearGhostFiller) && typeid(gf) != typeid(BiQuadraticGhostFiller)) {
-    throw RuntimeError(
-      "FastSchurMatrixAssembler2D only supports BiLinearGhostFiller and BiQuadraticGhostFiller");
+    throw RuntimeError("FastSchurMatrixAssembler2D only supports BiLinearGhostFiller and BiQuadraticGhostFiller");
   }
   int n = ns[0];
   Mat A;
@@ -496,33 +476,32 @@ ThunderEgg::Poisson::FastSchurMatrixAssemble2D(const InterfaceDomain<2>& iface_d
   MatSetType(A, MATMPIAIJ);
   MatMPIAIJSetPreallocation(A, 19 * n, nullptr, 19 * n, nullptr);
 
-  auto insertBlock =
-    [&](int block_i, int block_j, shared_ptr<vector<double>> block, bool flip_i, bool flip_j) {
-      int matrix_i = block_i * n;
-      int matrix_j = block_j * n;
+  auto insertBlock = [&](int block_i, int block_j, shared_ptr<vector<double>> block, bool flip_i, bool flip_j) {
+    int matrix_i = block_i * n;
+    int matrix_j = block_j * n;
 
-      vector<double>& orig = *block;
-      vector<double> copy(n * n);
-      for (int i = 0; i < n; i++) {
-        int orig_i = i;
-        if (flip_i) {
-          orig_i = n - i - 1;
-        }
-        for (int j = 0; j < n; j++) {
-          int orig_j = j;
-          if (flip_j) {
-            orig_j = n - j - 1;
-          }
-          copy[i * n + j] = orig[orig_i * n + orig_j];
-        }
+    vector<double>& orig = *block;
+    vector<double> copy(n * n);
+    for (int i = 0; i < n; i++) {
+      int orig_i = i;
+      if (flip_i) {
+        orig_i = n - i - 1;
       }
-      vector<int> inds_i(n);
-      iota(inds_i.begin(), inds_i.end(), matrix_i);
-      vector<int> inds_j(n);
-      iota(inds_j.begin(), inds_j.end(), matrix_j);
+      for (int j = 0; j < n; j++) {
+        int orig_j = j;
+        if (flip_j) {
+          orig_j = n - j - 1;
+        }
+        copy[i * n + j] = orig[orig_i * n + orig_j];
+      }
+    }
+    vector<int> inds_i(n);
+    iota(inds_i.begin(), inds_i.end(), matrix_i);
+    vector<int> inds_j(n);
+    iota(inds_j.begin(), inds_j.end(), matrix_j);
 
-      MatSetValues(A, n, &inds_i[0], n, &inds_j[0], &copy[0], ADD_VALUES);
-    };
+    MatSetValues(A, n, &inds_i[0], n, &inds_j[0], &copy[0], ADD_VALUES);
+  };
 
   assembleMatrix(iface_domain, solver, insertBlock);
   MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);

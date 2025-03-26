@@ -25,8 +25,12 @@
  *
  * @brief WCycle class
  */
+
 #include <ThunderEgg/GMG/Cycle.h>
 #include <ThunderEgg/GMG/CycleOpts.h>
+#include <ThunderEgg/GMG/Level.h>
+#include <ThunderEgg/Vector.h>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Implementation of a W-cycle

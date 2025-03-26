@@ -20,7 +20,17 @@
 
 #include <ThunderEgg/Schur/PatchIfaceInfo.h>
 
-#include <algorithm>
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/Schur/CoarseIfaceInfo.h>
+#include <ThunderEgg/Schur/FineIfaceInfo.h>
+#include <ThunderEgg/Schur/NormalIfaceInfo.h>
+#include <array>
+#include <memory>
 
 #include <doctest.h>
 

@@ -30,6 +30,12 @@
 #include <ThunderEgg/Iterative/Solver.h>
 #include <ThunderEgg/Operator.h>
 #include <ThunderEgg/Timer.h>
+#include <ThunderEgg/Vector.h>
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <ostream>
+#include <string>
 
 namespace ThunderEgg::Iterative {
 /**
@@ -54,11 +60,7 @@ private:
    */
   std::shared_ptr<Timer> timer = nullptr;
 
-  void applyWithPreconditioner(const Operator<D>* M_l,
-                               const Operator<D>& A,
-                               const Operator<D>* M_r,
-                               const Vector<D>& x,
-                               Vector<D>& b) const
+  void applyWithPreconditioner(const Operator<D>* M_l, const Operator<D>& A, const Operator<D>* M_r, const Vector<D>& x, Vector<D>& b) const
   {
     if (M_l == nullptr && M_r == nullptr) {
       A.apply(x, b);
@@ -123,12 +125,7 @@ public:
   std::shared_ptr<Timer> getTimer() const { return timer; }
 
 public:
-  int solve(const Operator<D>& A,
-            Vector<D>& x,
-            const Vector<D>& b,
-            const Operator<D>* Mr = nullptr,
-            bool output = false,
-            std::ostream& os = std::cout) const override
+  int solve(const Operator<D>& A, Vector<D>& x, const Vector<D>& b, const Operator<D>* Mr = nullptr, bool output = false, std::ostream& os = std::cout) const override
   {
     Vector<D> resid = b.getZeroClone();
 

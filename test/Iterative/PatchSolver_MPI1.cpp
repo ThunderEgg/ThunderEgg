@@ -21,8 +21,10 @@
 #include "PatchSolver_MOCKS.h"
 #include <ThunderEgg/Iterative/PatchSolver.h>
 
-#include <list>
-#include <sstream>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Iterative/BreakdownError.h>
+#include <ThunderEgg/Operator.h>
+#include <ThunderEgg/Vector.h>
 
 #include <doctest.h>
 

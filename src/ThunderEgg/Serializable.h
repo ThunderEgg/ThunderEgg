@@ -26,7 +26,6 @@
  * @brief Serializable class
  */
 
-#include <memory>
 namespace ThunderEgg {
 /**
  * @brief Interface for serializing objects

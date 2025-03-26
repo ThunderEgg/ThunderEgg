@@ -25,7 +25,22 @@
  *
  * @brief LinearRestrictor class
  */
+
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/GMG/MPIRestrictor.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <cstddef>
+#include <functional>
+#include <utility>
+#include <vector>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Restrictor that averages the corresponding fine cells into each coarse cell.
@@ -46,9 +61,7 @@ private:
    * @param fine_view the finer patch
    * @param coarse_view the coarser patch
    */
-  void extrapolateBoundaries(const PatchInfo<D>& pinfo,
-                             const PatchView<const double, D>& fine_view,
-                             const PatchView<double, D>& coarse_view) const
+  void extrapolateBoundaries(const PatchInfo<D>& pinfo, const PatchView<const double, D>& fine_view, const PatchView<double, D>& coarse_view) const
   {
     Orthant<D> orth = pinfo.orth_on_parent;
     std::array<int, D> starts;
@@ -84,9 +97,7 @@ private:
         View<const double, 1> fine_ghost = fine_view.getSliceOn(c, neg_one);
         View<const double, 1> fine_interior = fine_view.getSliceOn(c, zero);
         View<double, 1> coarse_ghost = coarse_view.getSliceOn(c, neg_one);
-        Loop::OverInteriorIndexes<1>(fine_ghost, [&](const std::array<int, 1>& coord) {
-          coarse_ghost[coord] += (3 * fine_ghost[coord] - fine_interior[coord]);
-        });
+        Loop::OverInteriorIndexes<1>(fine_ghost, [&](const std::array<int, 1>& coord) { coarse_ghost[coord] += (3 * fine_ghost[coord] - fine_interior[coord]); });
       }
     }
   }
@@ -98,10 +109,7 @@ private:
    * @param finer_vector the finer vector
    * @param coarser_vector the coarser vector
    */
-  void restrictToCoarserParent(const PatchInfo<D>& pinfo,
-                               int parent_index,
-                               const Vector<D>& finer_vector,
-                               Vector<D>& coarser_vector) const
+  void restrictToCoarserParent(const PatchInfo<D>& pinfo, int parent_index, const Vector<D>& finer_vector, Vector<D>& coarser_vector) const
   {
     PatchView<double, D> coarse_view = coarser_vector.getPatchView(parent_index);
     PatchView<const double, D> fine_view = finer_vector.getPatchView(pinfo.local_index);
@@ -135,22 +143,15 @@ private:
    * @param coarser_vector the coarser vector
    */
 
-  void copyToParent(const PatchInfo<D>& pinfo,
-                    int parent_index,
-                    const Vector<D>& finer_vector,
-                    Vector<D>& coarser_vector) const
+  void copyToParent(const PatchInfo<D>& pinfo, int parent_index, const Vector<D>& finer_vector, Vector<D>& coarser_vector) const
   {
     PatchView<double, D> coarse_view = coarser_vector.getPatchView(parent_index);
     PatchView<const double, D> fine_view = finer_vector.getPatchView(pinfo.local_index);
     // just copy the values
     if (extrapolate_boundary_ghosts) {
-      Loop::OverAllIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1>& coord) {
-        coarse_view[coord] += fine_view[coord];
-      });
+      Loop::OverAllIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1>& coord) { coarse_view[coord] += fine_view[coord]; });
     } else {
-      Loop::OverInteriorIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1>& coord) {
-        coarse_view[coord] += fine_view[coord];
-      });
+      Loop::OverInteriorIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1>& coord) { coarse_view[coord] += fine_view[coord]; });
     }
   }
 
@@ -163,12 +164,11 @@ public:
    * @param extrapolate_boundary_ghosts set to true if ghost values at the boundaries should be
    * extrapolated
    */
-  LinearRestrictor(const Domain<D>& fine_domain,
-                   const Domain<D>& coarse_domain,
-                   bool extrapolate_boundary_ghosts = false)
+  LinearRestrictor(const Domain<D>& fine_domain, const Domain<D>& coarse_domain, bool extrapolate_boundary_ghosts = false)
     : MPIRestrictor<D>(coarse_domain, fine_domain)
     , extrapolate_boundary_ghosts(extrapolate_boundary_ghosts)
-  {}
+  {
+  }
 
   /**
    * @brief Clone this restrictor
@@ -176,10 +176,7 @@ public:
    * @return LinearRestrictor<D>* a newly allocated copy of this restrictor
    */
   LinearRestrictor<D>* clone() const override { return new LinearRestrictor<D>(*this); }
-  void restrictPatches(
-    const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches,
-    const Vector<D>& finer_vector,
-    Vector<D>& coarser_vector) const override
+  void restrictPatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches, const Vector<D>& finer_vector, Vector<D>& coarser_vector) const override
   {
     for (const auto& pair : patches) {
       if (pair.second.get().hasCoarseParent()) {

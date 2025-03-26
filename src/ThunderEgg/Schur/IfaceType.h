@@ -25,8 +25,10 @@
  *
  * @brief IfaceType class
  */
+
 #include <ThunderEgg/Orthant.h>
 #include <tuple>
+
 namespace ThunderEgg {
 namespace Schur {
 /**
@@ -57,7 +59,8 @@ private:
   IfaceType(unsigned char val, Orthant<D - 1> orthant)
     : val(val)
     , orthant(orthant)
-  {}
+  {
+  }
 
 public:
   /**
@@ -94,10 +97,7 @@ public:
    * @param orthant the orthant of the fine patch
    * @return IfaceType<D> the new IfaceType
    */
-  static IfaceType<D> FineToCoarse(Orthant<D - 1> orth_on_coarse)
-  {
-    return IfaceType<D>(2, orth_on_coarse);
-  }
+  static IfaceType<D> FineToCoarse(Orthant<D - 1> orth_on_coarse) { return IfaceType<D>(2, orth_on_coarse); }
   /**
    * @brief Check if this type is FineToCoarse
    *
@@ -114,10 +114,7 @@ public:
    * @param orthant the orthant of the fine patch
    * @return IfaceType<D> the new IfaceType
    */
-  static IfaceType<D> FineToFine(Orthant<D - 1> orth_on_coarse)
-  {
-    return IfaceType<D>(3, orth_on_coarse);
-  }
+  static IfaceType<D> FineToFine(Orthant<D - 1> orth_on_coarse) { return IfaceType<D>(3, orth_on_coarse); }
   /**
    * @brief Check if this type is FineToFine
    *
@@ -156,10 +153,7 @@ public:
   /**
    * @brief Compare iface type values
    */
-  bool operator<(const IfaceType& b) const
-  {
-    return std::forward_as_tuple(val, orthant) < std::forward_as_tuple(b.val, b.orthant);
-  }
+  bool operator<(const IfaceType& b) const { return std::forward_as_tuple(val, orthant) < std::forward_as_tuple(b.val, b.orthant); }
 };
 } // namespace Schur
 } // namespace ThunderEgg

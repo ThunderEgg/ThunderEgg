@@ -27,9 +27,17 @@
  */
 
 #include <ThunderEgg/Domain.h>
-#include <ThunderEgg/GMG/InterLevelComm.h>
 #include <ThunderEgg/GMG/MPIInterpolator.h>
-#include <memory>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <cstddef>
+#include <functional>
+#include <utility>
+#include <vector>
 
 namespace ThunderEgg::GMG {
 /**
@@ -50,17 +58,15 @@ public:
    */
   DirectInterpolator(const Domain<D>& coarse_domain, const Domain<D>& fine_domain)
     : MPIInterpolator<D>(coarse_domain, fine_domain)
-  {}
+  {
+  }
   /**
    * @brief Clone this interpolator
    *
    * @return DirectInterpolator<D>* a newly allocated copy of this interpolator
    */
   DirectInterpolator<D>* clone() const override { return new DirectInterpolator<D>(*this); }
-  void interpolatePatches(
-    const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches,
-    const Vector<D>& coarser_vector,
-    Vector<D>& finer_vector) const override
+  void interpolatePatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches, const Vector<D>& coarser_vector, Vector<D>& finer_vector) const override
   {
     for (auto pair : patches) {
       const PatchInfo<D>& pinfo = pair.second.get();
@@ -83,9 +89,7 @@ public:
           fine_view[coord] += coarse_view[coarse_coord];
         });
       } else {
-        Loop::OverInteriorIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1>& coord) {
-          fine_view[coord] += coarse_view[coord];
-        });
+        Loop::OverInteriorIndexes<D + 1>(fine_view, [&](const std::array<int, D + 1>& coord) { fine_view[coord] += coarse_view[coord]; });
       }
     }
   }

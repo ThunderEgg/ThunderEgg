@@ -19,10 +19,10 @@
  ***************************************************************************/
 #include "PatchOperator_MOCKS.h"
 #include "utils/DomainReader.h"
-#include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/MPIGhostFiller.h>
 
-#include <list>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/Vector.h>
 
 using namespace std;
 using namespace ThunderEgg;

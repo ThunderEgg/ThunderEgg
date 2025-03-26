@@ -18,11 +18,27 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Timer.h>
 #include <ThunderEgg/tpl/json.hpp>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <algorithm>
 #include <chrono>
+#include <cstddef>
+#include <cstring>
 #include <fstream>
+#include <functional>
 #include <iomanip>
+#include <ios>
+#include <limits>
+#include <list>
+#include <map>
+#include <memory>
+#include <mpi.h>
+#include <ostream>
+#include <string>
+#include <tuple>
 
 using namespace ThunderEgg::tpl;
 namespace {
@@ -301,8 +317,7 @@ public:
       infos.emplace_back(info_ptr);
       pair.first->second = info_ptr;
     } else if (info_ptr == nullptr) {
-      throw RuntimeError("Adding int info to existing double info timing" + name + " for info " +
-                         info_name);
+      throw RuntimeError("Adding int info to existing double info timing" + name + " for info " + info_name);
     }
     info_ptr->addInfo(info);
   }
@@ -327,8 +342,7 @@ public:
       infos.emplace_back(info_ptr);
       pair.first->second = info_ptr;
     } else if (info_ptr == nullptr) {
-      throw RuntimeError("Adding int info to existing int info timing" + name + " for info " +
-                         info_name);
+      throw RuntimeError("Adding int info to existing int info timing" + name + " for info " + info_name);
     }
     info_ptr->addInfo(info);
   }
@@ -379,8 +393,7 @@ Timer::addDomain(int domain_id, nlohmann::json domain)
 {
   auto pair = domains.emplace(domain_id, domain);
   if (!pair.second) {
-    throw RuntimeError("Domain with id " + std::to_string(domain_id) +
-                       " was already added to timer");
+    throw RuntimeError("Domain with id " + std::to_string(domain_id) + " was already added to timer");
   }
 }
 void
@@ -408,13 +421,11 @@ void
 Timer::stopPatchTiming(int patch_id, int domain_id, const std::string& name)
 {
   Timing& curr_timing = stack.back();
-  if (curr_timing.patch_id == patch_id && curr_timing.domain_id == domain_id &&
-      curr_timing.name == name && stack.size() > 1) {
+  if (curr_timing.patch_id == patch_id && curr_timing.domain_id == domain_id && curr_timing.name == name && stack.size() > 1) {
     curr_timing.stop();
     stack.pop_back();
   } else {
-    throw RuntimeError("Timer was expecting to end \"" + curr_timing.name + "\", instead got \"" +
-                       name + "\"");
+    throw RuntimeError("Timer was expecting to end \"" + curr_timing.name + "\", instead got \"" + name + "\"");
   }
 }
 
@@ -438,11 +449,7 @@ Timer::addDoubleInfo(const std::string& name, double info)
   curr_timing.addDoubleInfo(name, info);
 }
 static void
-PrintMergedTimings(const Communicator& comm,
-                   size_t max_name_size,
-                   const std::string& parent_string,
-                   std::ostream& os,
-                   nlohmann::json& timings);
+PrintMergedTimings(const Communicator& comm, size_t max_name_size, const std::string& parent_string, std::ostream& os, nlohmann::json& timings);
 /**
  * @brief Output an information line
  *
@@ -470,11 +477,7 @@ OutputLine(std::ostream& os, size_t max_name_size, const std::string& name, doub
  * @param timing the timing to print
  */
 static void
-PrintTiming(const Communicator& comm,
-            size_t max_name_size,
-            const std::string& parent_string,
-            std::ostream& os,
-            nlohmann::json& timing)
+PrintTiming(const Communicator& comm, size_t max_name_size, const std::string& parent_string, std::ostream& os, nlohmann::json& timing)
 {
   std::string my_string = parent_string + timing["name"].get<std::string>();
   os << my_string << std::endl;
@@ -485,12 +488,8 @@ PrintTiming(const Communicator& comm,
   if (timing["num_calls"].get<size_t>() == 1) {
     OutputLine(os, max_name_size, "time (sec)", timing["sum"].get<double>());
   } else {
-    OutputLine(
-      os, max_name_size, "average calls per rank", timing["num_calls"].get<double>() / size);
-    OutputLine(os,
-               max_name_size,
-               "average (sec)",
-               timing["sum"].get<double>() / timing["num_calls"].get<double>());
+    OutputLine(os, max_name_size, "average calls per rank", timing["num_calls"].get<double>() / size);
+    OutputLine(os, max_name_size, "average (sec)", timing["sum"].get<double>() / timing["num_calls"].get<double>());
     OutputLine(os, max_name_size, "min (sec)", timing["min"].get<double>());
     OutputLine(os, max_name_size, "max (sec)", timing["max"].get<double>());
   }
@@ -498,14 +497,9 @@ PrintTiming(const Communicator& comm,
     if (info["num_calls"] == 1) {
       OutputLine(os, max_name_size, info["name"].get<std::string>(), info["sum"].get<double>());
     } else {
-      OutputLine(os,
-                 max_name_size,
-                 info["name"].get<std::string>() + " avg",
-                 info["sum"].get<double>() / info["num_calls"].get<double>());
-      OutputLine(
-        os, max_name_size, info["name"].get<std::string>() + " min", info["min"].get<double>());
-      OutputLine(
-        os, max_name_size, info["name"].get<std::string>() + " max", info["max"].get<double>());
+      OutputLine(os, max_name_size, info["name"].get<std::string>() + " avg", info["sum"].get<double>() / info["num_calls"].get<double>());
+      OutputLine(os, max_name_size, info["name"].get<std::string>() + " min", info["min"].get<double>());
+      OutputLine(os, max_name_size, info["name"].get<std::string>() + " max", info["max"].get<double>());
     }
   }
   os << std::endl;
@@ -597,11 +591,7 @@ MergeTimings(nlohmann::json& timings)
  * @param timings the timings to print
  */
 static void
-PrintMergedTimings(const Communicator& comm,
-                   size_t max_name_size,
-                   const std::string& parent_string,
-                   std::ostream& os,
-                   nlohmann::json& timings)
+PrintMergedTimings(const Communicator& comm, size_t max_name_size, const std::string& parent_string, std::ostream& os, nlohmann::json& timings)
 {
   nlohmann::json merged_timings = MergeTimings(timings);
   for (nlohmann::json& timing : merged_timings) {
@@ -744,13 +734,7 @@ to_json(nlohmann::json& output_j, const Timer& timer)
       MPI_Get_count(&status, MPI_CHAR, &buffer_size);
 
       char incoming_j_string[buffer_size];
-      MPI_Recv(incoming_j_string,
-               buffer_size,
-               MPI_CHAR,
-               incoming_rank,
-               0,
-               timer.comm.getMPIComm(),
-               &status);
+      MPI_Recv(incoming_j_string, buffer_size, MPI_CHAR, incoming_rank, 0, timer.comm.getMPIComm(), &status);
 
       nlohmann::json incoming_j = nlohmann::json::parse((char*)incoming_j_string);
       MergeIncomingJson(j, incoming_j);

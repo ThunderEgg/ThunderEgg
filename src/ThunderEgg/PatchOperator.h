@@ -25,10 +25,17 @@
  *
  * @brief PatchOperator class
  */
+
+#include <ThunderEgg/Config.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/Operator.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
+#include <memory>
+
 namespace ThunderEgg {
 /**
  * @brief This is an Operator where derived classes only have to implement the two virtual functions
@@ -61,7 +68,8 @@ public:
   PatchOperator(const Domain<D>& domain, const GhostFiller<D>& ghost_filler)
     : domain(domain)
     , ghost_filler(ghost_filler.clone())
-  {}
+  {
+  }
   /**
    * @brief Clone this patch operator
    *
@@ -82,9 +90,7 @@ public:
    * @param u_view the solution
    * @param f_view the left hand side
    */
-  virtual void applySinglePatch(const PatchInfo<D>& pinfo,
-                                const PatchView<const double, D>& u_view,
-                                const PatchView<double, D>& f_view) const = 0;
+  virtual void applySinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view) const = 0;
 
   /**
    * @brief Treat the internal patch boundaries as domain boundaires and modify
@@ -97,9 +103,7 @@ public:
    * @param u_view the left hand side
    * @param f_view the right hand side
    */
-  virtual void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo,
-                                                      const PatchView<const double, D>& u_view,
-                                                      const PatchView<double, D>& f_view) const = 0;
+  virtual void modifyRHSForInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view) const = 0;
 
   /**
    * @brief Apply the operator to a single patch
@@ -110,10 +114,7 @@ public:
    * @param u_view the solution
    * @param f_view the left hand side
    */
-  virtual void applySinglePatchWithInternalBoundaryConditions(
-    const PatchInfo<D>& pinfo,
-    const PatchView<const double, D>& u_view,
-    const PatchView<double, D>& f_view) const = 0;
+  virtual void applySinglePatchWithInternalBoundaryConditions(const PatchInfo<D>& pinfo, const PatchView<const double, D>& u_view, const PatchView<double, D>& f_view) const = 0;
 
   /**
    * @brief Apply the operator

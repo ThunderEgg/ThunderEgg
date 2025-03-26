@@ -26,8 +26,15 @@
  * @brief MatWrapper class
  */
 
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/Operator.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <cstddef>
 #include <petscmat.h>
+#include <petscsys.h>
+#include <petscvec.h>
 
 namespace ThunderEgg::PETSc {
 /**
@@ -50,10 +57,7 @@ private:
   Vec getPetscVecWithoutGhost(const Vector<D>& vec) const
   {
     Vec petsc_vec;
-    VecCreateMPI(vec.getCommunicator().getMPIComm(),
-                 vec.getNumLocalCells() * vec.getNumComponents(),
-                 PETSC_DETERMINE,
-                 &petsc_vec);
+    VecCreateMPI(vec.getCommunicator().getMPIComm(), vec.getNumLocalCells() * vec.getNumComponents(), PETSC_DETERMINE, &petsc_vec);
     return petsc_vec;
   }
   /**
@@ -118,7 +122,8 @@ public:
    */
   explicit MatWrapper(Mat A_in)
     : A(A_in)
-  {}
+  {
+  }
 
   /**
    * @brief Clone this wrapper

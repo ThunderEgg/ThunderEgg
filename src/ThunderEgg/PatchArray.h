@@ -25,7 +25,14 @@
  *
  * @brief PatchArray class
  */
+
+#include <ThunderEgg/Face.h>
 #include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <cstddef>
+#include <vector>
+
 namespace ThunderEgg {
 /**
  * @brief Array for acessing data of a patch. It supports variable striding
@@ -76,14 +83,10 @@ public:
    */
   PatchArray(const PatchArray<D>& other)
     : vector(other.vector)
-    , view(vector.data(),
-           other.getStrides(),
-           other.getGhostStart(),
-           other.getStart(),
-           other.getEnd(),
-           other.getGhostEnd())
+    , view(vector.data(), other.getStrides(), other.getGhostStart(), other.getStart(), other.getEnd(), other.getGhostEnd())
 
-  {}
+  {
+  }
 
   /**
    * @brief Copy assignment
@@ -94,12 +97,7 @@ public:
   PatchArray<D>& operator=(const PatchArray<D>& other)
   {
     vector = other.vector;
-    view = PatchView<double, D>(vector.data(),
-                                other.getStrides(),
-                                other.getGhostStart(),
-                                other.getStart(),
-                                other.getEnd(),
-                                other.getGhostEnd());
+    view = PatchView<double, D>(vector.data(), other.getStrides(), other.getGhostStart(), other.getStart(), other.getEnd(), other.getGhostEnd());
     return *this;
   }
 
@@ -128,8 +126,7 @@ public:
    * @return ConstView<M> a view to the slice on the face
    */
   template<int M>
-  inline View<const double, M + 1> getSliceOn(Face<D, M> f,
-                                              const std::array<int, D - M>& offset) const
+  inline View<const double, M + 1> getSliceOn(Face<D, M> f, const std::array<int, D - M>& offset) const
   {
     return View<const double, M + 1>(view.template getSliceOn<M>(f, offset));
   }
@@ -144,8 +141,7 @@ public:
    * @return View<M> a view to the slice on the face
    */
   template<int M>
-  inline View<double, M + 1> getGhostSliceOn(Face<D, M> f,
-                                             const std::array<size_t, D - M>& offset) const
+  inline View<double, M + 1> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M>& offset) const
   {
     return view.template getGhostSliceOn<M>(f, offset);
   }
@@ -156,10 +152,7 @@ public:
   {
     return view(args...);
   }
-  inline void set(const std::array<int, D + 1>& coord, double value) const
-  {
-    view.set(coord, value);
-  }
+  inline void set(const std::array<int, D + 1>& coord, double value) const { view.set(coord, value); }
   inline double& operator[](const std::array<int, D + 1>& coord) { return view[coord]; }
   template<class... Types>
   inline double& operator()(Types... args)

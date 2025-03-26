@@ -25,9 +25,14 @@
  *
  * @brief ComponentView class
  */
+
 #include <ThunderEgg/Face.h>
+#include <ThunderEgg/Loops.h>
 #include <ThunderEgg/View.h>
-#include <memory>
+#include <array>
+#include <cstddef>
+#include <type_traits>
+
 namespace ThunderEgg {
 /**
  * @brief Array for acessing data of a patch. It supports variable striding
@@ -86,8 +91,7 @@ private:
    * @brief Return array filled with lengths-1+num_ghost_cells
    */
   template<int M>
-  static std::array<int, M> DetermineGhostEnd(const std::array<int, M>& lengths,
-                                              int num_ghost_cells)
+  static std::array<int, M> DetermineGhostEnd(const std::array<int, M>& lengths, int num_ghost_cells)
   {
     std::array<int, M> end = lengths;
     Loop::Unroll<0, M - 1>([&](int i) { end[i] += num_ghost_cells - 1; });
@@ -140,7 +144,8 @@ public:
    */
   ComponentView()
     : View<T, D>()
-  {}
+  {
+  }
 
   /**
    * @brief Construct a new View object
@@ -151,14 +156,10 @@ public:
    * @param num_ghost_cells the number of ghost cells on each side of the patch
    * @param ldm the local data manager for the data
    */
-  ComponentView(T_ptr data,
-                const std::array<int, D>& strides,
-                const std::array<int, D>& ghost_start,
-                const std::array<int, D>& start,
-                const std::array<int, D>& end,
-                const std::array<int, D>& ghost_end)
+  ComponentView(T_ptr data, const std::array<int, D>& strides, const std::array<int, D>& ghost_start, const std::array<int, D>& start, const std::array<int, D>& end, const std::array<int, D>& ghost_end)
     : View<T, D>(data, strides, ghost_start, start, end, ghost_end)
-  {}
+  {
+  }
 
   /**
    * @brief Construct a new View object
@@ -169,17 +170,10 @@ public:
    * @param num_ghost_cells the number of ghost cells on each side of the patch
    * @param ldm the local data manager for the data
    */
-  ComponentView(T_ptr data,
-                const std::array<int, D>& strides,
-                const std::array<int, D>& lengths,
-                int num_ghost_cells)
-    : View<T, D>(data,
-                 strides,
-                 DetermineGhostStart<D>(num_ghost_cells),
-                 DetermineStart<D>(),
-                 DetermineEnd<D>(lengths),
-                 DetermineGhostEnd<D>(lengths, num_ghost_cells))
-  {}
+  ComponentView(T_ptr data, const std::array<int, D>& strides, const std::array<int, D>& lengths, int num_ghost_cells)
+    : View<T, D>(data, strides, DetermineGhostStart<D>(num_ghost_cells), DetermineStart<D>(), DetermineEnd<D>(lengths), DetermineGhostEnd<D>(lengths, num_ghost_cells))
+  {
+  }
 
   /**
    * @brief Get the slice on a given face
@@ -196,8 +190,7 @@ public:
     SliceInfo<M> info = getSliceOnPriv<M>(f, offset);
 
     T_ptr new_data = (&(*this)[info.first_value]);
-    return View<T, M>(
-      new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end);
+    return View<T, M>(new_data, info.strides, info.ghost_start, info.start, info.end, info.ghost_end);
   }
 
   /**
@@ -210,9 +203,7 @@ public:
    * @return View<M> a view to the slice on the face
    */
   template<int M>
-  View<typename std::remove_const<T>::type, M> getGhostSliceOn(
-    Face<D, M> f,
-    const std::array<size_t, D - M>& offset) const
+  View<typename std::remove_const<T>::type, M> getGhostSliceOn(Face<D, M> f, const std::array<size_t, D - M>& offset) const
   {
     using noconst_T = typename std::remove_const<T>::type;
     using noconst_T_ptr = typename std::add_pointer<noconst_T>::type;
@@ -247,22 +238,11 @@ public:
       }
     }
 
-    noconst_T_ptr new_data = const_cast<noconst_T_ptr>(
-      &(*this)[first_value]); // Thunderegg doesn't care if values in ghosts are modified
-    return View<noconst_T, M>(
-      new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end);
+    noconst_T_ptr new_data = const_cast<noconst_T_ptr>(&(*this)[first_value]); // Thunderegg doesn't care if values in ghosts are modified
+    return View<noconst_T, M>(new_data, new_strides, new_ghost_start, new_start, new_end, new_ghost_end);
   }
 
-  operator ComponentView<std::add_const_t<T>, D>() const
-  {
-    return ComponentView<std::add_const_t<T>, D>(this->getData() +
-                                                   this->getIndex(this->getGhostStart()),
-                                                 this->getStrides(),
-                                                 this->getGhostStart(),
-                                                 this->getStart(),
-                                                 this->getEnd(),
-                                                 this->getGhostEnd());
-  }
+  operator ComponentView<std::add_const_t<T>, D>() const { return ComponentView<std::add_const_t<T>, D>(this->getData() + this->getIndex(this->getGhostStart()), this->getStrides(), this->getGhostStart(), this->getStart(), this->getEnd(), this->getGhostEnd()); }
 };
 extern template class ComponentView<double, 1>;
 extern template View<double, 0>

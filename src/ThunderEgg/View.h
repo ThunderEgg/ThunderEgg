@@ -29,7 +29,8 @@
 #include <ThunderEgg/Loops.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <array>
-#include <memory>
+#include <type_traits>
+
 namespace ThunderEgg {
 /**
  * @brief Array for acessing data of a patch. It supports variable striding
@@ -117,12 +118,7 @@ public:
    * @param num_ghost_cells the number of ghost cells on each side of the patch
    * @param ldm the local data manager for the data
    */
-  View(T_ptr data,
-       const std::array<int, D>& strides,
-       const std::array<int, D>& ghost_start,
-       const std::array<int, D>& start,
-       const std::array<int, D>& end,
-       const std::array<int, D>& ghost_end)
+  View(T_ptr data, const std::array<int, D>& strides, const std::array<int, D>& ghost_start, const std::array<int, D>& start, const std::array<int, D>& end, const std::array<int, D>& ghost_end)
     : strides(strides)
     , ghost_start(ghost_start)
     , start(start)
@@ -218,11 +214,7 @@ public:
    */
   const std::array<int, D>& getGhostEnd() const { return ghost_end; }
 
-  operator View<std::add_const_t<T>, D>() const
-  {
-    return View<std::add_const_t<T>, D>(
-      data + getIndex(getGhostStart()), strides, ghost_start, start, end, ghost_end);
-  }
+  operator View<std::add_const_t<T>, D>() const { return View<std::add_const_t<T>, D>(data + getIndex(getGhostStart()), strides, ghost_start, start, end, ghost_end); }
 };
 extern template class View<double, 1>;
 extern template class View<double, 2>;

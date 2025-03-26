@@ -6,8 +6,16 @@
 			"binaryDir": "${sourceDir}/out/build/${presetName}",
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
-				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-				"CMAKE_CXX_FLAGS": "-O3",
+				"CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+			}
+		},
+		{
+			"name": "ci", "inherits": "default",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo",
+				"CMAKE_C_COMPILER_LAUNCHER": "ccache",
+				"CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
 				"THUNDEREGG_ENABLE_DEBUG": true,
 				"THUNDEREGG_MPIEXEC_FLAGS": "--oversubscribe",
 				"petsc": true,
@@ -21,16 +29,9 @@
 			}
 		},
 		{
-			"name": "ci", "inherits": "default",
-			"cacheVariables": {
-				"CMAKE_C_COMPILER_LAUNCHER": "ccache",
-				"CMAKE_CXX_COMPILER_LAUNCHER": "ccache"
-			}
-		},
-		{
 			"name": "ci-clang", "inherits": "ci",
 			"cacheVariables": {
-				"CMAKE_CXX_FLAGS": "-O3 -fprofile-instr-generate -fcoverage-mapping"
+				"CMAKE_CXX_FLAGS": "-fprofile-instr-generate -fcoverage-mapping"
 			},
 			"environment": {
 				"CXX": "clang++",

@@ -18,8 +18,22 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/GhostFillingType.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/MPIGhostFiller.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <cstddef>
+
 namespace ThunderEgg {
 namespace {
 /**
@@ -58,14 +72,11 @@ getOffset(const std::array<int, 4> end, Side<3> s, Orthant<2> orth)
  * @param side the side that the neighbor is on
  */
 void
-FillGhostCellsForNormalNbr(const PatchView<const double, 3>& local_view,
-                           const PatchView<const double, 3>& nbr_view,
-                           Side<3> side)
+FillGhostCellsForNormalNbr(const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Side<3> side)
 {
   View<const double, 3> local_slice = local_view.getSliceOn(side, { 0 });
   View<double, 3> nbr_ghosts = nbr_view.getGhostSliceOn(side.opposite(), { 0 });
-  Loop::OverInteriorIndexes<3>(
-    nbr_ghosts, [&](const std::array<int, 3>& coord) { nbr_ghosts[coord] = local_slice[coord]; });
+  Loop::OverInteriorIndexes<3>(nbr_ghosts, [&](const std::array<int, 3>& coord) { nbr_ghosts[coord] = local_slice[coord]; });
 }
 /**
  * @brief Fill ghost cells for coarser neighbor
@@ -79,10 +90,7 @@ FillGhostCellsForNormalNbr(const PatchView<const double, 3>& local_view,
  * @param orthant the orthant of the neighbors side that this patch lies on
  */
 void
-FillGhostCellsForCoarseNbr(const PatchView<const double, 3>& local_view,
-                           const PatchView<const double, 3>& nbr_view,
-                           Side<3> side,
-                           Orthant<2> orthant)
+FillGhostCellsForCoarseNbr(const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Side<3> side, Orthant<2> orthant)
 {
   auto [offset_i, offset_j] = getOffset(local_view.getEnd(), side, orthant);
   View<const double, 3> local_slice = local_view.getSliceOn(side, { 0 });
@@ -108,9 +116,7 @@ FillGhostCellsForLocalWithFineNbr(const PatchView<const double, 3>& view, Side<3
 {
   View<const double, 3> local_slice = view.getSliceOn(side, { 0 });
   View<double, 3> local_ghosts = view.getGhostSliceOn(side, { 0 });
-  Loop::OverInteriorIndexes<3>(local_ghosts, [&](const std::array<int, 3>& coord) {
-    local_ghosts[coord] -= 1.0 / 3.0 * local_slice[coord];
-  });
+  Loop::OverInteriorIndexes<3>(local_ghosts, [&](const std::array<int, 3>& coord) { local_ghosts[coord] -= 1.0 / 3.0 * local_slice[coord]; });
 }
 /**
  * @brief Fill ghost cells for a finer neighbor
@@ -124,10 +130,7 @@ FillGhostCellsForLocalWithFineNbr(const PatchView<const double, 3>& view, Side<3
  * @param orthant the orthant of this patches side that the neighbor lies on
  */
 void
-FillGhostCellsForFineNbr(const PatchView<const double, 3>& local_view,
-                         const PatchView<const double, 3>& nbr_view,
-                         Side<3> side,
-                         Orthant<2> orthant)
+FillGhostCellsForFineNbr(const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Side<3> side, Orthant<2> orthant)
 {
   auto [offset_i, offset_j] = getOffset(local_view.getEnd(), side, orthant);
   View<const double, 3> local_slice = local_view.getSliceOn(side, { 0 });
@@ -151,9 +154,7 @@ FillGhostCellsForFineNbr(const PatchView<const double, 3>& local_view,
  * @param side the side of the patch that the neighbor is on
  */
 void
-FillGhostCellsForLocalWithCoarseNbr(const PatchInfo<3>& pinfo,
-                                    PatchView<const double, 3> view,
-                                    Side<3> side)
+FillGhostCellsForLocalWithCoarseNbr(const PatchInfo<3>& pinfo, PatchView<const double, 3> view, Side<3> side)
 {
   View<const double, 3> local_slice = view.getSliceOn(side, { 0 });
   View<double, 3> local_ghosts = view.getGhostSliceOn(side, { 0 });
@@ -186,14 +187,11 @@ FillGhostCellsForLocalWithCoarseNbr(const PatchInfo<3>& pinfo,
  * @param edge the edge that the neighbor is on
  */
 void
-FillGhostCellsForNormalEdgeNbr(const PatchView<const double, 3>& local_view,
-                               const PatchView<const double, 3>& nbr_view,
-                               Edge edge)
+FillGhostCellsForNormalEdgeNbr(const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Edge edge)
 {
   View<const double, 2> local_slice = local_view.getSliceOn(edge, { 0, 0 });
   View<double, 2> nbr_ghosts = nbr_view.getGhostSliceOn(edge.opposite(), { 0, 0 });
-  Loop::OverInteriorIndexes<2>(
-    nbr_ghosts, [&](const std::array<int, 2>& coord) { nbr_ghosts[coord] = local_slice[coord]; });
+  Loop::OverInteriorIndexes<2>(nbr_ghosts, [&](const std::array<int, 2>& coord) { nbr_ghosts[coord] = local_slice[coord]; });
 }
 /**
  * @brief Fill ghost cells for coarser neighbor
@@ -207,10 +205,7 @@ FillGhostCellsForNormalEdgeNbr(const PatchView<const double, 3>& local_view,
  * @param orthant the orthant of the neighbors edge that this patch lies on
  */
 void
-FillGhostCellsForCoarseEdgeNbr(const PatchView<const double, 3>& local_view,
-                               const PatchView<const double, 3>& nbr_view,
-                               Edge edge,
-                               Orthant<1> orthant)
+FillGhostCellsForCoarseEdgeNbr(const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Edge edge, Orthant<1> orthant)
 {
   View<const double, 2> local_slice = local_view.getSliceOn(edge, { 0, 0 });
   View<double, 2> nbr_ghosts = nbr_view.getGhostSliceOn(edge.opposite(), { 0, 0 });
@@ -236,10 +231,7 @@ FillGhostCellsForCoarseEdgeNbr(const PatchView<const double, 3>& local_view,
  * @param orthant the orthant of this patches edge that the neighbor lies on
  */
 void
-FillGhostCellsForFineEdgeNbr(const PatchView<const double, 3>& local_view,
-                             const PatchView<const double, 3>& nbr_view,
-                             Edge edge,
-                             Orthant<1> orthant)
+FillGhostCellsForFineEdgeNbr(const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Edge edge, Orthant<1> orthant)
 {
   View<const double, 2> local_slice = local_view.getSliceOn(edge, { 0, 0 });
   View<double, 2> nbr_ghosts = nbr_view.getGhostSliceOn(edge.opposite(), { 0, 0 });
@@ -263,9 +255,7 @@ FillGhostCellsForFineEdgeNbr(const PatchView<const double, 3>& local_view,
  * @param edge the edge of the patch that the neighbor is on
  */
 void
-FillGhostCellsForLocalWithCoarseEdgeNbr(const PatchInfo<3>& pinfo,
-                                        const PatchView<const double, 3>& view,
-                                        Edge edge)
+FillGhostCellsForLocalWithCoarseEdgeNbr(const PatchInfo<3>& pinfo, const PatchView<const double, 3>& view, Edge edge)
 {
   View<const double, 2> local_slice = view.getSliceOn(edge, { 0, 0 });
   View<double, 2> local_ghosts = view.getGhostSliceOn(edge, { 0, 0 });
@@ -299,9 +289,7 @@ FillGhostCellsForLocalWithFineEdgeNbr(const PatchView<const double, 3>& view, Ed
 {
   View<const double, 2> local_slice = view.getSliceOn(edge, { 0, 0 });
   View<double, 2> local_ghosts = view.getGhostSliceOn(edge, { 0, 0 });
-  Loop::OverInteriorIndexes<2>(local_ghosts, [&](const std::array<int, 2>& coord) {
-    local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord];
-  });
+  Loop::OverInteriorIndexes<2>(local_ghosts, [&](const std::array<int, 2>& coord) { local_ghosts[coord] += -1.0 / 3.0 * local_slice[coord]; });
 }
 
 //////////
@@ -316,14 +304,11 @@ FillGhostCellsForLocalWithFineEdgeNbr(const PatchView<const double, 3>& view, Ed
  * @param corner the corner that the neighbor is on
  */
 void
-FillGhostCellsForNormalCornerNbr(const PatchView<const double, 3>& local_view,
-                                 const PatchView<const double, 3>& nbr_view,
-                                 Corner<3> corner)
+FillGhostCellsForNormalCornerNbr(const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Corner<3> corner)
 {
   View<const double, 1> local_slice = local_view.getSliceOn(corner, { 0, 0, 0 });
   View<double, 1> nbr_ghost = nbr_view.getGhostSliceOn(corner.opposite(), { 0, 0, 0 });
-  Loop::OverInteriorIndexes<1>(
-    local_slice, [&](const std::array<int, 1>& coord) { nbr_ghost[coord] = local_slice[coord]; });
+  Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1>& coord) { nbr_ghost[coord] = local_slice[coord]; });
 }
 
 /**
@@ -337,15 +322,11 @@ FillGhostCellsForNormalCornerNbr(const PatchView<const double, 3>& local_view,
  * @param corner the corner of the patch that the neighbor patch is on
  */
 void
-FillGhostCellsForCoarseCornerNbr(const PatchView<const double, 3>& local_view,
-                                 const PatchView<const double, 3>& nbr_view,
-                                 Corner<3> corner)
+FillGhostCellsForCoarseCornerNbr(const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Corner<3> corner)
 {
   View<const double, 1> local_slice = local_view.getSliceOn(corner, { 0, 0, 0 });
   View<double, 1> nbr_ghost = nbr_view.getGhostSliceOn(corner.opposite(), { 0, 0, 0 });
-  Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1>& coord) {
-    nbr_ghost[coord] += 4.0 * local_slice[coord] / 3.0;
-  });
+  Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1>& coord) { nbr_ghost[coord] += 4.0 * local_slice[coord] / 3.0; });
 }
 /**
  * @brief Fill ghost cells for a finer neighbor
@@ -359,15 +340,11 @@ FillGhostCellsForCoarseCornerNbr(const PatchView<const double, 3>& local_view,
  * @param orthant the orthant of this patches edge that the neighbor lies on
  */
 void
-FillGhostCellsForFineCornerNbr(const PatchView<const double, 3>& local_view,
-                               const PatchView<const double, 3>& nbr_view,
-                               Corner<3> corner)
+FillGhostCellsForFineCornerNbr(const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Corner<3> corner)
 {
   View<const double, 1> local_slice = local_view.getSliceOn(corner, { 0, 0, 0 });
   View<double, 1> nbr_ghost = nbr_view.getGhostSliceOn(corner.opposite(), { 0, 0, 0 });
-  Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1>& coord) {
-    nbr_ghost[coord] += 2.0 * local_slice[coord] / 3.0;
-  });
+  Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1>& coord) { nbr_ghost[coord] += 2.0 * local_slice[coord] / 3.0; });
 }
 /**
  * @brief Add in the values need for this patch's ghost cells when there is a coarse neighbor
@@ -382,9 +359,7 @@ FillGhostCellsForLocalWithCoarseCornerNbr(const PatchView<const double, 3>& view
 {
   View<const double, 1> local_slice = view.getSliceOn(corner, { 0, 0, 0 });
   View<double, 1> local_ghost = view.getGhostSliceOn(corner, { 0, 0, 0 });
-  Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1>& coord) {
-    local_ghost[coord] += local_slice[coord] / 3.0;
-  });
+  Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1>& coord) { local_ghost[coord] += local_slice[coord] / 3.0; });
 }
 /**
  * @brief Add in the values need for this patches ghost cells when there is a fine neighbor
@@ -399,9 +374,7 @@ FillGhostCellsForLocalWithFineCornerNbr(const PatchView<const double, 3>& view, 
 {
   View<const double, 1> local_slice = view.getSliceOn(corner, { 0, 0, 0 });
   View<double, 1> local_ghost = view.getGhostSliceOn(corner, { 0, 0, 0 });
-  Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1>& coord) {
-    local_ghost[coord] += -local_slice[coord] / 3.0;
-  });
+  Loop::OverInteriorIndexes<1>(local_slice, [&](const std::array<int, 1>& coord) { local_ghost[coord] += -local_slice[coord] / 3.0; });
 }
 /**
  * @brief Add in extra information needed from the local patch on the sides
@@ -487,12 +460,7 @@ FillLocalGhostCellsOnCorners(const PatchInfo<3>& pinfo, const PatchView<const do
 } // namespace
 
 void
-TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3>& pinfo,
-                                                const PatchView<const double, 3>& local_view,
-                                                const PatchView<const double, 3>& nbr_view,
-                                                Side<3> side,
-                                                NbrType nbr_type,
-                                                Orthant<2> orthant) const
+TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3>& pinfo, const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Side<3> side, NbrType nbr_type, Orthant<2> orthant) const
 {
   switch (nbr_type) {
     case NbrType::Normal:
@@ -510,12 +478,7 @@ TriLinearGhostFiller::fillGhostCellsForNbrPatch(const PatchInfo<3>& pinfo,
 }
 
 void
-TriLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<3>& pinfo,
-                                                    const PatchView<const double, 3>& local_view,
-                                                    const PatchView<const double, 3>& nbr_view,
-                                                    Edge edge,
-                                                    NbrType nbr_type,
-                                                    Orthant<1> orthant_on_coarse) const
+TriLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<3>& pinfo, const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Edge edge, NbrType nbr_type, Orthant<1> orthant_on_coarse) const
 {
   switch (nbr_type) {
     case NbrType::Normal:
@@ -533,11 +496,7 @@ TriLinearGhostFiller::fillGhostCellsForEdgeNbrPatch(const PatchInfo<3>& pinfo,
 }
 
 void
-TriLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<3>& pinfo,
-                                                      const PatchView<const double, 3>& local_view,
-                                                      const PatchView<const double, 3>& nbr_view,
-                                                      Corner<3> corner,
-                                                      NbrType nbr_type) const
+TriLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<3>& pinfo, const PatchView<const double, 3>& local_view, const PatchView<const double, 3>& nbr_view, Corner<3> corner, NbrType nbr_type) const
 {
   switch (nbr_type) {
     case NbrType::Normal:
@@ -555,9 +514,7 @@ TriLinearGhostFiller::fillGhostCellsForCornerNbrPatch(const PatchInfo<3>& pinfo,
 }
 
 void
-TriLinearGhostFiller::fillGhostCellsForLocalPatch(
-  const PatchInfo<3>& pinfo,
-  const PatchView<const double, 3>& local_view) const
+TriLinearGhostFiller::fillGhostCellsForLocalPatch(const PatchInfo<3>& pinfo, const PatchView<const double, 3>& local_view) const
 {
   switch (this->getFillType()) {
     case GhostFillingType::Corners: // Fill corners, edges, and faces

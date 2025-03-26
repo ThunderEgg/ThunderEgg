@@ -20,7 +20,27 @@
 
 #include "P4estDomainGenerator.h"
 
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <algorithm>
+#include <array>
+#include <deque>
+#include <functional>
+#include <map>
+#include <mpi.h>
+#include <p4est_base.h>
+#include <p4est.h>
+#include <p4est_extended.h>
+#include <p4est_ghost.h>
 #include <p4est_iterate.h>
+#include <set>
+#include <vector>
 
 using namespace std;
 using namespace ThunderEgg;
