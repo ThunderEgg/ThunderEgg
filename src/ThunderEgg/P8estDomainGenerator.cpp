@@ -19,12 +19,33 @@
  ***************************************************************************/
 
 #include "P8estDomainGenerator.h"
-#include <mpi.h>
-#include <p8est_mesh.h>
 
-#include <p8est_extended.h>
-
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <algorithm>
+#include <array>
+#include <cstdint>
+#include <deque>
+#include <functional>
+#include <map>
+#include <mpi.h>
+#include <p4est_base.h>
+#include <p8est.h>
+#include <p8est_connectivity.h>
+#include <p8est_extended.h>
+#include <p8est_ghost.h>
+#include <p8est_iterate.h>
+#include <p8est_mesh.h>
+#include <sc.h>
+#include <sc_containers.h>
+#include <set>
+#include <vector>
 
 using namespace std;
 using namespace ThunderEgg;
@@ -67,23 +88,10 @@ IterCornerWrap(p8est_iter_corner_info_t* info, void* user_data)
 }
 
 void
-p8est_iterate_ext(p8est_t* p8est,
-                  p8est_ghost_t* ghost_layer,
-                  const std::function<void(const p8est_iter_volume_info_t*)>& iter_volume,
-                  const std::function<void(const p8est_iter_face_info_t*)>& iter_face,
-                  const std::function<void(const p8est_iter_edge_info_t*)>& iter_edge,
-                  const std::function<void(const p8est_iter_corner_info_t*)>& iter_corner,
-                  int remote)
+p8est_iterate_ext(p8est_t* p8est, p8est_ghost_t* ghost_layer, const std::function<void(const p8est_iter_volume_info_t*)>& iter_volume, const std::function<void(const p8est_iter_face_info_t*)>& iter_face, const std::function<void(const p8est_iter_edge_info_t*)>& iter_edge, const std::function<void(const p8est_iter_corner_info_t*)>& iter_corner, int remote)
 {
   IterateFunctions functions = { iter_volume, iter_face, iter_edge, iter_corner };
-  p8est_iterate_ext(p8est,
-                    ghost_layer,
-                    &functions,
-                    iter_volume ? &IterVolumeWrap : nullptr,
-                    iter_face ? &IterFaceWrap : nullptr,
-                    iter_edge ? &IterEdgeWrap : nullptr,
-                    iter_corner ? &IterCornerWrap : nullptr,
-                    remote);
+  p8est_iterate_ext(p8est, ghost_layer, &functions, iter_volume ? &IterVolumeWrap : nullptr, iter_face ? &IterFaceWrap : nullptr, iter_edge ? &IterEdgeWrap : nullptr, iter_corner ? &IterCornerWrap : nullptr, remote);
 }
 
 struct CoarsenFunctions
@@ -100,35 +108,18 @@ CoarsenWrap(p8est_t* p8est, p4est_topidx_t which_tree, p8est_quadrant_t* quadran
 }
 
 void
-ReplaceWrap(p8est_t* p8est,
-            p4est_topidx_t which_tree,
-            int num_outgoing,
-            p8est_quadrant_t* outgoing[],
-            int num_incoming,
-            p8est_quadrant_t* incoming[])
+ReplaceWrap(p8est_t* p8est, p4est_topidx_t which_tree, int num_outgoing, p8est_quadrant_t* outgoing[], int num_incoming, p8est_quadrant_t* incoming[])
 {
   const CoarsenFunctions* functions = (CoarsenFunctions*)p8est->user_pointer;
   functions->replace(which_tree, num_outgoing, outgoing, num_incoming, incoming);
 }
 
 void
-p8est_coarsen_ext(
-  p8est_t* p8est,
-  int coarsen_recursive,
-  int callback_orphans,
-  const std::function<int(p4est_topidx_t, p8est_quadrant_t*[])>& coarsen,
-  p8est_init_t init_fn,
-  const std::function<void(p4est_topidx_t, int, p8est_quadrant_t*[], int, p8est_quadrant_t*[])>&
-    replace)
+p8est_coarsen_ext(p8est_t* p8est, int coarsen_recursive, int callback_orphans, const std::function<int(p4est_topidx_t, p8est_quadrant_t*[])>& coarsen, p8est_init_t init_fn, const std::function<void(p4est_topidx_t, int, p8est_quadrant_t*[], int, p8est_quadrant_t*[])>& replace)
 {
   CoarsenFunctions functions = { coarsen, replace };
   p8est->user_pointer = &functions;
-  p8est_coarsen_ext(p8est,
-                    coarsen_recursive,
-                    callback_orphans,
-                    coarsen ? &CoarsenWrap : nullptr,
-                    init_fn,
-                    replace ? &ReplaceWrap : nullptr);
+  p8est_coarsen_ext(p8est, coarsen_recursive, callback_orphans, coarsen ? &CoarsenWrap : nullptr, init_fn, replace ? &ReplaceWrap : nullptr);
   p8est->user_pointer = nullptr;
 }
 
@@ -137,16 +128,7 @@ GetMaxLevel(p8est_t* p8est)
 {
   int max_level = 0;
 
-  p8est_iterate_ext(
-    p8est,
-    nullptr,
-    [&](const p8est_iter_volume_info_t* info) {
-      max_level = max(max_level, (int)info->quad->level);
-    },
-    nullptr,
-    nullptr,
-    nullptr,
-    false);
+  p8est_iterate_ext(p8est, nullptr, [&](const p8est_iter_volume_info_t* info) { max_level = max(max_level, (int)info->quad->level); }, nullptr, nullptr, nullptr, false);
 
   int global_max_level;
 
@@ -216,7 +198,8 @@ SetIds(p8est_t* p8est)
     false);
 }
 
-void SetLevels(p8est_t* p8est)
+void
+SetLevels(p8est_t* p8est)
 {
   p8est_iterate_ext(
     p8est,
@@ -236,10 +219,7 @@ void SetLevels(p8est_t* p8est)
 /*
  * constructor
  */
-P8estDomainGenerator::P8estDomainGenerator(p8est_t* p8est,
-                                           const std::array<int, 3>& ns,
-                                           int num_ghost_cells,
-                                           const BlockMapFunc& bmf)
+P8estDomainGenerator::P8estDomainGenerator(p8est_t* p8est, const std::array<int, 3>& ns, int num_ghost_cells, const BlockMapFunc& bmf)
   : ns(ns)
   , num_ghost_cells(num_ghost_cells)
   , bmf(bmf)
@@ -365,10 +345,7 @@ P8estDomainGenerator::createPatchInfos()
     nullptr,
     [&](const p8est_iter_volume_info_t* info) {
       Data* data = (Data*)info->quad->p.user_data;
-      data->pinfo =
-        &domain_patches
-           .front()[info->quadid +
-                    p8est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset];
+      data->pinfo = &domain_patches.front()[info->quadid + p8est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset];
 
       data->pinfo->rank = info->p4est->mpirank;
       data->pinfo->id = data->id;
@@ -383,28 +360,13 @@ P8estDomainGenerator::createPatchInfos()
       double unit_y = (double)info->quad->y / P8EST_ROOT_LEN;
       double unit_z = (double)info->quad->z / P8EST_ROOT_LEN;
 
-      bmf(info->treeid,
-          unit_x,
-          unit_y,
-          unit_z,
-          data->pinfo->starts[0],
-          data->pinfo->starts[1],
-          data->pinfo->starts[2]);
+      bmf(info->treeid, unit_x, unit_y, unit_z, data->pinfo->starts[0], data->pinfo->starts[1], data->pinfo->starts[2]);
 
-      double upper_unit_x =
-        (double)(info->quad->x + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
-      double upper_unit_y =
-        (double)(info->quad->y + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
-      double upper_unit_z =
-        (double)(info->quad->z + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
+      double upper_unit_x = (double)(info->quad->x + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
+      double upper_unit_y = (double)(info->quad->y + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
+      double upper_unit_z = (double)(info->quad->z + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
 
-      bmf(info->treeid,
-          upper_unit_x,
-          upper_unit_y,
-          upper_unit_z,
-          data->pinfo->spacings[0],
-          data->pinfo->spacings[1],
-          data->pinfo->spacings[2]);
+      bmf(info->treeid, upper_unit_x, upper_unit_y, upper_unit_z, data->pinfo->spacings[0], data->pinfo->spacings[1], data->pinfo->spacings[2]);
 
       for (int i = 0; i < 3; i++) {
         data->pinfo->spacings[i] -= data->pinfo->starts[i];
@@ -539,8 +501,7 @@ SetEdgeNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, int
   } else {
     p4est_locidx_t offset_index = qte - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
     p4est_locidx_t start_index = *(p4est_locidx_t*)sc_array_index(mesh->edge_offset, offset_index);
-    p4est_locidx_t end_index =
-      *(p4est_locidx_t*)sc_array_index(mesh->edge_offset, offset_index + 1);
+    p4est_locidx_t end_index = *(p4est_locidx_t*)sc_array_index(mesh->edge_offset, offset_index + 1);
 
     int8_t ee = *(int8_t*)sc_array_index(mesh->edge_edge, start_index);
 
@@ -612,10 +573,8 @@ SetCornerNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, i
     level_diff = data->level - data_ptrs[qtc]->level;
   } else {
     p4est_locidx_t offset_index = qtc - (mesh->local_num_quadrants + mesh->ghost_num_quadrants);
-    p4est_locidx_t start_index =
-      *(p4est_locidx_t*)sc_array_index(mesh->corner_offset, offset_index);
-    p4est_locidx_t end_index =
-      *(p4est_locidx_t*)sc_array_index(mesh->corner_offset, offset_index + 1);
+    p4est_locidx_t start_index = *(p4est_locidx_t*)sc_array_index(mesh->corner_offset, offset_index);
+    p4est_locidx_t end_index = *(p4est_locidx_t*)sc_array_index(mesh->corner_offset, offset_index + 1);
 
     if (end_index - start_index != 1) {
       throw RuntimeError("Unsupported number of corner neighbors");
@@ -626,27 +585,22 @@ SetCornerNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, i
     nbr_rank = data_ptrs[cq]->rank;
     level_diff = data->level - data_ptrs[cq]->level;
   }
-  if(level_diff < -1 || level_diff > 1) {
+  if (level_diff < -1 || level_diff > 1) {
     throw RuntimeError("Invalid level difference between corner and neighbor");
   }
-  if(level_diff == 0)
-  {
+  if (level_diff == 0) {
     // normal nbr
     NormalNbrInfo<0>* nbr_info = new NormalNbrInfo<0>(nbr_id);
     nbr_info->rank = nbr_rank;
     data->pinfo->setNbrInfo(corner, nbr_info);
-  }
-  else if(level_diff == 1)
-  {
+  } else if (level_diff == 1) {
     // coarse nbr
     CoarseNbrInfo<0>* nbr_info = new CoarseNbrInfo<0>();
     nbr_info->orth_on_coarse = Orthant<0>(0);
     nbr_info->id = nbr_id;
     nbr_info->rank = nbr_rank;
     data->pinfo->setNbrInfo(corner, nbr_info);
-  }
-  else if(level_diff == -1)
-  {
+  } else if (level_diff == -1) {
     // fine nbr
     FineNbrInfo<0>* nbr_info = new FineNbrInfo<0>();
     nbr_info->ids[0] = nbr_id;
@@ -779,8 +733,7 @@ P8estDomainGenerator::getCoarserDomain()
   if (curr_level >= 0) {
     extractLevel();
   }
-  Domain<3> domain(
-    comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
+  Domain<3> domain(comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
   domain_patches.pop_back();
   id++;
   return domain;
@@ -792,8 +745,7 @@ P8estDomainGenerator::getFinestDomain()
   if (curr_level >= 0) {
     extractLevel();
   }
-  Domain<3> domain(
-    comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
+  Domain<3> domain(comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
   domain_patches.pop_back();
   id++;
   return domain;
