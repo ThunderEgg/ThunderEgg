@@ -50,47 +50,18 @@ using namespace std;
 using namespace ThunderEgg;
 
 namespace {
-struct IterateFunctions
-{
-  std::function<void(p8est_iter_volume_info_t*)> iter_volume;
-  std::function<void(p8est_iter_face_info_t*)> iter_face;
-  std::function<void(p8est_iter_edge_info_t*)> iter_edge;
-  std::function<void(p8est_iter_corner_info_t*)> iter_corner;
-};
-
 void
 IterVolumeWrap(p8est_iter_volume_info_t* info, void* user_data)
 {
-  const IterateFunctions* functions = (IterateFunctions*)user_data;
-  functions->iter_volume(info);
+  const std::function<void(p8est_iter_volume_info_t*)>* iter_volume =
+    (const std::function<void(p8est_iter_volume_info_t*)>*)user_data;
+  (*iter_volume)(info);
 }
 
 void
-IterFaceWrap(p8est_iter_face_info_t* info, void* user_data)
+IterVolume(p8est_t* p8est, const std::function<void(const p8est_iter_volume_info_t*)>& iter_volume)
 {
-  const IterateFunctions* functions = (IterateFunctions*)user_data;
-  functions->iter_face(info);
-}
-
-void
-IterEdgeWrap(p8est_iter_edge_info_t* info, void* user_data)
-{
-  const IterateFunctions* functions = (IterateFunctions*)user_data;
-  functions->iter_edge(info);
-}
-
-void
-IterCornerWrap(p8est_iter_corner_info_t* info, void* user_data)
-{
-  const IterateFunctions* functions = (IterateFunctions*)user_data;
-  functions->iter_corner(info);
-}
-
-void
-p8est_iterate_ext(p8est_t* p8est, p8est_ghost_t* ghost_layer, const std::function<void(const p8est_iter_volume_info_t*)>& iter_volume, const std::function<void(const p8est_iter_face_info_t*)>& iter_face, const std::function<void(const p8est_iter_edge_info_t*)>& iter_edge, const std::function<void(const p8est_iter_corner_info_t*)>& iter_corner, int remote)
-{
-  IterateFunctions functions = { iter_volume, iter_face, iter_edge, iter_corner };
-  p8est_iterate_ext(p8est, ghost_layer, &functions, iter_volume ? &IterVolumeWrap : nullptr, iter_face ? &IterFaceWrap : nullptr, iter_edge ? &IterEdgeWrap : nullptr, iter_corner ? &IterCornerWrap : nullptr, remote);
+  p8est_iterate(p8est, nullptr, (void*)&iter_volume, IterVolumeWrap, nullptr, nullptr, nullptr);
 }
 
 struct CoarsenFunctions
@@ -107,18 +78,33 @@ CoarsenWrap(p8est_t* p8est, p4est_topidx_t which_tree, p8est_quadrant_t* quadran
 }
 
 void
-ReplaceWrap(p8est_t* p8est, p4est_topidx_t which_tree, int num_outgoing, p8est_quadrant_t* outgoing[], int num_incoming, p8est_quadrant_t* incoming[])
+ReplaceWrap(p8est_t* p8est,
+            p4est_topidx_t which_tree,
+            int num_outgoing,
+            p8est_quadrant_t* outgoing[],
+            int num_incoming,
+            p8est_quadrant_t* incoming[])
 {
   const CoarsenFunctions* functions = (CoarsenFunctions*)p8est->user_pointer;
   functions->replace(which_tree, num_outgoing, outgoing, num_incoming, incoming);
 }
 
 void
-p8est_coarsen_ext(p8est_t* p8est, int coarsen_recursive, int callback_orphans, const std::function<int(p4est_topidx_t, p8est_quadrant_t*[])>& coarsen, p8est_init_t init_fn, const std::function<void(p4est_topidx_t, int, p8est_quadrant_t*[], int, p8est_quadrant_t*[])>& replace)
+Coarsen(p8est_t* p8est,
+        int coarsen_recursive,
+        int callback_orphans,
+        const std::function<int(p4est_topidx_t, p8est_quadrant_t*[])>& coarsen,
+        p8est_init_t init_fn,
+        const std::function<void(p4est_topidx_t, int, p8est_quadrant_t*[], int, p8est_quadrant_t*[])>& replace)
 {
   CoarsenFunctions functions = { coarsen, replace };
   p8est->user_pointer = &functions;
-  p8est_coarsen_ext(p8est, coarsen_recursive, callback_orphans, coarsen ? &CoarsenWrap : nullptr, init_fn, replace ? &ReplaceWrap : nullptr);
+  p8est_coarsen_ext(p8est,
+                    coarsen_recursive,
+                    callback_orphans,
+                    coarsen ? &CoarsenWrap : nullptr,
+                    init_fn,
+                    replace ? &ReplaceWrap : nullptr);
   p8est->user_pointer = nullptr;
 }
 
@@ -127,7 +113,7 @@ GetMaxLevel(p8est_t* p8est)
 {
   int max_level = 0;
 
-  p8est_iterate_ext(p8est, nullptr, [&](const p8est_iter_volume_info_t* info) { max_level = max(max_level, (int)info->quad->level); }, nullptr, nullptr, nullptr, false);
+  IterVolume(p8est, [&](const p8est_iter_volume_info_t* info) { max_level = max(max_level, (int)info->quad->level); });
 
   int global_max_level;
 
@@ -163,17 +149,10 @@ SetRanks(p8est_t* p8est)
   int rank;
   MPI_Comm_rank(p8est->mpicomm, &rank);
 
-  p8est_iterate_ext(
-    p8est,
-    nullptr,
-    [=](const p8est_iter_volume_info_t* info) {
-      Data* data = (Data*)info->quad->p.user_data;
-      data->rank = rank;
-    },
-    nullptr,
-    nullptr,
-    nullptr,
-    false);
+  IterVolume(p8est, [=](const p8est_iter_volume_info_t* info) {
+    Data* data = (Data*)info->quad->p.user_data;
+    data->rank = rank;
+  });
 }
 
 void
@@ -183,34 +162,20 @@ SetIds(p8est_t* p8est)
   MPI_Scan(&p8est->local_num_quadrants, &curr_global_id, 1, MPI_INT, MPI_SUM, p8est->mpicomm);
   curr_global_id -= p8est->local_num_quadrants;
 
-  p8est_iterate_ext(
-    p8est,
-    nullptr,
-    [&](const p8est_iter_volume_info_t* info) {
-      Data* data = (Data*)info->quad->p.user_data;
-      data->id = curr_global_id;
-      curr_global_id++;
-    },
-    nullptr,
-    nullptr,
-    nullptr,
-    false);
+  IterVolume(p8est, [&](const p8est_iter_volume_info_t* info) {
+    Data* data = (Data*)info->quad->p.user_data;
+    data->id = curr_global_id;
+    curr_global_id++;
+  });
 }
 
 void
 SetLevels(p8est_t* p8est)
 {
-  p8est_iterate_ext(
-    p8est,
-    nullptr,
-    [](const p8est_iter_volume_info_t* info) {
-      Data* data = (Data*)info->quad->p.user_data;
-      data->level = info->quad->level;
-    },
-    nullptr,
-    nullptr,
-    nullptr,
-    false);
+  IterVolume(p8est, [](const p8est_iter_volume_info_t* info) {
+    Data* data = (Data*)info->quad->p.user_data;
+    data->level = info->quad->level;
+  });
 }
 
 } // namespace
@@ -218,7 +183,10 @@ SetLevels(p8est_t* p8est)
 /*
  * constructor
  */
-P8estDomainGenerator::P8estDomainGenerator(p8est_t* p8est, const std::array<int, 3>& ns, int num_ghost_cells, const BlockMapFunc& bmf)
+P8estDomainGenerator::P8estDomainGenerator(p8est_t* p8est,
+                                           const std::array<int, 3>& ns,
+                                           int num_ghost_cells,
+                                           const BlockMapFunc& bmf)
   : ns(ns)
   , num_ghost_cells(num_ghost_cells)
   , bmf(bmf)
@@ -285,7 +253,7 @@ P8estDomainGenerator::extractLevel()
 void
 P8estDomainGenerator::coarsenTree()
 {
-  p8est_coarsen_ext(
+  Coarsen(
     my_p8est,
     false,
     true,
@@ -339,43 +307,44 @@ void
 P8estDomainGenerator::createPatchInfos()
 {
   domain_patches.emplace_front(my_p8est->local_num_quadrants);
-  p8est_iterate_ext(
-    my_p8est,
-    nullptr,
-    [&](const p8est_iter_volume_info_t* info) {
-      Data* data = (Data*)info->quad->p.user_data;
-      data->pinfo = &domain_patches.front()[info->quadid + p8est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset];
+  IterVolume(my_p8est, [&](const p8est_iter_volume_info_t* info) {
+    Data* data = (Data*)info->quad->p.user_data;
+    data->pinfo =
+      &domain_patches
+         .front()[info->quadid + p8est_tree_array_index(info->p4est->trees, info->treeid)->quadrants_offset];
 
-      data->pinfo->rank = info->p4est->mpirank;
-      data->pinfo->id = data->id;
-      data->pinfo->ns = ns;
-      data->pinfo->num_ghost_cells = num_ghost_cells;
-      data->pinfo->refine_level = info->quad->level;
+    data->pinfo->rank = info->p4est->mpirank;
+    data->pinfo->id = data->id;
+    data->pinfo->ns = ns;
+    data->pinfo->num_ghost_cells = num_ghost_cells;
+    data->pinfo->refine_level = info->quad->level;
 
-      data->pinfo->child_ids = data->child_ids;
-      data->pinfo->child_ranks = data->child_ranks;
+    data->pinfo->child_ids = data->child_ids;
+    data->pinfo->child_ranks = data->child_ranks;
 
-      double unit_x = (double)info->quad->x / P8EST_ROOT_LEN;
-      double unit_y = (double)info->quad->y / P8EST_ROOT_LEN;
-      double unit_z = (double)info->quad->z / P8EST_ROOT_LEN;
+    double unit_x = (double)info->quad->x / P8EST_ROOT_LEN;
+    double unit_y = (double)info->quad->y / P8EST_ROOT_LEN;
+    double unit_z = (double)info->quad->z / P8EST_ROOT_LEN;
 
-      bmf(info->treeid, unit_x, unit_y, unit_z, data->pinfo->starts[0], data->pinfo->starts[1], data->pinfo->starts[2]);
+    bmf(info->treeid, unit_x, unit_y, unit_z, data->pinfo->starts[0], data->pinfo->starts[1], data->pinfo->starts[2]);
 
-      double upper_unit_x = (double)(info->quad->x + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
-      double upper_unit_y = (double)(info->quad->y + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
-      double upper_unit_z = (double)(info->quad->z + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
+    double upper_unit_x = (double)(info->quad->x + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
+    double upper_unit_y = (double)(info->quad->y + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
+    double upper_unit_z = (double)(info->quad->z + P8EST_QUADRANT_LEN(info->quad->level)) / P8EST_ROOT_LEN;
 
-      bmf(info->treeid, upper_unit_x, upper_unit_y, upper_unit_z, data->pinfo->spacings[0], data->pinfo->spacings[1], data->pinfo->spacings[2]);
+    bmf(info->treeid,
+        upper_unit_x,
+        upper_unit_y,
+        upper_unit_z,
+        data->pinfo->spacings[0],
+        data->pinfo->spacings[1],
+        data->pinfo->spacings[2]);
 
-      for (int i = 0; i < 3; i++) {
-        data->pinfo->spacings[i] -= data->pinfo->starts[i];
-        data->pinfo->spacings[i] /= ns[i];
-      }
-    },
-    nullptr,
-    nullptr,
-    nullptr,
-    false);
+    for (int i = 0; i < 3; i++) {
+      data->pinfo->spacings[i] -= data->pinfo->starts[i];
+      data->pinfo->spacings[i] /= ns[i];
+    }
+  });
 }
 
 /*
@@ -627,17 +596,11 @@ P8estDomainGenerator::linkNeighbors()
 
   vector<Data*> data_ptrs(my_p8est->local_num_quadrants + ghost->ghosts.elem_count);
   p4est_locidx_t curr_id = 0;
-  p8est_iterate_ext(
-    my_p8est,
-    ghost,
-    [&](const p8est_iter_volume_info_t* info) {
-      data_ptrs[curr_id] = (Data*)info->quad->p.user_data;
-      curr_id++;
-    },
-    nullptr,
-    nullptr,
-    nullptr,
-    false);
+  IterVolume(my_p8est, [&](const p8est_iter_volume_info_t* info) {
+    data_ptrs[curr_id] = (Data*)info->quad->p.user_data;
+    curr_id++;
+  });
+
   for (int i = 0; i < ghost->ghosts.elem_count; i++) {
     data_ptrs[my_p8est->local_num_quadrants + i] = &ghost_data[i];
   }
