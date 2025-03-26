@@ -29,14 +29,6 @@
 			}
 		},
 		{
-			"name": "ci", "inherits": "default",
-			"cacheVariables": {
-				"CMAKE_C_COMPILER_LAUNCHER": "ccache",
-				"CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
-				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-			}
-		},
-		{
 			"name": "ci-clang", "inherits": "ci",
 			"cacheVariables": {
 				"CMAKE_CXX_FLAGS": "-fprofile-instr-generate -fcoverage-mapping"
