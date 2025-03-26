@@ -25,7 +25,6 @@
 #include <ThunderEgg/Face.h>
 #include <ThunderEgg/NbrType.h>
 #include <algorithm>
-#include <cstddef>
 #include <limits>
 #include <map>
 #include <mpi.h>

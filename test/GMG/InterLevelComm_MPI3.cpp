@@ -26,7 +26,6 @@
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
 #include <array>
-#include <cstddef>
 #include <map>
 #include <mpi.h>
 #include <set>

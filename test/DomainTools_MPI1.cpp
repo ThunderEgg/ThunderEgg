@@ -27,7 +27,6 @@
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
 #include <array>
-#include <cstddef>
 #include <mpi.h>
 #include <vector>
 
