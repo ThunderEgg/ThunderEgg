@@ -159,13 +159,10 @@ target_link_libraries(unit_tests_mpi1 test_shared)
 target_link_libraries(unit_tests_mpi2 test_shared)
 target_link_libraries(unit_tests_mpi3 test_shared)
 
-include(cmake/doctest.cmake)
+add_test(NAME unit_tests_mpi1 COMMAND unit_tests_mpi1)
 
-function(add_mpi_test TARGET NUMPROC)
-  set_target_properties(${TARGET} PROPERTIES CROSSCOMPILING_EMULATOR "${MPIEXEC};${MPIEXEC_NUMPROC_FLAG};${NUMPROC};${THUNDEREGG_MPIEXEC_FLAGS}")
-  doctest_discover_tests(${TARGET} TEST_PREFIX "${TARGET}___" PROPERTIES PROCESSORS ${NUMPROC})
-endfunction(add_mpi_test)
+add_test(NAME unit_tests_mpi2 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${THUNDEREGG_MPIEXEC_FLAGS} unit_tests_mpi2)
+set_tests_properties(unit_tests_mpi2 PROPERTIES PROCESSORS 2)
 
-add_mpi_test(unit_tests_mpi1 1)
-add_mpi_test(unit_tests_mpi2 2)
-add_mpi_test(unit_tests_mpi3 3)
+add_test(NAME unit_tests_mpi3 COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ${THUNDEREGG_MPIEXEC_FLAGS} unit_tests_mpi3)
+set_tests_properties(unit_tests_mpi3 PROPERTIES PROCESSORS 3)
