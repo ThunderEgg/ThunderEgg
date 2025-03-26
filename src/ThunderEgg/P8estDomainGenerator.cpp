@@ -42,7 +42,6 @@
 #include <p8est_ghost.h>
 #include <p8est_iterate.h>
 #include <p8est_mesh.h>
-#include <sc.h>
 #include <sc_containers.h>
 #include <set>
 #include <vector>
