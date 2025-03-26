@@ -479,11 +479,11 @@ SetFaceNbrInfo(p8est_mesh_t* mesh, vector<Data*>& data_ptrs, p4est_locidx_t quad
 }
 
 void
-SetEdgeNbrInfo(p8est_mesh_t* mesh, vector<Data*>& data_ptrs, p4est_locidx_t quadid, int i)
+SetEdgeNbrInfo(p8est_mesh_t* mesh, vector<Data*>& data_ptrs, p4est_locidx_t quadid, int e)
 {
   Data* data = data_ptrs[quadid];
-  Edge edge = getEdge(i);
-  int index = quadid * 12 + i;
+  Edge edge = getEdge(e);
+  int index = quadid * 12 + e;
   p4est_locidx_t qte = mesh->quad_to_edge[index];
 
   if (qte < 0) {
