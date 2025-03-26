@@ -19,6 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+        - name : "gcc"
+          preset: "ci"
+          analyze: false
         - name: "clang"
           preset: "ci-clang"
           analyze: true
