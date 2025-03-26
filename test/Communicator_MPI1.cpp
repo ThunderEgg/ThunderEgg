@@ -17,7 +17,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
+
 #include <ThunderEgg/Communicator.h>
+
+#include <ThunderEgg/RuntimeError.h>
+#include <mpi.h>
+#include <utility>
 
 #include <doctest.h>
 

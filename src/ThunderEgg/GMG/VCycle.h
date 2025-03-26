@@ -25,8 +25,12 @@
  *
  * @brief VCycle class
  */
+
 #include <ThunderEgg/GMG/Cycle.h>
 #include <ThunderEgg/GMG/CycleOpts.h>
+#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/GMG/Level.h>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Implementation of a V-cycle

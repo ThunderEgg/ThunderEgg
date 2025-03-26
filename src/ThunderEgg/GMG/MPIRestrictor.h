@@ -25,10 +25,18 @@
  *
  * @brief MPIRestrictor class
  */
+
+#include <ThunderEgg/Config.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
-#include <ThunderEgg/GMG/Level.h>
 #include <ThunderEgg/GMG/Restrictor.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Vector.h>
+#include <functional>
+#include <utility>
+#include <vector>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Base class that makes the necessary mpi calls, derived classes only have to
@@ -51,14 +59,13 @@ public:
    */
   MPIRestrictor(const Domain<D>& coarser_domain, const Domain<D>& finer_domain)
     : ilc(coarser_domain, finer_domain)
-  {}
+  {
+  }
   Vector<D> restrict(const Vector<D>& fine) const override
   {
     if constexpr (ENABLE_DEBUG) {
       if (fine.getNumLocalPatches() != ilc.getFinerDomain().getNumLocalPatches()) {
-        throw RuntimeError("fine vector is incorrect length. Expected Length of " +
-                           std::to_string(ilc.getFinerDomain().getNumLocalPatches()) +
-                           " but vector was length " + std::to_string(fine.getNumLocalPatches()));
+        throw RuntimeError("fine vector is incorrect length. Expected Length of " + std::to_string(ilc.getFinerDomain().getNumLocalPatches()) + " but vector was length " + std::to_string(fine.getNumLocalPatches()));
       }
     }
     Vector<D> coarse(ilc.getCoarserDomain(), fine.getNumComponents());
@@ -93,10 +100,7 @@ public:
    * @param finer_vector the finer vector
    * @param coarser_vector the coarser vector
    */
-  virtual void restrictPatches(
-    const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches,
-    const Vector<D>& finer_vector,
-    Vector<D>& coarser_vector) const = 0;
+  virtual void restrictPatches(const std::vector<std::pair<int, std::reference_wrapper<const PatchInfo<D>>>>& patches, const Vector<D>& finer_vector, Vector<D>& coarser_vector) const = 0;
 };
 } // namespace ThunderEgg::GMG
 // explicit instantiation

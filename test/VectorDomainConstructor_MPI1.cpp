@@ -21,6 +21,14 @@
 #include "utils/DomainReader.h"
 #include <ThunderEgg/Vector.h>
 
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Config.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <mpi.h>
+
 #include <doctest.h>
 
 using namespace std;

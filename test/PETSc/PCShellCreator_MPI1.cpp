@@ -19,8 +19,17 @@
  ***************************************************************************/
 
 #include "../utils/DomainReader.h"
-#include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
+
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Operator.h>
+#include <ThunderEgg/Vector.h>
+#include <mpi.h>
+#include <petscpc.h>
+#include <petscpctypes.h>
+#include <petscsys.h>
+#include <petscvec.h>
+#include <string>
 
 #include <doctest.h>
 

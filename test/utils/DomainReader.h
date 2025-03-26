@@ -18,9 +18,17 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 #include <TestConfig.h>
+#include <ThunderEgg/Communicator.h>
 #include <ThunderEgg/Domain.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/tpl/json.hpp>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <array>
+#include <cstddef>
+#include <deque>
 #include <fstream>
+#include <memory>
+#include <mpi.h>
 #include <string>
 template<int D>
 class DomainReader
@@ -61,16 +69,14 @@ public:
       if (patch.rank == comm.getRank())
         finer_patches.push_back(patch);
     }
-    finer_domain = std::make_shared<ThunderEgg::Domain<D>>(
-      comm, 0, ns, num_ghost, finer_patches.begin(), finer_patches.end());
+    finer_domain = std::make_shared<ThunderEgg::Domain<D>>(comm, 0, ns, num_ghost, finer_patches.begin(), finer_patches.end());
     std::deque<ThunderEgg::PatchInfo<D>> coarser_patches;
     for (ThunderEgg::tpl::nlohmann::json& patch_j : j.at("levels")[1]) {
       auto patch = parsePatch(patch_j);
       if (patch.rank == comm.getRank())
         coarser_patches.push_back(patch);
     }
-    coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(
-      comm, 1, ns, num_ghost, coarser_patches.begin(), coarser_patches.end());
+    coarser_domain = std::make_shared<ThunderEgg::Domain<D>>(comm, 1, ns, num_ghost, coarser_patches.begin(), coarser_patches.end());
   }
   ThunderEgg::Domain<D> getCoarserDomain() { return *coarser_domain; }
   ThunderEgg::Domain<D> getFinerDomain() { return *finer_domain; }

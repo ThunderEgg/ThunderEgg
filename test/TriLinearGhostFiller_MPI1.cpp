@@ -18,9 +18,18 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 #include "utils/DomainReader.h"
-#include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
+
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/GhostFillingType.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
 
 #include <doctest.h>
 

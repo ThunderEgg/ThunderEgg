@@ -81,6 +81,11 @@ jobs:
       uses: codecov/codecov-action@v5
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    
+    - name: Check for missing and/or extra includes
+      if: ${{ matrix.analyze }}
+      run: |
+        python3 scripts/clang-tidy.py clang-tidy out/build/${{ matrix.preset }}/compile_commands.json src/ test/
 
 
   macos:

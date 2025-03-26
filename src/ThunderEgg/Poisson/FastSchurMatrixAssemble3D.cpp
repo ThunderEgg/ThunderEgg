@@ -19,8 +19,41 @@
  ***************************************************************************/
 
 #include "FastSchurMatrixAssemble3D.h"
+
+#include <ThunderEgg/CoarseNbrInfo.h>
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/FineNbrInfo.h>
+#include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/MPIGhostFiller.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/NormalNbrInfo.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Poisson/FFTWPatchSolver.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Schur/IfaceType.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
+#include <ThunderEgg/Schur/PatchIfaceInfo.h>
 #include <ThunderEgg/TriLinearGhostFiller.h>
+#include <ThunderEgg/Vector.h>
+#include <ThunderEgg/View.h>
+#include <array>
+#include <bitset>
+#include <cstddef>
+#include <functional>
+#include <map>
+#include <memory>
+#include <mpi.h>
+#include <numeric>
+#include <petscmat.h>
+#include <petscsystypes.h>
+#include <set>
+#include <tuple>
+#include <utility>
+#include <vector>
+
 using namespace std;
 using namespace ThunderEgg;
 using namespace ThunderEgg::Schur;
@@ -60,12 +93,7 @@ public:
   bool orig_aux_is_left_oriented;
   unsigned char main_rotation = 0;
   unsigned char aux_rotation = 0;
-  Block(Side<3> main,
-        int j,
-        Side<3> aux,
-        int i,
-        bitset<6> non_dirichlet_boundary,
-        IfaceType<3> type)
+  Block(Side<3> main, int j, Side<3> aux, int i, bitset<6> non_dirichlet_boundary, IfaceType<3> type)
     : type(type)
     , main(main)
     , aux(aux)
@@ -122,87 +150,18 @@ public:
       type.setOrthant(Orthant<2>((unsigned char)quad));
     }
   }
-  bool operator<(const Block& b) const
-  {
-    return std::tie(i, j, main_rotation, orig_main_is_left_oriented, aux_rotation) <
-           std::tie(b.i, b.j, b.main_rotation, b.orig_main_is_left_oriented, b.aux_rotation);
-  }
+  bool operator<(const Block& b) const { return std::tie(i, j, main_rotation, orig_main_is_left_oriented, aux_rotation) < std::tie(b.i, b.j, b.main_rotation, b.orig_main_is_left_oriented, b.aux_rotation); }
   bool mainFlipped() const { return sideIsLeftOriented(main) != orig_main_is_left_oriented; }
   bool auxFlipped() const { return sideIsLeftOriented(aux) != orig_aux_is_left_oriented; }
 };
 
-const Side<3> Block::side_table[6][6] = { { Side<3>::west(),
-                                            Side<3>::east(),
-                                            Side<3>::top(),
-                                            Side<3>::bottom(),
-                                            Side<3>::south(),
-                                            Side<3>::north() },
-                                          { Side<3>::west(),
-                                            Side<3>::east(),
-                                            Side<3>::bottom(),
-                                            Side<3>::top(),
-                                            Side<3>::north(),
-                                            Side<3>::south() },
-                                          { Side<3>::bottom(),
-                                            Side<3>::top(),
-                                            Side<3>::south(),
-                                            Side<3>::north(),
-                                            Side<3>::east(),
-                                            Side<3>::west() },
-                                          { Side<3>::top(),
-                                            Side<3>::bottom(),
-                                            Side<3>::south(),
-                                            Side<3>::north(),
-                                            Side<3>::west(),
-                                            Side<3>::east() },
-                                          { Side<3>::north(),
-                                            Side<3>::south(),
-                                            Side<3>::west(),
-                                            Side<3>::east(),
-                                            Side<3>::bottom(),
-                                            Side<3>::top() },
-                                          { Side<3>::south(),
-                                            Side<3>::north(),
-                                            Side<3>::east(),
-                                            Side<3>::west(),
-                                            Side<3>::bottom(),
-                                            Side<3>::top() } };
-const char Block::rots_table[6][6] = { { 3, 1, 0, 0, 2, 2 }, { 1, 3, 2, 2, 0, 0 },
-                                       { 1, 3, 3, 1, 1, 3 }, { 1, 3, 1, 3, 3, 1 },
-                                       { 0, 0, 0, 0, 3, 1 }, { 0, 0, 0, 0, 1, 3 } };
-const vector<Rotation> Block::main_rot_plan[6] = { {},
-                                                   { Rotation::z_cw, Rotation::z_cw },
-                                                   { Rotation::z_cw },
-                                                   { Rotation::z_ccw },
-                                                   { Rotation::y_ccw },
-                                                   { Rotation::y_cw } };
-const vector<Rotation> Block::aux_rot_plan_dirichlet[6] = {
-  {}, {}, {}, { Rotation::x_cw, Rotation::x_cw }, { Rotation::x_cw }, { Rotation::x_ccw }
-};
-const vector<Rotation> Block::aux_rot_plan_neumann[16] = { {},
-                                                           {},
-                                                           { Rotation::x_cw, Rotation::x_cw },
-                                                           {},
-                                                           { Rotation::x_cw },
-                                                           { Rotation::x_cw },
-                                                           { Rotation::x_cw, Rotation::x_cw },
-                                                           { Rotation::x_cw, Rotation::x_cw },
-                                                           { Rotation::x_ccw },
-                                                           {},
-                                                           { Rotation::x_ccw },
-                                                           {},
-                                                           { Rotation::x_ccw },
-                                                           { Rotation::x_cw },
-                                                           { Rotation::x_ccw },
-                                                           {} };
-const char Block::rot_quad_lookup_left[4][4] = { { 0, 1, 2, 3 },
-                                                 { 1, 3, 0, 2 },
-                                                 { 3, 2, 1, 0 },
-                                                 { 2, 0, 3, 1 } };
-const char Block::rot_quad_lookup_right[4][4] = { { 0, 1, 2, 3 },
-                                                  { 2, 0, 3, 1 },
-                                                  { 3, 2, 1, 0 },
-                                                  { 1, 3, 0, 2 } };
+const Side<3> Block::side_table[6][6] = { { Side<3>::west(), Side<3>::east(), Side<3>::top(), Side<3>::bottom(), Side<3>::south(), Side<3>::north() }, { Side<3>::west(), Side<3>::east(), Side<3>::bottom(), Side<3>::top(), Side<3>::north(), Side<3>::south() }, { Side<3>::bottom(), Side<3>::top(), Side<3>::south(), Side<3>::north(), Side<3>::east(), Side<3>::west() }, { Side<3>::top(), Side<3>::bottom(), Side<3>::south(), Side<3>::north(), Side<3>::west(), Side<3>::east() }, { Side<3>::north(), Side<3>::south(), Side<3>::west(), Side<3>::east(), Side<3>::bottom(), Side<3>::top() }, { Side<3>::south(), Side<3>::north(), Side<3>::east(), Side<3>::west(), Side<3>::bottom(), Side<3>::top() } };
+const char Block::rots_table[6][6] = { { 3, 1, 0, 0, 2, 2 }, { 1, 3, 2, 2, 0, 0 }, { 1, 3, 3, 1, 1, 3 }, { 1, 3, 1, 3, 3, 1 }, { 0, 0, 0, 0, 3, 1 }, { 0, 0, 0, 0, 1, 3 } };
+const vector<Rotation> Block::main_rot_plan[6] = { {}, { Rotation::z_cw, Rotation::z_cw }, { Rotation::z_cw }, { Rotation::z_ccw }, { Rotation::y_ccw }, { Rotation::y_cw } };
+const vector<Rotation> Block::aux_rot_plan_dirichlet[6] = { {}, {}, {}, { Rotation::x_cw, Rotation::x_cw }, { Rotation::x_cw }, { Rotation::x_ccw } };
+const vector<Rotation> Block::aux_rot_plan_neumann[16] = { {}, {}, { Rotation::x_cw, Rotation::x_cw }, {}, { Rotation::x_cw }, { Rotation::x_cw }, { Rotation::x_cw, Rotation::x_cw }, { Rotation::x_cw, Rotation::x_cw }, { Rotation::x_ccw }, {}, { Rotation::x_ccw }, {}, { Rotation::x_ccw }, { Rotation::x_cw }, { Rotation::x_ccw }, {} };
+const char Block::rot_quad_lookup_left[4][4] = { { 0, 1, 2, 3 }, { 1, 3, 0, 2 }, { 3, 2, 1, 0 }, { 2, 0, 3, 1 } };
+const char Block::rot_quad_lookup_right[4][4] = { { 0, 1, 2, 3 }, { 2, 0, 3, 1 }, { 3, 2, 1, 0 }, { 1, 3, 0, 2 } };
 const char Block::quad_flip_lookup[4] = { 1, 0, 3, 2 };
 
 /**
@@ -266,10 +225,7 @@ getPatchViewForBuffer(double* buffer_ptr, const PatchInfo<3>& pinfo, const Side<
  * @param block
  */
 void
-FillBlockColumnForNormalInterface(int j,
-                                  const PatchView<const double, 3>& u,
-                                  Side<3> s,
-                                  std::vector<double>& block)
+FillBlockColumnForNormalInterface(int j, const PatchView<const double, 3>& u, Side<3> s, std::vector<double>& block)
 {
   int n = u.getEnd()[0] + 1;
   View<const double, 3> slice = u.getSliceOn(s, { 0 });
@@ -290,12 +246,7 @@ FillBlockColumnForNormalInterface(int j,
  * @param block
  */
 void
-FillBlockColumnForCoarseToCoarseInterface(int j,
-                                          const PatchView<const double, 3>& u,
-                                          Side<3> s,
-                                          const MPIGhostFiller<3>& ghost_filler,
-                                          const PatchInfo<3>& pinfo,
-                                          std::vector<double>& block)
+FillBlockColumnForCoarseToCoarseInterface(int j, const PatchView<const double, 3>& u, Side<3> s, const MPIGhostFiller<3>& ghost_filler, const PatchInfo<3>& pinfo, std::vector<double>& block)
 {
   int n = pinfo.ns[0];
   PatchInfo<3> new_pinfo = pinfo;
@@ -323,13 +274,7 @@ FillBlockColumnForCoarseToCoarseInterface(int j,
  * @param block
  */
 void
-FillBlockColumnForFineToFineInterface(int j,
-                                      const PatchView<const double, 3>& u,
-                                      Side<3> s,
-                                      const MPIGhostFiller<3>& ghost_filler,
-                                      const PatchInfo<3>& pinfo,
-                                      IfaceType<3> type,
-                                      std::vector<double>& block)
+FillBlockColumnForFineToFineInterface(int j, const PatchView<const double, 3>& u, Side<3> s, const MPIGhostFiller<3>& ghost_filler, const PatchInfo<3>& pinfo, IfaceType<3> type, std::vector<double>& block)
 {
   int n = pinfo.ns[0];
   PatchInfo<3> new_pinfo = pinfo;
@@ -357,13 +302,7 @@ FillBlockColumnForFineToFineInterface(int j,
  * @param block
  */
 void
-FillBlockColumnForCoarseToFineInterface(int j,
-                                        const PatchView<const double, 3>& u,
-                                        Side<3> s,
-                                        const MPIGhostFiller<3>& ghost_filler,
-                                        const PatchInfo<3>& pinfo,
-                                        IfaceType<3> type,
-                                        std::vector<double>& block)
+FillBlockColumnForCoarseToFineInterface(int j, const PatchView<const double, 3>& u, Side<3> s, const MPIGhostFiller<3>& ghost_filler, const PatchInfo<3>& pinfo, IfaceType<3> type, std::vector<double>& block)
 {
   int n = pinfo.ns[0];
   PatchInfo<3> new_pinfo = pinfo;
@@ -371,8 +310,7 @@ FillBlockColumnForCoarseToFineInterface(int j,
   new_pinfo.setNbrInfo(s, new FineNbrInfo<2>());
   vector<double> ghosts(n * n);
   PatchView<const double, 3> nbr_view = getPatchViewForBuffer(ghosts.data(), pinfo, s.opposite());
-  ghost_filler.fillGhostCellsForNbrPatch(
-    new_pinfo, u, nbr_view, s, NbrType::Fine, type.getOrthant());
+  ghost_filler.fillGhostCellsForNbrPatch(new_pinfo, u, nbr_view, s, NbrType::Fine, type.getOrthant());
   for (int yi = 0; yi < n; yi++) {
     for (int xi = 0; xi < n; xi++) {
       block[(xi + yi * n) * n * n + j] = -ghosts[xi + yi * n] / 2;
@@ -391,13 +329,7 @@ FillBlockColumnForCoarseToFineInterface(int j,
  * @param block
  */
 void
-FillBlockColumnForFineToCoarseInterface(int j,
-                                        const PatchView<const double, 3>& u,
-                                        Side<3> s,
-                                        const MPIGhostFiller<3>& ghost_filler,
-                                        const PatchInfo<3>& pinfo,
-                                        IfaceType<3> type,
-                                        std::vector<double>& block)
+FillBlockColumnForFineToCoarseInterface(int j, const PatchView<const double, 3>& u, Side<3> s, const MPIGhostFiller<3>& ghost_filler, const PatchInfo<3>& pinfo, IfaceType<3> type, std::vector<double>& block)
 {
   int n = pinfo.ns[0];
   PatchInfo<3> new_pinfo = pinfo;
@@ -405,8 +337,7 @@ FillBlockColumnForFineToCoarseInterface(int j,
   new_pinfo.setNbrInfo(s, new CoarseNbrInfo<2>(100, type.getOrthant()));
   vector<double> ghosts(n * n);
   PatchView<const double, 3> nbr_view = getPatchViewForBuffer(ghosts.data(), pinfo, s.opposite());
-  ghost_filler.fillGhostCellsForNbrPatch(
-    new_pinfo, u, nbr_view, s, NbrType::Coarse, type.getOrthant());
+  ghost_filler.fillGhostCellsForNbrPatch(new_pinfo, u, nbr_view, s, NbrType::Coarse, type.getOrthant());
   for (int yi = 0; yi < n; yi++) {
     for (int xi = 0; xi < n; xi++) {
       block[(xi + yi * n) * n * n + j] = -ghosts[xi + yi * n] / 2;
@@ -463,8 +394,7 @@ FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<3>& pinfo, Poisson::FFTWPatchSo
 {
   auto ns = solver.getDomain().getNs();
   int n = ns[0];
-  const MPIGhostFiller<3>& ghost_filler =
-    dynamic_cast<const MPIGhostFiller<3>&>(solver.getGhostFiller());
+  const MPIGhostFiller<3>& ghost_filler = dynamic_cast<const MPIGhostFiller<3>&>(solver.getGhostFiller());
   for (int yi = 0; yi < n; yi++) {
     for (int xi = 0; xi < n; xi++) {
       int j = xi + yi * n;
@@ -513,9 +443,7 @@ FillBlockCoeffs(CoeffMap coeffs, const PatchInfo<3>& pinfo, Poisson::FFTWPatchSo
 }
 template<class Inserter>
 void
-AssembleMatrix(const Schur::InterfaceDomain<3>& iface_domain,
-               Poisson::FFTWPatchSolver<3>& solver,
-               Inserter insertBlock)
+AssembleMatrix(const Schur::InterfaceDomain<3>& iface_domain, Poisson::FFTWPatchSolver<3>& solver, Inserter insertBlock)
 {
   auto ns = iface_domain.getDomain().getNs();
   int n = ns[0];
@@ -534,10 +462,7 @@ AssembleMatrix(const Schur::InterfaceDomain<3>& iface_domain,
     }
     solver.addPatch(pinfo);
 
-    map<Block, shared_ptr<vector<double>>, std::function<bool(const Block& a, const Block& b)>>
-      coeffs([](const Block& a, const Block& b) {
-        return std::tie(a.aux, a.type) < std::tie(b.aux, b.type);
-      });
+    map<Block, shared_ptr<vector<double>>, std::function<bool(const Block& a, const Block& b)>> coeffs([](const Block& a, const Block& b) { return std::tie(a.aux, a.type) < std::tie(b.aux, b.type); });
     // allocate blocks of coefficients
     for (const Block& b : blocks) {
       shared_ptr<vector<double>> ptr = coeffs[b];
@@ -554,18 +479,8 @@ AssembleMatrix(const Schur::InterfaceDomain<3>& iface_domain,
     }
   }
 }
-const function<int(int, int, int)> transforms_left[4] = {
-  [](int n, int xi, int yi) { return xi + yi * n; },
-  [](int n, int xi, int yi) { return n - yi - 1 + xi * n; },
-  [](int n, int xi, int yi) { return n - xi - 1 + (n - yi - 1) * n; },
-  [](int n, int xi, int yi) { return yi + (n - xi - 1) * n; }
-};
-const function<int(int, int, int)> transforms_right[4] = {
-  [](int n, int xi, int yi) { return xi + yi * n; },
-  [](int n, int xi, int yi) { return yi + (n - xi - 1) * n; },
-  [](int n, int xi, int yi) { return n - xi - 1 + (n - yi - 1) * n; },
-  [](int n, int xi, int yi) { return n - yi - 1 + xi * n; }
-};
+const function<int(int, int, int)> transforms_left[4] = { [](int n, int xi, int yi) { return xi + yi * n; }, [](int n, int xi, int yi) { return n - yi - 1 + xi * n; }, [](int n, int xi, int yi) { return n - xi - 1 + (n - yi - 1) * n; }, [](int n, int xi, int yi) { return yi + (n - xi - 1) * n; } };
+const function<int(int, int, int)> transforms_right[4] = { [](int n, int xi, int yi) { return xi + yi * n; }, [](int n, int xi, int yi) { return yi + (n - xi - 1) * n; }, [](int n, int xi, int yi) { return n - xi - 1 + (n - yi - 1) * n; }, [](int n, int xi, int yi) { return n - yi - 1 + xi * n; } };
 const function<int(int, int, int)> transforms_left_inv[4] = { [](int n, int xi, int yi) {
                                                                xi = n - xi - 1;
                                                                return xi + yi * n;
@@ -576,8 +491,7 @@ const function<int(int, int, int)> transforms_left_inv[4] = { [](int n, int xi, 
                                                               },
                                                               [](int n, int xi, int yi) {
                                                                 xi = n - xi - 1;
-                                                                return n - xi - 1 +
-                                                                       (n - yi - 1) * n;
+                                                                return n - xi - 1 + (n - yi - 1) * n;
                                                               },
                                                               [](int n, int xi, int yi) {
                                                                 xi = n - xi - 1;
@@ -593,8 +507,7 @@ const function<int(int, int, int)> transforms_right_inv[4] = { [](int n, int xi,
                                                                },
                                                                [](int n, int xi, int yi) {
                                                                  xi = n - xi - 1;
-                                                                 return n - xi - 1 +
-                                                                        (n - yi - 1) * n;
+                                                                 return n - xi - 1 + (n - yi - 1) * n;
                                                                },
                                                                [](int n, int xi, int yi) {
                                                                  xi = n - xi - 1;
@@ -663,8 +576,7 @@ FlipBlock(int n, const Block& b, const vector<double>& orig)
 }
 } // namespace
 Mat
-ThunderEgg::Poisson::FastSchurMatrixAssemble3D(const Schur::InterfaceDomain<3>& iface_domain,
-                                               Poisson::FFTWPatchSolver<3>& solver)
+ThunderEgg::Poisson::FastSchurMatrixAssemble3D(const Schur::InterfaceDomain<3>& iface_domain, Poisson::FFTWPatchSolver<3>& solver)
 {
   auto ns = iface_domain.getDomain().getNs();
   if (ns[0] != ns[1] && ns[0] != ns[2]) {

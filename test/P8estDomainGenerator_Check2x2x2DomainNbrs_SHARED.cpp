@@ -20,6 +20,12 @@
 
 #include "P8estDomainGenerator_SHARED.h"
 
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <vector>
+#include <mpi.h>
+
 using namespace std;
 using namespace ThunderEgg;
 

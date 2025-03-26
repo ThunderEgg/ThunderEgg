@@ -17,12 +17,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
-#include <ThunderEgg/Domain.h>
 #include <ThunderEgg/Timer.h>
-#include <ThunderEgg/tpl/json.hpp>
 
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/tpl/json.hpp>
+#include <ThunderEgg/tpl/json_fwd.hpp>
+#include <cstdio>
 #include <fstream>
+#include <mpi.h>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include <doctest.h>
 

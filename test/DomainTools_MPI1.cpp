@@ -19,6 +19,17 @@
  ***************************************************************************/
 #include <ThunderEgg/DomainTools.h>
 
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/RuntimeError.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <mpi.h>
+#include <vector>
+
 #include <doctest.h>
 
 using namespace std;

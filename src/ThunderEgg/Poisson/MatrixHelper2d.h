@@ -27,6 +27,7 @@
  */
 
 #include <ThunderEgg/Domain.h>
+#include <bitset>
 #include <petscmat.h>
 
 namespace ThunderEgg::Poisson {

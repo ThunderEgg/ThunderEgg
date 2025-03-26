@@ -28,6 +28,11 @@
 
 #include <ThunderEgg/tpl/json_fwd.hpp>
 #include <array>
+#include <cstddef>
+#include <iterator>
+#include <ostream>
+#include <type_traits>
+
 namespace ThunderEgg {
 /**
  * @brief Enum-style class for the faces of an n-dimensional cube
@@ -59,15 +64,9 @@ private:
   /**
    * @brief N choose K
    */
-  static constexpr size_t choose(size_t N, size_t K)
-  {
-    return factorial(N) / (factorial(K) * factorial(N - K));
-  }
+  static constexpr size_t choose(size_t N, size_t K) { return factorial(N) / (factorial(K) * factorial(N - K)); }
 
-  static constexpr size_t sum(int N)
-  {
-    return N == -1 ? 0 : (twopow(D - N) * choose(D, N) + sum(N - 1));
-  }
+  static constexpr size_t sum(int N) { return N == -1 ? 0 : (twopow(D - N) * choose(D, N) + sum(N - 1)); }
 
 public:
   static constexpr int dimensionality = M;
@@ -129,8 +128,7 @@ public:
    * @brief south side
    */
   template<int N = 0>
-  static auto south() ->
-    typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto south() -> typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b010);
   }
@@ -138,8 +136,7 @@ public:
    * @brief north side
    */
   template<int N = 0>
-  static auto north() ->
-    typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto north() -> typename std::enable_if<D <= 3 && D >= 2 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b011);
   }
@@ -147,8 +144,7 @@ public:
    * @brief bottom side
    */
   template<int N = 0>
-  static auto bottom() ->
-    typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto bottom() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b100);
   }
@@ -156,8 +152,7 @@ public:
    * @brief top side
    */
   template<int N = 0>
-  static auto top() ->
-    typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
+  static auto top() -> typename std::enable_if<D <= 3 && D >= 3 && M == D - 1 && N == N, Face<D, M>>::type
   {
     return Face<D, M>(0b101);
   }
@@ -456,8 +451,7 @@ public:
    * @brief Get the axis index of this side
    */
   template<int N = 0>
-  auto getAxisIndex() const ->
-    typename std::enable_if<D <= 3 && D >= 1 && M == D - 1 && N == N, size_t>::type
+  auto getAxisIndex() const -> typename std::enable_if<D <= 3 && D >= 1 && M == D - 1 && N == N, size_t>::type
   {
     return value >> 1;
   }
@@ -466,8 +460,7 @@ public:
    * @brief Return if this side is lower on it's axis
    */
   template<int N = 0>
-  auto isLowerOnAxis() const ->
-    typename std::enable_if<D <= 3 && D >= 1 && M == D - 1 && N == N, bool>::type
+  auto isLowerOnAxis() const -> typename std::enable_if<D <= 3 && D >= 1 && M == D - 1 && N == N, bool>::type
   {
     return !(value & 0b1);
   }
@@ -476,8 +469,7 @@ public:
    * @brief Return if this side is higher on it's axis
    */
   template<int N = 0>
-  auto isHigherOnAxis() const ->
-    typename std::enable_if<D <= 3 && D >= 1 && M == D - 1 && N == N, bool>::type
+  auto isHigherOnAxis() const -> typename std::enable_if<D <= 3 && D >= 1 && M == D - 1 && N == N, bool>::type
   {
     return value & 0b1;
   }

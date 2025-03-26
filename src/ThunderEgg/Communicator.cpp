@@ -19,7 +19,9 @@
  ***************************************************************************/
 
 #include "Communicator.h"
-#include <utility>
+#include <mpi.h>
+#include <string>
+#include <ThunderEgg/RuntimeError.h>
 
 namespace ThunderEgg {
 namespace {

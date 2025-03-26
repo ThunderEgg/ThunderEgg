@@ -26,8 +26,6 @@
  * @brief Loop templates
  */
 
-#include <array>
-
 namespace ThunderEgg {
 /**
  * @brief Dimension templated loops

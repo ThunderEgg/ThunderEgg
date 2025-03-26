@@ -21,7 +21,14 @@
 #include "../utils/DomainReader.h"
 #include <ThunderEgg/Schur/InterfaceDomain.h>
 
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/NbrType.h>
+#include <algorithm>
+#include <cstddef>
 #include <limits>
+#include <map>
+#include <set>
 
 #include <doctest.h>
 

@@ -27,6 +27,7 @@
  */
 
 #include <ThunderEgg/Operator.h>
+#include <ThunderEgg/Vector.h>
 #include <iostream>
 
 namespace ThunderEgg::Iterative {
@@ -61,12 +62,7 @@ public:
    *
    * @return the number of iterations
    */
-  virtual int solve(const Operator<D>& A,
-                    Vector<D>& x,
-                    const Vector<D>& b,
-                    const Operator<D>* Mr = nullptr,
-                    bool output = false,
-                    std::ostream& os = std::cout) const = 0;
+  virtual int solve(const Operator<D>& A, Vector<D>& x, const Vector<D>& b, const Operator<D>* Mr = nullptr, bool output = false, std::ostream& os = std::cout) const = 0;
 };
 } // namespace ThunderEgg::Iterative
 #endif

@@ -18,8 +18,17 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 #include "../utils/DomainReader.h"
-#include <ThunderEgg/DomainTools.h>
 #include <ThunderEgg/GMG/InterLevelComm.h>
+
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/DomainTools.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <map>
+#include <set>
+#include <string>
 
 #include <doctest.h>
 

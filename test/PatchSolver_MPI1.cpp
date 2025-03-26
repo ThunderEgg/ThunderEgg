@@ -17,13 +17,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
+
 #include "PatchSolver_MOCKS.h"
 #include "utils/DomainReader.h"
-#include <ThunderEgg/DomainTools.h>
-#include <ThunderEgg/MPIGhostFiller.h>
 
-#include <list>
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Timer.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <memory>
+#include <mpi.h>
 #include <sstream>
+#include <string>
 
 using namespace std;
 using namespace ThunderEgg;

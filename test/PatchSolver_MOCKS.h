@@ -18,9 +18,15 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ***************************************************************************/
 
-#include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/PatchSolver.h>
 
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/GhostFiller.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <memory>
 #include <set>
 
 #include <doctest.h>

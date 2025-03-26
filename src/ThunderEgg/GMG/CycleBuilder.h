@@ -26,11 +26,19 @@
  * @brief CycleBuilder class
  */
 
+#include <ThunderEgg/GMG/Cycle.h>
+#include <ThunderEgg/GMG/CycleOpts.h>
 #include <ThunderEgg/GMG/FMGCycle.h>
+#include <ThunderEgg/GMG/Interpolator.h>
 #include <ThunderEgg/GMG/Level.h>
+#include <ThunderEgg/GMG/Restrictor.h>
+#include <ThunderEgg/GMG/Smoother.h>
 #include <ThunderEgg/GMG/VCycle.h>
 #include <ThunderEgg/GMG/WCycle.h>
+#include <ThunderEgg/Operator.h>
 #include <ThunderEgg/RuntimeError.h>
+#include <memory>
+
 namespace ThunderEgg::GMG {
 /**
  * @brief Builder for GMG cycles.
@@ -85,7 +93,8 @@ public:
    */
   explicit CycleBuilder(const CycleOpts& opts_in)
     : opts(opts_in)
-  {}
+  {
+  }
   /**
    * @brief Add the finest level to the Cycle
    *
@@ -94,9 +103,7 @@ public:
    * @param restrictor the Restrictor that restricts from this level to the coarser level
    * @param vg the VectorGenerator for the level
    */
-  void addFinestLevel(const Operator<D>& op,
-                      const Smoother<D>& smoother,
-                      const Restrictor<D>& restrictor)
+  void addFinestLevel(const Operator<D>& op, const Smoother<D>& smoother, const Restrictor<D>& restrictor)
   {
     if (has_finest) {
       throw RuntimeError("addFinestLevel was already called");
@@ -119,10 +126,7 @@ public:
    * @param interpolator the Interpolator that restricts from this level to the finer level
    * @param vg the VectorGenerator for the level
    */
-  void addIntermediateLevel(const Operator<D>& op,
-                            const Smoother<D>& smoother,
-                            const Restrictor<D>& restrictor,
-                            const Interpolator<D>& interpolator)
+  void addIntermediateLevel(const Operator<D>& op, const Smoother<D>& smoother, const Restrictor<D>& restrictor, const Interpolator<D>& interpolator)
   {
     if (!has_finest) {
       throw RuntimeError("addFinestLevel has not been called yet");
@@ -148,9 +152,7 @@ public:
    * @param smoother the Smoother for the level
    * @param interpolator the Interpolator that restricts from this level to the finer level
    */
-  void addCoarsestLevel(const Operator<D>& op,
-                        Smoother<D>& smoother,
-                        const Interpolator<D>& interpolator)
+  void addCoarsestLevel(const Operator<D>& op, Smoother<D>& smoother, const Interpolator<D>& interpolator)
   {
     if (!has_finest) {
       throw RuntimeError("addFinestLevel has not been called yet");

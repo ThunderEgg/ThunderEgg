@@ -26,9 +26,17 @@
  * @brief DomainTools class
  */
 
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/PatchInfo.h>
 #include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
+#include <array>
+#include <cstddef>
 #include <functional>
+#include <mpi.h>
 
 namespace ThunderEgg {
 /**
@@ -67,11 +75,7 @@ private:
    * @param args additional functions for additional components
    */
   template<int D, typename T, typename... Args>
-  static void _SetValues(const Domain<D>& domain,
-                         Vector<D>& vec,
-                         int component_index,
-                         T func,
-                         Args... args)
+  static void _SetValues(const Domain<D>& domain, Vector<D>& vec, int component_index, T func, Args... args)
   {
     SetValues(domain, vec, component_index, func);
     _SetValues(domain, vec, component_index + 1, args...);
@@ -88,10 +92,7 @@ private:
    * @param func the function
    */
   template<int D, typename T>
-  static void _SetValuesWithGhost(const Domain<D>& domain,
-                                  Vector<D>& vec,
-                                  int component_index,
-                                  T func)
+  static void _SetValuesWithGhost(const Domain<D>& domain, Vector<D>& vec, int component_index, T func)
   {
     SetValuesWithGhost(domain, vec, component_index, func);
   }
@@ -109,11 +110,7 @@ private:
    * @param args additional functions for additional components
    */
   template<int D, typename T, typename... Args>
-  static void _SetValuesWithGhost(const Domain<D>& domain,
-                                  Vector<D>& vec,
-                                  int component_index,
-                                  T func,
-                                  Args... args)
+  static void _SetValuesWithGhost(const Domain<D>& domain, Vector<D>& vec, int component_index, T func, Args... args)
   {
     SetValuesWithGhost(domain, vec, component_index, func);
     _SetValuesWithGhost(domain, vec, component_index + 1, args...);
@@ -132,9 +129,7 @@ public:
    * @param real_coord (output) the coordnitate of the index
    */
   template<int D>
-  static void GetRealCoord(const PatchInfo<D>& pinfo,
-                           const std::array<int, D>& coord,
-                           std::array<double, D>& real_coord)
+  static void GetRealCoord(const PatchInfo<D>& pinfo, const std::array<int, D>& coord, std::array<double, D>& real_coord)
   {
     Loop::Unroll<0, D - 1>([&](int dir) {
       if (coord[dir] == -1) {
@@ -142,8 +137,7 @@ public:
       } else if (coord[dir] == pinfo.ns[dir]) {
         real_coord[dir] = pinfo.starts[dir] + pinfo.spacings[dir] * pinfo.ns[dir];
       } else {
-        real_coord[dir] =
-          pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir];
+        real_coord[dir] = pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir];
       }
     });
   }
@@ -156,14 +150,9 @@ public:
    * @param real_coord (output) the coordnitate of the index
    */
   template<int D>
-  static void GetRealCoordGhost(const PatchInfo<D>& pinfo,
-                                const std::array<int, D>& coord,
-                                std::array<double, D>& real_coord)
+  static void GetRealCoordGhost(const PatchInfo<D>& pinfo, const std::array<int, D>& coord, std::array<double, D>& real_coord)
   {
-    Loop::Unroll<0, D - 1>([&](int dir) {
-      real_coord[dir] =
-        pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir];
-    });
+    Loop::Unroll<0, D - 1>([&](int dir) { real_coord[dir] = pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir]; });
   }
   /**
    * @brief Given a path info object and a side of the patch, get the coordinate from a given
@@ -176,10 +165,7 @@ public:
    * @param real_coord (output) the coordnitate of the index
    */
   template<int D>
-  static void GetRealCoordBound(const PatchInfo<D>& pinfo,
-                                const std::array<int, D - 1>& coord,
-                                Side<D> s,
-                                std::array<double, D>& real_coord)
+  static void GetRealCoordBound(const PatchInfo<D>& pinfo, const std::array<int, D - 1>& coord, Side<D> s, std::array<double, D>& real_coord)
   {
     for (size_t dir = 0; dir < s.getAxisIndex(); dir++) {
       if (coord[dir] == -1) {
@@ -187,15 +173,13 @@ public:
       } else if (coord[dir] == pinfo.ns[dir]) {
         real_coord[dir] = pinfo.starts[dir] + pinfo.spacings[dir] * pinfo.ns[dir];
       } else {
-        real_coord[dir] =
-          pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir];
+        real_coord[dir] = pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir];
       }
     }
     if (s.isLowerOnAxis()) {
       real_coord[s.getAxisIndex()] = pinfo.starts[s.getAxisIndex()];
     } else {
-      real_coord[s.getAxisIndex()] = pinfo.starts[s.getAxisIndex()] +
-                                     pinfo.spacings[s.getAxisIndex()] * pinfo.ns[s.getAxisIndex()];
+      real_coord[s.getAxisIndex()] = pinfo.starts[s.getAxisIndex()] + pinfo.spacings[s.getAxisIndex()] * pinfo.ns[s.getAxisIndex()];
     }
     for (size_t dir = s.getAxisIndex() + 1; dir < D; dir++) {
       if (coord[dir - 1] == -1) {
@@ -203,8 +187,7 @@ public:
       } else if (coord[dir - 1] == pinfo.ns[dir]) {
         real_coord[dir] = pinfo.starts[dir] + pinfo.spacings[dir] * pinfo.ns[dir];
       } else {
-        real_coord[dir] =
-          pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir - 1];
+        real_coord[dir] = pinfo.starts[dir] + pinfo.spacings[dir] / 2.0 + pinfo.spacings[dir] * coord[dir - 1];
       }
     }
   }
@@ -218,10 +201,7 @@ public:
    * @param func the function
    */
   template<int D>
-  static void SetValues(const Domain<D>& domain,
-                        Vector<D>& vec,
-                        int component_index,
-                        std::function<double(const std::array<double, (int)D>&)> func)
+  static void SetValues(const Domain<D>& domain, Vector<D>& vec, int component_index, std::function<double(const std::array<double, (int)D>&)> func)
   {
     if (component_index >= vec.getNumComponents()) {
       throw RuntimeError("Invalid component to set");
@@ -244,10 +224,7 @@ public:
    * @param component_index the component to set
    * @param func the function
    */
-  static void SetValues(const Domain<3>& domain,
-                        Vector<3>& vec,
-                        int component_index,
-                        std::function<double(double, double, double)> func)
+  static void SetValues(const Domain<3>& domain, Vector<3>& vec, int component_index, std::function<double(double, double, double)> func)
   {
     if (component_index >= vec.getNumComponents()) {
       throw RuntimeError("Invalid component to set");
@@ -278,10 +255,7 @@ public:
    * @param component_index the component to set
    * @param func the function
    */
-  static void SetValues(const Domain<2>& domain,
-                        Vector<2>& vec,
-                        int component_index,
-                        std::function<double(double, double)> func)
+  static void SetValues(const Domain<2>& domain, Vector<2>& vec, int component_index, std::function<double(double, double)> func)
   {
     if (component_index >= vec.getNumComponents()) {
       throw RuntimeError("Invalid component to set");
@@ -308,10 +282,7 @@ public:
    * @param component_index the component to set
    * @param func the function
    */
-  static void SetValues(const Domain<1>& domain,
-                        Vector<1>& vec,
-                        int component_index,
-                        std::function<double(double)> func)
+  static void SetValues(const Domain<1>& domain, Vector<1>& vec, int component_index, std::function<double(double)> func)
   {
     if (component_index >= vec.getNumComponents()) {
       throw RuntimeError("Invalid component to set");
@@ -338,10 +309,7 @@ public:
    * @param args additional functions for additional components
    */
   template<int D, typename... Args>
-  static void SetValues(const Domain<D>& domain,
-                        Vector<D>& vec,
-                        std::function<double(const std::array<double, D>&)> func,
-                        Args... args)
+  static void SetValues(const Domain<D>& domain, Vector<D>& vec, std::function<double(const std::array<double, D>&)> func, Args... args)
   {
     _SetValues(domain, vec, 0, func, args...);
   }
@@ -355,10 +323,7 @@ public:
    * @param func the function
    */
   template<int D>
-  static void SetValuesWithGhost(const Domain<D>& domain,
-                                 Vector<D>& vec,
-                                 int component_index,
-                                 std::function<double(const std::array<double, (int)D>&)> func)
+  static void SetValuesWithGhost(const Domain<D>& domain, Vector<D>& vec, int component_index, std::function<double(const std::array<double, (int)D>&)> func)
   {
     if (component_index >= vec.getNumComponents()) {
       throw RuntimeError("Invalid component to set");
@@ -381,10 +346,7 @@ public:
    * @param component_index the component to set
    * @param func the function
    */
-  static void SetValuesWithGhost(const Domain<3>& domain,
-                                 Vector<3>& vec,
-                                 int component_index,
-                                 std::function<double(double, double, double)> func)
+  static void SetValuesWithGhost(const Domain<3>& domain, Vector<3>& vec, int component_index, std::function<double(double, double, double)> func)
   {
     if (component_index >= vec.getNumComponents()) {
       throw RuntimeError("Invalid component to set");
@@ -416,10 +378,7 @@ public:
    * @param component_index the component to set
    * @param func the function
    */
-  static void SetValuesWithGhost(const Domain<2>& domain,
-                                 Vector<2>& vec,
-                                 int component_index,
-                                 std::function<double(double, double)> func)
+  static void SetValuesWithGhost(const Domain<2>& domain, Vector<2>& vec, int component_index, std::function<double(double, double)> func)
   {
     if (component_index >= vec.getNumComponents()) {
       throw RuntimeError("Invalid component to set");
@@ -447,10 +406,7 @@ public:
    * @param component_index the component to set
    * @param func the function
    */
-  static void SetValuesWithGhost(const Domain<1>& domain,
-                                 Vector<1>& vec,
-                                 int component_index,
-                                 std::function<double(double)> func)
+  static void SetValuesWithGhost(const Domain<1>& domain, Vector<1>& vec, int component_index, std::function<double(double)> func)
   {
     if (component_index >= vec.getNumComponents()) {
       throw RuntimeError("Invalid component to set");
@@ -479,10 +435,7 @@ public:
    * @param args additional functions for additional components
    */
   template<int D, typename... Args>
-  static void SetValuesWithGhost(const Domain<D>& domain,
-                                 Vector<D>& vec,
-                                 std::function<double(const std::array<double, D>&)> func,
-                                 Args... args)
+  static void SetValuesWithGhost(const Domain<D>& domain, Vector<D>& vec, std::function<double(const std::array<double, D>&)> func, Args... args)
   {
     _SetValuesWithGhost(domain, vec, 0, func, args...);
   }
@@ -497,10 +450,7 @@ public:
    * @param args additional functions for additional components
    */
   template<typename... Args>
-  static void SetValuesWithGhost(const Domain<3>& domain,
-                                 Vector<3>& vec,
-                                 std::function<double(double, double, double)> func,
-                                 Args... args)
+  static void SetValuesWithGhost(const Domain<3>& domain, Vector<3>& vec, std::function<double(double, double, double)> func, Args... args)
   {
     _SetValuesWithGhost(domain, vec, 0, func, args...);
   }
@@ -520,9 +470,7 @@ public:
         ComponentView<const double, D> u_data = u.getComponentView(c, pinfo.local_index);
 
         double patch_sum = 0;
-        Loop::Nested<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) {
-          patch_sum += u_data[coord];
-        });
+        Loop::Nested<D>(u_data.getStart(), u_data.getEnd(), [&](std::array<int, D> coord) { patch_sum += u_data[coord]; });
 
         for (size_t i = 0; i < D; i++) {
           patch_sum *= pinfo.spacings[i];

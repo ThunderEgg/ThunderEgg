@@ -25,8 +25,21 @@
  *
  * @brief PCShellCreator class
  */
+
+#include <ThunderEgg/ComponentView.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Operator.h>
 #include <ThunderEgg/PETSc/MatShellCreator.h>
+#include <ThunderEgg/Vector.h>
+#include <functional>
+#include <memory>
+#include <petscmat.h>
 #include <petscpc.h>
+#include <petscpctypes.h>
+#include <petscvec.h>
+#include <array>
+#include <mpi.h>
+
 namespace ThunderEgg::PETSc {
 /**
  * @brief Wraps an Operator for use as a PETSc PC
@@ -57,7 +70,8 @@ private:
     : op(op.clone())
     , A(A)
     , getNewVector(vector_allocator)
-  {}
+  {
+  }
   PCShellCreator(const PCShellCreator&) = delete;
   PCShellCreator& operator=(const PCShellCreator&) = delete;
   PCShellCreator(PCShellCreator&&) noexcept = delete;
@@ -139,9 +153,7 @@ public:
    * @param vector_allocator function that allocates need TE vectors
    * @return PC the wrapped PC, you are responsible for calling PCDestroy on this object
    */
-  static PC GetNewPCShell(const Operator<D>& prec,
-                          const Operator<D>& op,
-                          const std::function<Vector<D>()>& vector_allocator)
+  static PC GetNewPCShell(const Operator<D>& prec, const Operator<D>& op, const std::function<Vector<D>()>& vector_allocator)
   {
     Mat A = MatShellCreator<D>::GetNewMatShell(op, vector_allocator);
     PCShellCreator<D>* psc = new PCShellCreator(prec, A, vector_allocator);

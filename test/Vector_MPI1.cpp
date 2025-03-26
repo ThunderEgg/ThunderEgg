@@ -21,6 +21,16 @@
 #include "Vector_MOCKS.h"
 #include "utils/DomainReader.h"
 
+#include <ThunderEgg/Communicator.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Vector.h>
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <mpi.h>
+#include <string>
+
 #include <doctest.h>
 
 using namespace std;

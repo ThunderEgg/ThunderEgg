@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include <ThunderEgg/Orthant.h>
 
+#include <ThunderEgg/Face.h>
+#include <array>
 #include <sstream>
 
 #include <doctest.h>

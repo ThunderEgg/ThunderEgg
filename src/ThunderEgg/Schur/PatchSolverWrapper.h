@@ -26,8 +26,19 @@
  * @brief PatchSolverWrapper class
  */
 
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Operator.h>
 #include <ThunderEgg/PatchSolver.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/Schur/InterfaceDomain.h>
+#include <ThunderEgg/Schur/PatchIfaceInfo.h>
 #include <ThunderEgg/Schur/PatchIfaceScatter.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <deque>
+#include <memory>
+#include <mpi.h>
 
 namespace ThunderEgg {
 namespace Schur {
@@ -82,8 +93,7 @@ public:
           break;
         }
       }
-      if (patches_with_ifaces_on_neighbor_rank.empty() ||
-          patches_with_ifaces_on_neighbor_rank.back() != piinfo) {
+      if (patches_with_ifaces_on_neighbor_rank.empty() || patches_with_ifaces_on_neighbor_rank.back() != piinfo) {
         patches_with_only_local_ifaces.push_back(piinfo);
       }
     }
@@ -120,9 +130,7 @@ public:
         if (piinfo->pinfo.hasNbr(s) && piinfo->getIfaceInfo(s)->rank == rank) {
           auto ghosts = local_data.getSliceOn(s, { -1 });
           auto interface = local_x->getComponentView(0, piinfo->getIfaceInfo(s)->patch_local_index);
-          Loop::OverInteriorIndexes<D - 1>(interface, [&](const std::array<int, D - 1>& coord) {
-            ghosts[coord] = 2 * interface[coord];
-          });
+          Loop::OverInteriorIndexes<D - 1>(interface, [&](const std::array<int, D - 1>& coord) { ghosts[coord] = 2 * interface[coord]; });
         }
       }
     }
@@ -142,9 +150,7 @@ public:
         if (piinfo->pinfo.hasNbr(s) && piinfo->getIfaceInfo(s)->rank != rank) {
           auto ghosts = local_data.getSliceOn(s, { -1 });
           auto interface = local_x->getComponentView(0, piinfo->getIfaceInfo(s)->patch_local_index);
-          Loop::OverInteriorIndexes<D - 1>(interface, [&](const std::array<int, D - 1>& coord) {
-            ghosts[coord] = 2 * interface[coord];
-          });
+          Loop::OverInteriorIndexes<D - 1>(interface, [&](const std::array<int, D - 1>& coord) { ghosts[coord] = 2 * interface[coord]; });
         }
       }
     }
@@ -159,17 +165,12 @@ public:
 
     for (auto iface : iface_domain->getInterfaces()) {
       for (auto patch : iface->patches) {
-        if (patch.piinfo->pinfo.rank == rank &&
-            (patch.type.isNormal() || patch.type.isCoarseToCoarse() || patch.type.isFineToFine())) {
+        if (patch.piinfo->pinfo.rank == rank && (patch.type.isNormal() || patch.type.isCoarseToCoarse() || patch.type.isFineToFine())) {
           auto local_data = u.getComponentView(0, patch.piinfo->pinfo.local_index);
           auto ghosts = local_data.getSliceOn(patch.side, { -1 });
           auto inner = local_data.getSliceOn(patch.side, { 0 });
-          auto interface =
-            b.getComponentView(0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
-          Loop::Nested<D - 1>(
-            interface.getStart(), interface.getEnd(), [&](const std::array<int, D - 1>& coord) {
-              interface[coord] = (ghosts[coord] + inner[coord]) / 2;
-            });
+          auto interface = b.getComponentView(0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
+          Loop::Nested<D - 1>(interface.getStart(), interface.getEnd(), [&](const std::array<int, D - 1>& coord) { interface[coord] = (ghosts[coord] + inner[coord]) / 2; });
           break;
         }
       }
@@ -195,10 +196,7 @@ public:
         if (piinfo->pinfo.hasNbr(s)) {
           auto ghosts = local_data.getSliceOn(s, { -1 });
           auto inner = local_data.getSliceOn(s, { 0 });
-          Loop::Nested<D - 1>(
-            ghosts.getStart(), ghosts.getEnd(), [&](const std::array<int, D - 1>& coord) {
-              ghosts[coord] = -inner[coord];
-            });
+          Loop::Nested<D - 1>(ghosts.getStart(), ghosts.getEnd(), [&](const std::array<int, D - 1>& coord) { ghosts[coord] = -inner[coord]; });
         }
       }
     }
@@ -212,17 +210,12 @@ public:
 
     for (auto iface : iface_domain->getInterfaces()) {
       for (auto patch : iface->patches) {
-        if (patch.piinfo->pinfo.rank == rank &&
-            (patch.type.isNormal() || patch.type.isCoarseToCoarse() || patch.type.isFineToFine())) {
+        if (patch.piinfo->pinfo.rank == rank && (patch.type.isNormal() || patch.type.isCoarseToCoarse() || patch.type.isFineToFine())) {
           auto local_data = u.getComponentView(0, patch.piinfo->pinfo.local_index);
           auto ghosts = local_data.getSliceOn(patch.side, { -1 });
           auto inner = local_data.getSliceOn(patch.side, { 0 });
-          auto interface =
-            schur_b.getComponentView(0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
-          Loop::Nested<D - 1>(
-            interface.getStart(), interface.getEnd(), [&](const std::array<int, D - 1>& coord) {
-              interface[coord] = (ghosts[coord] + inner[coord]) / 2;
-            });
+          auto interface = schur_b.getComponentView(0, patch.piinfo->getIfaceInfo(patch.side)->patch_local_index);
+          Loop::Nested<D - 1>(interface.getStart(), interface.getEnd(), [&](const std::array<int, D - 1>& coord) { interface[coord] = (ghosts[coord] + inner[coord]) / 2; });
           break;
         }
       }

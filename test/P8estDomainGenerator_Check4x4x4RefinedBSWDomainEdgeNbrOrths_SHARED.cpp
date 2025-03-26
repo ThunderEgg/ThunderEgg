@@ -20,6 +20,9 @@
 
 #include "P8estDomainGenerator_SHARED.h"
 
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/Orthant.h>
+
 using namespace std;
 using namespace ThunderEgg;
 

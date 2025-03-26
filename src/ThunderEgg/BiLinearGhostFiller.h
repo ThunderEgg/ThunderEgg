@@ -26,8 +26,15 @@
  * @brief BiLinearGhostFiller class
  */
 
-#include <ThunderEgg/GMG/Level.h>
+#include <ThunderEgg/Domain.h>
+#include <ThunderEgg/Face.h>
+#include <ThunderEgg/GhostFillingType.h>
 #include <ThunderEgg/MPIGhostFiller.h>
+#include <ThunderEgg/NbrType.h>
+#include <ThunderEgg/Orthant.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+
 namespace ThunderEgg {
 /**
  * @brief Exchanges ghost cells on patches, uses a BiLinear interpolation scheme for refinement
@@ -50,28 +57,13 @@ public:
    */
   BiLinearGhostFiller* clone() const override;
 
-  void fillGhostCellsForNbrPatch(const PatchInfo<2>& pinfo,
-                                 const PatchView<const double, 2>& local_view,
-                                 const PatchView<const double, 2>& nbr_view,
-                                 Side<2> sides,
-                                 NbrType nbr_type,
-                                 Orthant<1> orthant_on_coarse) const override;
+  void fillGhostCellsForNbrPatch(const PatchInfo<2>& pinfo, const PatchView<const double, 2>& local_view, const PatchView<const double, 2>& nbr_view, Side<2> sides, NbrType nbr_type, Orthant<1> orthant_on_coarse) const override;
 
-  void fillGhostCellsForEdgeNbrPatch(const PatchInfo<2>& pinfo,
-                                     const PatchView<const double, 2>& local_view,
-                                     const PatchView<const double, 2>& nbr_view,
-                                     Edge edge,
-                                     NbrType nbr_type,
-                                     Orthant<1> orthant_on_coarse) const override;
+  void fillGhostCellsForEdgeNbrPatch(const PatchInfo<2>& pinfo, const PatchView<const double, 2>& local_view, const PatchView<const double, 2>& nbr_view, Edge edge, NbrType nbr_type, Orthant<1> orthant_on_coarse) const override;
 
-  void fillGhostCellsForCornerNbrPatch(const PatchInfo<2>& pinfo,
-                                       const PatchView<const double, 2>& local_view,
-                                       const PatchView<const double, 2>& nbr_view,
-                                       Corner<2> corner,
-                                       NbrType nbr_type) const override;
+  void fillGhostCellsForCornerNbrPatch(const PatchInfo<2>& pinfo, const PatchView<const double, 2>& local_view, const PatchView<const double, 2>& nbr_view, Corner<2> corner, NbrType nbr_type) const override;
 
-  void fillGhostCellsForLocalPatch(const PatchInfo<2>& pinfo,
-                                   const PatchView<const double, 2>& view) const override;
+  void fillGhostCellsForLocalPatch(const PatchInfo<2>& pinfo, const PatchView<const double, 2>& view) const override;
 };
 } // namespace ThunderEgg
 #endif

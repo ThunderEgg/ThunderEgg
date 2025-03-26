@@ -26,11 +26,26 @@
  * @brief KSPSolver class
  */
 
+#include <ThunderEgg/ComponentView.h>
 #include <ThunderEgg/Iterative/Solver.h>
+#include <ThunderEgg/Loops.h>
+#include <ThunderEgg/Operator.h>
 #include <ThunderEgg/PETSc/MatShellCreator.h>
 #include <ThunderEgg/PETSc/PCShellCreator.h>
+#include <ThunderEgg/Vector.h>
+#include <array>
+#include <cstddef>
+#include <cstdio>
+#include <iostream>
+#include <ostream>
 #include <petscksp.h>
 #include <petscmat.h>
+#include <petscpc.h>
+#include <petscpctypes.h>
+#include <petscsys.h>
+#include <petscsystypes.h>
+#include <petscvec.h>
+#include <string>
 
 namespace ThunderEgg::PETSc {
 /**
@@ -53,10 +68,7 @@ private:
   Vec getPetscVecWithoutGhost(const Vector<D>& vec) const
   {
     Vec petsc_vec;
-    VecCreateMPI(vec.getCommunicator().getMPIComm(),
-                 vec.getNumLocalCells() * vec.getNumComponents(),
-                 PETSC_DETERMINE,
-                 &petsc_vec);
+    VecCreateMPI(vec.getCommunicator().getMPIComm(), vec.getNumLocalCells() * vec.getNumComponents(), PETSC_DETERMINE, &petsc_vec);
     return petsc_vec;
   }
   /**
@@ -73,7 +85,7 @@ private:
     for (int i = 0; i < vec.getNumLocalPatches(); i++) {
       for (int c = 0; c < vec.getNumComponents(); c++) {
         const ComponentView<const double, D> ld = vec.getComponentView(c, i);
-        nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D>& coord) {
+        Loop::OverInteriorIndexes<D>(ld, [&](const std::array<int, D>& coord) {
           petsc_vec_view[curr_index] = ld[coord];
           curr_index++;
         });
@@ -95,7 +107,7 @@ private:
     for (int i = 0; i < vec.getNumLocalPatches(); i++) {
       for (int c = 0; c < vec.getNumComponents(); c++) {
         ComponentView<double, D> ld = vec.getComponentView(c, i);
-        nested_loop<D>(ld.getStart(), ld.getEnd(), [&](const std::array<int, D>& coord) {
+        Loop::OverInteriorIndexes<D>(ld, [&](const std::array<int, D>& coord) {
           ld[coord] = petsc_vec_view[curr_index];
           curr_index++;
         });
@@ -131,12 +143,7 @@ public:
   KSPSolver<D>* clone() const override { return new KSPSolver<D>(*this); }
 
   void setType(KSPType new_type) { type = new_type; }
-  int solve(const Operator<D>& A,
-            Vector<D>& x,
-            const Vector<D>& b,
-            const Operator<D>* Mr = nullptr,
-            bool output = false,
-            std::ostream& os = std::cout) const override
+  int solve(const Operator<D>& A, Vector<D>& x, const Vector<D>& b, const Operator<D>* Mr = nullptr, bool output = false, std::ostream& os = std::cout) const override
   {
     Mat A_PETSC = MatShellCreator<D>::GetNewMatShell(A, [&]() { return x.getZeroClone(); });
 
@@ -161,8 +168,7 @@ public:
     }
 
     if (output) {
-      KSPMonitorSet(
-        ksp, (PetscErrorCode(*)(KSP, PetscInt, PetscReal, void*)) & MonitorResidual, &os, nullptr);
+      KSPMonitorSet(ksp, (PetscErrorCode (*)(KSP, PetscInt, PetscReal, void*))&MonitorResidual, &os, nullptr);
     }
 
     KSPSolve(ksp, b_PETSC, x_PETSC);

@@ -26,11 +26,16 @@
  * @brief PatchSolver class
  */
 
+#include <ThunderEgg/Config.h>
 #include <ThunderEgg/Domain.h>
 #include <ThunderEgg/GMG/Smoother.h>
 #include <ThunderEgg/GhostFiller.h>
 #include <ThunderEgg/Operator.h>
+#include <ThunderEgg/PatchInfo.h>
+#include <ThunderEgg/PatchView.h>
+#include <ThunderEgg/RuntimeError.h>
 #include <ThunderEgg/Vector.h>
+#include <memory>
 
 namespace ThunderEgg {
 /**
@@ -65,7 +70,8 @@ public:
   PatchSolver(const Domain<D>& domain, const GhostFiller<D>& ghost_filler)
     : domain(domain)
     , ghost_filler(ghost_filler.clone())
-  {}
+  {
+  }
   /**
    * @brief Destroy the Patch Solver object
    */
@@ -95,9 +101,7 @@ public:
    * @param f_view the left hand side
    * @param u_view the right hand side
    */
-  virtual void solveSinglePatch(const PatchInfo<D>& pinfo,
-                                const PatchView<const double, D>& f_view,
-                                const PatchView<double, D>& u_view) const = 0;
+  virtual void solveSinglePatch(const PatchInfo<D>& pinfo, const PatchView<const double, D>& f_view, const PatchView<double, D>& u_view) const = 0;
   /**
    * @brief Solve all the patches in the domain, assuming zero boundary conditions for the patches
    *
