@@ -431,7 +431,7 @@ getEdge(int p8est_edge)
 }
 
 void
-SetFaceNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, int s)
+SetFaceNbrInfo(p8est_mesh_t* mesh, vector<Data*>& data_ptrs, p4est_locidx_t quadid, int s)
 {
   Data* data = data_ptrs[quadid];
   Side<3> side(s);
@@ -479,7 +479,7 @@ SetFaceNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, int
 }
 
 void
-SetEdgeNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, int i)
+SetEdgeNbrInfo(p8est_mesh_t* mesh, vector<Data*>& data_ptrs, p4est_locidx_t quadid, int i)
 {
   Data* data = data_ptrs[quadid];
   Edge edge = getEdge(i);
@@ -551,7 +551,7 @@ SetEdgeNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, int
 }
 
 void
-SetCornerNbrInfo(p8est_mesh_t* mesh, Data* data_ptrs[], p4est_locidx_t quadid, int i)
+SetCornerNbrInfo(p8est_mesh_t* mesh, vector<Data*>& data_ptrs, p4est_locidx_t quadid, int i)
 {
   Data* data = data_ptrs[quadid];
   Corner<3> corner(i);
@@ -616,8 +616,8 @@ P8estDomainGenerator::linkNeighbors()
 {
   p8est_ghost_t* ghost = p8est_ghost_new(my_p8est, P8EST_CONNECT_CORNER);
 
-  Data ghost_data[ghost->ghosts.elem_count];
-  p8est_ghost_exchange_data(my_p8est, ghost, ghost_data);
+  vector<Data> ghost_data(ghost->ghosts.elem_count);
+  p8est_ghost_exchange_data(my_p8est, ghost, ghost_data.data());
 
   p8est_mesh_params_t mesh_params;
   p8est_mesh_params_init(&mesh_params);
@@ -626,7 +626,7 @@ P8estDomainGenerator::linkNeighbors()
 
   p8est_mesh_t* mesh = p8est_mesh_new_params(my_p8est, ghost, &mesh_params);
 
-  Data* data_ptrs[my_p8est->local_num_quadrants + ghost->ghosts.elem_count];
+  vector<Data*> data_ptrs(my_p8est->local_num_quadrants + ghost->ghosts.elem_count);
   p4est_locidx_t curr_id = 0;
   p8est_iterate_ext(
     my_p8est,
@@ -640,7 +640,7 @@ P8estDomainGenerator::linkNeighbors()
     nullptr,
     false);
   for (int i = 0; i < ghost->ghosts.elem_count; i++) {
-    data_ptrs[my_p8est->local_num_quadrants + i] = ghost_data + i;
+    data_ptrs[my_p8est->local_num_quadrants + i] = &ghost_data[i];
   }
 
   for (p4est_locidx_t quadid = 0; quadid < mesh->local_num_quadrants; quadid++) {
