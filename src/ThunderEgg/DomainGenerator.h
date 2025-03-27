@@ -42,17 +42,17 @@ public:
   /**
    * @brief Destroy the DomainGenerator object
    */
-  virtual ~DomainGenerator(){};
+  virtual ~DomainGenerator() {};
   /**
    * @brief Return the finest domain
    */
-  virtual Domain<D> getFinestDomain() = 0;
+  [[deprecated("use getCoarserDomain")]] virtual Domain<D> getFinestDomain() = 0;
   /**
    * @brief return true if there is a coarser domain to be generated.
    */
   virtual bool hasCoarserDomain() = 0;
   /**
-   * @brief Return a new coarser domain
+   * @brief Return a new coarser domain, or the finest domain if no domains have been generated.
    */
   virtual Domain<D> getCoarserDomain() = 0;
 };

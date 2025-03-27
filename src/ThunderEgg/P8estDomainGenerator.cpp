@@ -704,13 +704,7 @@ P8estDomainGenerator::getCoarserDomain()
 Domain<3>
 P8estDomainGenerator::getFinestDomain()
 {
-  if (curr_level >= 0) {
-    extractLevel();
-  }
-  Domain<3> domain(comm, id, ns, num_ghost_cells, domain_patches.back().begin(), domain_patches.back().end());
-  domain_patches.pop_back();
-  id++;
-  return domain;
+  return getCoarserDomain();
 }
 
 bool
