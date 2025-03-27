@@ -211,7 +211,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 starts")
 
           P8estDomainGenerator dg(tree.p8est, { nx, ny, nz }, 1, tree.bmf);
 
-          for (int curr_level = 2 - base_level; curr_level >= 0; curr_level--) {
+          for (int curr_level = 2; curr_level >= base_level; curr_level--) {
             Domain<3> domain = dg.getCoarserDomain();
 
             int n = 1 << curr_level; // 2^curr_level
