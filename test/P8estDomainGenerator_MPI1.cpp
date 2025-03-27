@@ -21,12 +21,14 @@
 #include "P8estDomainGenerator_SHARED.h"
 #include <ThunderEgg/P8estDomainGenerator.h>
 
+#include <ThunderEgg/Domain.h>
 #include <mpi.h>
 #include <p4est_base.h>
 #include <p8est.h>
 #include <p8est_connectivity.h>
 #include <p8est_extended.h>
-#include <ThunderEgg/Domain.h>
+#include <p8est_geometry.h>
+#include <vector>
 
 #include <doctest.h>
 
@@ -37,137 +39,137 @@ namespace {
 struct FourTreeBSW
 {
   p8est_connectivity_t* conn;
+  p8est_geometry_t* geom;
   p8est_t* p8est;
+  P8estDomainGenerator::BlockMapFunc bmf;
+  double scale_x = 1.0;
+  double scale_y = 1.0;
+  double scale_z = 1.0;
+  int n;
   int rank;
-  FourTreeBSW()
+
+  FourTreeBSW(int base_level)
   {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    conn = p8est_connectivity_new_unitcube();
+    n = 1 << base_level;
+    conn = p8est_connectivity_new_brick(n, n, n, 0, 0, 0);
+
+    geom = p8est_geometry_new_connectivity(conn);
 
     p8est = p8est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
 
-    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
+    for (int i = base_level; i < 2; i++) {
+      p8est_refine(
+        p8est,
+        false,
+        [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; },
+        nullptr);
+    }
 
     p8est_partition(p8est, true, nullptr);
+
+    bmf = [&](int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z) {
+      const double coord[3] = { unit_x, unit_y, unit_z };
+      double out_coord[3];
+      p8est_geometry_connectivity_X(geom, block_no, coord, out_coord);
+      x = scale_x * out_coord[0] / n;
+      y = scale_y * out_coord[1] / n;
+      z = scale_z * out_coord[2] / n;
+    };
   }
   ~FourTreeBSW()
   {
     p8est_destroy(p8est);
+    p8est_geometry_destroy(geom);
     p8est_connectivity_destroy(conn);
   }
 };
 } // namespace
 TEST_CASE("P8estDomainGenerator 4x4x4 hasCoarserDomain")
 {
-  FourTreeBSW tree;
+  for (int base_level = 0; base_level < 3; base_level++) {
+    FourTreeBSW tree(base_level);
 
-  P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
 
-  CHECK_UNARY(dg.hasCoarserDomain());
-  Domain<3> domain_2 = dg.getFinestDomain();
-  CHECK_UNARY(dg.hasCoarserDomain());
-  Domain<3> domain_1 = dg.getCoarserDomain();
-  CHECK_UNARY(dg.hasCoarserDomain());
-  Domain<3> domain_0 = dg.getCoarserDomain();
-  CHECK_UNARY_FALSE(dg.hasCoarserDomain());
+    for (int i = base_level; i < 3; i++) {
+      CHECK_UNARY(dg.hasCoarserDomain());
+      Domain<3> domain = dg.getCoarserDomain();
+    }
+    CHECK_UNARY_FALSE(dg.hasCoarserDomain());
+  }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 Uniform Number of Patches")
 {
-  FourTreeBSW tree;
+  for (int base_level = 0; base_level < 3; base_level++) {
+    FourTreeBSW tree(base_level);
 
-  P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
 
-  Domain<3> domain_2 = dg.getFinestDomain();
-  Domain<3> domain_1 = dg.getCoarserDomain();
-  Domain<3> domain_0 = dg.getCoarserDomain();
-
-  CHECK_EQ(domain_2.getNumGlobalPatches(), 64);
-  CHECK_EQ(domain_1.getNumGlobalPatches(), 8);
-  CHECK_EQ(domain_0.getNumGlobalPatches(), 1);
+    for (int curr_level = 2; curr_level >= base_level; curr_level--) {
+      Domain<3> domain = dg.getCoarserDomain();
+      int n = 1 << curr_level; // 2^curr_level
+      CHECK_EQ(domain.getNumGlobalPatches(), n * n * n);
+    }
+  }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 RefineLevel")
 {
-  FourTreeBSW tree;
+  for (int base_level = 0; base_level < 3; base_level++) {
+    FourTreeBSW tree(base_level);
 
-  P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
 
-  Domain<3> domain_2 = dg.getFinestDomain();
-  Domain<3> domain_1 = dg.getCoarserDomain();
-  Domain<3> domain_0 = dg.getCoarserDomain();
-
-  for (auto patch : domain_2.getPatchInfoVector()) {
-    CHECK_EQ(patch.refine_level, 2);
-  }
-
-  for (auto patch : domain_1.getPatchInfoVector()) {
-    CHECK_EQ(patch.refine_level, 1);
-  }
-
-  for (auto patch : domain_0.getPatchInfoVector()) {
-    CHECK_EQ(patch.refine_level, 0);
+    for (int curr_level = 2 - base_level; curr_level >= 0; curr_level--) {
+      Domain<3> domain = dg.getCoarserDomain();
+      for (auto patch : domain.getPatchInfoVector()) {
+        CHECK_EQ(patch.refine_level, curr_level);
+      }
+    }
   }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 rank")
 {
-  FourTreeBSW tree;
+  for (int base_level = 0; base_level < 3; base_level++) {
+    FourTreeBSW tree(base_level);
 
-  P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
 
-  Domain<3> domain_2 = dg.getFinestDomain();
-  Domain<3> domain_1 = dg.getCoarserDomain();
-  Domain<3> domain_0 = dg.getCoarserDomain();
-
-  for (auto patch : domain_2.getPatchInfoVector()) {
-    CHECK_EQ(patch.rank, tree.rank);
-  }
-
-  for (auto patch : domain_1.getPatchInfoVector()) {
-    CHECK_EQ(patch.rank, tree.rank);
-  }
-
-  for (auto patch : domain_0.getPatchInfoVector()) {
-    CHECK_EQ(patch.rank, tree.rank);
+    for (int curr_level = 2 - base_level; curr_level >= 0; curr_level--) {
+      Domain<3> domain = dg.getCoarserDomain();
+      for (auto patch : domain.getPatchInfoVector()) {
+        CHECK_EQ(patch.rank, tree.rank);
+      }
+    }
   }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 spacings")
 {
-  for (int nx : { 5, 10 }) {
-    for (int ny : { 5, 10 }) {
-      for (int nz : { 5, 10 }) {
-        for (double scale_x : { 0.5, 1.0 }) {
-          for (double scale_y : { 0.5, 1.0 }) {
-            for (double scale_z : { 0.5, 1.0 }) {
-              FourTreeBSW tree;
+  for (int base_level = 0; base_level < 3; base_level++) {
+    for (int nx : { 5, 10 }) {
+      for (int ny : { 5, 10 }) {
+        for (int nz : { 5, 10 }) {
+          for (double scale_x : { 0.5, 1.0 }) {
+            for (double scale_y : { 0.5, 1.0 }) {
+              for (double scale_z : { 0.5, 1.0 }) {
+                FourTreeBSW tree(base_level);
 
-              P8estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z) {
-                x = scale_x * unit_x;
-                y = scale_y * unit_y;
-                z = scale_z * unit_z;
-              };
+                tree.scale_x = scale_x;
+                tree.scale_y = scale_y;
+                tree.scale_z = scale_z;
 
-              P8estDomainGenerator dg(tree.p8est, { nx, ny, nz }, 1, bmf);
+                P8estDomainGenerator dg(tree.p8est, { nx, ny, nz }, 1, tree.bmf);
 
-              Domain<3> domain_2 = dg.getFinestDomain();
-              Domain<3> domain_1 = dg.getCoarserDomain();
-              Domain<3> domain_0 = dg.getCoarserDomain();
-
-              for (auto patch : domain_2.getPatchInfoVector()) {
-                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.25 / nx));
-                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.25 / ny));
-                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.25 / nz));
-              }
-
-              for (auto patch : domain_1.getPatchInfoVector()) {
-                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.5 / nx));
-                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.5 / ny));
-                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.5 / nz));
-              }
-
-              for (auto patch : domain_0.getPatchInfoVector()) {
-                CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 1.0 / nx));
-                CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 1.0 / ny));
-                CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 1.0 / nz));
+                for (int curr_level = 2; curr_level >= base_level; curr_level--) {
+                  int n = 1 << curr_level;
+                  double patch_length = 1.0 / n;
+                  Domain<3> domain = dg.getCoarserDomain();
+                  for (auto patch : domain.getPatchInfoVector()) {
+                    CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * patch_length / nx));
+                    CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * patch_length / ny));
+                    CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * patch_length / nz));
+                  }
+                }
               }
             }
           }
@@ -178,33 +180,60 @@ TEST_CASE("P8estDomainGenerator 4x4x4 spacings")
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 ns")
 {
-  for (int nx : { 5, 10 }) {
-    for (int ny : { 5, 10 }) {
-      for (int nz : { 5, 10 }) {
-        FourTreeBSW tree;
+  for (int base_level = 0; base_level < 3; base_level++) {
+    for (int nx : { 5, 10 }) {
+      for (int ny : { 5, 10 }) {
+        for (int nz : { 5, 10 }) {
+          FourTreeBSW tree(base_level);
 
-        P8estDomainGenerator dg(tree.p8est, { nx, ny, nz }, 1, Ident);
+          P8estDomainGenerator dg(tree.p8est, { nx, ny, nz }, 1, tree.bmf);
 
-        Domain<3> domain_2 = dg.getFinestDomain();
-        Domain<3> domain_1 = dg.getCoarserDomain();
-        Domain<3> domain_0 = dg.getCoarserDomain();
-
-        for (auto patch : domain_2.getPatchInfoVector()) {
-          CHECK_EQ(patch.ns[0], nx);
-          CHECK_EQ(patch.ns[1], ny);
-          CHECK_EQ(patch.ns[2], nz);
+          for (int curr_level = 2 - base_level; curr_level >= 0; curr_level--) {
+            Domain<3> domain = dg.getCoarserDomain();
+            for (auto patch : domain.getPatchInfoVector()) {
+              CHECK_EQ(patch.ns[0], nx);
+              CHECK_EQ(patch.ns[1], ny);
+              CHECK_EQ(patch.ns[2], nz);
+            }
+          }
         }
+      }
+    }
+  }
+}
+TEST_CASE("P8estDomainGenerator 4x4x4 starts")
+{
+  for (int base_level = 0; base_level < 3; base_level++) {
+    for (int nx : { 5, 10 }) {
+      for (int ny : { 5, 10 }) {
+        for (int nz : { 5, 10 }) {
+          FourTreeBSW tree(base_level);
 
-        for (auto patch : domain_1.getPatchInfoVector()) {
-          CHECK_EQ(patch.ns[0], nx);
-          CHECK_EQ(patch.ns[1], ny);
-          CHECK_EQ(patch.ns[2], nz);
-        }
+          P8estDomainGenerator dg(tree.p8est, { nx, ny, nz }, 1, tree.bmf);
 
-        for (auto patch : domain_0.getPatchInfoVector()) {
-          CHECK_EQ(patch.ns[0], nx);
-          CHECK_EQ(patch.ns[1], ny);
-          CHECK_EQ(patch.ns[2], nz);
+          for (int curr_level = 2 - base_level; curr_level >= 0; curr_level--) {
+            Domain<3> domain = dg.getCoarserDomain();
+
+            int n = 1 << curr_level; // 2^curr_level
+            vector<vector<vector<int>>> num_patches(n, vector<vector<int>>(n, vector<int>(4, 0)));
+            for (auto patch : domain.getPatchInfoVector()) {
+              int i = (int)(patch.starts[0] * n);
+              int j = (int)(patch.starts[1] * n);
+              int k = (int)(patch.starts[2] * n);
+              CHECK_EQ(patch.starts[0] * n, doctest::Approx((double)i));
+              CHECK_EQ(patch.starts[1] * n, doctest::Approx((double)j));
+              CHECK_EQ(patch.starts[2] * n, doctest::Approx((double)k));
+              num_patches[i][j][k]++;
+            }
+            // Check that each patch is unique
+            for (int i = 0; i < n; i++) {
+              for (int j = 0; j < n; j++) {
+                for (int k = 0; k < n; k++) {
+                  CHECK_EQ(num_patches[i][j][k], 1);
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -212,65 +241,103 @@ TEST_CASE("P8estDomainGenerator 4x4x4 ns")
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 num_ghost_cells")
 {
-  for (int num_ghost_cells : { 0, 1, 2 }) {
-    FourTreeBSW tree;
+  for (int base_level = 0; base_level < 3; base_level++) {
+    for (int num_ghost_cells : { 0, 1, 2 }) {
+      FourTreeBSW tree(base_level);
 
-    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, num_ghost_cells, Ident);
-
-    Domain<3> domain_2 = dg.getFinestDomain();
-    Domain<3> domain_1 = dg.getCoarserDomain();
-    Domain<3> domain_0 = dg.getCoarserDomain();
-
-    for (auto patch : domain_2.getPatchInfoVector()) {
-      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
-    }
-
-    for (auto patch : domain_1.getPatchInfoVector()) {
-      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
-    }
-
-    for (auto patch : domain_0.getPatchInfoVector()) {
-      CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
+      P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, num_ghost_cells, tree.bmf);
+      for (int curr_level = 2 - base_level; curr_level >= 0; curr_level--) {
+        Domain<3> domain = dg.getCoarserDomain();
+        for (auto patch : domain.getPatchInfoVector()) {
+          CHECK_EQ(patch.num_ghost_cells, num_ghost_cells);
+        }
+      }
     }
   }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 Uniform neighbor nfos")
 {
-  FourTreeBSW tree;
+  {
+    FourTreeBSW tree(0);
 
-  P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
 
-  Domain<3> domain_2 = dg.getFinestDomain();
-  Domain<3> domain_1 = dg.getCoarserDomain();
-  Domain<3> domain_0 = dg.getCoarserDomain();
+    Domain<3> domain_2 = dg.getCoarserDomain();
+    Domain<3> domain_1 = dg.getCoarserDomain();
+    Domain<3> domain_0 = dg.getCoarserDomain();
 
-  CheckRootDomainNeighbors(domain_0);
+    CheckRootDomainNeighbors(domain_0);
 
-  Check2x2x2DomainNeighbors(domain_1);
+    Check2x2x2DomainNeighbors(domain_1);
 
-  Check4x4x4DomainNeighbors(domain_2);
+    Check4x4x4DomainNeighbors(domain_2);
+  }
+  {
+    FourTreeBSW tree(1);
+
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
+
+    Domain<3> domain_2 = dg.getCoarserDomain();
+    Domain<3> domain_1 = dg.getCoarserDomain();
+
+    Check2x2x2DomainNeighbors(domain_1);
+
+    Check4x4x4DomainNeighbors(domain_2);
+  }
+  {
+    FourTreeBSW tree(2);
+
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
+
+    Domain<3> domain_2 = dg.getCoarserDomain();
+
+    Check4x4x4DomainNeighbors(domain_2);
+  }
 }
 TEST_CASE("P8estDomainGenerator 4x4x4 Uniform child/parent ids and ranks")
 {
-  FourTreeBSW tree;
+  {
+    FourTreeBSW tree(0);
 
-  P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, Ident);
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
 
-  Domain<3> domain_2 = dg.getFinestDomain();
-  Domain<3> domain_1 = dg.getCoarserDomain();
-  Domain<3> domain_0 = dg.getCoarserDomain();
+    Domain<3> domain_2 = dg.getCoarserDomain();
+    Domain<3> domain_1 = dg.getCoarserDomain();
+    Domain<3> domain_0 = dg.getCoarserDomain();
 
-  CheckChildIdsAndRanksNull(domain_2);
+    CheckChildIdsAndRanksNull(domain_2);
 
-  CheckParentAndChildIdsAndRanks(domain_1, 1, domain_2, 2);
+    CheckParentAndChildIdsAndRanks(domain_1, 1, domain_2, 2);
 
-  CheckParentAndChildIdsAndRanks(domain_0, 0, domain_1, 1);
+    CheckParentAndChildIdsAndRanks(domain_0, 0, domain_1, 1);
 
-  CheckParentIdsAndRanksNull(domain_0);
+    CheckParentIdsAndRanksNull(domain_0);
+  }
+  {
+    FourTreeBSW tree(1);
 
-  PatchVector domain_2_pvector(domain_2, 2);
-  PatchVector domain_1_pvector(domain_1, 1);
-  PatchVector domain_0_pvector(domain_0, 0);
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
+
+    Domain<3> domain_2 = dg.getCoarserDomain();
+    Domain<3> domain_1 = dg.getCoarserDomain();
+
+    CheckChildIdsAndRanksNull(domain_2);
+
+    CheckParentAndChildIdsAndRanks(domain_1, 1, domain_2, 2);
+
+    CheckParentIdsAndRanksNull(domain_1);
+  }
+  {
+    FourTreeBSW tree(2);
+
+    P8estDomainGenerator dg(tree.p8est, { 10, 10, 10 }, 1, tree.bmf);
+
+    Domain<3> domain_2 = dg.getCoarserDomain();
+
+    CheckChildIdsAndRanksNull(domain_2);
+
+    CheckParentIdsAndRanksNull(domain_2);
+  }
 }
 namespace {
 struct FourTreeRefineBSW
@@ -285,9 +352,23 @@ struct FourTreeRefineBSW
 
     p8est = p8est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
 
-    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return quadrant->x == 0 && quadrant->y == 0 && quadrant->z == 0; }, nullptr);
+    p8est_refine(
+      p8est,
+      false,
+      [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; },
+      nullptr);
+    p8est_refine(
+      p8est,
+      false,
+      [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; },
+      nullptr);
+    p8est_refine(
+      p8est,
+      false,
+      [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int {
+        return quadrant->x == 0 && quadrant->y == 0 && quadrant->z == 0;
+      },
+      nullptr);
 
     p8est_partition(p8est, true, nullptr);
   }
@@ -398,11 +479,12 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw spacings")
             for (double scale_z : { 0.5, 1.0 }) {
               FourTreeRefineBSW tree;
 
-              P8estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z) {
-                x = scale_x * unit_x;
-                y = scale_y * unit_y;
-                z = scale_z * unit_z;
-              };
+              P8estDomainGenerator::BlockMapFunc bmf =
+                [&](int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z) {
+                  x = scale_x * unit_x;
+                  y = scale_y * unit_y;
+                  z = scale_z * unit_z;
+                };
 
               P8estDomainGenerator dg(tree.p8est, { nx, ny, nz }, 1, bmf);
 
@@ -412,7 +494,8 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw spacings")
               Domain<3> domain_0 = dg.getCoarserDomain();
 
               for (auto patch : domain_3.getPatchInfoVector()) {
-                if (patch.starts[0] < 0.24 * scale_x && patch.starts[1] < 0.24 * scale_y && patch.starts[2] < 0.24 * scale_z) {
+                if (patch.starts[0] < 0.24 * scale_x && patch.starts[1] < 0.24 * scale_y &&
+                    patch.starts[2] < 0.24 * scale_z) {
                   CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.125 / nx));
                   CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.125 / ny));
                   CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.125 / nz));
@@ -570,8 +653,18 @@ struct TwoTreeRefineBSW
 
     p8est = p8est_new_ext(MPI_COMM_WORLD, conn, 0, 0, 0, 0, nullptr, nullptr);
 
-    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; }, nullptr);
-    p8est_refine(p8est, false, [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return quadrant->x == 0 && quadrant->y == 0 && quadrant->z == 0; }, nullptr);
+    p8est_refine(
+      p8est,
+      false,
+      [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int { return 1; },
+      nullptr);
+    p8est_refine(
+      p8est,
+      false,
+      [](p8est_t* p8est, p4est_topidx_t witch_tree, p8est_quadrant_t* quadrant) -> int {
+        return quadrant->x == 0 && quadrant->y == 0 && quadrant->z == 0;
+      },
+      nullptr);
 
     p8est_partition(p8est, true, nullptr);
   }
@@ -670,11 +763,12 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw spacings")
             for (double scale_z : { 0.5, 1.0 }) {
               TwoTreeRefineBSW tree;
 
-              P8estDomainGenerator::BlockMapFunc bmf = [&](int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z) {
-                x = scale_x * unit_x;
-                y = scale_y * unit_y;
-                z = scale_z * unit_z;
-              };
+              P8estDomainGenerator::BlockMapFunc bmf =
+                [&](int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z) {
+                  x = scale_x * unit_x;
+                  y = scale_y * unit_y;
+                  z = scale_z * unit_z;
+                };
 
               P8estDomainGenerator dg(tree.p8est, { nx, ny, nz }, 1, bmf);
 
@@ -683,7 +777,8 @@ TEST_CASE("P8estDomainGenerator 2x2x2rbsw spacings")
               Domain<3> domain_0 = dg.getCoarserDomain();
 
               for (auto patch : domain_2.getPatchInfoVector()) {
-                if (patch.starts[0] < 0.5 * scale_x && patch.starts[1] < 0.5 * scale_y && patch.starts[2] < 0.5 * scale_z) {
+                if (patch.starts[0] < 0.5 * scale_x && patch.starts[1] < 0.5 * scale_y &&
+                    patch.starts[2] < 0.5 * scale_z) {
                   CHECK_EQ(patch.spacings[0], doctest::Approx(scale_x * 0.25 / nx));
                   CHECK_EQ(patch.spacings[1], doctest::Approx(scale_y * 0.25 / ny));
                   CHECK_EQ(patch.spacings[2], doctest::Approx(scale_z * 0.25 / nz));
