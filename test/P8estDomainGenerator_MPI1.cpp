@@ -544,6 +544,67 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw ns")
     }
   }
 }
+TEST_CASE("P8estDomainGenerator 4x4x4rbsw starts")
+{
+  for (int base_level = 0; base_level < 3; base_level++) {
+    for (int nx : { 5, 10 }) {
+      for (int ny : { 5, 10 }) {
+        for (int nz : { 5, 10 }) {
+          FourTreeRefineBSW tree(base_level);
+
+          P8estDomainGenerator dg(tree.p8est, { nx, ny, nz }, 1, tree.bmf);
+
+          for (int curr_level = 3; curr_level >= base_level; curr_level--) {
+            Domain<3> domain = dg.getCoarserDomain();
+
+            int n = 1 << curr_level; // 2^curr_level
+            vector<vector<vector<int>>> num_patches(n, vector<vector<int>>(n, vector<int>(n, 0)));
+            for (auto patch : domain.getPatchInfoVector()) {
+              int i_start = (int)(patch.starts[0] * n);
+              int j_start = (int)(patch.starts[1] * n);
+              int k_start = (int)(patch.starts[2] * n);
+              CHECK(patch.starts[0] * n == doctest::Approx((double)i_start));
+              CHECK(patch.starts[1] * n == doctest::Approx((double)j_start));
+              CHECK(patch.starts[2] * n == doctest::Approx((double)k_start));
+
+              int i_end = (int)((patch.starts[0] + patch.spacings[0] * patch.ns[0]) * n);
+              int j_end = (int)((patch.starts[1] + patch.spacings[1] * patch.ns[1]) * n);
+              int k_end = (int)((patch.starts[2] + patch.spacings[2] * patch.ns[2]) * n);
+              CHECK((patch.starts[0] + patch.spacings[0] * patch.ns[0]) * n == doctest::Approx((double)i_end));
+              CHECK((patch.starts[1] + patch.spacings[1] * patch.ns[1]) * n == doctest::Approx((double)j_end));
+              CHECK((patch.starts[2] + patch.spacings[2] * patch.ns[2]) * n == doctest::Approx((double)k_end));
+
+              REQUIRE(i_start >= 0);
+              REQUIRE(i_start <= i_end);
+              REQUIRE(i_end <= n);
+              REQUIRE(j_start >= 0);
+              REQUIRE(j_start <= j_end);
+              REQUIRE(j_end <= n);
+              REQUIRE(k_start >= 0);
+              REQUIRE(k_start <= k_end);
+              REQUIRE(k_end <= n);
+              for (int i = i_start; i < i_end; i++) {
+                for (int j = j_start; j < j_end; j++) {
+                  for (int k = k_start; k < k_end; k++) {
+                    num_patches[i][j][k]++;
+                  }
+                }
+              }
+            }
+            // Check that each patch is unique
+            for (int i = 0; i < n; i++) {
+              for (int j = 0; j < n; j++) {
+                for (int k = 0; k < n; k++) {
+                  CHECK_EQ(num_patches[i][j][k], 1);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 TEST_CASE("P8estDomainGenerator 4x4x4rbsw num_ghost_cells")
 {
   for (int base_level = 0; base_level < 3; base_level++) {
