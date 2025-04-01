@@ -215,7 +215,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4 starts")
             Domain<3> domain = dg.getCoarserDomain();
 
             int n = 1 << curr_level; // 2^curr_level
-            vector<vector<vector<int>>> num_patches(n, vector<vector<int>>(n, vector<int>(4, 0)));
+            vector<int> num_patches(n * n * n, 0);
             for (auto patch : domain.getPatchInfoVector()) {
               int i = (int)(patch.starts[0] * n);
               int j = (int)(patch.starts[1] * n);
@@ -223,13 +223,14 @@ TEST_CASE("P8estDomainGenerator 4x4x4 starts")
               CHECK_EQ(patch.starts[0] * n, doctest::Approx((double)i));
               CHECK_EQ(patch.starts[1] * n, doctest::Approx((double)j));
               CHECK_EQ(patch.starts[2] * n, doctest::Approx((double)k));
-              num_patches[i][j][k]++;
+              num_patches[i * n * n + j * n + k]++;
             }
+            MPI_Allreduce(MPI_IN_PLACE, num_patches.data(), n * n * n, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
             // Check that each patch is unique
             for (int i = 0; i < n; i++) {
               for (int j = 0; j < n; j++) {
                 for (int k = 0; k < n; k++) {
-                  CHECK_EQ(num_patches[i][j][k], 1);
+                  CHECK_EQ(num_patches[i * n * n + j * n + k], 1);
                 }
               }
             }
@@ -558,7 +559,7 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw starts")
             Domain<3> domain = dg.getCoarserDomain();
 
             int n = 1 << curr_level; // 2^curr_level
-            vector<vector<vector<int>>> num_patches(n, vector<vector<int>>(n, vector<int>(n, 0)));
+            vector<int> num_patches(n * n * n, 0);
             for (auto patch : domain.getPatchInfoVector()) {
               int i_start = (int)(patch.starts[0] * n);
               int j_start = (int)(patch.starts[1] * n);
@@ -586,16 +587,17 @@ TEST_CASE("P8estDomainGenerator 4x4x4rbsw starts")
               for (int i = i_start; i < i_end; i++) {
                 for (int j = j_start; j < j_end; j++) {
                   for (int k = k_start; k < k_end; k++) {
-                    num_patches[i][j][k]++;
+                    num_patches[i * n * n + j * n + k]++;
                   }
                 }
               }
             }
+            MPI_Allreduce(MPI_IN_PLACE, num_patches.data(), n * n * n, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
             // Check that each patch is unique
             for (int i = 0; i < n; i++) {
               for (int j = 0; j < n; j++) {
                 for (int k = 0; k < n; k++) {
-                  CHECK_EQ(num_patches[i][j][k], 1);
+                  CHECK(num_patches[i * n * n + j * n + k] == 1);
                 }
               }
             }
