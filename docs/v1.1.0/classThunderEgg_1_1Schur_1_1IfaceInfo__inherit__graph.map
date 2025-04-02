@@ -1,0 +1,6 @@
+<map id="ThunderEgg::Schur::IfaceInfo&lt; D &gt;" name="ThunderEgg::Schur::IfaceInfo&lt; D &gt;">
+<area shape="rect" id="node1" title="The IfaceInfo class represents the information for an interface on a given side of the patch." alt="" coords="5,71,156,112"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1Schur_1_1CoarseIfaceInfo.html" title="Represents the interfaces where the neighbor is at a coarser refinement level." alt="" coords="205,5,369,47"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1Schur_1_1FineIfaceInfo.html" title="Represents the interfaces where the neighbors are at a finer refinement level." alt="" coords="212,71,363,112"/>
+<area shape="rect" id="node4" href="$classThunderEgg_1_1Schur_1_1NormalIfaceInfo.html" title="This represents an interface where the neighbor is at the same refinement level." alt="" coords="204,136,371,177"/>
+</map>

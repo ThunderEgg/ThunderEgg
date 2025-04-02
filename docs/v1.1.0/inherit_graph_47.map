@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classThunderEgg_1_1Serializable.html" title="Interface for serializing objects." alt="" coords="5,136,188,163"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1NbrInfoBase.html" title="Represents information about a patch&#39;s neighbor." alt="" coords="246,56,433,83"/>
+<area shape="rect" id="node7" href="$classThunderEgg_1_1PatchInfo.html" title="Contains metadata for a patch." alt="" coords="236,107,443,133"/>
+<area shape="rect" id="node8" href="$classThunderEgg_1_1Schur_1_1Interface.html" title="This is a set of PatchIfaceInfo objects for an interface." alt="" coords="264,158,415,199"/>
+<area shape="rect" id="node9" href="$classThunderEgg_1_1Schur_1_1PatchIfaceInfo.html" title="This decorates a PatchInfo object with a IfaceInfo object for each side of the patch." alt="" coords="262,223,417,265"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1NbrInfo.html" title="Represents information about a patch&#39;s neighbor." alt="" coords="491,56,685,83"/>
+<area shape="rect" id="node4" href="$classThunderEgg_1_1CoarseNbrInfo.html" title="Represents a neighbor that is at a coarser refinement level." alt="" coords="735,5,975,32"/>
+<area shape="rect" id="node5" href="$classThunderEgg_1_1FineNbrInfo.html" title="Represents neighbors that are at a finer refinement level." alt="" coords="743,56,966,83"/>
+<area shape="rect" id="node6" href="$classThunderEgg_1_1NormalNbrInfo.html" title="Represents a neighbor that is at the same refinement level." alt="" coords="733,107,976,133"/>
+</map>

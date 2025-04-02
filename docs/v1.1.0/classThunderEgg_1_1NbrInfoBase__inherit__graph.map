@@ -1,0 +1,8 @@
+<map id="ThunderEgg::NbrInfoBase" name="ThunderEgg::NbrInfoBase">
+<area shape="rect" id="node1" title="Represents information about a patch&#39;s neighbor." alt="" coords="236,56,423,83"/>
+<area shape="rect" id="node3" href="$classThunderEgg_1_1NbrInfo.html" title="Represents information about a patch&#39;s neighbor." alt="" coords="471,56,665,83"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1Serializable.html" title="Interface for serializing objects." alt="" coords="5,56,188,83"/>
+<area shape="rect" id="node4" href="$classThunderEgg_1_1CoarseNbrInfo.html" title="Represents a neighbor that is at a coarser refinement level." alt="" coords="715,5,955,32"/>
+<area shape="rect" id="node5" href="$classThunderEgg_1_1FineNbrInfo.html" title="Represents neighbors that are at a finer refinement level." alt="" coords="723,56,946,83"/>
+<area shape="rect" id="node6" href="$classThunderEgg_1_1NormalNbrInfo.html" title="Represents a neighbor that is at the same refinement level." alt="" coords="713,107,956,133"/>
+</map>

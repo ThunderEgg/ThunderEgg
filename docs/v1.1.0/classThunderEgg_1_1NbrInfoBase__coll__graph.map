@@ -1,0 +1,4 @@
+<map id="ThunderEgg::NbrInfoBase" name="ThunderEgg::NbrInfoBase">
+<area shape="rect" id="node1" title="Represents information about a patch&#39;s neighbor." alt="" coords="5,80,192,107"/>
+<area shape="rect" id="node2" href="$classThunderEgg_1_1Serializable.html" title="Interface for serializing objects." alt="" coords="7,5,190,32"/>
+</map>

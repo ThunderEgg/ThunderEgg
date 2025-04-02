@@ -1,0 +1,10 @@
+<map id="src/ThunderEgg/Schur/PatchIfaceInfo.h" name="src/ThunderEgg/Schur/PatchIfaceInfo.h">
+<area shape="rect" id="node1" title="PatchIfaceInfo class." alt="" coords="133,5,296,47"/>
+<area shape="rect" id="node2" href="$Interface_8h.html" title="Interface class." alt="" coords="75,95,237,136"/>
+<area shape="rect" id="node3" href="$InterfaceDomain_8h.html" title="InterfaceDomain class." alt="" coords="193,184,356,225"/>
+<area shape="rect" id="node5" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="189,452,323,479"/>
+<area shape="rect" id="node8" href="$PatchSolverWrapper_8h.html" title="PatchSolverWrapper class." alt="" coords="541,363,709,404"/>
+<area shape="rect" id="node4" href="$FastSchurMatrixAssemble2D_8h.html" title="FastSchurMatrixAssemble2D class." alt="" coords="144,363,368,404"/>
+<area shape="rect" id="node6" href="$FastSchurMatrixAssemble3D_8h.html" title="FastSchurMatrixAssemble3D class." alt="" coords="195,273,419,315"/>
+<area shape="rect" id="node7" href="$PatchIfaceScatter_8h.html" title="PatchIfaceScatter class." alt="" coords="443,273,605,315"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="src/ThunderEgg/Iterative/Solver.h" name="src/ThunderEgg/Iterative/Solver.h">
+<area shape="rect" id="node1" title="Solver class." alt="" coords="279,5,460,47"/>
+<area shape="rect" id="node2" href="$BiCGStab_8h.html" title="BiCGStab class." alt="" coords="5,95,187,136"/>
+<area shape="rect" id="node3" href="$ThunderEgg_8h_source.html" title=" " alt="" coords="302,184,437,211"/>
+<area shape="rect" id="node4" href="$CG_8h.html" title="CG class." alt="" coords="261,102,477,129"/>
+<area shape="rect" id="node5" href="$Iterative_2PatchSolver_8h.html" title="PatchSolver class." alt="" coords="501,95,683,136"/>
+<area shape="rect" id="node6" href="$KSPSolver_8h.html" title="KSPSolver class." alt="" coords="707,95,872,136"/>
+</map>

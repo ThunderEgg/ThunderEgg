@@ -1,0 +1,38 @@
+<map id="src/ThunderEgg/Domain.h" name="src/ThunderEgg/Domain.h">
+<area shape="rect" id="node1" title="Domain class." alt="" coords="2299,5,2488,32"/>
+<area shape="rect" id="node2" href="$Communicator_8h.html" title="Communicator class." alt="" coords="1176,304,1387,331"/>
+<area shape="rect" id="node3" title=" " alt="" coords="1180,379,1239,405"/>
+<area shape="rect" id="node4" title=" " alt="" coords="2339,379,2416,405"/>
+<area shape="rect" id="node5" href="$PatchInfo_8h.html" title="PatchInfo class." alt="" coords="1719,80,1894,107"/>
+<area shape="rect" id="node8" title=" " alt="" coords="850,379,921,405"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1450,453,1601,495"/>
+<area shape="rect" id="node18" title=" " alt="" coords="2476,379,2527,405"/>
+<area shape="rect" id="node21" title=" " alt="" coords="129,379,185,405"/>
+<area shape="rect" id="node31" href="$Timer_8h.html" title="Timer class." alt="" coords="3067,229,3219,256"/>
+<area shape="rect" id="node34" title=" " alt="" coords="3215,80,3257,107"/>
+<area shape="rect" id="node35" title=" " alt="" coords="3282,80,3342,107"/>
+<area shape="rect" id="node36" title=" " alt="" coords="3366,80,3429,107"/>
+<area shape="rect" id="node6" href="$BufferReader_8h.html" title="BufferReader class." alt="" coords="999,229,1198,256"/>
+<area shape="rect" id="node7" href="$Serializable_8h.html" title="Serializable class." alt="" coords="1767,379,1958,405"/>
+<area shape="rect" id="node10" href="$BufferWriter_8h.html" title="BufferWriter class." alt="" coords="1374,229,1567,256"/>
+<area shape="rect" id="node11" href="$CoarseNbrInfo_8h.html" title="CoarseNbrInfo class." alt="" coords="1703,155,1911,181"/>
+<area shape="rect" id="node12" href="$NbrInfo_8h.html" title="NbrInfo class." alt="" coords="1947,229,2109,256"/>
+<area shape="rect" id="node13" href="$NbrInfoBase_8h.html" title="NbrInfoBase class." alt="" coords="2117,304,2312,331"/>
+<area shape="rect" id="node14" href="$NbrType_8h.html" title="NbrType class." alt="" coords="2124,379,2292,405"/>
+<area shape="rect" id="node17" title=" " alt="" coords="1595,379,1658,405"/>
+<area shape="rect" id="node19" href="$Orthant_8h.html" title="Orthant class." alt="" coords="710,229,874,256"/>
+<area shape="rect" id="node20" href="$Face_8h.html" title="Face class." alt="" coords="347,304,491,331"/>
+<area shape="rect" id="node24" href="$FineNbrInfo_8h.html" title="FineNbrInfo class." alt="" coords="1190,155,1381,181"/>
+<area shape="rect" id="node25" href="$NormalNbrInfo_8h.html" title="NormalNbrType class." alt="" coords="2079,155,2289,181"/>
+<area shape="rect" id="node26" href="$RuntimeError_8h.html" title="RuntimeError struct." alt="" coords="2539,229,2739,256"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1511,155,1596,181"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1620,155,1679,181"/>
+<area shape="rect" id="node9" title=" " alt="" coords="991,379,1083,405"/>
+<area shape="rect" id="node16" title=" " alt="" coords="2170,461,2246,487"/>
+<area shape="rect" id="node22" title=" " alt="" coords="501,379,571,405"/>
+<area shape="rect" id="node23" title=" " alt="" coords="768,304,848,331"/>
+<area shape="rect" id="node27" title=" " alt="" coords="2569,304,2655,331"/>
+<area shape="rect" id="node28" title=" " alt="" coords="2680,304,2739,331"/>
+<area shape="rect" id="node32" title=" " alt="" coords="3337,304,3423,331"/>
+<area shape="rect" id="node33" title=" " alt="" coords="3219,304,3261,331"/>
+</map>
