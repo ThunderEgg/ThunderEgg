@@ -178,6 +178,59 @@ SetLevels(p8est_t* p8est)
   });
 }
 
+/**
+ * @brief Get the id of the bsw patch in the family of patches
+ *
+ * @param pinfo the patch info object, orth_on_parent should be set
+ * @return int the id of the bsw patch
+ */
+int
+GetBSWId(const PatchInfo<3>& pinfo)
+{
+  int id = -1;
+  if (pinfo.orth_on_parent == Orthant<3>::bsw()) {
+    id = pinfo.id;
+  } else if (pinfo.orth_on_parent == Orthant<3>::bse()) {
+    id = pinfo.getNormalNbrInfo(Side<3>::west()).id;
+  } else if (pinfo.orth_on_parent == Orthant<3>::bnw()) {
+    id = pinfo.getNormalNbrInfo(Side<3>::south()).id;
+  } else if (pinfo.orth_on_parent == Orthant<3>::bne()) {
+    id = pinfo.getNormalNbrInfo(Edge::sw()).id;
+  } else if (pinfo.orth_on_parent == Orthant<3>::tsw()) {
+    id = pinfo.getNormalNbrInfo(Side<3>::bottom()).id;
+  } else if (pinfo.orth_on_parent == Orthant<3>::tse()) {
+    id = pinfo.getNormalNbrInfo(Edge::bw()).id;
+  } else if (pinfo.orth_on_parent == Orthant<3>::tnw()) {
+    id = pinfo.getNormalNbrInfo(Edge::bs()).id;
+  } else if (pinfo.orth_on_parent == Orthant<3>::tne()) {
+    id = pinfo.getNormalNbrInfo(Corner<3>::bsw()).id;
+  }
+  return id;
+}
+/**
+ * @brief Get the Orthant of a quadrant in it's the family of patches
+ * 
+ * @param quad the quadrant
+ * @return Orthant<3> the orthant of the quadrant in it's family
+ */
+Orthant<3>
+GetOrthantInFamily(const p8est_quadrant_t* quad)
+{
+  // get orth in quadrant
+  int o = 0b000;
+  p4est_qcoord_t mask = P8EST_QUADRANT_LEN(quad->level);
+  if (quad->x & mask) {
+    o |= 0b001;
+  }
+  if (quad->y & mask) {
+    o |= 0b010;
+  }
+  if (quad->z & mask) {
+    o |= 0b100;
+  }
+  return Orthant<3>(o);
+}
+
 } // namespace
 
 /*
@@ -256,36 +309,9 @@ P8estDomainGenerator::coarsenTree()
   IterVolume(my_p8est, [&](const p8est_iter_volume_info_t* volume_info) {
     Data* data = (Data*)volume_info->quad->p.user_data;
     if (volume_info->quad->level > curr_level) {
-      // get orth in quadrant
-      int o = 0b000;
-      p4est_qcoord_t mask = P8EST_QUADRANT_LEN(volume_info->quad->level);
-      if (volume_info->quad->x & mask) {
-        o |= 0b001;
-      }
-      if (volume_info->quad->y & mask) {
-        o |= 0b010;
-      }
-      if (volume_info->quad->z & mask) {
-        o |= 0b100;
-      }
-      data->pinfo->orth_on_parent = Orthant<3>(o);
-      if (data->pinfo->orth_on_parent == Orthant<3>::bsw()) {
-        data->pinfo->parent_id = data->pinfo->id;
-      } else if (data->pinfo->orth_on_parent == Orthant<3>::bse()) {
-        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Side<3>::west()).id;
-      } else if (data->pinfo->orth_on_parent == Orthant<3>::bnw()) {
-        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Side<3>::south()).id;
-      } else if (data->pinfo->orth_on_parent == Orthant<3>::bne()) {
-        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Edge::sw()).id;
-      } else if (data->pinfo->orth_on_parent == Orthant<3>::tsw()) {
-        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Side<3>::bottom()).id;
-      } else if (data->pinfo->orth_on_parent == Orthant<3>::tse()) {
-        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Edge::bw()).id;
-      } else if (data->pinfo->orth_on_parent == Orthant<3>::tnw()) {
-        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Edge::bs()).id;
-      } else if (data->pinfo->orth_on_parent == Orthant<3>::tne()) {
-        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Corner<3>::bsw()).id;
-      }
+      data->pinfo->orth_on_parent = GetOrthantInFamily(volume_info->quad);
+      data->pinfo->parent_id = GetBSWId(*data->pinfo);
+      // data child ids and ranks will be set in partition call
     } else {
       // update data to point to self
       data->child_ids[0] = data->id;
