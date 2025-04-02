@@ -9,7 +9,7 @@ add_executable(unit_tests_mpi1)
 add_executable(unit_tests_mpi2)
 add_executable(unit_tests_mpi3)
 
-add_library(test_shared test.cpp)
+add_library(test_shared OBJECT test.cpp)
 target_include_directories(test_shared PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_include_directories(test_shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -94,8 +94,7 @@ if(TARGET P4EST::P4EST)
   target_sources(test_shared PRIVATE P8estDomainGenerator_Check4x4x4RefinedBSWDomainSideNbrOrths_SHARED.cpp)
   target_sources(test_shared PRIVATE P8estDomainGenerator_Check4x4x4RefinedBSWDomainSideNbrRanks_SHARED.cpp)
 
-  target_sources(unit_tests_mpi1 PRIVATE P8estDomainGenerator_MPI1.cpp)
-  target_sources(unit_tests_mpi2 PRIVATE P8estDomainGenerator_MPI2.cpp)
+  target_sources(test_shared PRIVATE P8estDomainGenerator.cpp)
 
   target_sources(test_shared PRIVATE P8estDomainGenerator_SHARED.cpp)
   

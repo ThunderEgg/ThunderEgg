@@ -57,7 +57,8 @@ public:
    * @param y the resulting y coordinate of the mapping function
    * @param z the resulting z coordinate of the mapping function
    */
-  using BlockMapFunc = std::function<void(int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z)>;
+  using BlockMapFunc =
+    std::function<void(int block_no, double unit_x, double unit_y, double unit_z, double& x, double& y, double& z)>;
 
 private:
   /**
@@ -140,7 +141,7 @@ public:
   P8estDomainGenerator& operator=(const P8estDomainGenerator&);
   P8estDomainGenerator& operator=(P8estDomainGenerator&&) = default;
   ~P8estDomainGenerator();
-  Domain<3> getFinestDomain();
+  [[deprecated("use getCoarserDomain")]] Domain<3> getFinestDomain();
   bool hasCoarserDomain();
   Domain<3> getCoarserDomain();
 };

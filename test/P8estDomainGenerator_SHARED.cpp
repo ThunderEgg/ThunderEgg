@@ -126,30 +126,33 @@ GetAllPatchesOnRank0(const Domain<3>& domain)
     string patches_string = patches.dump();
     MPI_Send(patches_string.data(), (int)patches_string.size() + 1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
   } else {
-    for (int i = 0; i < size - 1; i++) {
+    for (int i = 1; i < size; i++) {
       MPI_Status status;
-      MPI_Probe(1, 0, MPI_COMM_WORLD, &status);
+      MPI_Probe(i, 0, MPI_COMM_WORLD, &status);
 
       int buffer_size;
       MPI_Get_count(&status, MPI_CHAR, &buffer_size);
 
-      char patches_string[buffer_size];
-      MPI_Recv(patches_string, buffer_size, MPI_CHAR, 1, 0, MPI_COMM_WORLD, &status);
+      std::vector<char> patches_string(buffer_size);
+      MPI_Recv(patches_string.data(), buffer_size, MPI_CHAR, i, 0, MPI_COMM_WORLD, &status);
 
-      ThunderEgg::tpl::nlohmann::json patches = ThunderEgg::tpl::nlohmann::json::parse((char*)patches_string);
+      ThunderEgg::tpl::nlohmann::json patches = ThunderEgg::tpl::nlohmann::json::parse(patches_string.data());
       if (patches != nullptr) {
-        patches.get_to(all_patches);
-        for (auto& patch : all_patches) {
+        std::vector<PatchInfo<3>> incoming_patches;
+        patches.get_to(incoming_patches);
+        for (auto& patch : incoming_patches) {
           patch.ns = domain.getNs();
           for (int i = 0; i < 3; i++) {
             patch.spacings[i] /= patch.ns[i];
           }
+          all_patches.push_back(patch);
         }
       }
     }
     for (auto patch : domain.getPatchInfoVector()) {
       all_patches.push_back(patch);
     }
+    REQUIRE(all_patches.size() == domain.getNumGlobalPatches());
   }
   return all_patches;
 }
