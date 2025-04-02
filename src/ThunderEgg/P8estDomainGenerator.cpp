@@ -253,39 +253,58 @@ P8estDomainGenerator::extractLevel()
 void
 P8estDomainGenerator::coarsenTree()
 {
+  IterVolume(my_p8est, [&](const p8est_iter_volume_info_t* volume_info) {
+    Data* data = (Data*)volume_info->quad->p.user_data;
+    if (volume_info->quad->level > curr_level) {
+      // get orth in quadrant
+      int o = 0b000;
+      p4est_qcoord_t mask = P8EST_QUADRANT_LEN(volume_info->quad->level);
+      if (volume_info->quad->x & mask) {
+        o |= 0b001;
+      }
+      if (volume_info->quad->y & mask) {
+        o |= 0b010;
+      }
+      if (volume_info->quad->z & mask) {
+        o |= 0b100;
+      }
+      data->pinfo->orth_on_parent = Orthant<3>(o);
+      if (data->pinfo->orth_on_parent == Orthant<3>::bsw()) {
+        data->pinfo->parent_id = data->pinfo->id;
+      } else if (data->pinfo->orth_on_parent == Orthant<3>::bse()) {
+        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Side<3>::west()).id;
+      } else if (data->pinfo->orth_on_parent == Orthant<3>::bnw()) {
+        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Side<3>::south()).id;
+      } else if (data->pinfo->orth_on_parent == Orthant<3>::bne()) {
+        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Edge::sw()).id;
+      } else if (data->pinfo->orth_on_parent == Orthant<3>::tsw()) {
+        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Side<3>::bottom()).id;
+      } else if (data->pinfo->orth_on_parent == Orthant<3>::tse()) {
+        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Edge::bw()).id;
+      } else if (data->pinfo->orth_on_parent == Orthant<3>::tnw()) {
+        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Edge::bs()).id;
+      } else if (data->pinfo->orth_on_parent == Orthant<3>::tne()) {
+        data->pinfo->parent_id = data->pinfo->getNormalNbrInfo(Corner<3>::bsw()).id;
+      }
+    } else {
+      // update data to point to self
+      data->child_ids[0] = data->id;
+      data->child_ranks[0] = data->rank;
+      data->pinfo->parent_id = data->id;
+      data->pinfo->orth_on_parent = Orthant<3>::null();
+    }
+  });
+  p8est_partition_ext(my_p8est, true, nullptr);
   Coarsen(
     my_p8est,
     false,
     true,
     [&](p4est_topidx_t, p8est_quadrant_t* quadrant[]) {
       if (quadrant[1] == nullptr) {
-        // update child data to point to self
-        Data* data = (Data*)quadrant[0]->p.user_data;
-        data->child_ids[0] = data->id;
-        data->child_ranks[0] = data->rank;
-        data->pinfo->parent_id = data->id;
-        data->pinfo->orth_on_parent = Orthant<3>::null();
         return false;
       } else if (quadrant[0]->level > curr_level) {
-        // update child datas to point to parent
-        const Data* bsw_data = (Data*)quadrant[0]->p.user_data;
-        for (unsigned char i = 0; i < 8; i++) {
-          Data* data = (Data*)quadrant[i]->p.user_data;
-          data->child_ids[0] = data->id;
-          data->child_ranks[0] = data->rank;
-          data->pinfo->parent_id = bsw_data->id;
-          data->pinfo->orth_on_parent = Orthant<3>(i);
-        }
         return true;
       } else {
-        // update child datas to point to self
-        for (unsigned char i = 0; i < 8; i++) {
-          Data* data = (Data*)quadrant[i]->p.user_data;
-          data->child_ids[0] = data->id;
-          data->child_ranks[0] = data->rank;
-          data->pinfo->parent_id = data->id;
-          data->pinfo->orth_on_parent = Orthant<3>::null();
-        }
         return false;
       }
     },
@@ -300,7 +319,7 @@ P8estDomainGenerator::coarsenTree()
         data->child_ranks[i] = fine_data->rank;
       }
     });
-  p8est_partition_ext(my_p8est, true, nullptr);
+  p8est_partition_ext(my_p8est, false, nullptr);
 }
 
 void
